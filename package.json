@@ -9,9 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "antd": "^4.16.13",
+    "autoprefixer": "^10.3.7",
     "next": "11.1.2",
+    "postcss": "^8.3.9",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "tailwindcss": "^2.2.16"
   },
   "devDependencies": {
     "eslint": "7.32.0",

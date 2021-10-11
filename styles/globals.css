@@ -1,16 +1,36 @@
-html,
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+:root {
+  --kelly: #73C92D;
+}
+
 body {
-  padding: 0;
+  padding: 50px 153px;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background: #F0F2F5 !important;
+  background-repeat: no-repeat;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.logo {
+  text-align: center;
+  color: var(--kelly) !important;
 }
 
-* {
+.plans {
+  margin-top: 50px;
+}
+
+.plans Button {
+  background: #F0F2F5;
+  color: #009CD5;
+  border: 2px solid #009CD5;
+}
+
+.card {
+  background: #F0F2F5;
+  border: 2px solid #A6AE9D;
   box-sizing: border-box;
+  border-radius: 8px;
 }
