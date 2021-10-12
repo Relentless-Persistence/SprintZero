@@ -1,6 +1,6 @@
-/* @tailwind base;
+@tailwind base;
 @tailwind components;
-@tailwind utilities; */
+@tailwind utilities;
 
 :root {
   --kelly: #73C92D;
@@ -33,4 +33,10 @@ body {
   border: 2px solid #A6AE9D;
   box-sizing: border-box;
   border-radius: 8px;
+}
+
+@media screen and (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
 }

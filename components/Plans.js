@@ -7,13 +7,9 @@ const { Title, Text } = Typography;
 const Plans = () => {
   const router = useRouter();
   return (
-    <div>
-      <Title level={2} className="logo">
-        Sprint Zero
-      </Title>
-
+    <>
       <div>
-        <Title level={1}>Let's Get Started</Title>
+        <Title level={2}>Let's Get Started</Title>
         <Text>
           Thanks for choosing SprintZero to build your next product experience!
           Start by selecting the billing plan below that works best for your
@@ -46,7 +42,9 @@ const Plans = () => {
                 <Text style={{ fontSize: "14px" }}>Per Month</Text>
               </div>
               <div style={{ textAlign: "center" }}>
-                <Button onClick={() => router.push("/payment?plan=basic")}>Select</Button>
+                <Button onClick={() => router.push("/payment/basic")}>
+                  Select
+                </Button>
               </div>
             </Card>
           </Col>
@@ -73,7 +71,9 @@ const Plans = () => {
                 <Text style={{ fontSize: "14px" }}>Per Month</Text>
               </div>
               <div style={{ textAlign: "center" }}>
-                <Button>Select</Button>
+                <Button onClick={() => router.push("/payment/professional")}>
+                  Select
+                </Button>
               </div>
             </Card>
           </Col>
@@ -100,13 +100,13 @@ const Plans = () => {
               </div>
               <br />
               <div style={{ textAlign: "center" }}>
-                <Button>Contact Us</Button>
+                <Button onClick={() => router.push("/")}>Contact Us</Button>
               </div>
             </Card>
           </Col>
         </Row>
       </div>
-    </div>
+    </>
   );
 };
 
