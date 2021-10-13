@@ -2,6 +2,11 @@ import React from 'react'
 import Head from "next/head";
 import Billing from '../../components/Billing';
 import Layout from '../../components/Layout'
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_PUBLISHABLE_KEY);
+
 
 const payment = ({selectedPlan, countries}) => {
   return (
@@ -13,7 +18,9 @@ const payment = ({selectedPlan, countries}) => {
       </Head>
 
       <Layout>
-        <Billing selectedPlan={selectedPlan} countries={countries.data} />
+        <Elements stripe={stripePromise}>
+          <Billing selectedPlan={selectedPlan} countries={countries.data} />
+        </Elements>
       </Layout>
     </div>
   );
@@ -34,9 +41,7 @@ export const getServerSideProps = async (context) => {
     selectedPlan = "invalid"
   }
 
-  const res = await fetch(
-    "https://countriesnow.space/api/v0.1/countries/positions"
-  );
+  const res = await fetch("https://countriesnow.space/api/v0.1/countries/iso");
 
   const countries = await res.json();
 

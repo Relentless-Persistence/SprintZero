@@ -2,13 +2,83 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from "next/router";
 import { Typography, Card, Row, Col, Button, Input, Form, Select, Divider, Checkbox } from "antd";
 import {QuestionCircleOutlined} from '@ant-design/icons';
+import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 const {Item} = Form;
 const { Option } = Select;
 
+const card_options = {
+  hidePostalCode: true,
+  iconStyle: "solid",
+  style: {
+    base: {
+      iconColor: "#000",
+      color: "#000",
+      fontWeight: 400,
+      fontFamily: "Roboto, Open Sans, Segoe Ui, sans-serif",
+      fontSize: "14px",
+      "::placeholder": { color: "#A6AE9D" },
+    },
+    invalid: {
+      iconColor: "red",
+      color: "red",
+    },
+  },
+};
+
 const Billing = ({selectedPlan, countries}) => {
   const router = useRouter();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [country, setCountry] = useState("");
+  const [zip, setZip] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const billingDetails = {
+      name: `${firstName} ${lastName}`,
+      email,
+      address: {
+        country,
+        postal_code: zip,
+      }
+    }
+
+    const {error, paymentMethod} = await stripe.createPaymentMethod({
+      type: "card",
+      card: elements.getElement(CardElement),
+      billing_details: billingDetails
+    })
+
+    if(!error) {
+      try {
+        const {id} = paymentMethod
+        const response = await axios.post("/api/payment_intents", {
+          amount: selectedPlan.price * 100,
+          id,
+        });
+
+        if(response.data.success) {
+          console.log("Successful payment");
+          setSuccess(true);
+        }
+      } catch (error) {
+        console.log("Error", error)
+      }
+    } else {
+      console.log(error.message)
+    }
+
+
+  }
 
   return (
     selectedPlan && (
@@ -26,11 +96,11 @@ const Billing = ({selectedPlan, countries}) => {
             Contact Information
           </Text>
           <Row gutter={[16, 16]} className="mt-4">
-            <Col sm={24} lg={14}>
+            <Col xs={24} sm={24} lg={14}>
               <Item
                 label={
                   <Text className="flex items-center justify-between text-xs">
-                    Full Name <QuestionCircleOutlined className="ml-2" />
+                    Full Name <QuestionCircleOutlined className="ml-2 mr-2" />
                   </Text>
                 }
                 name="fullName"
@@ -42,17 +112,24 @@ const Billing = ({selectedPlan, countries}) => {
                 ]}
               >
                 <div className="flex">
-                  <Input placeholder="First" />
-                  <Input className="ml-2" placeholder="Last" />
+                  <Input
+                    placeholder="First"
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                  <Input
+                    className="ml-2"
+                    placeholder="Last"
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
                 </div>
               </Item>
             </Col>
 
-            <Col sm={24} lg={10}>
+            <Col xs={24} sm={24} lg={10}>
               <Item
                 label={
                   <Text className="flex items-center justify-between text-xs">
-                    Email <QuestionCircleOutlined className="ml-2" />
+                    Email <QuestionCircleOutlined className="ml-2 mr-2" />
                   </Text>
                 }
                 name="email"
@@ -63,7 +140,7 @@ const Billing = ({selectedPlan, countries}) => {
                   },
                 ]}
               >
-                <Input />
+                <Input onChange={(e) => setEmail(e.target.value)} />
               </Item>
             </Col>
           </Row>
@@ -73,12 +150,16 @@ const Billing = ({selectedPlan, countries}) => {
           <Text className="text-sm text-gray-500 font-semibold">
             Credit Card Details
           </Text>
+          <Col className="mt-4 py-2 px-3 bg-white border border-gray-300 rounded-sm">
+            <CardElement options={card_options} />
+          </Col>
+
           <Row gutter={[16, 16]} className="mt-4">
-            <Col sm={24} lg={12}>
+            <Col xs={24} sm={24} lg={12}>
               <Item
                 label={
                   <Text className="flex items-center justify-between text-xs">
-                    Country <QuestionCircleOutlined className="ml-2" />
+                    Country <QuestionCircleOutlined className="ml-2 mr-2" />
                   </Text>
                 }
                 name="country"
@@ -90,9 +171,12 @@ const Billing = ({selectedPlan, countries}) => {
                 ]}
               >
                 <div className="flex">
-                  <Select defaultValue="United States" style={{ width: "90%" }}>
+                  <Select
+                    style={{ width: "100%" }}
+                    onChange={(e) => setCountry(e)}
+                  >
                     {countries.map((country, i) => (
-                      <Option key={i} value={country.name}>
+                      <Option key={i} value={country.Iso2}>
                         {country.name}
                       </Option>
                     ))}
@@ -101,11 +185,12 @@ const Billing = ({selectedPlan, countries}) => {
               </Item>
             </Col>
 
-            <Col sm={24} lg={12}>
+            <Col xs={24} sm={24} lg={12}>
               <Item
                 label={
                   <Text className="flex items-center justify-between text-xs">
-                    ZIP/Postal Code <QuestionCircleOutlined className="ml-2" />
+                    ZIP/Postal Code{" "}
+                    <QuestionCircleOutlined className="ml-2 mr-2" />
                   </Text>
                 }
                 name="zip"
@@ -116,7 +201,7 @@ const Billing = ({selectedPlan, countries}) => {
                   },
                 ]}
               >
-                <Input />
+                <Input onChange={(e) => setZip(e.target.value)} />
               </Item>
             </Col>
           </Row>
@@ -152,7 +237,7 @@ const Billing = ({selectedPlan, countries}) => {
           </Col>
           <Row gutter={[16, 16]}>
             <Col xs={24} lg={12}>
-              <Button type="primary" danger block>
+              <Button type="primary" danger block onClick={handleSubmit}>
                 Submit
               </Button>
             </Col>

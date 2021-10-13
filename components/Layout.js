@@ -2,6 +2,7 @@ import React from 'react'
 import { Typography, Card, Row, Col, Button } from "antd";
 const { Title, Text } = Typography;
 
+
 const Layout = ({children}) => {
   return (
     <div>
