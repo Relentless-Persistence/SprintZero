@@ -62,7 +62,8 @@ const Billing = ({selectedPlan, countries}) => {
       try {
         const {id} = paymentMethod
         const response = await axios.post("/api/payment_intents", {
-          amount: selectedPlan.price * 100,
+          amount:
+            (selectedPlan === "Basic" ? 9.99 : 99.99) * 100,
           id,
         });
 
@@ -91,163 +92,164 @@ const Billing = ({selectedPlan, countries}) => {
           </Text>
         </div>
 
-        <div>
-          <Text className="text-sm text-gray-500 font-semibold">
-            Contact Information
-          </Text>
-          <Row gutter={[16, 16]} className="mt-4">
-            <Col xs={24} sm={24} lg={14}>
-              <Item
-                label={
-                  <Text className="flex items-center justify-between text-xs">
-                    Full Name <QuestionCircleOutlined className="ml-2 mr-2" />
-                  </Text>
-                }
-                name="fullName"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your full name!",
-                  },
-                ]}
-              >
-                <div className="flex">
-                  <Input
-                    placeholder="First"
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                  <Input
-                    className="ml-2"
-                    placeholder="Last"
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </div>
-              </Item>
-            </Col>
-
-            <Col xs={24} sm={24} lg={10}>
-              <Item
-                label={
-                  <Text className="flex items-center justify-between text-xs">
-                    Email <QuestionCircleOutlined className="ml-2 mr-2" />
-                  </Text>
-                }
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                ]}
-              >
-                <Input onChange={(e) => setEmail(e.target.value)} />
-              </Item>
-            </Col>
-          </Row>
-        </div>
-
-        <div>
-          <Text className="text-sm text-gray-500 font-semibold">
-            Credit Card Details
-          </Text>
-          <Col className="mt-4 py-2 px-3 bg-white border border-gray-300 rounded-sm">
-            <CardElement options={card_options} />
-          </Col>
-
-          <Row gutter={[16, 16]} className="mt-4">
-            <Col xs={24} sm={24} lg={12}>
-              <Item
-                label={
-                  <Text className="flex items-center justify-between text-xs">
-                    Country <QuestionCircleOutlined className="ml-2 mr-2" />
-                  </Text>
-                }
-                name="country"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your full name!",
-                  },
-                ]}
-              >
-                <div className="flex">
-                  <Select
-                    style={{ width: "100%" }}
-                    onChange={(e) => setCountry(e)}
-                  >
-                    {countries.map((country, i) => (
-                      <Option key={i} value={country.Iso2}>
-                        {country.name}
-                      </Option>
-                    ))}
-                  </Select>
-                </div>
-              </Item>
-            </Col>
-
-            <Col xs={24} sm={24} lg={12}>
-              <Item
-                label={
-                  <Text className="flex items-center justify-between text-xs">
-                    ZIP/Postal Code{" "}
-                    <QuestionCircleOutlined className="ml-2 mr-2" />
-                  </Text>
-                }
-                name="zip"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your zip/postal code",
-                  },
-                ]}
-              >
-                <Input onChange={(e) => setZip(e.target.value)} />
-              </Item>
-            </Col>
-          </Row>
-        </div>
-
-        <div>
-          <Text className="text-sm text-gray-500 font-semibold">
-            Selected Plan
-          </Text>
-          <Col className="flex items-center justify-between">
-            <Text className="text-xl">{selectedPlan.plan}</Text>
-            <Text className="text-xl">${selectedPlan.price} USD</Text>
-          </Col>
-          <Col className="flex items-center justify-between mt-4">
-            <Text className="text-xl">Sales Tax</Text>
-            <Text className="text-xl">$0.00 USD</Text>
-          </Col>
-          <Divider className="bg-gray-900" />
-          <Col className="flex items-center justify-between mt-4">
-            <Text className="text-xl font-semibold">Total</Text>
-            <Text className="text-xl font-semibold">
-              ${selectedPlan.price} USD
+        <form onSubmit={handleSubmit}>
+          <div>
+            <Text className="text-sm text-gray-500 font-semibold">
+              Contact Information
             </Text>
-          </Col>
-          <Col className="flex items-center justify-start mt-4 mb-8">
-            <Checkbox />
-            <Text className="ml-4">
-              I agree to the{" "}
-              <span className="underline cursor-pointer">Terms of Service</span>{" "}
-              and ackowledge the{" "}
-              <span className="underline cursor-pointer">Privacy Policy</span>.
+            <Row gutter={[16, 16]} className="mt-4">
+              <Col xs={24} sm={24} lg={14}>
+                <Item
+                  label={
+                    <Text className="flex items-center justify-between text-xs">
+                      Full Name <QuestionCircleOutlined className="ml-2 mr-2" />
+                    </Text>
+                  }
+                  name="fullName"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your full name!",
+                    },
+                  ]}
+                >
+                  <div className="flex">
+                    <Input
+                      placeholder="First"
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                    <Input
+                      className="ml-2"
+                      placeholder="Last"
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </div>
+                </Item>
+              </Col>
+
+              <Col xs={24} sm={24} lg={10}>
+                <Item
+                  label={
+                    <Text className="flex items-center justify-between text-xs">
+                      Email <QuestionCircleOutlined className="ml-2 mr-2" />
+                    </Text>
+                  }
+                  name="email"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your email!",
+                    },
+                  ]}
+                >
+                  <Input onChange={(e) => setEmail(e.target.value)} />
+                </Item>
+              </Col>
+            </Row>
+          </div>
+
+          <div>
+            <Text className="text-sm text-gray-500 font-semibold">
+              Credit Card Details
             </Text>
-          </Col>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} lg={12}>
-              <Button type="primary" danger block onClick={handleSubmit}>
-                Submit
-              </Button>
+            <Col className="mt-4 py-2 px-3 bg-white border border-gray-300 rounded-sm">
+              <CardElement options={card_options} />
             </Col>
-            <Col xs={24} lg={12}>
-              <Button danger block onClick={() => router.push("/")}>
-                Cancel
-              </Button>
+
+            <Row gutter={[16, 16]} className="mt-4">
+              <Col xs={24} sm={24} lg={12}>
+                <Item
+                  label={
+                    <Text className="flex items-center justify-between text-xs">
+                      Country <QuestionCircleOutlined className="ml-2 mr-2" />
+                    </Text>
+                  }
+                  name="country"
+                >
+                  <div className="flex">
+                    <Select
+                      style={{ width: "100%" }}
+                      onChange={(e) => setCountry(e)}
+                    >
+                      {countries.map((country, i) => (
+                        <Option key={i} value={country.Iso2}>
+                          {country.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
+                </Item>
+              </Col>
+
+              <Col xs={24} sm={24} lg={12}>
+                <Item
+                  label={
+                    <Text className="flex items-center justify-between text-xs">
+                      ZIP/Postal Code{" "}
+                      <QuestionCircleOutlined className="ml-2 mr-2" />
+                    </Text>
+                  }
+                  name="zip"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your zip/postal code",
+                    },
+                  ]}
+                >
+                  <Input onChange={(e) => setZip(e.target.value)} />
+                </Item>
+              </Col>
+            </Row>
+          </div>
+
+          <div>
+            <Text className="text-sm text-gray-500 font-semibold">
+              Selected Plan
+            </Text>
+            <Col className="flex items-center justify-between">
+              <Text className="text-xl">{selectedPlan}</Text>
+              <Text className="text-xl">
+                ${selectedPlan === "Basic" ? 9.99 : 99.99} USD
+              </Text>
             </Col>
-          </Row>
-        </div>
+            <Col className="flex items-center justify-between mt-4">
+              <Text className="text-xl">Sales Tax</Text>
+              <Text className="text-xl">$0.00 USD</Text>
+            </Col>
+            <Divider className="bg-gray-900" />
+            <Col className="flex items-center justify-between mt-4">
+              <Text className="text-xl font-semibold">Total</Text>
+              <Text className="text-xl font-semibold">
+                ${selectedPlan === "Basic" ? 9.99 : 99.99} USD
+              </Text>
+            </Col>
+            <Col className="flex items-center justify-start mt-4 mb-8">
+              <Checkbox />
+              <Text className="ml-4">
+                I agree to the{" "}
+                <span className="underline cursor-pointer">
+                  Terms of Service
+                </span>{" "}
+                and ackowledge the{" "}
+                <span className="underline cursor-pointer">Privacy Policy</span>
+                .
+              </Text>
+            </Col>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} lg={12}>
+                <Button type="primary" htmlType="submit" danger block>
+                  Submit
+                </Button>
+              </Col>
+              <Col xs={24} lg={12}>
+                <Button danger block onClick={() => router.push("/")}>
+                  Cancel
+                </Button>
+              </Col>
+            </Row>
+          </div>
+        </form>
       </>
     )
   );

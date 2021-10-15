@@ -34,9 +34,9 @@ export const getServerSideProps = async (context) => {
   let selectedPlan;
 
   if (plan === "basic") {
-    selectedPlan = {plan: "Basic", price: 9.99}
+    selectedPlan = "Basic"
   } else if (plan === "professional") {
-    selectedPlan = { plan: "Professional", price: 99.99 };
+    selectedPlan = "Professional";
   } else {
     selectedPlan = "invalid"
   }
