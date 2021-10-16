@@ -1,12 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Typography, Card, Row, Col, Button, Input, Form, Select, Divider, Checkbox } from "antd";
-import {QuestionCircleOutlined} from '@ant-design/icons';
+import {
+  Typography,
+  Row,
+  Col,
+  Button,
+  Input,
+  Form,
+  Select,
+  Divider,
+  Checkbox,
+} from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import axios from 'axios';
+import axios from "axios";
 
 const { Title, Text } = Typography;
-const {Item} = Form;
+const { Item } = Form;
 const { Option } = Select;
 
 const card_options = {
@@ -28,7 +38,7 @@ const card_options = {
   },
 };
 
-const Billing = ({selectedPlan, countries}) => {
+const Billing = ({ selectedPlan, countries }) => {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -41,7 +51,7 @@ const Billing = ({selectedPlan, countries}) => {
   const elements = useElements();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const billingDetails = {
       name: `${firstName} ${lastName}`,
@@ -49,37 +59,34 @@ const Billing = ({selectedPlan, countries}) => {
       address: {
         country,
         postal_code: zip,
-      }
-    }
+      },
+    };
 
-    const {error, paymentMethod} = await stripe.createPaymentMethod({
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
       type: "card",
       card: elements.getElement(CardElement),
-      billing_details: billingDetails
-    })
+      billing_details: billingDetails,
+    });
 
-    if(!error) {
+    if (!error) {
       try {
-        const {id} = paymentMethod
+        const { id } = paymentMethod;
         const response = await axios.post("/api/payment_intents", {
-          amount:
-            (selectedPlan === "Basic" ? 9.99 : 99.99) * 100,
+          amount: (selectedPlan === "Basic" ? 9.99 : 99.99) * 100,
           id,
         });
 
-        if(response.data.success) {
+        if (response.data.success) {
           console.log("Successful payment");
           setSuccess(true);
         }
       } catch (error) {
-        console.log("Error", error)
+        console.log("Error", error);
       }
     } else {
-      console.log(error.message)
+      console.log(error.message);
     }
-
-
-  }
+  };
 
   return (
     selectedPlan && (
@@ -152,12 +159,15 @@ const Billing = ({selectedPlan, countries}) => {
             <Text className="text-sm text-gray-500 font-semibold">
               Credit Card Details
             </Text>
-            <Col className="mt-4 py-2 px-3 bg-white border border-gray-300 rounded-sm">
-              <CardElement options={card_options} />
-            </Col>
 
             <Row gutter={[16, 16]} className="mt-4">
-              <Col xs={24} sm={24} lg={12}>
+              <Col xs={24} sm={24} lg={10}>
+                <div className="py-2 px-3 bg-white border border-gray-300 rounded-sm">
+                  <CardElement options={card_options} />
+                </div>
+              </Col>
+
+              <Col xs={24} sm={24} lg={6}>
                 <Item
                   label={
                     <Text className="flex items-center justify-between text-xs">
@@ -181,7 +191,7 @@ const Billing = ({selectedPlan, countries}) => {
                 </Item>
               </Col>
 
-              <Col xs={24} sm={24} lg={12}>
+              <Col xs={24} sm={24} lg={8}>
                 <Item
                   label={
                     <Text className="flex items-center justify-between text-xs">
@@ -238,13 +248,18 @@ const Billing = ({selectedPlan, countries}) => {
             </Col>
             <Row gutter={[16, 16]}>
               <Col xs={24} lg={12}>
-                <Button type="primary" htmlType="submit" danger block>
-                  Submit
+                <Button type="primary" htmlType="submit" block>
+                  <span className="font-semibold">Submit</span>
                 </Button>
               </Col>
               <Col xs={24} lg={12}>
-                <Button danger block onClick={() => router.push("/")}>
-                  Cancel
+                <Button
+                  danger
+                  type="ghost"
+                  block
+                  onClick={() => router.push("/")}
+                >
+                  <span className="font-semibold">Cancel</span>
                 </Button>
               </Col>
             </Row>
@@ -253,6 +268,6 @@ const Billing = ({selectedPlan, countries}) => {
       </>
     )
   );
-}
+};
 
-export default Billing
+export default Billing;
