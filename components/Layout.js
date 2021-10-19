@@ -5,7 +5,7 @@ const { Title, Text } = Typography;
 
 const Layout = ({children}) => {
   return (
-    <div>
+    <div className="mb-8">
       <Title level={2} className="logo">
         Sprint Zero
       </Title>
