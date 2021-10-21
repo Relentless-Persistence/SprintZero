@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, Typography, Carousel, Card, Col, Row } from "antd";
+import React, { useState } from "react";
+import { Button, Typography, Carousel, Card, Col, Row, message } from "antd";
 import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
@@ -32,12 +32,17 @@ const NextArrow = ({ className, currentSlide, style, onClick }) => {
   );
 };
 
-const cardSpacing = {
-  display: "flex",
-  justifyContent: "justify-center",
-}
+const ProductConfiguration = () => {
+  const [product, setProduct] = useState("");
+  const [email1, setEmail1] = useState("");
+  const [email2, setEmail2] = useState("");
+  const [email3, setEmail3] = useState("");
 
-const index = () => {
+  const [cadence, setCadence] = useState("");
+  const [gate, setGate] = useState("");
+  const [currency, setCurrency] = useState("USD");
+  const [cost, setCost] = useState("");
+
   return (
     <>
       <div className="flex items-center justify-center mb-4">
@@ -60,7 +65,16 @@ const index = () => {
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
             <Card className="card mb-12">
-              <ProductDetails />
+              <ProductDetails
+                product={product}
+                setProduct={setProduct}
+                email1={email1}
+                setEmail1={setEmail1}
+                email2={email2}
+                setEmail2={setEmail2}
+                email3={email3}
+                setEmail3={setEmail3}
+              />
             </Card>
           </Col>
         </Row>
@@ -68,7 +82,7 @@ const index = () => {
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
             <Card className="card mb-12">
-              <ProductCadence />
+              <ProductCadence setCadence={setCadence} />
             </Card>
           </Col>
         </Row>
@@ -76,14 +90,19 @@ const index = () => {
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
             <Card className="card mb-12">
-              <ProductGate />
+              <ProductGate setGate={setGate} />
             </Card>
           </Col>
         </Row>
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
             <Card className="card mb-12">
-              <ProductCost />
+              <ProductCost
+                currency={currency}
+                setCurrency={setCurrency}
+                cost={cost}
+                setCost={setCost}
+              />
             </Card>
           </Col>
         </Row>
@@ -91,7 +110,13 @@ const index = () => {
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
             <div className="h-72 flex items-center justify-center">
-              <Button type="primary" ghost>
+              <Button
+                type="primary"
+                ghost
+                onClick={() =>
+                  message.success("Product configuration successful")
+                }
+              >
                 <Text className="font-semibold">Start</Text>
               </Button>
             </div>
@@ -102,4 +127,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default ProductConfiguration;

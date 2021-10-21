@@ -1,11 +1,31 @@
-import React from 'react'
-import { Button, Typography, Carousel, Card, Col, Row, Form, Input } from "antd";
+import React from "react";
+import {
+  Button,
+  Typography,
+  Carousel,
+  Card,
+  Col,
+  Row,
+  Form,
+  Input,
+} from "antd";
+import update from "immutability-helper";
 
 const { Title, Text } = Typography;
-const {Item} = Form;
+const { Item } = Form;
 
-const ProductDetails = () => {
-  const count = [0, 1, 2]
+const ProductDetails = ({
+  product,
+  setProduct,
+  email1,
+  setEmail1,
+  email2,
+  setEmail2,
+  email3,
+  setEmail3,
+}) => {
+  const count = [0, 1, 2];
+
   return (
     <>
       <div className="text-center mb-4">
@@ -19,7 +39,11 @@ const ProductDetails = () => {
         <Text className="font-semibold mb-2" style={{ fontSize: "16px" }}>
           Product
         </Text>
-        <Input maxLength="32" />
+        <Input
+          maxLength="32"
+          value={product}
+          onChange={(e) => setProduct(e.target.value)}
+        />
         <Text className="text-xs">32 Character Limit</Text>
       </Col>
 
@@ -27,15 +51,35 @@ const ProductDetails = () => {
         <Text className="font-semibold" style={{ fontSize: "16px" }}>
           Team
         </Text>
-        {count.map((item, i) => (
-          <Col className="mb-2" key={i}>
-            <Input placeholder="Email Address" />
-            <Text className="text-xs">Slot {i+1}</Text>
-          </Col>
-        ))}
+        <Col className="mb-2">
+          <Input
+            placeholder="Email Address"
+            value={email1}
+            onChange={(e) => setEmail1(e.target.value)}
+          />
+          <Text className="text-xs">Slot 1</Text>
+        </Col>
+
+        <Col className="mb-2">
+          <Input
+            placeholder="Email Address"
+            value={email2}
+            onChange={(e) => setEmail2(e.target.value)}
+          />
+          <Text className="text-xs">Slot 2</Text>
+        </Col>
+
+        <Col className="mb-2">
+          <Input
+            placeholder="Email Address"
+            value={email3}
+            onChange={(e) => setEmail3(e.target.value)}
+          />
+          <Text className="text-xs">Slot 3</Text>
+        </Col>
       </div>
     </>
   );
-}
+};
 
-export default ProductDetails
+export default ProductDetails;

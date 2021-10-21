@@ -1,7 +1,8 @@
 import React from "react";
-import { Button, Typography } from "antd";
+import { Typography, Radio, Col } from "antd";
 
 const { Title, Text } = Typography;
+const { Group, Button } = Radio;
 
 const days = [
   "Monday",
@@ -13,7 +14,7 @@ const days = [
   "Sunday",
 ];
 
-const ProductGate = () => {
+const ProductGate = ({setGate}) => {
   return (
     <>
       <div className="text-center mb-4">
@@ -24,18 +25,19 @@ const ProductGate = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center">
-        {days.map(day => (
-          <Button
-          key={day}
-          className="mb-4"
-          style={{ width: "130px" }}
-          type="primary"
-          ghost
-        >
-          {day}
-        </Button>
-        ))}
-        
+        <Group buttonStyle="outline">
+          {days.map((day) => (
+            <Col className="mb-4 text-center" key={day}>
+              <Button
+                style={{ width: "130px" }}
+                value={day}
+                onChange={(e) => setGate(e.target.value)}
+              >
+                {day}
+              </Button>
+            </Col>
+          ))}
+        </Group>
       </div>
     </>
   );

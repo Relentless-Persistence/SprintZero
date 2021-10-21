@@ -1,12 +1,10 @@
-import React from 'react'
-import {
-  Button,
-  Typography
-} from "antd";
+import React, { useState } from "react";
+import { Typography, Radio, Col } from "antd";
 
 const { Title, Text } = Typography;
+const { Group, Button } = Radio;
 
-const ProductCadence = () => {
+const ProductCadence = ({ setCadence }) => {
   return (
     <div className="h-72">
       <div className="text-center mb-8">
@@ -17,35 +15,38 @@ const ProductCadence = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center">
-        <Button
-          className="mb-4"
-          style={{ width: "130px" }}
-          type="primary"
-          ghost
-        >
-          One Week
-        </Button>
-
-        <Button
-          className="mb-4"
-          style={{ width: "130px" }}
-          type="primary"
-          ghost
-        >
-          Two Weeks
-        </Button>
-
-        <Button
-          className="mb-4"
-          style={{ width: "130px" }}
-          type="primary"
-          ghost
-        >
-          Three Weeks
-        </Button>
+        <Group buttonStyle="outline">
+          <Col className="mb-4 text-center">
+            <Button
+              style={{ width: "130px" }}
+              value="One"
+              onChange={(e) => setCadence(e.target.value)}
+            >
+              One Week
+            </Button>
+          </Col>
+          <Col className="mb-4 text-center">
+            <Button
+              style={{ width: "130px" }}
+              value="Two"
+              onChange={(e) => setCadence(e.target.value)}
+            >
+              Two Week
+            </Button>
+          </Col>
+          <Col className="mb-4 text-center">
+            <Button
+              style={{ width: "130px" }}
+              value="Three"
+              onChange={(e) => setCadence(e.target.value)}
+            >
+              Three Week
+            </Button>
+          </Col>
+        </Group>
       </div>
     </div>
   );
-}
+};
 
-export default ProductCadence
+export default ProductCadence;
