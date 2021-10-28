@@ -4,7 +4,7 @@ import { Typography, Radio, Col } from "antd";
 const { Title, Text } = Typography;
 const { Group, Button } = Radio;
 
-const ProductCadence = ({ setCadence }) => {
+const ProductCadence = ({ setCadence, error }) => {
   return (
     <div className="h-72">
       <div className="text-center mb-8">
@@ -12,6 +12,9 @@ const ProductCadence = ({ setCadence }) => {
           Cadence
         </Title>
         <Text>How many weeks will you spend on each sprint?</Text>
+        {error ? (
+          <div className="text-sm text-red-600 mt-4">*Please select a cadence</div>
+        ) : null}
       </div>
 
       <div className="flex flex-col items-center justify-center">

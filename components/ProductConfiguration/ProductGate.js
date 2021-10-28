@@ -14,7 +14,7 @@ const days = [
   "Sunday",
 ];
 
-const ProductGate = ({setGate}) => {
+const ProductGate = ({setGate, error}) => {
   return (
     <>
       <div className="text-center mb-4">
@@ -22,6 +22,11 @@ const ProductGate = ({setGate}) => {
           Cadence
         </Title>
         <Text>How many weeks will you spend on each sprint?</Text>
+        {error ? (
+          <div className="text-sm text-red-600 mt-4">
+            *Please select a gate
+          </div>
+        ) : null}
       </div>
 
       <div className="flex flex-col items-center justify-center">

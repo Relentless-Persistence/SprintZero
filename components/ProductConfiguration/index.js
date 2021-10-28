@@ -17,6 +17,7 @@ const ProductConfiguration = () => {
   const [gate, setGate] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [cost, setCost] = useState("");
+  const [error, setError] = useState(false);
 
   const PrevArrow = ({ className, currentSlide, style, onClick }) => {
     const show = currentSlide === 0 ? true : false;
@@ -34,9 +35,31 @@ const ProductConfiguration = () => {
 
   const NextArrow = ({ className, currentSlide, style, onClick }) => {
     const show = currentSlide === 4 ? true : false;
+    
+    const next = () => {
+      const activate = () => {
+        onClick()
+        setError(false)
+      }
+
+      if (currentSlide === 0) {
+        if (product && email1) {
+          activate();
+        } else {
+          setError(true);
+        }
+      } else if (currentSlide === 1) {
+        cadence ? activate() : setError(true);
+      } else if (currentSlide === 2) {
+        gate ? activate() : setError(true);
+      } else if (currentSlide === 3) {
+        activate()
+      }
+    }
+
     return (
       <div style={{ position: "absolute", bottom: 0, right: 0 }}>
-        <Button disabled={show} onClick={onClick} type="primary" ghost>
+        <Button disabled={show} onClick={next} type="primary" ghost>
           Next
         </Button>
       </div>
@@ -75,6 +98,7 @@ const ProductConfiguration = () => {
                 setEmail2={setEmail2}
                 email3={email3}
                 setEmail3={setEmail3}
+                error={error}
               />
             </Card>
           </Col>
@@ -83,7 +107,7 @@ const ProductConfiguration = () => {
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
             <Card className="card mb-12">
-              <ProductCadence setCadence={setCadence} />
+              <ProductCadence setCadence={setCadence} error={error} />
             </Card>
           </Col>
         </Row>
@@ -91,7 +115,7 @@ const ProductConfiguration = () => {
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
             <Card className="card mb-12">
-              <ProductGate setGate={setGate} />
+              <ProductGate setGate={setGate} error={error} />
             </Card>
           </Col>
         </Row>

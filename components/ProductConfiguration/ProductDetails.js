@@ -23,6 +23,7 @@ const ProductDetails = ({
   setEmail2,
   email3,
   setEmail3,
+  error
 }) => {
   const count = [0, 1, 2];
 
@@ -44,6 +45,9 @@ const ProductDetails = ({
           value={product}
           onChange={(e) => setProduct(e.target.value)}
         />
+        {error ? (
+          <div className="text-xs text-red-600">*Product can't be empty</div>
+        ) : null}
         <Text className="text-xs">32 Character Limit</Text>
       </Col>
 
@@ -57,6 +61,9 @@ const ProductDetails = ({
             value={email1}
             onChange={(e) => setEmail1(e.target.value)}
           />
+          {error ? (
+            <div className="text-xs text-red-600">* Provide at least one email</div>
+          ) : null}
           <Text className="text-xs">Slot 1</Text>
         </Col>
 
