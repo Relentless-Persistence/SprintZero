@@ -36,6 +36,37 @@ body {
   border-radius: 8px;
 }
 
+.microsoft {
+  font-family: 'Segoe UI';
+  font-weight: 400;
+  color: #757575;
+  background: #fff;
+  font-size: 21px;
+  border: 1px #8c8c8c;
+  padding: 16px;
+  width: 279.49px;
+}
+
+.googleBtn {
+  color: #757575;
+  background: #fff;
+  border: 1px #8c8c8c;
+  font-size: 21px;
+  font-weight: 500;
+  padding: 16px; 
+  font-family: 'Roboto', sans-serif;
+  width: 279.49px;
+}
+
+.ant-carousel .slick-dots li {
+  background: #A6AE9D;
+  opacity: 0.3;
+}
+
+.ant-carousel .slick-dots li.slick-active button {
+  background-color: #A6AE9D;
+}
+
 @media screen and (max-width: 480px) {
   body {
     padding: 10px;

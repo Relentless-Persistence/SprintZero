@@ -10,6 +10,7 @@ import {
   Select,
   Divider,
   Checkbox,
+  message
 } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -50,6 +51,8 @@ const Billing = ({ selectedPlan, countries }) => {
   const stripe = useStripe();
   const elements = useElements();
 
+  const tax = 6.25;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -77,16 +80,30 @@ const Billing = ({ selectedPlan, countries }) => {
         });
 
         if (response.data.success) {
-          console.log("Successful payment");
+          message.success("Successful payment");
+          setTimeout(() => {
+            router.push('/login')
+          }, 3000);
           setSuccess(true);
         }
       } catch (error) {
-        console.log("Error", error);
+        message.error("Error", error);
       }
     } else {
       console.log(error.message);
     }
   };
+
+  const getTax = () => {
+    const price = selectedPlan === "Basic" ? 9.99 : 99.99
+    return Math.round(((price * (tax/100)) + Number.EPSILON) * 100) / 100;
+  }
+
+  const totalPrice = () => {
+    const price = selectedPlan === "Basic" ? 9.99 : 99.99;
+    const tax = getTax();
+    return Math.round(((price + tax) + Number.EPSILON) * 100) / 100;
+  }
 
   return (
     selectedPlan && (
@@ -224,14 +241,14 @@ const Billing = ({ selectedPlan, countries }) => {
               </Text>
             </Col>
             <Col className="flex items-center justify-between mt-4">
-              <Text className="text-xl">Sales Tax</Text>
-              <Text className="text-xl">$0.00 USD</Text>
+              <Text className="text-xl">Sales Tax @ {tax}%</Text>
+              <Text className="text-xl">${getTax()} USD</Text>
             </Col>
             <Divider className="bg-gray-900" />
             <Col className="flex items-center justify-between mt-4">
               <Text className="text-xl font-semibold">Total</Text>
               <Text className="text-xl font-semibold">
-                ${selectedPlan === "Basic" ? 9.99 : 99.99} USD
+                ${totalPrice()} USD
               </Text>
             </Col>
             <Col className="flex items-center justify-start mt-4 mb-8">

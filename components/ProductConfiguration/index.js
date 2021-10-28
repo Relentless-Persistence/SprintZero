@@ -7,31 +7,6 @@ import ProductCost from "./ProductCost";
 
 const { Title, Text } = Typography;
 
-const PrevArrow = ({ className, currentSlide, style, onClick }) => {
-  const show = currentSlide === 0 ? true : false;
-  return (
-    <div
-      // className={className}
-      style={{ position: "absolute", bottom: 0, left: 0, zIndex: 10 }}
-    >
-      <Button disabled={show} onClick={onClick} type="primary" ghost>
-        Prev
-      </Button>
-    </div>
-  );
-};
-
-const NextArrow = ({ className, currentSlide, style, onClick }) => {
-  const show = currentSlide === 4 ? true : false;
-  return (
-    <div style={{ position: "absolute", bottom: 0, right: 0 }}>
-      <Button disabled={show} onClick={onClick} type="primary" ghost>
-        Next
-      </Button>
-    </div>
-  );
-};
-
 const ProductConfiguration = () => {
   const [product, setProduct] = useState("");
   const [email1, setEmail1] = useState("");
@@ -42,6 +17,31 @@ const ProductConfiguration = () => {
   const [gate, setGate] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [cost, setCost] = useState("");
+
+  const PrevArrow = ({ className, currentSlide, style, onClick }) => {
+    const show = currentSlide === 0 ? true : false;
+    return (
+      <div
+        // className={className}
+        style={{ position: "absolute", bottom: 0, left: 0, zIndex: 10 }}
+      >
+        <Button disabled={show} onClick={onClick} type="primary" ghost>
+          Prev
+        </Button>
+      </div>
+    );
+  };
+
+  const NextArrow = ({ className, currentSlide, style, onClick }) => {
+    const show = currentSlide === 4 ? true : false;
+    return (
+      <div style={{ position: "absolute", bottom: 0, right: 0 }}>
+        <Button disabled={show} onClick={onClick} type="primary" ghost>
+          Next
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -59,6 +59,7 @@ const ProductConfiguration = () => {
 
       <Carousel
         arrows={true}
+        dotsClass="w-20"
         prevArrow={<PrevArrow />}
         nextArrow={<NextArrow />}
       >
