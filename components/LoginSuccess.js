@@ -23,7 +23,7 @@ const LoginSuccess = () => {
     <>
       <div className="mt-10 flex items-center justify-center">
         <div>
-          <Title level={1}>Welcome, </Title>
+          <Title level={1}>Welcome, {displayName(user.displayName)}</Title>
           <Text className="text-sm font-semibold">
             {"Let's help you configure your product."}
           </Text>

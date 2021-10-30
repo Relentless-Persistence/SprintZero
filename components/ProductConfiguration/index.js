@@ -4,8 +4,12 @@ import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
 import ProductCost from "./ProductCost";
+import withAuth from "../../hoc/withAuth";
+import firebaseConfig from "../../config/firebase-config"
+import firebase from "firebase";
 
 const { Title, Text } = Typography;
+const db = firebaseConfig.firestore();
 
 const ProductConfiguration = () => {
   const [product, setProduct] = useState("");
@@ -18,6 +22,24 @@ const ProductConfiguration = () => {
   const [currency, setCurrency] = useState("USD");
   const [cost, setCost] = useState("");
   const [error, setError] = useState(false);
+
+  const handleSubmit = () => {
+    if(product !== "" && email1 !== "" && cadence !== "", gate !== "" ) {
+      db.collection("Product")
+      .add({
+        product,
+        email1,
+        email2,
+        email3,
+        cadence,
+        gate,
+        currency,
+        cost,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+      .then(() => message.success("Product configuration saved successfully"));
+    }
+  }
 
   const PrevArrow = ({ className, currentSlide, style, onClick }) => {
     const show = currentSlide === 0 ? true : false;
@@ -85,6 +107,8 @@ const ProductConfiguration = () => {
         dotsClass="w-20"
         prevArrow={<PrevArrow />}
         nextArrow={<NextArrow />}
+        // slidesToShow={2.5}
+        // slidesToScroll={1}
       >
         <Row>
           <Col sm={24} lg={{ span: 12, offset: 6 }}>
@@ -138,9 +162,7 @@ const ProductConfiguration = () => {
               <Button
                 type="primary"
                 ghost
-                onClick={() =>
-                  message.success("Product configuration successful")
-                }
+                onClick={handleSubmit}
               >
                 <Text className="font-semibold">Start</Text>
               </Button>
@@ -152,4 +174,4 @@ const ProductConfiguration = () => {
   );
 };
 
-export default ProductConfiguration;
+export default withAuth(ProductConfiguration);

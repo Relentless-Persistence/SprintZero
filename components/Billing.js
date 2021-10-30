@@ -15,6 +15,7 @@ import {
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import axios from "axios";
+import { getPayment } from "../contexts/PaymentContext";
 
 const { Title, Text } = Typography;
 const { Item } = Form;
@@ -80,6 +81,7 @@ const Billing = ({ selectedPlan, countries }) => {
         });
 
         if (response.data.success) {
+          getPayment(true);
           message.success("Successful payment");
           setTimeout(() => {
             router.push('/login')
