@@ -111,8 +111,10 @@ const Billing = ({ selectedPlan, countries }) => {
     selectedPlan && (
       <>
         <div className="mb-4">
-          <Title level={2}>Hand Over Those Deets</Title>
-          <Text>
+          <Title level={1} style={{ fontWeight: "normal" }}>
+            Hand Over Those Deets
+          </Title>
+          <Text className="text-xl">
             Please provide your information below so we can keep our internet
             service providers happy and continue to evolve this product
           </Text>
@@ -120,14 +122,17 @@ const Billing = ({ selectedPlan, countries }) => {
 
         <form onSubmit={handleSubmit}>
           <div>
-            <Text className="text-sm text-gray-500 font-semibold">
+            <Text
+              className="text-gray-500 font-semibold"
+              style={{ fontSize: "16px" }}
+            >
               Contact Information
             </Text>
             <Row gutter={[16, 16]} className="mt-4">
               <Col xs={24} sm={24} lg={14}>
                 <Item
                   label={
-                    <Text className="flex items-center justify-between text-xs">
+                    <Text className="flex items-center justify-between text-sm">
                       Full Name <QuestionCircleOutlined className="ml-2 mr-2" />
                     </Text>
                   }
@@ -156,7 +161,7 @@ const Billing = ({ selectedPlan, countries }) => {
               <Col xs={24} sm={24} lg={10}>
                 <Item
                   label={
-                    <Text className="flex items-center justify-between text-xs">
+                    <Text className="flex items-center justify-between text-sm">
                       Email <QuestionCircleOutlined className="ml-2 mr-2" />
                     </Text>
                   }
@@ -175,7 +180,10 @@ const Billing = ({ selectedPlan, countries }) => {
           </div>
 
           <div>
-            <Text className="text-sm text-gray-500 font-semibold">
+            <Text
+              className="text-gray-500 font-semibold"
+              style={{ fontSize: "16px" }}
+            >
               Credit Card Details
             </Text>
 
@@ -189,7 +197,7 @@ const Billing = ({ selectedPlan, countries }) => {
               <Col xs={24} sm={24} lg={6}>
                 <Item
                   label={
-                    <Text className="flex items-center justify-between text-xs">
+                    <Text className="flex items-center justify-between text-sm">
                       Country <QuestionCircleOutlined className="ml-2 mr-2" />
                     </Text>
                   }
@@ -213,7 +221,7 @@ const Billing = ({ selectedPlan, countries }) => {
               <Col xs={24} sm={24} lg={8}>
                 <Item
                   label={
-                    <Text className="flex items-center justify-between text-xs">
+                    <Text className="flex items-center justify-between text-sm">
                       ZIP/Postal Code{" "}
                       <QuestionCircleOutlined className="ml-2 mr-2" />
                     </Text>
@@ -233,7 +241,10 @@ const Billing = ({ selectedPlan, countries }) => {
           </div>
 
           <div>
-            <Text className="text-sm text-gray-500 font-semibold">
+            <Text
+              className="text-gray-500 font-semibold"
+              style={{ fontSize: "16px" }}
+            >
               Selected Plan
             </Text>
             <Col className="flex items-center justify-between">
@@ -249,9 +260,7 @@ const Billing = ({ selectedPlan, countries }) => {
             <Divider className="bg-gray-900" />
             <Col className="flex items-center justify-between mt-4">
               <Text className="text-xl font-semibold">Total</Text>
-              <Text className="text-xl font-semibold">
-                ${totalPrice()} USD
-              </Text>
+              <Text className="text-xl font-semibold">${totalPrice()} USD</Text>
             </Col>
             <Col className="flex items-center justify-start mt-4 mb-8">
               <Checkbox />

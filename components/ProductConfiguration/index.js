@@ -1,21 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Button, Typography, Carousel, Card, Col, Row, message } from "antd";
 import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
 import ProductCost from "./ProductCost";
 import withAuth from "../../hoc/withAuth";
-import firebaseConfig from "../../config/firebase-config"
+import firebaseConfig from "../../config/firebase-config";
 import firebase from "firebase";
+
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import SwiperCore, { Pagination, Navigation } from "swiper";
 
 const { Title, Text } = Typography;
 const db = firebaseConfig.firestore();
+SwiperCore.use([Pagination, Navigation]);
 
 const ProductConfiguration = () => {
   const [product, setProduct] = useState("");
   const [email1, setEmail1] = useState("");
   const [email2, setEmail2] = useState("");
   const [email3, setEmail3] = useState("");
+  const [swiper, setSwiper] = useState(null);
 
   const [cadence, setCadence] = useState("");
   const [gate, setGate] = useState("");
@@ -23,65 +31,66 @@ const ProductConfiguration = () => {
   const [cost, setCost] = useState("");
   const [error, setError] = useState(false);
 
-  const handleSubmit = () => {
-    if(product !== "" && email1 !== "" && cadence !== "", gate !== "" ) {
-      db.collection("Product")
-      .add({
-        product,
-        email1,
-        email2,
-        email3,
-        cadence,
-        gate,
-        currency,
-        cost,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      })
-      .then(() => message.success("Product configuration saved successfully"));
-    }
-  }
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
 
-  const PrevArrow = ({ className, currentSlide, style, onClick }) => {
-    const show = currentSlide === 0 ? true : false;
+  const handleSubmit = () => {
+    if ((product !== "" && email1 !== "" && cadence !== "", gate !== "")) {
+      db.collection("Product")
+        .add({
+          product,
+          email1,
+          email2,
+          email3,
+          cadence,
+          gate,
+          currency,
+          cost,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() =>
+          message.success("Product configuration saved successfully")
+        );
+    }
+  };
+
+  const PrevArrow = ({index}) => {
+    const show = index === 0 ? true : false;
     return (
-      <div
-        // className={className}
-        style={{ position: "absolute", bottom: 0, left: 0, zIndex: 10 }}
-      >
-        <Button disabled={show} onClick={onClick} type="primary" ghost>
+      <div>
+        <Button disabled={show} type="primary" ghost>
           Prev
         </Button>
       </div>
     );
   };
 
-  const NextArrow = ({ className, currentSlide, style, onClick }) => {
-    const show = currentSlide === 4 ? true : false;
-    
+  const NextArrow = ({index}) => {
+    const show = index === 4 ? true : false;
+
     const next = () => {
       const activate = () => {
-        onClick()
-        setError(false)
-      }
+        setError(false);
+      };
 
-      if (currentSlide === 0) {
+      if (index === 0) {
         if (product && email1) {
           activate();
         } else {
           setError(true);
         }
-      } else if (currentSlide === 1) {
+      } else if (index === 1) {
         cadence ? activate() : setError(true);
-      } else if (currentSlide === 2) {
+      } else if (index === 2) {
         gate ? activate() : setError(true);
-      } else if (currentSlide === 3) {
-        activate()
+      } else if (index === 3) {
+        activate();
       }
-    }
+    };
 
     return (
       <div style={{ position: "absolute", bottom: 0, right: 0 }}>
-        <Button disabled={show} onClick={next} type="primary" ghost>
+        <Button disabled={show} type="primary" ghost>
           Next
         </Button>
       </div>
@@ -90,29 +99,36 @@ const ProductConfiguration = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center mb-4">
+      <div className="flex items-center justify-center mb-6">
         <div>
-          <Title style={{ margin: 0 }} level={2}>
+          <Title className="mb-3" style={{ margin: 0, fontWeight: "normal" }} level={1}>
             Product Configuration
           </Title>
-          <Text>
+          <Text className="text-2xl" style={{ color: "#A6AE9D" }}>
             Almost time to start building! We just require a few data points
             before we can begin
           </Text>
         </div>
       </div>
 
-      <Carousel
-        arrows={true}
-        dotsClass="w-20"
-        prevArrow={<PrevArrow />}
-        nextArrow={<NextArrow />}
-        // slidesToShow={2.5}
-        // slidesToScroll={1}
+      <Swiper
+        onSwiper={setSwiper}
+        onInit={(swiper) => {
+          swiper.params.navigation.prevEl = prevRef.current;
+          swiper.params.navigation.nextEl = nextRef.current;
+          swiper.navigation.init();
+          swiper.navigation.update();
+        }}
+        slidesPerView={2}
+        spaceBetween={10}
+        centeredSlides={true}
+        pagination={{
+          clickable: true,
+        }}
       >
-        <Row>
-          <Col sm={24} lg={{ span: 12, offset: 6 }}>
-            <Card className="card mb-12">
+        <SwiperSlide>
+          <div>
+            <Card className="card">
               <ProductDetails
                 product={product}
                 setProduct={setProduct}
@@ -125,26 +141,27 @@ const ProductConfiguration = () => {
                 error={error}
               />
             </Card>
-          </Col>
-        </Row>
+          </div>
+        </SwiperSlide>
 
-        <Row>
-          <Col sm={24} lg={{ span: 12, offset: 6 }}>
+        <SwiperSlide>
+          <div>
             <Card className="card mb-12">
               <ProductCadence setCadence={setCadence} error={error} />
             </Card>
-          </Col>
-        </Row>
+          </div>
+        </SwiperSlide>
 
-        <Row>
-          <Col sm={24} lg={{ span: 12, offset: 6 }}>
+        <SwiperSlide>
+          <div>
             <Card className="card mb-12">
               <ProductGate setGate={setGate} error={error} />
             </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={24} lg={{ span: 12, offset: 6 }}>
+          </div>
+        </SwiperSlide>
+
+        <SwiperSlide>
+          <div>
             <Card className="card mb-12">
               <ProductCost
                 currency={currency}
@@ -153,23 +170,41 @@ const ProductConfiguration = () => {
                 setCost={setCost}
               />
             </Card>
-          </Col>
-        </Row>
+          </div>
+        </SwiperSlide>
 
-        <Row>
-          <Col sm={24} lg={{ span: 12, offset: 6 }}>
+        <SwiperSlide>
+          <div>
             <div className="h-72 flex items-center justify-center">
-              <Button
-                type="primary"
-                ghost
-                onClick={handleSubmit}
-              >
+              <Button type="primary" ghost onClick={handleSubmit}>
                 <Text className="font-semibold">Start</Text>
               </Button>
             </div>
-          </Col>
-        </Row>
-      </Carousel>
+          </div>
+        </SwiperSlide>
+
+        <div className="flex items-center justify-between">
+          {/* <div ref={prevRef}>
+            {swiper && (
+              <PrevArrow
+                index={swiper.activeIndex}
+                isBeginning={swiper.isBeginning}
+              />
+            )}
+          </div>
+          <div ref={nextRef}>
+            {swiper && (
+              <NextArrow index={swiper.activeIndex} isEnd={swiper.isEnd} />
+            )}
+          </div> */}
+
+          <Button ref={prevRef}>Prev</Button>
+
+          <Button ref={nextRef} type="primary" ghost>
+            Next
+          </Button>
+        </div>
+      </Swiper>
     </>
   );
 };
