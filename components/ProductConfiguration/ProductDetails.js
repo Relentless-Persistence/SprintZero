@@ -36,7 +36,7 @@ const ProductDetails = ({
         <Text>Please provide the information below.</Text>
       </div>
 
-      <Col className="mb-2">
+      <Col className="mb-2 text-left">
         <Text className="font-semibold mb-2" style={{ fontSize: "16px" }}>
           Product
         </Text>
@@ -51,7 +51,7 @@ const ProductDetails = ({
         <Text className="text-xs">32 Character Limit</Text>
       </Col>
 
-      <div>
+      <div className="text-left">
         <Text className="font-semibold" style={{ fontSize: "16px" }}>
           Team
         </Text>
@@ -62,7 +62,9 @@ const ProductDetails = ({
             onChange={(e) => setEmail1(e.target.value)}
           />
           {error ? (
-            <div className="text-xs text-red-600">* Provide at least one email</div>
+            <div className="text-xs text-red-600">
+              * Provide at least one email
+            </div>
           ) : null}
           <Text className="text-xs">Slot 1</Text>
         </Col>
