@@ -16,26 +16,31 @@ const LoginSuccess = () => {
   };
 
   if (!user) {
-    return "Loading..."
-  } 
+    return "Loading...";
+  }
 
   return (
     <>
-      <div className="mt-10 flex items-center justify-center">
+      <div className="mt-10 flex items-center justify-start">
         <div>
-          <Title level={1}>Welcome, {displayName(user.displayName)}</Title>
-          <Text className="text-sm font-semibold">
-            {"Let's help you configure your product."}
-          </Text>
+          <Title level={1} style={{ marginBottom: "12px" }}>Feature Review</Title>
+          <Text className="text-primary text-2xl font-semibold">Userbase</Text>
         </div>
       </div>
-      <div className="text-center mt-10">
-        <Button size="large" type="primary" ghost onClick={() => router.push('/product')}>
-          <span className="uppercase">Configure Product</span>
+
+      <div
+        className="absolute bottom-10 right-0 flex items-center"
+        style={{ padding: "0 153px" }}
+      >
+        <Button disabled className="mr-3">
+          Skip
+        </Button>
+        <Button type="primary" onClick={() => router.push("/product")}>
+          Start
         </Button>
       </div>
     </>
-  )
+  );
 };
 
 export default LoginSuccess;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Button, Typography, Carousel, Card, Col, Row, message } from "antd";
 import ProductDetails from "./ProductDetails";
@@ -34,6 +34,10 @@ const ProductConfiguration = () => {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
+  // useEffect(() => {
+  //   Swiper.onSwiper(())
+  // }, [Swiper])
+
   const handleSubmit = () => {
     if ((product !== "" && email1 !== "" && cadence !== "", gate !== "")) {
       db.collection("Product")
@@ -49,12 +53,20 @@ const ProductConfiguration = () => {
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() =>
-          message.success("Product configuration saved successfully")
+          message.success({
+            content: "Product configuration saved successfully",
+            className: "custom-message",
+          })
         );
+    } else {
+      message.warning({
+        content: "Some field can't be empty",
+        className: "custom-message",
+      });
     }
   };
 
-  const PrevArrow = ({index}) => {
+  const PrevArrow = ({ index }) => {
     const show = index === 0 ? true : false;
     return (
       <div>
@@ -65,7 +77,7 @@ const ProductConfiguration = () => {
     );
   };
 
-  const NextArrow = ({index}) => {
+  const NextArrow = ({ index }) => {
     const show = index === 4 ? true : false;
 
     const next = () => {
@@ -101,7 +113,11 @@ const ProductConfiguration = () => {
     <>
       <div className="flex items-center justify-center mb-6">
         <div>
-          <Title className="mb-3" style={{ margin: 0, fontWeight: "normal" }} level={1}>
+          <Title
+            className="mb-3"
+            style={{ margin: 0, fontWeight: "normal" }}
+            level={1}
+          >
             Product Configuration
           </Title>
           <Text className="text-2xl" style={{ color: "#A6AE9D" }}>
@@ -119,16 +135,18 @@ const ProductConfiguration = () => {
           swiper.navigation.init();
           swiper.navigation.update();
         }}
-        slidesPerView={2}
-        spaceBetween={10}
+        slidesPerView={3}
+        spaceBetween={80}
         centeredSlides={true}
         pagination={{
           clickable: true,
         }}
+        noSwiping={true}
+        preventClicks={false}
       >
         <SwiperSlide>
           <div>
-            <Card className="card">
+            <Card className="product-card">
               <ProductDetails
                 product={product}
                 setProduct={setProduct}
@@ -146,7 +164,7 @@ const ProductConfiguration = () => {
 
         <SwiperSlide>
           <div>
-            <Card className="card mb-12">
+            <Card className="product-card mb-12">
               <ProductCadence setCadence={setCadence} error={error} />
             </Card>
           </div>
@@ -154,7 +172,7 @@ const ProductConfiguration = () => {
 
         <SwiperSlide>
           <div>
-            <Card className="card mb-12">
+            <Card className="product-card mb-12">
               <ProductGate setGate={setGate} error={error} />
             </Card>
           </div>
@@ -162,7 +180,7 @@ const ProductConfiguration = () => {
 
         <SwiperSlide>
           <div>
-            <Card className="card mb-12">
+            <Card className="product-card mb-12">
               <ProductCost
                 currency={currency}
                 setCurrency={setCurrency}
@@ -175,30 +193,21 @@ const ProductConfiguration = () => {
 
         <SwiperSlide>
           <div>
-            <div className="h-72 flex items-center justify-center">
-              <Button type="primary" ghost onClick={handleSubmit}>
-                <Text className="font-semibold">Start</Text>
+            <div
+              className="product-card h-72 flex items-center justify-center"
+              style={{ border: "none" }}
+            >
+              <Button type="primary" onClick={handleSubmit}>
+                <Text className="font-semibold text-white">Start</Text>
               </Button>
             </div>
           </div>
         </SwiperSlide>
 
-        <div className="flex items-center justify-between">
-          {/* <div ref={prevRef}>
-            {swiper && (
-              <PrevArrow
-                index={swiper.activeIndex}
-                isBeginning={swiper.isBeginning}
-              />
-            )}
-          </div>
-          <div ref={nextRef}>
-            {swiper && (
-              <NextArrow index={swiper.activeIndex} isEnd={swiper.isEnd} />
-            )}
-          </div> */}
-
-          <Button ref={prevRef}>Prev</Button>
+        <div className="flex items-center justify-between lg:mx-72 mx-4">
+          <Button ref={prevRef} type="primary" ghost>
+            Previous
+          </Button>
 
           <Button ref={nextRef} type="primary" ghost>
             Next

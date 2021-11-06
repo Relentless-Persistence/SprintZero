@@ -34,7 +34,7 @@ const ProductCadence = ({ setCadence, error }) => {
               value="Two"
               onChange={(e) => setCadence(e.target.value)}
             >
-              Two Week
+              Two Weeks
             </Button>
           </Col>
           <Col className="mb-4 text-center">
@@ -43,7 +43,7 @@ const ProductCadence = ({ setCadence, error }) => {
               value="Three"
               onChange={(e) => setCadence(e.target.value)}
             >
-              Three Week
+              Three Weeks
             </Button>
           </Col>
         </Group>

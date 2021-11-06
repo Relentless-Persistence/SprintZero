@@ -20,16 +20,15 @@ const ProductCost = ({ currency, setCurrency, cost, setCost }) => {
       <div className="h-72 flex items-center justify-center">
         <Row gutter={8}>
           <Col span={6}>
-            <Select
-            defaultValue={currency}
-              onChange={(e) => setCurrency(e)}
-            >
-              {currencies.map((currency, i) => (
-                <Option key={i} value={currency.code}>
-                  {currency.code}
-                </Option>
-              ))}
-            </Select>
+            {currencies && (
+              <select className="custom-select" defaultValue={currency} onChange={(e) => setCurrency(e)}>
+                {currencies.map((currency, i) => (
+                  <option key={i} value={currency.code}>
+                    {currency.code}
+                  </option>
+                ))}
+              </select>
+            )}
           </Col>
           <Col span={18}>
             <Item>

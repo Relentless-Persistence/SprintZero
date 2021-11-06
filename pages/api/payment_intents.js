@@ -2,7 +2,7 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.NEXT_PUBLIC_SECRET_KEY);
 
-export default async (req, res) => {
+export default async function handler(req, res) {
 
     try {
       const { amount, id } = req.body;

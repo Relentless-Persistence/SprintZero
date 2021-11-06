@@ -15,26 +15,23 @@ const Login = () => {
   const auth = firebase.auth();
   const paid = usePaymentConfirm();
 
-  // useEffect(() => {
-  //   if(!paid) {
-  //     message.warning("You need to select a plan to login");
-  //     setTimeout(() => {
-  //       router.push("/");
-  //     }, 3000);
-  //   }
-  // }, [paid])
-
   const handleOnClick = (provider) => {
     try {
       auth
         .signInWithPopup(provider)
         .then((res) => {
-          message.success("Successfully logged in");
+          message.success({
+            content: "Successfully logged in",
+            className: "custom-message",
+          });
         })
         .then(() => router.push("/loginsuccess"));
     } catch (error) {
       console.log(error.message);
-      message.error("An error occurred while trying to log you in");
+      message.error({
+        content: "An error occurred while trying to log you in",
+        className: "custom-message",
+      });
     }
   };
 
@@ -76,6 +73,9 @@ const Login = () => {
           />
           <span style={{ marginLeft: "15px" }}>Sign in with Microsoft</span>
         </button>
+      </div>
+      <div className="absolute bottom-20 lg:left-80">
+        <Button onClick={() => router.push("/")}>Go Back</Button>
       </div>
     </>
   );

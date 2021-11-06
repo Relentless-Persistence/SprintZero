@@ -19,20 +19,18 @@ const ProductGate = ({setGate, error}) => {
     <>
       <div className="text-center mb-4">
         <Title style={{ margin: 0 }} level={3}>
-          Cadence
+          Gate
         </Title>
-        <Text>How many weeks will you spend on each sprint?</Text>
+        <Text>Which day would you like to begin your sprints?</Text>
         {error ? (
-          <div className="text-sm text-red-600 mt-4">
-            *Please select a gate
-          </div>
+          <div className="text-sm text-red-600 mt-4">*Please select a gate</div>
         ) : null}
       </div>
 
       <div className="flex flex-col items-center justify-center">
         <Group buttonStyle="outline">
           {days.map((day) => (
-            <Col className="mb-4 text-center" key={day}>
+            <Col className="mb-2 text-center" key={day}>
               <Button
                 style={{ width: "130px" }}
                 value={day}

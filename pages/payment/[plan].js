@@ -8,7 +8,7 @@ import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_PUBLISHABLE_KEY);
 
 
-const payment = ({selectedPlan, countries}) => {
+const payment = ({selectedPlan, countries, ipData}) => {
   return (
     <div>
       <Head>
@@ -19,7 +19,11 @@ const payment = ({selectedPlan, countries}) => {
 
       <Layout>
         <Elements stripe={stripePromise}>
-          <Billing selectedPlan={selectedPlan} countries={countries.data} />
+          <Billing
+            selectedPlan={selectedPlan}
+            countries={countries.data}
+            ip={ipData.IPv4}
+          />
         </Elements>
       </Layout>
     </div>
@@ -43,7 +47,11 @@ export const getServerSideProps = async (context) => {
 
   const res = await fetch("https://countriesnow.space/api/v0.1/countries/iso");
 
+  const getIp = await fetch("https://geolocation-db.com/json/");
+
   const countries = await res.json();
+
+  const ipData = await getIp.json();
 
   if (selectedPlan === "invalid") {
     return {
@@ -54,7 +62,7 @@ export const getServerSideProps = async (context) => {
 
   return {
     props: {
-      selectedPlan, countries
+      selectedPlan, countries, ipData
     },
   };
 };
