@@ -63,7 +63,6 @@ const Billing = ({ selectedPlan, countries, ip }) => {
         ip
       });
       setCustomer(res.data);
-      console.log(res.data);
     }
     customer();
   },[])
@@ -76,7 +75,11 @@ const Billing = ({ selectedPlan, countries, ip }) => {
 
   const handleSubmit = async (e) => {
     setSubmitButton(true);
-    const totalPrice = (Math.round(((selectedPlan === "Basic" ? 9.99 : 99.99) * (taxInfo.total_tax_amounts[0].tax_rate.percentage / 100) + Number.EPSILON) * 100) / 100) * 100;
+    
+    const totalPrice = () => {
+      const price = selectedPlan === "Basic" ? 9.99 : 99.99;
+      return Math.round((price + getTax() + Number.EPSILON) * 100) / 100;
+    };
 
     if (validateEmail(email) === true && terms && country) {
       const billingDetails = {
@@ -98,7 +101,7 @@ const Billing = ({ selectedPlan, countries, ip }) => {
         try {
           const { id } = paymentMethod;
           const response = await axios.post("/api/payment_intents", {
-            amount: totalPrice,
+            amount: totalPrice() * 100,
             id,
           });
 
@@ -107,7 +110,7 @@ const Billing = ({ selectedPlan, countries, ip }) => {
             message
               .loading(
                 { content: "Running Card", className: "custom-message" },
-                2.5
+                50000
               )
               .then(() =>
                 message.success({
@@ -177,8 +180,6 @@ const Billing = ({ selectedPlan, countries, ip }) => {
       ],
     });
 
-    console.log(subscription);
-
     const response = await axios.post("/api/upcoming_invoice", {
       customer: customer.id,
       country: e,
@@ -194,22 +195,21 @@ const Billing = ({ selectedPlan, countries, ip }) => {
 
     if (response.status === 200) {
       setTaxInfo(response.data);
-      console.log(response.data);
-      console.log(response.data.total_tax_amounts);
     } else {
       console.log(response.data.message);
     }
   };
 
-  const getTax = (tax) => {
-    const price = selectedPlan === "Basic" ? 9.99 : 99.99;
-    return Math.round((price * (tax / 100) + Number.EPSILON) * 100) / 100;
-  };
+    const getTax = () => {
+      const price = selectedPlan === "Basic" ? 9.99 : 99.99;
+      const tax = taxInfo.total_tax_amounts[0].tax_rate.percentage / 100;
+      return Math.round((price * tax + Number.EPSILON) * 100) / 100;
+    };
 
-  const totalPrice = (tax) => {
-    const price = selectedPlan === "Basic" ? 9.99 : 99.99;
-    return Math.round((price + tax + Number.EPSILON) * 100) / 100;
-  };
+    const totalPrice = () => {
+      const price = selectedPlan === "Basic" ? 9.99 : 99.99;
+      return Math.round((price + getTax() + Number.EPSILON) * 100) / 100;
+    };
 
   const handleTerms = () => {
     if(taxInfo){
@@ -385,7 +385,7 @@ const Billing = ({ selectedPlan, countries, ip }) => {
               <Text className="text-xl">
                 $
                 {taxInfo
-                  ? getTax(taxInfo.total_tax_amounts[0].tax_rate.percentage)
+                  ? getTax()
                   : "-"}{" "}
                 USD
               </Text>
@@ -396,7 +396,7 @@ const Billing = ({ selectedPlan, countries, ip }) => {
               <Text className="text-xl font-semibold">
                 $
                 {taxInfo
-                  ? totalPrice(taxInfo.total_tax_amounts[0].tax_rate.percentage)
+                  ? totalPrice()
                   : selectedPlan === "Basic"
                   ? 9.99
                   : 99.99}{" "}

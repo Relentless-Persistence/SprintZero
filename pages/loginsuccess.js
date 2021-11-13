@@ -1,6 +1,6 @@
 import React from "react";
 import Head from "next/head";
-import Layout from "../components/Layout";
+import AuthLayout from "../components/AuthLayout";
 import LoginSuccess from "../components/LoginSuccess";
 
 const loginsuccess = () => {
@@ -11,9 +11,9 @@ const loginsuccess = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout>
+      <AuthLayout>
         <LoginSuccess />
-      </Layout>
+      </AuthLayout>
     </div>
   );
 };

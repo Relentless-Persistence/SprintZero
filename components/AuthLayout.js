@@ -11,12 +11,14 @@ const Layout = ({ children }) => {
       <Title level={2} className="logo">
         Sprint Zero
       </Title>
-      {/* {user ? (
+      {user ? (
         <div className="flex items-center justify-end -mt-10">
-          <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>{user.displayName}</Text>
+          <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>
+            {user.displayName}
+          </Text>
           <Avatar src={user.photoURL} />
         </div>
-      ) : null} */}
+      ) : null}
 
       {children}
     </div>

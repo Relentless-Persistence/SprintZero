@@ -4,7 +4,7 @@
 
 :root {
   --kelly: #73c92d;
-  --pine: #101D06;
+  --pine: #101d06;
 }
 
 .text-primary {
@@ -111,6 +111,7 @@ body {
 .swiper-slide-next,
 .swiper-slide-prev {
   opacity: 0.3;
+  pointer-events: none;
 }
 
 .swiper-slide img {
@@ -149,3 +150,56 @@ body {
   height: 32px;
   padding: 0 10px;
 }
+.ant-message-custom-content {
+  display: flex;
+  align-items: center;
+}
+
+.dropdown {
+  margin: 0 auto;
+  user-select: none;
+}
+
+.dropdown .dropdown-btn {
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  width: 100%;
+  height: 32px;
+  padding: 0 5px;
+  box-shadow: 3px 3px 10px 6px rgba(0, 0, 0, 0.06);
+  /* font-weight: bold; */
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.dropdown .dropdown-content {
+  position: absolute;
+  top: 1;
+  left: 5px;
+  background-color: #fff;
+  box-shadow: 3px 3px 10px 6px rgba(0, 0, 0, 0.06);
+  /* font-weight: 500; */
+  color: #333;
+  text-align: center;
+  width: 88%;
+  height: 155px;
+  overflow-y: scroll;
+}
+
+.dropdown .dropdown-content .dropdown-item {
+  padding: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dropdown .dropdown-content .dropdown-item:hover {
+  background-color: #009cd5;
+  color: #fff;
+}
+
+

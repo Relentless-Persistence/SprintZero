@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Button, Typography, Carousel, Card, Col, Row, message } from "antd";
+import { Button, Typography, Carousel, Card, Col, Row, message, Avatar } from "antd";
 import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
@@ -19,6 +20,7 @@ const db = firebaseConfig.firestore();
 SwiperCore.use([Pagination, Navigation]);
 
 const ProductConfiguration = () => {
+  const { user } = useAuth();
   const [product, setProduct] = useState("");
   const [email1, setEmail1] = useState("");
   const [email2, setEmail2] = useState("");
@@ -33,10 +35,7 @@ const ProductConfiguration = () => {
 
   const prevRef = useRef(null);
   const nextRef = useRef(null);
-
-  // useEffect(() => {
-  //   Swiper.onSwiper(())
-  // }, [Swiper])
+  const swiperRef = useRef(null);
 
   const handleSubmit = () => {
     if ((product !== "" && email1 !== "" && cadence !== "", gate !== "")) {
@@ -55,13 +54,13 @@ const ProductConfiguration = () => {
         .then(() =>
           message.success({
             content: "Product configuration saved successfully",
-            className: "custom-message",
+            className: "custom-message mt-12",
           })
         );
     } else {
       message.warning({
         content: "Some field can't be empty",
-        className: "custom-message",
+        className: "custom-message mt-12",
       });
     }
   };
@@ -77,32 +76,33 @@ const ProductConfiguration = () => {
     );
   };
 
-  const NextArrow = ({ index }) => {
-    const show = index === 4 ? true : false;
+  const NextArrow = () => {
+    // const show = index === 4 ? true : false;
 
-    const next = () => {
-      const activate = () => {
-        setError(false);
-      };
+    // const next = () => {
+    //   const activate = () => {
+    //     setError(false);
+    //   };
 
-      if (index === 0) {
-        if (product && email1) {
-          activate();
-        } else {
-          setError(true);
-        }
-      } else if (index === 1) {
-        cadence ? activate() : setError(true);
-      } else if (index === 2) {
-        gate ? activate() : setError(true);
-      } else if (index === 3) {
-        activate();
-      }
-    };
+    //   if (index === 0) {
+    //     if (product && email1) {
+    //       activate();
+    //     } else {
+    //       setError(true);
+    //     }
+    //   } else if (index === 1) {
+    //     cadence ? activate() : setError(true);
+    //   } else if (index === 2) {
+    //     gate ? activate() : setError(true);
+    //   } else if (index === 3) {
+    //     activate();
+    //   }
+    // };
+    // console.log(swiperRef.current);
 
     return (
       <div style={{ position: "absolute", bottom: 0, right: 0 }}>
-        <Button disabled={show} type="primary" ghost>
+        <Button disabled={false} type="primary" ghost ref={nextRef}>
           Next
         </Button>
       </div>
@@ -111,6 +111,20 @@ const ProductConfiguration = () => {
 
   return (
     <>
+      <div style={{ padding: "0 153px", marginTop: "50px" }}>
+        <Title level={2} className="logo">
+          Sprint Zero
+        </Title>
+        {user ? (
+          <div className="flex items-center justify-end -mt-10">
+            <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>
+              {user.displayName}
+            </Text>
+            <Avatar src={user.photoURL} />
+          </div>
+        ) : null}
+      </div>
+
       <div className="flex items-center justify-center mb-6">
         <div>
           <Title
@@ -128,12 +142,14 @@ const ProductConfiguration = () => {
       </div>
 
       <Swiper
+        ref={swiperRef}
         onSwiper={setSwiper}
         onInit={(swiper) => {
           swiper.params.navigation.prevEl = prevRef.current;
           swiper.params.navigation.nextEl = nextRef.current;
           swiper.navigation.init();
           swiper.navigation.update();
+          realIndexChange: (swiper) => console.log(swiper.realIndex);
         }}
         slidesPerView={3}
         spaceBetween={80}
@@ -141,8 +157,6 @@ const ProductConfiguration = () => {
         pagination={{
           clickable: true,
         }}
-        noSwiping={true}
-        preventClicks={false}
       >
         <SwiperSlide>
           <div>
