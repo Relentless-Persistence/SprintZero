@@ -71,7 +71,7 @@ const DashboardLayout = () => {
               <HeaderMenu key={i} className="mr-10" active={product === item ? true : false} onClick={() => setProduct(item)}>{item}</HeaderMenu>
             ))}
             
-            <div className="mr-10" style={{ color: "#73c92d"}}>Add Product</div>
+            {/* <div className="mr-10" style={{ color: "#73c92d"}}>Add Product</div> */}
           </div>
         </div>
         <div className="flex items-center">
@@ -93,9 +93,9 @@ const DashboardLayout = () => {
         <Sider
           width={200}
           className="site-layout-background"
-          collapsible
-          collapsed={collapsed}
-          onCollapse={onCollapse}
+          // collapsible
+          // collapsed={collapsed}
+          // onCollapse={onCollapse}
         >
           <Menu
             mode="inline"
@@ -185,7 +185,7 @@ const DashboardLayout = () => {
                   >
                     All
                   </Version>
-                  <Version style={{ color: "#009CD5" }}>Add Release</Version>
+                  {/* <Version style={{ color: "#009CD5" }}>Add Release</Version> */}
                 </Versions>
               </div>
             </div>
