@@ -1,5 +1,5 @@
 {
-    "family": "",
+    "family": "web",
     "taskRoleArn": "",
     "executionRoleArn": "",
     "networkMode": "none",
