@@ -46,7 +46,7 @@ const ProductDetails = ({
           onChange={(e) => setProduct(e.target.value)}
         />
         {error ? (
-          <div className="text-xs text-red-600">*Product can't be empty</div>
+          <div className="text-xs text-red-600">*Product can&apos;t be empty</div>
         ) : null}
         <Text className="text-xs">32 Character Limit</Text>
       </Col>
