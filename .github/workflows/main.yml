@@ -27,11 +27,11 @@ jobs:
         - name: 'Deploy to Azure Container Instances'
           uses: 'azure/aci-deploy@v1'
           with:
-            resource-group: ${{ secrets.RESOURCE_GROUP }}
+            resource-group: "SprintZeroDev"
             dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
             image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sprintzero:${{ github.sha }}
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-            registry-username: ${{ secrets.REGISTRY_USERNAME }}
+            registry-username: "3d54bb24-59bb-452f-bbbc-ddff86da3ff1"
             registry-password: ${{ secrets.REGISTRY_PASSWORD }}
             name: aci-sprintzero
             location: 'central us'
