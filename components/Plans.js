@@ -9,7 +9,7 @@ const Plans = () => {
   return (
     <>
       <div>
-        <Title level={1} style={{ fontWeight: "normal" }}>Let's Get Started</Title>
+        <Title level={1} style={{ fontWeight: "normal" }}>Let&apos;s Get Started</Title>
         <Text className="text-xl">
           Thanks for choosing SprintZero to build your next product experience!
           Start by selecting the billing plan below that works best for your
