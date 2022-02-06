@@ -74,6 +74,21 @@ export default function Objectives ()
         setActiveGoal( goal );
     };
 
+
+    const onAddGoal = ( name ) =>
+    {
+        const newData = { ...data };
+        const goal =
+        {
+            name,
+            title: `${ name } title`,
+            results: []
+        };
+        newData[ activeProduct ].push( goal );
+
+        setData( newData );
+    };
+
     const setProduct = ( product ) =>
     {
         setActiveProduct( product );
@@ -126,6 +141,7 @@ export default function Objectives ()
                 activeRightItem={ activeGoal?.name }
                 setActiveRightNav={ setGoal }
                 onMainAdd={ addItem }
+                onSideAdd={ onAddGoal }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Input

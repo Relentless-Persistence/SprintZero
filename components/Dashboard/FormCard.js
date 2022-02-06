@@ -26,7 +26,6 @@ export default function FormCard (
         }
     );
 
-    console.log( 'item' );
 
 
     const handleChange = ( e, key ) =>
@@ -38,6 +37,7 @@ export default function FormCard (
             [ key ]: value
         } );
     };
+
 
     const handleSubmit = () =>
     {

@@ -63,6 +63,18 @@ padding-right:6px;
 
 `;
 
+const AddSide = styled( Button )`
+background: transparent;
+border: none;
+margin: 5px auto;
+display:block;
+color: #009CD5;
+box-shadow:none
+font-family: SF Pro Text;
+font-size: 16px;
+line-height: 24px;
+`;
+
 const Partition = styled( Divider )`
   height:100px;
 `;
@@ -78,19 +90,34 @@ const AppLayout = ( {
     setActiveProduct,
     onMainAdd,
     onSideAdd,
+    hasSideAdd = true,
     children } ) =>
 {
-    const router = useRouter();
     const { user } = useAuth();
-    const [ collapsed, setCollapsed ] = useState( false );
-    const [ version, setVersion ] = useState( "All" );
-    const [ product, setProduct ] = useState( products[ 0 ] );
+    const [ showSideAdd, setShowSideAdd ] = useState( false );
+    const [ value, setValue ] = useState( "" );
 
-    const onCollapse = ( collapsed ) =>
+    const toggleSideAdd = () =>
     {
-        setCollapsed( collapsed );
+        setShowSideAdd( s => !s );
     };
 
+    const onEnter = ( e ) =>
+    {
+
+        if ( e.key === "Enter" )
+        {
+            onSideAdd( value );
+            toggleSideAdd();
+            setValue( "" );
+
+        }
+    };
+
+    const handleChange = e =>
+    {
+        setValue( e.target.value );
+    };
 
     if ( !user ) return <div>Loading...</div>;
 
@@ -188,6 +215,24 @@ const AppLayout = ( {
                                     }
 
                                 </Versions>
+
+                                {
+                                    ( hasSideAdd && showSideAdd ) ? <Input
+                                        className="mx-4 my-8 block"
+                                        autoFocus
+                                        value={ value }
+                                        onChange={ handleChange }
+                                        onKeyPress={ onEnter }
+                                    /> : null
+                                }
+
+                                {
+                                    hasSideAdd ?
+                                        <AddSide onClick={ toggleSideAdd }>
+                                            Add
+                                        </AddSide> : null
+                                }
+
                             </div>
                         </div>
                     </div>
