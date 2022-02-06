@@ -38,7 +38,11 @@ const SideBar = () =>
                         <a>Objectives</a>
                     </Link>
                 </Menu.Item>
-                <Menu.Item key="3">Partnerships</Menu.Item>
+                <Menu.Item key="3">
+                    <Link href="/dashboard/strategy/partnerships">
+                        <a>Partnerships</a>
+                    </Link>
+                </Menu.Item>
                 <Menu.Item key="4">Vision</Menu.Item>
                 <Menu.Item key="5">Accessibility</Menu.Item>
                 <Menu.Item key="6">Ethics</Menu.Item>

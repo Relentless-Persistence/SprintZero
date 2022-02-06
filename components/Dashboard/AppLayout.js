@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Layout, Breadcrumb, Typography, Input, Avatar } from "antd";
+import
+{
+    Layout,
+    Breadcrumb,
+    Typography,
+    Input,
+    Avatar,
+    Divider,
+    Button,
+} from "antd";
 import { useRouter } from 'next/router';
 import
 {
     MessageFilled,
+    PlusOutlined
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -41,6 +51,22 @@ const Version = styled.li`
   cursor: pointer;
 `;
 
+const AddNew = styled( Button )`
+align-items:center;
+display:flex;
+padding-top:0;
+padding-bottom:0;
+overflow:hidden;
+margin-top:14px;
+margin-right:44px;
+padding-right:6px;
+
+`;
+
+const Partition = styled( Divider )`
+  height:100px;
+`;
+
 
 const AppLayout = ( {
     rightNavItems,
@@ -50,6 +76,8 @@ const AppLayout = ( {
     breadCrumbItems,
     setActiveRightNav,
     setActiveProduct,
+    onMainAdd,
+    onSideAdd,
     children } ) =>
 {
     const router = useRouter();
@@ -107,24 +135,33 @@ const AppLayout = ( {
                 <Layout style={ { padding: "0 24px 24px" } }>
                     <div className="flex justify-between">
                         <div className="flex-1">
-                            <Breadcrumb style={ { margin: "16px 0 0 44px" } }>
+                            <div className="flex justify-between">
+                                <Breadcrumb style={ { margin: "16px 0 0 44px" } }>
 
-                                {
-                                    breadCrumbItems.map( ( item, i ) => (
-                                        <Breadcrumb.Item
-                                            key={ i }
-                                            className="capitalize"
-                                        >
-                                            { item }
-                                        </Breadcrumb.Item>
-                                    ) )
-                                }
+                                    {
+                                        breadCrumbItems.map( ( item, i ) => (
+                                            <Breadcrumb.Item
+                                                key={ i }
+                                                className="capitalize"
+                                            >
+                                                { item }
+                                            </Breadcrumb.Item>
+                                        ) )
+                                    }
 
 
-                                <Breadcrumb.Item className="capitalize text-green-800 ">
-                                    { activeRightItem }
-                                </Breadcrumb.Item>
-                            </Breadcrumb>
+                                    <Breadcrumb.Item className="capitalize text-green-800 ">
+                                        { activeRightItem }
+                                    </Breadcrumb.Item>
+                                </Breadcrumb>
+
+                                <AddNew onClick={ onMainAdd }>
+                                    Add New
+                                    <Partition type="vertical" />
+                                    <PlusOutlined />
+                                </AddNew>
+                            </div>
+
                             <Content
                                 style={ {
                                     padding: "24px 44px",

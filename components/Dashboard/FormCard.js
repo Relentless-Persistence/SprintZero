@@ -13,16 +13,21 @@ const { TextArea } = Input;
 
 export default function FormCard (
     {
-        onCreate
+        isEdit,
+        itemToEdit,
+        onSubmit
     }
 )
 {
-    const [ item, setItem ] = useState(
+    const [ item, setItem ] = useState( isEdit ? { ...itemToEdit } :
         {
             name: "",
             description: ""
         }
     );
+
+    console.log( 'item' );
+
 
     const handleChange = ( e, key ) =>
     {
@@ -34,16 +39,32 @@ export default function FormCard (
         } );
     };
 
-    const handleCreate = () =>
+    const handleSubmit = () =>
     {
-        onCreate( item );
+        if ( isEdit )
+        {
+            onSubmit(
+                {
+                    name: item.name || itemToEdit.name,
+                    description: item.description || itemToEdit.description,
+
+                }
+            );
+
+        }
+        else
+        {
+            onSubmit( item );
+
+        }
     };
 
     return (
         <Card
             bordered={ false }
-            extra={ <CardHeaderButton onClick={ handleCreate } >Done</CardHeaderButton> }
+            extra={ <CardHeaderButton onClick={ handleSubmit } >Done</CardHeaderButton> }
             title={ <Input
+                value={ item.name }
                 onChange={ e => handleChange( e, "name" ) }
                 placeholder="Result name..." /> }
             headStyle={ {
@@ -52,6 +73,7 @@ export default function FormCard (
         >
             <TextArea
                 autoSize={ { minRows: 6 } }
+                value={ item.description }
                 onChange={ e => handleChange( e, "description" ) }
                 placeholder="Result description..." />
         </Card>
