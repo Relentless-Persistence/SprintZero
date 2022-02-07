@@ -60,14 +60,14 @@ overflow:hidden;
 margin-top:14px;
 margin-right:44px;
 padding-right:6px;
+background:#fff;
 
 `;
 
 const AddSide = styled( Button )`
-background: transparent;
+background:transparent;
 border: none;
 margin: 5px auto;
-display:block;
 color: #009CD5;
 box-shadow:none
 font-family: SF Pro Text;
@@ -105,9 +105,9 @@ const AppLayout = ( {
     const onEnter = ( e ) =>
     {
 
-        if ( e.key === "Enter" )
+        if ( e.key === "Enter" && value.trim() )
         {
-            onSideAdd( value );
+            onSideAdd( value.trim() );
             toggleSideAdd();
             setValue( "" );
 
@@ -205,6 +205,7 @@ const AppLayout = ( {
                                     {
                                         rightNavItems.map( ( item, i ) => (
                                             <Version
+                                                className="capitalize"
                                                 key={ i }
                                                 active={ activeRightItem === item }
                                                 onClick={ () => setActiveRightNav( item ) }
@@ -214,24 +215,34 @@ const AppLayout = ( {
                                         ) )
                                     }
 
+
+                                    {
+                                        ( hasSideAdd && showSideAdd ) ?
+                                            <Version> <Input
+                                                className="mx-0 my-0"
+                                                autoFocus
+                                                value={ value }
+                                                onChange={ handleChange }
+                                                onKeyPress={ onEnter }
+                                            />
+                                            </Version>
+                                            : null
+                                    }
+
+                                    {
+                                        hasSideAdd ?
+
+                                            <Version>
+                                                <AddSide onClick={ toggleSideAdd }>
+                                                    Add
+                                                </AddSide>
+                                            </Version>
+                                            : null
+                                    }
+
                                 </Versions>
 
-                                {
-                                    ( hasSideAdd && showSideAdd ) ? <Input
-                                        className="mx-4 my-8 block"
-                                        autoFocus
-                                        value={ value }
-                                        onChange={ handleChange }
-                                        onKeyPress={ onEnter }
-                                    /> : null
-                                }
 
-                                {
-                                    hasSideAdd ?
-                                        <AddSide onClick={ toggleSideAdd }>
-                                            Add
-                                        </AddSide> : null
-                                }
 
                             </div>
                         </div>
