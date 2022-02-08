@@ -65,7 +65,7 @@ const Billing = ({ selectedPlan, countries, ip }) => {
       setCustomer(res.data);
     }
     customer();
-  },[])
+  }, [ip])
 
   function validateEmail(mail) {
     const re =

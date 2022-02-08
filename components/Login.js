@@ -3,17 +3,17 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { Button, Typography, message } from "antd";
 import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
-import { googleProvider, microsoftProvider } from "../config/authMethods";
+import { googleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
 import firebase from "../config/firebase-config";
-import { usePaymentConfirm } from "../contexts/PaymentContext";
+// import { usePaymentConfirm } from "../contexts/PaymentContext";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
   const router = useRouter();
   const auth = firebase.auth();
-  const paid = usePaymentConfirm();
+  // const paid = usePaymentConfirm();
 
   const handleOnClick = (provider) => {
     try {
@@ -61,7 +61,7 @@ const Login = () => {
           />
           <span style={{ marginLeft: "15px" }}>Sign in with Google</span>
         </button>
-        <button
+        {/* <button
           className="microsoft flex items-center"
           onClick={() => handleOnClick(microsoftProvider)}
         >
@@ -72,7 +72,7 @@ const Login = () => {
             height={24}
           />
           <span style={{ marginLeft: "15px" }}>Sign in with Microsoft</span>
-        </button>
+        </button> */}
       </div>
       <div className="absolute bottom-20 lg:left-80">
         <Button onClick={() => router.push("/")}>Go Back</Button>

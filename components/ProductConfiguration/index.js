@@ -6,7 +6,7 @@ import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
 import ProductCost from "./ProductCost";
-import withAuth from "../../hoc/withAuth";
+// import withAuth from "../../hoc/withAuth";
 import firebaseConfig from "../../config/firebase-config";
 import firebase from "firebase";
 
@@ -232,4 +232,4 @@ const ProductConfiguration = () => {
   );
 };
 
-export default withAuth(ProductConfiguration);
+export default ProductConfiguration
