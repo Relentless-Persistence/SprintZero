@@ -36,5 +36,6 @@ const withAuth = (Component) => {
       return <React.Fragment>{this.renderContent()}</React.Fragment>;
     }
   };
+  
 };
 export default withAuth;
