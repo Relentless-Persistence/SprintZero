@@ -220,6 +220,7 @@ const AppLayout = ( {
                                         ( hasSideAdd && showSideAdd ) ?
                                             <Version> <Input
                                                 className="mx-0 my-0"
+                                                maxLength={ 20 }
                                                 autoFocus
                                                 value={ value }
                                                 onChange={ handleChange }

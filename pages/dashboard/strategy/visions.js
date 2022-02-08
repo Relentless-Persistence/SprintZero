@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
-
-import styled from 'styled-components';
-
 import
 {
     Row,
     Col,
-    Avatar,
-    Card,
-    Divider
+    Input
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -19,8 +14,9 @@ import ItemCard from "../../../components/Dashboard/ItemCard";
 
 import { splitRoutes } from "../../../utils";
 
-import fakeData from "../../../fakeData/partnerships.json";
+import fakeData from "../../../fakeData/productData.json";
 import products from "../../../fakeData/products.json";
+
 
 const getGoalNames = ( goals ) =>
 {
@@ -29,16 +25,8 @@ const getGoalNames = ( goals ) =>
     return goalNames;
 };
 
-const Pcard = styled( Card )`
-.ant-card-body
-{
-    padding:0
-}
-`;
 
-const tabList = [ "active", "prospective", "historical" ];
-
-export default function Partnerships ()
+export default function Objectives ()
 {
     const { pathname } = useRouter();
 
@@ -47,15 +35,47 @@ export default function Partnerships ()
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
-    const [ activePartner, setActivePartner ] = useState( tabList[ 0 ] );
+    const [ activeGoal, setActiveGoal ] = useState( data[ activeProduct ][ 0 ] );
 
 
-
-    const setActiveTabItem = ( tabName ) =>
+    const handleTitleChange = ( e ) =>
     {
-        setActivePartner( tabName );
+        const { value } = e.target;
+
+        const newData = { ...data };
+        const goalIndex = data[ activeProduct ].findIndex( goal => goal.name === activeGoal.name );
+
+        newData[ activeProduct ][ goalIndex ].title = value;
+
+        setData( newData );
     };
 
+    const onClose = () =>
+    {
+        setVisible( false );
+    };
+
+    const setGoal = ( goalName, product ) =>
+    {
+        const goal = data[ product || activeProduct ].find( goal => goal.name === goalName );
+
+        setActiveGoal( goal );
+    };
+
+
+    const onAddGoal = ( name ) =>
+    {
+        const newData = { ...data };
+        const goal =
+        {
+            name,
+            title: `${ name } title`,
+            results: []
+        };
+        newData[ activeProduct ].push( goal );
+
+        setData( newData );
+    };
 
     const setProduct = ( product ) =>
     {
@@ -70,23 +90,26 @@ export default function Partnerships ()
         setShowAdd( true );
     };
 
-
     const addItemDone = ( item ) =>
     {
-        const body =
-        {
-            "logo": "/fakeImages/google.png",
-            "name": "Google",
-            "category": "Third Party Auth",
-            "costText": ".04 cents per event"
-        };
         const newData = { ...data };
-        newData[ activeProduct ][ activePartner ].push( body );
+        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
 
+        goal?.results.push( item );
 
         setData( newData );
         setShowAdd( false );
     };
+
+    const editItem = ( resultIndex, item ) =>
+    {
+        const newData = { ...data };
+        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
+
+        goal.results[ resultIndex ] = item;
+        setData( newData );
+    };
+
 
 
     return (
@@ -101,18 +124,22 @@ export default function Partnerships ()
             <AppLayout
                 products={ products }
                 setActiveProduct={ setProduct }
-                rightNavItems={ tabList }
+                rightNavItems={ getGoalNames( data[ activeProduct ] ) }
                 activeProduct={ activeProduct }
-                activeRightItem={ activePartner }
-                setActiveRightNav={ setActiveTabItem }
+                activeRightItem={ activeGoal?.name }
+                setActiveRightNav={ setGoal }
                 onMainAdd={ addItem }
+                onSideAdd={ onAddGoal }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-
+                <Input
+                    onChange={ handleTitleChange }
+                    maxLength={ 20 }
+                    value={ activeGoal?.title } />
 
 
                 <Row className="py-6" gutter={ [ 12, 12 ] }>
-                    {/* {
+                    {
                         activeGoal?.results.map( ( res, i ) => (
                             <Col
                                 xs={ { span: 24 } }
@@ -123,41 +150,6 @@ export default function Partnerships ()
                                     item={ res } />
                             </Col>
                         ) )
-                    } */}
-
-                    {
-                        data[ activeProduct ][ activePartner ].map(
-                            ( p, i ) => (
-                                <Col
-                                    xs={ { span: 24 } }
-                                    sm={ { span: 8 } }
-                                    key={ i }>
-                                    <Pcard>
-                                        <div className="px-4 pt-5 pb-0 flex items-center">
-                                            <Avatar
-                                                size={ 48 }
-                                                src={ p.logo } />
-
-                                            <div className=" ml-3">
-                                                <p><strong>{ p.name }</strong></p>
-
-                                                <p className="text-gray-400" >{ p.category }</p>
-                                            </div>
-                                        </div>
-                                        <Divider className="mt-3" />
-                                        <div className="px-5 pb-5" >
-                                            <p><strong>Cost</strong></p>
-
-                                            <p>
-                                                { p.costText }
-                                            </p>
-
-                                        </div>
-
-                                    </Pcard>
-                                </Col>
-                            )
-                        )
                     }
 
 

@@ -1,1 +1,1 @@
-export * from "./extractBreadCrumbs"
+export * from "./extractBreadCrumbs";
