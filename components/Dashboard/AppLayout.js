@@ -210,7 +210,6 @@ const AppLayout = ( {
                 </Layout>
             </Layout>
         </Layout>
-      </Layout >
     );
 };
 
