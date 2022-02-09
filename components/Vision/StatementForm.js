@@ -11,6 +11,10 @@ import
 import CardHeaderButton from '../Dashboard/CardHeaderButton';
 import { checkEmptyObject } from '../../utils';
 
+const FormItem = styled( Form.Item )`
+margin-bottom:24px;
+`;
+
 
 const test = () => alert( "lol" );
 
@@ -45,7 +49,20 @@ const StatementForm = (
 
     const onFinish = ( values ) =>
     {
-        console.log( values );
+        handleSubmit( values );
+    };
+
+    const validate = async () =>
+    {
+        try
+        {
+            const values = await form.validateFields();
+            onFinish( values );
+        } catch ( error )
+        {
+            console.error( error );
+
+        }
     };
 
 
@@ -53,7 +70,7 @@ const StatementForm = (
     return (
         <Card
             bordered={ false }
-            extra={ <CardHeaderButton onClick={ () => form.submit() } >Done</CardHeaderButton> }
+            extra={ <CardHeaderButton onClick={ validate } >Done</CardHeaderButton> }
             title="Guiding Statement">
             <Form
                 { ...layout }
@@ -63,56 +80,79 @@ const StatementForm = (
                 initialValues={ initialValues }
                 onFinish={ onFinish }>
 
-                <Form.Item
+                <FormItem
                     label="Target Customer"
                     name="targetCustomer"
                     tooltip="Identify the target of this product"
-                    required
+                    rules={ [
+                        {
+                            required: true,
+                            message: 'Please input the target customer',
+                        },
+                    ] }
                 >
                     <Input placeholder="Reviewer, Recorder, etc" />
-                </Form.Item>
+                </FormItem>
 
 
-                <Form.Item
+                <FormItem
                     label="Need"
                     name="need"
                     tooltip="Identify the need of this product"
-                    required
+                    rules={ [
+                        {
+                            required: true,
+                            message: 'Please input the product need',
+                        },
+                    ] }
                 >
                     <Input placeholder="eg File taxes" />
-                </Form.Item>
+                </FormItem>
 
 
-                <Form.Item
+                <FormItem
                     label="Key Benefits"
                     name="keyBenefits"
                     tooltip="Identify the key benefits of this product"
-                    required
+                    rules={ [
+                        {
+                            required: true,
+                            message: 'Please input the key benefits',
+                        },
+                    ] }
                 >
                     <Input placeholder="Fast, Cheap" />
-                </Form.Item>
+                </FormItem>
 
 
 
-                <Form.Item
+                <FormItem
                     label="Competitors"
                     name="competitors"
                     tooltip="Identify the competitors for this product"
-                    required
-                >
+                    rules={ [
+                        {
+                            required: true,
+                            message: 'Please input at least one competitor',
+                        },
+                    ] }                >
                     <Input placeholder="Turbotax" />
-                </Form.Item>
+                </FormItem>
 
 
 
-                <Form.Item
+                <FormItem
                     label="Differentiators"
                     name="differentiators"
                     tooltip="What makes your the product different?"
-                    required
-                >
+                    rules={ [
+                        {
+                            required: true,
+                            message: 'Please input the at least one difference',
+                        },
+                    ] }                >
                     <Input placeholder="Faster, Cheaper" />
-                </Form.Item>
+                </FormItem>
 
 
 

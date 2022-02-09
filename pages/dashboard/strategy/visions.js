@@ -44,10 +44,6 @@ export default function Visions ()
         setVision( vision );
     };
 
-    const addVision = () =>
-    {
-        alert( "Hello" );
-    };
 
     const handleActiveVision = ( visionDate ) =>
     {
@@ -61,6 +57,21 @@ export default function Visions ()
 
         }
 
+    };
+
+    const handleSubmit = ( info ) =>
+    {
+        const data =
+        {
+            createdAt: new Date().toISOString(),
+            info
+        };
+
+        const newData = { ...visionData };
+        newData[ activeProduct ] = [ data, ...newData[ activeProduct ] ];
+
+        setVisionData( newData );
+        setVision( newData[ activeProduct ][ 0 ].createdAt );
     };
 
 
@@ -80,7 +91,6 @@ export default function Visions ()
                 rightNavItems={ generateRightNav( visionData[ activeProduct ] ) }
                 activeRightItem={ vision }
                 setActiveRightNav={ handleActiveVision }
-                onMainAdd={ addVision }
                 hasSideAdd={ false }
                 defaultText="Statement"
                 onChangeProduct={ onChangeProduct }
@@ -89,7 +99,8 @@ export default function Visions ()
                 {
                     checkEmptyArray( visionData[ activeProduct ] ) ?
 
-                        <StatementForm /> :
+                        <StatementForm
+                            handleSubmit={ handleSubmit } /> :
 
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. A ducimus provident quo error in omnis ea minus dignissimos fugit commodi quibusdam laboriosam itaque minima, debitis voluptatum mollitia nostrum expedita similique.</p>
                 }
