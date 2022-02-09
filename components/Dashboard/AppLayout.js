@@ -4,38 +4,22 @@ import
 {
     Layout,
     Breadcrumb,
-    Typography,
     Input,
-    Avatar,
     Divider,
     Button,
 } from "antd";
-import { useRouter } from 'next/router';
 import
 {
-    MessageFilled,
     PlusOutlined
 } from "@ant-design/icons";
-import { useAuth } from "../../contexts/AuthContext";
 
 import SideBar from "./SideBar";
+import AppHeader from "./Header";
+import { useAuth } from "../../contexts/AuthContext";
 
-const { Header, Content, Footer, Sider } = Layout;
-const { Title, Text } = Typography;
-const { Search } = Input;
 
-const HeaderMenu = styled.div`
-  color: ${ ( props ) => ( props.active ? "#73c92d" : "#fff" ) };
-  cursor: pointer;
-  border-bottom-width: 4px;
-  border-bottom-style: solid;
-  border-bottom-color: ${ ( props ) => ( props.active ? "#73c92d" : "transparent" ) };
+const { Content, Sider } = Layout;
 
-  &:hover {
-    color: var(--kelly);
-    border-bottom: 4px solid var(--kelly);
-  }
-`;
 
 const Versions = styled.ul`
   list-style: none;
@@ -82,19 +66,19 @@ const Partition = styled( Divider )`
 
 const AppLayout = ( {
     rightNavItems,
-    products,
-    activeProduct,
     activeRightItem = "test",
     breadCrumbItems,
     setActiveRightNav,
-    setActiveProduct,
+    onChangeProduct,
     onMainAdd,
+    defaultText,
     onSideAdd,
     hasSideAdd = true,
     children } ) =>
 {
     const { user } = useAuth();
     const [ showSideAdd, setShowSideAdd ] = useState( false );
+
     const [ value, setValue ] = useState( "" );
 
     const toggleSideAdd = () =>
@@ -114,6 +98,8 @@ const AppLayout = ( {
         }
     };
 
+
+
     const handleChange = e =>
     {
         setValue( e.target.value );
@@ -123,34 +109,7 @@ const AppLayout = ( {
 
     return (
         <Layout style={ { minHeight: "100vh" } }>
-            <Header className="header">
-                <div className="flex items-center">
-                    <Title level={ 2 } className="dashboard-logo m-0">
-                        Sprint Zero
-                    </Title>
-                    <div className="flex items-center ml-11">
-                        { products.map( ( item, i ) => (
-                            <HeaderMenu key={ i } className="mr-10" active={ activeProduct === item } onClick={ () => setActiveProduct( item ) }>{ item }</HeaderMenu>
-                        ) ) }
-
-
-                    </div>
-                </div>
-                <div className="flex items-center">
-                    <Search
-                        placeholder="Search"
-                        allowClear
-                        className="mr-6 border-none focus:outline-none outline-none"
-                        // onSearch={onSearch}
-                        style={ { width: 200 } }
-                    />
-                    <MessageFilled
-                        style={ { color: "#73c92d", width: "24px" } }
-                        className="mr-6"
-                    />
-                    <Avatar src={ user.photoURL } style={ { border: "2px solid #73c92d" } } />
-                </div>
-            </Header>
+            <AppHeader onChangeProduct={ onChangeProduct } />
             <Layout>
                 <Sider
                     width={ 200 }
@@ -178,7 +137,7 @@ const AppLayout = ( {
 
 
                                     <Breadcrumb.Item className="capitalize text-green-800 ">
-                                        { activeRightItem }
+                                        { defaultText || activeRightItem }
                                     </Breadcrumb.Item>
                                 </Breadcrumb>
 

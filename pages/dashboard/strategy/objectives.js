@@ -122,10 +122,8 @@ export default function Objectives ()
 
 
             <AppLayout
-                products={ products }
-                setActiveProduct={ setProduct }
+                onChangeProduct={ setProduct }
                 rightNavItems={ getGoalNames( data[ activeProduct ] ) }
-                activeProduct={ activeProduct }
                 activeRightItem={ activeGoal?.name }
                 setActiveRightNav={ setGoal }
                 onMainAdd={ addItem }
@@ -133,6 +131,7 @@ export default function Objectives ()
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Input
+                    maxLength={ 80 }
                     onChange={ handleTitleChange }
                     value={ activeGoal?.title } />
 

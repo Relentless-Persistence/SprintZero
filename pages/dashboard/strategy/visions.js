@@ -9,7 +9,6 @@ import
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import FormCard from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
 
 import { splitRoutes } from "../../../utils";
@@ -25,90 +24,26 @@ const getGoalNames = ( goals ) =>
     return goalNames;
 };
 
+const visions = [ "Today", "2d ago", "Last week" ];
 
-export default function Objectives ()
+export default function Visions ()
 {
+    const [ vision, setVision ] = useState( visions[ 0 ] );
+
     const { pathname } = useRouter();
 
-    const [ data, setData ] = useState( fakeData );
-    const [ showAdd, setShowAdd ] = useState( false );
 
-    const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
-
-    const [ activeGoal, setActiveGoal ] = useState( data[ activeProduct ][ 0 ] );
-
-
-    const handleTitleChange = ( e ) =>
+    const addVision = () =>
     {
-        const { value } = e.target;
-
-        const newData = { ...data };
-        const goalIndex = data[ activeProduct ].findIndex( goal => goal.name === activeGoal.name );
-
-        newData[ activeProduct ][ goalIndex ].title = value;
-
-        setData( newData );
+        alert( "Hello" );
     };
 
-    const onClose = () =>
+    const setActiveVison = ( visionName ) =>
     {
-        setVisible( false );
+        setVision( visionName );
+
     };
 
-    const setGoal = ( goalName, product ) =>
-    {
-        const goal = data[ product || activeProduct ].find( goal => goal.name === goalName );
-
-        setActiveGoal( goal );
-    };
-
-
-    const onAddGoal = ( name ) =>
-    {
-        const newData = { ...data };
-        const goal =
-        {
-            name,
-            title: `${ name } title`,
-            results: []
-        };
-        newData[ activeProduct ].push( goal );
-
-        setData( newData );
-    };
-
-    const setProduct = ( product ) =>
-    {
-        setActiveProduct( product );
-        const goalName = data[ product ][ 0 ].name;
-        setGoal( goalName, product );
-        setShowAdd( false );
-    };
-
-    const addItem = () =>
-    {
-        setShowAdd( true );
-    };
-
-    const addItemDone = ( item ) =>
-    {
-        const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
-
-        goal?.results.push( item );
-
-        setData( newData );
-        setShowAdd( false );
-    };
-
-    const editItem = ( resultIndex, item ) =>
-    {
-        const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
-
-        goal.results[ resultIndex ] = item;
-        setData( newData );
-    };
 
 
 
@@ -121,61 +56,18 @@ export default function Objectives ()
             </Head>
 
 
+
             <AppLayout
-                products={ products }
-                setActiveProduct={ setProduct }
-                rightNavItems={ getGoalNames( data[ activeProduct ] ) }
-                activeProduct={ activeProduct }
-                activeRightItem={ activeGoal?.name }
-                setActiveRightNav={ setGoal }
-                onMainAdd={ addItem }
-                onSideAdd={ onAddGoal }
+                rightNavItems={ visions }
+                activeRightItem={ vision }
+                setActiveRightNav={ setActiveVison }
+                onMainAdd={ addVision }
+                hasSideAdd={ false }
+                defaultText="Statement"
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <Input
-                    onChange={ handleTitleChange }
-                    maxLength={ 20 }
-                    value={ activeGoal?.title } />
 
-
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
-                    {
-                        activeGoal?.results.map( ( res, i ) => (
-                            <Col
-                                xs={ { span: 24 } }
-                                sm={ { span: 8 } }
-                                key={ i }>
-                                <ItemCard
-                                    onEdit={ ( item ) => editItem( i, item ) }
-                                    item={ res } />
-                            </Col>
-                        ) )
-                    }
-
-
-
-                    {
-                        showAdd ? <Col
-                            xs={ { span: 24 } }
-                            sm={ { span: 8 } }>
-                            <FormCard
-                                onSubmit={ addItemDone } />
-                        </Col> : null
-                    }
-                    {/* 
-                    <Col
-                        xs={ { span: 24 } }
-                        sm={ { span: 8 } }>
-                        <AddCard
-                            bordered={ false }
-                        >
-                            <CardHeaderButton onClick={ addItem }>
-                                Add Result
-                            </CardHeaderButton>
-                        </AddCard>
-                    </Col> */}
-                </Row>
-
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet totam, sapiente hic sed voluptatum deserunt velit labore aperiam. Illo repellendus placeat ipsam quas quod consequatur temporibus, id asperiores laudantium sapiente?</p>
 
 
             </AppLayout>
