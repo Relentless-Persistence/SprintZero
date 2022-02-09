@@ -64,99 +64,92 @@ const AppLayout = ( {
     };
 
 
-    if ( !user ) return <div>Loading...</div>;
+    // if ( !user ) return <div>Loading...</div>;
 
     return (
-        <Layout style={ { minHeight: "100vh" } }>
-            <Header className="header">
-                <div className="flex items-center">
-                    <Title level={ 2 } className="dashboard-logo m-0">
-                        Sprint Zero
-                    </Title>
-                    <div className="flex items-center ml-11">
-                        { products.map( ( item, i ) => (
-                            <HeaderMenu key={ i } className="mr-10" active={ activeProduct === item } onClick={ () => setActiveProduct( item ) }>{ item }</HeaderMenu>
-                        ) ) }
-
-
-                    </div>
-                </div>
-                <div className="flex items-center">
-                    <Search
-                        placeholder="Search"
-                        allowClear
-                        className="mr-6 border-none focus:outline-none outline-none"
-                        // onSearch={onSearch}
-                        style={ { width: 200 } }
-                    />
-                    <MessageFilled
-                        style={ { color: "#73c92d", width: "24px" } }
-                        className="mr-6"
-                    />
-                    <Avatar src={ user.photoURL } style={ { border: "2px solid #73c92d" } } />
-                </div>
-            </Header>
-            <Layout>
-                <Sider
-                    width={ 200 }
-                    className="site-layout-background"
-                    breakpoint="sm"
+      <Layout style={{ minHeight: "100vh" }}>
+        <Header className="header">
+          <div className="flex items-center">
+            <Title level={2} className="dashboard-logo m-0">
+              Sprint Zero
+            </Title>
+            <div className="flex items-center ml-11">
+              {products.map((item, i) => (
+                <HeaderMenu
+                  key={i}
+                  className="mr-10"
+                  active={activeProduct === item}
+                  onClick={() => setActiveProduct(item)}
                 >
-                    <SideBar />
-                </Sider>
-                <Layout style={ { padding: "0 24px 24px" } }>
-                    <div className="flex justify-between">
-                        <div className="flex-1">
-                            <Breadcrumb style={ { margin: "16px 0 0 44px" } }>
+                  {item}
+                </HeaderMenu>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center">
+            <Search
+              placeholder="Search"
+              allowClear
+              className="mr-6 border-none focus:outline-none outline-none"
+              // onSearch={onSearch}
+              style={{ width: 200 }}
+            />
+            {/* <Avatar src={ user.photoURL } style={ { border: "2px solid #73c92d" } } /> */}
+            <Avatar
+              src={
+                "https://www.pngkey.com/png/detail/115-1150152_default-profile-picture-avatar-png-green.png"
+              }
+              style={{ border: "2px solid #73c92d" }}
+            />
+          </div>
+        </Header>
+        <Layout>
+          <Sider width={200} className="site-layout-background" breakpoint="sm">
+            <SideBar />
+          </Sider>
+          <Layout style={{ padding: "0 24px 24px" }}>
+            <div className="flex justify-between">
+              <div className="flex-1">
+                <Breadcrumb style={{ margin: "16px 0 0 44px" }}>
+                  {breadCrumbItems.map((item, i) => (
+                    <Breadcrumb.Item key={i} className="capitalize">
+                      {item}
+                    </Breadcrumb.Item>
+                  ))}
 
-                                {
-                                    breadCrumbItems.map( ( item, i ) => (
-                                        <Breadcrumb.Item
-                                            key={ i }
-                                            className="capitalize"
-                                        >
-                                            { item }
-                                        </Breadcrumb.Item>
-                                    ) )
-                                }
-
-
-                                <Breadcrumb.Item className="capitalize text-green-800 ">
-                                    { activeRightItem }
-                                </Breadcrumb.Item>
-                            </Breadcrumb>
-                            <Content
-                                style={ {
-                                    padding: "24px 44px",
-                                    margin: 0,
-                                    minHeight: 280,
-                                } }
-                            >
-                                { children }
-                            </Content>
-                        </div>
-                        <div>
-                            <div>
-                                <Versions className="">
-                                    {
-                                        rightNavItems.map( ( item, i ) => (
-                                            <Version
-                                                key={ i }
-                                                active={ activeRightItem === item }
-                                                onClick={ () => setActiveRightNav( item ) }
-                                            >
-                                                { item }
-                                            </Version>
-                                        ) )
-                                    }
-
-                                </Versions>
-                            </div>
-                        </div>
-                    </div>
-                </Layout>
-            </Layout>
+                  <Breadcrumb.Item className="capitalize text-green-800 ">
+                    {activeRightItem}
+                  </Breadcrumb.Item>
+                </Breadcrumb>
+                <Content
+                  style={{
+                    padding: "24px 44px",
+                    margin: 0,
+                    minHeight: 280,
+                  }}
+                >
+                  {children}
+                </Content>
+              </div>
+              <div>
+                <div>
+                  <Versions className="">
+                    {rightNavItems.map((item, i) => (
+                      <Version
+                        key={i}
+                        active={activeRightItem === item}
+                        onClick={() => setActiveRightNav(item)}
+                      >
+                        {item}
+                      </Version>
+                    ))}
+                  </Versions>
+                </div>
+              </div>
+            </div>
+          </Layout>
         </Layout>
+      </Layout>
     );
 };
 
