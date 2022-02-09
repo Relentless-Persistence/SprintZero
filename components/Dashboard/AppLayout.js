@@ -71,6 +71,7 @@ const AppLayout = ( {
     setActiveRightNav,
     onChangeProduct,
     onMainAdd,
+    hasMainAdd,
     defaultText,
     onSideAdd,
     hasSideAdd = true,
@@ -141,11 +142,15 @@ const AppLayout = ( {
                                     </Breadcrumb.Item>
                                 </Breadcrumb>
 
-                                <AddNew onClick={ onMainAdd }>
-                                    Add New
-                                    <Partition type="vertical" />
-                                    <PlusOutlined />
-                                </AddNew>
+                                {
+                                    hasMainAdd ? <AddNew onClick={ onMainAdd }>
+                                        Add New
+                                        <Partition type="vertical" />
+                                        <PlusOutlined />
+                                    </AddNew> : null
+                                }
+
+
                             </div>
 
                             <Content
@@ -166,10 +171,10 @@ const AppLayout = ( {
                                             <Version
                                                 className="capitalize"
                                                 key={ i }
-                                                active={ activeRightItem === item }
-                                                onClick={ () => setActiveRightNav( item ) }
+                                                active={ activeRightItem === ( item.value || item ) }
+                                                onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
                                             >
-                                                { item }
+                                                { item.render ? item.render() : item }
                                             </Version>
                                         ) )
                                     }

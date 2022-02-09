@@ -1,0 +1,35 @@
+{
+    "Insight Meeting": [
+        {
+            "createdAt": "2022-02-09T20:29:33.733Z",
+            "info": {
+                "targetCustomer": "Customer a",
+                "need": "customer_a need",
+                "keyBenefits": "customer_a benefit",
+                "competitors": "customer_a competitor",
+                "differentiators": "doloremque ,laboriosam"
+            }
+        },
+        {
+            "createdAt": "2022-02-07T20:29:33.733Z",
+            "info": {
+                "targetCustomer": "Customer a",
+                "need": "customer_a need",
+                "keyBenefits": "customer_a benefit",
+                "competitors": "customer_a competitor",
+                "differentiators": "dolor, distinctio"
+            }
+        },
+        {
+            "createdAt": "2022-02-02T20:29:33.733Z",
+            "info": {
+                "targetCustomer": "Customer a",
+                "need": "customer_a need",
+                "keyBenefits": "customer_a benefit",
+                "competitors": "customer_a competitor",
+                "differentiators": "lorem,ipsum"
+            }
+        }
+    ],
+    "Alpha Sheet": []
+}

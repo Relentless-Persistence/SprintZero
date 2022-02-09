@@ -1,46 +1,65 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import
-{
-    Row,
-    Col,
-    Input
-} from 'antd';
+
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import ItemCard from "../../../components/Dashboard/ItemCard";
+import StatementForm from "../../../components/Vision/StatementForm";
 
-import { splitRoutes } from "../../../utils";
-
-import fakeData from "../../../fakeData/productData.json";
+import { checkEmptyArray, getTimeAgo, splitRoutes } from "../../../utils";
 import products from "../../../fakeData/products.json";
 
+import fakeData from "../../../fakeData/visionData.json";
 
-const getGoalNames = ( goals ) =>
+
+const generateRightNav = ( items ) =>
 {
-    const goalNames = goals.map( g => g.name );
+    if ( !items?.length )
+    {
+        return [ "Now" ];
+    }
 
-    return goalNames;
+    return items.map( it => (
+        {
+            render: () => getTimeAgo( it.createdAt ),
+            value: it.createdAt
+        }
+    ) );
 };
-
-const visions = [ "Today", "2d ago", "Last week" ];
 
 export default function Visions ()
 {
-    const [ vision, setVision ] = useState( visions[ 0 ] );
+    const [ visionData, setVisionData ] = useState( fakeData );
+    const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
+    const [ vision, setVision ] = useState( checkEmptyArray( visionData[ activeProduct ] ) ? "Now" : visionData[ activeProduct ][ 0 ].createdAt );
+
 
     const { pathname } = useRouter();
 
+    const onChangeProduct = ( productName ) =>
+    {
+        setActiveProduct( productName );
+
+        const vision = checkEmptyArray( visionData[ productName ] ) ? "Now" : visionData[ productName ][ 0 ].createdAt;
+        setVision( vision );
+    };
 
     const addVision = () =>
     {
         alert( "Hello" );
     };
 
-    const setActiveVison = ( visionName ) =>
+    const handleActiveVision = ( visionDate ) =>
     {
-        setVision( visionName );
+        const visions = visionData[ activeProduct ];
+
+        const vision = visions.find( v => v.createdAt === visionDate );
+
+        if ( vision )
+        {
+            setVision( vision.createdAt );
+
+        }
 
     };
 
@@ -58,16 +77,22 @@ export default function Visions ()
 
 
             <AppLayout
-                rightNavItems={ visions }
+                rightNavItems={ generateRightNav( visionData[ activeProduct ] ) }
                 activeRightItem={ vision }
-                setActiveRightNav={ setActiveVison }
+                setActiveRightNav={ handleActiveVision }
                 onMainAdd={ addVision }
                 hasSideAdd={ false }
                 defaultText="Statement"
+                onChangeProduct={ onChangeProduct }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
+                {
+                    checkEmptyArray( visionData[ activeProduct ] ) ?
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet totam, sapiente hic sed voluptatum deserunt velit labore aperiam. Illo repellendus placeat ipsam quas quod consequatur temporibus, id asperiores laudantium sapiente?</p>
+                        <StatementForm /> :
+
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. A ducimus provident quo error in omnis ea minus dignissimos fugit commodi quibusdam laboriosam itaque minima, debitis voluptatum mollitia nostrum expedita similique.</p>
+                }
 
 
             </AppLayout>

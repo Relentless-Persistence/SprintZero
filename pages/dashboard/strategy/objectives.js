@@ -128,6 +128,7 @@ export default function Objectives ()
                 setActiveRightNav={ setGoal }
                 onMainAdd={ addItem }
                 onSideAdd={ onAddGoal }
+                hasMainAdd
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Input

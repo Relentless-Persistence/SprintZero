@@ -51,8 +51,6 @@ const SideBar = () =>
 {
     const { pathname } = useRouter();
 
-    console.log( pathname );
-
 
     return (
         <Menu
