@@ -22,7 +22,6 @@ const StatementCard = (
         onEditClick,
         info,
         product,
-        extra
     }
 ) =>
 {
