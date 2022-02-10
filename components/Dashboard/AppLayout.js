@@ -1,31 +1,25 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Layout, Breadcrumb, Typography, Input, Avatar } from "antd";
-import { useRouter } from 'next/router';
 import
 {
-    MessageFilled,
+    Layout,
+    Breadcrumb,
+    Input,
+    Divider,
+    Button,
+} from "antd";
+import
+{
+    PlusOutlined
 } from "@ant-design/icons";
-import { useAuth } from "../../contexts/AuthContext";
 
 import SideBar from "./SideBar";
+import AppHeader from "./Header";
+import { useAuth } from "../../contexts/AuthContext";
 
-const { Header, Content, Footer, Sider } = Layout;
-const { Title, Text } = Typography;
-const { Search } = Input;
 
-const HeaderMenu = styled.div`
-  color: ${ ( props ) => ( props.active ? "#73c92d" : "#fff" ) };
-  cursor: pointer;
-  border-bottom-width: 4px;
-  border-bottom-style: solid;
-  border-bottom-color: ${ ( props ) => ( props.active ? "#73c92d" : "transparent" ) };
+const { Content, Sider } = Layout;
 
-  &:hover {
-    color: var(--kelly);
-    border-bottom: 4px solid var(--kelly);
-  }
-`;
 
 const Versions = styled.ul`
   list-style: none;
@@ -41,115 +35,186 @@ const Version = styled.li`
   cursor: pointer;
 `;
 
+const AddNew = styled( Button )`
+align-items:center;
+display:flex;
+padding-top:0;
+padding-bottom:0;
+overflow:hidden;
+margin-top:14px;
+margin-right:44px;
+padding-right:6px;
+background:#fff;
+
+`;
+
+const AddSide = styled( Button )`
+background:transparent;
+border: none;
+margin: 5px auto;
+color: #009CD5;
+box-shadow:none
+font-family: SF Pro Text;
+font-size: 16px;
+line-height: 24px;
+`;
+
+const Partition = styled( Divider )`
+  height:100px;
+`;
+
 
 const AppLayout = ( {
     rightNavItems,
-    products,
-    activeProduct,
     activeRightItem = "test",
     breadCrumbItems,
     setActiveRightNav,
-    setActiveProduct,
+    onChangeProduct,
+    onMainAdd,
+    hasMainAdd,
+    defaultText,
+    onSideAdd,
+    hasSideAdd = true,
     children } ) =>
 {
-    const router = useRouter();
     const { user } = useAuth();
-    const [ collapsed, setCollapsed ] = useState( false );
-    const [ version, setVersion ] = useState( "All" );
-    const [ product, setProduct ] = useState( products[ 0 ] );
+    const [ showSideAdd, setShowSideAdd ] = useState( false );
 
-    const onCollapse = ( collapsed ) =>
+    const [ value, setValue ] = useState( "" );
+
+    const toggleSideAdd = () =>
     {
-        setCollapsed( collapsed );
+        setShowSideAdd( s => !s );
     };
 
+    const onEnter = ( e ) =>
+    {
+
+        if ( e.key === "Enter" && value.trim() )
+        {
+            onSideAdd( value.trim() );
+            toggleSideAdd();
+            setValue( "" );
+
+        }
+    };
+
+
+
+    const handleChange = e =>
+    {
+        setValue( e.target.value );
+    };
 
     // if ( !user ) return <div>Loading...</div>;
 
     return (
-      <Layout style={{ minHeight: "100vh" }}>
-        <Header className="header">
-          <div className="flex items-center">
-            <Title level={2} className="dashboard-logo m-0">
-              Sprint Zero
-            </Title>
-            <div className="flex items-center ml-11">
-              {products.map((item, i) => (
-                <HeaderMenu
-                  key={i}
-                  className="mr-10"
-                  active={activeProduct === item}
-                  onClick={() => setActiveProduct(item)}
+        <Layout style={ { minHeight: "100vh" } }>
+            <AppHeader onChangeProduct={ onChangeProduct } />
+            <Layout>
+                <Sider
+                    width={ 200 }
+                    className="site-layout-background"
+                    breakpoint="sm"
                 >
-                  {item}
-                </HeaderMenu>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center">
-            <Search
-              placeholder="Search"
-              allowClear
-              className="mr-6 border-none focus:outline-none outline-none"
-              // onSearch={onSearch}
-              style={{ width: 200 }}
-            />
-            {/* <Avatar src={ user.photoURL } style={ { border: "2px solid #73c92d" } } /> */}
-            <Avatar
-              src={
-                "https://www.pngkey.com/png/detail/115-1150152_default-profile-picture-avatar-png-green.png"
-              }
-              style={{ border: "2px solid #73c92d" }}
-            />
-          </div>
-        </Header>
-        <Layout>
-          <Sider width={200} className="site-layout-background" breakpoint="sm">
-            <SideBar />
-          </Sider>
-          <Layout style={{ padding: "0 24px 24px" }}>
-            <div className="flex justify-between">
-              <div className="flex-1">
-                <Breadcrumb style={{ margin: "16px 0 0 44px" }}>
-                  {breadCrumbItems.map((item, i) => (
-                    <Breadcrumb.Item key={i} className="capitalize">
-                      {item}
-                    </Breadcrumb.Item>
-                  ))}
+                    <SideBar />
+                </Sider>
+                <Layout style={ { padding: "0 24px 24px" } }>
+                    <div className="flex justify-between">
+                        <div className="flex-1">
+                            <div className="flex justify-between">
+                                <Breadcrumb style={ { margin: "16px 0 0 44px" } }>
 
-                  <Breadcrumb.Item className="capitalize text-green-800 ">
-                    {activeRightItem}
-                  </Breadcrumb.Item>
-                </Breadcrumb>
-                <Content
-                  style={{
-                    padding: "24px 44px",
-                    margin: 0,
-                    minHeight: 280,
-                  }}
-                >
-                  {children}
-                </Content>
-              </div>
-              <div>
-                <div>
-                  <Versions className="">
-                    {rightNavItems.map((item, i) => (
-                      <Version
-                        key={i}
-                        active={activeRightItem === item}
-                        onClick={() => setActiveRightNav(item)}
-                      >
-                        {item}
-                      </Version>
-                    ))}
-                  </Versions>
-                </div>
-              </div>
-            </div>
-          </Layout>
+                                    {
+                                        breadCrumbItems.map( ( item, i ) => (
+                                            <Breadcrumb.Item
+                                                key={ i }
+                                                className="capitalize"
+                                            >
+                                                { item }
+                                            </Breadcrumb.Item>
+                                        ) )
+                                    }
+
+
+                                    <Breadcrumb.Item className="capitalize text-green-800 ">
+                                        { defaultText || activeRightItem }
+                                    </Breadcrumb.Item>
+                                </Breadcrumb>
+
+                                {
+                                    hasMainAdd ? <AddNew onClick={ onMainAdd }>
+                                        Add New
+                                        <Partition type="vertical" />
+                                        <PlusOutlined />
+                                    </AddNew> : null
+                                }
+
+
+                            </div>
+
+                            <Content
+                                style={ {
+                                    padding: "24px 44px",
+                                    margin: 0,
+                                    minHeight: 280,
+                                } }
+                            >
+                                { children }
+                            </Content>
+                        </div>
+                        <div>
+                            <div>
+                                <Versions className="">
+                                    {
+                                        rightNavItems.map( ( item, i ) => (
+                                            <Version
+                                                className="capitalize"
+                                                key={ i }
+                                                active={ activeRightItem === ( item.value || item ) }
+                                                onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
+                                            >
+                                                { item.render ? item.render() : item }
+                                            </Version>
+                                        ) )
+                                    }
+
+
+                                    {
+                                        ( hasSideAdd && showSideAdd ) ?
+                                            <Version> <Input
+                                                className="mx-0 my-0"
+                                                maxLength={ 20 }
+                                                autoFocus
+                                                value={ value }
+                                                onChange={ handleChange }
+                                                onKeyPress={ onEnter }
+                                            />
+                                            </Version>
+                                            : null
+                                    }
+
+                                    {
+                                        hasSideAdd ?
+
+                                            <Version>
+                                                <AddSide onClick={ toggleSideAdd }>
+                                                    Add
+                                                </AddSide>
+                                            </Version>
+                                            : null
+                                    }
+
+                                </Versions>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </Layout>
+            </Layout>
         </Layout>
-      </Layout>
     );
 };
 
