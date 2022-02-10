@@ -65,9 +65,9 @@ const Partition = styled( Divider )`
 
 
 const AppLayout = ( {
-    rightNavItems,
+    rightNavItems = [],
     activeRightItem = "test",
-    breadCrumbItems,
+    breadCrumbItems = [],
     setActiveRightNav,
     onChangeProduct,
     onMainAdd,
