@@ -1,7 +1,9 @@
 import Head from "next/head";
 import DashboardLayout from "../../components/Dashboard/Layout";
 
-export default function Home() {
+
+export default function Home ()
+{
   return (
     <div className="mb-8">
       <Head>

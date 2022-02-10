@@ -125,7 +125,8 @@ const DashboardLayout = () =>
               key="sub1"
               icon={ <DeploymentUnitOutlined /> }
               title="Strategy"
-            >
+            >  <Menu.Item key="2">Accessibility</Menu.Item>
+              <Menu.Item key="3">Ethics</Menu.Item>
 
               <Menu.Item key="4">
                 <Link href="/dashboard/strategy/objectives">
@@ -136,8 +137,7 @@ const DashboardLayout = () =>
                 <Link href="/dashboard/strategy/vision">
                   <a>Vision</a>
                 </Link></Menu.Item>
-              <Menu.Item key="2">Accessibility</Menu.Item>
-              <Menu.Item key="3">Ethics</Menu.Item>
+
               {/* <Menu.Item key="6">Partnerships</Menu.Item> */ }
             </SubMenu>
             <SubMenu key="sub2" icon={ <PullRequestOutlined /> } title="Tactics">
