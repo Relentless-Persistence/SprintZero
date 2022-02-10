@@ -6,10 +6,12 @@ import { useRouter } from 'next/router';
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import StatementForm from "../../../components/Vision/StatementForm";
 
-import { checkEmptyArray, getTimeAgo, splitRoutes } from "../../../utils";
+import { checkEmptyArray, checkEmptyObject, getTimeAgo, splitRoutes } from "../../../utils";
 import products from "../../../fakeData/products.json";
 
 import fakeData from "../../../fakeData/visionData.json";
+import Deck from "../../../components/Vision/Deck";
+
 
 
 const generateRightNav = ( items ) =>
@@ -32,6 +34,9 @@ export default function Visions ()
     const [ visionData, setVisionData ] = useState( fakeData );
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
     const [ vision, setVision ] = useState( checkEmptyArray( visionData[ activeProduct ] ) ? "Now" : visionData[ activeProduct ][ 0 ].createdAt );
+    const [ info, setInfo ] = useState( {} );
+    const [ inEditMode, setEditMode ] = useState( false );
+    const [ visionIndex, setVisionIndex ] = useState( 0 );
 
 
     const { pathname } = useRouter();
@@ -49,13 +54,18 @@ export default function Visions ()
     {
         const visions = visionData[ activeProduct ];
 
-        const vision = visions.find( v => v.createdAt === visionDate );
+        const visionIndex = visions.findIndex( v => v.createdAt === visionDate );
 
-        if ( vision )
+
+        if ( visionIndex > -1 )
         {
+            const vision = visions[ visionIndex ];
             setVision( vision.createdAt );
-
+            setVisionIndex( visionIndex );
+            setInfo( {} );
+            setEditMode( false );
         }
+
 
     };
 
@@ -72,6 +82,16 @@ export default function Visions ()
 
         setVisionData( newData );
         setVision( newData[ activeProduct ][ 0 ].createdAt );
+        setEditMode( false );
+        setInfo( {} );
+        setVisionIndex( 0 );
+
+    };
+
+    const handleSetInfo = ( info ) =>
+    {
+        setEditMode( true );
+        setInfo( info );
     };
 
 
@@ -96,14 +116,22 @@ export default function Visions ()
                 onChangeProduct={ onChangeProduct }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
+
                 {
-                    checkEmptyArray( visionData[ activeProduct ] ) ?
-
-                        <StatementForm
-                            handleSubmit={ handleSubmit } /> :
-
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. A ducimus provident quo error in omnis ea minus dignissimos fugit commodi quibusdam laboriosam itaque minima, debitis voluptatum mollitia nostrum expedita similique.</p>
+                    checkEmptyObject( info ) ? <Deck
+                        product={ activeProduct }
+                        setInfo={ handleSetInfo }
+                        list={ visionData[ activeProduct ] }
+                        activeIndex={ visionIndex } /> : null
                 }
+
+
+                {
+                    ( inEditMode || !visionData[ activeProduct ].length ) ? <StatementForm
+                        info={ info }
+                        handleSubmit={ handleSubmit } /> : null
+                }
+
 
 
             </AppLayout>

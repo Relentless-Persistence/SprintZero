@@ -4,14 +4,14 @@ import { Layout, Menu, Breadcrumb, Typography, Input, Avatar } from "antd";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import
-  {
-    HomeOutlined,
-    MessageFilled,
-    DeploymentUnitOutlined,
-    PullRequestOutlined,
-    NodeExpandOutlined,
-    UserOutlined,
-  } from "@ant-design/icons";
+{
+  HomeOutlined,
+  MessageFilled,
+  DeploymentUnitOutlined,
+  PullRequestOutlined,
+  NodeExpandOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -132,7 +132,10 @@ const DashboardLayout = () =>
                   <a>Objectives</a>
                 </Link>
               </Menu.Item>
-              <Menu.Item key="5">Vision</Menu.Item>
+              <Menu.Item key="5">
+                <Link href="/dashboard/strategy/vision">
+                  <a>Vision</a>
+                </Link></Menu.Item>
               <Menu.Item key="2">Accessibility</Menu.Item>
               <Menu.Item key="3">Ethics</Menu.Item>
               {/* <Menu.Item key="6">Partnerships</Menu.Item> */ }

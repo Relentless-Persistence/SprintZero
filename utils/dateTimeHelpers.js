@@ -1,4 +1,6 @@
+import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
+
 
 const getTimeAgo = ( date ) =>
 {
@@ -18,9 +20,20 @@ const getTimeAgo = ( date ) =>
     return formattedDate;
 };
 
+const formatDateTime = ( date, shape = "yyyy-LL-dd" ) =>
+{
+    if ( !date )
+    {
+        return "N/A";
+    }
+    return format( new Date( date ), shape );
+
+};
+
 
 
 export
 {
-    getTimeAgo
+    getTimeAgo,
+    formatDateTime
 };
