@@ -72,10 +72,10 @@ const AppHeader = (
                     // onSearch={onSearch}
                     style={ { width: 200 } }
                 />
-                <MessageFilled
+                {/* <MessageFilled
                     style={ { color: "#73c92d", width: "24px" } }
                     className="mr-6"
-                />
+                /> */}
                 <Avatar src={ user?.photoURL } style={ { border: "2px solid #73c92d" } } />
             </div>
         </Header>
