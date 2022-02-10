@@ -1,5 +1,6 @@
 import Head from "next/head";
-import DashboardLayout from "../../components/Dashboard/AppLayout";
+import DashboardLayout from "../../components/Dashboard/Layout";
+
 
 export default function Home ()
 {
