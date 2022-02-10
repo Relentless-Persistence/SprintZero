@@ -1,29 +1,22 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import styled from 'styled-components';
 import
 {
-    Button,
     Row,
     Col,
-    Card,
-    Drawer,
-    Space,
     Input
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import FormCard from "../../../components/Dashboard/FormCard";
-import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
+import ItemCard from "../../../components/Dashboard/ItemCard";
+
+import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/productData.json";
+import products from "../../../fakeData/products.json";
 
-const splitRoutes = ( path ) =>
-{
-    return path.replace( "/dashboard/", "" )
-        .split( "/" );
-};
 
 const getGoalNames = ( goals ) =>
 {
@@ -32,29 +25,6 @@ const getGoalNames = ( goals ) =>
     return goalNames;
 };
 
-const products = [ "Insight Meeting", "Alpha Sheet" ];
-
-
-const AddCard = styled( Card )`
-border: 1px dashed #315613;
-background:transparent;
-display:flex;
-align-items:center;
-justify-content:center;
-min-height:181px;
-
-button
-{
-    border: 1px solid #315613;
-    color:#101D06;
-    padding: 0 8px;
-    font-size: 14px;
-    line-height: 22px;
-    color: #315613
-}
-
-
-`;
 
 export default function Objectives ()
 {
@@ -67,12 +37,6 @@ export default function Objectives ()
 
     const [ activeGoal, setActiveGoal ] = useState( data[ activeProduct ][ 0 ] );
 
-    const [ visible, setVisible ] = useState( false );
-
-    const showDrawer = () =>
-    {
-        setVisible( true );
-    };
 
     const handleTitleChange = ( e ) =>
     {
@@ -96,6 +60,21 @@ export default function Objectives ()
         const goal = data[ product || activeProduct ].find( goal => goal.name === goalName );
 
         setActiveGoal( goal );
+    };
+
+
+    const onAddGoal = ( name ) =>
+    {
+        const newData = { ...data };
+        const goal =
+        {
+            name,
+            title: `${ name } title`,
+            results: []
+        };
+        newData[ activeProduct ].push( goal );
+
+        setData( newData );
     };
 
     const setProduct = ( product ) =>
@@ -122,6 +101,15 @@ export default function Objectives ()
         setShowAdd( false );
     };
 
+    const editItem = ( resultIndex, item ) =>
+    {
+        const newData = { ...data };
+        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
+
+        goal.results[ resultIndex ] = item;
+        setData( newData );
+    };
+
 
 
     return (
@@ -134,15 +122,17 @@ export default function Objectives ()
 
 
             <AppLayout
-                products={ products }
-                setActiveProduct={ setProduct }
+                onChangeProduct={ setProduct }
                 rightNavItems={ getGoalNames( data[ activeProduct ] ) }
-                activeProduct={ activeProduct }
                 activeRightItem={ activeGoal?.name }
                 setActiveRightNav={ setGoal }
+                onMainAdd={ addItem }
+                onSideAdd={ onAddGoal }
+                hasMainAdd
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Input
+                    maxLength={ 80 }
                     onChange={ handleTitleChange }
                     value={ activeGoal?.title } />
 
@@ -154,19 +144,9 @@ export default function Objectives ()
                                 xs={ { span: 24 } }
                                 sm={ { span: 8 } }
                                 key={ i }>
-                                <Card
-
-                                    bordered={ false }
-                                    extra={ <CardHeaderButton onClick={ showDrawer } >Edit</CardHeaderButton> }
-                                    title={ res.name }
-                                    headStyle={ {
-                                        background: "#F5F5F5",
-                                    } }
-                                >
-                                    <p>
-                                        { res.description }
-                                    </p>
-                                </Card>
+                                <ItemCard
+                                    onEdit={ ( item ) => editItem( i, item ) }
+                                    item={ res } />
                             </Col>
                         ) )
                     }
@@ -178,10 +158,10 @@ export default function Objectives ()
                             xs={ { span: 24 } }
                             sm={ { span: 8 } }>
                             <FormCard
-                                onCreate={ addItemDone } />
+                                onSubmit={ addItemDone } />
                         </Col> : null
                     }
-
+                    {/* 
                     <Col
                         xs={ { span: 24 } }
                         sm={ { span: 8 } }>
@@ -192,25 +172,10 @@ export default function Objectives ()
                                 Add Result
                             </CardHeaderButton>
                         </AddCard>
-                    </Col>
+                    </Col> */}
                 </Row>
 
-                <Drawer
-                    title={ activeGoal?.title }
-                    placement={ "right" }
-                    width={ 230 }
-                    onClose={ onClose }
-                    visible={ visible }
-                    extra={
-                        <Space>
-                            <Button onClick={ onClose }>Cancel</Button>
-                        </Space>
-                    }
-                >
-                    <h3>Some contents...</h3>
-                    <p>Some contents...</p>
-                    <p>Some contents...</p>
-                </Drawer>
+
 
             </AppLayout>
         </div>
