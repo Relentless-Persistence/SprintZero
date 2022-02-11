@@ -68,8 +68,8 @@ export default function Objectives ()
         const newData = { ...data };
         const goal =
         {
-            name,
-            title: `${ name } title`,
+            name: String( name ).padStart( 3, '0' ),
+            title: String( name ).padStart( 3, '0' ),
             results: []
         };
         newData[ activeProduct ].push( goal );
@@ -142,7 +142,7 @@ export default function Objectives ()
                         activeGoal?.results.map( ( res, i ) => (
                             <Col
                                 xs={ { span: 24 } }
-                                sm={ { span: 8 } }
+                                sm={ { span: 12 } }
                                 key={ i }>
                                 <ItemCard
                                     onEdit={ ( item ) => editItem( i, item ) }
@@ -156,7 +156,7 @@ export default function Objectives ()
                     {
                         showAdd ? <Col
                             xs={ { span: 24 } }
-                            sm={ { span: 8 } }>
+                            sm={ { span: 12 } }>
                             <FormCard
                                 onSubmit={ addItemDone } />
                         </Col> : null

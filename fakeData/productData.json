@@ -1,7 +1,7 @@
 {
     "Insight Meeting": [
         {
-            "name": "Insight Meeting Goal 1",
+            "name": "001",
             "title": "Insight Meeting Goal 1 Title",
             "results": [
                 {
@@ -15,7 +15,7 @@
             ]
         },
         {
-            "name": "Insight Meeting Goal 2",
+            "name": "002",
             "title": "Insight Meeting Goal 2 Title",
             "results": [
                 {
@@ -31,7 +31,7 @@
     ],
     "Alpha Sheet": [
         {
-            "name": "Alpha Sheet Goal 1",
+            "name": "001",
             "title": "Alpha Sheet Goal 1 Title",
             "results": [
                 {
@@ -45,7 +45,7 @@
             ]
         },
         {
-            "name": "Alpha Sheet Goal 2",
+            "name": "002",
             "title": "Alpha Sheet Goal 2 Title",
             "results": [
                 {
