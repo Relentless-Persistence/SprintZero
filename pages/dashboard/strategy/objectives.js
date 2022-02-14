@@ -129,7 +129,6 @@ export default function Objectives ()
                 onMainAdd={ addItem }
                 onSideAdd={ onAddGoal }
                 hasMainAdd
-                hasMainAdd
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Input
