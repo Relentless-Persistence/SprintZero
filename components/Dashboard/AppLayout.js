@@ -195,7 +195,7 @@ const AppLayout = ( {
 
                                             <Version>
                                                 <AddSide onClick={ toggleSideAdd }>
-                                                    Add
+                                                    { showSideAdd ? "Close" : "Add" }
                                                 </AddSide>
                                             </Version>
                                             : null
