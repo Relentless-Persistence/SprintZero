@@ -16,7 +16,6 @@ const StyledCard = styled( Card )`
 import styles from './Deck.module.css';
 
 
-
 const StatementCard = (
     {
         index,
