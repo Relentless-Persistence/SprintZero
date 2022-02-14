@@ -72,7 +72,12 @@ const SideBar = () =>
                 title="Strategy"
             >
 
-                <Menu.Item key="2">Accessibility</Menu.Item>
+                <Menu.Item $highlight={ isActive( pathname, "/strategy/accessibility" ) } key="2">
+                    <Link href="/dashboard/strategy/accessibility">
+                        <a>Accessibility</a>
+                    </Link>
+
+                </Menu.Item>
                 <Menu.Item key="3">Ethics</Menu.Item>
                 <MenuItem $highlight={ isActive( pathname, "/strategy/objectives" ) } key="4">
                     <Link href="/dashboard/strategy/objectives">

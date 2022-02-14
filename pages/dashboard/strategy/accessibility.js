@@ -5,7 +5,6 @@ import
 {
     Row,
     Col,
-    Input
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -14,19 +13,19 @@ import ItemCard from "../../../components/Dashboard/ItemCard";
 
 import { splitRoutes } from "../../../utils";
 
-import fakeData from "../../../fakeData/productData.json";
+import fakeData from "../../../fakeData/accessiblity.json";
 import products from "../../../fakeData/products.json";
 
 
-const getGoalNames = ( goals ) =>
+const getChallengeNames = ( challenges ) =>
 {
-    const goalNames = goals.map( g => g.name );
+    const challengeNames = challenges.map( g => g.name );
 
-    return goalNames;
+    return challengeNames;
 };
 
 
-export default function Objectives ()
+export default function Accessiblity ()
 {
     const { pathname } = useRouter();
 
@@ -35,7 +34,7 @@ export default function Objectives ()
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
-    const [ activeGoal, setActiveGoal ] = useState( data[ activeProduct ][ 0 ] );
+    const [ activeChallenge, setActiveChallenge ] = useState( data[ activeProduct ][ 0 ] );
 
 
     const handleTitleChange = ( e ) =>
@@ -43,9 +42,9 @@ export default function Objectives ()
         const { value } = e.target;
 
         const newData = { ...data };
-        const goalIndex = data[ activeProduct ].findIndex( goal => goal.name === activeGoal.name );
+        const challengeIndex = data[ activeProduct ].findIndex( challenge => challenge.name === activeChallenge.name );
 
-        newData[ activeProduct ][ goalIndex ].title = value;
+        newData[ activeProduct ][ challengeIndex ].title = value;
 
         setData( newData );
     };
@@ -55,33 +54,19 @@ export default function Objectives ()
         setVisible( false );
     };
 
-    const setGoal = ( goalName, product ) =>
+    const setChallenge = ( challengeName, product ) =>
     {
-        const goal = data[ product || activeProduct ].find( goal => goal.name === goalName );
+        const challenge = data[ product || activeProduct ].find( challenge => challenge.name === challengeName );
 
-        setActiveGoal( goal );
+        setActiveChallenge( challenge );
     };
 
-
-    const onAddGoal = ( name ) =>
-    {
-        const newData = { ...data };
-        const goal =
-        {
-            name: String( name ).padStart( 3, '0' ),
-            title: String( name ).padStart( 3, '0' ),
-            results: []
-        };
-        newData[ activeProduct ].push( goal );
-
-        setData( newData );
-    };
 
     const setProduct = ( product ) =>
     {
         setActiveProduct( product );
-        const goalName = data[ product ][ 0 ].name;
-        setGoal( goalName, product );
+        const challengeName = data[ product ][ 0 ].name;
+        setChallenge( challengeName, product );
         setShowAdd( false );
     };
 
@@ -93,9 +78,9 @@ export default function Objectives ()
     const addItemDone = ( item ) =>
     {
         const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
+        const challenge = newData[ activeProduct ].find( challenge => challenge.name === activeChallenge.name );
 
-        goal?.results.push( item );
+        challenge?.challenges.push( item );
 
         setData( newData );
         setShowAdd( false );
@@ -104,9 +89,9 @@ export default function Objectives ()
     const editItem = ( resultIndex, item ) =>
     {
         const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
+        const challenge = newData[ activeProduct ].find( challenge => challenge.name === activeChallenge.name );
 
-        goal.results[ resultIndex ] = item;
+        challenge.challenges[ resultIndex ] = item;
         setData( newData );
     };
 
@@ -116,31 +101,28 @@ export default function Objectives ()
         <div className="mb-8">
             <Head>
                 <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero strategy objectives" />
+                <meta name="description" content="Sprint Zero strategy accessiblity" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
 
             <AppLayout
                 onChangeProduct={ setProduct }
-                rightNavItems={ getGoalNames( data[ activeProduct ] ) }
-                activeRightItem={ activeGoal?.name }
-                setActiveRightNav={ setGoal }
+                rightNavItems={ getChallengeNames( data[ activeProduct ] ) }
+                activeRightItem={ activeChallenge?.name }
+                setActiveRightNav={ setChallenge }
+                hasMainAdd={ true }
                 onMainAdd={ addItem }
-                onSideAdd={ onAddGoal }
-                hasMainAdd
-                hasMainAdd
+                hasSideAdd={ false }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <Input
-                    maxLength={ 80 }
-                    onChange={ handleTitleChange }
-                    value={ activeGoal?.title } />
+                <p>{ activeChallenge?.title }</p>
+
 
 
                 <Row className="py-6" gutter={ [ 12, 12 ] }>
                     {
-                        activeGoal?.results.map( ( res, i ) => (
+                        activeChallenge?.challenges.map( ( res, i ) => (
                             <Col
                                 xs={ { span: 24 } }
                                 sm={ { span: 12 } }
