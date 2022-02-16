@@ -37,23 +37,6 @@ export default function Accessiblity ()
     const [ activeChallenge, setActiveChallenge ] = useState( data[ activeProduct ][ 0 ] );
 
 
-    const handleTitleChange = ( e ) =>
-    {
-        const { value } = e.target;
-
-        const newData = { ...data };
-        const challengeIndex = data[ activeProduct ].findIndex( challenge => challenge.name === activeChallenge.name );
-
-        newData[ activeProduct ][ challengeIndex ].title = value;
-
-        setData( newData );
-    };
-
-    const onClose = () =>
-    {
-        setVisible( false );
-    };
-
     const setChallenge = ( challengeName, product ) =>
     {
         const challenge = data[ product || activeProduct ].find( challenge => challenge.name === challengeName );
