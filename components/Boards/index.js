@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import
@@ -12,13 +12,28 @@ import
 {
     Card as Acard,
     Row,
-    Col
+    Col,
 } from 'antd';
 
 import CardHeaderButton from '../Dashboard/CardHeaderButton';
 
 const StyledCol = styled( Acard )`
     min-height:450px;
+`;
+
+
+const StyledItem = styled.div`
+    color: ${ props => props.$color || "black" };
+    border: 1px solid ${ props => props.$color || "black" };
+    display:inline-block;
+    padding:4px 8px;
+
+    p
+    {
+        display:inline-block;
+        margin-left:5px;
+    }
+
 `;
 
 const StyledCard = styled.div`
@@ -105,6 +120,7 @@ const Column = ( {
 const Board = ( { columns = [],
     onDrop,
     onSwap,
+    isScrollable,
     colCount = 3 } ) =>
 {
 
@@ -129,7 +145,7 @@ const Board = ( { columns = [],
                 {
                     columns?.map( ( col ) => (
                         <Col
-                            span={ parseInt( 24 / colCount ) }
+                            span={ 24 / colCount }
                             key={ col.columnId }>
                             <Column
                                 columnId={ col.columnId }
@@ -146,7 +162,17 @@ const Board = ( { columns = [],
                                             onCardDrop={ swapCard }
                                         >
                                             <Index>{ i + 1 }</Index>
-                                            <p>{ card.title }</p>
+
+                                            <div>
+                                                <StyledItem $color={ card.color }>
+                                                    <span>x</span>
+
+                                                    <p>
+                                                        { card.title }</p>
+                                                </StyledItem>
+                                            </div>
+
+
                                         </Card>
                                     ) )
                                 }

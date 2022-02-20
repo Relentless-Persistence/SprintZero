@@ -72,6 +72,7 @@ const AppLayout = ( {
     defaultText,
     onSideAdd,
     hasSideAdd = true,
+    hideSideBar = false,
     children } ) =>
 {
     const { user } = useAuth();
@@ -158,55 +159,60 @@ const AppLayout = ( {
                                 { children }
                             </Content>
                         </div>
-                        <div>
-                            <div>
-                                <Versions className="">
-                                    {
-                                        rightNavItems.map( ( item, i ) => (
-                                            <Version
-                                                className="capitalize"
-                                                key={ i }
-                                                active={ activeRightItem === ( item.value || item ) }
-                                                onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
-                                            >
-                                                { item.render ? item.render() : item }
-                                            </Version>
-                                        ) )
-                                    }
+                        {
+                            hideSideBar ? null : (
+                                <div>
+                                    <div>
+                                        <Versions className="">
+                                            {
+                                                rightNavItems.map( ( item, i ) => (
+                                                    <Version
+                                                        className="capitalize"
+                                                        key={ i }
+                                                        active={ activeRightItem === ( item.value || item ) }
+                                                        onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
+                                                    >
+                                                        { item.render ? item.render() : item }
+                                                    </Version>
+                                                ) )
+                                            }
 
 
-                                    {
-                                        ( hasSideAdd && showSideAdd ) ?
-                                            <Version> <Input
-                                                className="mx-0 my-0"
-                                                type="number"
-                                                maxLength={ 20 }
-                                                autoFocus
-                                                value={ value }
-                                                onChange={ handleChange }
-                                                onKeyPress={ onEnter }
-                                            />
-                                            </Version>
-                                            : null
-                                    }
+                                            {
+                                                ( hasSideAdd && showSideAdd ) ?
+                                                    <Version> <Input
+                                                        className="mx-0 my-0"
+                                                        type="number"
+                                                        maxLength={ 20 }
+                                                        autoFocus
+                                                        value={ value }
+                                                        onChange={ handleChange }
+                                                        onKeyPress={ onEnter }
+                                                    />
+                                                    </Version>
+                                                    : null
+                                            }
 
-                                    {
-                                        hasSideAdd ?
+                                            {
+                                                hasSideAdd ?
 
-                                            <Version>
-                                                <AddSide onClick={ toggleSideAdd }>
-                                                    { showSideAdd ? "Close" : "Add" }
-                                                </AddSide>
-                                            </Version>
-                                            : null
-                                    }
+                                                    <Version>
+                                                        <AddSide onClick={ toggleSideAdd }>
+                                                            { showSideAdd ? "Close" : "Add" }
+                                                        </AddSide>
+                                                    </Version>
+                                                    : null
+                                            }
 
-                                </Versions>
+                                        </Versions>
 
 
 
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
                     </div>
                 </Layout>
             </Layout>

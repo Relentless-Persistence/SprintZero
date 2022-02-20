@@ -99,9 +99,17 @@ const SideBar = () =>
             </StyledSubMenu>
             <StyledSubMenu key="sub2" icon={ <PullRequestOutlined /> } title="Tactics">
                 <Menu.Item key="6">Priorities</Menu.Item>
-                <Menu.Item key="7">Retrospective</Menu.Item>
+                <MenuItem key="7" $highlight={ isActive( pathname, "/tactics/retrospective" ) } >
+                    <Link href="/dashboard/tactics/retrospective">
+                        <a>Retrospective</a>
+                    </Link>
+                </MenuItem>
                 <Menu.Item key="8">Release</Menu.Item>
-                <Menu.Item key="9">Tasks</Menu.Item>
+                <MenuItem key="9" $highlight={ isActive( pathname, "/tactics/tasks" ) } >
+                    <Link href="/dashboard/tactics/tasks">
+                        <a>Tasks</a>
+                    </Link>
+                </MenuItem>
             </StyledSubMenu>
             <StyledSubMenu
                 key="sub3"
@@ -109,7 +117,11 @@ const SideBar = () =>
                 title="Operations"
             >
                 <Menu.Item key="11">Calendar</Menu.Item>
-                <Menu.Item key="12">Huddle</Menu.Item>
+                <MenuItem key="12" $highlight={ isActive( pathname, "/operations/huddle" ) } >
+                    <Link href="/dashboard/operations/huddle">
+                        <a>Huddle</a>
+                    </Link>
+                </MenuItem>
                 <Menu.Item key="13">Performance</Menu.Item>
                 <Menu.Item key="14">Sprint</Menu.Item>
             </StyledSubMenu>

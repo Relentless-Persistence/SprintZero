@@ -13,7 +13,7 @@ import { Board } from '../../../components/Boards';
 
 import { splitRoutes } from "../../../utils";
 
-import fakeData from "../../../fakeData/ethics.json";
+import fakeData from "../../../fakeData/tasks.json";
 import products from "../../../fakeData/products.json";
 
 
@@ -25,7 +25,7 @@ const getBoardNames = ( boards ) =>
 };
 
 
-export default function Ethics ()
+export default function Tasks ()
 {
     const { pathname } = useRouter();
 
@@ -136,7 +136,7 @@ export default function Ethics ()
         <div className="mb-8">
             <Head>
                 <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero strategy ethics" />
+                <meta name="description" content="Sprint Zero strategy tasks" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
@@ -152,11 +152,11 @@ export default function Ethics ()
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
 
-
                 <Board
                     onDrop={ handleDrop }
                     onSwap={ handleSwap }
                     columns={ activeBoard?.columns }
+                    colCount={ 4 }
                 />
 
             </AppLayout>
