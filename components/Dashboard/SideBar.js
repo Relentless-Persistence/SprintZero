@@ -71,25 +71,31 @@ const SideBar = () =>
                 icon={ <DeploymentUnitOutlined /> }
                 title="Strategy"
             >
-                <MenuItem $highlight={ isActive( pathname, "/strategy/objectives" ) } key="2">
+
+                <Menu.Item $highlight={ isActive( pathname, "/strategy/accessibility" ) } key="2">
+                    <Link href="/dashboard/strategy/accessibility">
+                        <a>Accessibility</a>
+                    </Link>
+
+                </Menu.Item>
+                <Menu.Item key="3">Ethics</Menu.Item>
+                <MenuItem $highlight={ isActive( pathname, "/strategy/objectives" ) } key="4">
                     <Link href="/dashboard/strategy/objectives">
                         <a>Objectives</a>
                     </Link>
                 </MenuItem>
-                <MenuItem key="3" $highlight={ isActive( pathname, "/strategy/visions" ) } >
+                <MenuItem key="5" $highlight={ isActive( pathname, "/strategy/visions" ) } >
                     <Link href="/dashboard/strategy/visions">
                         <a>Visions</a>
                     </Link>
                 </MenuItem>
 
-                <Menu.Item key="5">Accessibility</Menu.Item>
-                <Menu.Item key="6">Ethics</Menu.Item>
             </StyledSubMenu>
             <StyledSubMenu key="sub2" icon={ <PullRequestOutlined /> } title="Tactics">
-                <Menu.Item key="7">Priorities</Menu.Item>
-                <Menu.Item key="8">Retrospective</Menu.Item>
-                <Menu.Item key="9">Release</Menu.Item>
-                <Menu.Item key="10">Tasks</Menu.Item>
+                <Menu.Item key="6">Priorities</Menu.Item>
+                <Menu.Item key="7">Retrospective</Menu.Item>
+                <Menu.Item key="8">Release</Menu.Item>
+                <Menu.Item key="9">Tasks</Menu.Item>
             </StyledSubMenu>
             <StyledSubMenu
                 key="sub3"

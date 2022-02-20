@@ -38,25 +38,22 @@ const Version = styled.li`
 const AddNew = styled( Button )`
 align-items:center;
 display:flex;
-padding-top:0;
-padding-bottom:0;
-overflow:hidden;
 margin-top:14px;
 margin-right:44px;
-padding-right:6px;
 background:#fff;
 
 `;
 
 const AddSide = styled( Button )`
-background:transparent;
+background:transparent !important ;
 border: none;
 margin: 5px auto;
-color: #009CD5;
-box-shadow:none
-font-family: SF Pro Text;
+color: #262626;
+box-shadow:none;
 font-size: 16px;
 line-height: 24px;
+padding-left:0;
+
 `;
 
 const Partition = styled( Divider )`
@@ -65,9 +62,9 @@ const Partition = styled( Divider )`
 
 
 const AppLayout = ( {
-    rightNavItems,
+    rightNavItems = [],
     activeRightItem = "test",
-    breadCrumbItems,
+    breadCrumbItems = [],
     setActiveRightNav,
     onChangeProduct,
     onMainAdd,
@@ -145,8 +142,6 @@ const AppLayout = ( {
                                 {
                                     hasMainAdd ? <AddNew onClick={ onMainAdd }>
                                         Add New
-                                        <Partition type="vertical" />
-                                        <PlusOutlined />
                                     </AddNew> : null
                                 }
 
@@ -184,6 +179,7 @@ const AppLayout = ( {
                                         ( hasSideAdd && showSideAdd ) ?
                                             <Version> <Input
                                                 className="mx-0 my-0"
+                                                type="number"
                                                 maxLength={ 20 }
                                                 autoFocus
                                                 value={ value }

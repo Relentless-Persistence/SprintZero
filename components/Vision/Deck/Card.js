@@ -10,10 +10,10 @@ import CardHeaderButton from '../../Dashboard/CardHeaderButton';
 const StyledCard = styled( Card )`
    transform:  ${ props => props.invert };
    margin-bottom: 135px;
+   font-size:30px;
 `;
 
 import styles from './Deck.module.css';
-
 
 
 const StatementCard = (
