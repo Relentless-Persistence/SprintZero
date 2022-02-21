@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
-import Image from "next/image";
-import { Button, Typography, message } from "antd";
+// import Image from "next/image";
+import { Button, Typography, message, Image } from "antd";
 import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
 import { googleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
