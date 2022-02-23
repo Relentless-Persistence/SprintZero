@@ -15,25 +15,9 @@ import
     Col,
 } from 'antd';
 
-import CardHeaderButton from '../Dashboard/CardHeaderButton';
 
 const StyledCol = styled( Acard )`
     min-height:450px;
-`;
-
-
-const StyledItem = styled.div`
-    color: ${ props => props.$color || "black" };
-    border: 1px solid ${ props => props.$color || "black" };
-    display:inline-block;
-    padding:4px 8px;
-
-    p
-    {
-        display:inline-block;
-        margin-left:5px;
-    }
-
 `;
 
 const StyledCard = styled.div`
@@ -47,23 +31,6 @@ const StyledCard = styled.div`
     gap:10px;
     opacity: ${ props => props.$isDraggging ? 0 : 1 };
 `;
-
-const Index = styled.span`
-    width:32px;
-    height:32px;
-    border: 1px solid #101D06;
-    background:#fff;
-    text-align:center;
-    margin:auto;
-    border-radius:50%;
-    font-size:12px;
-    line-height:16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-
 
 const Card = ( { children, id, colId, onCardDrop } ) =>
 {
@@ -122,11 +89,15 @@ const Board = ( { columns = [],
     onDrop,
     onSwap,
     columnHeaderRenders,
+    children,
+    renderColumn,
     colCount = 3 } ) =>
 {
 
+
     const swapCard = ( target, current ) =>
     {
+
         onSwap( target, current );
 
     };
@@ -154,6 +125,17 @@ const Board = ( { columns = [],
                                 key={ col.columnId }>
 
                                 {
+                                    col?.data?.map( ( card, i ) => ( <Card
+                                        key={ card.id }
+                                        id={ card.id }
+                                        colId={ col.columnId }
+                                        onCardDrop={ swapCard }>
+                                        { renderColumn( card, i ) }
+                                    </Card> )
+                                    )
+                                }
+
+                                {/* {
                                     col?.data?.map( ( card, i ) => (
                                         <Card
                                             key={ card.id }
@@ -175,7 +157,7 @@ const Board = ( { columns = [],
 
                                         </Card>
                                     ) )
-                                }
+                                } */}
 
                             </Column>
                         </Col>

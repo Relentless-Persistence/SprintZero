@@ -5,177 +5,216 @@ import
 {
     Row,
     Col,
-    Input
+    Card,
+    Checkbox,
+    Avatar
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import FormCard from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
 
-import { splitRoutes } from "../../../utils";
+import { splitRoutes, getTimeAgo } from "../../../utils";
 
-import fakeData from "../../../fakeData/productData.json";
+import fakeData from "../../../fakeData/huddleData.json";
 import products from "../../../fakeData/products.json";
+import styled from "styled-components";
 
-
-const getGoalNames = ( goals ) =>
+const generateRightNav = ( items ) =>
 {
-    const goalNames = goals.map( g => g.name );
+    if ( !items?.length )
+    {
+        return [ "Now" ];
+    }
 
-    return goalNames;
+    return items.map( it => (
+        {
+            render: () => getTimeAgo( it.createdAt ),
+            value: it.createdAt
+        }
+    ) );
 };
+
+
+const MyCard = styled( Card )`
+    .ant-card-meta-title
+    {
+        margin-bottom:0 !important;
+    }
+
+    .section
+    {
+        margin-bottom:20px;
+        h4
+        {
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 24px;
+            margin-bottom:5px;
+        }
+
+        .ant-checkbox-checked .ant-checkbox-inner 
+        {
+            background: #4A801D;
+            border: 1px solid #4A801D;
+            border-radius: 2px;
+        }
+    }
+`;
 
 
 export default function Huddle ()
 {
     const { pathname } = useRouter();
-
-    const [ data, setData ] = useState( fakeData );
-    const [ showAdd, setShowAdd ] = useState( false );
-
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
-    const [ activeGoal, setActiveGoal ] = useState( data[ activeProduct ][ 0 ] );
 
-
-    const handleTitleChange = ( e ) =>
-    {
-        const { value } = e.target;
-
-        const newData = { ...data };
-        const goalIndex = data[ activeProduct ].findIndex( goal => goal.name === activeGoal.name );
-
-        newData[ activeProduct ][ goalIndex ].title = value;
-
-        setData( newData );
-    };
-
-    const onClose = () =>
-    {
-        setVisible( false );
-    };
-
-    const setGoal = ( goalName, product ) =>
-    {
-        const goal = data[ product || activeProduct ].find( goal => goal.name === goalName );
-
-        setActiveGoal( goal );
-    };
-
-
-    const onAddGoal = ( name ) =>
-    {
-        const newData = { ...data };
-        const goal =
-        {
-            name: String( name ).padStart( 3, '0' ),
-            title: String( name ).padStart( 3, '0' ),
-            results: []
-        };
-        newData[ activeProduct ].push( goal );
-
-        setData( newData );
-    };
+    const [ data, setData ] = useState( fakeData );
+    const [ activeTimeIndex, setActiveTimeIndex ] = useState( 0 );
+    const [ activeTime, setActiveTime ] = useState( data[ activeProduct ][ activeTimeIndex ] );
 
     const setProduct = ( product ) =>
     {
         setActiveProduct( product );
-        const goalName = data[ product ][ 0 ].name;
-        setGoal( goalName, product );
-        setShowAdd( false );
+        setActiveTimeIndex( 0 );
+        setActiveTime( data[ product ][ 0 ] );
     };
 
-    const addItem = () =>
+    const setActiveRightNav = ( date ) =>
     {
-        setShowAdd( true );
+        const activeData = data[ activeProduct ];
+
+        const huddleIndex = activeData.findIndex( h => h.createdAt === date );
+
+
+        if ( huddleIndex > -1 )
+        {
+            const huddle = activeData[ huddleIndex ];
+            setActiveTime( huddle );
+            setActiveTimeIndex( huddleIndex );
+
+        }
     };
 
-    const addItemDone = ( item ) =>
+    const handleCheck = ( itemIndex, sectionKey, cardIndex ) =>
     {
         const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
+        const activeData = newData[ activeProduct ];
+        const comments = activeData[ activeTimeIndex ].comments;
 
-        goal?.results.push( item );
+
+        comments[ cardIndex ].data[ sectionKey ][ itemIndex ].complete = !comments[ cardIndex ].data[ sectionKey ][ itemIndex ].complete;
 
         setData( newData );
-        setShowAdd( false );
+
+
+
     };
 
-    const editItem = ( resultIndex, item ) =>
-    {
-        const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
-
-        goal.results[ resultIndex ] = item;
-        setData( newData );
-    };
-
+    const rightNav = generateRightNav( data[ activeProduct ] );
 
 
     return (
         <div className="mb-8">
             <Head>
                 <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero strategy objectives" />
+                <meta name="description" content="Sprint Zero strategy huddle" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-
             <AppLayout
                 onChangeProduct={ setProduct }
-                rightNavItems={ getGoalNames( data[ activeProduct ] ) }
-                activeRightItem={ activeGoal?.name }
-                setActiveRightNav={ setGoal }
-                onMainAdd={ addItem }
-                onSideAdd={ onAddGoal }
-                hasMainAdd
+                hasSideAdd={ false }
+                defaultText={ getTimeAgo( new Date( activeTime.createdAt ) ) }
+                rightNavItems={ rightNav }
+                setActiveRightNav={ setActiveRightNav }
+                activeRightItem={ activeTime.createdAt }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <Input
-                    maxLength={ 80 }
-                    onChange={ handleTitleChange }
-                    value={ activeGoal?.title } />
-
-
                 <Row className="py-6" gutter={ [ 12, 12 ] }>
+
                     {
-                        activeGoal?.results.map( ( res, i ) => (
-                            <Col
-                                xs={ { span: 24 } }
-                                sm={ { span: 12 } }
-                                key={ i }>
-                                <ItemCard
-                                    onEdit={ ( item ) => editItem( i, item ) }
-                                    item={ res } />
+                        activeTime?.comments?.map( ( c, index ) => (
+                            <Col key={ index } span={ 8 }>
+                                <MyCard title={ <Card.Meta
+                                    avatar={ <Avatar
+                                        size={ 48 }
+                                        src={ c.avatar }
+                                        style={ {
+                                            border: "2px solid #315613"
+                                        } }
+                                    /> }
+                                    title={ c.name }
+                                    description={ c.role }
+                                /> }>
+
+
+                                    <section>
+
+                                        <div className="section">
+                                            <h4>Blockers</h4>
+                                            <ul>
+                                                {
+                                                    c.data?.blockers.map( ( d, i ) => (
+                                                        <li key={ i }>
+                                                            <Checkbox
+                                                                onChange={ () => handleCheck( i, "blockers", index ) }
+                                                                checked={ d.complete } >
+                                                                {
+                                                                    d.complete ? <strike>
+                                                                        { d.text }
+                                                                    </strike> : d.text
+                                                                }
+                                                            </Checkbox>
+                                                        </li>
+                                                    ) )
+                                                }
+                                            </ul>
+                                        </div>
+
+                                        <div className="section">
+                                            <h4>Today</h4>
+                                            <ul>
+                                                {
+                                                    c.data?.today?.map( ( d, i ) => (
+                                                        <li key={ i }>
+                                                            <Checkbox onChange={ () => handleCheck( i, "today", index ) }
+                                                                checked={ d.complete } >{
+                                                                    d.complete ? <strike>
+                                                                        { d.text }
+                                                                    </strike> : d.text
+                                                                }</Checkbox>
+                                                        </li>
+                                                    ) )
+                                                }
+                                            </ul>
+                                        </div>
+
+                                        <div className="section">
+                                            <h4>Yesterday</h4>
+                                            <ul>
+                                                {
+                                                    c.data?.yesterday?.map( ( d, i ) => (
+                                                        <li key={ i }>
+                                                            <Checkbox onChange={ () => handleCheck( i, "yesterday", index ) }
+                                                                checked={ d.complete } >{
+                                                                    d.complete ? <strike>
+                                                                        { d.text }
+                                                                    </strike> : d.text
+                                                                }</Checkbox>
+                                                        </li>
+                                                    ) )
+                                                }
+                                            </ul>
+                                        </div>
+
+                                    </section>
+                                </MyCard>
                             </Col>
                         ) )
                     }
 
-
-
-                    {
-                        showAdd ? <Col
-                            xs={ { span: 24 } }
-                            sm={ { span: 12 } }>
-                            <FormCard
-                                onSubmit={ addItemDone } />
-                        </Col> : null
-                    }
-                    {/* 
-                    <Col
-                        xs={ { span: 24 } }
-                        sm={ { span: 8 } }>
-                        <AddCard
-                            bordered={ false }
-                        >
-                            <CardHeaderButton onClick={ addItem }>
-                                Add Result
-                            </CardHeaderButton>
-                        </AddCard>
-                    </Col> */}
                 </Row>
-
-
 
             </AppLayout>
         </div>

@@ -128,6 +128,7 @@ const AppLayout = ( {
                                             <Breadcrumb.Item
                                                 key={ i }
                                                 className="capitalize"
+                                                style={ { textTransform: "capitalize" } }
                                             >
                                                 { item }
                                             </Breadcrumb.Item>
