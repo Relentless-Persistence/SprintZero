@@ -12,7 +12,7 @@ const Plans = () => {
 
   const selectPlan = (plan) => {
     setPlan(plan);
-    router.push(`/payment/${plan}`);
+    router.push("/payment");
   };
 
   return (
