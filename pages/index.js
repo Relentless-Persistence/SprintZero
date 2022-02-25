@@ -52,7 +52,7 @@ export default function Home() {
         activeRightItem={version}
         setActiveRightNav={handleActiveVersion}
       >
-        <p>Node chart will go here</p>
+        <p>Node chart will go here.</p>
       </AppLayout>
     </div>
   );
