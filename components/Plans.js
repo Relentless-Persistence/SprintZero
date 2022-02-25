@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
 import { useRouter } from "next/router";
 import { useRecoilState } from "recoil";
@@ -9,6 +9,10 @@ const { Title, Text } = Typography;
 const Plans = () => {
   const router = useRouter();
   const [plan, setPlan] = useRecoilState(planState);
+
+  useEffect(() => {
+    router.push("/dashboard")
+  })
 
   const selectPlan = (plan) => {
     setPlan(plan);
