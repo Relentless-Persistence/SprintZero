@@ -54,6 +54,14 @@ const Billing = ({ selectedPlan, countries, ip }) => {
   const [taxInfo, setTaxInfo] = useState(null);
   const [customer, setCustomer] = useState(null);
 
+  console.log("selectedPlan", selectedPlan);
+  console.log("countries", countries);
+  console.log("ip", ip);
+
+  if (selectedPlan === null) {
+    router.push("/");
+  }
+
   const stripe = useStripe();
   const elements = useElements();
 

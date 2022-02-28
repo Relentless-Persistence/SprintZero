@@ -1,11 +1,24 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
 import { useRouter } from "next/router";
+import { useRecoilState } from "recoil";
+import { planState } from "../atoms/planAtom";
 
 const { Title, Text } = Typography;
 
 const Plans = () => {
   const router = useRouter();
+  const [plan, setPlan] = useRecoilState(planState);
+
+  useEffect(() => {
+    router.push("/dashboard")
+  })
+
+  const selectPlan = (plan) => {
+    setPlan(plan);
+    router.push("/payment");
+  };
+
   return (
     <>
       <div>
@@ -42,7 +55,7 @@ const Plans = () => {
                 <Text style={{ fontSize: "14px" }}>Per Month</Text>
               </div>
               <div style={{ textAlign: "center" }}>
-                <Button onClick={() => router.push("/payment/basic")}>
+                <Button onClick={() => selectPlan("basic")}>
                   Select
                 </Button>
               </div>
@@ -71,7 +84,7 @@ const Plans = () => {
                 <Text style={{ fontSize: "14px" }}>Per Month</Text>
               </div>
               <div style={{ textAlign: "center" }}>
-                <Button onClick={() => router.push("/payment/professional")}>
+                <Button onClick={() => selectPlan("professional")}>
                   Select
                 </Button>
               </div>
