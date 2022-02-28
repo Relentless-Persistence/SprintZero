@@ -1,6 +1,7 @@
 import Head from "next/head";
-import AppLayout from "../../components/Dashboard/AppLayout";
+import Layout from "../../components/Dashboard/Layout";
 import { useState } from "react";
+import UserStory from "../../components/UserStory";
 
 const versions = [ "v1", "v2", "v3" ];
 
@@ -31,16 +32,16 @@ export default function Home ()
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <AppLayout
-        breadCrumbItems={ [ "StoryMap" ] }
-        hasSideAdd={ false }
-        hasMainAdd={ false }
-        rightNavItems={ versions }
-        activeRightItem={ version }
-        setActiveRightNav={ handleActiveVersion }
+      <Layout
+        // breadCrumbItems={ [ "StoryMap" ] }
+        // hasSideAdd={ false }
+        // hasMainAdd={ false }
+        // rightNavItems={ versions }
+        // activeRightItem={ version }
+        // setActiveRightNav={ handleActiveVersion }
       >
-        <p>Node chart will go here</p>
-      </AppLayout>
+        <UserStory />
+      </Layout>
     </div>
   );
 }
