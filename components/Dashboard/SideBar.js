@@ -78,7 +78,13 @@ const SideBar = () =>
                     </Link>
 
                 </Menu.Item>
-                <Menu.Item key="3">Ethics</Menu.Item>
+                <Menu.Item
+                    $highlight={ isActive( pathname, "/strategy/ethics" ) }
+                    key="3">
+                    <Link href="/dashboard/strategy/ethics">
+                        <a>Ethics</a>
+                    </Link>
+                </Menu.Item>
                 <MenuItem $highlight={ isActive( pathname, "/strategy/objectives" ) } key="4">
                     <Link href="/dashboard/strategy/objectives">
                         <a>Objectives</a>
@@ -93,9 +99,17 @@ const SideBar = () =>
             </StyledSubMenu>
             <StyledSubMenu key="sub2" icon={ <PullRequestOutlined /> } title="Tactics">
                 <Menu.Item key="6">Priorities</Menu.Item>
-                <Menu.Item key="7">Retrospective</Menu.Item>
+                <MenuItem key="7" $highlight={ isActive( pathname, "/tactics/retrospective" ) } >
+                    <Link href="/dashboard/tactics/retrospective">
+                        <a>Retrospective</a>
+                    </Link>
+                </MenuItem>
                 <Menu.Item key="8">Release</Menu.Item>
-                <Menu.Item key="9">Tasks</Menu.Item>
+                <MenuItem key="9" $highlight={ isActive( pathname, "/tactics/tasks" ) } >
+                    <Link href="/dashboard/tactics/tasks">
+                        <a>Tasks</a>
+                    </Link>
+                </MenuItem>
             </StyledSubMenu>
             <StyledSubMenu
                 key="sub3"
@@ -103,14 +117,34 @@ const SideBar = () =>
                 title="Operations"
             >
                 <Menu.Item key="11">Calendar</Menu.Item>
-                <Menu.Item key="12">Huddle</Menu.Item>
+                <MenuItem key="12" $highlight={ isActive( pathname, "/operations/huddle" ) } >
+                    <Link href="/dashboard/operations/huddle">
+                        <a>Huddle</a>
+                    </Link>
+                </MenuItem>
                 <Menu.Item key="13">Performance</Menu.Item>
-                <Menu.Item key="14">Sprint</Menu.Item>
+                <MenuItem key="14" $highlight={ isActive( pathname, "/operations/sprint" ) } >
+                    <Link href="/dashboard/operations/sprint">
+                        <a>Sprint</a>
+                    </Link>
+                </MenuItem>
             </StyledSubMenu>
             <StyledSubMenu key="sub4" icon={ <UserOutlined /> } title="Userbase">
-                <Menu.Item key="15">Learnings</Menu.Item>
-                <Menu.Item key="16">Dialogue</Menu.Item>
-                <Menu.Item key="17">Personas</Menu.Item>
+                <MenuItem key="15" $highlight={ isActive( pathname, "/userbase/learnings" ) } >
+                    <Link href="/dashboard/userbase/learnings">
+                        <a>Learnings</a>
+                    </Link>
+                </MenuItem>
+                <MenuItem key="16" $highlight={ isActive( pathname, "/userbase/dialogue" ) } >
+                    <Link href="/dashboard/userbase/dialogue">
+                        <a>Dialogue</a>
+                    </Link>
+                </MenuItem>
+                <MenuItem key="17" $highlight={ isActive( pathname, "/userbase/personas" ) } >
+                    <Link href="/dashboard/userbase/personas">
+                        <a>Personas</a>
+                    </Link>
+                </MenuItem>
                 <Menu.Item key="18">Journeys</Menu.Item>
             </StyledSubMenu>
         </Menu>

@@ -8,10 +8,6 @@ import
     Divider,
     Button,
 } from "antd";
-import
-{
-    PlusOutlined
-} from "@ant-design/icons";
 
 import SideBar from "./SideBar";
 import AppHeader from "./Header";
@@ -38,8 +34,7 @@ const Version = styled.li`
 const AddNew = styled( Button )`
 align-items:center;
 display:flex;
-margin-top:14px;
-margin-right:44px;
+margin-left:10px;
 background:#fff;
 
 `;
@@ -56,9 +51,7 @@ padding-left:0;
 
 `;
 
-const Partition = styled( Divider )`
-  height:100px;
-`;
+const capitalize = text => `${ text[ 0 ].toUpperCase() }${ text.substring( 1 ).toLowerCase() }`;
 
 
 const AppLayout = ( {
@@ -72,6 +65,11 @@ const AppLayout = ( {
     defaultText,
     onSideAdd,
     hasSideAdd = true,
+    hideSideBar = false,
+    ignoreLast,
+    type,
+    capitalizeText = true,
+    topExtra = <></>,
     children } ) =>
 {
     const { user } = useAuth();
@@ -103,7 +101,7 @@ const AppLayout = ( {
         setValue( e.target.value );
     };
 
-    // if ( !user ) return <div>Loading...</div>;
+    if ( !user ) return <div>Loading...</div>;
 
     return (
         <Layout style={ { minHeight: "100vh" } }>
@@ -126,24 +124,38 @@ const AppLayout = ( {
                                         breadCrumbItems.map( ( item, i ) => (
                                             <Breadcrumb.Item
                                                 key={ i }
-                                                className="capitalize"
                                             >
-                                                { item }
+                                                { capitalize( item ) }
                                             </Breadcrumb.Item>
                                         ) )
                                     }
 
+                                    {
+                                        ignoreLast ? null : <Breadcrumb.Item className="text-green-800 ">
+                                            { capitalizeText ? capitalize( defaultText || activeRightItem ) : ( defaultText || activeRightItem ) }
+                                        </Breadcrumb.Item>
+                                    }
 
-                                    <Breadcrumb.Item className="capitalize text-green-800 ">
-                                        { defaultText || activeRightItem }
-                                    </Breadcrumb.Item>
                                 </Breadcrumb>
 
-                                {
-                                    hasMainAdd ? <AddNew onClick={ onMainAdd }>
-                                        Add New
-                                    </AddNew> : null
-                                }
+                                <div
+                                    className="flex justify-between"
+                                    style={ { margin: "16px 44px 0 10px" } }>
+
+                                    {
+                                        <div >
+                                            { topExtra }
+                                        </div>
+                                    }
+
+                                    {
+                                        hasMainAdd ? <AddNew onClick={ onMainAdd }>
+                                            Add New
+                                        </AddNew> : null
+                                    }
+                                </div>
+
+
 
 
                             </div>
@@ -158,55 +170,60 @@ const AppLayout = ( {
                                 { children }
                             </Content>
                         </div>
-                        <div>
-                            <div>
-                                <Versions className="">
-                                    {
-                                        rightNavItems.map( ( item, i ) => (
-                                            <Version
-                                                className="capitalize"
-                                                key={ i }
-                                                active={ activeRightItem === ( item.value || item ) }
-                                                onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
-                                            >
-                                                { item.render ? item.render() : item }
-                                            </Version>
-                                        ) )
-                                    }
+                        {
+                            hideSideBar ? null : (
+                                <div>
+                                    <div>
+                                        <Versions className="">
+                                            {
+                                                rightNavItems.map( ( item, i ) => (
+                                                    <Version
+                                                        className="capitalize"
+                                                        key={ i }
+                                                        active={ activeRightItem === ( item.value || item ) }
+                                                        onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
+                                                    >
+                                                        { item.render ? item.render() : item }
+                                                    </Version>
+                                                ) )
+                                            }
 
 
-                                    {
-                                        ( hasSideAdd && showSideAdd ) ?
-                                            <Version> <Input
-                                                className="mx-0 my-0"
-                                                type="number"
-                                                maxLength={ 20 }
-                                                autoFocus
-                                                value={ value }
-                                                onChange={ handleChange }
-                                                onKeyPress={ onEnter }
-                                            />
-                                            </Version>
-                                            : null
-                                    }
+                                            {
+                                                ( hasSideAdd && showSideAdd ) ?
+                                                    <Version> <Input
+                                                        className="mx-0 my-0"
+                                                        type={ type || "number" }
+                                                        maxLength={ 20 }
+                                                        autoFocus
+                                                        value={ value }
+                                                        onChange={ handleChange }
+                                                        onKeyPress={ onEnter }
+                                                    />
+                                                    </Version>
+                                                    : null
+                                            }
 
-                                    {
-                                        hasSideAdd ?
+                                            {
+                                                hasSideAdd ?
 
-                                            <Version>
-                                                <AddSide onClick={ toggleSideAdd }>
-                                                    Add
-                                                </AddSide>
-                                            </Version>
-                                            : null
-                                    }
+                                                    <Version>
+                                                        <AddSide onClick={ toggleSideAdd }>
+                                                            { showSideAdd ? "Close" : "Add" }
+                                                        </AddSide>
+                                                    </Version>
+                                                    : null
+                                            }
 
-                                </Versions>
+                                        </Versions>
 
 
 
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
                     </div>
                 </Layout>
             </Layout>

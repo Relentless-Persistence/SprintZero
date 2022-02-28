@@ -2,7 +2,7 @@ import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
 
 
-const getTimeAgo = ( date ) =>
+const getTimeAgo = ( date, addSuffix = false ) =>
 {
     if ( !date )
     {
@@ -10,7 +10,9 @@ const getTimeAgo = ( date ) =>
     }
     const now = new Date();
 
-    let formattedDate = formatDistance( new Date( date ), now );
+    let formattedDate = formatDistance( new Date( date ), now, {
+        addSuffix
+    } );
 
     if ( formattedDate.includes( "sec" ) )
     {
