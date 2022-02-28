@@ -10,7 +10,6 @@ import
     Avatar,
     Menu,
     Input,
-    Dropdown,
     Row,
     Tag,
     Col,
@@ -18,12 +17,14 @@ import
     Radio,
     Checkbox
 } from 'antd';
-import { FilterOutlined, LinkOutlined, CloseOutlined } from '@ant-design/icons';
+import { LinkOutlined, CloseOutlined } from '@ant-design/icons';
 
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
 import { Board } from '../../../components/Boards/Board2';
+import { DropDwnBtn } from '../../../components/Dashboard/DropdownBtn';
+
 
 import { splitRoutes } from "../../../utils";
 
@@ -112,11 +113,6 @@ const CloseTime = styled.p`
 `;
 
 
-
-
-const DropdownBtn = styled( Dropdown.Button )`
-    background:#fff !important;
-`;
 
 const StyledItem = styled.div`
     color: ${ props => props.$color || "black" };
@@ -314,10 +310,7 @@ export default function Ethics ()
                     onSwap={ handleSwap }
                     columns={ activeBoard?.columns }
                     renderColumn={ renderCol }
-                    columnHeaderRenders={ [ null, null, <DropdownBtn
-                        overlay={ menu } key="drp" placement="bottomCenter" icon={ <FilterOutlined /> }>
-                        All
-                    </DropdownBtn> ] }
+                    columnHeaderRenders={ [ null, null, <DropDwnBtn key="jjj" value="All" menu={ menu } /> ] }
                 />
 
                 <Drawer

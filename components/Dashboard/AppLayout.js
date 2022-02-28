@@ -34,8 +34,7 @@ const Version = styled.li`
 const AddNew = styled( Button )`
 align-items:center;
 display:flex;
-margin-top:14px;
-margin-right:44px;
+margin-left:10px;
 background:#fff;
 
 `;
@@ -70,6 +69,7 @@ const AppLayout = ( {
     ignoreLast,
     type,
     capitalizeText = true,
+    topExtra = <></>,
     children } ) =>
 {
     const { user } = useAuth();
@@ -138,11 +138,24 @@ const AppLayout = ( {
 
                                 </Breadcrumb>
 
-                                {
-                                    hasMainAdd ? <AddNew onClick={ onMainAdd }>
-                                        Add New
-                                    </AddNew> : null
-                                }
+                                <div
+                                    className="flex justify-between"
+                                    style={ { margin: "16px 44px 0 10px" } }>
+
+                                    {
+                                        <div >
+                                            { topExtra }
+                                        </div>
+                                    }
+
+                                    {
+                                        hasMainAdd ? <AddNew onClick={ onMainAdd }>
+                                            Add New
+                                        </AddNew> : null
+                                    }
+                                </div>
+
+
 
 
                             </div>
