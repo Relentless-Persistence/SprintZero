@@ -1,14 +1,16 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ReadOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
-import { Divider, Tag } from 'antd';
+import { Divider, Tag } from "antd";
 import update from "immutability-helper";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { last } from "lodash";
-import Epic from './Epic';
+import Epic from "./Epic";
+import Feature from "./Feature";
 
 const UserStory = () => {
   const [epics, setEpics] = useState([
@@ -42,6 +44,39 @@ const UserStory = () => {
     setEpics(newData);
   };
 
+  const addFeature = (epicIndex) => {
+    const newData = update(epics, {
+      [epicIndex]: {
+        features: {
+          $push: [
+            {
+              id: Math.floor(Math.random() * 0x1000000).toString(),
+              name: "",
+              stories: [],
+            },
+          ],
+        },
+      },
+    });
+
+    setEpics(newData);
+  };
+
+  const handleChangeFeature = (epicIndex, featureIndex, e) => {
+    const newData = update(epics, {
+      [epicIndex]: {
+        features: {
+          [featureIndex]: {
+            name: {
+              $set: e,
+            },
+          },
+        },
+      },
+    });
+
+    setEpics(newData);
+  };
 
   return (
     <>
@@ -60,12 +95,40 @@ const UserStory = () => {
           {epics.map((epic, i) => (
             <div key={i}>
               <ArcherContainer strokeColor="#0073B3" noCurves>
-                <Epic epic={epic} i={i} addEpic={addEpic} handleChangeEpic={handleChangeEpic} />
+                <Epic
+                  epic={epic}
+                  i={i}
+                  addEpic={addEpic}
+                  handleChangeEpic={handleChangeEpic}
+                />
 
                 {epic.name === "" ? null : (
                   <div className="mt-[42.5px]">
                     <div className="flex items-center space-x-4">
-                      
+                      {epic.features.length <= 0 ? (
+                        <ArcherElement id={"add_feature"}>
+                          <Tag
+                            className="flex items-center space-x-1 border-2 border-[#006378] border-dashed px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
+                            icon={<CopyOutlined />}
+                            onClick={() => addFeature(i)}
+                          >
+                            Add Feature
+                          </Tag>
+                        </ArcherElement>
+                      ) : (
+                        epic.features.map((feature, featureIndex) => (
+                          <div key={feature.id}>
+                            <Feature
+                              epic={epic}
+                              feature={feature}
+                              i={i}
+                              featureIndex={featureIndex}
+                              addFeature={addFeature}
+                              handleChangeFeature={handleChangeFeature}
+                            />
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}
@@ -86,6 +149,6 @@ const UserStory = () => {
       </div>
     </>
   );
-}
+};
 
 export default UserStory;

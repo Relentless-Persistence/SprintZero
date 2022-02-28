@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import { ArcherElement } from "react-archer";
-import { Input, Tag } from 'antd';
+import { Input, Tag, Drawer, Space, Button } from "antd";
 import {
   ReadOutlined,
   CopyOutlined,
@@ -8,7 +8,8 @@ import {
   PlusCircleFilled,
 } from "@ant-design/icons";
 
-const Epic = ({epic, i, addEpic, handleChangeEpic}) => {
+const Epic = ({ epic, i, addEpic, handleChangeEpic }) => {
+  const [openDetail, setOpenDetail] = useState(false);
   return (
     <div className="flex items-center justify-start">
       <ArcherElement
@@ -41,6 +42,7 @@ const Epic = ({epic, i, addEpic, handleChangeEpic}) => {
             !epic.name ? "border-dashed" : ""
           } px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded`}
           icon={<ReadOutlined />}
+          onContextMenu={() => setOpenDetail(true)}
         >
           <Input
             placeholder="New Epic"
@@ -52,8 +54,25 @@ const Epic = ({epic, i, addEpic, handleChangeEpic}) => {
           />
         </Tag>
       </ArcherElement>
+  
+      <Drawer
+        placement="bottom"
+        width={"30%"}
+        onClose={() => setOpenDetail(false)}
+        visible={openDetail}
+        extra={
+          <Space>
+            <Button onClick={() => setOpenDetail(false)}>Cancel</Button>
+            <Button type="primary">
+              OK
+            </Button>
+          </Space>
+        }
+      >
+        Hello
+      </Drawer>
     </div>
   );
-}
+};
 
 export default Epic;
