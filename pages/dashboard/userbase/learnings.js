@@ -5,6 +5,7 @@ import
 {
     Row,
     Col,
+    Input
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -13,19 +14,19 @@ import ItemCard from "../../../components/Dashboard/ItemCard";
 
 import { splitRoutes } from "../../../utils";
 
-import fakeData from "../../../fakeData/accessiblity.json";
+import fakeData from "../../../fakeData/learnings.json";
 import products from "../../../fakeData/products.json";
 
 
-const getChallengeNames = ( challenges ) =>
+const getNames = ( learnings ) =>
 {
-    const challengeNames = challenges.map( g => g.name );
+    const names = learnings.map( g => g.name );
 
-    return challengeNames;
+    return names;
 };
 
 
-export default function Accessiblity ()
+export default function Learnings ()
 {
     const { pathname } = useRouter();
 
@@ -34,22 +35,22 @@ export default function Accessiblity ()
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
-    const [ activeChallenge, setActiveChallenge ] = useState( data[ activeProduct ][ 0 ] );
+    const [ activeLearning, setActiveLearning ] = useState( data[ activeProduct ][ 0 ] );
 
 
-    const setChallenge = ( challengeName, product ) =>
+    const setLearning = ( name, product ) =>
     {
-        const challenge = data[ product || activeProduct ].find( challenge => challenge.name === challengeName );
+        const learning = data[ product || activeProduct ].find( learning => learning.name === name );
 
-        setActiveChallenge( challenge );
+        setActiveLearning( learning );
     };
 
 
     const setProduct = ( product ) =>
     {
         setActiveProduct( product );
-        const challengeName = data[ product ][ 0 ].name;
-        setChallenge( challengeName, product );
+        const learningName = data[ product ][ 0 ].name;
+        setGoal( learningName, product );
         setShowAdd( false );
     };
 
@@ -61,9 +62,9 @@ export default function Accessiblity ()
     const addItemDone = ( item ) =>
     {
         const newData = { ...data };
-        const challenge = newData[ activeProduct ].find( challenge => challenge.name === activeChallenge.name );
+        const learning = newData[ activeProduct ].find( learning => learning.name === activeLearning.name );
 
-        challenge?.challenges.push( item );
+        learning?.data.push( item );
 
         setData( newData );
         setShowAdd( false );
@@ -72,9 +73,9 @@ export default function Accessiblity ()
     const editItem = ( resultIndex, item ) =>
     {
         const newData = { ...data };
-        const challenge = newData[ activeProduct ].find( challenge => challenge.name === activeChallenge.name );
+        const learning = newData[ activeProduct ].find( learning => learning.name === activeLearning.name );
 
-        challenge.challenges[ resultIndex ] = item;
+        learning.data[ resultIndex ] = item;
         setData( newData );
     };
 
@@ -84,28 +85,26 @@ export default function Accessiblity ()
         <div className="mb-8">
             <Head>
                 <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero strategy accessiblity" />
+                <meta name="description" content="Sprint Zero strategy learnings" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
 
             <AppLayout
                 onChangeProduct={ setProduct }
-                rightNavItems={ getChallengeNames( data[ activeProduct ] ) }
-                activeRightItem={ activeChallenge?.name }
-                setActiveRightNav={ setChallenge }
-                hasMainAdd={ true }
+                rightNavItems={ getNames( data[ activeProduct ] ) }
+                activeRightItem={ activeLearning?.name }
+                setActiveRightNav={ setLearning }
                 onMainAdd={ addItem }
+                hasMainAdd
                 hasSideAdd={ false }
                 breadCrumbItems={ splitRoutes( pathname ) }>
-
-                <p>{ activeChallenge?.title }</p>
 
 
 
                 <Row className="py-6" gutter={ [ 12, 12 ] }>
                     {
-                        activeChallenge?.challenges.map( ( res, i ) => (
+                        activeLearning?.data.map( ( res, i ) => (
                             <Col
                                 xs={ { span: 24 } }
                                 sm={ { span: 12 } }
@@ -118,7 +117,6 @@ export default function Accessiblity ()
                     }
 
 
-
                     {
                         showAdd ? <Col
                             xs={ { span: 24 } }
@@ -127,18 +125,8 @@ export default function Accessiblity ()
                                 onSubmit={ addItemDone } />
                         </Col> : null
                     }
-                    {/* 
-                    <Col
-                        xs={ { span: 24 } }
-                        sm={ { span: 8 } }>
-                        <AddCard
-                            bordered={ false }
-                        >
-                            <CardHeaderButton onClick={ addItem }>
-                                Add Result
-                            </CardHeaderButton>
-                        </AddCard>
-                    </Col> */}
+
+
                 </Row>
 
 
