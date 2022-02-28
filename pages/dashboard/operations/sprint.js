@@ -15,10 +15,9 @@ import
     Tag,
     Col,
     Drawer,
-    Radio,
     Checkbox
 } from 'antd';
-import { FilterOutlined, LinkOutlined, CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -27,9 +26,10 @@ import { Board } from '../../../components/Boards/Board2';
 
 import { splitRoutes } from "../../../utils";
 
-import fakeData from "../../../fakeData/ethics.json";
+import fakeData from "../../../fakeData/sprint.json";
 import products from "../../../fakeData/products.json";
 import { Title } from "../../../components/Dashboard/SectionTitle";
+import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
 
 
 const { TextArea } = Input;
@@ -52,22 +52,8 @@ const getBoardNames = ( boards ) =>
     return boardNames;
 };
 
-const menu = (
-    <Menu>
-        <Menu.Item key="1">
-            All
-        </Menu.Item>
-        <Menu.Item key="2">
-            Allowed
-        </Menu.Item>
-        <Menu.Item key="3">
-            Rejected
-        </Menu.Item>
-    </Menu>
-);
 
 const ListItemMeta = styled( List.Item.Meta )`
-
 
 .ant-list-item-meta-title
 {
@@ -135,13 +121,23 @@ const StyledItem = styled.div`
 
 const Story = styled.p`
    padding:12px 19px;
-   background:#F5F5F5;
+   background:#FFF;
    color: #262626;
    border: 1px solid #D9D9D9;
 `;
 
 
+const CheckList = styled.div`
 
+
+
+        .ant-checkbox-checked .ant-checkbox-inner 
+        {
+            background: #4A801D;
+            border: 1px solid #4A801D;
+            border-radius: 2px;
+        }
+`;
 
 const Index = styled.span`
     width:32px;
@@ -161,7 +157,7 @@ const Index = styled.span`
 
 
 
-export default function Ethics ()
+export default function Sprint ()
 {
     const { pathname } = useRouter();
 
@@ -286,12 +282,20 @@ export default function Ethics ()
         </>;
     };
 
+    const selectAll = [
+        <CardHeaderButton key={ 1 } onClick={ () => { } } >Select All</CardHeaderButton>,
+        <CardHeaderButton key={ 2 } onClick={ () => { } } >Select All</CardHeaderButton>,
+        <CardHeaderButton key={ 3 } onClick={ () => { } } >Select All</CardHeaderButton>,
+        <CardHeaderButton key={ 4 } onClick={ () => { } } >Select All</CardHeaderButton>,
+
+    ];
+
 
     return (
         <div className="mb-8">
             <Head>
                 <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero strategy ethics" />
+                <meta name="description" content="Sprint Zero strategy sprint" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
@@ -314,21 +318,17 @@ export default function Ethics ()
                     onSwap={ handleSwap }
                     columns={ activeBoard?.columns }
                     renderColumn={ renderCol }
-                    columnHeaderRenders={ [ null, null, <DropdownBtn
-                        overlay={ menu } key="drp" placement="bottomCenter" icon={ <FilterOutlined /> }>
-                        All
-                    </DropdownBtn> ] }
+                    colCount={ 4 }
+                    columnHeaderRenders={ selectAll }
                 />
 
                 <Drawer
                     title={ <DrawerTitle gutter={ [ 12, 12 ] }>
                         <Col span={ 12 }>
-                            <h3>card_title</h3>
-                            <Tag color="#91D5FF">3 points</Tag>
-                            <Tag color="#A4DF74">$1,230</Tag>
-                            <Tag
-                                icon={ <LinkOutlined /> }
-                                color="#096DD9">Design</Tag>
+                            <h3>System Status</h3>
+                            <Tag color="#91D5FF"># points total</Tag>
+                            <Tag color="#A4DF74">$0.00 total</Tag>
+
                         </Col>
                         <Col span={ 12 }>
                             <CloseTime>
@@ -349,37 +349,49 @@ export default function Ethics ()
                         <Col span={ 12 }>
 
                             <Title>
-                                Adjudication Response
+                                Epic
                             </Title>
 
 
-                            <p>Do you think this would provide value and reaffirm the commitment to our users?</p>
-                            <br />
-
-                            <Radio.Group
-                                options={ [
-                                    {
-                                        label: "Allow",
-                                        value: true
-                                    },
-                                    {
-                                        label: "Deny",
-                                        value: false
-                                    }
-                                ] }
-                                optionType={ Checkbox }
-                            />
-                            <br />
-                            <br />
-
-                            <Title>
-                                User Story
-                            </Title>
-
-                            <br />
                             <Story>
                                 As a user I need to be aware of any issues with the platform so that I can pre-emptively warn attendees and provide any new contact information to join the meeting
                             </Story>
+                            <br />
+
+
+                            <Title>
+                                Keeper(s)
+                            </Title>
+
+                            <br />
+
+                            <CheckList>
+
+                                <p>
+                                    <Checkbox checked>
+                                        Darrell Steward
+                                    </Checkbox>
+                                </p>
+                                <p>
+                                    <Checkbox >
+                                        Jane Cooper
+                                    </Checkbox>
+                                </p>
+                                <p>
+                                    <Checkbox checked>
+                                        Bessie Cooper
+                                    </Checkbox>
+                                </p>
+                                <p>
+                                    <Checkbox >
+                                        Floyd Miles
+                                    </Checkbox>
+                                </p>
+
+
+
+
+                            </CheckList>
 
 
                         </Col>

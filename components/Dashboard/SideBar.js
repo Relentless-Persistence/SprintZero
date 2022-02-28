@@ -123,12 +123,24 @@ const SideBar = () =>
                     </Link>
                 </MenuItem>
                 <Menu.Item key="13">Performance</Menu.Item>
-                <Menu.Item key="14">Sprint</Menu.Item>
+                <MenuItem key="14" $highlight={ isActive( pathname, "/operations/sprint" ) } >
+                    <Link href="/dashboard/operations/sprint">
+                        <a>Sprint</a>
+                    </Link>
+                </MenuItem>
             </StyledSubMenu>
             <StyledSubMenu key="sub4" icon={ <UserOutlined /> } title="Userbase">
-                <Menu.Item key="15">Learnings</Menu.Item>
+                <MenuItem key="15" $highlight={ isActive( pathname, "/userbase/learnings" ) } >
+                    <Link href="/dashboard/userbase/learnings">
+                        <a>Learnings</a>
+                    </Link>
+                </MenuItem>
                 <Menu.Item key="16">Dialogue</Menu.Item>
-                <Menu.Item key="17">Personas</Menu.Item>
+                <MenuItem key="17" $highlight={ isActive( pathname, "/userbase/personas" ) } >
+                    <Link href="/dashboard/userbase/personas">
+                        <a>Personas</a>
+                    </Link>
+                </MenuItem>
                 <Menu.Item key="18">Journeys</Menu.Item>
             </StyledSubMenu>
         </Menu>

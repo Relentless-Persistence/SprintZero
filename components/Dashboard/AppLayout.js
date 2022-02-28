@@ -8,10 +8,6 @@ import
     Divider,
     Button,
 } from "antd";
-import
-{
-    PlusOutlined
-} from "@ant-design/icons";
 
 import SideBar from "./SideBar";
 import AppHeader from "./Header";
@@ -56,9 +52,7 @@ padding-left:0;
 
 `;
 
-const Partition = styled( Divider )`
-  height:100px;
-`;
+const capitalize = text => `${ text[ 0 ].toUpperCase() }${ text.substring( 1 ).toLowerCase() }`;
 
 
 const AppLayout = ( {
@@ -73,6 +67,9 @@ const AppLayout = ( {
     onSideAdd,
     hasSideAdd = true,
     hideSideBar = false,
+    ignoreLast,
+    type,
+    capitalizeText = true,
     children } ) =>
 {
     const { user } = useAuth();
@@ -127,18 +124,18 @@ const AppLayout = ( {
                                         breadCrumbItems.map( ( item, i ) => (
                                             <Breadcrumb.Item
                                                 key={ i }
-                                                className="capitalize"
-                                                style={ { textTransform: "capitalize" } }
                                             >
-                                                { item }
+                                                { capitalize( item ) }
                                             </Breadcrumb.Item>
                                         ) )
                                     }
 
+                                    {
+                                        ignoreLast ? null : <Breadcrumb.Item className="text-green-800 ">
+                                            { capitalizeText ? capitalize( defaultText || activeRightItem ) : ( defaultText || activeRightItem ) }
+                                        </Breadcrumb.Item>
+                                    }
 
-                                    <Breadcrumb.Item className="capitalize text-green-800 ">
-                                        { defaultText || activeRightItem }
-                                    </Breadcrumb.Item>
                                 </Breadcrumb>
 
                                 {
@@ -183,7 +180,7 @@ const AppLayout = ( {
                                                 ( hasSideAdd && showSideAdd ) ?
                                                     <Version> <Input
                                                         className="mx-0 my-0"
-                                                        type="number"
+                                                        type={ type || "number" }
                                                         maxLength={ 20 }
                                                         autoFocus
                                                         value={ value }

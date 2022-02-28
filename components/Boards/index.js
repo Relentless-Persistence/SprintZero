@@ -150,7 +150,7 @@ const Board = ( { columns = [],
                                 columnId={ col.columnId }
                                 columnName={ col.columnName }
                                 onCardEntry={ entryCard }
-                                header={ columnHeaderRenders[ i ] }
+                                //header={ columnHeaderRenders[ i ] }
                                 key={ col.columnId }>
 
                                 {
