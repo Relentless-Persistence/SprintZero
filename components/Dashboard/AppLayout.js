@@ -101,7 +101,7 @@ const AppLayout = ( {
         setValue( e.target.value );
     };
 
-    if ( !user ) return <div>Loading...</div>;
+    //if ( !user ) return <div>Loading...</div>;
 
     return (
         <Layout style={ { minHeight: "100vh" } }>
