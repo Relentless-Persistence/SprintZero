@@ -247,3 +247,7 @@ body {
 .ant-layout-sider-trigger {
   background-color: var(--kelly) !important;
 }
+
+.ant-checkbox-wrapper + .ant-checkbox-wrapper {
+    margin-left: 0px;
+}
