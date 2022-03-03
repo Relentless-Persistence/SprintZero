@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Row, Col, Input, Checkbox, Tag} from 'antd';
 import EpicComments from './EpicComments';
 
@@ -14,6 +14,8 @@ const options = [
 ];
 
 const EpicDetails = ({epic}) => {
+  const [designComments, setDesignComments] = useState(true);
+  const [CommentType, setCommentType] = useState(designComments ? "design" : "code");
   return (
     <div>
       <Row gutter={[48]}>
@@ -44,13 +46,29 @@ const EpicDetails = ({epic}) => {
             <h3 className="font-semibold text-[20px]">Comments</h3>
 
             <div>
-              <Tag className="font-semibold text-sm text-[#4A801D] border-[#4A801D] px-2">
+              <Tag
+                className={
+                  designComments
+                    ? "font-semibold text-sm text-[#4A801D] border-[#4A801D] px-2 cursor-pointer"
+                    : "text-sm text-black px-2 -ml-2 cursor-pointer"
+                }
+                onClick={() => {setDesignComments(true); setCommentType("design")}}
+              >
                 Design
               </Tag>
-              <Tag className="text-sm text-black px-2 -ml-2">Code</Tag>
+              <Tag
+                className={
+                  !designComments
+                    ? "font-semibold text-sm text-[#4A801D] border-[#4A801D] px-2 cursor-pointer -ml-2"
+                    : "text-sm text-black px-2 -ml-2 cursor-pointer"
+                }
+                onClick={() => {setDesignComments(false); setCommentType("code")}}
+              >
+                Code
+              </Tag>
             </div>
           </div>
-          <EpicComments />
+          <EpicComments type={CommentType} />
         </Col>
       </Row>
     </div>

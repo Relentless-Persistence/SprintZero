@@ -1,8 +1,8 @@
-import React from 'react';
-import {Comment, Tooltip, List, Avatar, Form, Button, Input } from 'antd';
-import { SendOutlined, FlagOutlined } from '@ant-design/icons';
+import React from "react";
+import { Comment, Tooltip, List, Avatar, Form, Button, Input } from "antd";
+import { SendOutlined, FlagOutlined } from "@ant-design/icons";
 
-const {TextArea} = Input
+const { TextArea } = Input;
 
 const data = [
   {
@@ -15,24 +15,41 @@ const data = [
         economically sound.
       </p>
     ),
+    type: "design",
   },
   {
     actions: [<span key="comment-list-reply-to-0">Reply to</span>],
     author: "Kim James",
     avatar: "https://joeschmoe.io/api/v1/random",
     content: <p>Is this really want we think the story should be?</p>,
+    type: "code",
   },
 ];
 
+const EpicComments = ({ type }) => {
+  const [comments, setComments] = React.useState(data);
+  const [comment, setComment] = React.useState("");
 
-const EpicComments = () => {
+  const addComment = () => {
+    setComments([...comments,
+      {
+        actions: [<span key="comment-list-reply-to-0">Reply to</span>],
+        author: "James Bond",
+        avatar: "https://joeschmoe.io/api/v1/random",
+        content: <p>{comment}</p>,
+        type: type,
+      },
+    ]);
+    setComment("");
+  };
+
   return (
     <>
       <List
         className="comment-list"
         // header={`${data.length} replies`}
         itemLayout="horizontal"
-        dataSource={data}
+        dataSource={comments.filter((item) => item.type === type)}
         renderItem={(item) => (
           <li>
             <Comment
@@ -51,21 +68,20 @@ const EpicComments = () => {
         }
         content={
           <Editor
-            // onChange={this.handleChange}
-            // onSubmit={this.handleSubmit}
-            // submitting={submitting}
-            // value={value}
+          onChange={(e) => setComment(e.target.value)}
+          onSubmit={addComment}
+          // submitting={submitting}
+          value={comment}
           />
         }
       />
     </>
   );
-}
+};
 
 export default EpicComments;
 
-
-const Editor = ({ onChange, onSubmit, submitting, value }) => (
+const Editor = ({ onChange, onSubmit, value }) => (
   <>
     <Form.Item>
       <TextArea rows={3} onChange={onChange} value={value} />
@@ -74,12 +90,12 @@ const Editor = ({ onChange, onSubmit, submitting, value }) => (
       <div className="flex space-x-3">
         <Button
           className="text-blue-400 flex items-center"
-          htmlType="submit"
-          loading={submitting}
-          onClick={onSubmit}
+          // htmlType="submit"
+          // loading={submitting}
+          onClick={() => onSubmit()}
           icon={<SendOutlined />}
           type="primary"
-          disabled
+          disabled={!value}
         >
           Post
         </Button>
@@ -87,8 +103,7 @@ const Editor = ({ onChange, onSubmit, submitting, value }) => (
           className="flex items-center"
           danger
           htmlType="submit"
-          loading={submitting}
-          onClick={onSubmit}
+          // onClick={onSubmit}
           icon={<FlagOutlined />}
         >
           Flag
