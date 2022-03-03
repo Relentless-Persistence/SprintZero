@@ -1,5 +1,6 @@
 import React from 'react';
-import {Row, Col, Input, Checkbox, Tag, Comment, Tooltip, Avatar} from 'antd';
+import {Row, Col, Input, Checkbox, Tag} from 'antd';
+import EpicComments from './EpicComments';
 
 const {TextArea} = Input;
 
@@ -49,6 +50,7 @@ const EpicDetails = ({epic}) => {
               <Tag className="text-sm text-black px-2 -ml-2">Code</Tag>
             </div>
           </div>
+          <EpicComments />
         </Col>
       </Row>
     </div>

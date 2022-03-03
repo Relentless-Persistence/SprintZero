@@ -44,7 +44,7 @@ const Epic = ({ epic, i, addEpic, handleChangeEpic }) => {
             !epic.name ? "border-dashed" : ""
           } px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded`}
           icon={<ReadOutlined />}
-          onContextMenu={() => setOpenDetail(true)}
+          onClick={() => setOpenDetail(true)}
         >
           <Input
             placeholder="New Epic"
