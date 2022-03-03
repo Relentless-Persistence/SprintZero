@@ -6,7 +6,9 @@ import {
   CopyOutlined,
   FileOutlined,
   PlusCircleFilled,
+  LinkOutlined,
 } from "@ant-design/icons";
+import EpicDetails from "./EpicDetails";
 
 const Epic = ({ epic, i, addEpic, handleChangeEpic }) => {
   const [openDetail, setOpenDetail] = useState(false);
@@ -54,22 +56,47 @@ const Epic = ({ epic, i, addEpic, handleChangeEpic }) => {
           />
         </Tag>
       </ArcherElement>
-  
+
       <Drawer
+        title={
+          <div className="flex items-center space-x-2">
+            <h3 className="text-xl font-semibold">{epic.name}</h3>
+            <Tag className="font-semibold text-sm text-black bg-[#91D5FF] px-2">
+              3 points
+            </Tag>
+            <Tag className="font-semibold text-sm text-black bg-[#A4DF74] px-2">
+              $1,230
+            </Tag>
+            <Tag
+              className="flex items-center px-2 font-semibold text-sm"
+              color="#096DD9"
+              icon={<LinkOutlined />}
+            >
+              <span>Design</span>
+            </Tag>
+            <Tag
+              className="flex items-center text-[#BFBFBF] px-2 font-semibold text-sm"
+              icon={<LinkOutlined />}
+            >
+              Code
+            </Tag>
+            <p className="text-[#1890FF] text-sm cursor-pointer font-semibold">
+              Edit
+            </p>
+          </div>
+        }
+        closable={false}
         placement="bottom"
         width={"30%"}
         onClose={() => setOpenDetail(false)}
         visible={openDetail}
         extra={
           <Space>
-            <Button onClick={() => setOpenDetail(false)}>Cancel</Button>
-            <Button type="primary">
-              OK
-            </Button>
+            <p className="text-[#BFBFBF] text-xs">Last modified 2 hrs ago</p>
           </Space>
         }
       >
-        Hello
+        <EpicDetails epic={epic} />
       </Drawer>
     </div>
   );
