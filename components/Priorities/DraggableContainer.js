@@ -6,7 +6,7 @@ import
     ArrowRightOutlined
 } from "@ant-design/icons";
 
-const DraggableContainer = React.forwardRef( ( { children, styles }, ref ) =>
+const DraggableContainer = React.forwardRef( ( { disable, children, styles }, ref ) =>
 {
     return (
         <div className='relative pl-[20px]'>
@@ -16,6 +16,7 @@ const DraggableContainer = React.forwardRef( ( { children, styles }, ref ) =>
                     height: "795px",
                     marginTop: "30px",
                     marginRight: "34px",
+                    background: disable ? "" : "#fff",
                     ...styles
                 } } >
 

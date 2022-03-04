@@ -68,6 +68,7 @@ const AppLayout = ( {
     hideSideBar = false,
     ignoreLast,
     type,
+    addNewText = "Add More",
     capitalizeText = true,
     topExtra = <></>,
     children } ) =>
@@ -150,7 +151,7 @@ const AppLayout = ( {
 
                                     {
                                         hasMainAdd ? <AddNew onClick={ onMainAdd }>
-                                            Add New
+                                            { addNewText }
                                         </AddNew> : null
                                     }
                                 </div>

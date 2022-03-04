@@ -14,7 +14,11 @@ const Span = styled.span`
     zIndex: 4,
 `;
 
-const DraggableTab = React.forwardRef( ( { index, label, onStop, val }, ref ) => 
+const DraggableTab = React.forwardRef( ( {
+    disable,
+    index,
+    label,
+    onStop, val }, ref ) => 
 {
     const nodeRef = useRef();
 
@@ -65,10 +69,11 @@ const DraggableTab = React.forwardRef( ( { index, label, onStop, val }, ref ) =>
             bounds="parent"
             position={ pos }
             nodeRef={ nodeRef }
+            disabled={ disable }
 
         >
             <Tag
-                style={ { zIndex: 4 } }
+                style={ { zIndex: 4, cursor: disable ? "" : "pointer" } }
                 ref={ nodeRef }>
                 { label }
             </Tag>

@@ -34,6 +34,7 @@ export default function Priorities ()
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
     const [ activePriority, setActivePriority ] = useState( null );
+    const [ disableDrag, setDisableDrag ] = useState( true );
 
     const [ activePriorityIndex, setActivePriorityIndex ] = useState( 0 );
 
@@ -56,6 +57,8 @@ export default function Priorities ()
         setActivePriorityIndex( 0 );
         setActivePriority( data[ product ][ 0 ] );
     };
+
+    const toggleDisable = () => setDisableDrag( s => !s );
 
     const onStop = ( e, itemData, index ) =>
     {
@@ -122,19 +125,26 @@ export default function Priorities ()
                 activeRightItem={ activePriority?.name }
                 setActiveRightNav={ setPriority }
                 breadCrumbItems={ splitRoutes( pathname ) }
+                hasMainAdd
+                addNewText={ disableDrag ? "Edit" : "Done" }
+
+                onMainAdd={ toggleDisable }
             >
 
                 <p className='text-[#A6AE9D]'>
                     Assess the practicality of proposed items to objectively and rationally uncover strengths and weaknesses, opportunities and threats, the resources required to carry through, and ultimately the prospects for success
                 </p>
 
-                <DraggableContainer ref={ container }>
+                <DraggableContainer
+                    disable={ disableDrag }
+                    ref={ container }>
 
                     {
                         activePriority?.data.map( ( d, i ) => <DraggableTab
                             onStop={ onStop }
                             ref={ container }
                             label={ d.label }
+                            disable={ disableDrag }
                             index={ i }
                             val={
                                 {
