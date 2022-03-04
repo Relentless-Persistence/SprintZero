@@ -1,0 +1,210 @@
+{
+    "Insight Meeting": [
+        {
+            "id": "2345tyujk",
+            "name": "Epics",
+            "data": [
+                {
+                    "label": "Meetings",
+                    "feasiblity": 91.23730578804485,
+                    "value": 0,
+                    "id": "52241003-e8c2-4747-ad1a-d11e4de06b2b",
+                    "color": "#7332db"
+                },
+                {
+                    "label": "Global",
+                    "feasiblity": 82.0138198648873,
+                    "value": 29.475433065695444,
+                    "id": "e1f45619-3e79-4db6-908d-26204d70dcd0",
+                    "color": "#1ad4db"
+                },
+                {
+                    "label": "Analytics",
+                    "feasiblity": 76.0948523011529,
+                    "value": 57.5376803233006,
+                    "id": "e0cb846d-4d5c-419a-b319-30d1a06dfbcd",
+                    "color": "#d5ffa5"
+                },
+                {
+                    "label": "Integrations",
+                    "feasiblity": 35.73368165451425,
+                    "value": 71.92273983431225,
+                    "id": "5f7cd1a9-b535-477b-994c-a08d19039ef7",
+                    "color": "#41d880"
+                }
+            ]
+        },
+        {
+            "id": "vcvf6ujk",
+            "name": "Features",
+            "data": [
+                {
+                    "label": "Meetings",
+                    "feasiblity": 85.95791101621815,
+                    "value": 69.35009264724692,
+                    "id": "569c1e12-e0c5-4275-ab96-82692049b7f6",
+                    "color": "#d31092"
+                },
+                {
+                    "label": "Global",
+                    "feasiblity": 55.015656697137146,
+                    "value": 91.31509909440796,
+                    "id": "cab35114-7fb8-408b-8e31-dde3ef41e57a",
+                    "color": "#6f8708"
+                },
+                {
+                    "label": "Analytics",
+                    "feasiblity": 77.29510949825422,
+                    "value": 25.132885411219497,
+                    "id": "6db04b0e-3fe1-4b80-9085-b30e3db13c18",
+                    "color": "#6e7f0c"
+                },
+                {
+                    "label": "Integrations",
+                    "feasiblity": 60.72815122262114,
+                    "value": 2.7690884601985877,
+                    "id": "3e7b4c75-ceff-4583-9b18-ae68fd314e1e",
+                    "color": "#8e2407"
+                }
+            ]
+        },
+        {
+            "id": "098ygjhnjb",
+            "name": "Stories",
+            "data": [
+                {
+                    "label": "Meetings",
+                    "feasiblity": 17.897688791471246,
+                    "value": 90.44052023069928,
+                    "id": "b79fe89e-2920-44da-b9b5-c9796ef61f57",
+                    "color": "#10a5a0"
+                },
+                {
+                    "label": "Global",
+                    "feasiblity": 44.05886048564695,
+                    "value": 55.56018222958128,
+                    "id": "10dd1477-b702-4576-be4f-09d51a3a576b",
+                    "color": "#82020d"
+                },
+                {
+                    "label": "Analytics",
+                    "feasiblity": 7.703927961169765,
+                    "value": 27.851130901673326,
+                    "id": "27c5b41d-58ff-407f-add6-92019064820e",
+                    "color": "#0d9b54"
+                },
+                {
+                    "label": "Integrations",
+                    "feasiblity": 60.18897162150989,
+                    "value": 14.826897295922636,
+                    "id": "d5eb8e26-0e9a-4ab1-8ff3-09c5a0957aa2",
+                    "color": "#4d0270"
+                }
+            ]
+        }
+    ],
+    "Alpha Sheet": [
+        {
+            "id": "2345tyujk",
+            "name": "Epics",
+            "data": [
+                {
+                    "label": "Meetings",
+                    "feasiblity": 77.80008064384276,
+                    "value": 70.89668230695119,
+                    "id": "4c36264e-8b74-48cb-b1bc-540035f84555",
+                    "color": "#529e0b"
+                },
+                {
+                    "label": "Global",
+                    "feasiblity": 0.1596878081961739,
+                    "value": 90.08485986749047,
+                    "id": "d378ea2a-a398-4e44-8032-cc5de1629576",
+                    "color": "#1f7a01"
+                },
+                {
+                    "label": "Analytics",
+                    "feasiblity": 7.7188841267439745,
+                    "value": 98.12966983286127,
+                    "id": "421d57e7-bc0c-4afe-ad88-6a9519e13ce2",
+                    "color": "#037510"
+                },
+                {
+                    "label": "Integrations",
+                    "feasiblity": 59.57481962457243,
+                    "value": 49.075668222715386,
+                    "id": "5d568d12-5474-45ca-8302-ade0e20126c5",
+                    "color": "#04396d"
+                }
+            ]
+        },
+        {
+            "id": "vcvf6ujk",
+            "name": "Features",
+            "data": [
+                {
+                    "label": "Meetings",
+                    "feasiblity": 66.70808882887378,
+                    "value": 31.363890884164714,
+                    "id": "a5518162-d682-434f-b89a-71c5d997e4c5",
+                    "color": "#d3d300"
+                },
+                {
+                    "label": "Global",
+                    "feasiblity": 18.60092491648251,
+                    "value": 6.7388050700234015,
+                    "id": "ec8073cc-66e7-4259-834a-672080a6e20f",
+                    "color": "#050c89"
+                },
+                {
+                    "label": "Analytics",
+                    "feasiblity": 27.347635498523747,
+                    "value": 46.12273502943438,
+                    "id": "f0d2cb8d-13cb-4902-8177-aef60937f3d6",
+                    "color": "#d87811"
+                },
+                {
+                    "label": "Integrations",
+                    "feasiblity": 67.25697667291726,
+                    "value": 42.71418892623575,
+                    "id": "bc0ee918-37bb-4cc5-84ad-d8290d4102f2",
+                    "color": "#002f72"
+                }
+            ]
+        },
+        {
+            "id": "098ygjhnjb",
+            "name": "Stories",
+            "data": [
+                {
+                    "label": "Meetings",
+                    "feasiblity": 54.13496910618078,
+                    "value": 78.41227313281216,
+                    "id": "a02b849b-a208-452c-a8f8-4a388d6b87e7",
+                    "color": "#6a7f02"
+                },
+                {
+                    "label": "Global",
+                    "feasiblity": 46.7250654310853,
+                    "value": 33.31677796845425,
+                    "id": "a5500783-ae9b-4c09-92a3-7701304dfff8",
+                    "color": "#017a13"
+                },
+                {
+                    "label": "Analytics",
+                    "feasiblity": 88.6040581481995,
+                    "value": 93.62525713520672,
+                    "id": "f2c61f13-54f2-4741-b9a9-77fb3a9c482d",
+                    "color": "#dbab00"
+                },
+                {
+                    "label": "Integrations",
+                    "feasiblity": 72.8760493091715,
+                    "value": 59.3958593051616,
+                    "id": "1453769a-6294-4d3a-b173-29b55a3d5978",
+                    "color": "#499904"
+                }
+            ]
+        }
+    ]
+}
