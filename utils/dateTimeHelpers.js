@@ -32,10 +32,18 @@ const formatDateTime = ( date, shape = "yyyy-LL-dd" ) =>
 
 };
 
+const formatDate = (date, shape = "yyyy-LL-dd") => {
+  if (!date) {
+    return "N/A";
+  }
+  return format(new Date(date), shape);
+};
+
 
 
 export
 {
     getTimeAgo,
-    formatDateTime
+    formatDateTime,
+    formatDate
 };
