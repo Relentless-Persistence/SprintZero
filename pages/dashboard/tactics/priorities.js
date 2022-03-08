@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
-
 import { scaleToVal, splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/priorities.json";

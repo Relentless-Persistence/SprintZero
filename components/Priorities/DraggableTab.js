@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 import styled from 'styled-components';
 
+
 import
 {
     Tag
 } from 'antd';
 import { scaleToScreen } from '../../utils';
+import CustomTag from '../Dashboard/Tag';
 
 
 const Span = styled.span`
@@ -73,6 +75,7 @@ const DraggableTab = React.forwardRef( ( {
 
         >
             <Tag
+                className='space-x-1 border-2 border-[#0073B3] px-[8px] py-[4px] text-[#0073B3] text-sm rounded'
                 style={ { zIndex: 4, cursor: disable ? "" : "pointer" } }
                 ref={ nodeRef }>
                 { label }
