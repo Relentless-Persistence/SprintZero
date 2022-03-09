@@ -68,8 +68,10 @@ const AppLayout = ( {
     hideSideBar = false,
     ignoreLast,
     type,
+    addNewText = "Add More",
     capitalizeText = true,
     topExtra = <></>,
+    useGrid,
     children } ) =>
 {
     const { user } = useAuth();
@@ -115,7 +117,13 @@ const AppLayout = ( {
                     <SideBar />
                 </Sider>
                 <Layout style={ { padding: "0 24px 24px" } }>
-                    <div className="flex justify-between">
+                    <div
+                        style={ useGrid ?
+                            {
+                                display: "grid",
+                                "grid-template-columns": "minmax(0,1fr) auto"
+                            } : {} }
+                        className={ useGrid ? null : "flex justify-between" }>
                         <div className="flex-1">
                             <div className="flex justify-between">
                                 <Breadcrumb style={ { margin: "16px 0 0 44px" } }>
@@ -150,7 +158,7 @@ const AppLayout = ( {
 
                                     {
                                         hasMainAdd ? <AddNew onClick={ onMainAdd }>
-                                            Add New
+                                            { addNewText }
                                         </AddNew> : null
                                     }
                                 </div>
