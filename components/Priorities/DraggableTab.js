@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 import styled from 'styled-components';
 
+
 import
 {
     Tag
 } from 'antd';
 import { scaleToScreen } from '../../utils';
+import CustomTag from '../Dashboard/Tag';
 
 
 const Span = styled.span`
@@ -14,7 +16,11 @@ const Span = styled.span`
     zIndex: 4,
 `;
 
-const DraggableTab = React.forwardRef( ( { index, label, onStop, val }, ref ) => 
+const DraggableTab = React.forwardRef( ( {
+    disable,
+    index,
+    label,
+    onStop, val }, ref ) => 
 {
     const nodeRef = useRef();
 
@@ -65,10 +71,12 @@ const DraggableTab = React.forwardRef( ( { index, label, onStop, val }, ref ) =>
             bounds="parent"
             position={ pos }
             nodeRef={ nodeRef }
+            disabled={ disable }
 
         >
             <Tag
-                style={ { zIndex: 4 } }
+                className='space-x-1 border-2 border-[#0073B3] px-[8px] py-[4px] text-[#0073B3] text-sm rounded'
+                style={ { zIndex: 4, cursor: disable ? "" : "pointer" } }
                 ref={ nodeRef }>
                 { label }
             </Tag>

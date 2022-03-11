@@ -251,3 +251,73 @@ body {
 .ant-checkbox-wrapper + .ant-checkbox-wrapper {
     margin-left: 0px;
 }
+
+.react-calendar
+{
+  width:280px;
+  border:none;
+  box-shadow: 0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+  font-family: SF Pro Text;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 22px;
+  /* identical to box height, or 157% */
+  text-align: center;
+  /* Gray / gray-9 */
+  color: #262626;
+}
+
+.react-calendar__month-view__weekdays
+{
+   text-transform: capitalize;
+}
+
+
+.react-calendar__month-view__weekdays abbr
+{
+   text-decoration: none;
+}
+
+.react-calendar__navigation
+{
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.react-calendar__navigation__arrow 
+{
+  font-size: 18px;
+}
+
+
+.react-calendar__tile.react-calendar__tile--active
+{
+  border: 1px solid #1890FF;
+  color: #262626;
+  border-radius: 2px;
+}
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-today {
+  border-color: #73C92D !important;
+}
+
+.ant-picker-calendar-date-value {
+  color: #000 !important;
+}
+
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-cell-selected .ant-picker-calendar-date, .ant-picker-calendar-full .ant-picker-panel .ant-picker-cell-selected:hover .ant-picker-calendar-date, .ant-picker-calendar-full .ant-picker-panel .ant-picker-cell-selected .ant-picker-calendar-date-today, .ant-picker-calendar-full .ant-picker-panel .ant-picker-cell-selected:hover .ant-picker-calendar-date-today {
+  background-color: #EBF8E0 !important;
+}
+
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-content::-webkit-scrollbar {
+  display: none;
+}
+
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-content {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* .ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date {
+  height: 165px !important;
+} */

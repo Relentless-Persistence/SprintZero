@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Row } from "antd";
+import { Button, Drawer, Row, Space } from "antd";
+import { findIndex } from "lodash";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import Agenda from "../../../components/Calendar/Agenda";
 
 import { splitRoutes } from "../../../utils";
 
-import fakeData from "../../../fakeData/huddleData.json";
 import products from "../../../fakeData/products.json";
+import CreateEvent from "../../../components/Calendar/CreateEvent";
+import Month from "../../../components/Calendar/Month";
+import Year from "../../../components/Calendar/Year";
 
 const generateRightNav = (items) => {
   if (!items?.length) {
@@ -24,30 +27,28 @@ const generateRightNav = (items) => {
 export default function Calendar() {
   const { pathname } = useRouter();
   const [activeProduct, setActiveProduct] = useState(products[0]);
-
-  const [data, setData] = useState(fakeData);
-  const [activeTimeIndex, setActiveTimeIndex] = useState(0);
-  const [calendarType, setCalendarType] = useState(
-    ["Agenda", "Week", "Month", "Year"]
-  );
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [activeCalendarTypeIndex, setActiveCalendarTypeIndex] = useState(0);
+  const [calendarType, setCalendarType] = useState([
+    "Agenda",
+    "Week",
+    "Month",
+    "Year",
+  ]);
 
   const setProduct = (product) => {
     setActiveProduct(product);
-    setActiveTimeIndex(0);
-    setActiveTime(data[product][0]);
+    setActiveCalendarTypeIndex(0);
   };
 
-  // const setActiveRightNav = () => {
-  //   const activeData = calendarType;
+  const setActiveRightNav = (h) => {
+    const calendarTypeIndex = findIndex(calendarType, (o) => o === h);
 
-  //   const huddleIndex = activeData.findIndex((h) => h);
-
-  //   if (huddleIndex > -1) {
-  //     const huddle = activeData[huddleIndex];
-  //     setActiveTime(huddle);
-  //     setActiveTimeIndex(huddleIndex);
-  //   }
-  // };
+    if (calendarTypeIndex > -1) {
+      const activeCalendarType = calendarType[calendarTypeIndex];
+      setActiveCalendarTypeIndex(calendarTypeIndex);
+    }
+  };
 
   return (
     <div className="mb-8">
@@ -60,15 +61,51 @@ export default function Calendar() {
       <AppLayout
         onChangeProduct={setProduct}
         hasSideAdd={false}
-        defaultText={"Agenda"}
+        defaultText={calendarType[activeCalendarTypeIndex]}
         rightNavItems={calendarType}
-        // setActiveRightNav={setActiveRightNav}
-        activeRightItem={calendarType}
+        setActiveRightNav={setActiveRightNav}
+        activeRightItem={calendarType[activeCalendarTypeIndex]}
         breadCrumbItems={splitRoutes(pathname)}
+        topExtra={
+          <Button
+            className="bg-white text-gray-900"
+            onClick={() => setOpenDrawer(true)}
+          >
+            Add Event
+          </Button>
+        }
       >
-        <Row className="py-6" gutter={[12, 12]}>
-          <Agenda />
+        <Row gutter={[12, 12]}>
+          {calendarType[activeCalendarTypeIndex] === "Agenda" ? (
+            <Agenda />
+          ) : calendarType[activeCalendarTypeIndex] === "Month" ? (
+            <Month />
+          ) : calendarType[activeCalendarTypeIndex] === "Year" ? (
+            <Year />
+          ) : (
+            "Week"
+          )}
         </Row>
+        <Drawer
+          title={<h3 className="text-20 font-semibold">Event</h3>}
+          closable={false}
+          placement="bottom"
+          width={"30%"}
+          onClose={() => setOpenDrawer(false)}
+          visible={openDrawer}
+          extra={
+            <Space>
+              <Button danger onClick={() => setOpenDrawer(false)}>
+                Cancel
+              </Button>
+              <Button type="primary" danger>
+                Done
+              </Button>
+            </Space>
+          }
+        >
+          <CreateEvent />
+        </Drawer>
       </AppLayout>
     </div>
   );

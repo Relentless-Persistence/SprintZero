@@ -1,5 +1,7 @@
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
+import differenceInDays from 'date-fns/differenceInDays';
+import isBefore from 'date-fns/isBefore';
 
 
 const getTimeAgo = ( date, addSuffix = false ) =>
@@ -32,7 +34,7 @@ const formatDateTime = ( date, shape = "yyyy-LL-dd" ) =>
 
 };
 
-const formatDate = (date, shape = "yyyy-LL-dd") => {
+const formatDate = (date, shape = "EEEE, MMM do") => {
   if (!date) {
     return "N/A";
   }
@@ -45,5 +47,7 @@ export
 {
     getTimeAgo,
     formatDateTime,
-    formatDate
+    formatDate,
+    differenceInDays,
+    isBefore
 };
