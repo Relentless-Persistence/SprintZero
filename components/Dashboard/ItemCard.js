@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 import
 {
     Card,
@@ -6,6 +7,7 @@ import
 
 import CardHeaderButton from "./CardHeaderButton";
 import FormCard from "./FormCard";
+import { CardTitle as Title } from './CardTitle';
 
 
 const ItemCard = ( {
@@ -28,6 +30,7 @@ const ItemCard = ( {
         return (
             <FormCard
                 isEdit
+                className='mb-[16px]'
                 itemToEdit={ item }
                 onSubmit={ handleEdit } />
         );
@@ -35,10 +38,10 @@ const ItemCard = ( {
 
     return (
         <Card
-
+            className='mb-[16px]'
             bordered={ false }
             extra={ <CardHeaderButton onClick={ toggleEdit } >Edit</CardHeaderButton> }
-            title={ item.name }
+            title={ <Title>{ item.name }</Title> }
             headStyle={ {
                 background: "#F5F5F5",
             } }
