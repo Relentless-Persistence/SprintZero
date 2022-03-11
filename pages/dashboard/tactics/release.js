@@ -116,6 +116,7 @@ export default function Release ()
                 setActiveRightNav={ setVersion }
                 onChangeProduct={ setProduct }
                 activeRightItem={ activeVersion }
+                ignoreLast={ true }
             >
 
                 <ScrollContainer
