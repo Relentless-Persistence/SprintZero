@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, Avatar, Divider } from 'antd';
+import { Card, Avatar, List } from 'antd';
 import events from '../../fakeData/events.json';
+import { formatDate } from '../../utils';
 
 const Agenda = () => {
   console.log(events)
@@ -10,17 +11,28 @@ const Agenda = () => {
         <Card
           key={event.title}
           className="mb-4"
-          title="Default size card"
+          title={
+            <span className="font-semibold text-16">
+              {formatDate(event.date)}
+            </span>
+          }
           style={{ width: "100%" }}
         >
-          <div className="flex items-center">
-            <Avatar className="mr-4" src="https://joeschmoe.io/api/v1/random" />
-            <div>
-              <h3 className="font-semibold">{event.title}</h3>
-              <p className="text-[#8c8c8c]">{event.description}</p>
-            </div>
-          </div>
-          <Divider />
+          <List
+            itemLayout="horizontal"
+            dataSource={event.events}
+            renderItem={(event) => (
+              <List.Item>
+                <List.Item.Meta
+                  avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+                  title={<h3 className="font-semibold">{event.title}</h3>}
+                  description={
+                    <p className="text-[#8c8c8c]">{event.description}</p>
+                  }
+                />
+              </List.Item>
+            )}
+          />
         </Card>
       ))}
     </div>
