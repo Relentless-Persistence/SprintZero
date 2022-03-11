@@ -166,7 +166,7 @@ export default function Personas ()
 
             >
 
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
+                <Row className="py-6" gutter={ [ 16, 16 ] }>
                     <Col
                         xs={ { span: 24 } }
                         sm={ { span: 12 } }>

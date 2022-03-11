@@ -8,18 +8,13 @@ import
     Tag
 } from 'antd';
 import { scaleToScreen } from '../../utils';
-import CustomTag from '../Dashboard/Tag';
 
-
-const Span = styled.span`
-    display: inline-block;
-    zIndex: 4,
-`;
 
 const DraggableTab = React.forwardRef( ( {
     disable,
     index,
     label,
+    onClickItem,
     onStop, val }, ref ) => 
 {
     const nodeRef = useRef();
@@ -75,6 +70,7 @@ const DraggableTab = React.forwardRef( ( {
 
         >
             <Tag
+                onClick={ () => onClickItem( index ) }
                 className='space-x-1 border-2 border-[#0073B3] px-[8px] py-[4px] text-[#0073B3] text-sm rounded'
                 style={ { zIndex: 4, cursor: disable ? "" : "pointer" } }
                 ref={ nodeRef }>

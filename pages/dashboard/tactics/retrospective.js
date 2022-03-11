@@ -108,7 +108,7 @@ export default function Retrospective ()
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
 
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
+                <Row className="py-6" gutter={ [ 16, 16 ] }>
                     {
                         data[ activeProduct ][ activeTabIndex ].comments.map( ( c, i ) => (
                             <Col

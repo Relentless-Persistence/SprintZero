@@ -1,5 +1,4 @@
 import "antd/dist/antd.css";
-import 'react-calendar/dist/Calendar.css';
 
 import "../styles/globals.css";
 

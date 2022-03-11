@@ -323,7 +323,7 @@ export default function Sprint ()
                 />
 
                 <Drawer
-                    title={ <DrawerTitle gutter={ [ 12, 12 ] }>
+                    title={ <DrawerTitle gutter={ [ 16, 16 ] }>
                         <Col span={ 12 }>
                             <h3>System Status</h3>
                             <Tag color="#91D5FF"># points total</Tag>

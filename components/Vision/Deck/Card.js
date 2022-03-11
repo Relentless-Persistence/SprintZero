@@ -3,17 +3,21 @@ import styled from 'styled-components';
 
 import
 {
-    Card
+    Card,
+    Button
 } from 'antd';
-import CardHeaderButton from '../../Dashboard/CardHeaderButton';
+
 
 const StyledCard = styled( Card )`
    transform:  ${ props => props.invert };
    margin-bottom: 135px;
    font-size:30px;
+   line-height:38px;
+   box-shadow: ${ props => props.$active ? "0px 4px 4px rgba(0, 0, 0, 0.25), 1px -1px 4px rgba(0, 0, 0, 0.1)" : "" };
+  border-radius: 2px;
 `;
 
-import styles from './Deck.module.css';
+import { CardTitle } from '../../Dashboard/CardTitle';
 
 
 const StatementCard = (
@@ -22,6 +26,7 @@ const StatementCard = (
         onEditClick,
         info,
         product,
+        isActive
     }
 ) =>
 {
@@ -54,9 +59,10 @@ const StatementCard = (
         <StyledCard
             ref={ elRef }
             invert={ invert }
-            className={ invert ? "" : styles.animate }
-            extra={ <CardHeaderButton onClick={ () => onEditClick( info ) } >Edit</CardHeaderButton> }
-            title="Guiding Statement">
+            className={ invert ? "" : "deck-animate" }
+            $active={ isActive }
+            extra={ <Button className="text-[#262626] text-[14px] leading[22px]" onClick={ () => onEditClick( info ) } >Edit</Button> }
+            title={ <CardTitle className='text-[16px] leading[24px]'>Guiding Statement</CardTitle> }>
 
 
             <p>  { `For ${ info.targetCustomer }, who ${ info.need }, the ${ product } is a [product category or description] that ${ info.keyBenefits }.` }</p>

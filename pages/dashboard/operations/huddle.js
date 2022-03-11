@@ -131,7 +131,7 @@ export default function Huddle ()
                 activeRightItem={ activeTime.createdAt }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
+                <Row className="py-6" gutter={ [ 16, 16 ] }>
 
                     {
                         activeTime?.comments?.map( ( c, index ) => (

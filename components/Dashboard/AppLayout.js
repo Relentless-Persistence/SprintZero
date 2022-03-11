@@ -24,11 +24,16 @@ const Versions = styled.ul`
 `;
 
 const Version = styled.li`
-  padding: 16px 24px;
   border-left-width: 4px;
   border-left-style: solid;
-  border-left-color: ${ ( props ) => ( props.active ? "#315613" : "#ccc" ) };
+  border-left-color: ${ ( props ) => ( props.active ? "#315613" : "#3156131a" ) };
   cursor: pointer;
+  padding-bottom:28px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+
 `;
 
 const AddNew = styled( Button )`
@@ -42,12 +47,13 @@ background:#fff;
 const AddSide = styled( Button )`
 background:transparent !important ;
 border: none;
-margin: 5px auto;
-color: #262626;
+color: #262626 !important ;
 box-shadow:none;
 font-size: 16px;
 line-height: 24px;
-padding-left:0;
+margin:0;
+padding:0;
+text-align:center;
 
 `;
 
@@ -68,8 +74,9 @@ const AppLayout = ( {
     hideSideBar = false,
     ignoreLast,
     type,
-    addNewText = "Add More",
+    addNewText = "Add New",
     capitalizeText = true,
+    versionClass,
     topExtra = <></>,
     useGrid,
     children } ) =>
@@ -116,7 +123,7 @@ const AppLayout = ( {
                 >
                     <SideBar />
                 </Sider>
-                <Layout style={ { padding: "0 24px 24px" } }>
+                <Layout>
                     <div
                         style={ useGrid ?
                             {
@@ -124,10 +131,10 @@ const AppLayout = ( {
                                 "grid-template-columns": "minmax(0,1fr) auto"
                             } : {} }
                         className={ useGrid ? null : "flex justify-between" }>
-                        <div className="flex-1">
-                            <div className="flex justify-between">
-                                <Breadcrumb style={ { margin: "16px 0 0 44px" } }>
-
+                        <div
+                            className="flex-1 py-[24px] pl-[42px] pr-[33px]">
+                            <div className="flex justify-between items-center">
+                                <Breadcrumb>
                                     {
                                         breadCrumbItems.map( ( item, i ) => (
                                             <Breadcrumb.Item
@@ -147,8 +154,7 @@ const AppLayout = ( {
                                 </Breadcrumb>
 
                                 <div
-                                    className="flex justify-between"
-                                    style={ { margin: "16px 44px 0 10px" } }>
+                                    className="flex justify-between items-center">
 
                                     {
                                         <div >
@@ -169,24 +175,22 @@ const AppLayout = ( {
                             </div>
 
                             <Content
-                                style={ {
-                                    padding: "24px 44px",
-                                    margin: 0,
-                                    minHeight: 280,
-                                } }
+                                className="px-0 pt-[12px] pb-[16px] m-0 "
                             >
                                 { children }
                             </Content>
                         </div>
+
+
                         {
                             hideSideBar ? null : (
-                                <div>
+                                <div style={ { minWidth: 0 } }>
                                     <div>
                                         <Versions className="">
                                             {
                                                 rightNavItems.map( ( item, i ) => (
                                                     <Version
-                                                        className="capitalize"
+                                                        className={ `py-[16px] px-[24px] ${ versionClass }` }
                                                         key={ i }
                                                         active={ activeRightItem === ( item.value || item ) }
                                                         onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
@@ -199,15 +203,18 @@ const AppLayout = ( {
 
                                             {
                                                 ( hasSideAdd && showSideAdd ) ?
-                                                    <Version> <Input
-                                                        className="mx-0 my-0"
-                                                        type={ type || "number" }
-                                                        maxLength={ 20 }
-                                                        autoFocus
-                                                        value={ value }
-                                                        onChange={ handleChange }
-                                                        onKeyPress={ onEnter }
-                                                    />
+                                                    <Version
+                                                        className={ `py-[16px] px-[24px] ${ versionClass }` }>
+                                                        <Input
+                                                            className="mx-0 my-0 "
+                                                            type={ type || "number" }
+                                                            maxLength={ 20 }
+                                                            autoFocus
+                                                            value={ value }
+                                                            onChange={ handleChange }
+                                                            onKeyPress={ onEnter }
+                                                            style={ { width: "100%" } }
+                                                        />
                                                     </Version>
                                                     : null
                                             }
@@ -215,7 +222,7 @@ const AppLayout = ( {
                                             {
                                                 hasSideAdd ?
 
-                                                    <Version>
+                                                    <Version className="flex items-center justify-center">
                                                         <AddSide onClick={ toggleSideAdd }>
                                                             { showSideAdd ? "Close" : "Add" }
                                                         </AddSide>

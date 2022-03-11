@@ -3,8 +3,6 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import Head from "next/head";
 import { useRouter } from 'next/router';
 import { Divider } from "antd";
-import { CalendarOutlined } from '@ant-design/icons';
-import Calendar from 'react-calendar';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
@@ -72,32 +70,6 @@ export default function Release ()
 
     };
 
-    const handleDateSelect = ( date ) =>
-    {
-        const newData = { ...data };
-        const formatted = new Date( date ).toISOString();
-
-        const item = newData[ activeProduct ][ activeDataIndex ];
-
-        let isValid = true;
-
-        item.taskList.forEach( t => 
-        {
-            isValid = isValid && isBefore( new Date( t.endDate ), new Date( date ) );
-        } );
-
-        if ( isValid )
-        {
-            item.target = formatted;
-
-            setData( newData );
-        }
-
-        setShowCalendar( false );
-
-    };
-
-
     const getOffset = ( subStart ) =>
     {
         const subtaskStart = new Date( subStart );
@@ -140,36 +112,10 @@ export default function Release ()
                 rightNavItems={ getName( data[ activeProduct ] ) }
                 useGrid
                 hasSideAdd={ false }
+                hideSideBar
                 setActiveRightNav={ setVersion }
                 onChangeProduct={ setProduct }
                 activeRightItem={ activeVersion }
-                hasMainAdd
-                onMainAdd={ () => setShowCalendar( true ) }
-                addNewText={ <div
-                    className='flex grid grid-cols-[minmax(0px,_1fr)_auto] items-center gap-x-2' >
-                    { formatDateTime( target ) }
-                    <CalendarOutlined color='#A6AE9D' />
-
-                    {
-                        showCalendar ? (
-                            <div
-                                style={ {
-                                    right: 0,
-                                    top: "120%",
-                                    zIndex: "200"
-                                } } className='absolute'>
-                                <div className='relative'>
-                                    <Calendar
-                                        calendarType='US'
-                                        formatShortWeekday={ ( locale, date ) => formatDateTime( date, "cccccc" ) }
-                                        onChange={ handleDateSelect }
-                                        value={ new Date( target ) }
-                                    />
-                                </div>
-                            </div>
-                        ) : null
-                    }
-                </div> }
             >
 
                 <ScrollContainer

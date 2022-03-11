@@ -9,6 +9,8 @@ import styled from "styled-components";
 
 export const DropdownBtn = styled( Dropdown.Button )`
     background:#fff !important;
+    padding:0;
+    margin:0;
 `;
 
 
