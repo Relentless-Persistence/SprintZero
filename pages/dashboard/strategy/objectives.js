@@ -3,10 +3,9 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import
 {
-    Row,
-    Col,
     Input
 } from 'antd';
+import { AimOutlined } from '@ant-design/icons';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import FormCard from "../../../components/Dashboard/FormCard";
@@ -16,6 +15,7 @@ import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/productData.json";
 import products from "../../../fakeData/products.json";
+import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 
 
 const getGoalNames = ( goals ) =>
@@ -129,52 +129,33 @@ export default function Objectives ()
                 onMainAdd={ addItem }
                 onSideAdd={ onAddGoal }
                 hasMainAdd
+                versionClass="px-[28px] py-[14px]"
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Input
+                    prefix={ <AimOutlined /> }
                     maxLength={ 80 }
+                    className="mb-[16px]"
                     onChange={ handleTitleChange }
                     value={ activeGoal?.title } />
 
-
-                <Row className="py-6" gutter={ [ 16, 16 ] }>
+                <MasonryGrid>
                     {
                         activeGoal?.results.map( ( res, i ) => (
-                            <Col
-                                xs={ { span: 24 } }
-                                sm={ { span: 12 } }
-                                key={ i }>
-                                <ItemCard
-                                    onEdit={ ( item ) => editItem( i, item ) }
-                                    item={ res } />
-                            </Col>
+                            <ItemCard
+                                key={ i }
+                                onEdit={ ( item ) => editItem( i, item ) }
+                                item={ res } />
                         ) )
                     }
 
 
 
                     {
-                        showAdd ? <Col
-                            xs={ { span: 24 } }
-                            sm={ { span: 12 } }>
-                            <FormCard
-                                onSubmit={ addItemDone } />
-                        </Col> : null
+                        showAdd ? <FormCard
+                            onSubmit={ addItemDone } /> : null
                     }
-                    {/* 
-                    <Col
-                        xs={ { span: 24 } }
-                        sm={ { span: 8 } }>
-                        <AddCard
-                            bordered={ false }
-                        >
-                            <CardHeaderButton onClick={ addItem }>
-                                Add Result
-                            </CardHeaderButton>
-                        </AddCard>
-                    </Col> */}
-                </Row>
-
+                </MasonryGrid>
 
 
             </AppLayout>

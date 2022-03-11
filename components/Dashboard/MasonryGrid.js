@@ -9,11 +9,16 @@ const Grid = styled( Masonry )`
 
 `;
 
+const breakpointColumnsObj = {
+    0: 1,
+    500: 2
+};
+
 
 const MasonryGrid = ( {
     columnClassName,
     className,
-    breakpointCols = 2,
+    breakpointCols = breakpointColumnsObj,
     children } ) =>
 {
     return (
