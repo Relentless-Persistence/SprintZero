@@ -115,21 +115,6 @@ const CloseTime = styled.p`
 
 
 
-const StyledItem = styled.div`
-    color: ${ props => props.$color || "black" };
-    border: 1px solid ${ props => props.$color || "black" };
-    display:inline-block;
-    padding:4px 8px;
-    cursor:pointer;
-
-    p
-    {
-        display:inline-block;
-        margin-left:5px;
-    }
-
-`;
-
 const Story = styled.p`
    padding:12px 19px;
    background:#F5F5F5;
@@ -304,7 +289,7 @@ export default function Ethics ()
                 />
 
                 <Drawer
-                    title={ <DrawerTitle gutter={ [ 12, 12 ] }>
+                    title={ <DrawerTitle gutter={ [ 16, 16 ] }>
                         <Col span={ 12 }>
                             <h3>card_title</h3>
                             <Tag color="#91D5FF">3 points</Tag>

@@ -7,15 +7,8 @@ import
 
 import CardHeaderButton from "./CardHeaderButton";
 import FormCard from "./FormCard";
+import { CardTitle as Title } from './CardTitle';
 
-const Title = styled.h2`
-font-family: 'SF Pro Text';
-font-style: normal;
-font-weight: 600;
-font-size: 14px;
-line-height: 22px;
-color: #262626;
-`;
 
 const ItemCard = ( {
     onEdit,

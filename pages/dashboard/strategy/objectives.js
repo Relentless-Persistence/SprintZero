@@ -137,7 +137,7 @@ export default function Objectives ()
                     value={ activeGoal?.title } />
 
 
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
+                <Row className="py-6" gutter={ [ 16, 16 ] }>
                     {
                         activeGoal?.results.map( ( res, i ) => (
                             <Col

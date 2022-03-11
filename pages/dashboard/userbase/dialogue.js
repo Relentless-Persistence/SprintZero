@@ -138,7 +138,7 @@ export default function Dialogue ()
                 topExtra={ <DropDwnBtn menu={ menu( getRightNav( data[ activeProduct ] ) ) } /> }
                 hasSideAdd={ false }
             >
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
+                <Row className="py-6" gutter={ [ 16, 16 ] }>
 
                     {
                         activeDialogue?.list.map( ( card, i ) => (

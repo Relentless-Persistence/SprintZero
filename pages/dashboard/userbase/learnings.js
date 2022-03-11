@@ -102,7 +102,7 @@ export default function Learnings ()
 
 
 
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
+                <Row className="py-6" gutter={ [ 16, 16 ] }>
                     {
                         activeLearning?.data.map( ( res, i ) => (
                             <Col

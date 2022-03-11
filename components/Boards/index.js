@@ -14,6 +14,7 @@ import
     Row,
     Col,
 } from 'antd';
+import { CardTitle } from '../Dashboard/CardTitle';
 
 
 const StyledCol = styled( Acard )`
@@ -30,6 +31,11 @@ const StyledCard = styled.div`
     align-items:center;
     gap:10px;
     opacity: ${ props => props.$isDraggging ? 0 : 1 };
+`;
+
+const Title = styled( CardTitle )`
+font-size: 16px;
+line-height: 24px;
 `;
 
 const Card = ( { children, id, colId, onCardDrop } ) =>
@@ -70,7 +76,7 @@ const Column = ( {
         <StyledCol
             ref={ col }
             extra={ header }
-            title={ columnName }
+            title={ <Title>{ columnName }</Title> }
             bodyStyle={ {
                 padding: "0"
             } }
@@ -111,7 +117,7 @@ const Board = ( { columns = [],
 
     return (
         <RBoard>
-            <Row className="py-6" gutter={ [ 12, 12 ] }>
+            <Row gutter={ [ 16, 16 ] }>
                 {
                     columns?.map( ( ( col, i ) => (
                         <Col
@@ -134,30 +140,6 @@ const Board = ( { columns = [],
                                     </Card> )
                                     )
                                 }
-
-                                {/* {
-                                    col?.data?.map( ( card, i ) => (
-                                        <Card
-                                            key={ card.id }
-                                            id={ card.id }
-                                            colId={ col.columnId }
-                                            onCardDrop={ swapCard }
-                                        >
-                                            <Index>{ i + 1 }</Index>
-
-                                            <div>
-                                                <StyledItem $color={ card.color }>
-                                                    <span>x</span>
-
-                                                    <p>
-                                                        { card.title }</p>
-                                                </StyledItem>
-                                            </div>
-
-
-                                        </Card>
-                                    ) )
-                                } */}
 
                             </Column>
                         </Col>
