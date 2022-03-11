@@ -34,7 +34,7 @@ const formatDateTime = ( date, shape = "yyyy-LL-dd" ) =>
 
 };
 
-const formatDate = (date, shape = "yyyy-LL-dd") => {
+const formatDate = (date, shape = "EEEE, MMM do") => {
   if (!date) {
     return "N/A";
   }
@@ -47,6 +47,7 @@ export
 {
     getTimeAgo,
     formatDateTime,
+    formatDate,
     differenceInDays,
     isBefore
 };
