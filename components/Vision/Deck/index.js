@@ -17,7 +17,6 @@ const data =
         }
     ];
 
-let index = 4;
 
 const Deck = (
     {
@@ -37,7 +36,7 @@ const Deck = (
 
 
     return (
-        <div>
+        <div className='pt-[18px]'>
 
             {
                 cards.map( ( o, i ) => <StatementCard
@@ -45,6 +44,7 @@ const Deck = (
                     onEditClick={ setInfo }
                     index={ i }
                     product={ product }
+                    isActive={ i === 0 }
                     key={ o.createdAt } /> )
             }
         </div>

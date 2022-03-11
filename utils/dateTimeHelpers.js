@@ -4,7 +4,7 @@ import differenceInDays from 'date-fns/differenceInDays';
 import isBefore from 'date-fns/isBefore';
 
 
-const getTimeAgo = ( date, addSuffix = false ) =>
+const getTimeAgo = ( date, addSuffix = true ) =>
 {
     if ( !date )
     {
@@ -12,7 +12,9 @@ const getTimeAgo = ( date, addSuffix = false ) =>
     }
     const now = new Date();
 
-    let formattedDate = formatDistance( new Date( date ), now, {
+    const actualDate = date.includes( "Now" ) ? now : date;
+
+    let formattedDate = formatDistance( new Date( actualDate ), now, {
         addSuffix
     } );
 
@@ -21,7 +23,7 @@ const getTimeAgo = ( date, addSuffix = false ) =>
         return "Now";
     }
 
-    return formattedDate;
+    return formattedDate.replace( "about ", "" );
 };
 
 const formatDateTime = ( date, shape = "yyyy-LL-dd" ) =>

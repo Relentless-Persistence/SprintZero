@@ -112,7 +112,7 @@ export default function Visions ()
                 activeRightItem={ vision }
                 setActiveRightNav={ handleActiveVision }
                 hasSideAdd={ false }
-                defaultText="Statement"
+                defaultText={ getTimeAgo( vision ) }
                 onChangeProduct={ onChangeProduct }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 

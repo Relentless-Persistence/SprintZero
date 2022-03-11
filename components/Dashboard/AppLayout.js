@@ -190,7 +190,7 @@ const AppLayout = ( {
                                             {
                                                 rightNavItems.map( ( item, i ) => (
                                                     <Version
-                                                        className={ `capitalize py-[16px] px-[24px] ${ versionClass }` }
+                                                        className={ `py-[16px] px-[24px] ${ versionClass }` }
                                                         key={ i }
                                                         active={ activeRightItem === ( item.value || item ) }
                                                         onClick={ () => setActiveRightNav( item.value ? item.value : item ) }

@@ -251,3 +251,8 @@ body {
 .ant-checkbox-wrapper + .ant-checkbox-wrapper {
     margin-left: 0px;
 }
+
+.deck-animate 
+{
+    transition: transform 300ms ease;
+}
