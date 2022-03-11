@@ -2,8 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 
+import { Drawer, Button, Radio, Space } from 'antd';
+
+
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
+import { CardTitle } from "../../../components/Dashboard/CardTitle";
+import MainSub from "../../../components/Dashboard/MainSub";
 import { scaleToVal, splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/priorities.json";
@@ -29,7 +34,7 @@ export default function Priorities ()
 
 
     const [ data, setData ] = useState( fakeData );
-
+    const [ visible, setVisible ] = useState( false );
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
     const [ activePriority, setActivePriority ] = useState( null );
@@ -58,6 +63,11 @@ export default function Priorities ()
     };
 
     const toggleDisable = () => setDisableDrag( s => !s );
+
+    const toggleDrawer = ( itemIndex ) => 
+    {
+        setVisible( s => !s );
+    };
 
     const onStop = ( e, itemData, index ) =>
     {
@@ -130,9 +140,11 @@ export default function Priorities ()
                 onMainAdd={ toggleDisable }
             >
 
-                <p className='text-[#A6AE9D]'>
+
+
+                <MainSub>
                     Assess the practicality of proposed items to objectively and rationally uncover strengths and weaknesses, opportunities and threats, the resources required to carry through, and ultimately the prospects for success
-                </p>
+                </MainSub>
 
                 <DraggableContainer
                     disable={ disableDrag }
@@ -145,6 +157,7 @@ export default function Priorities ()
                             label={ d.label }
                             disable={ disableDrag }
                             index={ i }
+                            onClickItem={ toggleDrawer }
                             val={
                                 {
                                     x: d.feasiblity,
@@ -154,6 +167,17 @@ export default function Priorities ()
                     }
 
                 </DraggableContainer>
+
+                <Drawer
+                    title={ <CardTitle>System Status</CardTitle> }
+                    placement="bottom"
+                    closable={ false }
+                    visible={ visible }
+                >
+                    <p>Some contents...</p>
+                    <p>Some contents...</p>
+                    <p>Some contents...</p>
+                </Drawer>
             </AppLayout>
         </div>
     );
