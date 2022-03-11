@@ -290,6 +290,7 @@ export default function Ethics ()
                 setActiveRightNav={ setBoard }
                 hasMainAdd={ false }
                 hasSideAdd={ false }
+                hideSideBar
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
 

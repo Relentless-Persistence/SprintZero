@@ -7,7 +7,7 @@ import
 
 
 const More = styled( Button )`
-color: #009C7E;
+color: #4A801D;
 background:transparent;
 box-shadow:none;
 border:none;

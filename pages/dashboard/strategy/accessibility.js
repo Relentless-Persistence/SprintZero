@@ -10,8 +10,9 @@ import
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import FormCard from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
-
+import MainSub from "../../../components/Dashboard/MainSub";
 import { splitRoutes } from "../../../utils";
+import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 
 import fakeData from "../../../fakeData/accessiblity.json";
 import products from "../../../fakeData/products.json";
@@ -56,6 +57,10 @@ export default function Accessiblity ()
     const addItem = () =>
     {
         setShowAdd( true );
+        window?.scrollTo( {
+            top: 2 * document?.body?.scrollHeight,
+            behavior: 'smooth'
+        } );
     };
 
     const addItemDone = ( item ) =>
@@ -67,6 +72,7 @@ export default function Accessiblity ()
 
         setData( newData );
         setShowAdd( false );
+
     };
 
     const editItem = ( resultIndex, item ) =>
@@ -99,48 +105,33 @@ export default function Accessiblity ()
                 hasSideAdd={ false }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <p>{ activeChallenge?.title }</p>
+                <MainSub>
+                    { activeChallenge?.title }
+                </MainSub>
+
+                <MasonryGrid>
 
 
-
-                <Row className="py-6" gutter={ [ 12, 12 ] }>
                     {
                         activeChallenge?.challenges.map( ( res, i ) => (
-                            <Col
-                                xs={ { span: 24 } }
-                                sm={ { span: 12 } }
-                                key={ i }>
-                                <ItemCard
-                                    onEdit={ ( item ) => editItem( i, item ) }
-                                    item={ res } />
-                            </Col>
+
+                            <ItemCard
+                                key={ 1 }
+                                onEdit={ ( item ) => editItem( i, item ) }
+                                item={ res } />
                         ) )
                     }
 
 
-
                     {
-                        showAdd ? <Col
-                            xs={ { span: 24 } }
-                            sm={ { span: 12 } }>
+                        showAdd ?
                             <FormCard
                                 onSubmit={ addItemDone } />
-                        </Col> : null
+                            : null
                     }
-                    {/* 
-                    <Col
-                        xs={ { span: 24 } }
-                        sm={ { span: 8 } }>
-                        <AddCard
-                            bordered={ false }
-                        >
-                            <CardHeaderButton onClick={ addItem }>
-                                Add Result
-                            </CardHeaderButton>
-                        </AddCard>
-                    </Col> */}
-                </Row>
 
+
+                </MasonryGrid>
 
 
             </AppLayout>

@@ -27,7 +27,7 @@ const Version = styled.li`
   padding: 16px 24px;
   border-left-width: 4px;
   border-left-style: solid;
-  border-left-color: ${ ( props ) => ( props.active ? "#315613" : "#ccc" ) };
+  border-left-color: ${ ( props ) => ( props.active ? "#315613" : "#3156131a" ) };
   cursor: pointer;
 `;
 
@@ -68,7 +68,7 @@ const AppLayout = ( {
     hideSideBar = false,
     ignoreLast,
     type,
-    addNewText = "Add More",
+    addNewText = "Add New",
     capitalizeText = true,
     topExtra = <></>,
     useGrid,
@@ -116,7 +116,7 @@ const AppLayout = ( {
                 >
                     <SideBar />
                 </Sider>
-                <Layout style={ { padding: "0 24px 24px" } }>
+                <Layout>
                     <div
                         style={ useGrid ?
                             {
@@ -124,10 +124,10 @@ const AppLayout = ( {
                                 "grid-template-columns": "minmax(0,1fr) auto"
                             } : {} }
                         className={ useGrid ? null : "flex justify-between" }>
-                        <div className="flex-1">
-                            <div className="flex justify-between">
-                                <Breadcrumb style={ { margin: "16px 0 0 44px" } }>
-
+                        <div
+                            className="flex-1 py-[24px] pl-[42px] pr-[33px]">
+                            <div className="flex justify-between items-center">
+                                <Breadcrumb>
                                     {
                                         breadCrumbItems.map( ( item, i ) => (
                                             <Breadcrumb.Item
@@ -147,8 +147,7 @@ const AppLayout = ( {
                                 </Breadcrumb>
 
                                 <div
-                                    className="flex justify-between"
-                                    style={ { margin: "16px 44px 0 10px" } }>
+                                    className="flex justify-between items-center">
 
                                     {
                                         <div >
@@ -169,15 +168,13 @@ const AppLayout = ( {
                             </div>
 
                             <Content
-                                style={ {
-                                    padding: "24px 44px",
-                                    margin: 0,
-                                    minHeight: 280,
-                                } }
+                                className="px-0 pt-[12px] pb-[16px] m-0 "
                             >
                                 { children }
                             </Content>
                         </div>
+
+
                         {
                             hideSideBar ? null : (
                                 <div>
