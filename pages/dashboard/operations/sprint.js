@@ -22,7 +22,7 @@ import { CloseOutlined } from '@ant-design/icons';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
-import { Board } from '../../../components/Boards/Board2';
+import { Board } from '../../../components/Boards';
 
 import { splitRoutes } from "../../../utils";
 
