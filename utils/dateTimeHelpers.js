@@ -12,7 +12,7 @@ const getTimeAgo = ( date, addSuffix = true ) =>
     }
     const now = new Date();
 
-    const actualDate = date.includes( "Now" ) ? now : date;
+    const actualDate = date?.toString().includes( "Now" ) ? now : date;
 
     let formattedDate = formatDistance( new Date( actualDate ), now, {
         addSuffix
@@ -36,11 +36,13 @@ const formatDateTime = ( date, shape = "yyyy-LL-dd" ) =>
 
 };
 
-const formatDate = (date, shape = "EEEE, MMM do") => {
-  if (!date) {
-    return "N/A";
-  }
-  return format(new Date(date), shape);
+const formatDate = ( date, shape = "EEEE, MMM do" ) =>
+{
+    if ( !date )
+    {
+        return "N/A";
+    }
+    return format( new Date( date ), shape );
 };
 
 
