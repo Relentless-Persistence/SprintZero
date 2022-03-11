@@ -19,10 +19,10 @@ import
 } from 'antd';
 import { LinkOutlined, CloseOutlined } from '@ant-design/icons';
 
-
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
-import { Board } from '../../../components/Boards/Board2';
+import { Board } from '../../../components/Boards';
+import { Index } from '../../../components/Boards/NumberIndex';
 import { DropDwnBtn } from '../../../components/Dashboard/DropdownBtn';
 
 
@@ -31,6 +31,7 @@ import { splitRoutes } from "../../../utils";
 import fakeData from "../../../fakeData/ethics.json";
 import products from "../../../fakeData/products.json";
 import { Title } from "../../../components/Dashboard/SectionTitle";
+import CustomTag from "../../../components/Dashboard/Tag";
 
 
 const { TextArea } = Input;
@@ -139,20 +140,6 @@ const Story = styled.p`
 
 
 
-const Index = styled.span`
-    width:32px;
-    height:32px;
-    border: 1px solid #101D06;
-    background:#fff;
-    text-align:center;
-    margin:auto;
-    border-radius:50%;
-    font-size:12px;
-    line-height:16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
 
 
 
@@ -271,13 +258,16 @@ export default function Ethics ()
             <Index>{ index + 1 }</Index>
 
             <div onClick={ () => setVisible( true ) }>
-                <StyledItem
+                <CustomTag
+                    type={ index % 2 === 0 ? "feature" : "epic" }
+                    text={ card.title } />
+                {/* <StyledItem
                     $color={ card.color }>
                     <span>x</span>
 
                     <p>
                         { card.title }</p>
-                </StyledItem>
+                </StyledItem> */}
             </div>
         </>;
     };
@@ -293,7 +283,6 @@ export default function Ethics ()
 
 
             <AppLayout
-                hideSideBar
                 ignoreLast={ true }
                 onChangeProduct={ setProduct }
                 rightNavItems={ getBoardNames( data[ activeProduct ] ) }

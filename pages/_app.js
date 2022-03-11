@@ -1,16 +1,21 @@
 import "antd/dist/antd.css";
+import 'react-calendar/dist/Calendar.css';
+
 import "../styles/globals.css";
 
 import { AuthProvider } from "../contexts/AuthContext";
 import { PaymentProvider } from "../contexts/PaymentContext";
 import { RecoilRoot } from "recoil";
 
-function MyApp({ Component, pageProps }) {
+
+
+function MyApp ( { Component, pageProps } )
+{
   return (
     <AuthProvider>
       <RecoilRoot>
         <PaymentProvider>
-          <Component {...pageProps} />
+          <Component { ...pageProps } />
         </PaymentProvider>
       </RecoilRoot>
     </AuthProvider>

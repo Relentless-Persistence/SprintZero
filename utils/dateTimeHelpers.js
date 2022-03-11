@@ -1,5 +1,7 @@
 import format from 'date-fns/format';
 import formatDistance from 'date-fns/formatDistance';
+import differenceInDays from 'date-fns/differenceInDays';
+import isBefore from 'date-fns/isBefore';
 
 
 const getTimeAgo = ( date, addSuffix = false ) =>
@@ -45,5 +47,6 @@ export
 {
     getTimeAgo,
     formatDateTime,
-    formatDate
+    differenceInDays,
+    isBefore
 };

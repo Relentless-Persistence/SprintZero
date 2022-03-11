@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import
-{
-    Row,
-    Col,
-} from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
 import { Board } from '../../../components/Boards';
+import { Index } from '../../../components/Boards/NumberIndex';
 
 import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/tasks.json";
 import products from "../../../fakeData/products.json";
-
+import CustomTag from "../../../components/Dashboard/Tag";
 
 const getBoardNames = ( boards ) =>
 {
@@ -131,6 +127,21 @@ export default function Tasks ()
 
     };
 
+    const renderCol = ( card, index ) =>
+    {
+
+        return <>
+            <Index>{ index + 1 }</Index>
+
+            <div>
+                <CustomTag
+                    type={ index % 2 === 0 ? "feature" : "epic" }
+                    text={ card.title } />
+
+            </div>
+        </>;
+    };
+
 
     return (
         <div className="mb-8">
@@ -142,7 +153,7 @@ export default function Tasks ()
 
 
             <AppLayout
-                hideSideBar
+                useGrid
                 onChangeProduct={ setProduct }
                 rightNavItems={ getBoardNames( data[ activeProduct ] ) }
                 activeRightItem={ activeBoard?.boardName }
@@ -152,12 +163,28 @@ export default function Tasks ()
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
 
-                <Board
-                    onDrop={ handleDrop }
-                    onSwap={ handleSwap }
-                    columns={ activeBoard?.columns }
-                    colCount={ 4 }
-                />
+                <div style={
+                    {
+                        overflowX: "scroll"
+                    }
+                }>
+
+                    <div style={ {
+                        width: "1200px"
+                    } }>
+                        <Board
+                            colCount={ 4 }
+                            onDrop={ handleDrop }
+                            onSwap={ handleSwap }
+                            columns={ activeBoard?.columns }
+                            renderColumn={ renderCol }
+                            columnHeaderRenders={ [ null, null, null ] }
+                        />
+
+                    </div>
+
+                </div>
+
 
             </AppLayout>
         </div>
