@@ -5,35 +5,34 @@ import { Button, Typography, message, Image } from "antd";
 import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
 import { googleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
-import firebase from "../config/firebase-config";
+import {auth} from "../config/firebase-config";
 // import { usePaymentConfirm } from "../contexts/PaymentContext";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
   const router = useRouter();
-  const auth = firebase.auth();
   // const paid = usePaymentConfirm();
 
-  const handleOnClick = (provider) => {
-    try {
-      auth
-        .signInWithPopup(provider)
-        .then((res) => {
-          message.success({
-            content: "Successfully logged in",
-            className: "custom-message",
-          });
-        })
-        .then(() => router.push("/loginsuccess"));
-    } catch (error) {
-      console.log(error.message);
-      message.error({
-        content: "An error occurred while trying to log you in",
-        className: "custom-message",
-      });
-    }
-  };
+  // const handleOnClick = (provider) => {
+  //   try {
+  //     auth
+  //       .signInWithPopup(provider)
+  //       .then((res) => {
+  //         message.success({
+  //           content: "Successfully logged in",
+  //           className: "custom-message",
+  //         });
+  //       })
+  //       .then(() => router.push("/loginsuccess"));
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     message.error({
+  //       content: "An error occurred while trying to log you in",
+  //       className: "custom-message",
+  //     });
+  //   }
+  // };
 
   return (
     <>
@@ -51,7 +50,7 @@ const Login = () => {
       <div className="flex flex-col items-center justify-center mt-10">
         <button
           className="googleBtn flex items-center m-10"
-          onClick={() => handleOnClick(googleProvider)}
+          // onClick={() => handleOnClick(googleProvider)}
         >
           <Image
             src="https://developers.google.com/identity/sign-in/g-normal.png"

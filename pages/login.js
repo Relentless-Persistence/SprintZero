@@ -1,7 +1,7 @@
 import React from 'react'
 import Head from "next/head";
 import Layout from "../components/Layout";
-import Login from '../components/Login';
+// import Login from '../components/Login';
 
 const login = () => {
   return (
@@ -12,7 +12,8 @@ const login = () => {
       </Head>
 
       <Layout>
-        <Login />
+        {/* <Login /> */}
+        Login
       </Layout>
     </div>
   );

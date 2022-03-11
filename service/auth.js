@@ -1,9 +1,8 @@
 import React from "react";
-import firebase from "../config/firebase-config";
+import {auth} from "../config/firebase-config";
 
 const SocialMediaAuth = (provider) => {
-  firebase
-    .auth()
+  auth
     .signInWithPopup(provider)
     .then((res) => {
       return res.user;
