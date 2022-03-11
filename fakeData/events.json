@@ -1,0 +1,53 @@
+{
+  "Insight Meeting": [
+    {
+      "date": "2018-12-12",
+      "events": [
+        {
+          "title": "Insight Meeting",
+          "description": "Insight Meeting",
+          "time": "2018-04-24T00:00:00.000Z",
+          "frequency": "weekly",
+          "days": [
+            "Monday",
+            "Wednesday",
+            "Friday"
+          ],
+          "Attendees": [
+            "John",
+            "Jack"
+          ]
+        },
+        {
+          "title": "Insight Meeting2",
+          "description": "Insight Meeting2",
+          "date": "2018-04-24T00:00:00.000Z",
+          "time": "2018-04-24T00:00:00.000Z",
+          "frequency": "weekly",
+          "days": [
+            "Monday",
+            "Wednesday",
+            "Friday"
+          ],
+          "Attendees": [
+            "John",
+            "Jack"
+          ]
+        },
+        {
+          "title": "Insight Meeting3",
+          "description": "Insight Meeting3",
+          "date": "2018-04-24T00:00:00.000Z",
+          "time": "2018-04-24T00:00:00.000Z",
+          "frequency": "once",
+          "days": [],
+          "Attendees": [
+            "John",
+            "Jack"
+          ]
+        }
+      ]
+    }
+  ],
+  "Alpha Sheet": []
+}

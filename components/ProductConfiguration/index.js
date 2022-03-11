@@ -7,7 +7,7 @@ import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
 import ProductCost from "./ProductCost";
 // import withAuth from "../../hoc/withAuth";
-import firebaseConfig from "../../config/firebase-config";
+import {db} from "../../config/firebase-config";
 import firebase from "firebase";
 
 import "swiper/css";
@@ -16,7 +16,7 @@ import "swiper/css/navigation";
 import SwiperCore, { Pagination, Navigation } from "swiper";
 
 const { Title, Text } = Typography;
-const db = firebaseConfig.firestore();
+// const db = firebaseConfig.firestore();
 SwiperCore.use([Pagination, Navigation]);
 
 const ProductConfiguration = () => {
