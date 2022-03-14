@@ -113,136 +113,110 @@ const AppLayout = ( {
     //if ( !user ) return <div>Loading...</div>;
 
     return (
-        <Layout style={ { minHeight: "100vh" } }>
-            <AppHeader onChangeProduct={ onChangeProduct } />
-            <Layout>
-                <Sider
-                    width={ 200 }
-                    className="site-layout-background"
-                    breakpoint="sm"
-                >
-                    <SideBar />
-                </Sider>
-                <Layout>
-                    <div
-                        style={ useGrid ?
-                            {
-                                display: "grid",
-                                "grid-template-columns": "minmax(0,1fr) auto"
-                            } : {} }
-                        className={ useGrid ? null : "flex justify-between" }>
-                        <div
-                            className="flex-1 py-[24px] pl-[42px] pr-[33px]">
-                            <div className="flex justify-between items-center">
-                                <Breadcrumb>
-                                    {
-                                        breadCrumbItems.map( ( item, i ) => (
-                                            <Breadcrumb.Item
-                                                key={ i }
-                                            >
-                                                { capitalize( item ) }
-                                            </Breadcrumb.Item>
-                                        ) )
-                                    }
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader onChangeProduct={onChangeProduct} />
+        <Layout>
+          <Sider
+            width={200}
+            className="site-layout-background"
+            breakpoint="sm"
+            style={{ position: "fixed", zIndex: 1, height: "100%", marginTop: "64px" }}
+          >
+            <SideBar />
+          </Sider>
+          <Layout style={{ marginTop: "65px", marginLeft: "200px" }}>
+            <div
+              style={
+                useGrid
+                  ? {
+                      display: "grid",
+                      "grid-template-columns": "minmax(0,1fr) auto",
+                    }
+                  : {}
+              }
+              className={useGrid ? null : "flex justify-between"}
+            >
+              <div className="flex-1 py-[24px] pl-[42px] pr-[33px]">
+                <div className="flex justify-between items-center">
+                  <Breadcrumb>
+                    {breadCrumbItems.map((item, i) => (
+                      <Breadcrumb.Item key={i}>
+                        {capitalize(item)}
+                      </Breadcrumb.Item>
+                    ))}
 
-                                    {
-                                        ignoreLast ? null : <Breadcrumb.Item className="text-green-800 ">
-                                            { capitalizeText ? capitalize( defaultText || activeRightItem ) : ( defaultText || activeRightItem ) }
-                                        </Breadcrumb.Item>
-                                    }
+                    {ignoreLast ? null : (
+                      <Breadcrumb.Item className="text-green-800 ">
+                        {capitalizeText
+                          ? capitalize(defaultText || activeRightItem)
+                          : defaultText || activeRightItem}
+                      </Breadcrumb.Item>
+                    )}
+                  </Breadcrumb>
 
-                                </Breadcrumb>
+                  <div className="flex justify-between items-center">
+                    {<div>{topExtra}</div>}
 
-                                <div
-                                    className="flex justify-between items-center">
+                    {hasMainAdd ? (
+                      <AddNew onClick={onMainAdd}>{addNewText}</AddNew>
+                    ) : null}
+                  </div>
+                </div>
 
-                                    {
-                                        <div >
-                                            { topExtra }
-                                        </div>
-                                    }
+                <Content className="px-0 pt-[12px] pb-[16px] m-0 ">
+                  {children}
+                </Content>
+              </div>
 
-                                    {
-                                        hasMainAdd ? <AddNew onClick={ onMainAdd }>
-                                            { addNewText }
-                                        </AddNew> : null
-                                    }
-                                </div>
+              {hideSideBar ? null : (
+                <div style={{ minWidth: 0 }}>
+                  <div>
+                    <Versions className="">
+                      {rightNavItems.map((item, i) => (
+                        <Version
+                          className={`py-[16px] px-[24px] ${versionClass}`}
+                          key={i}
+                          active={activeRightItem === (item.value || item)}
+                          onClick={() =>
+                            setActiveRightNav(item.value ? item.value : item)
+                          }
+                        >
+                          {item.render ? item.render() : item}
+                        </Version>
+                      ))}
 
+                      {hasSideAdd && showSideAdd ? (
+                        <Version
+                          className={`py-[16px] px-[24px] ${versionClass}`}
+                        >
+                          <Input
+                            className="mx-0 my-0 "
+                            type={type || "number"}
+                            maxLength={20}
+                            autoFocus
+                            value={value}
+                            onChange={handleChange}
+                            onKeyPress={onEnter}
+                            style={{ width: "100%" }}
+                          />
+                        </Version>
+                      ) : null}
 
-
-
-                            </div>
-
-                            <Content
-                                className="px-0 pt-[12px] pb-[16px] m-0 "
-                            >
-                                { children }
-                            </Content>
-                        </div>
-
-
-                        {
-                            hideSideBar ? null : (
-                                <div style={ { minWidth: 0 } }>
-                                    <div>
-                                        <Versions className="">
-                                            {
-                                                rightNavItems.map( ( item, i ) => (
-                                                    <Version
-                                                        className={ `py-[16px] px-[24px] ${ versionClass }` }
-                                                        key={ i }
-                                                        active={ activeRightItem === ( item.value || item ) }
-                                                        onClick={ () => setActiveRightNav( item.value ? item.value : item ) }
-                                                    >
-                                                        { item.render ? item.render() : item }
-                                                    </Version>
-                                                ) )
-                                            }
-
-
-                                            {
-                                                ( hasSideAdd && showSideAdd ) ?
-                                                    <Version
-                                                        className={ `py-[16px] px-[24px] ${ versionClass }` }>
-                                                        <Input
-                                                            className="mx-0 my-0 "
-                                                            type={ type || "number" }
-                                                            maxLength={ 20 }
-                                                            autoFocus
-                                                            value={ value }
-                                                            onChange={ handleChange }
-                                                            onKeyPress={ onEnter }
-                                                            style={ { width: "100%" } }
-                                                        />
-                                                    </Version>
-                                                    : null
-                                            }
-
-                                            {
-                                                hasSideAdd ?
-
-                                                    <Version className="flex items-center justify-center">
-                                                        <AddSide onClick={ toggleSideAdd }>
-                                                            { showSideAdd ? "Close" : "Add" }
-                                                        </AddSide>
-                                                    </Version>
-                                                    : null
-                                            }
-
-                                        </Versions>
-
-
-
-                                    </div>
-                                </div>
-                            )
-                        }
-
-                    </div>
-                </Layout>
-            </Layout>
+                      {hasSideAdd ? (
+                        <Version className="flex items-center justify-center">
+                          <AddSide onClick={toggleSideAdd}>
+                            {showSideAdd ? "Close" : "Add"}
+                          </AddSide>
+                        </Version>
+                      ) : null}
+                    </Versions>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Layout>
         </Layout>
+      </Layout>
     );
 };
 
