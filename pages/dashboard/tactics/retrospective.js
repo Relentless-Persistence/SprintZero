@@ -6,14 +6,22 @@ import
 {
     Row,
     Col,
+    Dropdown,
     Card,
     Avatar,
     Divider
 } from 'antd';
 
+import
+{
+    SortAscendingOutlined
+} from '@ant-design/icons';
+
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
 import { splitRoutes } from "../../../utils";
+
+import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 
 import fakeData from "../../../fakeData/retrospective.json";
 import products from "../../../fakeData/products.json";
@@ -62,6 +70,13 @@ const MyCard = styled( Card )`
 
 `;
 
+const MyBtn = styled( Dropdown.Button )`
+   & > button
+   {
+       background: #fff !important;
+   }
+`;
+
 export default function Retrospective ()
 {
     const { pathname } = useRouter();
@@ -105,41 +120,51 @@ export default function Retrospective ()
                 onChangeProduct={ setProduct }
                 setActiveRightNav={ handleRightNav }
                 hasSideAdd={ false }
+                topExtra={ <MyBtn
+                    className=""
+                    overlay={ <></> }
+                    onClick={ () => { } }
+                    icon={ <SortAscendingOutlined /> }
+                >
+                    Sort
+                </MyBtn> }
+                hasMainAdd
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-
-                <Row className="py-6" gutter={ [ 16, 16 ] }>
+                <MasonryGrid>
                     {
+
                         data[ activeProduct ][ activeTabIndex ].comments.map( ( c, i ) => (
-                            <Col
-                                xs={ { span: 24 } }
-                                sm={ { span: 12 } }
+
+                            <MyCard
+                                className='mb-[16px]'
                                 key={ i }>
-                                <MyCard>
-                                    <Meta
-                                        avatar={ <Avatar
-                                            size={ 48 }
-                                            src={ c.avatar }
-                                            style={ {
-                                                border: "2px solid #315613"
-                                            } }
-                                        /> }
-                                        title={ c.name }
-                                        description={ c.role }
-                                    />
+                                <Meta
+                                    avatar={ <Avatar
+                                        size={ 48 }
+                                        src={ c.avatar }
+                                        style={ {
+                                            border: "2px solid #315613"
+                                        } }
+                                    /> }
+                                    title={ c.name }
+                                    description={ c.role }
+                                />
 
-                                    <Divider />
+                                <Divider />
 
-                                    <article>
-                                        <h5>{ c.title }</h5>
-                                        <p>{ c.text }</p>
-                                    </article>
-                                </MyCard>
-                            </Col>
+                                <article>
+                                    <h5>{ c.title }</h5>
+                                    <p>{ c.text }</p>
+                                </article>
+
+                                <br />
+                            </MyCard>
                         ) )
                     }
+                </MasonryGrid>
 
-                </Row>
+
 
             </AppLayout>
 

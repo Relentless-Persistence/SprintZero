@@ -34,6 +34,7 @@ import fakeData from "../../../fakeData/priorities.json";
 import products from "../../../fakeData/products.json";
 
 import { DraggableTab, DraggableContainer } from "../../../components/Priorities";
+import DrawerSubTitle from "../../../components/Dashboard/DrawerSubTitle";
 
 const { TextArea } = Input;
 
@@ -109,6 +110,9 @@ export default function Priorities ()
     const [ disableDrag, setDisableDrag ] = useState( true );
 
     const [ activePriorityIndex, setActivePriorityIndex ] = useState( 0 );
+    const [ text, setText ] = useState( "As a user I need to be aware of any issues with the platform so that I can pre-emptivly warn attendees and provide any new contact information to join the meeting" );
+
+    const changeText = e => setText( e.target.value );
 
     const setPriority = ( name ) =>
     {
@@ -275,17 +279,18 @@ export default function Priorities ()
                 >
 
 
-                    <Row gutter={ 20 } className="mt-[15px]">
+                    <Row gutter={ 63 } className="mt-[15px]">
 
                         <Col span={ 12 } >
-                            <h3 className="mb-[8px] text-[#595959] text-[20px] leading-[28px] font-[600]">Features</h3>
+                            <DrawerSubTitle>Features</DrawerSubTitle>
 
                             <TextArea
-                                value="As a user I need to be aware of any issues with the platform so that I can pre-emptivly warn attendees and provide any new contact information to join the meeting"
+                                onChange={ changeText }
+                                value={ text }
                                 rows={ 4 } />
                         </Col>
                         <Col span={ 11 } >
-                            <h3 className="mb-[8px] text-[#595959] text-[20px] leading-[28px] font-[600]">Comments</h3>
+                            <DrawerSubTitle>Comments</DrawerSubTitle>
 
                             <List
                                 className="comment-list"

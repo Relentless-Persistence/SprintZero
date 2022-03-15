@@ -1,8 +1,34 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
+import styled from 'styled-components';
+
+import
+{
+    Input,
+    Drawer,
+    Tag,
+    Checkbox,
+    Form,
+    Avatar,
+    Row,
+    Col,
+    Comment,
+    Button,
+    List,
+    DatePicker,
+    TimePicker
+} from 'antd';
+import
+{
+    SendOutlined,
+    FlagOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
+import DrawerSubTitle from "../../../components/Dashboard/DrawerSubTitle";
+import { CardTitle } from "../../../components/Dashboard/CardTitle";
 
 import { Board } from '../../../components/Boards';
 import { Index } from '../../../components/Boards/NumberIndex';
@@ -12,6 +38,7 @@ import { splitRoutes } from "../../../utils";
 import fakeData from "../../../fakeData/tasks.json";
 import products from "../../../fakeData/products.json";
 import CustomTag from "../../../components/Dashboard/Tag";
+import ActionButtons from "../../../components/Personas/ActionButtons";
 
 const getBoardNames = ( boards ) =>
 {
@@ -20,10 +47,31 @@ const getBoardNames = ( boards ) =>
     return boardNames;
 };
 
+const { TextArea } = Input;
+
+const SubTasks = styled.div`
+
+    .ant-checkbox-wrapper
+    {
+        display:flex;
+        align-items:center;
+        margin-bottom:4px;
+
+    }
+    .ant-checkbox-checked .ant-checkbox-inner 
+        {
+            background: #4A801D;
+            border: 1px solid #4A801D;
+            border-radius: 2px;
+        }
+`;
+
+
 
 export default function Tasks ()
 {
     const { pathname } = useRouter();
+    const [ visible, setVisible ] = useState( false );
 
     const [ data, setData ] = useState( fakeData );
 
@@ -31,6 +79,51 @@ export default function Tasks ()
 
     const [ activeBoard, setActiveBoard ] = useState( data[ activeProduct ][ 0 ] );
     const [ activeBoardIndex, setActiveBoardIndex ] = useState( 0 );
+
+    const [ drawerData, setDrawerData ] = useState( {
+        subject: "Talk to Dave",
+        desc: "Reach out to Dave to make sure that things get go ok",
+        date: "",
+        time: ""
+    } );
+
+    const handleDrawerChange = ( e, key ) =>
+    {
+        setDrawerData( s => (
+            {
+                ...s,
+                [ key ]: e.target.value
+            }
+        )
+
+        );
+    };
+
+    const handleDrawerDateChange = ( date, dateString ) =>
+    {
+        setDrawerData( s => (
+            {
+                ...s,
+                date: dateString
+            }
+        )
+
+        );
+    };
+
+
+    const handleDrawerTimeChange = ( time, timeString ) =>
+    {
+        setDrawerData( s => (
+            {
+                ...s,
+                time: timeString
+            }
+        )
+
+        );
+    };
+
 
 
     const setBoard = ( boardName, product ) =>
@@ -133,7 +226,7 @@ export default function Tasks ()
         return <>
             <Index>{ index + 1 }</Index>
 
-            <div>
+            <div onClick={ () => setVisible( true ) }>
                 <CustomTag
                     type={ index % 2 === 0 ? "feature" : "epic" }
                     text={ card.title } />
@@ -158,7 +251,8 @@ export default function Tasks ()
                 rightNavItems={ getBoardNames( data[ activeProduct ] ) }
                 activeRightItem={ activeBoard?.boardName }
                 setActiveRightNav={ setBoard }
-                hasMainAdd={ false }
+                hasMainAdd
+                addNewText="Add Task"
                 hasSideAdd={ false }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
@@ -170,7 +264,8 @@ export default function Tasks ()
                 }>
 
                     <div style={ {
-                        width: "1200px"
+                        width: "1200px",
+                        marginBottom: "30px"
                     } }>
                         <Board
                             colCount={ 4 }
@@ -186,6 +281,148 @@ export default function Tasks ()
                 </div>
 
 
+
+                <Drawer
+                    visible={ visible }
+                    closable={ false }
+                    placement={ "bottom" }
+                    height={ 550 }
+                    title={
+                        <Row>
+                            <Col span={ 21 }>
+
+                                <CardTitle className="inline-block mr-[10px]">Task</CardTitle>
+
+
+                            </Col>
+
+                            <Col span={ 3 }>
+                                <div className="flex justify-end">
+                                    <ActionButtons
+                                        onCancel={ () => setVisible( false ) }
+                                        onSubmit={ () => setVisible( false ) }
+                                    />
+                                </div>
+                            </Col>
+
+                        </Row>
+                    }
+                >
+
+
+                    <Row gutter={ [ 24, 24 ] } className="mt-[15px]">
+
+                        <Col span={ 8 } >
+                            <div>
+                                <DrawerSubTitle>Subject</DrawerSubTitle>
+
+                                <Input
+                                    className="mb-[24px]"
+                                    onChange={ ( e ) => handleDrawerChange( e, "subject" ) }
+                                    value={ drawerData.subject } />
+
+
+
+
+                                <DrawerSubTitle>Description</DrawerSubTitle>
+
+                                <TextArea
+                                    onChange={ ( e ) => handleDrawerChange( e, "desc" ) }
+                                    value={ drawerData.desc }
+                                    rows={ 4 } />
+
+
+                            </div>
+                        </Col>
+                        <Col span={ 8 } >
+                            <DrawerSubTitle>Due</DrawerSubTitle>
+
+
+                            <div className="mb-[24px]"
+                            >
+                                <DatePicker
+                                    className="mr-[8px]"
+                                    onChange={ handleDrawerDateChange } />
+
+                                <TimePicker onChange={ handleDrawerTimeChange } />,
+
+
+                            </div>
+
+                            <SubTasks>
+                                <Checkbox
+                                    checked >
+                                    Lorem ipsum
+                                </Checkbox>
+                                <Checkbox >
+                                    Amet consectetur adipisicing elit
+                                </Checkbox>
+                                <Checkbox
+                                    checked >
+                                    Ipsam repellendus?
+                                </Checkbox>
+                                <Checkbox
+                                    checked >
+                                    Inventore perspiciatis ratione
+                                </Checkbox>
+                            </SubTasks>
+
+                        </Col>
+                        <Col span={ 8 } >
+                            <DrawerSubTitle>Discussion</DrawerSubTitle>
+
+                            <List
+                                className="comment-list"
+                                itemLayout="horizontal"
+                                dataSource={ [] }
+                                renderItem={ item => (
+                                    <li>
+                                        <Comment
+                                            actions={ item.actions }
+                                            author={ item.author }
+                                            avatar={ item.avatar }
+                                            content={ item.content }
+                                        />
+                                    </li>
+                                ) }
+                            />
+
+                            <Comment
+                                avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" /> }
+                                content={
+                                    <>
+                                        <Form.Item>
+                                            <TextArea rows={ 2 } />
+                                        </Form.Item>
+
+                                        <Form.Item>
+                                            <Button
+                                                className="inline-flex justify-between items-center mr-[8px]"
+                                                disabled>
+                                                <SendOutlined />
+                                                Post
+                                            </Button>
+
+
+                                            <Button
+                                                className="inline-flex justify-between items-center text-[#4A801D]
+                                                border-[#4A801D]"
+                                            >
+                                                <UserOutlined />
+                                                Assign
+                                            </Button>
+                                        </Form.Item>
+
+                                    </>
+                                }
+                            />
+
+
+                        </Col>
+
+                    </Row>
+
+                </Drawer >
             </AppLayout>
         </div>
     );
