@@ -2,8 +2,27 @@ import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 
-import { Drawer, Button, Radio, Space } from 'antd';
-
+import
+{
+    Input,
+    Drawer,
+    Tag,
+    Form,
+    Avatar,
+    Row,
+    Col,
+    Comment,
+    Button,
+    List
+} from 'antd';
+import
+{
+    SendOutlined,
+    FlagOutlined,
+    CloseOutlined,
+    LikeOutlined,
+    DislikeOutlined
+} from '@ant-design/icons';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
@@ -16,6 +35,7 @@ import products from "../../../fakeData/products.json";
 
 import { DraggableTab, DraggableContainer } from "../../../components/Priorities";
 
+const { TextArea } = Input;
 
 
 const getNames = ( goals ) =>
@@ -24,6 +44,54 @@ const getNames = ( goals ) =>
 
     return names;
 };
+
+const comments = [
+    {
+        actions: [
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="like"><LikeOutlined /> 127 </button>,
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="dislike"><DislikeOutlined /> 0</button>,
+            <span
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="comment-list-reply-to-0">Reply to</span> ],
+        author: 'Han Solo',
+        avatar: 'https://joeschmoe.io/api/v1/random',
+        content: (
+            <p>
+                We supply a series of design principles, practical patterns and high quality design
+                resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                efficiently.
+            </p>
+        ),
+
+    },
+    {
+        actions: [
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="like"><LikeOutlined /> 127 </button>,
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="dislike"><DislikeOutlined /> 0</button>,
+            <span
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="comment-list-reply-to-0">Reply to</span> ],
+        author: 'Han Solo',
+        avatar: 'https://joeschmoe.io/api/v1/random',
+        content: (
+            <p>
+                We supply a series of design principles, practical patterns and high quality design
+                resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                efficiently.
+            </p>
+        ),
+
+    }
+];
+
 
 
 
@@ -168,15 +236,108 @@ export default function Priorities ()
 
                 </DraggableContainer>
 
+
+
                 <Drawer
-                    title={ <CardTitle>System Status</CardTitle> }
-                    placement="bottom"
-                    closable={ false }
                     visible={ visible }
+                    closable={ false }
+                    placement={ "bottom" }
+                    height={ 400 }
+                    title={
+                        <Row>
+                            <Col span={ 21 }>
+
+                                <CardTitle className="inline-block mr-[10px]">System Status</CardTitle>
+                                <Tag color="#91D5FF">3 points</Tag>
+                                <Tag color="#A4DF74">$0.00 Total</Tag>
+
+                                <button className="text-[14px] leading-[16px] text-[#1890FF]">
+                                    Edit
+                                </button>
+
+                            </Col>
+
+                            <Col span={ 3 }>
+
+                                <p className="inline-block text-[12px] leading-[16px] text-[#A6AE9D] mr-[10px]">
+                                    Last modified 2 hrs ago
+                                </p>
+
+                                <button className="text-right" onClick={ () => setVisible( false ) }>
+                                    <CloseOutlined
+                                        color="#8C8C8C"
+                                    />
+                                </button>
+                            </Col>
+
+                        </Row>
+                    }
                 >
-                    <p>Some contents...</p>
-                    <p>Some contents...</p>
-                    <p>Some contents...</p>
+
+
+                    <Row gutter={ 20 } className="mt-[15px]">
+
+                        <Col span={ 12 } >
+                            <h3 className="mb-[8px] text-[#595959] text-[20px] leading-[28px] font-[600]">Features</h3>
+
+                            <TextArea
+                                value="As a user I need to be aware of any issues with the platform so that I can pre-emptivly warn attendees and provide any new contact information to join the meeting"
+                                rows={ 4 } />
+                        </Col>
+                        <Col span={ 11 } >
+                            <h3 className="mb-[8px] text-[#595959] text-[20px] leading-[28px] font-[600]">Comments</h3>
+
+                            <List
+                                className="comment-list"
+                                itemLayout="horizontal"
+                                dataSource={ comments }
+                                renderItem={ item => (
+                                    <li>
+                                        <Comment
+                                            actions={ item.actions }
+                                            author={ item.author }
+                                            avatar={ item.avatar }
+                                            content={ item.content }
+                                        />
+                                    </li>
+                                ) }
+                            />
+
+                            <Comment
+                                avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" /> }
+                                content={
+                                    <>
+                                        <Form.Item>
+                                            <TextArea rows={ 2 } />
+                                        </Form.Item>
+
+                                        <Form.Item>
+                                            <Button
+                                                className="inline-flex justify-between items-center mr-[8px]"
+                                                disabled>
+                                                <SendOutlined />
+                                                Post
+                                            </Button>
+
+
+                                            <Button
+                                                className="inline-flex justify-between items-center"
+                                                danger>
+                                                <FlagOutlined />
+                                                Flag
+                                            </Button>
+                                        </Form.Item>
+
+                                    </>
+                                }
+                            />
+
+
+                        </Col>
+
+                    </Row>
+
+
                 </Drawer>
             </AppLayout>
         </div>
