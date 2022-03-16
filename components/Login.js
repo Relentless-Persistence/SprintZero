@@ -17,15 +17,18 @@ const Login = () => {
 
   const handleOnClick = (provider) => {
     try {
-      auth
-        .signInWithPopup(provider)
-        .then((res) => {
+      auth.signInWithPopup(provider).then((res) => {
+        var user = res.user;
+        if (!/@gmail.com\s*$/.test(user.email)) {
+          router.push("/enterprise-contact");
+        } else {
           message.success({
             content: "Successfully logged in",
             className: "custom-message",
           });
-        })
-        .then(() => router.push("/loginsuccess"));
+          router.push("/loginsuccess");
+        }
+      });
     } catch (error) {
       console.log(error.message);
       message.error({
