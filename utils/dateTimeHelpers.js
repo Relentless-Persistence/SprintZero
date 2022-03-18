@@ -18,7 +18,7 @@ const getTimeAgo = ( date, addSuffix = true ) =>
         addSuffix
     } );
 
-    if ( formattedDate.includes( "sec" ) )
+    if ( formattedDate.includes( "sec" ) || formattedDate.includes( "less than a minute ago" ) )
     {
         return "Now";
     }

@@ -1,0 +1,3110 @@
+{
+    "Insight Meeting": [
+        {
+            "id": "1",
+            "name": "Flow",
+            "data": [
+                {
+                    "date": 1965,
+                    "value": 1390.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1966,
+                    "value": 1469.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1967,
+                    "value": 1521.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1968,
+                    "value": 1615.9,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1969,
+                    "value": 1703.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1970,
+                    "value": 1767.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1971,
+                    "value": 1806.2,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1972,
+                    "value": 1903.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1973,
+                    "value": 1986.6,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1974,
+                    "value": 1952,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1975,
+                    "value": 1910.4,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1976,
+                    "value": 2015.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1977,
+                    "value": 2074.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1978,
+                    "value": 2092.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1979,
+                    "value": 2123.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1980,
+                    "value": 2068.3,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1981,
+                    "value": 2018,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1982,
+                    "value": 1951.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1983,
+                    "value": 1941.1,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1984,
+                    "value": 2046.2,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1985,
+                    "value": 2053.1,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1986,
+                    "value": 2060.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1987,
+                    "value": 2130.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1988,
+                    "value": 2223.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1989,
+                    "value": 2275.9,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1990,
+                    "value": 2280.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1965,
+                    "value": 109.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1966,
+                    "value": 115.7,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1967,
+                    "value": 120.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1968,
+                    "value": 128,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1969,
+                    "value": 134.4,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1970,
+                    "value": 142.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1971,
+                    "value": 157.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1972,
+                    "value": 169.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1973,
+                    "value": 186.3,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1974,
+                    "value": 195.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1975,
+                    "value": 198,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1976,
+                    "value": 211.7,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1977,
+                    "value": 223.8,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1978,
+                    "value": 236.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1979,
+                    "value": 251.8,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1980,
+                    "value": 262.9,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1981,
+                    "value": 262.7,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1982,
+                    "value": 265.9,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1983,
+                    "value": 268.3,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1984,
+                    "value": 278.3,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1985,
+                    "value": 285.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1986,
+                    "value": 304.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1987,
+                    "value": 315.4,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1988,
+                    "value": 324.6,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1989,
+                    "value": 329.9,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1990,
+                    "value": 331.1,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1965,
+                    "value": 1058.1,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1966,
+                    "value": 1089.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1967,
+                    "value": 1121.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1968,
+                    "value": 1196.6,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1969,
+                    "value": 1285.5,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1970,
+                    "value": 1369,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1971,
+                    "value": 1406.2,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1972,
+                    "value": 1472.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1973,
+                    "value": 1558,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1974,
+                    "value": 1535.5,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1975,
+                    "value": 1519.3,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1976,
+                    "value": 1606.9,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1977,
+                    "value": 1632.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1978,
+                    "value": 1687.5,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1979,
+                    "value": 1749.6,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1980,
+                    "value": 1706.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1981,
+                    "value": 1661.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1982,
+                    "value": 1630.2,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1983,
+                    "value": 1645.2,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1984,
+                    "value": 1686.9,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1985,
+                    "value": 1779.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1986,
+                    "value": 1811.3,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1987,
+                    "value": 1849.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1988,
+                    "value": 1870,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1989,
+                    "value": 1875,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1990,
+                    "value": 1853.3,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1965,
+                    "value": 593.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1966,
+                    "value": 630.9,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1967,
+                    "value": 663.2,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1968,
+                    "value": 687.8,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1969,
+                    "value": 719,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1970,
+                    "value": 754.8,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1971,
+                    "value": 791.9,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1972,
+                    "value": 832.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1973,
+                    "value": 875.1,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1974,
+                    "value": 923.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1975,
+                    "value": 969,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1976,
+                    "value": 1006.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1977,
+                    "value": 1051.4,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1978,
+                    "value": 1094.2,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1979,
+                    "value": 1127.1,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1980,
+                    "value": 1150.1,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1981,
+                    "value": 1174.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1982,
+                    "value": 1204,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1983,
+                    "value": 1229,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1984,
+                    "value": 1274.6,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1985,
+                    "value": 1257,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1986,
+                    "value": 1282,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1987,
+                    "value": 1318,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1988,
+                    "value": 1341.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1989,
+                    "value": 1332.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1990,
+                    "value": 1350.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1965,
+                    "value": 48.3,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1966,
+                    "value": 50.4,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1967,
+                    "value": 52.7,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1968,
+                    "value": 55.6,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1969,
+                    "value": 58.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1970,
+                    "value": 61.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1971,
+                    "value": 64.9,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1972,
+                    "value": 70.6,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1973,
+                    "value": 77.4,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1974,
+                    "value": 82.3,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1975,
+                    "value": 82.1,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1976,
+                    "value": 93,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1977,
+                    "value": 105.7,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1978,
+                    "value": 111,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1979,
+                    "value": 130.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1980,
+                    "value": 126.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1981,
+                    "value": 137.9,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1982,
+                    "value": 152.8,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1983,
+                    "value": 167.1,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1984,
+                    "value": 188.9,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1985,
+                    "value": 200.8,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1986,
+                    "value": 209.8,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1987,
+                    "value": 224.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1988,
+                    "value": 238.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1989,
+                    "value": 251.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1990,
+                    "value": 260,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1965,
+                    "value": 60.6,
+                    "category": "Design"
+                },
+                {
+                    "date": 1966,
+                    "value": 63.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1967,
+                    "value": 64,
+                    "category": "Design"
+                },
+                {
+                    "date": 1968,
+                    "value": 67.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1969,
+                    "value": 68.9,
+                    "category": "Design"
+                },
+                {
+                    "date": 1970,
+                    "value": 74.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1971,
+                    "value": 81.2,
+                    "category": "Design"
+                },
+                {
+                    "date": 1972,
+                    "value": 86.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1973,
+                    "value": 92.9,
+                    "category": "Design"
+                },
+                {
+                    "date": 1974,
+                    "value": 97.6,
+                    "category": "Design"
+                },
+                {
+                    "date": 1975,
+                    "value": 103.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1976,
+                    "value": 112.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1977,
+                    "value": 118.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1978,
+                    "value": 123.1,
+                    "category": "Design"
+                },
+                {
+                    "date": 1979,
+                    "value": 134.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1980,
+                    "value": 144.8,
+                    "category": "Design"
+                },
+                {
+                    "date": 1981,
+                    "value": 161.5,
+                    "category": "Design"
+                },
+                {
+                    "date": 1982,
+                    "value": 172.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1983,
+                    "value": 177.5,
+                    "category": "Design"
+                },
+                {
+                    "date": 1984,
+                    "value": 183.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1985,
+                    "value": 190.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1986,
+                    "value": 195.1,
+                    "category": "Design"
+                },
+                {
+                    "date": 1987,
+                    "value": 201.2,
+                    "category": "Design"
+                },
+                {
+                    "date": 1988,
+                    "value": 215.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1989,
+                    "value": 216.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1990,
+                    "value": 223.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1965,
+                    "value": 441.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1966,
+                    "value": 482.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1967,
+                    "value": 506.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1968,
+                    "value": 544.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1969,
+                    "value": 619.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1970,
+                    "value": 704.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1971,
+                    "value": 771.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1972,
+                    "value": 817.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1973,
+                    "value": 885.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1974,
+                    "value": 902.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1975,
+                    "value": 936.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1976,
+                    "value": 983.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1977,
+                    "value": 1037.3,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1978,
+                    "value": 1106.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1979,
+                    "value": 1157.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1980,
+                    "value": 1168,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1981,
+                    "value": 1175,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1982,
+                    "value": 1186.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1983,
+                    "value": 1240.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1984,
+                    "value": 1326.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1985,
+                    "value": 1395.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1986,
+                    "value": 1456.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1987,
+                    "value": 1538,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1988,
+                    "value": 1650.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1989,
+                    "value": 1740.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1990,
+                    "value": 1812.8,
+                    "category": "Backlog"
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "Burndown",
+            "data": [
+                {
+                    "sprintId": "7e5714f9-1046-4b14-9976-dd9dc2bdac2a",
+                    "sprintName": "Sprint A",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.618Z",
+                            "planned": 47.83281163992144,
+                            "added": 68.35502669798517
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.618Z",
+                            "planned": 20.50264929173973,
+                            "added": 37.50210974841863
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.618Z",
+                            "planned": 47.545709358081666,
+                            "added": 61.064571416798955
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.618Z",
+                            "planned": 88.23593873657212,
+                            "added": 99.49926748065599
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.618Z",
+                            "planned": 97.77507656695641,
+                            "added": 56.59176801090213
+                        }
+                    ]
+                },
+                {
+                    "sprintId": "d371078c-277a-4a84-bd02-082a797f29bd",
+                    "sprintName": "Sprint B",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.620Z",
+                            "planned": 54.84460475652515,
+                            "added": 72.13085461965947
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.620Z",
+                            "planned": 14.933086325583321,
+                            "added": 53.71564734350045
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.620Z",
+                            "planned": 91.95082508325176,
+                            "added": 71.46409545484164
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.620Z",
+                            "planned": 60.86849897487261,
+                            "added": 33.9627681215819
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.620Z",
+                            "planned": 68.48483544041473,
+                            "added": 58.50388316439994
+                        }
+                    ]
+                },
+                {
+                    "sprintId": "773130dc-b4b5-4615-8006-a0e8df1b6f0f",
+                    "sprintName": "Sprint C",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.620Z",
+                            "planned": 88.85845960712172,
+                            "added": 92.46271373908372
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.620Z",
+                            "planned": 93.80571841804696,
+                            "added": 27.662722498980962
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.620Z",
+                            "planned": 35.66703711320398,
+                            "added": 10.974824499826985
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.620Z",
+                            "planned": 73.21029884004953,
+                            "added": 57.91012287605073
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.620Z",
+                            "planned": 43.91094889680194,
+                            "added": 60.50481194153865
+                        }
+                    ]
+                },
+                {
+                    "sprintId": "eeff93f6-d516-431e-8489-32200941cf54",
+                    "sprintName": "Sprint D",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.620Z",
+                            "planned": 65.87099145041834,
+                            "added": 5.718901609123628
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.620Z",
+                            "planned": 90.34415787417022,
+                            "added": 96.46273996143296
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.620Z",
+                            "planned": 90.56096032148821,
+                            "added": 6.911134747239678
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.620Z",
+                            "planned": 24.846372473329325,
+                            "added": 42.820683294297645
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.620Z",
+                            "planned": 22.468273877394186,
+                            "added": 60.23201710408286
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "Velocity",
+            "data": [
+                {
+                    "category": "Status",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1390.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1469.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1521.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1615.9
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1703.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1767.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1806.2
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1903.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1986.6
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1952
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1910.4
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 2015.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 2074.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 2092.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 2123.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 2068.3
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 2018
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1951.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1941.1
+                },
+                {
+                    "category": "Status",
+                    "date": 1984,
+                    "value": 2046.2
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 2053.1
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2060.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2130.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 2223.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 2275.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 109.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 115.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 120.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 128
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 134.4
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 142.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 157.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 169.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 186.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 195.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 198
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 211.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 223.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 236.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 251.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 262.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 262.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 265.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 268.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": 1984,
+                    "value": 278.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 285.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 304.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 315.4
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 324.6
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 329.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1058.1
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1089.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1121.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1196.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1285.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1369
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1406.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1472.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1558
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1535.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1519.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1606.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1632.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1687.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1749.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1706.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1661.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1630.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1645.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": 1984,
+                    "value": 1686.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1779.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1811.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1849.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1870
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1875
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 593.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 630.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 663.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 687.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 719
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 754.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 791.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 832.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 875.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 923.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 969
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1006.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1051.4
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1094.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1127.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1150.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1174.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1204
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1229
+                },
+                {
+                    "category": "Analytics",
+                    "date": 1984,
+                    "value": 1274.6
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1257
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1282
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1318
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1341.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1332.5
+                }
+            ]
+        }
+    ],
+    "Alpha Sheet": [
+        {
+            "id": "1",
+            "name": "Flow",
+            "data": [
+                {
+                    "date": 1965,
+                    "value": 1390.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1966,
+                    "value": 1469.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1967,
+                    "value": 1521.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1968,
+                    "value": 1615.9,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1969,
+                    "value": 1703.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1970,
+                    "value": 1767.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1971,
+                    "value": 1806.2,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1972,
+                    "value": 1903.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1973,
+                    "value": 1986.6,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1974,
+                    "value": 1952,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1975,
+                    "value": 1910.4,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1976,
+                    "value": 2015.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1977,
+                    "value": 2074.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1978,
+                    "value": 2092.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1979,
+                    "value": 2123.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1980,
+                    "value": 2068.3,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1981,
+                    "value": 2018,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1982,
+                    "value": 1951.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1983,
+                    "value": 1941.1,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1984,
+                    "value": 2046.2,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1985,
+                    "value": 2053.1,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1986,
+                    "value": 2060.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1987,
+                    "value": 2130.8,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1988,
+                    "value": 2223.5,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1989,
+                    "value": 2275.9,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1990,
+                    "value": 2280.7,
+                    "category": "Shipped"
+                },
+                {
+                    "date": 1965,
+                    "value": 109.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1966,
+                    "value": 115.7,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1967,
+                    "value": 120.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1968,
+                    "value": 128,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1969,
+                    "value": 134.4,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1970,
+                    "value": 142.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1971,
+                    "value": 157.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1972,
+                    "value": 169.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1973,
+                    "value": 186.3,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1974,
+                    "value": 195.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1975,
+                    "value": 198,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1976,
+                    "value": 211.7,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1977,
+                    "value": 223.8,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1978,
+                    "value": 236.5,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1979,
+                    "value": 251.8,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1980,
+                    "value": 262.9,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1981,
+                    "value": 262.7,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1982,
+                    "value": 265.9,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1983,
+                    "value": 268.3,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1984,
+                    "value": 278.3,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1985,
+                    "value": 285.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1986,
+                    "value": 304.2,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1987,
+                    "value": 315.4,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1988,
+                    "value": 324.6,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1989,
+                    "value": 329.9,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1990,
+                    "value": 331.1,
+                    "category": "Ready"
+                },
+                {
+                    "date": 1965,
+                    "value": 1058.1,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1966,
+                    "value": 1089.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1967,
+                    "value": 1121.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1968,
+                    "value": 1196.6,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1969,
+                    "value": 1285.5,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1970,
+                    "value": 1369,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1971,
+                    "value": 1406.2,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1972,
+                    "value": 1472.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1973,
+                    "value": 1558,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1974,
+                    "value": 1535.5,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1975,
+                    "value": 1519.3,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1976,
+                    "value": 1606.9,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1977,
+                    "value": 1632.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1978,
+                    "value": 1687.5,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1979,
+                    "value": 1749.6,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1980,
+                    "value": 1706.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1981,
+                    "value": 1661.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1982,
+                    "value": 1630.2,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1983,
+                    "value": 1645.2,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1984,
+                    "value": 1686.9,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1985,
+                    "value": 1779.4,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1986,
+                    "value": 1811.3,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1987,
+                    "value": 1849.7,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1988,
+                    "value": 1870,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1989,
+                    "value": 1875,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1990,
+                    "value": 1853.3,
+                    "category": "Quality"
+                },
+                {
+                    "date": 1965,
+                    "value": 593.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1966,
+                    "value": 630.9,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1967,
+                    "value": 663.2,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1968,
+                    "value": 687.8,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1969,
+                    "value": 719,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1970,
+                    "value": 754.8,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1971,
+                    "value": 791.9,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1972,
+                    "value": 832.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1973,
+                    "value": 875.1,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1974,
+                    "value": 923.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1975,
+                    "value": 969,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1976,
+                    "value": 1006.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1977,
+                    "value": 1051.4,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1978,
+                    "value": 1094.2,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1979,
+                    "value": 1127.1,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1980,
+                    "value": 1150.1,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1981,
+                    "value": 1174.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1982,
+                    "value": 1204,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1983,
+                    "value": 1229,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1984,
+                    "value": 1274.6,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1985,
+                    "value": 1257,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1986,
+                    "value": 1282,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1987,
+                    "value": 1318,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1988,
+                    "value": 1341.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1989,
+                    "value": 1332.5,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1990,
+                    "value": 1350.3,
+                    "category": "Dev"
+                },
+                {
+                    "date": 1965,
+                    "value": 48.3,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1966,
+                    "value": 50.4,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1967,
+                    "value": 52.7,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1968,
+                    "value": 55.6,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1969,
+                    "value": 58.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1970,
+                    "value": 61.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1971,
+                    "value": 64.9,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1972,
+                    "value": 70.6,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1973,
+                    "value": 77.4,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1974,
+                    "value": 82.3,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1975,
+                    "value": 82.1,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1976,
+                    "value": 93,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1977,
+                    "value": 105.7,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1978,
+                    "value": 111,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1979,
+                    "value": 130.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1980,
+                    "value": 126.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1981,
+                    "value": 137.9,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1982,
+                    "value": 152.8,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1983,
+                    "value": 167.1,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1984,
+                    "value": 188.9,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1985,
+                    "value": 200.8,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1986,
+                    "value": 209.8,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1987,
+                    "value": 224.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1988,
+                    "value": 238.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1989,
+                    "value": 251.5,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1990,
+                    "value": 260,
+                    "category": "Critique"
+                },
+                {
+                    "date": 1965,
+                    "value": 60.6,
+                    "category": "Design"
+                },
+                {
+                    "date": 1966,
+                    "value": 63.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1967,
+                    "value": 64,
+                    "category": "Design"
+                },
+                {
+                    "date": 1968,
+                    "value": 67.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1969,
+                    "value": 68.9,
+                    "category": "Design"
+                },
+                {
+                    "date": 1970,
+                    "value": 74.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1971,
+                    "value": 81.2,
+                    "category": "Design"
+                },
+                {
+                    "date": 1972,
+                    "value": 86.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1973,
+                    "value": 92.9,
+                    "category": "Design"
+                },
+                {
+                    "date": 1974,
+                    "value": 97.6,
+                    "category": "Design"
+                },
+                {
+                    "date": 1975,
+                    "value": 103.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1976,
+                    "value": 112.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1977,
+                    "value": 118.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1978,
+                    "value": 123.1,
+                    "category": "Design"
+                },
+                {
+                    "date": 1979,
+                    "value": 134.4,
+                    "category": "Design"
+                },
+                {
+                    "date": 1980,
+                    "value": 144.8,
+                    "category": "Design"
+                },
+                {
+                    "date": 1981,
+                    "value": 161.5,
+                    "category": "Design"
+                },
+                {
+                    "date": 1982,
+                    "value": 172.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1983,
+                    "value": 177.5,
+                    "category": "Design"
+                },
+                {
+                    "date": 1984,
+                    "value": 183.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1985,
+                    "value": 190.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1986,
+                    "value": 195.1,
+                    "category": "Design"
+                },
+                {
+                    "date": 1987,
+                    "value": 201.2,
+                    "category": "Design"
+                },
+                {
+                    "date": 1988,
+                    "value": 215.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1989,
+                    "value": 216.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1990,
+                    "value": 223.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1965,
+                    "value": 441.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1966,
+                    "value": 482.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1967,
+                    "value": 506.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1968,
+                    "value": 544.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1969,
+                    "value": 619.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1970,
+                    "value": 704.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1971,
+                    "value": 771.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1972,
+                    "value": 817.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1973,
+                    "value": 885.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1974,
+                    "value": 902.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1975,
+                    "value": 936.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1976,
+                    "value": 983.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1977,
+                    "value": 1037.3,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1978,
+                    "value": 1106.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1979,
+                    "value": 1157.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1980,
+                    "value": 1168,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1981,
+                    "value": 1175,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1982,
+                    "value": 1186.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1983,
+                    "value": 1240.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1984,
+                    "value": 1326.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1985,
+                    "value": 1395.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1986,
+                    "value": 1456.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1987,
+                    "value": 1538,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1988,
+                    "value": 1650.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1989,
+                    "value": 1740.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1990,
+                    "value": 1812.8,
+                    "category": "Backlog"
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "Burndown",
+            "data": [
+                {
+                    "sprintId": "7e5714f9-1046-4b14-9976-dd9dc2bdac2a",
+                    "sprintName": "Sprint A",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.618Z",
+                            "planned": 47.83281163992144,
+                            "added": 68.35502669798517
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.618Z",
+                            "planned": 20.50264929173973,
+                            "added": 37.50210974841863
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.618Z",
+                            "planned": 47.545709358081666,
+                            "added": 61.064571416798955
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.618Z",
+                            "planned": 88.23593873657212,
+                            "added": 99.49926748065599
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.618Z",
+                            "planned": 97.77507656695641,
+                            "added": 56.59176801090213
+                        }
+                    ]
+                },
+                {
+                    "sprintId": "d371078c-277a-4a84-bd02-082a797f29bd",
+                    "sprintName": "Sprint B",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.620Z",
+                            "planned": 54.84460475652515,
+                            "added": 72.13085461965947
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.620Z",
+                            "planned": 14.933086325583321,
+                            "added": 53.71564734350045
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.620Z",
+                            "planned": 91.95082508325176,
+                            "added": 71.46409545484164
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.620Z",
+                            "planned": 60.86849897487261,
+                            "added": 33.9627681215819
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.620Z",
+                            "planned": 68.48483544041473,
+                            "added": 58.50388316439994
+                        }
+                    ]
+                },
+                {
+                    "sprintId": "773130dc-b4b5-4615-8006-a0e8df1b6f0f",
+                    "sprintName": "Sprint C",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.620Z",
+                            "planned": 88.85845960712172,
+                            "added": 92.46271373908372
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.620Z",
+                            "planned": 93.80571841804696,
+                            "added": 27.662722498980962
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.620Z",
+                            "planned": 35.66703711320398,
+                            "added": 10.974824499826985
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.620Z",
+                            "planned": 73.21029884004953,
+                            "added": 57.91012287605073
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.620Z",
+                            "planned": 43.91094889680194,
+                            "added": 60.50481194153865
+                        }
+                    ]
+                },
+                {
+                    "sprintId": "eeff93f6-d516-431e-8489-32200941cf54",
+                    "sprintName": "Sprint D",
+                    "data": [
+                        {
+                            "date": "2022-03-16T13:05:43.620Z",
+                            "planned": 65.87099145041834,
+                            "added": 5.718901609123628
+                        },
+                        {
+                            "date": "2022-03-17T13:05:43.620Z",
+                            "planned": 90.34415787417022,
+                            "added": 96.46273996143296
+                        },
+                        {
+                            "date": "2022-03-18T13:05:43.620Z",
+                            "planned": 90.56096032148821,
+                            "added": 6.911134747239678
+                        },
+                        {
+                            "date": "2022-03-19T13:05:43.620Z",
+                            "planned": 24.846372473329325,
+                            "added": 42.820683294297645
+                        },
+                        {
+                            "date": "2022-03-20T13:05:43.620Z",
+                            "planned": 22.468273877394186,
+                            "added": 60.23201710408286
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "Velocity",
+            "data": [
+                {
+                    "category": "Status",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1390.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1469.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1521.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1615.9
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1703.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1767.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1806.2
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1903.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1986.6
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1952
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1910.4
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 2015.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 2074.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 2092.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 2123.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 2068.3
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 2018
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1951.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1941.1
+                },
+                {
+                    "category": "Status",
+                    "date": 1984,
+                    "value": 2046.2
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 2053.1
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2060.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2130.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 2223.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 2275.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 109.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 115.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 120.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 128
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 134.4
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 142.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 157.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 169.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 186.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 195.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 198
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 211.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 223.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 236.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 251.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 262.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 262.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 265.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 268.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": 1984,
+                    "value": 278.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 285.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 304.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 315.4
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 324.6
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 329.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1058.1
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1089.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1121.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1196.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1285.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1369
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1406.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1472.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1558
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1535.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1519.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1606.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1632.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1687.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1749.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1706.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1661.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1630.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1645.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": 1984,
+                    "value": 1686.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1779.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1811.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1849.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1870
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1875
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 593.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 630.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 663.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 687.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 719
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 754.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 791.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 832.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 875.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 923.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 969
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1006.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1051.4
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1094.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1127.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1150.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1174.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1204
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1229
+                },
+                {
+                    "category": "Analytics",
+                    "date": 1984,
+                    "value": 1274.6
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1257
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1282
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1318
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1341.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1332.5
+                }
+            ]
+        }
+    ]
+}
