@@ -91,7 +91,7 @@ const chartConfig =
 };
 
 
-export default function Performance ()
+export default function Journeys ()
 {
     const { pathname } = useRouter();
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
