@@ -57,7 +57,7 @@ text-align:center;
 
 `;
 
-const capitalize = text => `${ text[ 0 ].toUpperCase() }${ text.substring( 1 ).toLowerCase() }`;
+const capitalize = text => `${ text[ 0 ]?.toUpperCase() }${ text?.substring( 1 ).toLowerCase() }`;
 
 
 const AppLayout = ( {

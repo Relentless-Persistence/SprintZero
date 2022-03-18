@@ -11,9 +11,6 @@ import
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import FormCard from "../../../components/Dashboard/FormCard";
-import ItemCard from "../../../components/Dashboard/ItemCard";
-
 import { splitRoutes, getTimeAgo } from "../../../utils";
 
 import fakeData from "../../../fakeData/huddleData.json";
@@ -125,96 +122,118 @@ export default function Huddle ()
             <AppLayout
                 onChangeProduct={ setProduct }
                 hasSideAdd={ false }
-                defaultText={ getTimeAgo( new Date( activeTime.createdAt ) ) }
+                defaultText={ activeTime ? getTimeAgo( new Date( activeTime?.createdAt ) ) : "" }
                 rightNavItems={ rightNav }
                 setActiveRightNav={ setActiveRightNav }
-                activeRightItem={ activeTime.createdAt }
+                activeRightItem={ activeTime?.createdAt }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <Row className="py-6" gutter={ [ 16, 16 ] }>
+                <Row className="py-6" gutter={ [ 8, 8 ] }>
 
                     {
-                        activeTime?.comments?.map( ( c, index ) => (
-                            <Col key={ index } span={ 8 }>
-                                <MyCard title={ <Card.Meta
-                                    avatar={ <Avatar
-                                        size={ 48 }
-                                        src={ c.avatar }
-                                        style={ {
-                                            border: "2px solid #315613"
-                                        } }
-                                    /> }
-                                    title={ c.name }
-                                    description={ c.role }
-                                /> }>
+                        activeTime ? <>
+                            {
+                                activeTime?.comments?.map( ( c, index ) => (
+                                    <Col key={ index } span={ 8 }>
+                                        <MyCard title={ <Card.Meta
+                                            avatar={ <Avatar
+                                                size={ 48 }
+                                                src={ c.avatar }
+                                                style={ {
+                                                    border: "2px solid #315613"
+                                                } }
+                                            /> }
+                                            title={ c.name }
+                                            description={ c.role }
+                                        /> }>
 
 
-                                    <section>
+                                            <section>
 
-                                        <div className="section">
-                                            <h4>Blockers</h4>
-                                            <ul>
-                                                {
-                                                    c.data?.blockers.map( ( d, i ) => (
-                                                        <li key={ i }>
-                                                            <Checkbox
-                                                                onChange={ () => handleCheck( i, "blockers", index ) }
-                                                                checked={ d.complete } >
+                                                <div className="section">
+                                                    <h4>Blockers</h4>
+
+                                                    {
+                                                        c.data?.blockers?.length ? (
+                                                            <ul>
                                                                 {
-                                                                    d.complete ? <strike>
-                                                                        { d.text }
-                                                                    </strike> : d.text
+                                                                    c.data?.blockers.map( ( d, i ) => (
+                                                                        <li key={ i }>
+                                                                            <Checkbox
+                                                                                onChange={ () => handleCheck( i, "blockers", index ) }
+                                                                                checked={ d.complete } >
+                                                                                {
+                                                                                    d.complete ? <strike>
+                                                                                        { d.text }
+                                                                                    </strike> : d.text
+                                                                                }
+                                                                            </Checkbox>
+                                                                        </li>
+                                                                    ) )
                                                                 }
-                                                            </Checkbox>
-                                                        </li>
-                                                    ) )
-                                                }
-                                            </ul>
-                                        </div>
+                                                            </ul>
+                                                        ) : <p className="text-[#595959]" >None</p>
+                                                    }
 
-                                        <div className="section">
-                                            <h4>Today</h4>
-                                            <ul>
-                                                {
-                                                    c.data?.today?.map( ( d, i ) => (
-                                                        <li key={ i }>
-                                                            <Checkbox onChange={ () => handleCheck( i, "today", index ) }
-                                                                checked={ d.complete } >{
-                                                                    d.complete ? <strike>
-                                                                        { d.text }
-                                                                    </strike> : d.text
-                                                                }</Checkbox>
-                                                        </li>
-                                                    ) )
-                                                }
-                                            </ul>
-                                        </div>
 
-                                        <div className="section">
-                                            <h4>Yesterday</h4>
-                                            <ul>
-                                                {
-                                                    c.data?.yesterday?.map( ( d, i ) => (
-                                                        <li key={ i }>
-                                                            <Checkbox onChange={ () => handleCheck( i, "yesterday", index ) }
-                                                                checked={ d.complete } >{
-                                                                    d.complete ? <strike>
-                                                                        { d.text }
-                                                                    </strike> : d.text
-                                                                }</Checkbox>
-                                                        </li>
-                                                    ) )
-                                                }
-                                            </ul>
-                                        </div>
+                                                </div>
 
-                                    </section>
-                                </MyCard>
-                            </Col>
-                        ) )
+                                                <div className="section">
+                                                    <h4>Today</h4>
+
+                                                    {
+                                                        c.data?.today?.length ? ( <ul>
+                                                            {
+                                                                c.data?.today?.map( ( d, i ) => (
+                                                                    <li key={ i }>
+                                                                        <Checkbox onChange={ () => handleCheck( i, "today", index ) }
+                                                                            checked={ d.complete } >{
+                                                                                d.complete ? <strike>
+                                                                                    { d.text }
+                                                                                </strike> : d.text
+                                                                            }</Checkbox>
+                                                                    </li>
+                                                                ) )
+                                                            }
+                                                        </ul> ) : <p className="text-[#595959]" >None</p>
+                                                    }
+
+                                                </div>
+
+                                                <div className="section">
+                                                    <h4>Yesterday</h4>
+
+                                                    {
+                                                        c.data?.yesterday?.length ? (
+                                                            <ul>
+                                                                {
+                                                                    c.data?.yesterday?.map( ( d, i ) => (
+                                                                        <li key={ i }>
+                                                                            <Checkbox onChange={ () => handleCheck( i, "yesterday", index ) }
+                                                                                checked={ d.complete } >{
+                                                                                    d.complete ? <strike>
+                                                                                        { d.text }
+                                                                                    </strike> : d.text
+                                                                                }</Checkbox>
+                                                                        </li>
+                                                                    ) )
+                                                                }
+                                                            </ul>
+                                                        ) : <p className="text-[#595959]" >None</p>
+                                                    }
+
+                                                </div>
+
+                                            </section>
+                                        </MyCard>
+                                    </Col>
+                                ) )
+                            }</> : <h2 className="text-[#595959] text-center" >Nothing to see</h2>
+
                     }
 
                 </Row>
+
 
             </AppLayout>
         </div>

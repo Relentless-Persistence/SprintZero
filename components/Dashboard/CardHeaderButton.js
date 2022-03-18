@@ -5,12 +5,11 @@ import
   Button,
 } from 'antd';
 
-
+// background:transparent;
 const More = styled( Button )`
 color: #4A801D;
-background:transparent;
+background:#fff;
 box-shadow:none;
-border:none;
 `;
 
 
