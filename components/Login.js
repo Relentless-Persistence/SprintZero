@@ -14,25 +14,28 @@ const Login = () => {
   const router = useRouter();
   // const paid = usePaymentConfirm();
 
-  // const handleOnClick = (provider) => {
-  //   try {
-  //     auth
-  //       .signInWithPopup(provider)
-  //       .then((res) => {
-  //         message.success({
-  //           content: "Successfully logged in",
-  //           className: "custom-message",
-  //         });
-  //       })
-  //       .then(() => router.push("/loginsuccess"));
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     message.error({
-  //       content: "An error occurred while trying to log you in",
-  //       className: "custom-message",
-  //     });
-  //   }
-  // };
+  const handleOnClick = (provider) => {
+    try {
+      auth.signInWithPopup(provider).then((res) => {
+        var user = res.user;
+        if (!/@gmail.com\s*$/.test(user.email)) {
+          router.push("/enterprise-contact");
+        } else {
+          message.success({
+            content: "Successfully logged in",
+            className: "custom-message",
+          });
+          router.push("/loginsuccess");
+        }
+      });
+    } catch (error) {
+      console.log(error.message);
+      message.error({
+        content: "An error occurred while trying to log you in",
+        className: "custom-message",
+      });
+    }
+  };
 
   return (
     <>
