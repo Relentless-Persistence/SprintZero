@@ -5,754 +5,914 @@
             "name": "Flow",
             "data": [
                 {
-                    "category": "Quality",
-                    "date": "2022-09-07T12:29:45.650Z",
-                    "value": 78.85871909398936
+                    "date": 1965,
+                    "value": 1390.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-26T12:29:45.650Z",
-                    "value": 7.323165051279634
+                    "date": 1966,
+                    "value": 1469.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-11-01T12:29:45.650Z",
-                    "value": 13.998477916455055
+                    "date": 1967,
+                    "value": 1521.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-20T12:29:45.650Z",
-                    "value": 55.293868191964066
+                    "date": 1968,
+                    "value": 1615.9,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-13T12:29:45.650Z",
-                    "value": 11.458068175743396
+                    "date": 1969,
+                    "value": 1703.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-19T12:29:45.650Z",
-                    "value": 68.6428077669418
+                    "date": 1970,
+                    "value": 1767.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-10-28T12:29:45.650Z",
-                    "value": 32.76116084378131
+                    "date": 1971,
+                    "value": 1806.2,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-05T12:29:45.650Z",
-                    "value": 61.89461604536739
+                    "date": 1972,
+                    "value": 1903.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 2.9538477626478876
+                    "date": 1973,
+                    "value": 1986.6,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-09-03T12:29:45.650Z",
-                    "value": 60.71524925813592
+                    "date": 1974,
+                    "value": 1952,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-05-09T12:29:45.650Z",
-                    "value": 82.21315927533553
+                    "date": 1975,
+                    "value": 1910.4,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-10T12:29:45.650Z",
-                    "value": 28.02625814233275
+                    "date": 1976,
+                    "value": 2015.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-06-24T12:29:45.650Z",
-                    "value": 83.1539843716051
+                    "date": 1977,
+                    "value": 2074.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-04-26T12:29:45.650Z",
-                    "value": 20.200889136251643
+                    "date": 1978,
+                    "value": 2092.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-08-06T12:29:45.650Z",
-                    "value": 99.38276032702429
+                    "date": 1979,
+                    "value": 2123.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-06-16T12:29:45.650Z",
-                    "value": 89.44712821276364
+                    "date": 1980,
+                    "value": 2068.3,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-04-25T12:29:45.650Z",
-                    "value": 24.64698320669889
+                    "date": 1981,
+                    "value": 2018,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-07-28T12:29:45.650Z",
-                    "value": 86.93040244689283
+                    "date": 1982,
+                    "value": 1951.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-09-24T12:29:45.650Z",
-                    "value": 15.09152785838781
+                    "date": 1983,
+                    "value": 1941.1,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-08T12:29:45.650Z",
-                    "value": 52.01427049997851
+                    "date": 1984,
+                    "value": 2046.2,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-08-10T12:29:45.650Z",
-                    "value": 78.34653194535541
+                    "date": 1985,
+                    "value": 2053.1,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-10T12:29:45.650Z",
-                    "value": 44.03090294140291
+                    "date": 1986,
+                    "value": 2060.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-20T12:29:45.650Z",
-                    "value": 42.33826606746183
+                    "date": 1987,
+                    "value": 2130.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-03-26T12:29:45.650Z",
-                    "value": 79.57344086469149
+                    "date": 1988,
+                    "value": 2223.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-12T12:29:45.650Z",
-                    "value": 31.40333185278028
+                    "date": 1989,
+                    "value": 2275.9,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-30T12:29:45.650Z",
-                    "value": 76.0437477071203
+                    "date": 1990,
+                    "value": 2280.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-15T12:29:45.650Z",
-                    "value": 42.469563198398205
+                    "date": 1965,
+                    "value": 109.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 25.72883524087839
+                    "date": 1966,
+                    "value": 115.7,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-10-03T12:29:45.650Z",
-                    "value": 46.06677621545114
+                    "date": 1967,
+                    "value": 120.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-10-04T12:29:45.650Z",
-                    "value": 50.85405197957464
+                    "date": 1968,
+                    "value": 128,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-03T12:29:45.650Z",
-                    "value": 73.72991082502034
+                    "date": 1969,
+                    "value": 134.4,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 90.85716236790333
+                    "date": 1970,
+                    "value": 142.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-04-28T12:29:45.650Z",
-                    "value": 10.413922951056565
+                    "date": 1971,
+                    "value": 157.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-10-27T12:29:45.650Z",
-                    "value": 32.05273990172228
+                    "date": 1972,
+                    "value": 169.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 13.377298040126417
+                    "date": 1973,
+                    "value": 186.3,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-04-09T12:29:45.650Z",
-                    "value": 33.78470699457105
+                    "date": 1974,
+                    "value": 195.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-26T12:29:45.650Z",
-                    "value": 28.027194308081494
+                    "date": 1975,
+                    "value": 198,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-07-28T12:29:45.650Z",
-                    "value": 53.64346717188524
+                    "date": 1976,
+                    "value": 211.7,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-05-24T12:29:45.650Z",
-                    "value": 4.87309932453599
+                    "date": 1977,
+                    "value": 223.8,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 89.4698173827115
+                    "date": 1978,
+                    "value": 236.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-20T12:29:45.650Z",
-                    "value": 49.71801069027606
+                    "date": 1979,
+                    "value": 251.8,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-28T12:29:45.650Z",
-                    "value": 92.75251361868439
+                    "date": 1980,
+                    "value": 262.9,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-29T12:29:45.650Z",
-                    "value": 25.40839829568835
+                    "date": 1981,
+                    "value": 262.7,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-31T12:29:45.650Z",
-                    "value": 35.486807960597844
+                    "date": 1982,
+                    "value": 265.9,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-08T12:29:45.650Z",
-                    "value": 90.68821242222378
+                    "date": 1983,
+                    "value": 268.3,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-23T12:29:45.650Z",
-                    "value": 16.677753313259114
+                    "date": 1984,
+                    "value": 278.3,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-08T12:29:45.650Z",
-                    "value": 99.64188183526946
+                    "date": 1985,
+                    "value": 285.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-07-18T12:29:45.650Z",
-                    "value": 14.997164125141428
+                    "date": 1986,
+                    "value": 304.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-05-09T12:29:45.650Z",
-                    "value": 92.955227214113
+                    "date": 1987,
+                    "value": 315.4,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-03-31T12:29:45.650Z",
-                    "value": 39.35080246426639
+                    "date": 1988,
+                    "value": 324.6,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-18T12:29:45.650Z",
-                    "value": 46.85114935179029
+                    "date": 1989,
+                    "value": 329.9,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-06-18T12:29:45.650Z",
-                    "value": 78.64783414315212
+                    "date": 1990,
+                    "value": 331.1,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-04-18T12:29:45.650Z",
-                    "value": 41.04216753674825
+                    "date": 1965,
+                    "value": 1058.1,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-03-29T12:29:45.650Z",
-                    "value": 82.19723767886957
+                    "date": 1966,
+                    "value": 1089.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-08-25T12:29:45.650Z",
-                    "value": 74.43313089485765
+                    "date": 1967,
+                    "value": 1121.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-05-31T12:29:45.650Z",
-                    "value": 27.585978780577225
+                    "date": 1968,
+                    "value": 1196.6,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-08T12:29:45.650Z",
-                    "value": 42.677155904088536
+                    "date": 1969,
+                    "value": 1285.5,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-09-18T12:29:45.650Z",
-                    "value": 26.2754638239874
+                    "date": 1970,
+                    "value": 1369,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-18T12:29:45.650Z",
-                    "value": 9.113986176147936
+                    "date": 1971,
+                    "value": 1406.2,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-11-07T12:29:45.650Z",
-                    "value": 99.22056344833207
+                    "date": 1972,
+                    "value": 1472.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-04-24T12:29:45.650Z",
-                    "value": 36.812843489788214
+                    "date": 1973,
+                    "value": 1558,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-11-03T12:29:45.650Z",
-                    "value": 47.94723756618171
+                    "date": 1974,
+                    "value": 1535.5,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-07-09T12:29:45.650Z",
-                    "value": 95.4907615436119
+                    "date": 1975,
+                    "value": 1519.3,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 57.89722898982319
+                    "date": 1976,
+                    "value": 1606.9,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-31T12:29:45.650Z",
-                    "value": 22.250327277667736
+                    "date": 1977,
+                    "value": 1632.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-07-10T12:29:45.650Z",
-                    "value": 19.809059317320642
+                    "date": 1978,
+                    "value": 1687.5,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-09-23T12:29:45.650Z",
-                    "value": 19.855558962088637
+                    "date": 1979,
+                    "value": 1749.6,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-28T12:29:45.650Z",
-                    "value": 74.72195549103388
+                    "date": 1980,
+                    "value": 1706.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-09-21T12:29:45.650Z",
-                    "value": 97.8047662632153
+                    "date": 1981,
+                    "value": 1661.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-11T12:29:45.650Z",
-                    "value": 32.013718999441856
+                    "date": 1982,
+                    "value": 1630.2,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-07-27T12:29:45.650Z",
-                    "value": 94.89568375181194
+                    "date": 1983,
+                    "value": 1645.2,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-04-03T12:29:45.650Z",
-                    "value": 74.91759852349942
+                    "date": 1984,
+                    "value": 1686.9,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-04-15T12:29:45.650Z",
-                    "value": 40.07271477102865
+                    "date": 1985,
+                    "value": 1779.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-11-08T12:29:45.650Z",
-                    "value": 30.54381103217738
+                    "date": 1986,
+                    "value": 1811.3,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-23T12:29:45.650Z",
-                    "value": 4.273821135143963
+                    "date": 1987,
+                    "value": 1849.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-09-10T12:29:45.650Z",
-                    "value": 55.61754786557598
+                    "date": 1988,
+                    "value": 1870,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-27T12:29:45.650Z",
-                    "value": 55.31105951329407
+                    "date": 1989,
+                    "value": 1875,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-05-08T12:29:45.650Z",
-                    "value": 73.81896255682688
+                    "date": 1990,
+                    "value": 1853.3,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-19T12:29:45.650Z",
-                    "value": 76.44154566025053
+                    "date": 1965,
+                    "value": 593.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-25T12:29:45.650Z",
-                    "value": 62.22494854271314
+                    "date": 1966,
+                    "value": 630.9,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-06-30T12:29:45.650Z",
-                    "value": 77.66838126199002
+                    "date": 1967,
+                    "value": 663.2,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-06-18T12:29:45.650Z",
-                    "value": 79.11064436810665
+                    "date": 1968,
+                    "value": 687.8,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 4.808742324042536
+                    "date": 1969,
+                    "value": 719,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-18T12:29:45.650Z",
-                    "value": 5.483194031018823
+                    "date": 1970,
+                    "value": 754.8,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-05-02T12:29:45.650Z",
-                    "value": 70.48004228065898
+                    "date": 1971,
+                    "value": 791.9,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-08-25T12:29:45.650Z",
-                    "value": 83.80425205379917
+                    "date": 1972,
+                    "value": 832.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-08-24T12:29:45.650Z",
-                    "value": 78.13562810924938
+                    "date": 1973,
+                    "value": 875.1,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 36.72490499729641
+                    "date": 1974,
+                    "value": 923.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-07-14T12:29:45.650Z",
-                    "value": 68.218388224076
+                    "date": 1975,
+                    "value": 969,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-08-25T12:29:45.650Z",
-                    "value": 23.766480268624758
+                    "date": 1976,
+                    "value": 1006.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-03-17T12:29:45.650Z",
-                    "value": 59.174213904042695
+                    "date": 1977,
+                    "value": 1051.4,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-06-04T12:29:45.650Z",
-                    "value": 62.593289239864006
+                    "date": 1978,
+                    "value": 1094.2,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-04-01T12:29:45.650Z",
-                    "value": 67.81785084011001
+                    "date": 1979,
+                    "value": 1127.1,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-24T12:29:45.650Z",
-                    "value": 35.82445205182603
+                    "date": 1980,
+                    "value": 1150.1,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-21T12:29:45.650Z",
-                    "value": 8.047208261987858
+                    "date": 1981,
+                    "value": 1174.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-04-13T12:29:45.650Z",
-                    "value": 92.0599051128445
+                    "date": 1982,
+                    "value": 1204,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-10-17T12:29:45.650Z",
-                    "value": 22.706520328514035
+                    "date": 1983,
+                    "value": 1229,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-06-05T12:29:45.650Z",
-                    "value": 25.96788116312969
+                    "date": 1984,
+                    "value": 1274.6,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-31T12:29:45.650Z",
-                    "value": 87.86263996381113
+                    "date": 1985,
+                    "value": 1257,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-03T12:29:45.650Z",
-                    "value": 9.025158912638398
+                    "date": 1986,
+                    "value": 1282,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-24T12:29:45.650Z",
-                    "value": 79.38576034746536
+                    "date": 1987,
+                    "value": 1318,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-10-20T12:29:45.650Z",
-                    "value": 33.7533654019112
+                    "date": 1988,
+                    "value": 1341.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-09-02T12:29:45.650Z",
-                    "value": 83.2423404267794
+                    "date": 1989,
+                    "value": 1332.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-03-30T12:29:45.650Z",
-                    "value": 2.026870517029389
+                    "date": 1990,
+                    "value": 1350.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-11-05T12:29:45.650Z",
-                    "value": 25.202545211137185
+                    "date": 1965,
+                    "value": 48.3,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-10-09T12:29:45.650Z",
-                    "value": 59.34040693417335
+                    "date": 1966,
+                    "value": 50.4,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-08T12:29:45.650Z",
-                    "value": 15.603660541880027
+                    "date": 1967,
+                    "value": 52.7,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-07-20T12:29:45.650Z",
-                    "value": 83.2006810600669
+                    "date": 1968,
+                    "value": 55.6,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-03T12:29:45.650Z",
-                    "value": 30.727137005415784
+                    "date": 1969,
+                    "value": 58.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-09T12:29:45.650Z",
-                    "value": 75.73693765495779
+                    "date": 1970,
+                    "value": 61.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-14T12:29:45.650Z",
-                    "value": 6.388108093442391
+                    "date": 1971,
+                    "value": 64.9,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 25.428996569946015
+                    "date": 1972,
+                    "value": 70.6,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-05-12T12:29:45.650Z",
-                    "value": 82.93549889874666
+                    "date": 1973,
+                    "value": 77.4,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-08T12:29:45.650Z",
-                    "value": 59.73504566903698
+                    "date": 1974,
+                    "value": 82.3,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-03-23T12:29:45.650Z",
-                    "value": 55.14232138253592
+                    "date": 1975,
+                    "value": 82.1,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-05-30T12:29:45.650Z",
-                    "value": 87.58403940685717
+                    "date": 1976,
+                    "value": 93,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 81.62513758560526
+                    "date": 1977,
+                    "value": 105.7,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-05-14T12:29:45.650Z",
-                    "value": 50.30765043643546
+                    "date": 1978,
+                    "value": 111,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-04-18T12:29:45.650Z",
-                    "value": 44.79181799862746
+                    "date": 1979,
+                    "value": 130.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-03-22T12:29:45.650Z",
-                    "value": 48.52283991233266
+                    "date": 1980,
+                    "value": 126.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-03T12:29:45.650Z",
-                    "value": 69.00531810726405
+                    "date": 1981,
+                    "value": 137.9,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-04-05T12:29:45.650Z",
-                    "value": 23.408824788229165
+                    "date": 1982,
+                    "value": 152.8,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-16T12:29:45.650Z",
-                    "value": 92.58458284978045
+                    "date": 1983,
+                    "value": 167.1,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-08-19T12:29:45.650Z",
-                    "value": 34.52254608211065
+                    "date": 1984,
+                    "value": 188.9,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-11-05T12:29:45.650Z",
-                    "value": 67.39213746877273
+                    "date": 1985,
+                    "value": 200.8,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-03-23T12:29:45.650Z",
-                    "value": 76.56085314299379
+                    "date": 1986,
+                    "value": 209.8,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-09-02T12:29:45.650Z",
-                    "value": 6.905388128748813
+                    "date": 1987,
+                    "value": 224.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-07T12:29:45.650Z",
-                    "value": 29.117743528042705
+                    "date": 1988,
+                    "value": 238.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-06-27T12:29:45.650Z",
-                    "value": 84.14731830177236
+                    "date": 1989,
+                    "value": 251.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-05-03T12:29:45.650Z",
-                    "value": 9.86901344710085
+                    "date": 1990,
+                    "value": 260,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-08-13T12:29:45.650Z",
-                    "value": 66.24185240385225
+                    "date": 1965,
+                    "value": 60.6,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-27T12:29:45.650Z",
-                    "value": 89.51616754064963
+                    "date": 1966,
+                    "value": 63.3,
+                    "category": "Design"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-19T12:29:45.650Z",
-                    "value": 23.45839544818005
+                    "date": 1967,
+                    "value": 64,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-18T12:29:45.650Z",
-                    "value": 29.162124728297822
+                    "date": 1968,
+                    "value": 67.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-08-20T12:29:45.650Z",
-                    "value": 27.17238682084624
+                    "date": 1969,
+                    "value": 68.9,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-03-27T12:29:45.650Z",
-                    "value": 32.93726335698815
+                    "date": 1970,
+                    "value": 74.7,
+                    "category": "Design"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-23T12:29:45.650Z",
-                    "value": 79.01275461273221
+                    "date": 1971,
+                    "value": 81.2,
+                    "category": "Design"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-07-22T12:29:45.650Z",
-                    "value": 14.255900524412857
+                    "date": 1972,
+                    "value": 86.3,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-31T12:29:45.650Z",
-                    "value": 7.84189048211188
+                    "date": 1973,
+                    "value": 92.9,
+                    "category": "Design"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-03-26T12:29:45.650Z",
-                    "value": 89.80599527018099
+                    "date": 1974,
+                    "value": 97.6,
+                    "category": "Design"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 97.89578011341848
+                    "date": 1975,
+                    "value": 103.3,
+                    "category": "Design"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-07-13T12:29:45.650Z",
-                    "value": 24.55017986856227
+                    "date": 1976,
+                    "value": 112.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 5.005287556222959
+                    "date": 1977,
+                    "value": 118.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-24T12:29:45.650Z",
-                    "value": 2.8428640292447627
+                    "date": 1978,
+                    "value": 123.1,
+                    "category": "Design"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-03-20T12:29:45.650Z",
-                    "value": 84.2639649834934
+                    "date": 1979,
+                    "value": 134.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-01T12:29:45.650Z",
-                    "value": 22.27647909921191
+                    "date": 1980,
+                    "value": 144.8,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-06-23T12:29:45.650Z",
-                    "value": 96.01747028574037
+                    "date": 1981,
+                    "value": 161.5,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-06-16T12:29:45.650Z",
-                    "value": 91.23574705545113
+                    "date": 1982,
+                    "value": 172.7,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-03-19T12:29:45.650Z",
-                    "value": 3.289172413993424
+                    "date": 1983,
+                    "value": 177.5,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-01T12:29:45.650Z",
-                    "value": 29.653742397483597
+                    "date": 1984,
+                    "value": 183.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1985,
+                    "value": 190.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1986,
+                    "value": 195.1,
+                    "category": "Design"
+                },
+                {
+                    "date": 1987,
+                    "value": 201.2,
+                    "category": "Design"
+                },
+                {
+                    "date": 1988,
+                    "value": 215.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1989,
+                    "value": 216.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1990,
+                    "value": 223.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1965,
+                    "value": 441.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1966,
+                    "value": 482.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1967,
+                    "value": 506.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1968,
+                    "value": 544.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1969,
+                    "value": 619.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1970,
+                    "value": 704.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1971,
+                    "value": 771.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1972,
+                    "value": 817.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1973,
+                    "value": 885.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1974,
+                    "value": 902.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1975,
+                    "value": 936.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1976,
+                    "value": 983.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1977,
+                    "value": 1037.3,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1978,
+                    "value": 1106.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1979,
+                    "value": 1157.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1980,
+                    "value": 1168,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1981,
+                    "value": 1175,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1982,
+                    "value": 1186.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1983,
+                    "value": 1240.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1984,
+                    "value": 1326.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1985,
+                    "value": 1395.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1986,
+                    "value": 1456.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1987,
+                    "value": 1538,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1988,
+                    "value": 1650.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1989,
+                    "value": 1740.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1990,
+                    "value": 1812.8,
+                    "category": "Backlog"
                 }
             ]
         },
@@ -891,304 +1051,504 @@
             "name": "Velocity",
             "data": [
                 {
-                    "category": "Analytics",
-                    "date": "2022-04-23T13:14:47.401Z",
-                    "value": 73.59182063770409
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-03T13:14:47.401Z",
-                    "value": 65.60273104141821
+                    "category": "Status",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1390.5
                 },
                 {
                     "category": "Status",
-                    "date": "2022-04-21T13:14:47.401Z",
-                    "value": 32.99099398866281
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-24T13:14:47.401Z",
-                    "value": 46.04715604912008
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-05-11T13:14:47.401Z",
-                    "value": 87.46493016013257
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-29T13:14:47.401Z",
-                    "value": 76.9813422338238
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-17T13:14:47.401Z",
-                    "value": 59.183169390091315
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1469.5
                 },
                 {
                     "category": "Status",
-                    "date": "2022-04-10T13:14:47.401Z",
-                    "value": 84.80737739016845
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1521.7
                 },
                 {
-                    "category": "Global",
-                    "date": "2022-03-21T13:14:47.401Z",
-                    "value": 21.386599804807325
+                    "category": "Status",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1615.9
                 },
                 {
-                    "category": "Meetings",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 68.44352351762113
+                    "category": "Status",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1703.7
                 },
                 {
-                    "category": "Meetings",
-                    "date": "2022-04-22T13:14:47.401Z",
-                    "value": 97.69377905440608
+                    "category": "Status",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1767.8
                 },
                 {
-                    "category": "Meetings",
-                    "date": "2022-04-01T13:14:47.401Z",
-                    "value": 8.759178360605645
+                    "category": "Status",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1806.2
                 },
                 {
-                    "category": "Analytics",
-                    "date": "2022-04-10T13:14:47.401Z",
-                    "value": 65.19651375623083
+                    "category": "Status",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1903.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1986.6
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1952
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1910.4
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 2015.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 2074.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 2092.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 2123.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 2068.3
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 2018
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1951.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1941.1
+                },
+                {
+                    "category": "Status",
+                    "date": 1984,
+                    "value": 2046.2
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 2053.1
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2060.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2130.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 2223.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 2275.9
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-04-04T13:14:47.401Z",
-                    "value": 97.00953011336976
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-21T13:14:47.401Z",
-                    "value": 84.47456343204425
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-17T13:14:47.401Z",
-                    "value": 37.406482619412444
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-30T13:14:47.401Z",
-                    "value": 20.743539009009293
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-03-18T13:14:47.401Z",
-                    "value": 75.23491116894772
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-27T13:14:47.401Z",
-                    "value": 69.12171469116079
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-04-06T13:14:47.401Z",
-                    "value": 92.35304654210303
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-26T13:14:47.401Z",
-                    "value": 86.95287906476574
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 109.2
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-04-01T13:14:47.401Z",
-                    "value": 4.830780087128916
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-04-21T13:14:47.401Z",
-                    "value": 62.50616662928843
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-03T13:14:47.401Z",
-                    "value": 49.05625667276345
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-27T13:14:47.401Z",
-                    "value": 97.1227130511177
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-03-21T13:14:47.401Z",
-                    "value": 0.414933903978687
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 49.67145301599152
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 59.8525855551056
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-05T13:14:47.401Z",
-                    "value": 89.01823325842273
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-03-19T13:14:47.401Z",
-                    "value": 66.9095714452657
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-05-06T13:14:47.401Z",
-                    "value": 82.28264348562293
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-05-13T13:14:47.401Z",
-                    "value": 29.990246627712636
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 115.7
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-05-11T13:14:47.401Z",
-                    "value": 94.79922929399562
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 120.5
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 88.87719257732701
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-16T13:14:47.401Z",
-                    "value": 46.66000354292237
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-03-26T13:14:47.401Z",
-                    "value": 68.07010743320325
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-04-04T13:14:47.401Z",
-                    "value": 72.89117091695141
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-12T13:14:47.401Z",
-                    "value": 73.20759586757264
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-23T13:14:47.401Z",
-                    "value": 6.629702098255663
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 128
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-03-26T13:14:47.401Z",
-                    "value": 62.84102486134528
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-03T13:14:47.401Z",
-                    "value": 57.67448659605028
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-03-27T13:14:47.401Z",
-                    "value": 34.657295083201724
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-28T13:14:47.401Z",
-                    "value": 32.03309434853507
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-12T13:14:47.401Z",
-                    "value": 51.7280402082972
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-30T13:14:47.401Z",
-                    "value": 16.53410480838511
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-26T13:14:47.401Z",
-                    "value": 45.9229828393132
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-28T13:14:47.401Z",
-                    "value": 20.21681486906235
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-02T13:14:47.401Z",
-                    "value": 67.22566525921363
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-22T13:14:47.401Z",
-                    "value": 96.40015614825685
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 134.4
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-04-02T13:14:47.401Z",
-                    "value": 22.974963898329047
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-11T13:14:47.401Z",
-                    "value": 89.79058018044226
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-31T13:14:47.401Z",
-                    "value": 57.39153947733957
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-25T13:14:47.401Z",
-                    "value": 28.258655299592704
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-24T13:14:47.401Z",
-                    "value": 6.639640502733135
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 35.87745195901291
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 142.2
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-03-17T13:14:47.401Z",
-                    "value": 21.548890344604608
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 33.59090293345688
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 157.5
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 13.178042653570166
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 169.5
                 },
                 {
-                    "category": "Global",
-                    "date": "2022-03-28T13:14:47.401Z",
-                    "value": 55.31278353629359
+                    "category": "Integrations",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 186.3
                 },
                 {
-                    "category": "Status",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 64.83922646788109
+                    "category": "Integrations",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 195.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 198
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 211.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 223.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 236.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 251.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 262.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 262.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 265.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 268.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": 1984,
+                    "value": 278.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 285.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 304.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 315.4
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 324.6
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 329.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1058.1
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1089.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1121.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1196.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1285.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1369
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1406.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1472.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1558
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1535.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1519.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1606.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1632.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1687.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1749.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1706.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1661.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1630.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1645.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": 1984,
+                    "value": 1686.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1779.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1811.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1849.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1870
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1875
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 593.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 630.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 663.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 687.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 719
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 754.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 791.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 832.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 875.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 923.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 969
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1006.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1051.4
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1094.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1127.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1150.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1174.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1204
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1229
+                },
+                {
+                    "category": "Analytics",
+                    "date": 1984,
+                    "value": 1274.6
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1257
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1282
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1318
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1341.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1332.5
                 }
             ]
         }
@@ -1199,754 +1559,914 @@
             "name": "Flow",
             "data": [
                 {
-                    "category": "Quality",
-                    "date": "2022-09-07T12:29:45.650Z",
-                    "value": 78.85871909398936
+                    "date": 1965,
+                    "value": 1390.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-26T12:29:45.650Z",
-                    "value": 7.323165051279634
+                    "date": 1966,
+                    "value": 1469.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-11-01T12:29:45.650Z",
-                    "value": 13.998477916455055
+                    "date": 1967,
+                    "value": 1521.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-20T12:29:45.650Z",
-                    "value": 55.293868191964066
+                    "date": 1968,
+                    "value": 1615.9,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-13T12:29:45.650Z",
-                    "value": 11.458068175743396
+                    "date": 1969,
+                    "value": 1703.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-19T12:29:45.650Z",
-                    "value": 68.6428077669418
+                    "date": 1970,
+                    "value": 1767.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-10-28T12:29:45.650Z",
-                    "value": 32.76116084378131
+                    "date": 1971,
+                    "value": 1806.2,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-05T12:29:45.650Z",
-                    "value": 61.89461604536739
+                    "date": 1972,
+                    "value": 1903.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 2.9538477626478876
+                    "date": 1973,
+                    "value": 1986.6,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-09-03T12:29:45.650Z",
-                    "value": 60.71524925813592
+                    "date": 1974,
+                    "value": 1952,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-05-09T12:29:45.650Z",
-                    "value": 82.21315927533553
+                    "date": 1975,
+                    "value": 1910.4,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-10T12:29:45.650Z",
-                    "value": 28.02625814233275
+                    "date": 1976,
+                    "value": 2015.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-06-24T12:29:45.650Z",
-                    "value": 83.1539843716051
+                    "date": 1977,
+                    "value": 2074.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-04-26T12:29:45.650Z",
-                    "value": 20.200889136251643
+                    "date": 1978,
+                    "value": 2092.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-08-06T12:29:45.650Z",
-                    "value": 99.38276032702429
+                    "date": 1979,
+                    "value": 2123.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-06-16T12:29:45.650Z",
-                    "value": 89.44712821276364
+                    "date": 1980,
+                    "value": 2068.3,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-04-25T12:29:45.650Z",
-                    "value": 24.64698320669889
+                    "date": 1981,
+                    "value": 2018,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-07-28T12:29:45.650Z",
-                    "value": 86.93040244689283
+                    "date": 1982,
+                    "value": 1951.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-09-24T12:29:45.650Z",
-                    "value": 15.09152785838781
+                    "date": 1983,
+                    "value": 1941.1,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-08T12:29:45.650Z",
-                    "value": 52.01427049997851
+                    "date": 1984,
+                    "value": 2046.2,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-08-10T12:29:45.650Z",
-                    "value": 78.34653194535541
+                    "date": 1985,
+                    "value": 2053.1,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-10T12:29:45.650Z",
-                    "value": 44.03090294140291
+                    "date": 1986,
+                    "value": 2060.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-20T12:29:45.650Z",
-                    "value": 42.33826606746183
+                    "date": 1987,
+                    "value": 2130.8,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-03-26T12:29:45.650Z",
-                    "value": 79.57344086469149
+                    "date": 1988,
+                    "value": 2223.5,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-12T12:29:45.650Z",
-                    "value": 31.40333185278028
+                    "date": 1989,
+                    "value": 2275.9,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-30T12:29:45.650Z",
-                    "value": 76.0437477071203
+                    "date": 1990,
+                    "value": 2280.7,
+                    "category": "Shipped"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-15T12:29:45.650Z",
-                    "value": 42.469563198398205
+                    "date": 1965,
+                    "value": 109.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 25.72883524087839
+                    "date": 1966,
+                    "value": 115.7,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-10-03T12:29:45.650Z",
-                    "value": 46.06677621545114
+                    "date": 1967,
+                    "value": 120.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-10-04T12:29:45.650Z",
-                    "value": 50.85405197957464
+                    "date": 1968,
+                    "value": 128,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-03T12:29:45.650Z",
-                    "value": 73.72991082502034
+                    "date": 1969,
+                    "value": 134.4,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 90.85716236790333
+                    "date": 1970,
+                    "value": 142.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-04-28T12:29:45.650Z",
-                    "value": 10.413922951056565
+                    "date": 1971,
+                    "value": 157.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-10-27T12:29:45.650Z",
-                    "value": 32.05273990172228
+                    "date": 1972,
+                    "value": 169.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 13.377298040126417
+                    "date": 1973,
+                    "value": 186.3,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-04-09T12:29:45.650Z",
-                    "value": 33.78470699457105
+                    "date": 1974,
+                    "value": 195.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-26T12:29:45.650Z",
-                    "value": 28.027194308081494
+                    "date": 1975,
+                    "value": 198,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-07-28T12:29:45.650Z",
-                    "value": 53.64346717188524
+                    "date": 1976,
+                    "value": 211.7,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-05-24T12:29:45.650Z",
-                    "value": 4.87309932453599
+                    "date": 1977,
+                    "value": 223.8,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 89.4698173827115
+                    "date": 1978,
+                    "value": 236.5,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-20T12:29:45.650Z",
-                    "value": 49.71801069027606
+                    "date": 1979,
+                    "value": 251.8,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-28T12:29:45.650Z",
-                    "value": 92.75251361868439
+                    "date": 1980,
+                    "value": 262.9,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-29T12:29:45.650Z",
-                    "value": 25.40839829568835
+                    "date": 1981,
+                    "value": 262.7,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-31T12:29:45.650Z",
-                    "value": 35.486807960597844
+                    "date": 1982,
+                    "value": 265.9,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-08T12:29:45.650Z",
-                    "value": 90.68821242222378
+                    "date": 1983,
+                    "value": 268.3,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-23T12:29:45.650Z",
-                    "value": 16.677753313259114
+                    "date": 1984,
+                    "value": 278.3,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-08T12:29:45.650Z",
-                    "value": 99.64188183526946
+                    "date": 1985,
+                    "value": 285.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-07-18T12:29:45.650Z",
-                    "value": 14.997164125141428
+                    "date": 1986,
+                    "value": 304.2,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-05-09T12:29:45.650Z",
-                    "value": 92.955227214113
+                    "date": 1987,
+                    "value": 315.4,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-03-31T12:29:45.650Z",
-                    "value": 39.35080246426639
+                    "date": 1988,
+                    "value": 324.6,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-18T12:29:45.650Z",
-                    "value": 46.85114935179029
+                    "date": 1989,
+                    "value": 329.9,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-06-18T12:29:45.650Z",
-                    "value": 78.64783414315212
+                    "date": 1990,
+                    "value": 331.1,
+                    "category": "Ready"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-04-18T12:29:45.650Z",
-                    "value": 41.04216753674825
+                    "date": 1965,
+                    "value": 1058.1,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-03-29T12:29:45.650Z",
-                    "value": 82.19723767886957
+                    "date": 1966,
+                    "value": 1089.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-08-25T12:29:45.650Z",
-                    "value": 74.43313089485765
+                    "date": 1967,
+                    "value": 1121.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-05-31T12:29:45.650Z",
-                    "value": 27.585978780577225
+                    "date": 1968,
+                    "value": 1196.6,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-08T12:29:45.650Z",
-                    "value": 42.677155904088536
+                    "date": 1969,
+                    "value": 1285.5,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-09-18T12:29:45.650Z",
-                    "value": 26.2754638239874
+                    "date": 1970,
+                    "value": 1369,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-18T12:29:45.650Z",
-                    "value": 9.113986176147936
+                    "date": 1971,
+                    "value": 1406.2,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-11-07T12:29:45.650Z",
-                    "value": 99.22056344833207
+                    "date": 1972,
+                    "value": 1472.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-04-24T12:29:45.650Z",
-                    "value": 36.812843489788214
+                    "date": 1973,
+                    "value": 1558,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-11-03T12:29:45.650Z",
-                    "value": 47.94723756618171
+                    "date": 1974,
+                    "value": 1535.5,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-07-09T12:29:45.650Z",
-                    "value": 95.4907615436119
+                    "date": 1975,
+                    "value": 1519.3,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-09-04T12:29:45.650Z",
-                    "value": 57.89722898982319
+                    "date": 1976,
+                    "value": 1606.9,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-31T12:29:45.650Z",
-                    "value": 22.250327277667736
+                    "date": 1977,
+                    "value": 1632.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-07-10T12:29:45.650Z",
-                    "value": 19.809059317320642
+                    "date": 1978,
+                    "value": 1687.5,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-09-23T12:29:45.650Z",
-                    "value": 19.855558962088637
+                    "date": 1979,
+                    "value": 1749.6,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-28T12:29:45.650Z",
-                    "value": 74.72195549103388
+                    "date": 1980,
+                    "value": 1706.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-09-21T12:29:45.650Z",
-                    "value": 97.8047662632153
+                    "date": 1981,
+                    "value": 1661.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-11T12:29:45.650Z",
-                    "value": 32.013718999441856
+                    "date": 1982,
+                    "value": 1630.2,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-07-27T12:29:45.650Z",
-                    "value": 94.89568375181194
+                    "date": 1983,
+                    "value": 1645.2,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-04-03T12:29:45.650Z",
-                    "value": 74.91759852349942
+                    "date": 1984,
+                    "value": 1686.9,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-04-15T12:29:45.650Z",
-                    "value": 40.07271477102865
+                    "date": 1985,
+                    "value": 1779.4,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-11-08T12:29:45.650Z",
-                    "value": 30.54381103217738
+                    "date": 1986,
+                    "value": 1811.3,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-23T12:29:45.650Z",
-                    "value": 4.273821135143963
+                    "date": 1987,
+                    "value": 1849.7,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-09-10T12:29:45.650Z",
-                    "value": 55.61754786557598
+                    "date": 1988,
+                    "value": 1870,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-27T12:29:45.650Z",
-                    "value": 55.31105951329407
+                    "date": 1989,
+                    "value": 1875,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-05-08T12:29:45.650Z",
-                    "value": 73.81896255682688
+                    "date": 1990,
+                    "value": 1853.3,
+                    "category": "Quality"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-19T12:29:45.650Z",
-                    "value": 76.44154566025053
+                    "date": 1965,
+                    "value": 593.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-25T12:29:45.650Z",
-                    "value": 62.22494854271314
+                    "date": 1966,
+                    "value": 630.9,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-06-30T12:29:45.650Z",
-                    "value": 77.66838126199002
+                    "date": 1967,
+                    "value": 663.2,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-06-18T12:29:45.650Z",
-                    "value": 79.11064436810665
+                    "date": 1968,
+                    "value": 687.8,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 4.808742324042536
+                    "date": 1969,
+                    "value": 719,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-18T12:29:45.650Z",
-                    "value": 5.483194031018823
+                    "date": 1970,
+                    "value": 754.8,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-05-02T12:29:45.650Z",
-                    "value": 70.48004228065898
+                    "date": 1971,
+                    "value": 791.9,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-08-25T12:29:45.650Z",
-                    "value": 83.80425205379917
+                    "date": 1972,
+                    "value": 832.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-08-24T12:29:45.650Z",
-                    "value": 78.13562810924938
+                    "date": 1973,
+                    "value": 875.1,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 36.72490499729641
+                    "date": 1974,
+                    "value": 923.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-07-14T12:29:45.650Z",
-                    "value": 68.218388224076
+                    "date": 1975,
+                    "value": 969,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-08-25T12:29:45.650Z",
-                    "value": 23.766480268624758
+                    "date": 1976,
+                    "value": 1006.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-03-17T12:29:45.650Z",
-                    "value": 59.174213904042695
+                    "date": 1977,
+                    "value": 1051.4,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-06-04T12:29:45.650Z",
-                    "value": 62.593289239864006
+                    "date": 1978,
+                    "value": 1094.2,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-04-01T12:29:45.650Z",
-                    "value": 67.81785084011001
+                    "date": 1979,
+                    "value": 1127.1,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-03-24T12:29:45.650Z",
-                    "value": 35.82445205182603
+                    "date": 1980,
+                    "value": 1150.1,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-21T12:29:45.650Z",
-                    "value": 8.047208261987858
+                    "date": 1981,
+                    "value": 1174.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-04-13T12:29:45.650Z",
-                    "value": 92.0599051128445
+                    "date": 1982,
+                    "value": 1204,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-10-17T12:29:45.650Z",
-                    "value": 22.706520328514035
+                    "date": 1983,
+                    "value": 1229,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-06-05T12:29:45.650Z",
-                    "value": 25.96788116312969
+                    "date": 1984,
+                    "value": 1274.6,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-31T12:29:45.650Z",
-                    "value": 87.86263996381113
+                    "date": 1985,
+                    "value": 1257,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-03T12:29:45.650Z",
-                    "value": 9.025158912638398
+                    "date": 1986,
+                    "value": 1282,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-24T12:29:45.650Z",
-                    "value": 79.38576034746536
+                    "date": 1987,
+                    "value": 1318,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-10-20T12:29:45.650Z",
-                    "value": 33.7533654019112
+                    "date": 1988,
+                    "value": 1341.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-09-02T12:29:45.650Z",
-                    "value": 83.2423404267794
+                    "date": 1989,
+                    "value": 1332.5,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-03-30T12:29:45.650Z",
-                    "value": 2.026870517029389
+                    "date": 1990,
+                    "value": 1350.3,
+                    "category": "Dev"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-11-05T12:29:45.650Z",
-                    "value": 25.202545211137185
+                    "date": 1965,
+                    "value": 48.3,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-10-09T12:29:45.650Z",
-                    "value": 59.34040693417335
+                    "date": 1966,
+                    "value": 50.4,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-08T12:29:45.650Z",
-                    "value": 15.603660541880027
+                    "date": 1967,
+                    "value": 52.7,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-07-20T12:29:45.650Z",
-                    "value": 83.2006810600669
+                    "date": 1968,
+                    "value": 55.6,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-03T12:29:45.650Z",
-                    "value": 30.727137005415784
+                    "date": 1969,
+                    "value": 58.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-09-09T12:29:45.650Z",
-                    "value": 75.73693765495779
+                    "date": 1970,
+                    "value": 61.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-14T12:29:45.650Z",
-                    "value": 6.388108093442391
+                    "date": 1971,
+                    "value": 64.9,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 25.428996569946015
+                    "date": 1972,
+                    "value": 70.6,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-05-12T12:29:45.650Z",
-                    "value": 82.93549889874666
+                    "date": 1973,
+                    "value": 77.4,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-08T12:29:45.650Z",
-                    "value": 59.73504566903698
+                    "date": 1974,
+                    "value": 82.3,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-03-23T12:29:45.650Z",
-                    "value": 55.14232138253592
+                    "date": 1975,
+                    "value": 82.1,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-05-30T12:29:45.650Z",
-                    "value": 87.58403940685717
+                    "date": 1976,
+                    "value": 93,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 81.62513758560526
+                    "date": 1977,
+                    "value": 105.7,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-05-14T12:29:45.650Z",
-                    "value": 50.30765043643546
+                    "date": 1978,
+                    "value": 111,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-04-18T12:29:45.650Z",
-                    "value": 44.79181799862746
+                    "date": 1979,
+                    "value": 130.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-03-22T12:29:45.650Z",
-                    "value": 48.52283991233266
+                    "date": 1980,
+                    "value": 126.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-03T12:29:45.650Z",
-                    "value": 69.00531810726405
+                    "date": 1981,
+                    "value": 137.9,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-04-05T12:29:45.650Z",
-                    "value": 23.408824788229165
+                    "date": 1982,
+                    "value": 152.8,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-16T12:29:45.650Z",
-                    "value": 92.58458284978045
+                    "date": 1983,
+                    "value": 167.1,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-08-19T12:29:45.650Z",
-                    "value": 34.52254608211065
+                    "date": 1984,
+                    "value": 188.9,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-11-05T12:29:45.650Z",
-                    "value": 67.39213746877273
+                    "date": 1985,
+                    "value": 200.8,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-03-23T12:29:45.650Z",
-                    "value": 76.56085314299379
+                    "date": 1986,
+                    "value": 209.8,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-09-02T12:29:45.650Z",
-                    "value": 6.905388128748813
+                    "date": 1987,
+                    "value": 224.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-07T12:29:45.650Z",
-                    "value": 29.117743528042705
+                    "date": 1988,
+                    "value": 238.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-06-27T12:29:45.650Z",
-                    "value": 84.14731830177236
+                    "date": 1989,
+                    "value": 251.5,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-05-03T12:29:45.650Z",
-                    "value": 9.86901344710085
+                    "date": 1990,
+                    "value": 260,
+                    "category": "Critique"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-08-13T12:29:45.650Z",
-                    "value": 66.24185240385225
+                    "date": 1965,
+                    "value": 60.6,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-05-27T12:29:45.650Z",
-                    "value": 89.51616754064963
+                    "date": 1966,
+                    "value": 63.3,
+                    "category": "Design"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-07-19T12:29:45.650Z",
-                    "value": 23.45839544818005
+                    "date": 1967,
+                    "value": 64,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-08-18T12:29:45.650Z",
-                    "value": 29.162124728297822
+                    "date": 1968,
+                    "value": 67.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-08-20T12:29:45.650Z",
-                    "value": 27.17238682084624
+                    "date": 1969,
+                    "value": 68.9,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-03-27T12:29:45.650Z",
-                    "value": 32.93726335698815
+                    "date": 1970,
+                    "value": 74.7,
+                    "category": "Design"
                 },
                 {
-                    "category": "Shipped",
-                    "date": "2022-06-23T12:29:45.650Z",
-                    "value": 79.01275461273221
+                    "date": 1971,
+                    "value": 81.2,
+                    "category": "Design"
                 },
                 {
-                    "category": "Design",
-                    "date": "2022-07-22T12:29:45.650Z",
-                    "value": 14.255900524412857
+                    "date": 1972,
+                    "value": 86.3,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-10-31T12:29:45.650Z",
-                    "value": 7.84189048211188
+                    "date": 1973,
+                    "value": 92.9,
+                    "category": "Design"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-03-26T12:29:45.650Z",
-                    "value": 89.80599527018099
+                    "date": 1974,
+                    "value": 97.6,
+                    "category": "Design"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-10-16T12:29:45.650Z",
-                    "value": 97.89578011341848
+                    "date": 1975,
+                    "value": 103.3,
+                    "category": "Design"
                 },
                 {
-                    "category": "Backlog",
-                    "date": "2022-07-13T12:29:45.650Z",
-                    "value": 24.55017986856227
+                    "date": 1976,
+                    "value": 112.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-08-15T12:29:45.650Z",
-                    "value": 5.005287556222959
+                    "date": 1977,
+                    "value": 118.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Dev",
-                    "date": "2022-09-24T12:29:45.650Z",
-                    "value": 2.8428640292447627
+                    "date": 1978,
+                    "value": 123.1,
+                    "category": "Design"
                 },
                 {
-                    "category": "Critique",
-                    "date": "2022-03-20T12:29:45.650Z",
-                    "value": 84.2639649834934
+                    "date": 1979,
+                    "value": 134.4,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-07-01T12:29:45.650Z",
-                    "value": 22.27647909921191
+                    "date": 1980,
+                    "value": 144.8,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-06-23T12:29:45.650Z",
-                    "value": 96.01747028574037
+                    "date": 1981,
+                    "value": 161.5,
+                    "category": "Design"
                 },
                 {
-                    "category": "Quality",
-                    "date": "2022-06-16T12:29:45.650Z",
-                    "value": 91.23574705545113
+                    "date": 1982,
+                    "value": 172.7,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-03-19T12:29:45.650Z",
-                    "value": 3.289172413993424
+                    "date": 1983,
+                    "value": 177.5,
+                    "category": "Design"
                 },
                 {
-                    "category": "Ready",
-                    "date": "2022-10-01T12:29:45.650Z",
-                    "value": 29.653742397483597
+                    "date": 1984,
+                    "value": 183.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1985,
+                    "value": 190.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1986,
+                    "value": 195.1,
+                    "category": "Design"
+                },
+                {
+                    "date": 1987,
+                    "value": 201.2,
+                    "category": "Design"
+                },
+                {
+                    "date": 1988,
+                    "value": 215.7,
+                    "category": "Design"
+                },
+                {
+                    "date": 1989,
+                    "value": 216.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1990,
+                    "value": 223.3,
+                    "category": "Design"
+                },
+                {
+                    "date": 1965,
+                    "value": 441.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1966,
+                    "value": 482.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1967,
+                    "value": 506.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1968,
+                    "value": 544.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1969,
+                    "value": 619.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1970,
+                    "value": 704.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1971,
+                    "value": 771.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1972,
+                    "value": 817.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1973,
+                    "value": 885.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1974,
+                    "value": 902.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1975,
+                    "value": 936.1,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1976,
+                    "value": 983.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1977,
+                    "value": 1037.3,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1978,
+                    "value": 1106.2,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1979,
+                    "value": 1157.6,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1980,
+                    "value": 1168,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1981,
+                    "value": 1175,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1982,
+                    "value": 1186.8,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1983,
+                    "value": 1240.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1984,
+                    "value": 1326.7,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1985,
+                    "value": 1395.9,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1986,
+                    "value": 1456.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1987,
+                    "value": 1538,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1988,
+                    "value": 1650.5,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1989,
+                    "value": 1740.4,
+                    "category": "Backlog"
+                },
+                {
+                    "date": 1990,
+                    "value": 1812.8,
+                    "category": "Backlog"
                 }
             ]
         },
@@ -2085,304 +2605,504 @@
             "name": "Velocity",
             "data": [
                 {
-                    "category": "Analytics",
-                    "date": "2022-04-23T13:14:47.401Z",
-                    "value": 73.59182063770409
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-03T13:14:47.401Z",
-                    "value": 65.60273104141821
+                    "category": "Status",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1390.5
                 },
                 {
                     "category": "Status",
-                    "date": "2022-04-21T13:14:47.401Z",
-                    "value": 32.99099398866281
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-24T13:14:47.401Z",
-                    "value": 46.04715604912008
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-05-11T13:14:47.401Z",
-                    "value": 87.46493016013257
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-29T13:14:47.401Z",
-                    "value": 76.9813422338238
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-17T13:14:47.401Z",
-                    "value": 59.183169390091315
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1469.5
                 },
                 {
                     "category": "Status",
-                    "date": "2022-04-10T13:14:47.401Z",
-                    "value": 84.80737739016845
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1521.7
                 },
                 {
-                    "category": "Global",
-                    "date": "2022-03-21T13:14:47.401Z",
-                    "value": 21.386599804807325
+                    "category": "Status",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1615.9
                 },
                 {
-                    "category": "Meetings",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 68.44352351762113
+                    "category": "Status",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1703.7
                 },
                 {
-                    "category": "Meetings",
-                    "date": "2022-04-22T13:14:47.401Z",
-                    "value": 97.69377905440608
+                    "category": "Status",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1767.8
                 },
                 {
-                    "category": "Meetings",
-                    "date": "2022-04-01T13:14:47.401Z",
-                    "value": 8.759178360605645
+                    "category": "Status",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1806.2
                 },
                 {
-                    "category": "Analytics",
-                    "date": "2022-04-10T13:14:47.401Z",
-                    "value": 65.19651375623083
+                    "category": "Status",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1903.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1986.6
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1952
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1910.4
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 2015.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 2074.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 2092.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 2123.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 2068.3
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 2018
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1951.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1941.1
+                },
+                {
+                    "category": "Status",
+                    "date": 1984,
+                    "value": 2046.2
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 2053.1
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2060.7
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 2130.8
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 2223.5
+                },
+                {
+                    "category": "Status",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 2275.9
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-04-04T13:14:47.401Z",
-                    "value": 97.00953011336976
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-21T13:14:47.401Z",
-                    "value": 84.47456343204425
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-17T13:14:47.401Z",
-                    "value": 37.406482619412444
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-30T13:14:47.401Z",
-                    "value": 20.743539009009293
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-03-18T13:14:47.401Z",
-                    "value": 75.23491116894772
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-27T13:14:47.401Z",
-                    "value": 69.12171469116079
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-04-06T13:14:47.401Z",
-                    "value": 92.35304654210303
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-26T13:14:47.401Z",
-                    "value": 86.95287906476574
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 109.2
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-04-01T13:14:47.401Z",
-                    "value": 4.830780087128916
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-04-21T13:14:47.401Z",
-                    "value": 62.50616662928843
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-03T13:14:47.401Z",
-                    "value": 49.05625667276345
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-27T13:14:47.401Z",
-                    "value": 97.1227130511177
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-03-21T13:14:47.401Z",
-                    "value": 0.414933903978687
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 49.67145301599152
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 59.8525855551056
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-05T13:14:47.401Z",
-                    "value": 89.01823325842273
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-03-19T13:14:47.401Z",
-                    "value": 66.9095714452657
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-05-06T13:14:47.401Z",
-                    "value": 82.28264348562293
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-05-13T13:14:47.401Z",
-                    "value": 29.990246627712636
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 115.7
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-05-11T13:14:47.401Z",
-                    "value": 94.79922929399562
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 120.5
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 88.87719257732701
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-16T13:14:47.401Z",
-                    "value": 46.66000354292237
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-03-26T13:14:47.401Z",
-                    "value": 68.07010743320325
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-04-04T13:14:47.401Z",
-                    "value": 72.89117091695141
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-12T13:14:47.401Z",
-                    "value": 73.20759586757264
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-23T13:14:47.401Z",
-                    "value": 6.629702098255663
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 128
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-03-26T13:14:47.401Z",
-                    "value": 62.84102486134528
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-03T13:14:47.401Z",
-                    "value": 57.67448659605028
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-03-27T13:14:47.401Z",
-                    "value": 34.657295083201724
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-28T13:14:47.401Z",
-                    "value": 32.03309434853507
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-12T13:14:47.401Z",
-                    "value": 51.7280402082972
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-30T13:14:47.401Z",
-                    "value": 16.53410480838511
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-03-26T13:14:47.401Z",
-                    "value": 45.9229828393132
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-28T13:14:47.401Z",
-                    "value": 20.21681486906235
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-02T13:14:47.401Z",
-                    "value": 67.22566525921363
-                },
-                {
-                    "category": "Analytics",
-                    "date": "2022-04-22T13:14:47.401Z",
-                    "value": 96.40015614825685
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 134.4
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-04-02T13:14:47.401Z",
-                    "value": 22.974963898329047
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-05-11T13:14:47.401Z",
-                    "value": 89.79058018044226
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-31T13:14:47.401Z",
-                    "value": 57.39153947733957
-                },
-                {
-                    "category": "Global",
-                    "date": "2022-04-25T13:14:47.401Z",
-                    "value": 28.258655299592704
-                },
-                {
-                    "category": "Status",
-                    "date": "2022-04-24T13:14:47.401Z",
-                    "value": 6.639640502733135
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 35.87745195901291
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 142.2
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-03-17T13:14:47.401Z",
-                    "value": 21.548890344604608
-                },
-                {
-                    "category": "Meetings",
-                    "date": "2022-03-16T13:14:47.401Z",
-                    "value": 33.59090293345688
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 157.5
                 },
                 {
                     "category": "Integrations",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 13.178042653570166
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 169.5
                 },
                 {
-                    "category": "Global",
-                    "date": "2022-03-28T13:14:47.401Z",
-                    "value": 55.31278353629359
+                    "category": "Integrations",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 186.3
                 },
                 {
-                    "category": "Status",
-                    "date": "2022-05-05T13:14:47.401Z",
-                    "value": 64.83922646788109
+                    "category": "Integrations",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 195.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 198
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 211.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 223.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 236.5
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 251.8
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 262.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 262.7
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 265.9
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 268.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": 1984,
+                    "value": 278.3
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 285.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 304.2
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 315.4
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 324.6
+                },
+                {
+                    "category": "Integrations",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 329.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 1058.1
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1089.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 1121.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 1196.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 1285.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 1369
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 1406.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 1472.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 1558
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 1535.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 1519.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1606.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1632.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1687.5
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1749.6
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1706.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1661.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1630.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1645.2
+                },
+                {
+                    "category": "Meetings",
+                    "date": 1984,
+                    "value": 1686.9
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1779.4
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1811.3
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1849.7
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1870
+                },
+                {
+                    "category": "Meetings",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1875
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-01T11:35:03.599Z",
+                    "value": 593.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 630.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-02T11:35:03.599Z",
+                    "value": 663.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-03T11:35:03.599Z",
+                    "value": 687.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-04T11:35:03.599Z",
+                    "value": 719
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-05T11:35:03.599Z",
+                    "value": 754.8
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-06T11:35:03.599Z",
+                    "value": 791.9
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-07T11:35:03.599Z",
+                    "value": 832.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-08T11:35:03.599Z",
+                    "value": 875.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-09T11:35:03.599Z",
+                    "value": 923.3
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-10T11:35:03.599Z",
+                    "value": 969
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-11T11:35:03.599Z",
+                    "value": 1006.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-12T11:35:03.599Z",
+                    "value": 1051.4
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-13T11:35:03.599Z",
+                    "value": 1094.2
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-14T11:35:03.599Z",
+                    "value": 1127.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-15T11:35:03.599Z",
+                    "value": 1150.1
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-16T11:35:03.599Z",
+                    "value": 1174.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-17T11:35:03.599Z",
+                    "value": 1204
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-18T11:35:03.599Z",
+                    "value": 1229
+                },
+                {
+                    "category": "Analytics",
+                    "date": 1984,
+                    "value": 1274.6
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-19T11:35:03.599Z",
+                    "value": 1257
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1282
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-20T11:35:03.599Z",
+                    "value": 1318
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-21T11:35:03.599Z",
+                    "value": 1341.5
+                },
+                {
+                    "category": "Analytics",
+                    "date": "2022-06-22T11:35:03.599Z",
+                    "value": 1332.5
                 }
             ]
         }

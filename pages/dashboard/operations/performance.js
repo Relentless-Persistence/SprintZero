@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 import { Area, DualAxes } from '@ant-design/plots';
@@ -151,8 +151,9 @@ export default function Performance ()
     };
 
     const rightNav = generateRightNav( data[ activeProduct ] );
-    const isArea = activeData?.name.includes( "Flow" ) || activeData?.name.includes( "Velocity" );
-
+    const isBurn = activeData?.name.includes( "Burn" );
+    const isFlow = activeData?.name.includes( "Flow" );
+    const isVel = activeData?.name.includes( "Velocity" );
 
 
     return (
@@ -178,7 +179,7 @@ export default function Performance ()
                             } /> */}
 
                 {
-                    !isArea ? (
+                    isBurn ? (
                         <Select
                             defaultValue={ menu[ 0 ] }
                             style={ { width: 120 } }
@@ -194,20 +195,32 @@ export default function Performance ()
                 }
 
 
+                {
+                    isBurn ? ( sprint?.length ? <DualAxes
+                        data={ [ sprint, sprint ] }
+                        {
+                        ...chartConfig[ activeData?.name ]
+                        } /> : null ) : null
+                }
 
                 {
-                    isArea ?
+                    isVel ? <Area
+                        data={ activeData?.data }
+                        {
+                        ...chartConfig[ activeData?.name ]
+                        }
+                    /> : null
+                }
+
+                {
+                    isFlow ?
                         <Area
                             data={ activeData?.data }
                             {
                             ...chartConfig[ activeData?.name ]
                             }
                         />
-                        : ( sprint?.length ? <DualAxes
-                            data={ [ sprint, sprint ] }
-                            {
-                            ...chartConfig[ activeData?.name ]
-                            } /> : null )
+                        : null
                 }
 
 

@@ -236,12 +236,12 @@ body {
 }
 
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
-  background-color: #EBF8E0 !important;
-  color: var(--pine);
+  background-color: #F5FBF0 !important;
+  color: #4A801D !important;
 }
 
 .ant-menu-vertical .ant-menu-item::after, .ant-menu-vertical-left .ant-menu-item::after, .ant-menu-vertical-right .ant-menu-item::after, .ant-menu-inline .ant-menu-item::after {
-  border-right: 2px solid var(--kelly) !important;
+  border-right: 2px solid #4A801D !important;
 }
 
 .ant-layout-sider-trigger {

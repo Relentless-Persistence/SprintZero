@@ -51,34 +51,45 @@ const AppHeader = (
     };
 
     return (
-        <Header className="header">
-            <div className="flex items-center">
-                <Title level={ 2 } className="dashboard-logo m-0">
-                    Sprint Zero
-                </Title>
-                <div className="flex items-center ml-11">
-                    { products.map( ( item, i ) => (
-                        <HeaderMenu key={ i } className="mr-10" active={ activeProduct === item } onClick={ () => onProductChange( item ) }>{ item }</HeaderMenu>
-                    ) ) }
-
-
-                </div>
-            </div>
-            <div className="flex items-center">
-                <Search
-                    placeholder="Search"
-                    allowClear
-                    className="mr-6 border-none focus:outline-none outline-none"
-                    // onSearch={onSearch}
-                    style={ { width: 200 } }
-                />
-                {/* <MessageFilled
+      <Header
+        className="header"
+        style={{ position: "fixed", zIndex: 1, width: "100%" }}
+      >
+        <div className="flex items-center">
+          <Title level={2} className="dashboard-logo m-0">
+            Sprint Zero
+          </Title>
+          <div className="flex items-center ml-11">
+            {products.map((item, i) => (
+              <HeaderMenu
+                key={i}
+                className="mr-10"
+                active={activeProduct === item}
+                onClick={() => onProductChange(item)}
+              >
+                {item}
+              </HeaderMenu>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center">
+          <Search
+            placeholder="Search"
+            allowClear
+            className="mr-6 border-none focus:outline-none outline-none"
+            // onSearch={onSearch}
+            style={{ width: 200 }}
+          />
+          {/* <MessageFilled
                     style={ { color: "#73c92d", width: "24px" } }
                     className="mr-6"
                 /> */}
-                <Avatar src={ user?.photoURL } style={ { border: "2px solid #73c92d" } } />
-            </div>
-        </Header>
+          <Avatar
+            src={user?.photoURL}
+            style={{ border: "2px solid #73c92d" }}
+          />
+        </div>
+      </Header>
     );
 };
 

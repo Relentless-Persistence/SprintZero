@@ -26,10 +26,10 @@ const StyledSubMenu = styled( SubMenu )`
 
 const MenuItem = styled( Menu.Item )`
   background-color: ${ ( props ) =>
-    props.$highlight ? "#EBF8E0" : "tranparent" } !important;
-  color: ${ ( props ) => ( props.$highlight ? "#315613" : "#000" ) };
+    props.$highlight ? "#F5FBF0" : "tranparent" } !important;
+  color: ${ ( props ) => ( props.$highlight ? "#4A801D" : "#000" ) };
   box-shadow: ${ ( props ) =>
-    props.$highlight ? "inset -3px 0px 0px #73C92D" : "none" };
+    props.$highlight ? "inset -3px 0px 0px #4A801D" : "none" };
 
   .ant-menu-item-icon {
     color: ${ ( props ) => ( props.$highlight ? "#315613" : "#000" ) };
@@ -42,12 +42,33 @@ const MenuItem = styled( Menu.Item )`
   }
 `;
 
+const rootSubmenuKeys = [ "sub1", "sub2", "sub3", "sub4" ];
+
 const SideBar = () =>
 {
   const { pathname } = useRouter();
+  const [ openKeys, setOpenKeys ] = React.useState( [ "sub1" ] );
+
+  const onOpenChange = ( keys ) =>
+  {
+    const latestOpenKey = keys.find( ( key ) => openKeys.indexOf( key ) === -1 );
+    if ( rootSubmenuKeys.indexOf( latestOpenKey ) === -1 )
+    {
+      setOpenKeys( keys );
+    } else
+    {
+      setOpenKeys( latestOpenKey ? [ latestOpenKey ] : [] );
+    }
+  };
+
 
   return (
-    <Menu mode="inline" style={ { height: "100%", borderRight: 0 } }>
+    <Menu
+      mode="inline"
+      openKeys={ openKeys }
+      onOpenChange={ onOpenChange }
+      style={ { height: "100%", borderRight: 0 } }
+    >
       <MenuItem
         $highlight={ pathname === "/dashboard" }
         key="1"
@@ -98,17 +119,17 @@ const SideBar = () =>
             <a>Priorities</a>
           </Link>
         </MenuItem>
+        <MenuItem key="7" $highlight={ isActive( pathname, "/tactics/release" ) }>
+          <Link href="/dashboard/tactics/release">
+            <a>Release</a>
+          </Link>
+        </MenuItem>
         <MenuItem
-          key="7"
+          key="8"
           $highlight={ isActive( pathname, "/tactics/retrospective" ) }
         >
           <Link href="/dashboard/tactics/retrospective">
             <a>Retrospective</a>
-          </Link>
-        </MenuItem>
-        <MenuItem key="8" $highlight={ isActive( pathname, "/tactics/release" ) }>
-          <Link href="/dashboard/tactics/release">
-            <a>Release</a>
           </Link>
         </MenuItem>
         <MenuItem key="9" $highlight={ isActive( pathname, "/tactics/tasks" ) }>
