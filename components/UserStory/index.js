@@ -17,6 +17,7 @@ const UserStory = () => {
     {
       id: Math.floor(Math.random() * 0x1000000).toString(),
       name: "",
+      status: "",
       features: [],
     },
   ]);
@@ -38,10 +39,28 @@ const UserStory = () => {
         name: {
           $set: e,
         },
+        status: {
+          $set: "saved",
+        },
       },
     });
 
     setEpics(newData);
+  };
+
+  const handleChangeStatus = (index, e) => {
+    if (e.key === "Enter") {
+      const newData = update(epics, {
+      [index]: {
+        status: {
+          $set: "saved",
+        },
+      },
+    });
+
+    setEpics(newData);
+    }
+    
   };
 
   const addFeature = (epicIndex) => {
@@ -100,6 +119,7 @@ const UserStory = () => {
                   i={i}
                   addEpic={addEpic}
                   handleChangeEpic={handleChangeEpic}
+                  handleChangeStatus={handleChangeStatus}
                 />
 
                 {epic.name === "" ? null : (

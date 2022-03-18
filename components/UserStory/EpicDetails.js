@@ -16,6 +16,7 @@ const options = [
 const EpicDetails = ({epic}) => {
   const [designComments, setDesignComments] = useState(true);
   const [CommentType, setCommentType] = useState(designComments ? "design" : "code");
+  
   return (
     <div>
       <Row gutter={[48]}>
