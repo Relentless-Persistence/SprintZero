@@ -38,7 +38,7 @@ const DialogueCard = (
     };
     return (
         <Card
-            bordered={ false }
+            //bordered={ false }
             extra={ <CardHeaderButton onClick={ handleOpen } >View</CardHeaderButton> }
             title={ name }
             headStyle={ {

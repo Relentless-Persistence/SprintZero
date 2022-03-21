@@ -39,7 +39,6 @@ const ItemCard = ( {
     return (
         <Card
             className='mb-[16px]'
-            bordered={ false }
             extra={ <CardHeaderButton onClick={ toggleEdit } >Edit</CardHeaderButton> }
             title={ <Title>{ item.name }</Title> }
             headStyle={ {
