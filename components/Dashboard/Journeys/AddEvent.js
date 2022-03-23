@@ -43,7 +43,30 @@ const AddEvent = (
             "start": "",
             "end": "",
             "isDelighted": "",
-            "level": ""
+            "level": "",
+            "participants":
+                [
+                    {
+                        label: "Marketing",
+                        checked: false
+                    },
+                    {
+                        label: "Administrative Assistant",
+                        checked: true
+                    },
+                    {
+                        label: "Account Executive",
+                        checked: false
+                    },
+                    {
+                        label: "Vice President of Marketing",
+                        checked: true
+                    },
+                    {
+                        label: "Media Relations Coordinator",
+                        checked: true
+                    }
+                ]
         },
     );
 
@@ -204,6 +227,20 @@ const AddEvent = (
                     <Title className="mb-[8px]" >
                         Participants
                     </Title>
+
+                    {
+                        evt.participants.map( e => ( <div
+                            key={ e.label }
+                            className='flex items-center'>
+                            <Switch
+                                size="small"
+                                className={ `${ e.checked ? "bg-[#4A801D]" : "bg-[#BFBFBF]" } mr-[8px]` } />
+                            <p>{ e.label }</p>
+                        </div> ) )
+                    }
+
+
+
 
                 </Col>
 
