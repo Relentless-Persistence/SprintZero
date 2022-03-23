@@ -82,10 +82,12 @@ const TimeLineCard = (
     {
 
         return (
-            <Card extra={ <ActionButtons
-                onCancel={ toggleEdit }
-                onSubmit={ onFinish }
-            /> }
+            <Card
+                className="border-2 border-[#D9D9D9]"
+                extra={ <ActionButtons
+                    onCancel={ toggleEdit }
+                    onSubmit={ onFinish }
+                /> }
                 title={ <strong>{ title }</strong> }
                 headStyle={ {
                     background: "#F5F5F5",
@@ -215,6 +217,7 @@ const TimeLineCard = (
 
     return (
         <Card
+            className="border-2 border-[#D9D9D9]"
             extra={ <CardHeaderButton onClick={ toggleEdit } >Edit</CardHeaderButton> }
             title={ <strong>{ title }</strong> }
             headStyle={ {

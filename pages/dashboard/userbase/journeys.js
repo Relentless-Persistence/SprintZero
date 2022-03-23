@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
-import { Input, Select, Divider, DatePicker } from 'antd';
+import
+{
+    Row,
+    Col,
+    Input,
+    Select,
+    Divider,
+    DatePicker,
+    Drawer
+} from 'antd';
 import { useRouter } from 'next/router';
 import { SettingOutlined } from '@ant-design/icons';
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -10,7 +19,9 @@ import { Chart } from "../../../components/Dashboard/Journeys";
 import fakeData from "../../../fakeData/journeys.json";
 import products from "../../../fakeData/products.json";
 import { splitRoutes } from "../../../utils";
-
+import ActionButtons from "../../../components/Personas/ActionButtons";
+import { Title } from "../../../components/Dashboard/SectionTitle";
+import AddEvent from "../../../components/Dashboard/Journeys/AddEvent";
 
 
 const { Option } = Select;
@@ -20,6 +31,14 @@ const getNames = ( list = [] ) =>
     return list.map( j => j.journeyName );
 };
 
+const init = {
+    "id": "",
+    "journeyName": "",
+    "durationType": "",
+    "duration": 0,
+    "events": []
+};
+
 export default function Journeys ()
 {
     const { pathname } = useRouter();
@@ -27,29 +46,14 @@ export default function Journeys ()
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
     const [ data, setData ] = useState( fakeData );
-    const [ showAdd, setShowAdd ] = useState( false );
 
     const [ showDrawer, setShowDrawer ] = useState( false );
 
-    const [ newJourney, setNewJourney ] = useState(
-        {
-
-            "id": "",
-            "journeyName": "",
-            "durationType": "",
-            "duration": 0,
-            "events": []
-        }
-    );
+    const [ newJourney, setNewJourney ] = useState
+        ( init );
 
     const [ activeJourney, setActiveJourney ] = useState( data[ activeProduct ][ 0 ] );
 
-    const handleTypeSelect = ( type ) =>
-    {
-        alert( type );
-
-        console.log( newJourney );
-    };
 
     const setJourney = ( journeyName ) =>
     {
@@ -63,7 +67,6 @@ export default function Journeys ()
         setActiveProduct( product );
         const journey = data[ product ][ 0 ];
         setActiveJourney( journey );
-        setShowAdd( false );
 
     };
 
@@ -74,6 +77,7 @@ export default function Journeys ()
 
         setNewJourney( {
             ...newJourney,
+            journeyName: newJourney.journeyName || `Default_name ${ data[ activeProduct ].length }`,
             start
         } );
     };
@@ -82,8 +86,8 @@ export default function Journeys ()
     {
         const newJ = {
             ...newJourney,
+            journeyName: name || `Default_name ${ data[ activeProduct ].length }`,
             id: new Date().getTime(),
-            journeyName: name,
         };
 
         const newData = { ...data };
@@ -94,23 +98,81 @@ export default function Journeys ()
         setNewJourney( newJ );
         setActiveJourney( newJ );
 
-        setShowAdd( true );
     };
 
     const setDuration = ( e ) =>
     {
         setNewJourney( {
             ...newJourney,
-            duration: +e.target.value || 0
+            duration: +e.target.value || 0,
+            journeyName: newJourney.journeyName || `Default_name ${ data[ activeProduct ].length }`,
+
         } );
+    };
+
+    const handleTypeSelect = ( type ) =>
+    {
+        setNewJourney( {
+            ...newJourney,
+            durationType: type
+        } );
+    };
+
+    const addEvent = ( event ) =>
+    {
+        const journey = { ...activeJourney };
+        journey.events.push( event );
+
+        const newData = { ...data };
+
+        const jIndex = newData[ activeProduct ].findIndex( j => j.id === journey.id );
+
+        if ( jIndex > -1 )
+        {
+            newData[ activeProduct ][ jIndex ] = journey;
+        }
+        else
+        {
+            newData[ activeProduct ].push( journey );
+        }
+
+        setData( newData );
+
+
+
+        setActiveJourney( journey );
+
+        setShowDrawer( false );
+
+
+        if ( !newJourney?.id )
+        {
+            setNewJourney( init );
+        }
+    };
+
+    const checkJourney = () =>
+    {
+        if ( activeJourney )
+        {
+            return activeJourney.start && activeJourney.duration && activeJourney.durationType;
+        }
+
+        return newJourney.start && newJourney.duration && newJourney.durationType;
+    };
+
+    const onClickAddEvt = () =>
+    {
+        setActiveJourney( newJourney );
+        setShowDrawer( true );
     };
 
 
     return (
         <div className="mb-8">
             <Head>
-                <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero strategy huddle" />
+                <title >Dashboard | Sprint Zero</title>
+                <meta name="description" content="Sprint Zero journey" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
@@ -121,6 +183,7 @@ export default function Journeys ()
                 hasMainAdd
                 hasSideAdd
                 onSideAdd={ onAddJourney }
+                onMainAdd={ ( checkJourney() ) ? onClickAddEvt : () => alert( "Configure journey details" ) }
                 type="text"
                 setActiveRightNav={ setJourney }
                 defaultText={ activeJourney?.journeyName ? activeJourney.journeyName : "Add" }
@@ -139,7 +202,7 @@ export default function Journeys ()
                 }
 
                 {
-                    ( showAdd || ( activeJourney && !activeJourney.events.length ) ) ? (
+                    ( !( activeJourney?.events?.length ) ) ? (
                         <div style={ { minHeight: "50vh" } } className="flex items-center justify-center">
 
                             <div>
@@ -178,18 +241,11 @@ export default function Journeys ()
                     ) : null
                 }
 
-                {
-                    !activeJourney ? <div style={ { minHeight: "50vh" } } className="flex items-center justify-center">
-
-                        <div>
-                            <h1 className="text-[24px] leading-[32px] font-[600]">
-                                Click <q>Add</q> in the right side menu
-                            </h1>
-
-                        </div>
-                    </div> : null
-                }
-
+                <AddEvent
+                    onAdd={ addEvent }
+                    journeyType={ activeJourney?.durationType }
+                    onCancel={ () => setShowDrawer( false ) }
+                    showDrawer={ showDrawer } />
             </AppLayout>
         </div>
     );

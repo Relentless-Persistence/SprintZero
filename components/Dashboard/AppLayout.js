@@ -55,6 +55,7 @@ line-height: 24px;
 margin:0;
 padding:0;
 text-align:start;
+font-weight:600;
 
 `;
 
@@ -175,7 +176,7 @@ const AppLayout = ( {
                   <Versions className="">
                     { rightNavItems.map( ( item, i ) => (
                       <Version
-                        className={ `py-[16px] px-[24px] ${ versionClass }` }
+                        className={ `py-[16px] px-[24px] ${ versionClass } ${ activeRightItem === ( item.value || item ) ? "font-[600]" : "" }` }
                         key={ i }
                         active={ activeRightItem === ( item.value || item ) }
                         onClick={ () =>

@@ -40,7 +40,7 @@ const Ellipse = (
             <div style={ { width: "100%", height: "100%" } } className='relative'>
                 <svg width='100%' height='100%' >
                     <ellipse
-                        fill={ event.isDelighted ? "#009CD5" : "#FF4D4F" }
+                        fill={ event.isDelighted ? "rgba(0,156,213,0.6)" : "rgba(255,77,79,.6)" }
                         cx="100%"
                         cy="50%"
                         rx="100%"

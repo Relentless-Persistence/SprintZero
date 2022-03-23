@@ -9,7 +9,7 @@ import
     Button
 } from 'antd';
 
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
 import { OL } from "./NumberList";
 
@@ -46,6 +46,14 @@ const Add = styled( Button )`
     align-items: center;
 `;
 
+const MyCard = styled( Card )`
+
+    .ant-card-head
+    {
+        min-height:unset;
+    }
+`;
+
 
 const ListCard = (
     {
@@ -78,10 +86,12 @@ const ListCard = (
 
 
         return (
-            <Card extra={ <ActionButtons
-                onCancel={ toggleEdit }
-                onSubmit={ onFinish }
-            /> }
+            <MyCard
+                className="border-2 border-[#D9D9D9]"
+                extra={ <ActionButtons
+                    onCancel={ toggleEdit }
+                    onSubmit={ onFinish }
+                /> }
                 title={ <strong>{ title }</strong> }
                 headStyle={ {
                     background: "#F5F5F5",
@@ -90,7 +100,7 @@ const ListCard = (
                     <Form.List
                         initialValue={ cardData }
                         name={ `${ name }${ title }fields` }>
-                        { ( fields, { add } ) => (
+                        { ( fields, { add, remove } ) => (
                             <div>
                                 {
                                     fields.map( ( field, index ) => (
@@ -101,7 +111,18 @@ const ListCard = (
                                         >
 
                                             <MyInput
-                                                addonBefore={ `${ index + 1 }.` }
+                                                addonBefore={ <div className="flex items-center justify-between">
+                                                    <button
+                                                        onClick={ () => remove( index ) }
+                                                        className="flex items-center mr-[5px]">
+                                                        <MinusCircleOutlined
+                                                            style=
+                                                            { {
+                                                                color: "#C82D73"
+                                                            } } />
+                                                    </button>
+                                                    { `${ index + 1 }.` }
+                                                </div> }
                                                 value={ field[ index ] }
                                                 autoFocus
                                                 $removeRightBorder={ index === fields.length - 1 }
@@ -125,14 +146,16 @@ const ListCard = (
                         ) }
                     </Form.List>
                 </Form>
-            </Card>
+            </MyCard>
         );
 
     }
 
     return (
-        <Card
-            extra={ <CardHeaderButton onClick={ toggleEdit } >Edit</CardHeaderButton> }
+        <MyCard
+            className="border-2 border-[#D9D9D9]"
+
+            extra={ <CardHeaderButton size="small" onClick={ toggleEdit } >Edit</CardHeaderButton> }
             title={ <strong>{ title }</strong> }
             headStyle={ {
                 background: "#F5F5F5",
@@ -147,7 +170,7 @@ const ListCard = (
                     ) )
                 }
             </OL>
-        </Card>
+        </MyCard>
     );
 };
 

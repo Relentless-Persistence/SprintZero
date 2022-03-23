@@ -133,6 +133,39 @@ const Chart = (
                 <p className='font-[600] text-[#A6AE9D] text-[14px] leading-[22px]'>Finish</p>
 
             </div>
+
+
+            {/* legends */ }
+
+            <div
+                style={ {
+                    left: "-8%",
+                    top: "50%",
+                    transform: "rotate(-90deg)",
+                } }
+                className="absolute flex items-center">
+
+                <div className="flex items-center justify-between mr-[16px] ">
+                    <p className='font-[400] text-[#8C8C8C] text-[12px] leading-[16px] mr-[2px]'>Frustrated</p>
+                    <span style={ {
+                        width: "24px",
+                        height: "11px",
+                        borderRadius: "12px",
+                        backgroundColor: "#FF4D4F"
+                    } } />
+                </div>
+
+                <div className="flex items-center justify-between]">
+                    <p className='font-[400] text-[#8C8C8C] text-[12px] leading-[16px] mr-[2px]'>Delighted</p>
+                    <span style={ {
+                        width: "24px",
+                        height: "11px",
+                        borderRadius: "12px",
+                        backgroundColor: "#009CD5"
+                    } } />
+                </div>
+
+            </div>
         </div>
     );
 };
