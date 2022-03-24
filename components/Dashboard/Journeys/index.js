@@ -13,6 +13,7 @@ const map =
 {
     year: "years",
     month: "months",
+    week: "weeks",
     day: "days",
     hour: "hours",
     minute: "minutes",
@@ -58,6 +59,7 @@ const Chart = (
         const scale = interval[ map[ journey.durationType ] ];
 
         const diff = eInterval[ map[ journey.durationType ] ];
+
 
         const scaledWidth = ( evtLevel / 100 ) * chartWidth * ( 2 / 3 );
 

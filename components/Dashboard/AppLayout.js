@@ -171,12 +171,12 @@ const AppLayout = ( {
             </div>
 
             { hideSideBar ? null : (
-              <div style={ { minWidth: "100px" } }>
-                <div>
-                  <Versions className="">
+              <div style={ { minWidth: "180px" } }>
+                <div className="fixed right-0 min-w-[100px] max-w-[160px] z-[500] bg-[#F0F2F5] ">
+                  <Versions>
                     { rightNavItems.map( ( item, i ) => (
                       <Version
-                        className={ `py-[16px] px-[24px] ${ versionClass } ${ activeRightItem === ( item.value || item ) ? "font-[600]" : "" }` }
+                        className={ `py-[16px] px-[24px] ${ versionClass || "" } ${ activeRightItem === ( item.value || item ) ? "font-[600]" : "" }` }
                         key={ i }
                         active={ activeRightItem === ( item.value || item ) }
                         onClick={ () =>
@@ -189,7 +189,7 @@ const AppLayout = ( {
 
                     { hasSideAdd && showSideAdd ? (
                       <Version
-                        className={ `py-[16px] px-[24px] ${ versionClass }` }
+                        className={ `py-[16px] px-[24px] ${ versionClass || "" }` }
                       >
                         <Input
                           className="mx-0 my-0 "

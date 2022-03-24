@@ -3,6 +3,8 @@ import formatDistance from 'date-fns/formatDistance';
 import differenceInDays from 'date-fns/differenceInDays';
 import isBefore from 'date-fns/isBefore';
 import intervalToDuration from 'date-fns/intervalToDuration';
+import isWithinInterval from 'date-fns/isWithinInterval';
+import add from 'date-fns/add';
 
 
 const getTimeAgo = ( date, addSuffix = true ) =>
@@ -56,5 +58,7 @@ export
     differenceInDays,
     isBefore,
     intervalToDuration,
+    isWithinInterval,
+    add
 
 };

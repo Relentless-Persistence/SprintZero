@@ -36,23 +36,23 @@ const init = {
     "journeyName": "",
     "durationType": "",
     "duration": 0,
+    "start": "",
     "events": []
 };
 
 export default function Journeys ()
 {
     const { pathname } = useRouter();
-    const [ type, setType ] = useState( "" );
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
     const [ data, setData ] = useState( fakeData );
 
     const [ showDrawer, setShowDrawer ] = useState( false );
 
-    const [ newJourney, setNewJourney ] = useState
-        ( init );
+    const initJourney = data[ activeProduct ][ 0 ]?.id ? data[ activeProduct ][ 0 ] : { ...init, events: [] };
 
-    const [ activeJourney, setActiveJourney ] = useState( data[ activeProduct ][ 0 ] );
+
+    const [ activeJourney, setActiveJourney ] = useState( initJourney );
 
 
     const setJourney = ( journeyName ) =>
@@ -65,29 +65,62 @@ export default function Journeys ()
     const setProduct = ( product ) =>
     {
         setActiveProduct( product );
-        const journey = data[ product ][ 0 ];
-        setActiveJourney( journey );
+        if ( data[ product ][ 0 ] )
+        {
+            setActiveJourney( data[ product ][ 0 ] );
+        }
+        else
+        {
+            setActiveJourney( { ...init, events: [] } );
+        }
 
     };
 
 
     const setJourneyStart = ( dateTime ) =>
     {
-        const start = new Date( dateTime._d ).toISOString();
+        console.log( dateTime );
 
-        setNewJourney( {
-            ...newJourney,
-            journeyName: newJourney.journeyName || `Default_name ${ data[ activeProduct ].length }`,
-            start
-        } );
+        if ( dateTime?._d )
+        {
+            const start = new Date( dateTime._d ).toISOString();
+            setActiveJourney(
+                {
+                    ...activeJourney,
+                    journeyName: activeJourney.journeyName || `Default_name ${ data[ activeProduct ].length }`,
+                    start
+                } );
+        }
     };
+
+    const setDuration = ( e ) =>
+    {
+
+        setActiveJourney(
+            {
+                ...activeJourney,
+                journeyName: activeJourney.journeyName || `Default_name ${ data[ activeProduct ].length }`,
+                duration: +e.target.value || 0,
+            } );
+    };
+
+    const handleTypeSelect = ( type ) =>
+    {
+        setActiveJourney(
+            {
+                ...activeJourney,
+                durationType: type
+            } );
+    };
+
 
     const onAddJourney = ( name ) =>
     {
         const newJ = {
-            ...newJourney,
-            journeyName: name || `Default_name ${ data[ activeProduct ].length }`,
+            ...init,
+            journeyName: name || `Default_name ${ data[ activeProduct ].length + 1 }`,
             id: new Date().getTime(),
+            events: []
         };
 
         const newData = { ...data };
@@ -95,34 +128,15 @@ export default function Journeys ()
         newData[ activeProduct ].push( newJ );
         setData( newData );
 
-        setNewJourney( newJ );
         setActiveJourney( newJ );
 
     };
 
-    const setDuration = ( e ) =>
-    {
-        setNewJourney( {
-            ...newJourney,
-            duration: +e.target.value || 0,
-            journeyName: newJourney.journeyName || `Default_name ${ data[ activeProduct ].length }`,
-
-        } );
-    };
-
-    const handleTypeSelect = ( type ) =>
-    {
-        setNewJourney( {
-            ...newJourney,
-            durationType: type
-        } );
-    };
 
     const addEvent = ( event ) =>
     {
         const journey = { ...activeJourney };
         journey.events.push( event );
-
         const newData = { ...data };
 
         const jIndex = newData[ activeProduct ].findIndex( j => j.id === journey.id );
@@ -138,32 +152,22 @@ export default function Journeys ()
 
         setData( newData );
 
-
-
         setActiveJourney( journey );
 
         setShowDrawer( false );
 
 
-        if ( !newJourney?.id )
-        {
-            setNewJourney( init );
-        }
     };
 
     const checkJourney = () =>
     {
-        if ( activeJourney )
-        {
-            return activeJourney.start && activeJourney.duration && activeJourney.durationType;
-        }
+        return activeJourney?.start && activeJourney?.duration && activeJourney?.durationType;
 
-        return newJourney.start && newJourney.duration && newJourney.durationType;
+
     };
 
     const onClickAddEvt = () =>
     {
-        setActiveJourney( newJourney );
         setShowDrawer( true );
     };
 
@@ -195,14 +199,14 @@ export default function Journeys ()
             >
 
                 {
-                    ( activeJourney && activeJourney.events.length ) ?
+                    ( activeJourney && activeJourney?.start && activeJourney?.events?.length ) ?
                         <Chart
                             journey={ activeJourney }
                         /> : null
                 }
 
                 {
-                    ( !( activeJourney?.events?.length ) ) ? (
+                    ( !activeJourney?.start || ( activeJourney?.start && !activeJourney?.events.length ) ) ? (
                         <div style={ { minHeight: "50vh" } } className="flex items-center justify-center">
 
                             <div>
@@ -215,12 +219,15 @@ export default function Journeys ()
                                         className="max-w-[102px] mr-[28px]"
                                         type="number"
                                         min="0"
+                                        value={ activeJourney?.duration }
                                         onChange={ setDuration }
                                         placeholder="5" />
 
                                     <Select
                                         className="min-w-[112px] mr-[28px]"
                                         placeholder="Time Picker"
+                                        value={ activeJourney?.durationType }
+
                                         onChange={ handleTypeSelect }
                                     >
                                         <Option value="second">Seconds</Option>
@@ -243,6 +250,8 @@ export default function Journeys ()
 
                 <AddEvent
                     onAdd={ addEvent }
+                    journeyStart={ activeJourney?.start }
+                    journeyDur={ activeJourney?.duration }
                     journeyType={ activeJourney?.durationType }
                     onCancel={ () => setShowDrawer( false ) }
                     showDrawer={ showDrawer } />
