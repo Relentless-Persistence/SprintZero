@@ -42,12 +42,12 @@ const MenuItem = styled( Menu.Item )`
   }
 `;
 
-const rootSubmenuKeys = [ "sub1", "sub2", "sub3", "sub4" ];
+const rootSubmenuKeys = [ "strategy", "tactics", "operations", "userbase" ];
 
 const SideBar = () =>
 {
   const { pathname } = useRouter();
-  const [ openKeys, setOpenKeys ] = React.useState( [ "sub1" ] );
+  const [openKeys, setOpenKeys] = React.useState([pathname.split("/")[2]]);
 
   const onOpenChange = ( keys ) =>
   {
@@ -79,7 +79,7 @@ const SideBar = () =>
         </Link>
       </MenuItem>
       <StyledSubMenu
-        key="sub1"
+        key="strategy"
         icon={ <DeploymentUnitOutlined /> }
         title="Strategy"
       >
@@ -106,11 +106,11 @@ const SideBar = () =>
         </MenuItem>
         <MenuItem key="5" $highlight={ isActive( pathname, "/strategy/visions" ) }>
           <Link href="/dashboard/strategy/visions">
-            <a>Visions</a>
+            <a>Vision</a>
           </Link>
         </MenuItem>
       </StyledSubMenu>
-      <StyledSubMenu key="sub2" icon={ <PullRequestOutlined /> } title="Tactics">
+      <StyledSubMenu key="tactics" icon={ <PullRequestOutlined /> } title="Tactics">
         <MenuItem
           key="6"
           $highlight={ isActive( pathname, "/tactics/priorities" ) }
@@ -139,7 +139,7 @@ const SideBar = () =>
         </MenuItem>
       </StyledSubMenu>
       <StyledSubMenu
-        key="sub3"
+        key="operations"
         icon={ <NodeExpandOutlined /> }
         title="Operations"
       >
@@ -174,7 +174,7 @@ const SideBar = () =>
           </Link>
         </MenuItem>
       </StyledSubMenu>
-      <StyledSubMenu key="sub4" icon={ <UserOutlined /> } title="Userbase">
+      <StyledSubMenu key="userbase" icon={ <UserOutlined /> } title="Userbase">
         <MenuItem
           key="15"
           $highlight={ isActive( pathname, "/userbase/learnings" ) }

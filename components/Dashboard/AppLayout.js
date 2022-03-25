@@ -120,7 +120,7 @@ const AppLayout = ( {
             width={200}
             className="site-layout-background"
             breakpoint="sm"
-            style={{ position: "fixed", zIndex: 1, height: "100%", marginTop: "64px" }}
+            style={{ position: "fixed", zIndex: 0, height: "100%", marginTop: "63px" }}
           >
             <SideBar />
           </Sider>
