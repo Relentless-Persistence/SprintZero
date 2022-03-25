@@ -15,6 +15,25 @@ const StyledCard = styled( Card )`
    line-height:38px;
    box-shadow: ${ props => props.$active ? "0px 4px 4px rgba(0, 0, 0, 0.25), 1px -1px 4px rgba(0, 0, 0, 0.1)" : "" };
   border-radius: 2px;
+
+  .ant-card-head
+    {
+        min-height:unset;
+    }
+
+    .ant-card-head-title
+    {
+        padding:0
+    }
+
+    .ant-card-head-wrapper
+    {
+        margin:20px 0;
+    }
+    .ant-card-extra
+    {
+        padding:0
+    }
 `;
 
 import { CardTitle } from '../../Dashboard/CardTitle';
@@ -62,7 +81,7 @@ const StatementCard = (
             className={ invert ? "" : "deck-animate" }
             $active={ isActive }
             extra={ <Button className="text-[#262626] text-[14px] leading[22px]" onClick={ () => onEditClick( info ) } >Edit</Button> }
-            title={ <CardTitle className='text-[16px] leading[24px]'>Guiding Statement</CardTitle> }>
+            title={ <CardTitle className='!text-[16px] !leading[24px]'>Guiding Statement</CardTitle> }>
 
 
             <p>  { `For ${ info.targetCustomer }, who ${ info.need }, the ${ product } is a [product category or description] that ${ info.keyBenefits }.` }</p>

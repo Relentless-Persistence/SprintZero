@@ -18,7 +18,7 @@ import { CardTitle } from '../Dashboard/CardTitle';
 
 
 const StyledCol = styled( Acard )`
-    min-height:450px;
+    min-height:80vh;
 `;
 
 const StyledCard = styled.div`

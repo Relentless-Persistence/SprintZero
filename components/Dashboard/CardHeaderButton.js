@@ -10,12 +10,13 @@ const More = styled( Button )`
 color: #4A801D;
 background:#fff;
 box-shadow:none;
+
 `;
 
 
 const CardHeaderButton = ( { children, ...props } ) =>
 {
-  return <More { ...props } >{ children }</More>;
+  return <More size="small" { ...props } >{ children }</More>;
 };
 
 export default CardHeaderButton;

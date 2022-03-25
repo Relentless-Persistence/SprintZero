@@ -5,9 +5,39 @@ import
     Card,
     Tag
 } from 'antd';
+import styled from 'styled-components';
 
 import CardHeaderButton from "../CardHeaderButton";
 import { getTimeAgo } from '../../../utils';
+
+const MyCard = styled( Card )`
+
+    .ant-card-head
+    {
+        min-height:unset;
+        padding: 0 16px;
+    }
+
+    .ant-card-body
+    {
+        padding:12px 16px;
+    }
+
+    .ant-card-head-title
+    {
+        padding:0
+    }
+
+    .ant-card-head-wrapper
+    {
+        margin:7px 0;
+    }
+    .ant-card-extra
+    {
+        padding:0
+    }
+`;
+
 
 const DialogueCard = (
     {
@@ -37,9 +67,9 @@ const DialogueCard = (
         } );
     };
     return (
-        <Card
-            bordered={ false }
-            extra={ <CardHeaderButton onClick={ handleOpen } >View</CardHeaderButton> }
+        <MyCard
+            className='border-2 border-[#D9D9D9]'
+            onClick={ handleOpen }
             title={ name }
             headStyle={ {
                 background: "#F5F5F5",
@@ -52,7 +82,7 @@ const DialogueCard = (
             <br />
 
             <Tag color="default">{ post }</Tag>
-        </Card>
+        </MyCard>
     );
 };
 

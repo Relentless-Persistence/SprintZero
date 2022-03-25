@@ -15,6 +15,15 @@ import ActionButtons from "./ActionButtons";
 
 const { TextArea } = Input;
 
+const MyCard = styled( Card )`
+
+    .ant-card-head
+    {
+        min-height:unset;
+    }
+
+`;
+
 
 
 const DescriptionCard = (
@@ -51,10 +60,12 @@ const DescriptionCard = (
     {
         return (
             <div onMouseLeave={ toggleEdit }>
-                <Card extra={ <ActionButtons
-                    onCancel={ toggleEdit }
-                    onSubmit={ onFinish }
-                /> }
+                <MyCard
+                    className='border-2 border-[#D9D9D9]'
+                    extra={ <ActionButtons
+                        onCancel={ toggleEdit }
+                        onSubmit={ onFinish }
+                    /> }
                     title={ <strong>{ title }</strong> }
                     headStyle={ {
                         background: "#F5F5F5",
@@ -66,22 +77,23 @@ const DescriptionCard = (
                             onChange={ handleChange }
                             placeholder="Description..." />
                     </Form>
-                </Card>
+                </MyCard>
             </div>
         );
 
     }
 
     return (
-        <Card
-            extra={ <CardHeaderButton onClick={ toggleEdit } >Edit</CardHeaderButton> }
+        <MyCard
+            className='border-2 border-[#D9D9D9]'
+            extra={ <CardHeaderButton size="small" onClick={ toggleEdit } >Edit</CardHeaderButton> }
             title={ <strong>{ title }</strong> }
             headStyle={ {
                 background: "#F5F5F5",
             } }
         >
             <p>{ cardData }</p>
-        </Card>
+        </MyCard>
     );
 };
 

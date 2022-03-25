@@ -67,6 +67,7 @@ export default function Dialogue ()
 
     const [ dialogue, setDialogue ] = useState( null );
 
+
     const setProduct = ( product ) =>
     {
         setActiveProduct( product );
@@ -84,7 +85,6 @@ export default function Dialogue ()
             setActiveDialogueIndex( index );
 
             setActiveDialogue( data[ activeProduct ][ index ] );
-            setDialogue( data[ activeProduct ][ index ].list.notes[ 0 ] );
 
         }
     };

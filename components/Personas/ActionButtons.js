@@ -15,7 +15,7 @@ const Row = styled.div`
        line-height: 22px;
        color: #FFFFFF;
        border: 1px solid #4A801D;
-       padding:4px 6px;
+       padding:1px 8px;
        box-sizing:border-box;
        flex-basis:52px;
        font-family: "SF Pro Text";
