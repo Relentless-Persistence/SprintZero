@@ -252,6 +252,10 @@ body {
     margin-left: 0px;
 }
 
+.ant-menu-item-selected a, .ant-menu-item-selected a:hover {
+  color: black !important;
+}
+
 .deck-animate 
 {
     transition: transform 300ms ease;

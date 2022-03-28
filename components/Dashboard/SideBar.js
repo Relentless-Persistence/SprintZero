@@ -83,19 +83,19 @@ const SideBar = () =>
         icon={ <DeploymentUnitOutlined /> }
         title="Strategy"
       >
-        <Menu.Item
+        <MenuItem
           $highlight={ isActive( pathname, "/strategy/accessibility" ) }
           key="2"
         >
           <Link href="/dashboard/strategy/accessibility">
             <a>Accessibility</a>
           </Link>
-        </Menu.Item>
-        <Menu.Item $highlight={ isActive( pathname, "/strategy/ethics" ) } key="3">
+        </MenuItem>
+        <MenuItem $highlight={ isActive( pathname, "/strategy/ethics" ) } key="3">
           <Link href="/dashboard/strategy/ethics">
             <a>Ethics</a>
           </Link>
-        </Menu.Item>
+        </MenuItem>
         <MenuItem
           $highlight={ isActive( pathname, "/strategy/objectives" ) }
           key="4"
@@ -143,12 +143,12 @@ const SideBar = () =>
         icon={ <NodeExpandOutlined /> }
         title="Operations"
       >
-        <Menu.Item
+        <MenuItem
           key="11"
           $highlight={ isActive( pathname, "/operations/huddle" ) }
         >
           <Link href="/dashboard/operations/calendar">Calendar</Link>
-        </Menu.Item>
+        </MenuItem>
         <MenuItem
           key="12"
           $highlight={ isActive( pathname, "/operations/huddle" ) }
