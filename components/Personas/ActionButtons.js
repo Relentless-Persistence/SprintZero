@@ -29,11 +29,11 @@ const Row = styled.div`
 `;
 
 const ActionButtons = ( {
-    onCancel, onSubmit
+    onCancel, onSubmit, className
 } ) =>
 {
     return (
-        <Row>
+        <Row className={ className }>
             <button className="with-border" onClick={ onCancel } type="button">Cancel</button>
             <button onClick={ onSubmit } type="button">Done</button>
 

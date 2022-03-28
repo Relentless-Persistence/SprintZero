@@ -234,7 +234,7 @@ export default function Journeys ()
                                         <Option value="minute">Minutes</Option>
                                         <Option value="hour">Hours</Option>
                                         <Option value="day">Days</Option>
-                                        <Option value="week">Weeks</Option>
+                                        {/* <Option value="week">Weeks</Option> */ }
                                         <Option value="month">Months</Option>
                                         <Option value="year">Years</Option>
                                     </Select>

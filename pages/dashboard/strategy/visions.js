@@ -114,6 +114,7 @@ export default function Visions ()
                 hasSideAdd={ false }
                 defaultText={ getTimeAgo( vision ) }
                 onChangeProduct={ onChangeProduct }
+                mainClass="mr-[160px]"
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
 

@@ -18,7 +18,19 @@ import { CardTitle } from '../Dashboard/CardTitle';
 
 
 const StyledCol = styled( Acard )`
-    min-height:80vh;
+    min-height:75vh;
+    .ant-card-head
+    {
+        min-height:unset;
+        border-bottom: 2px solid #D9D9D9;
+    }
+
+    .ant-card-extra
+    {
+        padding:0
+    }
+
+
 `;
 
 const StyledCard = styled.div`
@@ -77,6 +89,7 @@ const Column = ( {
             ref={ col }
             extra={ header }
             title={ <Title>{ columnName }</Title> }
+            className="border-2 border-[#D9D9D9]"
             bodyStyle={ {
                 padding: "0"
             } }
@@ -95,6 +108,7 @@ const Board = ( { columns = [],
     onDrop,
     onSwap,
     columnHeaderRenders,
+    maxWidthClass,
     children,
     renderColumn,
     colCount = 3 } ) =>
@@ -117,10 +131,13 @@ const Board = ( { columns = [],
 
     return (
         <RBoard>
-            <Row gutter={ [ 16, 16 ] }>
+            <Row
+                className={ maxWidthClass }
+                gutter={ [ 16, 16 ] }>
                 {
                     columns?.map( ( ( col, i ) => (
                         <Col
+
                             span={ 24 / colCount }
                             key={ col.columnId }>
                             <Column

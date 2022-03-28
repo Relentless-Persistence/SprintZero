@@ -63,13 +63,14 @@ export default function Objectives ()
     };
 
 
-    const onAddGoal = ( name ) =>
+    const onAddGoal = () =>
     {
         const newData = { ...data };
+        const length = newData[ activeProduct ]?.length || 0;
         const goal =
         {
-            name: String( name ).padStart( 3, '0' ),
-            title: String( name ).padStart( 3, '0' ),
+            name: String( length + 1 ).padStart( 3, '0' ),
+            title: String( length + 1 ).padStart( 3, '0' ),
             results: []
         };
         newData[ activeProduct ].push( goal );
@@ -127,9 +128,10 @@ export default function Objectives ()
                 activeRightItem={ activeGoal?.name }
                 setActiveRightNav={ setGoal }
                 onMainAdd={ addItem }
-                onSideAdd={ onAddGoal }
+                onSideAddClick={ onAddGoal }
                 hasMainAdd
                 versionClass="px-[28px] py-[14px]"
+                mainClass="mr-[86px]"
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Input

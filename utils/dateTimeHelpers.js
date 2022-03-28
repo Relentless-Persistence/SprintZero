@@ -18,15 +18,11 @@ const getTimeAgo = ( date, addSuffix = true ) =>
     const actualDate = date?.toString().includes( "Now" ) ? now : date;
 
     let formattedDate = formatDistance( new Date( actualDate ), now, {
-        addSuffix
+        addSuffix,
+        includeSeconds: true
     } );
 
-    if ( formattedDate.includes( "sec" ) || formattedDate.includes( "less than a minute ago" ) )
-    {
-        return "Now";
-    }
-
-    return formattedDate.replace( "about ", "" );
+    return formattedDate.replace( "less than", "" ).replace( "about ", "" ).replace( "minute", "min" ).replace( "second", "sec" );
 };
 
 const formatDateTime = ( date, shape = "yyyy-LL-dd" ) =>

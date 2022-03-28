@@ -103,7 +103,9 @@ export default function Accessiblity ()
                 hasMainAdd={ true }
                 onMainAdd={ addItem }
                 hasSideAdd={ false }
-                breadCrumbItems={ splitRoutes( pathname ) }>
+                breadCrumbItems={ splitRoutes( pathname ) }
+                mainClass="mr-[174px]"
+            >
 
                 <MainSub>
                     { activeChallenge?.title }

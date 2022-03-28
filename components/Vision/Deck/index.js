@@ -1,21 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StatementCard from './Card';
 
-const data =
-    [
-        {
-            value: `1 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis velit blanditiis impedit quidem et quam dolorem sunt quis saepe, nihil dolor officiis cum itaque dicta sint dolores, consequuntur odit. Libero.
-        `
-        },
-        {
-            value: `2 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis velit blanditiis impedit quidem et quam dolorem sunt quis saepe, nihil dolor officiis cum itaque dicta sint dolores, consequuntur odit. Libero.
-        `
-        },
-        {
-            value: `3 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis velit blanditiis impedit quidem et quam dolorem sunt quis saepe, nihil dolor officiis cum itaque dicta sint dolores, consequuntur odit. Libero.
-        `
-        }
-    ];
 
 
 const Deck = (

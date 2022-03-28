@@ -13,11 +13,20 @@ import
     Row,
     Tag,
     Col,
+    Button,
     Drawer,
-    Radio,
-    Checkbox
+    Comment,
+    Form,
 } from 'antd';
-import { LinkOutlined, CloseOutlined } from '@ant-design/icons';
+import
+{
+    DislikeOutlined,
+    LikeOutlined,
+    LinkOutlined,
+    CloseOutlined,
+    FlagOutlined,
+    SendOutlined
+} from '@ant-design/icons';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
@@ -32,6 +41,7 @@ import fakeData from "../../../fakeData/ethics.json";
 import products from "../../../fakeData/products.json";
 import { Title } from "../../../components/Dashboard/SectionTitle";
 import CustomTag from "../../../components/Dashboard/Tag";
+import AppCheckbox from "../../../components/AppCheckbox";
 
 
 const { TextArea } = Input;
@@ -90,6 +100,16 @@ color: #262626;
 `;
 
 
+const StyledTag = styled( Tag )`
+background: #F5F5F5;
+border: ${ props => props.$border ? "1px solid #BFBFBF" : "" };
+color: ${ props => props.$textColor || "#262626" } !important;
+font-weight: 600;
+font-size: 14px;
+line-height: 22px;
+`;
+
+
 const DrawerTitle = styled( Row )`
     h3
     {
@@ -123,6 +143,55 @@ const Story = styled.p`
 `;
 
 
+const comments = [
+    {
+        actions: [
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="like"><LikeOutlined /> 127 </button>,
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="dislike"><DislikeOutlined /> 0</button>,
+            <span
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="comment-list-reply-to-0">Reply to</span> ],
+        author: 'Han Solo',
+        avatar: 'https://joeschmoe.io/api/v1/random',
+        content: (
+            <p>
+                We supply a series of design principles, practical patterns and high quality design
+                resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                efficiently.
+            </p>
+        ),
+
+    },
+    {
+        actions: [
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="like"><LikeOutlined /> 127 </button>,
+            <button
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="dislike"><DislikeOutlined /> 0</button>,
+            <span
+                className="inline-block mr-[10px] flex justify-between items-center"
+                key="comment-list-reply-to-0">Reply to</span> ],
+        author: 'Han Solo',
+        avatar: 'https://joeschmoe.io/api/v1/random',
+        content: (
+            <p>
+                We supply a series of design principles, practical patterns and high quality design
+                resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                efficiently.
+            </p>
+        ),
+
+    }
+];
+
+
+
 
 
 
@@ -134,6 +203,7 @@ export default function Ethics ()
     const { pathname } = useRouter();
 
     const [ data, setData ] = useState( fakeData );
+    const [ allow, setAllow ] = useState( "" );
     const [ visible, setVisible ] = useState( false );
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
@@ -285,24 +355,39 @@ export default function Ethics ()
                     onSwap={ handleSwap }
                     columns={ activeBoard?.columns }
                     renderColumn={ renderCol }
+                    maxWidthClass="max-w-[1200px]"
                     columnHeaderRenders={ [ null, null, <DropDwnBtn key="jjj" value="All" menu={ menu } /> ] }
                 />
 
                 <Drawer
+                    height="412px"
                     title={ <DrawerTitle gutter={ [ 16, 16 ] }>
                         <Col span={ 12 }>
                             <h3>card_title</h3>
-                            <Tag color="#91D5FF">3 points</Tag>
-                            <Tag color="#A4DF74">$1,230</Tag>
-                            <Tag
+                            <StyledTag color="#91D5FF">3 points</StyledTag>
+                            <StyledTag color="#A4DF74">$1,230</StyledTag>
+                            <StyledTag
                                 icon={ <LinkOutlined /> }
-                                color="#096DD9">Design</Tag>
+                                color="#096DD9">Design</StyledTag>
+                            <StyledTag
+                                $border
+                                $textColor="#BFBFBF"
+                                icon={ <LinkOutlined style={ {
+                                    color: "#BFBFBF"
+                                } } /> }>
+                                Code
+                            </StyledTag>
                         </Col>
-                        <Col span={ 12 }>
+                        <Col
+                            className="flex items-center justify-end"
+                            span={ 12 }>
                             <CloseTime>
-                                <p>Last modified 2 hrs ago</p>
+                                <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">Last modified 2 hrs ago</p>
                                 <CloseOutlined
-                                    color="#A6AE9D"
+                                    style={ {
+                                        color: "#101D06",
+                                        fontSize: "12px"
+                                    } }
                                     onClick={ () => setVisible( false ) } />
                             </CloseTime>
                         </Col>
@@ -313,7 +398,7 @@ export default function Ethics ()
                     onClose={ () => setVisible( false ) }
                     visible={ visible }
                 >
-                    <Row className="py-6" gutter={ [ 50, 50 ] }>
+                    <Row className="py-6" gutter={ [ 16, 16 ] }>
                         <Col span={ 12 }>
 
                             <Title>
@@ -324,19 +409,18 @@ export default function Ethics ()
                             <p>Do you think this would provide value and reaffirm the commitment to our users?</p>
                             <br />
 
-                            <Radio.Group
-                                options={ [
-                                    {
-                                        label: "Allow",
-                                        value: true
-                                    },
-                                    {
-                                        label: "Deny",
-                                        value: false
-                                    }
-                                ] }
-                                optionType={ Checkbox }
-                            />
+
+
+                            <AppCheckbox
+                                checked={ allow }
+                                onChange={ () => setAllow( true ) }
+                            >Allow</AppCheckbox>
+                            <AppCheckbox
+                                checked={ !allow }
+                                onChange={ () => setAllow( false ) }
+                            >Reject</AppCheckbox>
+
+
                             <br />
                             <br />
 
@@ -352,7 +436,65 @@ export default function Ethics ()
 
                         </Col>
 
-                        <Col span={ 12 }>
+                        <Col
+                            offset={ 1 }
+                            className="max-h-[250px] overflow-y-scroll"
+                            span={ 11 }>
+                            <Title>
+                                Comments
+                            </Title>
+
+                            <List
+                                className="comment-list"
+                                itemLayout="horizontal"
+                                dataSource={ comments }
+                                renderItem={ item => (
+                                    <li>
+                                        <Comment
+                                            actions={ item.actions }
+                                            author={ item.author }
+                                            avatar={ item.avatar }
+                                            content={ item.content }
+                                        />
+                                    </li>
+                                ) }
+                            />
+
+                            <Comment
+                                avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" /> }
+                                content={
+                                    <>
+                                        <Form.Item>
+                                            <TextArea rows={ 2 } />
+                                        </Form.Item>
+
+                                        <Form.Item>
+                                            <Button
+                                                className="inline-flex justify-between items-center mr-[8px]"
+                                                disabled>
+                                                <SendOutlined />
+                                                Post
+                                            </Button>
+
+
+                                            <Button
+                                                className="inline-flex justify-between items-center"
+                                                danger>
+                                                <FlagOutlined />
+                                                Flag
+                                            </Button>
+                                        </Form.Item>
+
+                                    </>
+                                }
+                            />
+
+
+                        </Col>
+
+                        {/* <Col
+                            className="max-h-[250px] overflow-y-scroll"
+                            span={ 12 }>
                             <Title>
                                 Comments
                             </Title>
@@ -384,8 +526,25 @@ export default function Ethics ()
 
                             </List.Item>
 
+                            <List.Item>
+                                <Button
+                                    className="mr-[8px]"
+                                    disabled>
+                                    <SendOutlined />
+                                    Post
+                                </Button>
 
-                        </Col>
+
+                                <Button
+                                    className="inline-flex justify-between items-center"
+                                    danger>
+                                    <FlagOutlined />
+                                    Flag
+                                </Button>
+                            </List.Item>
+
+
+                        </Col> */}
 
                     </Row>
                 </Drawer>

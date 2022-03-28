@@ -11,8 +11,6 @@ import
 const StyledCard = styled( Card )`
    transform:  ${ props => props.invert };
    margin-bottom: 135px;
-   font-size:30px;
-   line-height:38px;
    box-shadow: ${ props => props.$active ? "0px 4px 4px rgba(0, 0, 0, 0.25), 1px -1px 4px rgba(0, 0, 0, 0.1)" : "" };
   border-radius: 2px;
 
@@ -84,12 +82,12 @@ const StatementCard = (
             title={ <CardTitle className='!text-[16px] !leading[24px]'>Guiding Statement</CardTitle> }>
 
 
-            <p>  { `For ${ info.targetCustomer }, who ${ info.need }, the ${ product } is a [product category or description] that ${ info.keyBenefits }.` }</p>
+            <p className='text-[30px] leading-[38px]'>  { `For ${ info.targetCustomer }, who ${ info.need }, the ${ product } is a [product category or description] that ${ info.keyBenefits }.` }</p>
 
 
             <br />
 
-            <p>
+            <p className='text-[30px] leading-[38px]'>
 
                 { `Unlike ${ info.competitors }, our product ${ info.differentiators }.` }
 

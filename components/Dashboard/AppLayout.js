@@ -81,6 +81,8 @@ const AppLayout = ( {
   versionClass,
   topExtra = <></>,
   useGrid,
+  mainClass,
+  onSideAddClick,
   children } ) =>
 {
   const { user } = useAuth();
@@ -126,7 +128,13 @@ const AppLayout = ( {
         >
           <SideBar />
         </Sider>
-        <Layout style={ { marginTop: "65px", marginLeft: "200px" } }>
+        <Layout
+          className={ mainClass }
+          style={
+            {
+              marginTop: "65px",
+              marginLeft: "200px"
+            } }>
           <div
             style={
               useGrid
@@ -171,8 +179,10 @@ const AppLayout = ( {
             </div>
 
             { hideSideBar ? null : (
-              <div style={ { minWidth: "180px" } }>
-                <div className="fixed right-0 min-w-[100px] max-w-[160px] z-[500] bg-[#F0F2F5] ">
+              <div
+              //style={ { minWidth: "180px" } }
+              >
+                <div className="fixed right-0 min-w-[100px] max-w-[160px] z-[500] bg-[#F0F2F5] max-h-full overflow-y-auto pb-[80px]">
                   <Versions>
                     { rightNavItems.map( ( item, i ) => (
                       <Version
@@ -204,7 +214,17 @@ const AppLayout = ( {
                       </Version>
                     ) : null }
 
-                    { hasSideAdd ? (
+                    {
+                      ( hasSideAdd && onSideAddClick ) ?
+                        <Version className="py-[16px] px-[24px]">
+                          <AddSide onClick={ onSideAddClick }>
+                            Add
+                          </AddSide>
+                        </Version>
+                        : null
+                    }
+
+                    { ( hasSideAdd && !onSideAddClick ) ? (
                       <Version className="py-[16px] px-[24px]">
                         <AddSide onClick={ toggleSideAdd }>
                           { showSideAdd ? "Close" : "Add" }

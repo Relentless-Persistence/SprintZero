@@ -87,7 +87,7 @@ const AddEvent = (
         if ( start && end )
         {
 
-            console.log( journeyStart );
+            //console.log( journeyStart );
             const jStart = new Date( journeyStart );
             const jEnd = add( jStart,
                 {

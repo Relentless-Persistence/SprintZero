@@ -5,7 +5,7 @@ import
     Card,
 } from 'antd';
 
-import CardHeaderButton from "./CardHeaderButton";
+import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
 import FormCard from "./FormCard";
 import { CardTitle as Title } from './CardTitle';
 
@@ -14,6 +14,7 @@ const MyCard = styled( Card )`
     .ant-card-head
     {
         min-height:unset;
+        border-bottom: 2px solid #D9D9D9;
     }
 
     .ant-card-head-title
@@ -61,9 +62,9 @@ const ItemCard = ( {
     return (
         <MyCard
             className='mb-[16px] border-2 border-[#D9D9D9]'
-            extra={ <CardHeaderButton
+            extra={ <CardHeaderLink
                 size="small"
-                onClick={ toggleEdit } >Edit</CardHeaderButton> }
+                onClick={ toggleEdit } >Edit</CardHeaderLink> }
             title={ <Title>{ item.name }</Title> }
             headStyle={ {
                 background: "#F5F5F5",

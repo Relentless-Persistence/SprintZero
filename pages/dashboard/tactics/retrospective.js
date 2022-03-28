@@ -4,8 +4,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import
 {
-    Row,
-    Col,
+
     Dropdown,
     Card,
     Avatar,
@@ -17,18 +16,22 @@ import
     SortAscendingOutlined
 } from '@ant-design/icons';
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
+import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
 
+import AppLayout from "../../../components/Dashboard/AppLayout";
 import { splitRoutes } from "../../../utils";
 
 import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 
 import fakeData from "../../../fakeData/retrospective.json";
 import products from "../../../fakeData/products.json";
+import { ActionFormCard } from "../../../components/Dashboard/FormCard";
 
 const { Meta } = Card;
 
 const MyCard = styled( Card )`
+
+    position:relative;
    
     .ant-card-body
     {
@@ -80,10 +83,12 @@ const MyBtn = styled( Dropdown.Button )`
 export default function Retrospective ()
 {
     const { pathname } = useRouter();
+    const user = "Arlene McCoy";
 
     const [ data, setData ] = useState( fakeData );
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
+    const [ activeEditIndex, setActiveEditIndex ] = useState( null );
 
     const [ activeTabIndex, setActiveTabIndex ] = useState( 0 );
 
@@ -105,6 +110,20 @@ export default function Retrospective ()
 
     };
 
+    const onEdit = ( item ) =>
+    {
+        const newData = { ...data };
+
+        const card = newData[ activeProduct ][ activeTabIndex ].comments[ activeEditIndex ];
+
+        card.title = item.title;
+        card.text = item.description;
+
+        setData( newData );
+
+        setActiveEditIndex( null );
+    };
+
 
     return (
         <div className="mb-8">
@@ -119,6 +138,7 @@ export default function Retrospective ()
                 activeRightItem={ data[ activeProduct ][ activeTabIndex ].title }
                 onChangeProduct={ setProduct }
                 setActiveRightNav={ handleRightNav }
+                mainClass="mr-[128px]"
                 hasSideAdd={ false }
                 topExtra={ <MyBtn
                     className=""
@@ -131,13 +151,24 @@ export default function Retrospective ()
                 hasMainAdd
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <MasonryGrid>
+                { data[ activeProduct ][ activeTabIndex ]?.comments?.length ? <MasonryGrid>
                     {
 
                         data[ activeProduct ][ activeTabIndex ].comments.map( ( c, i ) => (
 
-                            <MyCard
+                            i === activeEditIndex ? (
+                                <>
+                                    <ActionFormCard
+                                        title={ c.title }
+                                        description={ c.text }
+                                        className='mb-[16px]'
+                                        onCancel={ () => setActiveEditIndex( null ) }
+                                        onSubmit={ onEdit }
+                                    />
+                                </>
+                            ) : ( <MyCard
                                 className='mb-[16px]'
+                                //extra={ user === c.name ? <CardHeaderLink>Edit</CardHeaderLink> : null }
                                 key={ i }>
                                 <Meta
                                     avatar={ <Avatar
@@ -151,7 +182,14 @@ export default function Retrospective ()
                                     description={ c.role }
                                 />
 
+                                {
+                                    user === c.name ? <CardHeaderButton
+                                        onClick={ () => setActiveEditIndex( i ) }
+                                        className="absolute top-[28px] right-[16px]" >Edit</CardHeaderButton> : null
+                                }
+
                                 <Divider />
+
 
                                 <article>
                                     <h5>{ c.title }</h5>
@@ -159,10 +197,16 @@ export default function Retrospective ()
                                 </article>
 
                                 <br />
-                            </MyCard>
+                            </MyCard> )
+
                         ) )
                     }
-                </MasonryGrid>
+                </MasonryGrid> : <h3 className="text-center" >
+                    Add Item
+                </h3>
+                }
+
+
 
 
 

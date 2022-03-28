@@ -6,7 +6,9 @@ import
     Input
 } from 'antd';
 
-import CardHeaderButton from "./CardHeaderButton";
+import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
+import ActionButtons from "../Personas/ActionButtons";
+
 
 const { TextArea } = Input;
 
@@ -15,7 +17,9 @@ export default function FormCard (
     {
         isEdit,
         itemToEdit,
-        onSubmit
+        extra,
+        onSubmit,
+        className,
     }
 )
 {
@@ -61,8 +65,9 @@ export default function FormCard (
 
     return (
         <Card
+            className={ className }
             bordered={ false }
-            extra={ <CardHeaderButton onClick={ handleSubmit } >Done</CardHeaderButton> }
+            extra={ extra ? extra : <CardHeaderLink onClick={ handleSubmit } >Done</CardHeaderLink> }
             title={ <Input
                 value={ item.name }
                 onChange={ e => handleChange( e, "name" ) }
@@ -79,3 +84,65 @@ export default function FormCard (
         </Card>
     );
 }
+
+export const ActionFormCard = (
+    {
+        title,
+        description,
+        useAction = true,
+        onSubmit,
+        onCancel,
+        className,
+    }
+) =>
+{
+    const [ item, setItem ] = useState(
+        {
+            title,
+            description,
+        }
+    );
+
+
+    const handleChange = ( e, key ) =>
+    {
+        const { value } = e.target;
+
+        setItem( {
+            ...item,
+            [ key ]: value
+        } );
+    };
+
+    const handleSubmit = () =>
+    {
+        onSubmit( item );
+        setItem( { item: "", description: "" } );
+    };
+
+
+    return (
+        <Card
+            className={ className }
+            bordered={ false }
+            extra={ useAction ? <ActionButtons
+                className="ml-[12px]"
+                onCancel={ onCancel }
+                onSubmit={ handleSubmit }
+            /> : <CardHeaderLink onClick={ handleSubmit } >Done</CardHeaderLink> }
+            title={ <Input
+                value={ item.title }
+                onChange={ e => handleChange( e, "title" ) }
+                placeholder="Result name..." /> }
+            headStyle={ {
+                background: "#F5F5F5",
+            } }
+        >
+            <TextArea
+                autoSize={ { minRows: 6 } }
+                value={ item.description }
+                onChange={ e => handleChange( e, "description" ) }
+                placeholder="Result description..." />
+        </Card>
+    );
+};
