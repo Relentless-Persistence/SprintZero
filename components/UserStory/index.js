@@ -11,6 +11,7 @@ import { ArcherContainer, ArcherElement } from "react-archer";
 import { last } from "lodash";
 import Epic from "./Epic";
 import Feature from "./Feature";
+import Story from "./Story";
 
 const UserStory = () => {
   const [epics, setEpics] = useState([
@@ -51,16 +52,15 @@ const UserStory = () => {
   const handleChangeStatus = (index, e) => {
     if (e.key === "Enter") {
       const newData = update(epics, {
-      [index]: {
-        status: {
-          $set: "saved",
+        [index]: {
+          status: {
+            $set: "saved",
+          },
         },
-      },
-    });
+      });
 
-    setEpics(newData);
+      setEpics(newData);
     }
-    
   };
 
   const addFeature = (epicIndex) => {
@@ -88,6 +88,47 @@ const UserStory = () => {
           [featureIndex]: {
             name: {
               $set: e,
+            },
+          },
+        },
+      },
+    });
+
+    setEpics(newData);
+  };
+
+  const addStory = (epicIndex, featureIndex) => {
+    const newData = update(epics, {
+      [epicIndex]: {
+        features: {
+          [featureIndex]: {
+            stories: {
+              $push: [
+                {
+                  id: Math.floor(Math.random() * 0x1000000).toString(),
+                  name: "",
+                },
+              ],
+            },
+          },
+        },
+      },
+    });
+
+    setEpics(newData);
+  };
+
+  const handleChangeStory = (epicIndex, featureIndex, storyIndex, e) => {
+    const newData = update(epics, {
+      [epicIndex]: {
+        features: {
+          [featureIndex]: {
+            stories: {
+              [storyIndex]: {
+                name: {
+                  $set: e,
+                },
+              },
             },
           },
         },
@@ -146,6 +187,56 @@ const UserStory = () => {
                               addFeature={addFeature}
                               handleChangeFeature={handleChangeFeature}
                             />
+                            <ArcherElement
+                              id={`${feature.id}-1`}
+                              relations={[
+                                {
+                                  targetId: feature.id,
+                                  targetAnchor: "bottom",
+                                  sourceAnchor: "top",
+                                  style: {
+                                    strokeDasharray: "4,3",
+                                    endShape: {
+                                      arrow: {
+                                        arrowLength: 4,
+                                        arrowThickness: 1.5,
+                                      },
+                                    },
+                                  },
+                                },
+                              ]}
+                            >
+                              <div className="mt-[42.5px] flex flex-col p-[14px] border-2 border-[#0073B3] rounded">
+                                {feature.name === "" ? null : (
+                                  <>
+                                    {feature.stories.length <= 0
+                                      ? null
+                                      : feature.stories.map(
+                                          (story, storyIndex) => (
+                                            <div key={story.id}>
+                                              <Story
+                                                featureIndex={featureIndex}
+                                                story={story}
+                                                storyIndex={storyIndex}
+                                                i={i}
+                                                addStory={addStory}
+                                                handleChangeStory={
+                                                  handleChangeStory
+                                                }
+                                              />
+                                            </div>
+                                          )
+                                        )}
+                                    <Tag
+                                      className="flex items-center space-x-1 border-2 border-[#0073B3] border-dashed px-[8px] py-[4px] text-[#0073B3] text-sm rounded cursor-pointer"
+                                      onClick={() => addStory(i, featureIndex)}
+                                    >
+                                      Add Story
+                                    </Tag>
+                                  </>
+                                )}
+                              </div>
+                            </ArcherElement>
                           </div>
                         ))
                       )}
