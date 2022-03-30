@@ -26,6 +26,8 @@ import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 import fakeData from "../../../fakeData/retrospective.json";
 import products from "../../../fakeData/products.json";
 import { ActionFormCard } from "../../../components/Dashboard/FormCard";
+import AddItem from "../../../components/Retrospective/AddItem";
+
 
 const { Meta } = Card;
 
@@ -90,6 +92,8 @@ export default function Retrospective ()
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
     const [ activeEditIndex, setActiveEditIndex ] = useState( null );
 
+    const [ showAdd, setShowAdd ] = useState( false );
+
     const [ activeTabIndex, setActiveTabIndex ] = useState( 0 );
 
     const handleRightNav = ( name ) =>
@@ -124,6 +128,30 @@ export default function Retrospective ()
         setActiveEditIndex( null );
     };
 
+    const addRetro = ( dto ) =>
+    {
+        const newData = { ...data };
+
+        const comments = newData[ activeProduct ][ activeTabIndex ].comments;
+
+        const newComm = {
+            "avatar": "https://joeschmoe.io/api/v1/random",
+            "role": "Designer",
+            name: user,
+            title: dto.title,
+            text: dto.description,
+        };
+
+        newData[ activeProduct ][ activeTabIndex ].comments = [ newComm, ...comments ];
+
+
+        setData( newData );
+
+        setShowAdd( false );
+
+
+    };
+
 
     return (
         <div className="mb-8">
@@ -149,6 +177,7 @@ export default function Retrospective ()
                     Sort
                 </MyBtn> }
                 hasMainAdd
+                onMainAdd={ () => setShowAdd( true ) }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 { data[ activeProduct ][ activeTabIndex ]?.comments?.length ? <MasonryGrid>
@@ -206,6 +235,11 @@ export default function Retrospective ()
                 </h3>
                 }
 
+                <AddItem
+                    show={ showAdd }
+                    onSubmit={ addRetro }
+                    setShow={ setShowAdd }
+                />
 
 
 
