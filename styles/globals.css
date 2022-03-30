@@ -30,6 +30,11 @@
   color: var(--kelly);
 }
 
+*
+{
+  text-rendering:optimizeLegibility;
+}
+
 body {
   /* padding: 50px 153px; */
   margin: 0;
