@@ -76,7 +76,8 @@ const Chart = (
     return (
         <div
             style={ {
-                height: "65vh"
+                height: "65vh",
+                marginLeft: "2%"
             } }
             ref={ wrapper }
             className='relative mt-[30px]'>
@@ -141,7 +142,7 @@ const Chart = (
 
             <div
                 style={ {
-                    left: "-8%",
+                    left: "-10%",
                     top: "50%",
                     transform: "rotate(-90deg)",
                 } }

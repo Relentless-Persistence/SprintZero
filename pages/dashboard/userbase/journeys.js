@@ -19,8 +19,6 @@ import { Chart } from "../../../components/Dashboard/Journeys";
 import fakeData from "../../../fakeData/journeys.json";
 import products from "../../../fakeData/products.json";
 import { splitRoutes } from "../../../utils";
-import ActionButtons from "../../../components/Personas/ActionButtons";
-import { Title } from "../../../components/Dashboard/SectionTitle";
 import AddEvent from "../../../components/Dashboard/Journeys/AddEvent";
 
 
@@ -189,6 +187,7 @@ export default function Journeys ()
                 onSideAdd={ onAddJourney }
                 onMainAdd={ ( checkJourney() ) ? onClickAddEvt : () => alert( "Configure journey details" ) }
                 type="text"
+                mainClass="mr-[152px]"
                 setActiveRightNav={ setJourney }
                 defaultText={ activeJourney?.journeyName ? activeJourney.journeyName : "Add" }
                 breadCrumbItems={ splitRoutes( pathname ) }

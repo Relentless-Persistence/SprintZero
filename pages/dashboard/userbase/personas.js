@@ -37,12 +37,13 @@ export default function Personas ()
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
-    const [ activeRole, setActiveRole ] = useState( data[ activeProduct ][ 0 ] );
+    const [ activeRole, setActiveRole ] = useState( { ...data[ activeProduct ][ 0 ] } );
 
     const setProduct = ( product ) =>
     {
         setActiveProduct( product );
-        setActiveRole( data[ product ][ 0 ] );
+        const role = { ...data[ product ][ 0 ] };
+        setActiveRole( role );
     };
 
     const setRole = ( roleName ) =>
@@ -51,7 +52,9 @@ export default function Personas ()
 
         if ( roleIndex > -1 )
         {
-            setActiveRole( data[ activeProduct ][ roleIndex ] );
+            const role = { ...data[ activeProduct ][ roleIndex ] };
+
+            setActiveRole( role );
         }
     };
 
@@ -109,11 +112,12 @@ export default function Personas ()
 
         if ( roleIndex > -1 )
         {
-            const cardIndex = newData[ activeProduct ][ roleIndex ].cards.findIndex( c => c.name === cardName );
+            const role = newData[ activeProduct ][ roleIndex ];
+            const cardIndex = role.cards.findIndex( c => c.name === cardName );
 
             if ( cardIndex > -1 )
             {
-                newData[ activeProduct ][ roleIndex ].cards[ cardIndex ].list = list;
+                role.cards[ cardIndex ].list = list;
             }
 
             setData( newData );
@@ -144,7 +148,6 @@ export default function Personas ()
 
     };
 
-
     return (
         <div className="mb-8">
             <Head>
@@ -162,11 +165,13 @@ export default function Personas ()
                 setActiveRightNav={ setRole }
                 onSideAdd={ createRole }
                 hasSideAdd
+                mainClass="mr-[120px]"
                 type="text"
 
             >
 
-                <Row className="py-6" gutter={ [ 16, 16 ] }>
+                <Row
+                    key={ activeRole?.id } gutter={ [ 16, 16 ] }>
                     <Col
                         xs={ { span: 24 } }
                         sm={ { span: 12 } }>
@@ -174,15 +179,15 @@ export default function Personas ()
                         <ListCard
                             handleEdit={ ( list ) => handleEdit( activeRole?.title, "Goals", list ) }
                             title="Goals"
-                            name={ activeRole?.id }
                             cardData={ getCardData( "Goals", activeRole?.cards ) }
                         />
 
                         <br />
 
                         <ListCard
+
                             handleEdit={ ( list ) => handleEdit( activeRole?.title, "Interactions", list ) }
-                            name={ activeRole?.id }
+
                             title="Interactions"
                             cardData={ getCardData( "Interactions", activeRole?.cards ) }
                         />
@@ -194,8 +199,6 @@ export default function Personas ()
                             handleEdit={ ( list ) => handleEdit( activeRole?.title, "Tasks", list ) }
                             title="Tasks"
                             cardData={ getCardData( "Tasks", activeRole?.cards ) }
-                            name={ activeRole?.id }
-
                         />
 
 
@@ -205,8 +208,6 @@ export default function Personas ()
                             handleEdit={ ( list ) => handleEdit( activeRole?.title, "Responsiblities", list ) }
                             title="Responsiblities"
                             cardData={ getCardData( "Responsiblities", activeRole?.cards ) }
-                            name={ activeRole?.id }
-
                         />
 
 
@@ -229,8 +230,6 @@ export default function Personas ()
                         <TimeLineCard
                             handleEdit={ ( list ) => handleEdit( activeRole?.title, "A Day in the life", list ) }
                             title="A Day in the life"
-                            name={ activeRole?.id }
-
                             cardData={ getCardData( "A Day in the life", activeRole?.cards ) } />
 
                     </Col>

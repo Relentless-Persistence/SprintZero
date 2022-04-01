@@ -35,6 +35,7 @@ const MyCard = styled( Card )`
 
 const ItemCard = ( {
     onEdit,
+    useBtn,
     item
 } ) => 
 {
@@ -62,9 +63,11 @@ const ItemCard = ( {
     return (
         <MyCard
             className='mb-[16px] border-2 border-[#D9D9D9]'
-            extra={ <CardHeaderLink
+            extra={ useBtn ? <CardHeaderButton
                 size="small"
-                onClick={ toggleEdit } >Edit</CardHeaderLink> }
+                onClick={ toggleEdit } >Edit</CardHeaderButton> : <CardHeaderLink
+                    size="small"
+                    onClick={ toggleEdit } >Edit</CardHeaderLink> }
             title={ <Title>{ item.name }</Title> }
             headStyle={ {
                 background: "#F5F5F5",

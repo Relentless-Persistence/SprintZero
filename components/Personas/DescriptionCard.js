@@ -17,9 +17,11 @@ const { TextArea } = Input;
 
 const MyCard = styled( Card )`
 
+
     .ant-card-head
     {
         min-height:unset;
+        border-bottom: 2px solid #D9D9D9;
     }
 
 `;
@@ -31,7 +33,7 @@ const DescriptionCard = (
         handleEdit,
         title = "Goals",
         name = "",
-        cardData = [ "" ]
+        cardData = []
     }
 ) => 
 {
@@ -52,33 +54,39 @@ const DescriptionCard = (
     {
         handleEdit( state );
         toggleEdit();
-        setState( "" );
 
     };
+
+    const onCancel = () =>
+    {
+        toggleEdit();
+        setState( cardData[ 0 ] );
+
+    };
+
+
 
     if ( isEdit )
     {
         return (
-            <div onMouseLeave={ toggleEdit }>
-                <MyCard
-                    className='border-2 border-[#D9D9D9]'
-                    extra={ <ActionButtons
-                        onCancel={ toggleEdit }
-                        onSubmit={ onFinish }
-                    /> }
-                    title={ <strong>{ title }</strong> }
-                    headStyle={ {
-                        background: "#F5F5F5",
-                    } }>
-                    <Form name={ `${ name }${ title }fields` } >
-                        <TextArea
-                            autoSize={ { minRows: 6 } }
-                            value={ state }
-                            onChange={ handleChange }
-                            placeholder="Description..." />
-                    </Form>
-                </MyCard>
-            </div>
+            <MyCard
+                className='border-2 border-[#D9D9D9]'
+                extra={ <ActionButtons
+                    onCancel={ onCancel }
+                    onSubmit={ onFinish }
+                /> }
+                title={ <strong>{ title }</strong> }
+                headStyle={ {
+                    background: "#F5F5F5",
+                } }>
+                <Form name={ `${ name }${ title }fields` } >
+                    <TextArea
+                        autoSize={ { minRows: 6 } }
+                        value={ state }
+                        onChange={ handleChange }
+                        placeholder="Description..." />
+                </Form>
+            </MyCard>
         );
 
     }
