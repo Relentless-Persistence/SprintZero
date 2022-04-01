@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
@@ -9,6 +9,7 @@ import
     Col,
     Menu,
     Button,
+    Dropdown,
     Drawer
 } from 'antd';
 
@@ -27,6 +28,12 @@ import { DialogueCard, AddNote } from "../../../components/Dashboard/Dialogue";
 const getRightNav = data => 
 {
     return data.map( d => d.title );
+};
+
+const getPosts = data =>
+{
+    return data.map( d => d.post );
+
 };
 
 
@@ -51,6 +58,8 @@ const menu = ( data ) => (
     </Menu>
 );
 
+const DEFAULT_HEIGHT = 378;
+
 export default function Dialogue ()
 {
     const { pathname } = useRouter();
@@ -60,12 +69,23 @@ export default function Dialogue ()
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
     const [ visible, setVisible ] = useState( false );
+    const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
+
     const [ visibleEdit, setVisibleEdit ] = useState( false );
 
     const [ activeDialogue, setActiveDialogue ] = useState( data[ activeProduct ][ 0 ] );
     const [ activeDialogueIndex, setActiveDialogueIndex ] = useState( 0 );
 
     const [ dialogue, setDialogue ] = useState( null );
+
+
+    useEffect( () =>
+    {
+        setHeight( 0.7 * window.innerHeight );
+
+    }, [] );
+
+
 
 
     const setProduct = ( product ) =>
@@ -131,13 +151,16 @@ export default function Dialogue ()
                 breadCrumbItems={ splitRoutes( pathname ) }
                 activeRightItem={ activeDialogue?.title } onChangeProduct={ setProduct }
                 setActiveRightNav={ setDia }
+                mainClass="mr-[130px]"
                 rightNavItems={ getRightNav( data[ activeProduct ] )
                 }
                 hasMainAdd
-                onMainAdd={ () => alert( "text" ) }
-                topExtra={ <DropDwnBtn menu={ menu( getRightNav( data[ activeProduct ] ) ) } /> }
+                onMainAdd={ () => { } }
+                topExtra={ <DropDwnBtn menu={ menu( getPosts( activeDialogue ? activeDialogue.list : [] ) ) } /> }
                 hasSideAdd={ false }
             >
+
+
                 <Row className="py-6" gutter={ [ 16, 16 ] }>
 
                     {
@@ -157,6 +180,7 @@ export default function Dialogue ()
                 </Row>
 
                 <Drawer
+                    height={ height }
                     forceRender={ true }
                     destroyOnClose={ true }
                     placement={ "bottom" }

@@ -70,12 +70,13 @@ const AddNote = (
             onClose={ onClose }
             title={
                 <Row>
-                    <Col span={ 21 }>
+                    <Col span={ 23 }>
                         <span>{ dialogue?.name }</span>
 
                     </Col>
                     <Col span={ 1 }>
                         <ActionButtons
+                            className="justify-end"
                             onCancel={ onClose }
                             onSubmit={ handleFinish }
                         />
