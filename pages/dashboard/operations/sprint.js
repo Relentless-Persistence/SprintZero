@@ -12,7 +12,6 @@ import
     Comment,
     Button,
     Input,
-    Dropdown,
     Row,
     Tag,
     Col,
@@ -41,6 +40,7 @@ import { Title } from "../../../components/Dashboard/SectionTitle";
 import CustomTag from "../../../components/Dashboard/Tag";
 import AppCheckbox from "../../../components/AppCheckbox";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
+import RadioButton from "../../../components/AppRadioBtn";
 
 
 
@@ -64,15 +64,7 @@ font-size: 14px;
 line-height: 22px;
 `;
 
-const RadioButton = styled( Radio.Button )`
-  border-color:${ props => props.checked ? "#4A801D" : "#262626" } !important;
-  box-shadow:none !important;
-  span
-  {
-      color:${ props => props.checked ? "#4A801D" : "#262626" } !important;
-  }
 
-`;
 
 const DrawerTitle = styled( Row )`
     h3
@@ -474,16 +466,14 @@ export default function Sprint ()
                                     Comments
                                 </Title>
 
-                                <Radio.Group size="small">
+                                <Radio.Group
+                                    size="small">
 
                                     <RadioButton
-                                        $checked={ commentsIndex === 0 }
-
                                         checked={ commentsIndex === 0 }
                                         onChange={ () => setCommentsIndex( 0 ) }
                                         value={ 0 }>Design</RadioButton>
                                     <RadioButton
-                                        $checked={ commentsIndex === 1 }
                                         checked={ commentsIndex === 1 }
                                         onChange={ () => setCommentsIndex( 1 ) }
                                         value={ 1 }>Code</RadioButton>

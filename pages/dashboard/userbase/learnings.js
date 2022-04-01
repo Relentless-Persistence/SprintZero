@@ -3,19 +3,18 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import
 {
-    Row,
-    Col,
-    Input
+    Radio
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import FormCard from "../../../components/Dashboard/FormCard";
+import FormCard, { ActionFormCard } from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
-
 import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/learnings.json";
 import products from "../../../fakeData/products.json";
+import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
+import RadioButton from "../../../components/AppRadioBtn";
 
 
 const getNames = ( learnings ) =>
@@ -37,12 +36,15 @@ export default function Learnings ()
 
     const [ activeLearning, setActiveLearning ] = useState( data[ activeProduct ][ 0 ] );
 
+    const [ learningName, setLearningName ] = useState( activeLearning.name );
+
 
     const setLearning = ( name, product ) =>
     {
         const learning = data[ product || activeProduct ].find( learning => learning.name === name );
 
         setActiveLearning( learning );
+        setLearningName( learning.name );
     };
 
 
@@ -51,6 +53,7 @@ export default function Learnings ()
         setActiveProduct( product );
         const learningName = data[ product ][ 0 ].name;
         setGoal( learningName, product );
+        setLearningName( learningName );
         setShowAdd( false );
     };
 
@@ -62,9 +65,14 @@ export default function Learnings ()
     const addItemDone = ( item ) =>
     {
         const newData = { ...data };
-        const learning = newData[ activeProduct ].find( learning => learning.name === activeLearning.name );
+        const learning = newData[ activeProduct ].find( learning => learning.name === learningName );
 
-        learning?.data.push( item );
+        learning?.data.push(
+            {
+                name: item.title,
+                description: item.description
+            }
+        );
 
         setData( newData );
         setShowAdd( false );
@@ -73,12 +81,23 @@ export default function Learnings ()
     const editItem = ( resultIndex, item ) =>
     {
         const newData = { ...data };
-        const learning = newData[ activeProduct ].find( learning => learning.name === activeLearning.name );
+        const learning = newData[ activeProduct ].find( learning => learning.name === learningName );
 
         learning.data[ resultIndex ] = item;
         setData( newData );
     };
 
+    const changeLearningForNew = name =>
+    {
+        if ( showAdd )
+        {
+            setLearningName( name );
+
+
+        }
+    };
+
+    const rightNav = getNames( data[ activeProduct ] );
 
 
     return (
@@ -92,42 +111,58 @@ export default function Learnings ()
 
             <AppLayout
                 onChangeProduct={ setProduct }
-                rightNavItems={ getNames( data[ activeProduct ] ) }
+                rightNavItems={ rightNav }
                 activeRightItem={ activeLearning?.name }
                 setActiveRightNav={ setLearning }
                 onMainAdd={ addItem }
                 hasMainAdd
                 hasSideAdd={ false }
+                mainClass="mr-[130px]"
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
+                <MasonryGrid>
+                    {
+                        showAdd ?
+                            <ActionFormCard
+                                className="mb-[16px]"
+                                onSubmit={ addItemDone }
+                                extraItems={ <Radio.Group
+                                    className="mt-[12px] flex justify-end" size="small">
 
+                                    {
+                                        rightNav.map( ( opt, i ) => (
+                                            <RadioButton
+                                                key={ i }
+                                                checked={ opt === learningName }
+                                                onChange={ () => setLearningName( opt ) }
+                                                value={ opt }>
+                                                { opt }
+                                            </RadioButton>
+                                        ) )
+                                    }
 
-                <Row className="py-6" gutter={ [ 16, 16 ] }>
+                                </Radio.Group> }
+                            />
+
+                            : null
+                    }
+
                     {
                         activeLearning?.data.map( ( res, i ) => (
-                            <Col
-                                xs={ { span: 24 } }
-                                sm={ { span: 12 } }
-                                key={ i }>
-                                <ItemCard
-                                    onEdit={ ( item ) => editItem( i, item ) }
-                                    item={ res } />
-                            </Col>
+
+                            <ItemCard
+                                useBtn
+                                key={ i }
+                                onEdit={ ( item ) => editItem( i, item ) }
+                                item={ res } />
                         ) )
                     }
 
 
-                    {
-                        showAdd ? <Col
-                            xs={ { span: 24 } }
-                            sm={ { span: 12 } }>
-                            <FormCard
-                                onSubmit={ addItemDone } />
-                        </Col> : null
-                    }
+
+                </MasonryGrid>
 
 
-                </Row>
 
 
 

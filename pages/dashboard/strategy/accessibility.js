@@ -118,7 +118,7 @@ export default function Accessiblity ()
                         activeChallenge?.challenges.map( ( res, i ) => (
 
                             <ItemCard
-                                key={ 1 }
+                                key={ i }
                                 onEdit={ ( item ) => editItem( i, item ) }
                                 item={ res } />
                         ) )

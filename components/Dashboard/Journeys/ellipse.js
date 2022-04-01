@@ -2,12 +2,12 @@ import React from 'react';
 
 const Label = ( { title, description } ) =>
 {
-    const longerThan = val => val?.toString().trim().length > 10;
+    const longerThan = val => val?.toString().trim().length > 30;
 
     return (
         <div style={ { zIndex: 500 } } className='absolute left-full top-1/2 -translate-y-2/4 w-1/3 pl-[12px]' >
-            <p className={ longerThan( title ) ? "truncate" : "" }>{ title }</p>
-            <p className={ longerThan( description ) ? "truncate" : "" }>{ description }</p>
+            <p className={ `text-[12px] leading-[20px] font-[600] ${ longerThan( title ) ? "truncate" : "" }` }>{ title }</p>
+            <p className={ `text-[12px] leading-[16px]  ${ longerThan( description ) ? "truncate" : "" }` }>{ description }</p>
 
         </div>
     );

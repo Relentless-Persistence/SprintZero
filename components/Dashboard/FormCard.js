@@ -16,8 +16,9 @@ const { TextArea } = Input;
 export default function FormCard (
     {
         isEdit,
-        itemToEdit,
         extra,
+        itemToEdit,
+        extraItems,
         onSubmit,
         className,
     }
@@ -81,6 +82,8 @@ export default function FormCard (
                 value={ item.description }
                 onChange={ e => handleChange( e, "description" ) }
                 placeholder="Result description..." />
+
+            { extraItems }
         </Card>
     );
 }
@@ -93,6 +96,7 @@ export const ActionFormCard = (
         onSubmit,
         onCancel,
         className,
+        extraItems
     }
 ) =>
 {
@@ -143,6 +147,7 @@ export const ActionFormCard = (
                 value={ item.description }
                 onChange={ e => handleChange( e, "description" ) }
                 placeholder="Result description..." />
+            { extraItems }
         </Card>
     );
 };
