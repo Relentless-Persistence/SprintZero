@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import AuthLayout from "../components/AuthLayout";
 import LoginSuccess from "../components/LoginSuccess";
+import withAuth from "../hoc/withAuth";
 
 const loginsuccess = () => {
   return (
@@ -18,4 +19,4 @@ const loginsuccess = () => {
   );
 };
 
-export default loginsuccess;
+export default withAuth(loginsuccess);
