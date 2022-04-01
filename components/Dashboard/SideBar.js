@@ -47,7 +47,7 @@ const rootSubmenuKeys = [ "strategy", "tactics", "operations", "userbase" ];
 const SideBar = () =>
 {
   const { pathname } = useRouter();
-  const [openKeys, setOpenKeys] = React.useState([pathname.split("/")[2]]);
+  const [ openKeys, setOpenKeys ] = React.useState( [ pathname.split( "/" )[ 2 ] ] );
 
   const onOpenChange = ( keys ) =>
   {
@@ -145,7 +145,7 @@ const SideBar = () =>
       >
         <MenuItem
           key="11"
-          $highlight={ isActive( pathname, "/operations/huddle" ) }
+          $highlight={ isActive( pathname, "/operations/calendar" ) }
         >
           <Link href="/dashboard/operations/calendar">Calendar</Link>
         </MenuItem>

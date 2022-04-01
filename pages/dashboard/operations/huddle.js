@@ -7,8 +7,11 @@ import
     Col,
     Card,
     Checkbox,
+    Input,
     Avatar
 } from 'antd';
+
+import AppCheckbox from '../../../components/AppCheckbox';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import { splitRoutes, getTimeAgo } from "../../../utils";
@@ -39,6 +42,14 @@ const MyCard = styled( Card )`
         margin-bottom:0 !important;
     }
 
+    .ant-card-body 
+    {
+        flex-grow: 1;
+        max-height: 511px;
+        overflow-y:auto;
+        padding:12px 16px;
+    }
+
     .section
     {
         margin-bottom:20px;
@@ -64,6 +75,19 @@ export default function Huddle ()
 {
     const { pathname } = useRouter();
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
+    const user = "Arlene McCoy";
+
+    const [ showAddNews, setShowAddNews ] = useState( {
+        blockers: false,
+        today: false,
+        yesterday: false
+    } );
+
+    const [ addText, setAddText ] = useState( {
+        blockers: "",
+        today: "",
+        yesterday: ""
+    } );
 
 
     const [ data, setData ] = useState( fakeData );
@@ -108,6 +132,73 @@ export default function Huddle ()
 
     };
 
+    const onClickAddNew = ( sectionKey, cardIndex ) =>
+    {
+        setShowAddNews( {
+            ...showAddNews,
+            [ sectionKey ]: true
+        } );
+
+        const newData = { ...data };
+        const activeData = newData[ activeProduct ];
+        const comments = activeData[ activeTimeIndex ].comments;
+
+        comments[ cardIndex ].data[ sectionKey ].push( {
+            text: "",
+            complete: true
+        } );
+
+        setData( newData );
+
+    };
+
+    const doneAddNew = ( e, sectionKey, cardIndex ) =>
+    {
+        if ( e.key === "Enter" )
+        {
+            setShowAddNews( {
+                blockers: false,
+                today: false,
+                yesterday: false
+            } );
+
+            const newData = { ...data };
+            const activeData = newData[ activeProduct ];
+            let comments = activeData[ activeTimeIndex ].comments;
+
+            const val = addText[ sectionKey ].trim();
+
+            if ( val )
+            {
+                const length = comments[ cardIndex ].data[ sectionKey ].length - 1;
+                comments[ cardIndex ].data[ sectionKey ][ length ].text = val;
+            }
+            else
+            {
+                comments[ cardIndex ].data[ sectionKey ].pop();
+            }
+
+            setData( newData );
+
+            setAddText( {
+                blockers: "",
+                today: "",
+                yesterday: ""
+            } );
+        }
+
+
+    };
+
+    const onChange = ( e, field ) =>
+    {
+        console.log( 9 );
+        setAddText( {
+            ...addText,
+            [ field ]: e.target.value
+        } );
+    };
+
     const rightNav = generateRightNav( data[ activeProduct ] );
 
 
@@ -126,26 +217,33 @@ export default function Huddle ()
                 rightNavItems={ rightNav }
                 setActiveRightNav={ setActiveRightNav }
                 activeRightItem={ activeTime?.createdAt }
+                mainClass="mr-[100px]"
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
-                <Row className="py-6" gutter={ [ 8, 8 ] }>
+                <Row
+                    className="max-w-[1200px] overflow-x-auto"
+                    gutter={ [ 16, 16 ] }>
 
                     {
                         activeTime ? <>
                             {
                                 activeTime?.comments?.map( ( c, index ) => (
-                                    <Col key={ index } span={ 8 }>
-                                        <MyCard title={ <Card.Meta
-                                            avatar={ <Avatar
-                                                size={ 48 }
-                                                src={ c.avatar }
-                                                style={ {
-                                                    border: "2px solid #315613"
-                                                } }
-                                            /> }
-                                            title={ c.name }
-                                            description={ c.role }
-                                        /> }>
+                                    <Col
+                                        className="flex"
+                                        key={ index } span={ 8 }>
+                                        <MyCard
+                                            style={ { display: 'flex', flexDirection: 'column' } }
+                                            title={ <Card.Meta
+                                                avatar={ <Avatar
+                                                    size={ 48 }
+                                                    src={ c.avatar }
+                                                    style={ {
+                                                        border: "2px solid #315613"
+                                                    } }
+                                                /> }
+                                                title={ c.name }
+                                                description={ c.role }
+                                            /> }>
 
 
                                             <section>
@@ -158,7 +256,8 @@ export default function Huddle ()
                                                             <ul>
                                                                 {
                                                                     c.data?.blockers.map( ( d, i ) => (
-                                                                        <li key={ i }>
+                                                                        !( i == c.data?.blockers.length - 1 && showAddNews.blockers ) ? <li key={ i }>
+
                                                                             <Checkbox
                                                                                 onChange={ () => handleCheck( i, "blockers", index ) }
                                                                                 checked={ d.complete } >
@@ -168,8 +267,32 @@ export default function Huddle ()
                                                                                     </strike> : d.text
                                                                                 }
                                                                             </Checkbox>
-                                                                        </li>
+                                                                        </li> : null
                                                                     ) )
+                                                                }
+
+                                                                {
+                                                                    c.name === user ?
+                                                                        (
+                                                                            <li>
+                                                                                {
+                                                                                    showAddNews.blockers ?
+                                                                                        <Input
+                                                                                            value={ addText.blockers }
+                                                                                            onKeyPress={ ( e ) => doneAddNew( e, "blockers", index ) }
+                                                                                            onChange={ ( e ) => onChange( e, "blockers" ) }
+                                                                                        />
+                                                                                        : <AppCheckbox
+                                                                                            checked={ false }
+                                                                                            onChange={ () => onClickAddNew( "blockers", index ) }>
+                                                                                            <span className='text-[#BFBFBF]'>
+                                                                                                Add New
+                                                                                            </span>
+                                                                                        </AppCheckbox>
+                                                                                }
+                                                                            </li>
+                                                                        )
+                                                                        : null
                                                                 }
                                                             </ul>
                                                         ) : <p className="text-[#595959]" >None</p>
@@ -185,15 +308,39 @@ export default function Huddle ()
                                                         c.data?.today?.length ? ( <ul>
                                                             {
                                                                 c.data?.today?.map( ( d, i ) => (
-                                                                    <li key={ i }>
+                                                                    !( i == c.data?.today.length - 1 && showAddNews.today ) ? <li key={ i }>
                                                                         <Checkbox onChange={ () => handleCheck( i, "today", index ) }
                                                                             checked={ d.complete } >{
                                                                                 d.complete ? <strike>
                                                                                     { d.text }
                                                                                 </strike> : d.text
                                                                             }</Checkbox>
-                                                                    </li>
+                                                                    </li> : null
                                                                 ) )
+                                                            }
+
+                                                            {
+                                                                c.name === user ?
+                                                                    (
+                                                                        <li>
+                                                                            {
+                                                                                showAddNews.today ?
+                                                                                    <Input
+                                                                                        value={ addText.today }
+                                                                                        onKeyPress={ ( e ) => doneAddNew( e, "today", index ) }
+                                                                                        onChange={ ( e ) => onChange( e, "today" ) }
+                                                                                    />
+                                                                                    : <AppCheckbox
+                                                                                        checked={ false }
+                                                                                        onChange={ () => onClickAddNew( "today", index ) }>
+                                                                                        <span className='text-[#BFBFBF]'>
+                                                                                            Add New
+                                                                                        </span>
+                                                                                    </AppCheckbox>
+                                                                            }
+                                                                        </li>
+                                                                    )
+                                                                    : null
                                                             }
                                                         </ul> ) : <p className="text-[#595959]" >None</p>
                                                     }
@@ -208,15 +355,40 @@ export default function Huddle ()
                                                             <ul>
                                                                 {
                                                                     c.data?.yesterday?.map( ( d, i ) => (
-                                                                        <li key={ i }>
+                                                                        !( i == c.data?.yesterday.length - 1 && showAddNews.yesterday ) ? <li key={ i }>
                                                                             <Checkbox onChange={ () => handleCheck( i, "yesterday", index ) }
                                                                                 checked={ d.complete } >{
                                                                                     d.complete ? <strike>
                                                                                         { d.text }
                                                                                     </strike> : d.text
                                                                                 }</Checkbox>
-                                                                        </li>
+                                                                        </li> : null
                                                                     ) )
+                                                                }
+
+
+                                                                {
+                                                                    c.name === user ?
+                                                                        (
+                                                                            <li>
+                                                                                {
+                                                                                    showAddNews.yesterday ?
+                                                                                        <Input
+                                                                                            value={ addText.yesterday }
+                                                                                            onKeyPress={ ( e ) => doneAddNew( e, "yesterday", index ) }
+                                                                                            onChange={ ( e ) => onChange( e, "yesterday" ) }
+                                                                                        />
+                                                                                        : <AppCheckbox
+                                                                                            checked={ false }
+                                                                                            onChange={ () => onClickAddNew( "yesterday", index ) }>
+                                                                                            <span className='text-[#BFBFBF]'>
+                                                                                                Add New
+                                                                                            </span>
+                                                                                        </AppCheckbox>
+                                                                                }
+                                                                            </li>
+                                                                        )
+                                                                        : null
                                                                 }
                                                             </ul>
                                                         ) : <p className="text-[#595959]" >None</p>

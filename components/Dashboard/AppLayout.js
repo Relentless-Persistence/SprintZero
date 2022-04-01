@@ -82,6 +82,8 @@ const AppLayout = ( {
   topExtra = <></>,
   useGrid,
   mainClass,
+  breadCrumbClass,
+  sideBarClass,
   onSideAddClick,
   children } ) =>
 {
@@ -146,8 +148,8 @@ const AppLayout = ( {
             }
             className={ useGrid ? null : "flex justify-between" }
           >
-            <div className="flex-1 py-[24px] pl-[42px] pr-[33px]">
-              <div className="flex justify-between items-center">
+            <div className={ `flex-1 py-[24px] pl-[42px] pr-[33px]` }>
+              <div className={ `flex justify-between items-center ${ breadCrumbClass }` }>
                 <Breadcrumb>
                   { breadCrumbItems.map( ( item, i ) => (
                     <Breadcrumb.Item key={ i }>
@@ -173,7 +175,7 @@ const AppLayout = ( {
                 </div>
               </div>
 
-              <Content className="px-0 pt-[12px] pb-[16px] m-0 ">
+              <Content className="px-0 pt-[12px] pb-[42px] m-0 ">
                 { children }
               </Content>
             </div>
@@ -182,7 +184,7 @@ const AppLayout = ( {
               <div
               //style={ { minWidth: "180px" } }
               >
-                <div className="fixed right-0 min-w-[100px] max-w-[160px] z-[500] bg-[#F0F2F5] max-h-full overflow-y-auto pb-[80px]">
+                <div className={ `fixed right-0 min-w-[100px] max-w-[160px] z-[500] bg-[#F0F2F5] min-h-full max-h-full overflow-y-auto pb-[80px] ${ sideBarClass }` }>
                   <Versions>
                     { rightNavItems.map( ( item, i ) => (
                       <Version

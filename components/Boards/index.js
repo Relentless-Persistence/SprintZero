@@ -18,11 +18,19 @@ import { CardTitle } from '../Dashboard/CardTitle';
 
 
 const StyledCol = styled( Acard )`
+
     min-height:75vh;
+
     .ant-card-head
     {
         min-height:unset;
         border-bottom: 2px solid #D9D9D9;
+    }
+
+    .ant-card-body
+    {
+        max-height: 511px;
+        overflow-y:auto;
     }
 
     .ant-card-extra
@@ -107,7 +115,7 @@ const Column = ( {
 const Board = ( { columns = [],
     onDrop,
     onSwap,
-    columnHeaderRenders,
+    columnHeaderRenders = [],
     maxWidthClass,
     children,
     renderColumn,

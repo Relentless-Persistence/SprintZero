@@ -8,17 +8,26 @@ import
 {
     List,
     Avatar,
-    Menu,
+    Form,
+    Comment,
+    Button,
     Input,
     Dropdown,
     Row,
     Tag,
     Col,
-    Drawer,
-    Checkbox
+    Radio,
 } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
 
+import
+{
+    LikeOutlined,
+    DislikeOutlined,
+    CopyOutlined,
+    CloseOutlined,
+    SendOutlined,
+    FlagOutlined
+} from '@ant-design/icons';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
@@ -29,21 +38,11 @@ import { splitRoutes } from "../../../utils";
 import fakeData from "../../../fakeData/sprint.json";
 import products from "../../../fakeData/products.json";
 import { Title } from "../../../components/Dashboard/SectionTitle";
-import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
+import CustomTag from "../../../components/Dashboard/Tag";
+import AppCheckbox from "../../../components/AppCheckbox";
+import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 
 
-const { TextArea } = Input;
-
-const list = [
-    {
-        title: 'Han Solo',
-        text: "Authoritatively disseminate prospective leadership via opportunities economically sound."
-    },
-    {
-        title: 'Kim James',
-        text: "Is this really want we think the story should be? "
-    }
-];
 
 const getBoardNames = ( boards ) =>
 {
@@ -53,26 +52,27 @@ const getBoardNames = ( boards ) =>
 };
 
 
-const ListItemMeta = styled( List.Item.Meta )`
+const { TextArea } = Input;
 
-.ant-list-item-meta-title
-{
-    margin-bottom:0;
-}
-`;
 
-const ListTitle = styled.p`
-   color: #8C8C8C;
-   font-size: 12px;
-line-height: 16px;
-`;
-
-const SubListTitle = styled.p`
+const StyledTag = styled( Tag )`
+background: ${ props => props.background || "#F5F5F5" };
+border: ${ props => props.$border ? "1px solid #BFBFBF" : "" };
+color: ${ props => props.$textColor || "#262626" } !important;
+font-weight: 600;
 font-size: 14px;
 line-height: 22px;
-color: #262626;
 `;
 
+const RadioButton = styled( Radio.Button )`
+  border-color:${ props => props.checked ? "#4A801D" : "#262626" } !important;
+  box-shadow:none !important;
+  span
+  {
+      color:${ props => props.checked ? "#4A801D" : "#262626" } !important;
+  }
+
+`;
 
 const DrawerTitle = styled( Row )`
     h3
@@ -97,28 +97,6 @@ const CloseTime = styled.p`
    }
 `;
 
-
-
-
-const DropdownBtn = styled( Dropdown.Button )`
-    background:#fff !important;
-`;
-
-const StyledItem = styled.div`
-    color: ${ props => props.$color || "black" };
-    border: 1px solid ${ props => props.$color || "black" };
-    display:inline-block;
-    padding:4px 8px;
-    cursor:pointer;
-
-    p
-    {
-        display:inline-block;
-        margin-left:5px;
-    }
-
-`;
-
 const Story = styled.p`
    padding:12px 19px;
    background:#FFF;
@@ -126,18 +104,6 @@ const Story = styled.p`
    border: 1px solid #D9D9D9;
 `;
 
-
-const CheckList = styled.div`
-
-
-
-        .ant-checkbox-checked .ant-checkbox-inner 
-        {
-            background: #4A801D;
-            border: 1px solid #4A801D;
-            border-radius: 2px;
-        }
-`;
 
 const Index = styled.span`
     width:32px;
@@ -155,6 +121,100 @@ const Index = styled.span`
 `;
 
 
+const comments = [
+    [
+        {
+            actions: [
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="like"><LikeOutlined /> 127 </button>,
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="dislike"><DislikeOutlined /> 0</button>,
+                <span
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="comment-list-reply-to-0">Reply to</span> ],
+            author: 'Han Solo',
+            avatar: 'https://joeschmoe.io/api/v1/random',
+            content: (
+                <p>
+                    We supply a series of design principles, practical patterns and high quality design
+                    resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                    efficiently.
+                </p>
+            ),
+
+        },
+        {
+            actions: [
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="like"><LikeOutlined /> 127 </button>,
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="dislike"><DislikeOutlined /> 0</button>,
+                <span
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="comment-list-reply-to-0">Reply to</span> ],
+            author: 'Han Solo',
+            avatar: 'https://joeschmoe.io/api/v1/random',
+            content: (
+                <p>
+                    We supply a series of design principles, practical patterns and high quality design
+                    resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                    efficiently.
+                </p>
+            ),
+
+        }
+    ],
+    [
+        {
+            actions: [
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="like"><LikeOutlined /> 127 </button>,
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="dislike"><DislikeOutlined /> 0</button>,
+                <span
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="comment-list-reply-to-0">Reply to</span> ],
+            author: 'Jane Doe',
+            avatar: 'https://joeschmoe.io/api/v1/random',
+            content: (
+                <p>
+                    We supply a series of design principles, practical patterns and high quality design
+                    resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                    efficiently.
+                </p>
+            ),
+
+        },
+        {
+            actions: [
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="like"><LikeOutlined /> 127 </button>,
+                <button
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="dislike"><DislikeOutlined /> 0</button>,
+                <span
+                    className="inline-block mr-[10px] flex justify-between items-center"
+                    key="comment-list-reply-to-0">Reply to</span> ],
+            author: 'Han Solo',
+            avatar: 'https://joeschmoe.io/api/v1/random',
+            content: (
+                <p>
+                    We supply a series of design principles, practical patterns and high quality design
+                    resources (Sketch and Axure), to help people create their product prototypes beautifully and
+                    efficiently.
+                </p>
+            ),
+
+        }
+    ] ];
+
 
 
 export default function Sprint ()
@@ -163,6 +223,8 @@ export default function Sprint ()
 
     const [ data, setData ] = useState( fakeData );
     const [ visible, setVisible ] = useState( false );
+
+    const [ commentsIndex, setCommentsIndex ] = useState( 0 );
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
@@ -264,6 +326,7 @@ export default function Sprint ()
 
     };
 
+
     const renderCol = ( card, index ) =>
     {
 
@@ -271,24 +334,14 @@ export default function Sprint ()
             <Index>{ index + 1 }</Index>
 
             <div onClick={ () => setVisible( true ) }>
-                <StyledItem
-                    $color={ card.color }>
-                    <span>x</span>
+                <CustomTag
+                    icon={ <CopyOutlined /> }
+                    text={ "System Status" } />
 
-                    <p>
-                        { card.title }</p>
-                </StyledItem>
             </div>
         </>;
     };
 
-    const selectAll = [
-        <CardHeaderButton key={ 1 } onClick={ () => { } } >Select All</CardHeaderButton>,
-        <CardHeaderButton key={ 2 } onClick={ () => { } } >Select All</CardHeaderButton>,
-        <CardHeaderButton key={ 3 } onClick={ () => { } } >Select All</CardHeaderButton>,
-        <CardHeaderButton key={ 4 } onClick={ () => { } } >Select All</CardHeaderButton>,
-
-    ];
 
 
     return (
@@ -301,8 +354,7 @@ export default function Sprint ()
 
 
             <AppLayout
-                hideSideBar
-                ignoreLast={ true }
+                useGrid
                 onChangeProduct={ setProduct }
                 rightNavItems={ getBoardNames( data[ activeProduct ] ) }
                 activeRightItem={ activeBoard?.boardName }
@@ -312,29 +364,56 @@ export default function Sprint ()
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
 
+                <div style={
+                    {
+                        overflowX: "auto"
+                    }
+                }>
 
-                <Board
-                    onDrop={ handleDrop }
-                    onSwap={ handleSwap }
-                    columns={ activeBoard?.columns }
-                    renderColumn={ renderCol }
-                    colCount={ 4 }
-                    columnHeaderRenders={ selectAll }
-                />
+                    <div style={ {
+                        width: "1200px",
+                        marginBottom: "20px",
+                        paddingRight: "100px"
+                    } }>
+                        <Board
+                            colCount={ 4 }
+                            onDrop={ handleDrop }
+                            onSwap={ handleSwap }
+                            columns={ activeBoard?.columns }
+                            renderColumn={ renderCol }
+                            columnHeaderRenders={ [ null, null, null ] }
+                        />
 
-                <Drawer
+                    </div>
+
+                </div>
+
+
+
+
+                <ResizeableDrawer
                     title={ <DrawerTitle gutter={ [ 16, 16 ] }>
                         <Col span={ 12 }>
-                            <h3>System Status</h3>
-                            <Tag color="#91D5FF"># points total</Tag>
-                            <Tag color="#A4DF74">$0.00 total</Tag>
+                            <h3>card_title</h3>
+                            <StyledTag color="#91D5FF"># points total</StyledTag>
+                            <StyledTag color="#A4DF74">$0.00 total</StyledTag>
+
+                            <button
+                                className="text-[#1890FF]">
+                                Edit
+                            </button>
 
                         </Col>
-                        <Col span={ 12 }>
+                        <Col
+                            className="flex items-center justify-end"
+                            span={ 12 }>
                             <CloseTime>
-                                <p>Last modified 2 hrs ago</p>
+                                <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">Last modified 2 hrs ago</p>
                                 <CloseOutlined
-                                    color="#A6AE9D"
+                                    style={ {
+                                        color: "#101D06",
+                                        fontSize: "12px"
+                                    } }
                                     onClick={ () => setVisible( false ) } />
                             </CloseTime>
                         </Col>
@@ -345,94 +424,127 @@ export default function Sprint ()
                     onClose={ () => setVisible( false ) }
                     visible={ visible }
                 >
-                    <Row className="py-6" gutter={ [ 50, 50 ] }>
+                    <Row gutter={ [ 16, 16 ] }>
                         <Col span={ 12 }>
 
                             <Title>
                                 Epic
                             </Title>
 
-
                             <Story>
                                 As a user I need to be aware of any issues with the platform so that I can pre-emptively warn attendees and provide any new contact information to join the meeting
                             </Story>
-                            <br />
 
-
-                            <Title>
-                                Keeper(s)
+                            <Title className="mt-[24px]">
+                                Keep
                             </Title>
 
-                            <br />
+                            <p>
+                                <AppCheckbox checked>
+                                    Darrell Steward
+                                </AppCheckbox>
+                            </p>
 
-                            <CheckList>
+                            <p>
+                                <AppCheckbox>
+                                    Jane Cooper
+                                </AppCheckbox>
+                            </p>
 
-                                <p>
-                                    <Checkbox checked>
-                                        Darrell Steward
-                                    </Checkbox>
-                                </p>
-                                <p>
-                                    <Checkbox >
-                                        Jane Cooper
-                                    </Checkbox>
-                                </p>
-                                <p>
-                                    <Checkbox checked>
-                                        Bessie Cooper
-                                    </Checkbox>
-                                </p>
-                                <p>
-                                    <Checkbox >
-                                        Floyd Miles
-                                    </Checkbox>
-                                </p>
+                            <p>
+                                <AppCheckbox checked>
+                                    Bessie Cooper
+                                </AppCheckbox>
+                            </p>
 
-
-
-
-                            </CheckList>
-
+                            <p>
+                                <AppCheckbox>
+                                    Floyd Miles
+                                </AppCheckbox>
+                            </p>
 
                         </Col>
 
-                        <Col span={ 12 }>
-                            <Title>
-                                Comments
-                            </Title>
+                        <Col
+                            offset={ 1 }
+                            span={ 11 }>
+                            <div className="flex items-center justify-between">
 
-                            <br />
+                                <Title>
+                                    Comments
+                                </Title>
+
+                                <Radio.Group size="small">
+
+                                    <RadioButton
+                                        $checked={ commentsIndex === 0 }
+
+                                        checked={ commentsIndex === 0 }
+                                        onChange={ () => setCommentsIndex( 0 ) }
+                                        value={ 0 }>Design</RadioButton>
+                                    <RadioButton
+                                        $checked={ commentsIndex === 1 }
+                                        checked={ commentsIndex === 1 }
+                                        onChange={ () => setCommentsIndex( 1 ) }
+                                        value={ 1 }>Code</RadioButton>
+                                </Radio.Group>
+                            </div>
+
 
                             <List
-                                itemLayout="vertical"
-                                dataSource={ list }
+                                className="comment-list"
+                                itemLayout="horizontal"
+                                dataSource={ comments[ commentsIndex ] }
                                 renderItem={ item => (
-                                    <List.Item>
-                                        <ListItemMeta
-                                            avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" /> }
-                                            title={ <ListTitle> { item.title }</ListTitle> }
-                                            description={ <SubListTitle> { item.text }</SubListTitle> }
+                                    <li>
+                                        <Comment
+                                            actions={ item.actions }
+                                            author={ item.author }
+                                            avatar={ item.avatar }
+                                            content={ item.content }
                                         />
-
-
-                                    </List.Item>
+                                    </li>
                                 ) }
                             />
 
-                            <List.Item>
-                                <ListItemMeta
-                                    avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" /> }
-                                    title={ <TextArea /> }
-                                />
+                            <Comment
+                                avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" /> }
+                                content={
+                                    <>
+                                        <Form.Item>
+                                            <TextArea rows={ 2 } />
+                                        </Form.Item>
+
+                                        <Form.Item>
+                                            <Button
+                                                className="inline-flex justify-between items-center mr-[8px]"
+                                                disabled>
+                                                <SendOutlined />
+                                                Post
+                                            </Button>
 
 
-                            </List.Item>
+                                            <Button
+                                                className="inline-flex justify-between items-center"
+                                                danger>
+                                                <FlagOutlined />
+                                                Flag
+                                            </Button>
+                                        </Form.Item>
+
+                                    </>
+                                }
+                            />
 
 
                         </Col>
 
+
+
                     </Row>
-                </Drawer>
+                </ResizeableDrawer>
+
+
             </AppLayout>
         </div>
     );

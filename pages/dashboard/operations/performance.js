@@ -11,6 +11,7 @@ import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/performance.json";
 import products from "../../../fakeData/products.json";
+import { clamp } from "lodash";
 
 const generateRightNav = ( items ) =>
 {
@@ -90,11 +91,13 @@ const chartConfig =
     }
 };
 
+const DEFAULT_HEIGHT = 500;
 
 export default function Performance ()
 {
     const { pathname } = useRouter();
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
+    const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
 
     const [ data, setData ] = useState( fakeData );
 
@@ -103,6 +106,23 @@ export default function Performance ()
 
     const [ activeData, setActiveData ] = useState( null );
     const [ sprint, setSprint ] = useState( null );
+
+    useEffect( () =>
+    {
+        const setChartHeight = () =>
+        {
+
+            const height = clamp( 0.6 * window.innerHeight, DEFAULT_HEIGHT, 600 );
+            setHeight( height );
+        };
+
+        setChartHeight();
+
+        window.addEventListener( "resize", setChartHeight );
+
+        () => window.removeEventListener( "resize", setChartHeight );
+
+    }, [] );
 
 
     useEffect( () =>
@@ -171,6 +191,7 @@ export default function Performance ()
                 rightNavItems={ rightNav }
                 setActiveRightNav={ setActiveRightNav }
                 activeRightItem={ activeData?.name }
+                mainClass="mr-[120px]"
                 breadCrumbItems={ splitRoutes( pathname ) }>
                 {/* <DualAxes
                             data={ [ sprint, sprint ] }
@@ -197,6 +218,7 @@ export default function Performance ()
 
                 {
                     isBurn ? ( sprint?.length ? <DualAxes
+                        height={ 0.9 * height }
                         data={ [ sprint, sprint ] }
                         {
                         ...chartConfig[ activeData?.name ]
@@ -206,6 +228,8 @@ export default function Performance ()
                 {
                     isVel ? <Area
                         data={ activeData?.data }
+                        height={ height }
+
                         {
                         ...chartConfig[ activeData?.name ]
                         }
@@ -216,6 +240,8 @@ export default function Performance ()
                     isFlow ?
                         <Area
                             data={ activeData?.data }
+                            height={ height }
+
                             {
                             ...chartConfig[ activeData?.name ]
                             }

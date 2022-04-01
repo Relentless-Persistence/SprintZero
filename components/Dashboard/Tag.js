@@ -7,6 +7,7 @@ const CustomTag = (
     {
         type,
         text,
+        icon,
         className,
         ...props
 
@@ -35,6 +36,7 @@ const CustomTag = (
 
         default:
             return <Tag className={ classNames( "space-x-1 border-2 border-[#0073B3] px-[8px] py-[4px] text-[#0073B3] text-sm rounded cursor-pointer", className ) }
+                icon={ icon }
                 { ...props }
             >
                 { text }

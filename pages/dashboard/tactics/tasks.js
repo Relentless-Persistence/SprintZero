@@ -26,6 +26,7 @@ import
     UserOutlined,
 } from '@ant-design/icons';
 
+
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import DrawerSubTitle from "../../../components/Dashboard/DrawerSubTitle";
 import { CardTitle } from "../../../components/Dashboard/CardTitle";
@@ -39,6 +40,7 @@ import fakeData from "../../../fakeData/tasks.json";
 import products from "../../../fakeData/products.json";
 import CustomTag from "../../../components/Dashboard/Tag";
 import ActionButtons from "../../../components/Personas/ActionButtons";
+import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 
 const getBoardNames = ( boards ) =>
 {
@@ -228,7 +230,6 @@ export default function Tasks ()
 
             <div onClick={ () => setVisible( true ) }>
                 <CustomTag
-                    type={ index % 2 === 0 ? "feature" : "epic" }
                     text={ card.title } />
 
             </div>
@@ -254,18 +255,22 @@ export default function Tasks ()
                 hasMainAdd
                 addNewText="Add Task"
                 hasSideAdd={ false }
+                breadCrumbClass="mr-[112px]"
+                sideBarClass="h-[700px]"
+                onMainAdd={ () => setVisible( true ) }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
 
                 <div style={
                     {
-                        overflowX: "scroll"
+                        overflowX: "auto"
                     }
                 }>
 
                     <div style={ {
                         width: "1200px",
-                        marginBottom: "30px"
+                        marginBottom: "20px",
+                        paddingRight: "100px"
                     } }>
                         <Board
                             colCount={ 4 }
@@ -282,11 +287,11 @@ export default function Tasks ()
 
 
 
-                <Drawer
+                <ResizeableDrawer
                     visible={ visible }
                     closable={ false }
                     placement={ "bottom" }
-                    height={ 550 }
+                    //height={ 550 }
                     title={
                         <Row>
                             <Col span={ 21 }>
@@ -422,7 +427,7 @@ export default function Tasks ()
 
                     </Row>
 
-                </Drawer >
+                </ResizeableDrawer >
             </AppLayout>
         </div>
     );
