@@ -77,6 +77,7 @@ const AppLayout = ( {
   ignoreLast,
   type,
   addNewText = "Add New",
+  addNewClass,
   capitalizeText = true,
   versionClass,
   topExtra = <></>,
@@ -170,7 +171,9 @@ const AppLayout = ( {
                   { <div>{ topExtra }</div> }
 
                   { hasMainAdd ? (
-                    <AddNew onClick={ onMainAdd }>{ addNewText }</AddNew>
+                    <AddNew
+                      className={ addNewClass }
+                      onClick={ onMainAdd }>{ addNewText }</AddNew>
                   ) : null }
                 </div>
               </div>

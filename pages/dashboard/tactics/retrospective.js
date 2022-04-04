@@ -167,6 +167,7 @@ export default function Retrospective ()
                 onChangeProduct={ setProduct }
                 setActiveRightNav={ handleRightNav }
                 mainClass="mr-[128px]"
+                addNewClass="px-[16px] min-w-[92px]"
                 hasSideAdd={ false }
                 topExtra={ <MyBtn
                     className=""

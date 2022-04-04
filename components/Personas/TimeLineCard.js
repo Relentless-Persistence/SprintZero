@@ -5,7 +5,6 @@ import
 {
     Card,
     Input,
-    Form,
     Button,
     Timeline
 } from 'antd';
@@ -17,13 +16,11 @@ import ActionButtons from "./ActionButtons";
 
 const MyCard = styled( Card )`
 
-
     .ant-card-head
     {
         min-height:unset;
         border-bottom: 2px solid #D9D9D9;
     }
-
 `;
 
 
@@ -77,7 +74,6 @@ const TimeLineCard = (
 ) => 
 {
 
-    const [ form ] = Form.useForm();
     const [ list, setList ] = useState( [ ...cardData ] );
 
 
@@ -247,7 +243,7 @@ const TimeLineCard = (
     }
 
     return (
-        <Card
+        <MyCard
             className="border-2 border-[#D9D9D9]"
             extra={ <CardHeaderButton onClick={ toggleEdit } >Edit</CardHeaderButton> }
             title={ <strong>{ title }</strong> }
@@ -267,7 +263,7 @@ const TimeLineCard = (
                     ) )
                 }
             </Timeline>
-        </Card>
+        </MyCard>
     );
 };
 
