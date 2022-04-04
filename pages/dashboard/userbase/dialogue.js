@@ -194,6 +194,7 @@ export default function Dialogue ()
                                     <span>{ dialogue?.name }</span>
                                     &nbsp;
                                     <small
+                                        className=""
                                         style={ { cursor: "pointer" } }
                                         onClick={ openEdit }
                                     >Edit</small>
