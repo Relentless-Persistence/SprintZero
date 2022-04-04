@@ -47,7 +47,7 @@ const AppHeader = ({ onChangeProduct }) => {
         <Title level={2} className="dashboard-logo m-0">
           Sprint Zero
         </Title>
-        <div className="flex items-center ml-11">
+        <div className="flex items-center ml-11 mb-1">
           {products.map((item, i) => (
             <HeaderMenu
               key={i}
@@ -61,13 +61,13 @@ const AppHeader = ({ onChangeProduct }) => {
         </div>
       </div>
       <div className="flex items-center">
-        <Search
+        {/* <Search
           placeholder="Search"
           allowClear
           className="mr-6 border-none focus:outline-none outline-none"
           // onSearch={onSearch}
           style={{ width: 200 }}
-        />
+        /> */}
         {/* <MessageFilled
                     style={ { color: "#73c92d", width: "24px" } }
                     className="mr-6"
@@ -87,10 +87,12 @@ const AppHeader = ({ onChangeProduct }) => {
         closable={false}
         extra={
           <Space>
-            <CloseOutlined
-              style={{ width: "10px", height: "10px" }}
-              onClick={() => setSettingsMenuDrawer(false)}
-            />
+            <div className="h-full flex items-center">
+              <CloseOutlined
+                style={{ width: "10px", height: "10px" }}
+                onClick={() => setSettingsMenuDrawer(false)}
+              />
+            </div>
           </Space>
         }
       >
