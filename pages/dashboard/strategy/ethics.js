@@ -147,13 +147,13 @@ const comments = [
     {
         actions: [
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="like"><LikeOutlined /> 127 </button>,
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="dislike"><DislikeOutlined /> 0</button>,
             <span
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="comment-list-reply-to-0">Reply to</span> ],
         author: 'Han Solo',
         avatar: 'https://joeschmoe.io/api/v1/random',
@@ -169,13 +169,13 @@ const comments = [
     {
         actions: [
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="like"><LikeOutlined /> 127 </button>,
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="dislike"><DislikeOutlined /> 0</button>,
             <span
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="comment-list-reply-to-0">Reply to</span> ],
         author: 'Han Solo',
         avatar: 'https://joeschmoe.io/api/v1/random',
