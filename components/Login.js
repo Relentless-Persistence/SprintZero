@@ -5,7 +5,7 @@ import { Button, Typography, message, Image } from "antd";
 import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
 import { googleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
-import {auth} from "../config/firebase-config";
+import { auth } from "../config/firebase-config";
 // import { usePaymentConfirm } from "../contexts/PaymentContext";
 
 const { Title, Text } = Typography;
@@ -17,15 +17,19 @@ const Login = () => {
   const handleOnClick = (provider) => {
     try {
       auth.signInWithPopup(provider).then((res) => {
-        var user = res.user;
-        if (!/@gmail.com\s*$/.test(user.email)) {
-          router.push("/enterprise-contact");
+        if (res.additionalUserInfo.isNewUser) {
+          var user = res.user;
+          if (!/@gmail.com\s*$/.test(user.email)) {
+            router.push("/enterprise-contact");
+          } else {
+            message.success({
+              content: "Successfully logged in",
+              className: "custom-message",
+            });
+            router.push("/loginsuccess");
+          }
         } else {
-          message.success({
-            content: "Successfully logged in",
-            className: "custom-message",
-          });
-          router.push("/loginsuccess");
+          router.push("/dashboard");
         }
       });
     } catch (error) {
@@ -53,7 +57,7 @@ const Login = () => {
       <div className="flex flex-col items-center justify-center mt-10">
         <button
           className="googleBtn flex items-center m-10"
-          // onClick={() => handleOnClick(googleProvider)}
+          onClick={() => handleOnClick(googleProvider)}
         >
           <Image
             src="https://developers.google.com/identity/sign-in/g-normal.png"

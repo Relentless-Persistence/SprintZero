@@ -1,9 +1,7 @@
 /* eslint-disable react/display-name */
 import React from "react";
 import router from "next/router";
-import firebase from "../config/firebase-config";
-
-const auth = firebase.auth();
+import {auth} from "../config/firebase-config";
 
 const withAuth = (Component) => {
   return class extends React.Component {

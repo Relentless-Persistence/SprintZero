@@ -240,6 +240,10 @@ body {
   color: #fff;
 }
 
+#settingsDrawer .ant-drawer-body {
+  padding: 0 !important;
+}
+
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
   background-color: #F5FBF0 !important;
   color: #4A801D !important;

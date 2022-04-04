@@ -9,7 +9,6 @@ import {
   PullRequestOutlined,
   NodeExpandOutlined,
   UserOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 
