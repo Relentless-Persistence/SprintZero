@@ -238,7 +238,7 @@ export default function Tasks ()
 
 
     return (
-        <div className="mb-8">
+        <div>
             <Head>
                 <title>Dashboard | Sprint Zero</title>
                 <meta name="description" content="Sprint Zero strategy tasks" />
@@ -257,6 +257,7 @@ export default function Tasks ()
                 hasSideAdd={ false }
                 breadCrumbClass="mr-[112px]"
                 sideBarClass="h-[700px]"
+                contentClass="pb-0"
                 onMainAdd={ () => setVisible( true ) }
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
@@ -269,7 +270,8 @@ export default function Tasks ()
 
                     <div style={ {
                         width: "1200px",
-                        marginBottom: "20px",
+                        marginBottom: "5px",
+                        paddingBottom: "5px",
                         paddingRight: "100px"
                     } }>
                         <Board

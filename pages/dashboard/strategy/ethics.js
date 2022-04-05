@@ -147,13 +147,13 @@ const comments = [
     {
         actions: [
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="like"><LikeOutlined /> 127 </button>,
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="dislike"><DislikeOutlined /> 0</button>,
             <span
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="comment-list-reply-to-0">Reply to</span> ],
         author: 'Han Solo',
         avatar: 'https://joeschmoe.io/api/v1/random',
@@ -169,13 +169,13 @@ const comments = [
     {
         actions: [
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="like"><LikeOutlined /> 127 </button>,
             <button
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="dislike"><DislikeOutlined /> 0</button>,
             <span
-                className="inline-block mr-[10px] flex justify-between items-center"
+                className="mr-[10px] flex justify-between items-center"
                 key="comment-list-reply-to-0">Reply to</span> ],
         author: 'Han Solo',
         avatar: 'https://joeschmoe.io/api/v1/random',
@@ -329,7 +329,7 @@ export default function Ethics ()
 
 
     return (
-        <div className="mb-8">
+        <div>
             <Head>
                 <title>Dashboard | Sprint Zero</title>
                 <meta name="description" content="Sprint Zero strategy ethics" />

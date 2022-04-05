@@ -19,7 +19,7 @@ import { CardTitle } from '../Dashboard/CardTitle';
 
 const StyledCol = styled( Acard )`
 
-    min-height:75vh;
+    min-height:70vh;
 
     .ant-card-head
     {
