@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Layout, Menu, Breadcrumb, Typography, Input, Avatar, Button } from "antd";
+import { Layout, Menu, Breadcrumb, Typography, Input, Avatar, Button, Image } from "antd";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -65,9 +65,12 @@ const DashboardLayout = ({children}) => {
     <Layout style={{ minHeight: "100vh" }}>
       <Header className="header">
         <div className="flex items-center">
-          <Title level={2} className="dashboard-logo m-0">
-            Sprint Zero
-          </Title>
+          <Image
+            src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/Light.png?alt=media&token=ede37d0b-e499-4005-8bd7-7bca97b35235"
+            alt="Logo"
+            className="w-[178px] h-[42px]"
+            preview={false}
+          />
           <div className="flex items-center ml-11">
             {products.map((item, i) => (
               <HeaderMenu

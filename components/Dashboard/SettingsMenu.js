@@ -56,11 +56,11 @@ const SettingsMenu = () => {
         style={{ height: "100%", borderRight: 0 }}
       >
         <MenuItem
-          $highlight={pathname === "/settings"}
+          $highlight={pathname === "/settings/account"}
           key="1"
           icon={<UserOutlined />}
         >
-          <Link href="/dashboard/settings">
+          <Link href="/dashboard/settings/account">
             <a>Account</a>
           </Link>
         </MenuItem>

@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 
-import { Layout, Typography, Input, Avatar, Drawer, Space } from "antd";
+import { Layout, Typography, Input, Avatar, Drawer, Space, Image } from "antd";
 import { MessageFilled, CloseOutlined } from "@ant-design/icons";
 
 import products from "../../fakeData/products.json";
 
 import { useAuth } from "../../contexts/AuthContext";
 import SettingsMenu from "./SettingsMenu";
+import light from "../light.svg";
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -44,9 +45,15 @@ const AppHeader = ({ onChangeProduct }) => {
       style={{ position: "fixed", zIndex: 1, width: "100%" }}
     >
       <div className="flex items-center">
-        <Title level={2} className="dashboard-logo m-0">
-          Sprint Zero
-        </Title>
+        <Image
+          src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/Light.png?alt=media&token=ede37d0b-e499-4005-8bd7-7bca97b35235"
+          alt="Logo"
+          className="w-[178px] h-[42px]"
+          preview={false}
+        />
+        {/* <Title level={2} className="dashboard-logo m-0">
+          
+        </Title> */}
         <div className="flex items-center ml-11 mb-1">
           {products.map((item, i) => (
             <HeaderMenu
