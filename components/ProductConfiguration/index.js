@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Button, Typography, Carousel, Card, Col, Row, message, Avatar } from "antd";
+import { Button, Typography, Carousel, Card, Col, Row, message, Avatar, Image } from "antd";
 import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
@@ -111,10 +111,13 @@ const ProductConfiguration = () => {
 
   return (
     <>
-      <div style={{ padding: "0 153px", marginTop: "50px" }}>
-        <Title level={2} className="logo">
-          Sprint Zero
-        </Title>
+      <div style={{ padding: "0 153px", marginTop: "50px", marginBottom: "30px" }}>
+        <Image
+          src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/Dark.png?alt=media&token=48f74ba5-b0cc-4026-803c-ca8c8d727eda"
+          alt="Logo"
+          className="w-[178px] h-[42px]"
+          preview={false}
+        />
         {user ? (
           <div className="flex items-center justify-end -mt-10">
             <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>
