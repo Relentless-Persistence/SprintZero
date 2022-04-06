@@ -240,6 +240,10 @@ body {
   color: #fff;
 }
 
+.ant-layout-header {
+  padding: 0 24px !important;
+}
+
 #settingsDrawer .ant-drawer-body {
   padding: 0 !important;
 }
