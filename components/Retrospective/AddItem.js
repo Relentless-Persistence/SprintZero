@@ -193,7 +193,7 @@ const AddItem = (
                                     a.isNew ?
                                         <Input
                                             className='my-[8px]'
-                                            onKeyDown={ ( e ) => handleKeyDown( e, i, a.label ) }
+                                            onKeyPress={ ( e ) => handleKeyDown( e, i, a.label ) }
                                             onChange={ ( e ) => onEditAct( e, i ) }
                                             value={ a.label } />
                                         : <p key={ i }>
