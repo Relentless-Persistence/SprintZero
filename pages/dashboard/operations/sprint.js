@@ -337,7 +337,7 @@ export default function Sprint ()
 
 
     return (
-        <div className="mb-8">
+        <div>
             <Head>
                 <title>Dashboard | Sprint Zero</title>
                 <meta name="description" content="Sprint Zero strategy sprint" />

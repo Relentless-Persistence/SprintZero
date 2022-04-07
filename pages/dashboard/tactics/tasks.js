@@ -270,7 +270,6 @@ export default function Tasks ()
 
                     <div style={ {
                         width: "1200px",
-                        marginBottom: "5px",
                         paddingBottom: "5px",
                         paddingRight: "100px"
                     } }>

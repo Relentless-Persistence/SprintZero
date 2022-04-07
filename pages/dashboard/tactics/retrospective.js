@@ -169,14 +169,14 @@ export default function Retrospective ()
                 mainClass="mr-[128px]"
                 addNewClass="px-[16px] min-w-[92px]"
                 hasSideAdd={ false }
-                topExtra={ <MyBtn
-                    className=""
-                    overlay={ <></> }
-                    onClick={ () => { } }
-                    icon={ <SortAscendingOutlined /> }
-                >
-                    Sort
-                </MyBtn> }
+                // topExtra={ <MyBtn
+                //     className=""
+                //     overlay={ <></> }
+                //     onClick={ () => { } }
+                // //icon={ <SortAscendingOutlined /> }
+                // >
+                //     Sort
+                // </MyBtn> }
                 hasMainAdd
                 onMainAdd={ () => setShowAdd( true ) }
                 breadCrumbItems={ splitRoutes( pathname ) }>

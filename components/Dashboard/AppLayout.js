@@ -179,7 +179,7 @@ const AppLayout = ( {
                 </div>
               </div>
 
-              <Content className={ `px-0 pt-[12px] pb-[42px] m-0  ${ contentClass }` }>
+              <Content className={ `px-0 pt-[12px]  m-0  ${ contentClass }` }>
                 { children }
               </Content>
             </div>
