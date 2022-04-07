@@ -1,11 +1,11 @@
-import React from 'react';
-import { Button, Form, Input } from 'antd';
-import { InfoCircleOutlined } from "@ant-design/icons";
+import React from "react";
+import { Row, Col, Button, Form, Input, Avatar } from "antd";
+import { InfoCircleOutlined, UserOutlined } from "@ant-design/icons";
 
 const Account = () => {
   return (
-    <div className="w-[90%] flex items-center justify-between">
-      <div className="w-full">
+    <Row gutter={62}>
+      <Col span={20}>
         <h3 className="text-16 font-semibold">Personal Details</h3>
         <Form>
           <Form.Item
@@ -55,15 +55,23 @@ const Account = () => {
               icon: <InfoCircleOutlined />,
             }}
           >
-            <Button type='primary' danger block>Delete</Button>
+            <Button type="primary" danger block>
+              Delete
+            </Button>
           </Form.Item>
         </Form>
-      </div>
-      <div>
-        <h3 className="text-16 font-semibold">Avatar</h3>
-      </div>
-    </div>
+      </Col>
+      <Col span={4}>
+        <h3 className="w-16 mb-2 text-16 font-semibold text-center">Avatar</h3>
+        <Avatar
+          className="flex items-center justify-center"
+          size={64}
+          icon={<UserOutlined />}
+        />
+        <p className="w-16 text-[#1890FF] text-center">Edit</p>
+      </Col>
+    </Row>
   );
-}
+};
 
 export default Account;

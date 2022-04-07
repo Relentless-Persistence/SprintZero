@@ -16,7 +16,8 @@ const { Title } = Typography;
 const { Search } = Input;
 
 const HeaderMenu = styled.div`
-  color: ${(props) => (props.active ? "#73c92d" : "#fff")};
+  color: #fff;
+  font-weight: ${(props) => (props.active ? 600 : 400)};
   cursor: pointer;
   border-bottom-width: 4px;
   border-bottom-style: solid;
