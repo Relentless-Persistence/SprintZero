@@ -31,7 +31,6 @@ export default function Calendar() {
   const [activeCalendarTypeIndex, setActiveCalendarTypeIndex] = useState(0);
   const [calendarType, setCalendarType] = useState([
     "Agenda",
-    "Week",
     "Month",
     "Year",
   ]);

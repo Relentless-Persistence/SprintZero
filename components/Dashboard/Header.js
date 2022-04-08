@@ -23,10 +23,10 @@ const HeaderMenu = styled.div`
   border-bottom-style: solid;
   border-bottom-color: ${(props) => (props.active ? "#73c92d" : "transparent")};
 
-  &:hover {
+  /* &:hover {
     color: var(--kelly);
     border-bottom: 4px solid var(--kelly);
-  }
+  } */
 `;
 
 const AppHeader = ({ onChangeProduct }) => {
