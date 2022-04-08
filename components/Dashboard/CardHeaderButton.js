@@ -9,13 +9,13 @@ import
 const More = styled( Button )`
 color: #4A801D !important;
 background:#fff;
-box-shadow:none;
+box-shadow:none !important;
 
 `;
 
 const Link = styled( Button )`
 color: #4A801D !important;
-box-shadow:none;
+box-shadow:none !important;;
 border:none;
 background: transparent !important;
 `;

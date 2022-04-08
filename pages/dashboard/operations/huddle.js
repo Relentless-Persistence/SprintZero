@@ -203,7 +203,7 @@ export default function Huddle ()
 
 
     return (
-        <div className="mb-8">
+        <div>
             <Head>
                 <title>Dashboard | Sprint Zero</title>
                 <meta name="description" content="Sprint Zero strategy huddle" />
@@ -217,7 +217,7 @@ export default function Huddle ()
                 rightNavItems={ rightNav }
                 setActiveRightNav={ setActiveRightNav }
                 activeRightItem={ activeTime?.createdAt }
-                mainClass="mr-[100px]"
+                mainClass="mr-[140px]"
                 breadCrumbItems={ splitRoutes( pathname ) }>
 
                 <Row
