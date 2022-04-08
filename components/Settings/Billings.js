@@ -1,6 +1,11 @@
 import { Form, Row, Col, Input, Select, Card, Space, Button } from "antd";
 import React, { useState, useEffect } from "react";
-import { InfoCircleOutlined, CalendarOutlined, EyeOutlined, DownloadOutlined } from "@ant-design/icons";
+import {
+  InfoCircleOutlined,
+  CalendarOutlined,
+  EyeOutlined,
+  DownloadOutlined,
+} from "@ant-design/icons";
 import axios from "axios";
 
 const { Option } = Select;
