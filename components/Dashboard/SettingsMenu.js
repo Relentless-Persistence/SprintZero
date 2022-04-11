@@ -69,16 +69,16 @@ const SettingsMenu = () => {
           key="2"
           icon={<DollarOutlined />}
         >
-          <Link href="#">
+          <Link href="/dashboard/settings/billing">
             <a>Billing</a>
           </Link>
         </MenuItem>
         <MenuItem
-          $highlight={pathname === "/settings/configuration"}
+          $highlight={pathname === "/settings/config"}
           key="1"
           icon={<SettingOutlined />}
         >
-          <Link href="#">
+          <Link href="/dashboard/settings/config">
             <a>Configuration</a>
           </Link>
         </MenuItem>
@@ -87,7 +87,7 @@ const SettingsMenu = () => {
           key="1"
           icon={<ShareAltOutlined />}
         >
-          <Link href="#">
+          <Link href="/dashboard/settings/share">
             <a>Share</a>
           </Link>
         </MenuItem>

@@ -32,7 +32,7 @@ const account = () => {
         hasMainAdd={false}
         hasSideAdd={false}
         breadCrumbItems={splitRoutes(pathname)}
-        mainClass="mr-[174px]"
+        mainClass="mr-[110px]"
         rightNavItems={menus}
         activeRightItem={menus[activeMenuIndex]}
         setActiveRightNav={setActiveRightNav}

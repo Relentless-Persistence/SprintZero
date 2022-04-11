@@ -32,7 +32,7 @@ export default function billing() {
         hasSideAdd={false}
         breadCrumbItems={splitRoutes(pathname)}
         ignoreLast={true}
-        mainClass="mr-[174px]"
+        mainClass="mr-[110px]"
         rightNavItems={menus}
         activeRightItem={menus[activeMenuIndex]}
         setActiveRightNav={setActiveRightNav}
