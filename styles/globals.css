@@ -327,3 +327,11 @@ body {
   color: #4A801D !important;
   border-color: #4A801D !important;
 }
+
+.ant-input:focus,
+.ant-input:hover,
+.ant-input:active
+{
+  border-color:#4A801D ;
+  box-shadow: none !important;
+}
