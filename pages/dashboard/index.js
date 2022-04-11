@@ -1,27 +1,24 @@
 import Head from "next/head";
-import Layout from "../../components/Dashboard/Layout";
+import { useRouter } from "next/router";
+import AppLayout from "../../components/Dashboard/AppLayout";
 import { useState } from "react";
 import UserStory from "../../components/UserStory";
+import { findIndex } from "lodash";
+import { splitRoutes } from "../../utils";
 
-const versions = [ "v1", "v2", "v3" ];
+const versions = ["v1", "v2", "v3", "All"];
 
-export default function Home ()
-{
-  const [ version, setVersion ] = useState( versions[ 0 ] );
+export default function Home() {
+  const { pathname } = useRouter();
+  console.log(pathname);
+  const [version, setVersion] = useState(versions[0]);
 
+  const handleActiveVersion = (version) => {
+    const versionIndex = versions.findIndex((v) => v === version);
 
-  const handleActiveVersion = ( version ) =>
-  {
-
-    const versionIndex = versions.findIndex( v => v === version );
-
-
-    if ( versionIndex > -1 )
-    {
-      setVersion( versions[ versionIndex ] );
+    if (versionIndex > -1) {
+      setVersion(versions[versionIndex]);
     }
-
-
   };
 
   return (
@@ -32,16 +29,18 @@ export default function Home ()
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout
-        // breadCrumbItems={ [ "StoryMap" ] }
-        // hasSideAdd={ false }
-        // hasMainAdd={ false }
-        // rightNavItems={ versions }
-        // activeRightItem={ version }
-        // setActiveRightNav={ handleActiveVersion }
+      <AppLayout
+        ignoreLast={true}
+        breadCrumbItems={[`Story Map / ${version}`]}
+        hasSideAdd={false}
+        hasMainAdd={true}
+        rightNavItems={versions}
+        activeRightItem={version}
+        mainClass="mr-[110px]"
+        setActiveRightNav={handleActiveVersion}
       >
         <UserStory />
-      </Layout>
+      </AppLayout>
     </div>
   );
 }

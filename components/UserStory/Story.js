@@ -2,7 +2,7 @@ import React from 'react';
 import {FileOutlined} from '@ant-design/icons';
 import {Input} from 'antd';
 
-const Story = ({story, storyIndex, featureIndex, i, handleChangeStory}) => {
+const Story = ({story, storyIndex, featureIndex, i, handleChangeStory, handleChangeStoryStatus}) => {
   return (
     <div
       key={i}
@@ -16,16 +16,23 @@ const Story = ({story, storyIndex, featureIndex, i, handleChangeStory}) => {
 
       <div className="flex items-center justify-center text-[#0073B3] text-[14px] px-[8px]">
         <FileOutlined className="mr-1" />
-        <Input
-          placeholder="New User Story"
-          type="text"
-          maxLength="16"
-          className="max-w-[70px] focus:outline-none outline-none placeholder:text-[#4F2DC8] bg-transparent border-none"
-          value={story.name}
-          onChange={(e) =>
-            handleChangeStory(i, featureIndex, storyIndex, e.target.value)
-          }
-        />
+        {story.status !== "saved" ? (
+          <Input
+            placeholder="New User Story"
+            type="text"
+            maxLength="16"
+            className="max-w-[70px] focus:outline-none outline-none placeholder:text-[#4F2DC8] bg-transparent border-none"
+            value={story.name}
+            onChange={(e) =>
+              handleChangeStory(i, featureIndex, storyIndex, e.target.value)
+            }
+            onKeyDown={(e) =>
+              handleChangeStoryStatus(i, featureIndex, storyIndex, e)
+            }
+          />
+        ) : (
+          <p>{story.name}</p>
+        )}
       </div>
     </div>
   );
