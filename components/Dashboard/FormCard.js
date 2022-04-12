@@ -7,7 +7,7 @@ import
 } from 'antd';
 
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
-import ActionButtons from "../Personas/ActionButtons";
+import ActionButtons, { LightActionButtons } from "../Personas/ActionButtons";
 
 
 const { TextArea } = Input;
@@ -93,6 +93,7 @@ export const ActionFormCard = (
         title,
         description,
         useAction = true,
+        version = 1,
         onSubmit,
         onCancel,
         className,
@@ -129,11 +130,13 @@ export const ActionFormCard = (
         <Card
             className={ className }
             bordered={ false }
-            extra={ useAction ? <ActionButtons
+            extra={ useAction ? ( version === 1 ? <ActionButtons
                 className="ml-[12px]"
                 onCancel={ onCancel }
                 onSubmit={ handleSubmit }
-            /> : <CardHeaderLink onClick={ handleSubmit } >Done</CardHeaderLink> }
+            /> : <LightActionButtons className="ml-[12px]"
+                onCancel={ onCancel }
+                onSubmit={ handleSubmit } /> ) : <CardHeaderLink onClick={ handleSubmit } >Done</CardHeaderLink> }
             title={ <Input
                 value={ item.title }
                 onChange={ e => handleChange( e, "title" ) }

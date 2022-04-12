@@ -330,7 +330,8 @@ body {
 
 .ant-input:focus,
 .ant-input:hover,
-.ant-input:active
+.ant-input:active,
+.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover
 {
   border-color:#4A801D ;
   box-shadow: none !important;

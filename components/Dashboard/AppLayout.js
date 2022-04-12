@@ -150,7 +150,7 @@ const AppLayout = ( {
             }
             className={ useGrid ? null : "flex justify-between" }
           >
-            <div className={ `flex-1 py-[24px] pl-[42px] pr-[33px]` }>
+            <div className={ `flex-1 pt-[24px] pl-[42px] pr-[33px]` }>
               <div className={ `flex justify-between items-center ${ breadCrumbClass }` }>
                 <Breadcrumb>
                   { breadCrumbItems.map( ( item, i ) => (

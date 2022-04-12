@@ -292,7 +292,7 @@ export default function Tasks ()
                     visible={ visible }
                     closable={ false }
                     placement={ "bottom" }
-                    //height={ 550 }
+                    headerStyle={ { background: "#F5F5F5" } }
                     title={
                         <Row>
                             <Col span={ 21 }>

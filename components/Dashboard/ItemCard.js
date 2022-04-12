@@ -6,7 +6,7 @@ import
 } from 'antd';
 
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
-import FormCard from "./FormCard";
+import FormCard, { ActionFormCard } from "./FormCard";
 import { CardTitle as Title } from './CardTitle';
 
 const MyCard = styled( Card )`
@@ -36,7 +36,9 @@ const MyCard = styled( Card )`
 const ItemCard = ( {
     onEdit,
     useBtn,
-    item
+    item,
+    itemBtnText = "Edit",
+    version = 2
 } ) => 
 {
     const [ isEdit, setIsEdit ] = useState( false );
@@ -52,11 +54,17 @@ const ItemCard = ( {
     if ( isEdit )
     {
         return (
-            <FormCard
-                isEdit
+            <ActionFormCard
+
+                title={ item.name }
+                description={ item.description }
+                useAction={ true }
+                version={ version }
+                onSubmit={ handleEdit }
+                onCancel={ toggleEdit }
                 className='mb-[16px] border-2 border-[#D9D9D9]'
-                itemToEdit={ item }
-                onSubmit={ handleEdit } />
+
+            />
         );
     }
 
@@ -65,7 +73,7 @@ const ItemCard = ( {
             className='mb-[16px] border-2 border-[#D9D9D9]'
             extra={ useBtn ? <CardHeaderButton
                 size="small"
-                onClick={ toggleEdit } >Edit</CardHeaderButton> : <CardHeaderLink
+                onClick={ toggleEdit } >{ itemBtnText }</CardHeaderButton> : <CardHeaderLink
                     size="small"
                     onClick={ toggleEdit } >Edit</CardHeaderLink> }
             title={ <Title>{ item.name }</Title> }

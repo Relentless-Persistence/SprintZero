@@ -142,6 +142,7 @@ const AddItem = (
             destroyOnClose={ true }
             closable={ false }
             placement={ "bottom" }
+            headerStyle={ { background: "#F5F5F5" } }
             title={
                 <Row>
                     <Col span={ 22 }>
@@ -166,7 +167,7 @@ const AddItem = (
 
                     <Col span={ 13 }>
                         <Title className="mb-[8px]" >
-                            Subject
+                            Title
                         </Title>
 
                         <Form.Item

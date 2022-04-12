@@ -16,7 +16,7 @@ import
     SortAscendingOutlined
 } from '@ant-design/icons';
 
-import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
+import CardHeaderButton, { CardHeaderLink } from "../../../components/Dashboard/CardHeaderButton";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import { splitRoutes } from "../../../utils";
@@ -34,6 +34,7 @@ const { Meta } = Card;
 const MyCard = styled( Card )`
 
     position:relative;
+    border: 1px solid #D9D9D9;
    
     .ant-card-body
     {
@@ -44,6 +45,9 @@ const MyCard = styled( Card )`
     .ant-card-meta
     {
         padding:16px ;
+        background:#F5F5F5;
+        border-bottom:1px solid #D9D9D9;
+        border-top: 1px solid #D9D9D9;
 
         .ant-card-meta-title
         {
@@ -51,11 +55,6 @@ const MyCard = styled( Card )`
         }
     }
     
-    .ant-divider-horizontal
-    {
-        margin: 0
-    }
-
     article
     {
         padding:16px 16px 0;
@@ -75,12 +74,6 @@ const MyCard = styled( Card )`
 
 `;
 
-const MyBtn = styled( Dropdown.Button )`
-   & > button
-   {
-       background: #fff !important;
-   }
-`;
 
 export default function Retrospective ()
 {
@@ -213,12 +206,11 @@ export default function Retrospective ()
                                 />
 
                                 {
-                                    user === c.name ? <CardHeaderButton
+                                    user === c.name ? <CardHeaderLink
                                         onClick={ () => setActiveEditIndex( i ) }
-                                        className="absolute top-[28px] right-[16px]" >Edit</CardHeaderButton> : null
+                                        className="absolute top-[28px] right-[16px]" >Edit</CardHeaderLink> : null
                                 }
 
-                                <Divider />
 
 
                                 <article>
