@@ -82,16 +82,23 @@ const Share = ({ addPerson, setAddPerson }) => {
         title={<h3 className="font-semibold text-20">Viewer</h3>}
         extra={
           <Space>
-            <Button danger ghost onClick={() => setAddPerson(false)}>
+            <Button
+              className="border-[#4A801D] hover:border-[#4A801D] text-[#4A801D] hover:text-[#4A801D]"
+              onClick={() => setAddPerson(false)}
+            >
               Cancel
             </Button>
-            <Button type="primary" danger onClick={() => setAddPerson(false)}>
+            <Button
+              // type="primary"
+              className="bg-[#4A801D] border-none outline-none hover:outline-none text-white hover:bg-[#4A801D] hover:text-white"
+              onClick={() => setAddPerson(false)}
+            >
               Done
             </Button>
           </Space>
         }
       >
-        <Form layout="vertical">
+        <Form layout="vertical" id="share">
           <Row gutter={48}>
             <Col span={8}>
               <Form.Item label={<p className="font-semibold text-20">Name</p>}>

@@ -156,7 +156,6 @@ export default function Dialogue ()
                 }
                 hasMainAdd
                 onMainAdd={ () => { } }
-                topExtra={ <DropDwnBtn menu={ menu( getPosts( activeDialogue ? activeDialogue.list : [] ) ) } /> }
                 hasSideAdd={ false }
             >
 

@@ -37,6 +37,7 @@ const generateRightNav = ( items ) =>
 
 
 const MyCard = styled( Card )`
+border: 1px solid #D9D9D9;
     .ant-card-meta-title
     {
         margin-bottom:0 !important;
@@ -45,7 +46,7 @@ const MyCard = styled( Card )`
     .ant-card-body 
     {
         flex-grow: 1;
-        max-height: 511px;
+        max-height:65vh;
         overflow-y:auto;
         padding:12px 16px;
     }
@@ -145,7 +146,7 @@ export default function Huddle ()
 
         comments[ cardIndex ].data[ sectionKey ].push( {
             text: "",
-            complete: true
+            complete: false
         } );
 
         setData( newData );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { Row, Col } from "antd";
@@ -13,67 +13,87 @@ import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 import fakeData from "../../../fakeData/accessiblity.json";
 import products from "../../../fakeData/products.json";
 
-const getChallengeNames = (challenges) => {
-  const challengeNames = challenges.map((g) => g.name);
+const getChallengeNames = ( challenges ) =>
+{
+  const challengeNames = challenges.map( ( g ) => g.name );
 
   return challengeNames;
 };
 
-export default function Accessiblity() {
+export default function Accessiblity ()
+{
   const { pathname } = useRouter();
+  const ref = useRef( null );
 
-  const [data, setData] = useState(fakeData);
-  const [showAdd, setShowAdd] = useState(false);
+  const [ data, setData ] = useState( fakeData );
+  const [ showAdd, setShowAdd ] = useState( false );
 
-  const [activeProduct, setActiveProduct] = useState(products[0]);
+  const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
 
-  const [activeChallenge, setActiveChallenge] = useState(
-    data[activeProduct][0]
+  const [ activeChallenge, setActiveChallenge ] = useState(
+    data[ activeProduct ][ 0 ]
   );
 
-  const setChallenge = (challengeName, product) => {
-    const challenge = data[product || activeProduct].find(
-      (challenge) => challenge.name === challengeName
+  const setChallenge = ( challengeName, product ) =>
+  {
+    const challenge = data[ product || activeProduct ].find(
+      ( challenge ) => challenge.name === challengeName
     );
 
-    setActiveChallenge(challenge);
+    setActiveChallenge( challenge );
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    const challengeName = data[product][0].name;
-    setChallenge(challengeName, product);
-    setShowAdd(false);
+  const setProduct = ( product ) =>
+  {
+    setActiveProduct( product );
+    const challengeName = data[ product ][ 0 ].name;
+    setChallenge( challengeName, product );
+    setShowAdd( false );
   };
 
-  const addItem = () => {
-    setShowAdd(true);
-    window?.scrollTo({
-      top: 2 * document?.body?.scrollHeight,
+  const addItem = () =>
+  {
+    const top = ref?.current?.getBoundingClientRect()?.top || document?.documentElement?.scrollHeight;
+    setShowAdd( true );
+
+    window?.scrollTo( {
+      top,
       behavior: "smooth",
-    });
+    } );
   };
 
-  const addItemDone = (item) => {
-    const newData = { ...data };
-    const challenge = newData[activeProduct].find(
-      (challenge) => challenge.name === activeChallenge.name
-    );
+  const addItemDone = ( item ) =>
+  {
 
-    challenge?.challenges.push(item);
+    if ( item.name.trim() && item.description.trim() )
+    {
+      const newData = { ...data };
+      const challenge = newData[ activeProduct ].find(
+        ( challenge ) => challenge.name === activeChallenge.name
+      );
 
-    setData(newData);
-    setShowAdd(false);
+      challenge?.challenges.push( item );
+
+      setData( newData );
+
+    }
+
+    setShowAdd( false );
   };
 
-  const editItem = (resultIndex, item) => {
-    const newData = { ...data };
-    const challenge = newData[activeProduct].find(
-      (challenge) => challenge.name === activeChallenge.name
-    );
+  const editItem = ( resultIndex, item ) =>
+  {
+    if ( item.name.trim() && item.description.trim() )
+    {
+      const newData = { ...data };
+      const challenge = newData[ activeProduct ].find(
+        ( challenge ) => challenge.name === activeChallenge.name
+      );
 
-    challenge.challenges[resultIndex] = item;
-    setData(newData);
+      challenge.challenges[ resultIndex ] = item;
+      setData( newData );
+    }
+
   };
 
   return (
@@ -85,24 +105,29 @@ export default function Accessiblity() {
       </Head>
 
       <AppLayout
-        onChangeProduct={setProduct}
-        rightNavItems={getChallengeNames(data[activeProduct])}
-        activeRightItem={activeChallenge?.name}
-        setActiveRightNav={setChallenge}
-        hasMainAdd={true}
-        onMainAdd={addItem}
-        hasSideAdd={false}
-        breadCrumbItems={splitRoutes(pathname)}
+        onChangeProduct={ setProduct }
+        rightNavItems={ getChallengeNames( data[ activeProduct ] ) }
+        activeRightItem={ activeChallenge?.name }
+        setActiveRightNav={ setChallenge }
+        hasMainAdd={ true }
+        onMainAdd={ addItem }
+        hasSideAdd={ false }
+        breadCrumbItems={ splitRoutes( pathname ) }
         mainClass="mr-[174px]"
       >
-        <MainSub>{activeChallenge?.title}</MainSub>
+        <MainSub>{ activeChallenge?.title }</MainSub>
 
         <MasonryGrid>
-          {activeChallenge?.challenges.map((res, i) => (
-            <ItemCard key={i} onEdit={(item) => editItem(i, item)} item={res} />
-          ))}
+          { activeChallenge?.challenges.map( ( res, i ) => (
+            <ItemCard key={ i } onEdit={ ( item ) => editItem( i, item ) } item={ res } />
+          ) ) }
 
-          {showAdd ? <FormCard onSubmit={addItemDone} /> : null}
+          <div style={ {
+            visibility: showAdd ? "visible" : "hidden"
+          } } ref={ ref }>
+            <FormCard onSubmit={ addItemDone } />
+          </div>
+
         </MasonryGrid>
       </AppLayout>
     </div>

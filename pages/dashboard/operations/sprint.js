@@ -118,13 +118,13 @@ const comments = [
         {
             actions: [
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="like"><LikeOutlined /> 127 </button>,
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="dislike"><DislikeOutlined /> 0</button>,
                 <span
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="comment-list-reply-to-0">Reply to</span> ],
             author: 'Han Solo',
             avatar: 'https://joeschmoe.io/api/v1/random',
@@ -140,13 +140,13 @@ const comments = [
         {
             actions: [
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="like"><LikeOutlined /> 127 </button>,
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="dislike"><DislikeOutlined /> 0</button>,
                 <span
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="comment-list-reply-to-0">Reply to</span> ],
             author: 'Han Solo',
             avatar: 'https://joeschmoe.io/api/v1/random',
@@ -164,13 +164,13 @@ const comments = [
         {
             actions: [
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="like"><LikeOutlined /> 127 </button>,
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="dislike"><DislikeOutlined /> 0</button>,
                 <span
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="comment-list-reply-to-0">Reply to</span> ],
             author: 'Jane Doe',
             avatar: 'https://joeschmoe.io/api/v1/random',
@@ -186,13 +186,13 @@ const comments = [
         {
             actions: [
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="like"><LikeOutlined /> 127 </button>,
                 <button
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="dislike"><DislikeOutlined /> 0</button>,
                 <span
-                    className="inline-block mr-[10px] flex justify-between items-center"
+                    className="mr-[10px] flex justify-between items-center"
                     key="comment-list-reply-to-0">Reply to</span> ],
             author: 'Han Solo',
             avatar: 'https://joeschmoe.io/api/v1/random',
@@ -358,17 +358,17 @@ export default function Sprint ()
 
                 <div style={
                     {
-                        overflowX: "auto"
+                        overflowX: "auto",
+
                     }
                 }>
 
                     <div style={ {
                         width: "1200px",
                         marginBottom: "20px",
-                        paddingRight: "100px"
                     } }>
                         <Board
-                            colCount={ 4 }
+                            colCount={ 8 }
                             onDrop={ handleDrop }
                             onSwap={ handleSwap }
                             columns={ activeBoard?.columns }

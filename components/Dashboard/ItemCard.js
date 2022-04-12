@@ -6,7 +6,7 @@ import
 } from 'antd';
 
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
-import FormCard from "./FormCard";
+import FormCard, { ActionFormCard } from "./FormCard";
 import { CardTitle as Title } from './CardTitle';
 
 const MyCard = styled( Card )`
@@ -15,11 +15,12 @@ const MyCard = styled( Card )`
     {
         min-height:unset;
         border-bottom: 2px solid #D9D9D9;
+        padding: ${ props => props.$headerSmall ? "0 12px" : "0 24px" }
     }
 
     .ant-card-head-title
     {
-        padding:0
+        padding:0;
     }
 
     .ant-card-head-wrapper
@@ -29,6 +30,11 @@ const MyCard = styled( Card )`
     .ant-card-extra
     {
         padding:0
+    }    
+
+    .ant-card-body
+    {
+        padding:${ props => props.$headerSmall ? "12px" : "24px" }
     }
 `;
 
@@ -36,7 +42,11 @@ const MyCard = styled( Card )`
 const ItemCard = ( {
     onEdit,
     useBtn,
-    item
+    item,
+    itemBtnText = "Edit",
+    version = 2,
+    headerSmall = false,
+    extraItems
 } ) => 
 {
     const [ isEdit, setIsEdit ] = useState( false );
@@ -52,20 +62,29 @@ const ItemCard = ( {
     if ( isEdit )
     {
         return (
-            <FormCard
-                isEdit
+            <ActionFormCard
+                headerSmall={ headerSmall }
+                extraItems={ extraItems }
+                id={ item?.id }
+                title={ item.name }
+                description={ item.description }
+                useAction={ true }
+                version={ version }
+                onSubmit={ handleEdit }
+                onCancel={ toggleEdit }
                 className='mb-[16px] border-2 border-[#D9D9D9]'
-                itemToEdit={ item }
-                onSubmit={ handleEdit } />
+
+            />
         );
     }
 
     return (
         <MyCard
+            $headerSmall={ headerSmall }
             className='mb-[16px] border-2 border-[#D9D9D9]'
             extra={ useBtn ? <CardHeaderButton
                 size="small"
-                onClick={ toggleEdit } >Edit</CardHeaderButton> : <CardHeaderLink
+                onClick={ toggleEdit } >{ itemBtnText }</CardHeaderButton> : <CardHeaderLink
                     size="small"
                     onClick={ toggleEdit } >Edit</CardHeaderLink> }
             title={ <Title>{ item.name }</Title> }

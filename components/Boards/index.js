@@ -16,10 +16,16 @@ import
 } from 'antd';
 import { CardTitle } from '../Dashboard/CardTitle';
 
+const Grid = styled.div`
+    display:grid;
+    gap:16px;
+`;
+
 
 const StyledCol = styled( Acard )`
 
-    min-height:70vh;
+    min-height:80vh;
+    min-width:245px;
 
     .ant-card-head
     {
@@ -139,39 +145,48 @@ const Board = ( { columns = [],
 
     return (
         <RBoard>
-            <Row
+            <div
                 className={ maxWidthClass }
-                gutter={ [ 16, 16 ] }>
-                {
-                    columns?.map( ( ( col, i ) => (
-                        <Col
+            >
+                <Grid style={ {
+                    gridTemplateColumns: `repeat(${ colCount + 1 },1fr)`
+                } }>
+                    {
+                        columns?.map( ( ( col, i ) => (
+                            <div
 
-                            span={ 24 / colCount }
-                            key={ col.columnId }>
-                            <Column
-                                columnId={ col.columnId }
-                                columnName={ col.columnName }
-                                onCardEntry={ entryCard }
-                                header={ columnHeaderRenders[ i ] }
                                 key={ col.columnId }>
+                                <Column
+                                    columnId={ col.columnId }
+                                    columnName={ col.columnName }
+                                    onCardEntry={ entryCard }
+                                    header={ columnHeaderRenders[ i ] }
+                                    key={ col.columnId }>
 
-                                {
-                                    col?.data?.map( ( card, i ) => ( <Card
-                                        key={ card.id }
-                                        id={ card.id }
-                                        colId={ col.columnId }
-                                        onCardDrop={ swapCard }>
-                                        { renderColumn( card, i ) }
-                                    </Card> )
-                                    )
-                                }
+                                    {
+                                        col?.data?.map( ( card, i ) => ( <Card
+                                            key={ card.id }
+                                            id={ card.id }
+                                            colId={ col.columnId }
+                                            onCardDrop={ swapCard }>
+                                            { renderColumn( card, i ) }
+                                        </Card> )
+                                        )
+                                    }
 
-                            </Column>
-                        </Col>
-                    ) )
-                    )
-                }
-            </Row>
+                                </Column>
+                            </div>
+                        ) )
+                        )
+                    }
+
+                    <div style={ {
+                        visibility: "hidden",
+                    } }>
+                        <Column />
+                    </div>
+                </Grid>
+            </div>
         </RBoard>
     );
 };

@@ -356,7 +356,7 @@ export default function Ethics ()
                     columns={ activeBoard?.columns }
                     renderColumn={ renderCol }
                     maxWidthClass="max-w-[1200px]"
-                    columnHeaderRenders={ [ null, null, <DropDwnBtn key="jjj" value="All" menu={ menu } /> ] }
+
                 />
 
                 <Drawer
