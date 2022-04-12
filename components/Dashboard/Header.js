@@ -47,7 +47,7 @@ const AppHeader = ({ onChangeProduct }) => {
     >
       <div className="flex items-center">
         <Image
-          src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/logoDarkLettersWhite%201.png?alt=media&token=e97358f0-8ed9-4026-b9a7-42c224ff4d64"
+          src="/images/logo.png"
           alt="Logo"
           className="w-[178px] h-[42px]"
           preview={false}

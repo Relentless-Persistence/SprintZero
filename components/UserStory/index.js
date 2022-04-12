@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import
-  {
-    ArrowLeftOutlined,
-    ArrowRightOutlined,
-    ReadOutlined,
-    CopyOutlined,
-  } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  ReadOutlined,
+  CopyOutlined,
+} from "@ant-design/icons";
 import { Divider, Tag } from "antd";
 import update from "immutability-helper";
 import { ArcherContainer, ArcherElement } from "react-archer";
@@ -14,33 +13,30 @@ import Epic from "./Epic";
 import Feature from "./Feature";
 import Story from "./Story";
 
-const UserStory = () =>
-{
-  const [ epics, setEpics ] = useState( [
+const UserStory = () => {
+  const [epics, setEpics] = useState([
     {
-      id: Math.floor( Math.random() * 0x1000000 ).toString(),
+      id: Math.floor(Math.random() * 0x1000000).toString(),
       name: "",
       status: "",
       features: [],
     },
-  ] );
+  ]);
 
-  const addEpic = () =>
-  {
-    setEpics( [
+  const addEpic = () => {
+    setEpics([
       ...epics,
       {
-        id: Math.floor( Math.random() * 0x1000000 ).toString(),
+        id: Math.floor(Math.random() * 0x1000000).toString(),
         name: "",
         features: [],
       },
-    ] );
+    ]);
   };
 
-  const handleChangeEpic = ( index, e ) =>
-  {
-    const newData = update( epics, {
-      [ index ]: {
+  const handleChangeEpic = (index, e) => {
+    const newData = update(epics, {
+      [index]: {
         name: {
           $set: e,
         },
@@ -48,93 +44,107 @@ const UserStory = () =>
         //   $set: "saved",
         // },
       },
-    } );
+    });
 
-    setEpics( newData );
+    setEpics(newData);
   };
 
-  const handleChangeStatus = ( index, e ) => 
-  {
-    if ( e.key === "Enter" ) 
-    {
-      const newData = update( epics, {
-        [ index ]: {
+  const handleChangeStatus = (index, e) => {
+    if (e.key === "Enter") {
+      const newData = update(epics, {
+        [index]: {
           status: {
             $set: "saved",
           },
         },
-      } );
+      });
 
-      setEpics( newData );
+      setEpics(newData);
     }
   };
 
-  const addFeature = ( epicIndex ) =>
-  {
-    const newData = update( epics, {
-      [ epicIndex ]: {
+  const addFeature = (epicIndex) => {
+    const newData = update(epics, {
+      [epicIndex]: {
         features: {
           $push: [
             {
-              id: Math.floor( Math.random() * 0x1000000 ).toString(),
+              id: Math.floor(Math.random() * 0x1000000).toString(),
               name: "",
+              status: "",
               stories: [],
             },
           ],
         },
       },
-    } );
+    });
 
-    setEpics( newData );
+    setEpics(newData);
   };
 
-  const handleChangeFeature = ( epicIndex, featureIndex, e ) =>
-  {
-    const newData = update( epics, {
-      [ epicIndex ]: {
+  const handleChangeFeature = (epicIndex, featureIndex, e) => {
+    const newData = update(epics, {
+      [epicIndex]: {
         features: {
-          [ featureIndex ]: {
+          [featureIndex]: {
             name: {
               $set: e,
             },
           },
         },
       },
-    } );
+    });
 
-    setEpics( newData );
+    setEpics(newData);
   };
 
-  const addStory = ( epicIndex, featureIndex ) =>
-  {
-    const newData = update( epics, {
-      [ epicIndex ]: {
+  const handleChangeFeatureStatus = (epicIndex, featureIndex, e) => {
+    if (e.key === "Enter") {
+      const newData = update(epics, {
+        [epicIndex]: {
+          features: {
+            [featureIndex]: {
+              status: {
+                $set: "saved",
+              },
+            },
+          },
+        },
+      });
+
+      setEpics(newData);
+    }
+  };
+
+  const addStory = (epicIndex, featureIndex) => {
+    const newData = update(epics, {
+      [epicIndex]: {
         features: {
-          [ featureIndex ]: {
+          [featureIndex]: {
             stories: {
               $push: [
                 {
-                  id: Math.floor( Math.random() * 0x1000000 ).toString(),
+                  id: Math.floor(Math.random() * 0x1000000).toString(),
                   name: "",
+                  status: "",
                 },
               ],
             },
           },
         },
       },
-    } );
+    });
 
-    setEpics( newData );
+    setEpics(newData);
   };
 
-  const handleChangeStory = ( epicIndex, featureIndex, storyIndex, e ) =>
-  {
-    const newData = update( epics, {
-      [ epicIndex ]: {
+  const handleChangeStory = (epicIndex, featureIndex, storyIndex, e) => {
+    const newData = update(epics, {
+      [epicIndex]: {
         features: {
-          [ featureIndex ]: {
+          [featureIndex]: {
             stories: {
-              [ storyIndex ]: {
+              [storyIndex]: {
                 name: {
                   $set: e,
                 },
@@ -143,9 +153,30 @@ const UserStory = () =>
           },
         },
       },
-    } );
+    });
 
-    setEpics( newData );
+    setEpics(newData);
+  };
+
+  const handleChangeStoryStatus = (epicIndex, featureIndex, storyIndex, e) => {
+    if (e.key === "Enter") {
+      const newData = update(epics, {
+        [epicIndex]: {
+          features: {
+            [featureIndex]: {
+              stories: {
+                [storyIndex]: {
+                  status: {
+                    $set: "saved",
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+      setEpics(newData);
+    }
   };
 
   return (
@@ -162,44 +193,47 @@ const UserStory = () =>
 
       <div className="flex justify-center mt-8">
         <div className="flex justify-center space-x-10 overflow-x-auto">
-          { epics.map( ( epic, i ) => (
-            <div key={ i }>
+          {epics.map((epic, i) => (
+            <div key={i}>
               <ArcherContainer strokeColor="#0073B3" noCurves>
                 <Epic
-                  epic={ epic }
-                  i={ i }
-                  addEpic={ addEpic }
-                  handleChangeEpic={ handleChangeEpic }
-                  handleChangeStatus={ handleChangeStatus }
+                  epic={epic}
+                  i={i}
+                  addEpic={addEpic}
+                  handleChangeEpic={handleChangeEpic}
+                  handleChangeStatus={handleChangeStatus}
                 />
 
-                { epic.name === "" ? null : (
+                {epic.name === "" ? null : (
                   <div className="mt-[42.5px]">
                     <div className="flex items-center space-x-4">
-                      { epic.features.length <= 0 ? (
-                        <ArcherElement id={ "add_feature" }>
+                      {epic.features.length <= 0 ? (
+                        <ArcherElement id={"add_feature"}>
                           <Tag
                             className="flex items-center space-x-1 border-2 border-[#006378] border-dashed px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
-                            icon={ <CopyOutlined /> }
-                            onClick={ () => addFeature( i ) }
+                            icon={<CopyOutlined />}
+                            onClick={() => addFeature(i)}
                           >
                             Add Feature
                           </Tag>
                         </ArcherElement>
                       ) : (
-                        epic.features.map( ( feature, featureIndex ) => (
-                          <div key={ feature.id }>
+                        epic.features.map((feature, featureIndex) => (
+                          <div key={feature.id}>
                             <Feature
-                              epic={ epic }
-                              feature={ feature }
-                              i={ i }
-                              featureIndex={ featureIndex }
-                              addFeature={ addFeature }
-                              handleChangeFeature={ handleChangeFeature }
+                              epic={epic}
+                              feature={feature}
+                              i={i}
+                              featureIndex={featureIndex}
+                              addFeature={addFeature}
+                              handleChangeFeature={handleChangeFeature}
+                              handleChangeFeatureStatus={
+                                handleChangeFeatureStatus
+                              }
                             />
                             <ArcherElement
-                              id={ `${ feature.id }-1` }
-                              relations={ [
+                              id={`${feature.id}-1`}
+                              relations={[
                                 {
                                   targetId: feature.id,
                                   targetAnchor: "bottom",
@@ -214,55 +248,58 @@ const UserStory = () =>
                                     },
                                   },
                                 },
-                              ] }
+                              ]}
                             >
                               <div className="mt-[42.5px] flex flex-col p-[14px] border-2 border-[#0073B3] rounded">
-                                { feature.name === "" ? null : (
+                                {feature.name === "" ? null : (
                                   <>
-                                    { feature.stories.length <= 0
+                                    {feature.stories.length <= 0
                                       ? null
                                       : feature.stories.map(
-                                        ( story, storyIndex ) => (
-                                          <div key={ story.id }>
-                                            <Story
-                                              featureIndex={ featureIndex }
-                                              story={ story }
-                                              storyIndex={ storyIndex }
-                                              i={ i }
-                                              addStory={ addStory }
-                                              handleChangeStory={
-                                                handleChangeStory
-                                              }
-                                            />
-                                          </div>
-                                        )
-                                      ) }
+                                          (story, storyIndex) => (
+                                            <div key={story.id}>
+                                              <Story
+                                                featureIndex={featureIndex}
+                                                story={story}
+                                                storyIndex={storyIndex}
+                                                i={i}
+                                                addStory={addStory}
+                                                handleChangeStory={
+                                                  handleChangeStory
+                                                }
+                                                handleChangeStoryStatus={
+                                                  handleChangeStoryStatus
+                                                }
+                                              />
+                                            </div>
+                                          )
+                                        )}
                                     <Tag
                                       className="flex items-center space-x-1 border-2 border-[#0073B3] border-dashed px-[8px] py-[4px] text-[#0073B3] text-sm rounded cursor-pointer"
-                                      onClick={ () => addStory( i, featureIndex ) }
+                                      onClick={() => addStory(i, featureIndex)}
                                     >
                                       Add Story
                                     </Tag>
                                   </>
-                                ) }
+                                )}
                               </div>
                             </ArcherElement>
                           </div>
-                        ) )
-                      ) }
+                        ))
+                      )}
                     </div>
                   </div>
-                ) }
+                )}
               </ArcherContainer>
             </div>
-          ) ) }
+          ))}
         </div>
 
         <div>
           <Tag
             className="flex items-center space-x-1 border-2 border-[#4F2DC8] border-dashed px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded cursor-pointer"
-            icon={ <ReadOutlined /> }
-          // onClick={addEpic}
+            icon={<ReadOutlined />}
+            // onClick={addEpic}
           >
             Add Epic
           </Tag>

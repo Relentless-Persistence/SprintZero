@@ -11,6 +11,7 @@ const Feature = ({
   addFeature,
   handleChangeFeature,
   epic,
+  handleChangeFeatureStatus,
 }) => {
   return (
     <div>
@@ -47,16 +48,21 @@ const Feature = ({
           } px-[8px] py-[4px] text-[#006378] text-sm rounded`}
           icon={<CopyOutlined />}
         >
-          <Input
-            placeholder="New Feature"
-            type="text"
-            maxLength="16"
-            className="max-w-[70px] focus:outline-none placeholder:text-[#4F2DC8] p-0 bg-transparent outline-none border-none"
-            value={feature.name}
-            onChange={(e) =>
-              handleChangeFeature(i, featureIndex, e.target.value)
-            }
-          />
+          {feature.status !== "saved" ? (
+            <Input
+              placeholder="New Feature"
+              type="text"
+              maxLength="16"
+              className="max-w-[70px] focus:outline-none placeholder:text-[#4F2DC8] p-0 bg-transparent outline-none border-none"
+              value={feature.name}
+              onChange={(e) =>
+                handleChangeFeature(i, featureIndex, e.target.value)
+              }
+              onKeyDown={(e) => handleChangeFeatureStatus(i, featureIndex, e)}
+            />
+          ) : (
+            <p>{feature.name}</p>
+          )}
         </Tag>
       </ArcherElement>
     </div>
