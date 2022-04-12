@@ -15,11 +15,12 @@ const MyCard = styled( Card )`
     {
         min-height:unset;
         border-bottom: 2px solid #D9D9D9;
+        padding: ${ props => props.$headerSmall ? "0 12px" : "0 24px" }
     }
 
     .ant-card-head-title
     {
-        padding:0
+        padding:0;
     }
 
     .ant-card-head-wrapper
@@ -29,6 +30,11 @@ const MyCard = styled( Card )`
     .ant-card-extra
     {
         padding:0
+    }    
+
+    .ant-card-body
+    {
+        padding:${ props => props.$headerSmall ? "12px" : "24px" }
     }
 `;
 
@@ -39,6 +45,7 @@ const ItemCard = ( {
     item,
     itemBtnText = "Edit",
     version = 2,
+    headerSmall = false,
     extraItems
 } ) => 
 {
@@ -56,6 +63,7 @@ const ItemCard = ( {
     {
         return (
             <ActionFormCard
+                headerSmall={ headerSmall }
                 extraItems={ extraItems }
                 id={ item?.id }
                 title={ item.name }
@@ -72,6 +80,7 @@ const ItemCard = ( {
 
     return (
         <MyCard
+            $headerSmall={ headerSmall }
             className='mb-[16px] border-2 border-[#D9D9D9]'
             extra={ useBtn ? <CardHeaderButton
                 size="small"

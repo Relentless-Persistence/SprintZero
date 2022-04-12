@@ -7,7 +7,7 @@ import
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import { ActionFormCard } from "../../../components/Dashboard/FormCard";
+import { ActionFormCard, ActionFormCard2 } from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
 import { splitRoutes } from "../../../utils";
 
@@ -77,7 +77,8 @@ export default function Learnings ()
         learning?.data.push(
             {
                 name: item.title,
-                description: item.description
+                description: item.description,
+                id: new Date().getTime()
             }
         );
 
@@ -100,10 +101,12 @@ export default function Learnings ()
         };
 
 
-        if ( temp )
+        if ( temp && temp !== learningName )
         {
-            learning.data = learning.data.filter( d => d.id !== item.id );
+            learning.data = learning.data.filter( d => d.id !== newItem.id );
+
             const newLearning = newData[ activeProduct ].find( learning => learning.name === temp );
+
             newLearning.data.push( newItem );
 
 
@@ -115,6 +118,7 @@ export default function Learnings ()
 
 
         setData( newData );
+        setTemp( "" );
     };
 
 
@@ -146,6 +150,7 @@ export default function Learnings ()
                     {
                         showAdd ?
                             <ActionFormCard
+                                headerSmall
                                 className="mb-[16px]"
                                 onSubmit={ addItemDone }
                                 extraItems={ <Radio.Group
@@ -173,7 +178,7 @@ export default function Learnings ()
                         activeLearning?.data.map( ( res, i ) => (
 
                             <ItemCard
-
+                                headerSmall
                                 extraItems={ <Radio.Group
                                     className="mt-[12px] grid grid-cols-3" size="small">
 
