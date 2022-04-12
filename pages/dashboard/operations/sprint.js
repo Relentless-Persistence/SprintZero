@@ -358,17 +358,17 @@ export default function Sprint ()
 
                 <div style={
                     {
-                        overflowX: "auto"
+                        overflowX: "auto",
+
                     }
                 }>
 
                     <div style={ {
                         width: "1200px",
                         marginBottom: "20px",
-                        paddingRight: "100px"
                     } }>
                         <Board
-                            colCount={ 4 }
+                            colCount={ 8 }
                             onDrop={ handleDrop }
                             onSwap={ handleSwap }
                             columns={ activeBoard?.columns }

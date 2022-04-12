@@ -38,7 +38,8 @@ const ItemCard = ( {
     useBtn,
     item,
     itemBtnText = "Edit",
-    version = 2
+    version = 2,
+    extraItems
 } ) => 
 {
     const [ isEdit, setIsEdit ] = useState( false );
@@ -55,7 +56,8 @@ const ItemCard = ( {
     {
         return (
             <ActionFormCard
-
+                extraItems={ extraItems }
+                id={ item?.id }
                 title={ item.name }
                 description={ item.description }
                 useAction={ true }

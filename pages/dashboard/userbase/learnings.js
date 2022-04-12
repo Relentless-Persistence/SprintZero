@@ -7,14 +7,14 @@ import
 } from 'antd';
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import FormCard, { ActionFormCard } from "../../../components/Dashboard/FormCard";
+import { ActionFormCard } from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
 import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/learnings.json";
 import products from "../../../fakeData/products.json";
 import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
-import RadioButton from "../../../components/AppRadioBtn";
+import { RadioButtonWithFill } from "../../../components/AppRadioBtn";
 
 
 const getNames = ( learnings ) =>
@@ -38,6 +38,9 @@ export default function Learnings ()
 
     const [ learningName, setLearningName ] = useState( activeLearning.name );
 
+    const [ temp, setTemp ] = useState( learningName );
+
+
 
     const setLearning = ( name, product ) =>
     {
@@ -45,6 +48,7 @@ export default function Learnings ()
 
         setActiveLearning( learning );
         setLearningName( learning.name );
+        setTemp( learning.name );
     };
 
 
@@ -55,10 +59,13 @@ export default function Learnings ()
         setGoal( learningName, product );
         setLearningName( learningName );
         setShowAdd( false );
+        setTemp( learningName );
+
     };
 
     const addItem = () =>
     {
+
         setShowAdd( true );
     };
 
@@ -76,26 +83,41 @@ export default function Learnings ()
 
         setData( newData );
         setShowAdd( false );
+
     };
 
     const editItem = ( resultIndex, item ) =>
     {
+
         const newData = { ...data };
         const learning = newData[ activeProduct ].find( learning => learning.name === learningName );
 
-        learning.data[ resultIndex ] = item;
-        setData( newData );
-    };
-
-    const changeLearningForNew = name =>
-    {
-        if ( showAdd )
+        const newItem =
         {
-            setLearningName( name );
+            id: item.id,
+            name: item.title,
+            description: item.description
+        };
+
+
+        if ( temp )
+        {
+            learning.data = learning.data.filter( d => d.id !== item.id );
+            const newLearning = newData[ activeProduct ].find( learning => learning.name === temp );
+            newLearning.data.push( newItem );
 
 
         }
+        else
+        {
+            learning.data[ resultIndex ] = newItem;
+        }
+
+
+        setData( newData );
     };
+
+
 
     const rightNav = getNames( data[ activeProduct ] );
 
@@ -127,17 +149,17 @@ export default function Learnings ()
                                 className="mb-[16px]"
                                 onSubmit={ addItemDone }
                                 extraItems={ <Radio.Group
-                                    className="mt-[12px] flex justify-end" size="small">
+                                    className="mt-[12px] grid grid-cols-3" size="small">
 
                                     {
                                         rightNav.map( ( opt, i ) => (
-                                            <RadioButton
+                                            <RadioButtonWithFill
                                                 key={ i }
                                                 checked={ opt === learningName }
                                                 onChange={ () => setLearningName( opt ) }
                                                 value={ opt }>
                                                 { opt }
-                                            </RadioButton>
+                                            </RadioButtonWithFill>
                                         ) )
                                     }
 
@@ -151,6 +173,23 @@ export default function Learnings ()
                         activeLearning?.data.map( ( res, i ) => (
 
                             <ItemCard
+
+                                extraItems={ <Radio.Group
+                                    className="mt-[12px] grid grid-cols-3" size="small">
+
+                                    {
+                                        rightNav.map( ( opt, i ) => (
+                                            <RadioButtonWithFill
+                                                key={ i }
+                                                checked={ opt === temp }
+                                                onChange={ () => setTemp( opt ) }
+                                                value={ opt }>
+                                                { opt }
+                                            </RadioButtonWithFill>
+                                        ) )
+                                    }
+
+                                </Radio.Group> }
                                 useBtn
                                 key={ i }
                                 onEdit={ ( item ) => editItem( i, item ) }

@@ -92,6 +92,7 @@ export const ActionFormCard = (
     {
         title,
         description,
+        id,
         useAction = true,
         version = 1,
         onSubmit,
@@ -115,6 +116,7 @@ export const ActionFormCard = (
 
         setItem( {
             ...item,
+            id,
             [ key ]: value
         } );
     };
