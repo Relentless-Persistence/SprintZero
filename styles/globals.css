@@ -336,3 +336,14 @@ body {
   border-color:#4A801D ;
   box-shadow: none !important;
 }
+
+/* .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: #4A801D !important;
+  border-color: #4A801D !important;
+} */
+
+#share .ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: #fff!important;
+  background-color: #4A801D !important;
+  border-color: #4A801D !important;
+}

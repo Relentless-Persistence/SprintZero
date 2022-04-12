@@ -9,7 +9,7 @@ import
   PlusCircleFilled,
   LinkOutlined,
 } from "@ant-design/icons";
-import EpicDetails from "./EpicDetails";
+import EpicDetails from "./StoryDetails";
 
 const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
 {
@@ -45,12 +45,12 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
           className={ `flex items-center justify-center space-x-1 border-2 border-[#4F2DC8] ${ !epic.name ? "border-dashed" : ""
             } px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded` }
           icon={ <ReadOutlined /> }
-          onClick={ () =>
-          {
-            epic.status === "saved" ? setOpenDetail( true ) : null;
-          } }
+          // onClick={ () =>
+          // {
+          //   epic.status === "saved" ? setOpenDetail( true ) : null;
+          // } }
         >
-          { epic.status !== "saved" ? (
+          {/* { epic.status !== "saved" ? ( */}
             <Input
               placeholder="New Epic"
               type="text"
@@ -58,15 +58,15 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
               className="max-w-[70px] bg-transparent border-none outline-none focus:outline-none placeholder:text-[#4F2DC8] p-0"
               value={ epic.name }
               onChange={ ( e ) => handleChangeEpic( i, e.target.value ) }
-              onKeyDown={ ( e ) => handleChangeStatus( i, e ) }
+              // onKeyDown={ ( e ) => handleChangeStatus( i, e ) }
             />
-          ) : (
+          {/* ) : (
             <p>{ epic.name }</p>
-          ) }
+          ) } */}
         </Tag>
       </ArcherElement>
 
-      { epic.status === "saved" && (
+      {/* { epic.status === "saved" && (
         <Drawer
           title={
             <div className="flex items-center space-x-2">
@@ -108,7 +108,7 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
         >
           <EpicDetails epic={ epic } />
         </Drawer>
-      ) }
+      ) } */}
     </div>
   );
 };

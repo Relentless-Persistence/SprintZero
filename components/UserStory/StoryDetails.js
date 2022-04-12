@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Row, Col, Input, Checkbox, Tag } from "antd";
-import EpicComments from "./EpicComments";
+import React, {useState} from 'react';
+import {Row, Col, Input, Checkbox, Tag} from 'antd';
+import EpicComments from './EpicComments';
 
-const { TextArea } = Input;
+const {TextArea} = Input;
 
 const options = [
   { label: "Create a new task", value: "Create a new task" },
@@ -13,12 +13,10 @@ const options = [
   { label: "Learn the Calendar view", value: "Learn the Calendar view" },
 ];
 
-const EpicDetails = ({ epic }) => {
+const StoryDetails = ({story}) => {
   const [designComments, setDesignComments] = useState(true);
-  const [CommentType, setCommentType] = useState(
-    designComments ? "design" : "code"
-  );
-
+  const [CommentType, setCommentType] = useState(designComments ? "design" : "code");
+  
   return (
     <div>
       <Row gutter={[48]}>
@@ -55,10 +53,7 @@ const EpicDetails = ({ epic }) => {
                     ? "font-semibold text-sm text-[#4A801D] border-[#4A801D] px-2 cursor-pointer"
                     : "text-sm text-black px-2 -ml-2 cursor-pointer"
                 }
-                onClick={() => {
-                  setDesignComments(true);
-                  setCommentType("design");
-                }}
+                onClick={() => {setDesignComments(true); setCommentType("design")}}
               >
                 Design
               </Tag>
@@ -68,10 +63,7 @@ const EpicDetails = ({ epic }) => {
                     ? "font-semibold text-sm text-[#4A801D] border-[#4A801D] px-2 cursor-pointer -ml-2"
                     : "text-sm text-black px-2 -ml-2 cursor-pointer"
                 }
-                onClick={() => {
-                  setDesignComments(false);
-                  setCommentType("code");
-                }}
+                onClick={() => {setDesignComments(false); setCommentType("code")}}
               >
                 Code
               </Tag>
@@ -82,6 +74,6 @@ const EpicDetails = ({ epic }) => {
       </Row>
     </div>
   );
-};
+}
 
-export default EpicDetails;
+export default StoryDetails;
