@@ -33,11 +33,14 @@ const AddNote = (
         setVisible,
         dialogue,
         setDialogue,
-        onSubmit
+        onSubmit,
+        isNew,
+        height = 378
     }
 ) => 
 {
     const [ form ] = Form.useForm();
+
 
 
     const onClose = () =>
@@ -55,8 +58,6 @@ const AddNote = (
             notes: values[ `${ dialogue?.id }fields` ]
         };
 
-        //console.log( updatedDialogue );
-
         onSubmit( updatedDialogue );
 
         onClose();
@@ -66,7 +67,11 @@ const AddNote = (
         <Drawer
             visible={ visible }
             closable={ false }
+            height={ height }
             placement={ "bottom" }
+            headerStyle={ {
+                background: "#F5F5F5"
+            } }
             onClose={ onClose }
             title={
                 <Row>

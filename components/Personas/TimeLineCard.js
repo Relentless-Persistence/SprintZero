@@ -11,7 +11,7 @@ import
 
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
-import CardHeaderButton from "../Dashboard/CardHeaderButton";
+import { CardHeaderLink } from "../Dashboard/CardHeaderButton";
 import ActionButtons from "./ActionButtons";
 
 const MyCard = styled( Card )`
@@ -245,7 +245,7 @@ const TimeLineCard = (
     return (
         <MyCard
             className="border-2 border-[#D9D9D9]"
-            extra={ <CardHeaderButton onClick={ toggleEdit } >Edit</CardHeaderButton> }
+            extra={ <CardHeaderLink onClick={ toggleEdit } >Edit</CardHeaderLink> }
             title={ <strong>{ title }</strong> }
             headStyle={ {
                 background: "#F5F5F5",

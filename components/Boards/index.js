@@ -24,7 +24,7 @@ const Grid = styled.div`
 
 const StyledCol = styled( Acard )`
 
-    min-height:80vh;
+    min-height:72vh;
     min-width:245px;
 
     .ant-card-head

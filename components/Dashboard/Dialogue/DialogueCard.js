@@ -7,7 +7,7 @@ import
 } from 'antd';
 import styled from 'styled-components';
 
-import CardHeaderButton from "../CardHeaderButton";
+import { CardHeaderLink } from "../CardHeaderButton";
 import { getTimeAgo } from '../../../utils';
 
 const MyCard = styled( Card )`
@@ -69,8 +69,9 @@ const DialogueCard = (
     return (
         <MyCard
             className='border-2 border-[#D9D9D9]'
-            onClick={ handleOpen }
             title={ name }
+            extra={ <CardHeaderLink onClick={ handleOpen }
+            >View</CardHeaderLink> }
             headStyle={ {
                 background: "#F5F5F5",
             } }

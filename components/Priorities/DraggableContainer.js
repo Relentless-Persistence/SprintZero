@@ -56,7 +56,7 @@ const DraggableContainer = React.forwardRef( ( { disable, children, styles }, re
             </div>
 
             {/* y-axis labels */ }
-            <div style={ { width: "68vh" } } className='absolute left-0 top-0 left-0 flex justify-between transform rotate-90 origin-left'>
+            <div style={ { width: "68vh" } } className='absolute left-0 top-0 flex justify-between transform rotate-90 origin-left'>
                 <p className='text-[#A6AE9D] transform rotate-180'>High Value</p>
 
                 <p className='text-[#A6AE9D] transform rotate-180'>Low Value</p>

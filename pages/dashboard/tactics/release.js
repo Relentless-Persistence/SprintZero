@@ -120,6 +120,7 @@ export default function Release ()
             >
 
                 <ScrollContainer
+                    vertical={ false }
                     style={ {
                         height: "500px",
                         position: "relative",

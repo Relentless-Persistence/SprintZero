@@ -24,6 +24,7 @@ import fakeData from "../../../fakeData/dialogue.json";
 import products from "../../../fakeData/products.json";
 import { DropDwnBtn } from "../../../components/Dashboard/DropdownBtn";
 import { DialogueCard, AddNote } from "../../../components/Dashboard/Dialogue";
+import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
 
 const getRightNav = data => 
 {
@@ -77,7 +78,7 @@ export default function Dialogue ()
     const [ activeDialogueIndex, setActiveDialogueIndex ] = useState( 0 );
 
     const [ dialogue, setDialogue ] = useState( null );
-
+    const [ showAddNew, setShowAddNew ] = useState( false );
 
     useEffect( () =>
     {
@@ -137,6 +138,23 @@ export default function Dialogue ()
 
     };
 
+    const addDialogueDone = ( dialogue ) =>
+    {
+
+        dialogue =
+        {
+            ...dialogue,
+            id: new Date().getTime()
+        };
+
+        const newData = { ...data };
+
+        newData[ activeProduct ][ activeDialogueIndex ].list.push( dialogue );
+
+        setData( newData );
+        setShowAddNew( false );
+
+    };
 
 
     return (
@@ -184,6 +202,9 @@ export default function Dialogue ()
                     destroyOnClose={ true }
                     placement={ "bottom" }
                     closable={ false }
+                    headerStyle={ {
+                        background: "#F5F5F5"
+                    } }
                     visible={ visible }
                     onClose={ () => setVisible( false ) }
                     title={
@@ -192,11 +213,12 @@ export default function Dialogue ()
                                 <>
                                     <span>{ dialogue?.name }</span>
                                     &nbsp;
-                                    <small
-                                        className=""
-                                        style={ { cursor: "pointer" } }
-                                        onClick={ openEdit }
-                                    >Edit</small>
+
+                                    <CardHeaderButton
+                                        className="!bg-transparent border-[#4A801D]"
+                                        onClick={ openEdit }>
+                                        Edit
+                                    </CardHeaderButton>
                                 </>
                             </Col>
                             <Col span={ 1 }>
@@ -245,6 +267,7 @@ export default function Dialogue ()
                 {
                     dialogue?.id ?
                         <AddNote
+                            height={ height }
                             visible={ visibleEdit }
                             dialogue={ dialogue }
                             setDialogue={ setDialogue }
@@ -252,7 +275,6 @@ export default function Dialogue ()
                             onSubmit={ editDialogue }
                         /> : null
                 }
-
 
             </AppLayout>
 
