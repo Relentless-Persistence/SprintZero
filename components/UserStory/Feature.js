@@ -48,7 +48,7 @@ const Feature = ({
           } px-[8px] py-[4px] text-[#006378] text-sm rounded`}
           icon={<CopyOutlined />}
         >
-          {feature.status !== "saved" ? (
+          {/* {feature.status !== "saved" ? ( */}
             <Input
               placeholder="New Feature"
               type="text"
@@ -58,11 +58,11 @@ const Feature = ({
               onChange={(e) =>
                 handleChangeFeature(i, featureIndex, e.target.value)
               }
-              onKeyDown={(e) => handleChangeFeatureStatus(i, featureIndex, e)}
+              // onKeyDown={(e) => handleChangeFeatureStatus(i, featureIndex, e)}
             />
-          ) : (
+          {/* ) : (
             <p>{feature.name}</p>
-          )}
+          )} */}
         </Tag>
       </ArcherElement>
     </div>

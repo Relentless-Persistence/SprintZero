@@ -44,7 +44,7 @@ const EpicComments = ({ type }) => {
   };
 
   return (
-    <>
+    <div className="h-full overflow-y-auto">
       <List
         className="comment-list"
         // header={`${data.length} replies`}
@@ -75,7 +75,7 @@ const EpicComments = ({ type }) => {
           />
         }
       />
-    </>
+    </div>
   );
 };
 
