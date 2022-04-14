@@ -7,9 +7,6 @@ import
 {
     Row,
     Col,
-    Menu,
-    Button,
-    Dropdown,
     Drawer
 } from 'antd';
 
@@ -22,20 +19,13 @@ import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/dialogue.json";
 import products from "../../../fakeData/products.json";
-import { DropDwnBtn } from "../../../components/Dashboard/DropdownBtn";
-import { DialogueCard, AddNote } from "../../../components/Dashboard/Dialogue";
+import { DialogueCard, AddNote, EditNote } from "../../../components/Dashboard/Dialogue";
+import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
 
 const getRightNav = data => 
 {
     return data.map( d => d.title );
 };
-
-const getPosts = data =>
-{
-    return data.map( d => d.post );
-
-};
-
 
 const Title = styled.p`
     font-size: 16px;
@@ -44,19 +34,6 @@ const Title = styled.p`
     flex: none;
     margin: 4px 0px;
 `;
-
-const menu = ( data ) => (
-    <Menu>
-        {
-            data.map( ( d, i ) => (
-                <Menu.Item key={ i }>
-                    { d }
-                </Menu.Item>
-
-            ) )
-        }
-    </Menu>
-);
 
 const DEFAULT_HEIGHT = 378;
 
@@ -77,7 +54,7 @@ export default function Dialogue ()
     const [ activeDialogueIndex, setActiveDialogueIndex ] = useState( 0 );
 
     const [ dialogue, setDialogue ] = useState( null );
-
+    const [ showAddNew, setShowAddNew ] = useState( false );
 
     useEffect( () =>
     {
@@ -137,6 +114,25 @@ export default function Dialogue ()
 
     };
 
+    const addDialogueDone = ( dialogue ) =>
+    {
+
+        dialogue =
+        {
+            ...dialogue,
+            id: new Date().getTime(),
+            updatedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString()
+        };
+
+        const newData = { ...data };
+
+        newData[ activeProduct ][ activeDialogueIndex ].list.push( dialogue );
+
+        setData( newData );
+        setShowAddNew( false );
+
+    };
 
 
     return (
@@ -155,7 +151,7 @@ export default function Dialogue ()
                 rightNavItems={ getRightNav( data[ activeProduct ] )
                 }
                 hasMainAdd
-                onMainAdd={ () => { } }
+                onMainAdd={ () => setShowAddNew( true ) }
                 hasSideAdd={ false }
             >
 
@@ -184,6 +180,9 @@ export default function Dialogue ()
                     destroyOnClose={ true }
                     placement={ "bottom" }
                     closable={ false }
+                    headerStyle={ {
+                        background: "#F5F5F5"
+                    } }
                     visible={ visible }
                     onClose={ () => setVisible( false ) }
                     title={
@@ -192,11 +191,12 @@ export default function Dialogue ()
                                 <>
                                     <span>{ dialogue?.name }</span>
                                     &nbsp;
-                                    <small
-                                        className=""
-                                        style={ { cursor: "pointer" } }
-                                        onClick={ openEdit }
-                                    >Edit</small>
+
+                                    <CardHeaderButton
+                                        className="!bg-transparent border-[#4A801D]"
+                                        onClick={ openEdit }>
+                                        Edit
+                                    </CardHeaderButton>
                                 </>
                             </Col>
                             <Col span={ 1 }>
@@ -244,7 +244,8 @@ export default function Dialogue ()
 
                 {
                     dialogue?.id ?
-                        <AddNote
+                        <EditNote
+                            height={ height }
                             visible={ visibleEdit }
                             dialogue={ dialogue }
                             setDialogue={ setDialogue }
@@ -252,6 +253,18 @@ export default function Dialogue ()
                             onSubmit={ editDialogue }
                         /> : null
                 }
+
+                {
+                    showAddNew ?
+
+                        <AddNote
+                            visible={ showAddNew }
+                            setVisible={ setShowAddNew }
+                            onSubmit={ addDialogueDone }
+                        />
+                        : null
+                }
+
 
 
             </AppLayout>

@@ -458,6 +458,7 @@ export default function Sprint ()
                         </Col>
 
                         <Col
+                            className="max-h-[250px] overflow-y-scroll pr-[20px]"
                             offset={ 1 }
                             span={ 11 }>
                             <div className="flex items-center justify-between">

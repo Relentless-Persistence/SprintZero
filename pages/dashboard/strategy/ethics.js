@@ -492,60 +492,6 @@ export default function Ethics ()
 
                         </Col>
 
-                        {/* <Col
-                            className="max-h-[250px] overflow-y-scroll"
-                            span={ 12 }>
-                            <Title>
-                                Comments
-                            </Title>
-
-                            <br />
-
-                            <List
-                                itemLayout="vertical"
-                                dataSource={ list }
-                                renderItem={ item => (
-                                    <List.Item>
-                                        <ListItemMeta
-                                            avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" /> }
-                                            title={ <ListTitle> { item.title }</ListTitle> }
-                                            description={ <SubListTitle> { item.text }</SubListTitle> }
-                                        />
-
-
-                                    </List.Item>
-                                ) }
-                            />
-
-                            <List.Item>
-                                <ListItemMeta
-                                    avatar={ <Avatar src="https://joeschmoe.io/api/v1/random" /> }
-                                    title={ <TextArea /> }
-                                />
-
-
-                            </List.Item>
-
-                            <List.Item>
-                                <Button
-                                    className="mr-[8px]"
-                                    disabled>
-                                    <SendOutlined />
-                                    Post
-                                </Button>
-
-
-                                <Button
-                                    className="inline-flex justify-between items-center"
-                                    danger>
-                                    <FlagOutlined />
-                                    Flag
-                                </Button>
-                            </List.Item>
-
-
-                        </Col> */}
-
                     </Row>
                 </Drawer>
             </AppLayout>

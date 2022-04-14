@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import
 {
     Row,
     Col,
-    Menu,
     Button,
     Input,
     Form,
@@ -11,13 +10,10 @@ import
 } from 'antd';
 import styled from 'styled-components';
 
-import { CloseOutlined } from '@ant-design/icons';
 import ActionButtons from '../../Personas/ActionButtons';
 
 
 const { TextArea } = Input;
-
-
 
 const Title = styled.p`
     font-size: 16px;
@@ -27,54 +23,132 @@ const Title = styled.p`
     margin: 4px 0px;
 `;
 
+const init =
+{
+    "name": "",
+    "post": "BobCat Operator",
+    "region": "",
+    "education": "",
+    "notes": [
+        {
+            "id": "1",
+            "title": "",
+            "response": ""
+        }
+    ]
+};
+
 const AddNote = (
     {
         visible,
         setVisible,
-        dialogue,
-        setDialogue,
-        onSubmit
+        onSubmit,
+        height = 378
     }
 ) => 
 {
-    const [ form ] = Form.useForm();
-
+    const ref = useRef();
+    const [ item, setItem ] = useState( { ...init } );
 
     const onClose = () =>
     {
-        setDialogue( null );
         setVisible( false );
     };
 
+    const handleEducation = ( e ) =>
+    {
+        setItem( {
+            ...item,
+            education: e.target.value
+        } );
+    };
+
+    const handleRegion = ( e ) =>
+    {
+        setItem( {
+            ...item,
+            region: e.target.value
+        } );
+    };
+
+    const handleName = ( e ) =>
+    {
+        setItem( {
+            ...item,
+            name: e.target.value
+        } );
+    };
+
+
+    const handleNoteChange = ( e, index, key ) =>
+    {
+        const newItem = { ...item };
+        const notes = newItem.notes;
+
+        notes[ index ][ key ] = e.target.value;
+        setItem( newItem );
+
+
+    };
 
     const handleFinish = () => 
     {
-        const values = form.getFieldsValue();
-        const updatedDialogue = {
-            ...dialogue,
-            notes: values[ `${ dialogue?.id }fields` ]
-        };
+        const filteredNotes = item.notes.filter( it =>
+        {
+            return it.response.trim() && it.title.trim();
+        } );
 
-        //console.log( updatedDialogue );
+        const length = filteredNotes.length;
 
-        onSubmit( updatedDialogue );
+        if ( item.name && length && item.education && item.region )
+        {
+            onSubmit( {
+                ...item,
+                notes: filteredNotes
+            } );
+        }
 
         onClose();
+    };
+
+    const onAddNote = () =>
+    {
+        const newItem = { ...item };
+        const notes = newItem.notes;
+
+        notes.push( {
+            "id": new Date().getTime(),
+            "title": "",
+            "response": ""
+        } );
+
+
+        setItem( newItem );
     };
 
     return (
         <Drawer
             visible={ visible }
             closable={ false }
+            height={ height }
             placement={ "bottom" }
+            headerStyle={ {
+                background: "#F5F5F5"
+            } }
             onClose={ onClose }
             title={
                 <Row>
-                    <Col span={ 23 }>
-                        <span>{ dialogue?.name }</span>
+                    <Col span={ 20 }>
+                        <Input
+                            value={ item.name }
+                            placeholder="John Doe"
+                            onChange={ handleName }
+                        />
 
                     </Col>
-                    <Col span={ 1 }>
+                    <Col
+                        offset={ 3 }
+                        span={ 1 }>
                         <ActionButtons
                             className="justify-end"
                             onCancel={ onClose }
@@ -85,7 +159,7 @@ const AddNote = (
             }
         >
 
-            <Row className="py-6" gutter={ [ 20, 20 ] }>
+            <Row gutter={ [ 20, 20 ] }>
                 <Col span={ 16 }>
                     <p>
                         <strong>
@@ -94,43 +168,34 @@ const AddNote = (
                     </p>
 
                     <Form
-                        form={ form }
+                        ref={ ref }
                         onFinish={ handleFinish }>
 
-                        <Form.List
-                            initialValue={ dialogue?.notes }
-                            name={ `${ dialogue?.id }fields` } >
-                            { ( fields, { add, remove } ) =>
-                            {
-                                return (
-                                    <div>
-                                        { fields.map( ( field, index ) => (
-                                            <div key={ index }>
-                                                <Form.Item
-                                                    name={ [ index, "title" ] }
-                                                    rules={ [ { required: true } ] }
-                                                >
-                                                    <Input placeholder="Title" />
-                                                </Form.Item>
+                        {
+                            item.notes.map( ( note, index ) => (
+                                <div
+                                    key={ index }>
+                                    <Input
+                                        className='mb-[24px]'
+                                        onChange={ ( e ) => handleNoteChange( e, index, "title" ) }
+                                        value={ note.title }
+                                        placeholder="Title" />
 
-                                                <Form.Item
-                                                    name={ [ index, "response" ] }
-                                                    rules={ [ { required: true } ] }
-                                                >
-                                                    <TextArea
-                                                        autoSize={ { minRows: 6 } }
-                                                        placeholder="Response" />
-                                                </Form.Item>
-                                            </div>
-                                        ) ) }
+                                    <TextArea
+                                        className='mb-[24px]'
+                                        onChange={ ( e ) => handleNoteChange( e, index, "response" ) }
+                                        value={ note.response }
+                                        autoSize={ { minRows: 6 } }
+                                        placeholder="Response" />
+                                </div>
+                            ) )
+                        }
 
-                                        <Button onClick={ () => add() } >
-                                            Add More
-                                        </Button>
-                                    </div>
-                                );
-                            } }
-                        </Form.List>
+                        <Button
+                            className='text-[#4A801D] border-[#4A801D]'
+                            onClick={ onAddNote } >
+                            Add More
+                        </Button>
 
                     </Form>
 
@@ -140,12 +205,25 @@ const AddNote = (
                     offset={ 3 }
                     span={ 4 }>
                     <Title className="text-right">Region</Title>
-                    <p className="text-right text-lg">{ dialogue?.region }</p>
+                    <Input
+                        className="text-right text-lg"
+                        value={ item.region }
+                        placeholder="Africa"
+                        onChange={ handleRegion }
+                    />
+                    {/* <p className="text-right text-lg">{ item.region }</p> */ }
 
                     <br />
                     <br />
+
                     <Title className="text-right">Education</Title>
-                    <p className="text-right text-lg">{ dialogue?.education }</p>
+                    <Input
+                        className="text-right text-lg"
+                        value={ item.education }
+                        placeHolder="Bachelors"
+                        onChange={ handleEducation }
+                    />
+                    {/* <p className="text-right text-lg">{ item.education }</p> */ }
                 </Col>
             </Row>
 

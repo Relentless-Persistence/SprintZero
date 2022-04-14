@@ -2,7 +2,9 @@ import React from 'react';
 import { Divider, Tag } from "antd";
 import styled from 'styled-components';
 import { ReadOutlined, CopyOutlined } from '@ant-design/icons';
-import { differenceInDays } from '../../utils';
+import { differenceInDays, scaleToVal } from '../../utils';
+import { DraggableTask } from '../Priorities';
+
 
 const TaskItem = styled.div`
   position: absolute;
@@ -53,15 +55,17 @@ const Circle = styled.div`
   z-index:2;
 `;
 
-const Task = ( {
+const Task = React.forwardRef( ( {
     name = "Task name",
+    taskIndex,
     subTasks = [],
+    onStop,
     duration,
     start,
     end,
     style,
     ...props
-} ) =>
+}, ref ) =>
 {
     const getTaskDuration = () => 
     {
@@ -95,6 +99,22 @@ const Task = ( {
 
     };
 
+    const handleStop = ( e, itemData, index ) =>
+    {
+
+        const node = itemData.node.getBoundingClientRect();
+        const nodeWidth = node.width;
+
+        const parent = ref?.current.getBoundingClientRect();
+        const parentWidth = parent.width;
+
+        const maxPossibleX = parentWidth - nodeWidth;
+
+        const valX = scaleToVal( itemData.x, maxPossibleX );
+
+        onStop( valX, index, taskIndex );
+    };
+
 
     return (
         <TaskItem
@@ -114,18 +134,24 @@ const Task = ( {
                 </Name>
 
                 {
-                    subTasks?.map( s => (
-                        <SubTask key={ s.id }
-                            style={
-                                {
-                                    left: `${ getSubOffset( s.endDate ) }%`
+                    subTasks?.map( ( s, i ) => (
+                        <DraggableTask
+                            onStop={ handleStop }
+                            index={ i }
+                            ref={ ref }
+                            key={ s.id }>
+                            <SubTask
+                                style={
+                                    {
+                                        left: `${ getSubOffset( s.endDate ) }%`
+                                    }
                                 }
-                            }
-                            className="flex items-center space-x-1 border-2 border-[#006378]  px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
-                            icon={ <CopyOutlined /> }
-                        >
-                            { s.name }
-                        </SubTask>
+                                className="flex items-center space-x-1 border-2 border-[#006378]  px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
+                                icon={ <CopyOutlined /> }
+                            >
+                                { s.name }
+                            </SubTask>
+                        </DraggableTask>
                     ) )
                 }
 
@@ -144,6 +170,8 @@ const Task = ( {
             </TaskContent>
         </TaskItem>
     );
-};
+} );
+
+Task.displayName = "Task";
 
 export default Task;

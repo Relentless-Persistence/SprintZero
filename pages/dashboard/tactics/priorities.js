@@ -279,7 +279,7 @@ export default function Priorities ()
                 >
 
 
-                    <Row gutter={ 63 } className="mt-[15px]">
+                    <Row className="mt-[15px]">
 
                         <Col span={ 12 } >
                             <DrawerSubTitle>Features</DrawerSubTitle>
@@ -289,7 +289,11 @@ export default function Priorities ()
                                 value={ text }
                                 rows={ 4 } />
                         </Col>
-                        <Col span={ 11 } >
+                        <Col
+                            className="max-h-[250px] overflow-y-scroll pr-[20px]"
+
+                            offset={ 1 }
+                            span={ 11 } >
                             <DrawerSubTitle>Comments</DrawerSubTitle>
 
                             <List

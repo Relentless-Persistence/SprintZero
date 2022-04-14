@@ -81,6 +81,66 @@ const DraggableTab = React.forwardRef( ( {
     );
 } );
 
+const DraggableTask = React.forwardRef( ( {
+    disable,
+    index,
+    onStop,
+    children,
+    val }, ref ) => 
+{
+    const nodeRef = useRef();
+
+    const [ pos, setPos ] = useState(
+        {
+            x: 0,
+        }
+    );
+
+    useEffect( () =>
+    {
+        if ( nodeRef?.current )
+        {
+
+            const node = nodeRef?.current.getBoundingClientRect();
+            const nodeWidth = node.width;
+
+            const parent = ref?.current.getBoundingClientRect();
+            const parentWidth = parent.width;
+
+
+            const maxPossibleX = parentWidth - nodeWidth;
+            setPos(
+                {
+                    x: scaleToScreen( val.x, maxPossibleX ),
+                }
+            );
+
+        }
+    }, [ val, ref ] );
+
+    const handleStop = ( e, data ) =>
+    {
+
+        onStop( e, data, index );
+    };
+
+    return (
+        <Draggable
+            onStop={ handleStop }
+            bounds="parent"
+            position={ pos }
+            nodeRef={ nodeRef }
+            disabled={ disable }
+
+        >
+            { children }
+        </Draggable>
+
+    );
+} );
+
 DraggableTab.displayName = "DraggableTab";
 
-export { DraggableTab };
+DraggableTask.displayName = "DraggableTask";
+
+export { DraggableTab, DraggableTask };

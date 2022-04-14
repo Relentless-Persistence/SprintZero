@@ -374,7 +374,9 @@ export default function Tasks ()
                             </SubTasks>
 
                         </Col>
-                        <Col span={ 8 } >
+                        <Col
+                            className="max-h-[250px] overflow-y-scroll pr-[20px]"
+                            span={ 8 } >
                             <DrawerSubTitle>Discussion</DrawerSubTitle>
 
                             <List
