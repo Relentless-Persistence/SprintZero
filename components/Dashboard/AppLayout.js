@@ -33,7 +33,6 @@ const Version = styled.li`
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
-
 `;
 
 const AddNew = styled( Button )`
