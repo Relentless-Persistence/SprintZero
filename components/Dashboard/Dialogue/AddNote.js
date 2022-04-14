@@ -191,7 +191,9 @@ const AddNote = (
                             ) )
                         }
 
-                        <Button onClick={ onAddNote } >
+                        <Button
+                            className='text-[#4A801D] border-[#4A801D]'
+                            onClick={ onAddNote } >
                             Add More
                         </Button>
 

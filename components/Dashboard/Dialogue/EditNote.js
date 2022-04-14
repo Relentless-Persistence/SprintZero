@@ -135,7 +135,10 @@ const EditNote = (
                                             </div>
                                         ) ) }
 
-                                        <Button onClick={ () => add() } >
+                                        <Button
+
+                                            className='text-[#4A801D] border-[#4A801D]'
+                                            onClick={ () => add() } >
                                             Add More
                                         </Button>
                                     </div>
