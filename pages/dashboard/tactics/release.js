@@ -18,6 +18,7 @@ import
 
 import fakeData from "../../../fakeData/release.json";
 import products from "../../../fakeData/products.json";
+import { DraggableContainer } from '../../../components/Priorities';
 
 const getName = list => list?.map( l => l.name );
 
@@ -92,6 +93,29 @@ export default function Release ()
             chartRef.current.scrollTo( 100, 0 );
         }
     }, [] );
+
+    const onStop = ( x, index, taskIndex ) =>
+    {
+        const newData = { ...data };
+        const list = newData[ activeProduct ][ activeDataIndex ].taskList;
+
+        //TODO
+        //get task time as number
+        //get correct x dims
+        //width = task time
+        // convert x to match above
+        // convert above to datetime
+
+
+        // list[ taskIndex ].subTasks[ index ] =
+        // {
+        //     ...list[ taskIndex ].subTasks[ index ],
+        //     "endDate": "2022-03-15T22:21:32.035Z"
+        // };
+
+        //setData( newData );
+
+    };
 
     const taskList = activeData?.taskList || [];
     const duration = getDuration();
@@ -172,6 +196,8 @@ export default function Release ()
                             {
                                 taskList.map( ( t, i ) => (
                                     <Task
+                                        taskIndex={ i }
+                                        ref={ chartRef }
                                         style={ {
                                             top: i == 0 ? `65px` : `${ 65 + ( i * ( 35 + 150 ) ) }px`,
                                             left: `${ getOffset( t.startDate ) }%`
@@ -182,6 +208,7 @@ export default function Release ()
                                         start={ t.startDate }
                                         end={ t.endDate }
                                         duration={ duration }
+                                        onStop={ onStop }
                                     />
                                 ) )
                             }
