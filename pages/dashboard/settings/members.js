@@ -7,6 +7,8 @@ import { useRouter } from "next/router";
 import Account from "../../../components/Settings/Account";
 import { findIndex } from "lodash";
 import Members from "../../../components/Settings/Members";
+import { UserAddOutlined } from "@ant-design/icons";
+import { Modal, Button } from "antd";
 
 const members = () => {
   const router = useRouter();
@@ -14,6 +16,7 @@ const members = () => {
   const menus = ["Account", "Billing", "Config", "Share", "Members"];
   const [activeMenuIndex, setActiveMenuIndex] = useState(4);
   const [addPerson, setAddPerson] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const setActiveRightNav = (h) => {
     const menuTypeIndex = findIndex(menus, (o) => o === h);
@@ -31,8 +34,16 @@ const members = () => {
       <AppLayout
         ignoreLast={true}
         hasMainAdd={true}
-        addNewText="Add"
-        onMainAdd={() => setAddPerson(true)}
+        addNewText={
+          <div
+            className="flex items-center space-x-2"
+            // onClick={() => setIsModalVisible(true)}
+          >
+            <UserAddOutlined />
+            <p>Add</p>
+          </div>
+        }
+        onMainAdd={() => setIsModalVisible(true)}
         hasSideAdd={false}
         breadCrumbItems={splitRoutes(pathname)}
         mainClass="mr-[174px]"
@@ -42,6 +53,16 @@ const members = () => {
       >
         <Members />
       </AppLayout>
+      <Modal
+        // title="Basic Modal"
+        visible={isModalVisible}
+        // onOk={handleOk}
+        onCancel={() => setIsModalVisible(false)}
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
     </div>
   );
 };
