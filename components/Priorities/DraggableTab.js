@@ -26,7 +26,7 @@ const Circle = styled.div`
 
 
 
-import { differenceInDays, scaleToScreen } from '../../utils';
+import { scaleToScreen } from '../../utils';
 
 
 const DraggableTab = React.forwardRef( ( {
@@ -123,9 +123,9 @@ const DraggableSubTask = React.forwardRef( ( { item, index, taskStart, taskEnd, 
             const parentWidth = parent.width;
             const maxPossibleX = parentWidth - nodeWidth;
 
-            const offset = differenceInDays( new Date( item.endDate ), new Date( taskStart ) );
+            const offset = new Date( item.endDate ).getTime() - new Date( taskStart ).getTime();
 
-            const duration = differenceInDays( new Date( taskEnd ), new Date( taskStart ) );
+            const duration = new Date( taskEnd ).getTime() - new Date( taskStart ).getTime();
 
 
             setPos(

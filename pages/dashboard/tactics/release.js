@@ -10,7 +10,6 @@ import Task from '../../../components/Release/Task';
 import
 {
     splitRoutes,
-    differenceInDays,
 } from "../../../utils";
 
 import fakeData from "../../../fakeData/release.json";
@@ -58,10 +57,10 @@ export default function Release ()
 
     const getDuration = () =>
     {
-        const end = new Date( activeData.target );
-        const start = new Date( activeData.start );
+        const end = new Date( activeData.target ).getTime();
+        const start = new Date( activeData.start ).getTime();
 
-        const duration = differenceInDays( end, start );
+        const duration = end - start;
 
         return duration;
 
@@ -69,10 +68,10 @@ export default function Release ()
 
     const getOffset = ( subStart ) =>
     {
-        const subtaskStart = new Date( subStart );
-        const start = new Date( activeData.start );
+        const subtaskStart = new Date( subStart ).getTime();
+        const start = new Date( activeData.start ).getTime();
 
-        const dayOffset = differenceInDays( subtaskStart, start );
+        const dayOffset = subtaskStart - start;
         const duration = getDuration();
 
         return ( dayOffset / duration ) * 100;

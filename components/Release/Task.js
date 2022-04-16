@@ -4,8 +4,7 @@ import Draggable from 'react-draggable';
 
 import styled from 'styled-components';
 import { ReadOutlined } from '@ant-design/icons';
-import { differenceInDays, scaleToScreen, scaleToVal, timeScale } from '../../utils';
-import { clamp } from 'lodash';
+import { timeScale } from '../../utils';
 import { DraggableSubTask } from '../Priorities';
 
 
@@ -57,10 +56,10 @@ const Task = React.forwardRef( ( {
 
     const getTaskDuration = () => 
     {
-        const _end = new Date( end );
-        const _start = new Date( start );
+        const _end = new Date( end ).getTime();
+        const _start = new Date( start ).getTime();
 
-        const taskDur = differenceInDays( _end, _start );
+        const taskDur = _end - _start;
         return taskDur;
     };
 
@@ -76,10 +75,10 @@ const Task = React.forwardRef( ( {
 
     const getSubOffset = ( subEnd ) =>
     {
-        const _start = new Date( start );
-        const _end = new Date( subEnd );
+        const _start = new Date( start ).getTime();
+        const _end = new Date( subEnd ).getTime();
         const taskDur = getTaskDuration();
-        const subtaskDur = differenceInDays( _end, _start );
+        const subtaskDur = _end - _start;
 
         const offset = ( subtaskDur / taskDur ) * 100;
 
@@ -104,6 +103,7 @@ const Task = React.forwardRef( ( {
         const _end = new Date( end ).getTime();
 
         const newEndDate = timeScale( 0, maxPossibleX, _start, _end, newX );
+
 
         onStop( i, taskIndex, newEndDate );
 
