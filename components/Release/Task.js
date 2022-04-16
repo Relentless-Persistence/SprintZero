@@ -99,11 +99,11 @@ const Task = React.forwardRef( ( {
 
         const newX = itemData.lastX;
 
+
         const _start = new Date( start ).getTime();
         const _end = new Date( end ).getTime();
 
         const newEndDate = timeScale( 0, maxPossibleX, _start, _end, newX );
-
 
         onStop( i, taskIndex, newEndDate );
 
