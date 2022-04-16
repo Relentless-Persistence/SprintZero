@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Divider, Tag } from "antd";
+import Draggable from 'react-draggable';
+
 import styled from 'styled-components';
-import { ReadOutlined, CopyOutlined } from '@ant-design/icons';
-import { differenceInDays, scaleToVal } from '../../utils';
-import { DraggableTask } from '../Priorities';
+import { ReadOutlined } from '@ant-design/icons';
+import { differenceInDays, scaleToScreen, scaleToVal, timeScale } from '../../utils';
+import { clamp } from 'lodash';
+import { DraggableSubTask } from '../Priorities';
 
 
 const TaskItem = styled.div`
@@ -35,29 +38,11 @@ const Name = styled( Tag )`
   background: #FFFFFF;
   margin-bottom: 6px;
 `;
-const SubTask = styled( Tag )`
-  position: absolute;
-  top: 100%;
-  transform: translateX(-50%);
-  margin-top: 6px;
-
-`;
-
-const Circle = styled.div`
-  position: absolute; 
-  border: 2px solid #4F2DC8;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  top:50%;
-  transform: translate(-50%,-50%);
-  background: #FFFFFF;
-  z-index:2;
-`;
 
 const Task = React.forwardRef( ( {
     name = "Task name",
     taskIndex,
+    disabled,
     subTasks = [],
     onStop,
     duration,
@@ -67,6 +52,9 @@ const Task = React.forwardRef( ( {
     ...props
 }, ref ) =>
 {
+
+    const taskRef = useRef( null );
+
     const getTaskDuration = () => 
     {
         const _end = new Date( end );
@@ -99,20 +87,26 @@ const Task = React.forwardRef( ( {
 
     };
 
-    const handleStop = ( e, itemData, index ) =>
+    const handleStop = ( e, itemData, i ) =>
     {
 
         const node = itemData.node.getBoundingClientRect();
         const nodeWidth = node.width;
 
-        const parent = ref?.current.getBoundingClientRect();
-        const parentWidth = parent.width;
-
+        const parentChart = taskRef?.current.getBoundingClientRect();
+        const parentWidth = parentChart.width;
         const maxPossibleX = parentWidth - nodeWidth;
 
-        const valX = scaleToVal( itemData.x, maxPossibleX );
+        const newX = itemData.lastX;
 
-        onStop( valX, index, taskIndex );
+        const _start = new Date( start ).getTime();
+        const _end = new Date( end ).getTime();
+
+        const newEndDate = timeScale( 0, maxPossibleX, _start, _end, newX );
+
+
+        onStop( i, taskIndex, newEndDate );
+
     };
 
 
@@ -124,50 +118,41 @@ const Task = React.forwardRef( ( {
             } }
             { ...props }
 
-        > <TaskContent>
-                <Line />
+        >
+            <div
+                className='subtask-wrapper'
+                ref={ taskRef }>
+                <TaskContent>
+                    <Line />
 
-                <Name
-                    className="flex items-center space-x-1 border-2 border-[#4F2DC8] px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded cursor-pointer"
-                    icon={ <ReadOutlined /> }>
-                    { name }
-                </Name>
+                    <Name
+                        className="flex items-center space-x-1 border-2 border-[#4F2DC8] px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded cursor-pointer"
+                        icon={ <ReadOutlined /> }>
+                        { name }
+                    </Name>
 
-                {
-                    subTasks?.map( ( s, i ) => (
-                        <DraggableTask
-                            onStop={ handleStop }
-                            index={ i }
-                            ref={ ref }
-                            key={ s.id }>
-                            <SubTask
-                                style={
-                                    {
-                                        left: `${ getSubOffset( s.endDate ) }%`
-                                    }
-                                }
-                                className="flex items-center space-x-1 border-2 border-[#006378]  px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
-                                icon={ <CopyOutlined /> }
-                            >
-                                { s.name }
-                            </SubTask>
-                        </DraggableTask>
-                    ) )
-                }
 
-                {
-                    subTasks?.map( s => (
-                        <Circle
-                            style={
-                                {
-                                    left: `${ getSubOffset( s.endDate ) }%`
-                                }
-                            }
-                            key={ s.id } />
-                    ) )
-                }
 
-            </TaskContent>
+                    {
+                        subTasks?.map( ( s, i ) => (
+                            <DraggableSubTask
+                                disabled={ disabled }
+                                ref={ taskRef }
+                                item={ s }
+                                index={ i }
+                                handleStop={ handleStop }
+                                key={ s.id }
+                                taskStart={ start }
+                                taskEnd={ end }
+                                offset={ `${ getSubOffset( s.endDate ) }% ` }
+                            />
+                        ) )
+                    }
+
+
+
+                </TaskContent>
+            </div>
         </TaskItem>
     );
 } );
