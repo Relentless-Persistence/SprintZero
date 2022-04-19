@@ -32,8 +32,6 @@ import AppLayout from "../../../components/Dashboard/AppLayout";
 
 import { Board } from '../../../components/Boards';
 import { Index } from '../../../components/Boards/NumberIndex';
-import { DropDwnBtn } from '../../../components/Dashboard/DropdownBtn';
-
 
 import { splitRoutes } from "../../../utils";
 

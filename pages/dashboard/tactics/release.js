@@ -1,8 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
-import ScrollContainer from 'react-indiana-drag-scroll';
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import { Divider } from "antd";
+import { Button, Divider } from "antd";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
@@ -10,15 +9,12 @@ import Task from '../../../components/Release/Task';
 
 import
 {
-    formatDateTime,
     splitRoutes,
-    differenceInDays,
-    isBefore
 } from "../../../utils";
 
 import fakeData from "../../../fakeData/release.json";
 import products from "../../../fakeData/products.json";
-import { DraggableContainer } from '../../../components/Priorities';
+
 
 const getName = list => list?.map( l => l.name );
 
@@ -29,7 +25,7 @@ export default function Release ()
     const chartRef = useRef( null );
 
     const [ data, setData ] = useState( fakeData );
-    const [ showCalendar, setShowCalendar ] = useState( false );
+    const [ disabled, setDisabled ] = useState( true );
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
     const [ activeDataIndex, setActiveDataIndex ] = useState( 0 );
@@ -39,7 +35,6 @@ export default function Release ()
     const activeData = data[ activeProduct ][ activeDataIndex ];
     const sprintCount = activeData.sprints.length;
     const percentage = 100 / sprintCount;
-    const target = activeData?.target;
 
     const setProduct = product =>
     {
@@ -62,10 +57,10 @@ export default function Release ()
 
     const getDuration = () =>
     {
-        const end = new Date( activeData.target );
-        const start = new Date( activeData.start );
+        const end = new Date( activeData.target ).getTime();
+        const start = new Date( activeData.start ).getTime();
 
-        const duration = differenceInDays( end, start );
+        const duration = end - start;
 
         return duration;
 
@@ -73,10 +68,10 @@ export default function Release ()
 
     const getOffset = ( subStart ) =>
     {
-        const subtaskStart = new Date( subStart );
-        const start = new Date( activeData.start );
+        const subtaskStart = new Date( subStart ).getTime();
+        const start = new Date( activeData.start ).getTime();
 
-        const dayOffset = differenceInDays( subtaskStart, start );
+        const dayOffset = subtaskStart - start;
         const duration = getDuration();
 
         return ( dayOffset / duration ) * 100;
@@ -84,43 +79,31 @@ export default function Release ()
 
     };
 
-
     useEffect( () =>
     {
-        //start chart in 0 scroll
         if ( chartRef.current )
         {
             chartRef.current.scrollTo( 100, 0 );
         }
     }, [] );
 
-    const onStop = ( x, index, taskIndex ) =>
+    const onStop = ( subTaskIndex, taskIndex, newDateInMs ) =>
     {
         const newData = { ...data };
-        const list = newData[ activeProduct ][ activeDataIndex ].taskList;
+        const list = newData[ activeProduct ][ activeDataIndex ].taskList[ taskIndex ].subTasks;
 
-        //TODO
-        //get task time as number
-        //get correct x dims
-        //width = task time
-        // convert x to match above
-        // convert above to datetime
+        list[ subTaskIndex ] =
+        {
+            ...list[ subTaskIndex ],
+            "endDate": new Date( newDateInMs ).toISOString()
+        };
 
-
-        // list[ taskIndex ].subTasks[ index ] =
-        // {
-        //     ...list[ taskIndex ].subTasks[ index ],
-        //     "endDate": "2022-03-15T22:21:32.035Z"
-        // };
-
-        //setData( newData );
+        setData( newData );
 
     };
 
     const taskList = activeData?.taskList || [];
     const duration = getDuration();
-
-
 
     return (
         <div className="mb-8">
@@ -141,14 +124,36 @@ export default function Release ()
                 onChangeProduct={ setProduct }
                 activeRightItem={ activeVersion }
                 ignoreLast={ true }
+                topExtra={ disabled ? <Button
+                    onClick={ () => setDisabled( false ) }
+                    size="small"
+                    className='px-2 font[600] bg-white border-[#4A801D] text-[14px] leading-[22px] text-[#4A801D]'
+                >
+                    Edit
+                </Button>
+                    :
+                    <Button
+                        style={ {
+                            color: "#fff",
+                            backgroundColor: "#4A801D"
+                        } }
+                        onClick={ () => setDisabled( true ) }
+                        size="small"
+                        className='px-2 font[600] border-[#4A801D] text-[14px] leading-[22px] bg-[#4A801D] text-white'
+                    >
+                        Done
+                    </Button> }
+
             >
 
-                <ScrollContainer
-                    vertical={ false }
+
+                <div
                     style={ {
                         height: "500px",
                         position: "relative",
-                        paddingTop: "20px"
+                        paddingTop: "20px",
+                        overflowX: "scroll",
+                        overflowY: "hidden"
                     } }>
                     <div
                         ref={ chartRef }
@@ -156,6 +161,7 @@ export default function Release ()
                             width: `${ sprintCount * 339 }px`, margin: "20px",
                             minHeight: "100%",
                             position: "relative",
+                            background: !disabled ? "#fff" : "transparent"
 
                         } }>
 
@@ -209,6 +215,7 @@ export default function Release ()
                                         end={ t.endDate }
                                         duration={ duration }
                                         onStop={ onStop }
+                                        disabled={ disabled }
                                     />
                                 ) )
                             }
@@ -217,7 +224,7 @@ export default function Release ()
 
 
                     </div>
-                </ScrollContainer>
+                </div>
 
             </AppLayout>
         </div>

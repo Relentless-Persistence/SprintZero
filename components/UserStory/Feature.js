@@ -14,7 +14,7 @@ const Feature = ({
   handleChangeFeatureStatus,
 }) => {
   return (
-    <div>
+    <div className="flex items-center justify-start">
       <ArcherElement
         key={feature.id}
         id={feature.id}
@@ -49,17 +49,17 @@ const Feature = ({
           icon={<CopyOutlined />}
         >
           {/* {feature.status !== "saved" ? ( */}
-            <Input
-              placeholder="New Feature"
-              type="text"
-              maxLength="16"
-              className="max-w-[70px] focus:outline-none placeholder:text-[#4F2DC8] p-0 bg-transparent outline-none border-none"
-              value={feature.name}
-              onChange={(e) =>
-                handleChangeFeature(i, featureIndex, e.target.value)
-              }
-              // onKeyDown={(e) => handleChangeFeatureStatus(i, featureIndex, e)}
-            />
+          <Input
+            placeholder="New Feature"
+            type="text"
+            maxLength="16"
+            className="max-w-[70px] capitalize focus:outline-none placeholder:text-[#4F2DC8] p-0 bg-transparent outline-none border-none"
+            value={feature.name}
+            onChange={(e) =>
+              handleChangeFeature(i, featureIndex, e.target.value)
+            }
+            // onKeyDown={(e) => handleChangeFeatureStatus(i, featureIndex, e)}
+          />
           {/* ) : (
             <p>{feature.name}</p>
           )} */}

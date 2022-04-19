@@ -1,12 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 import styled from 'styled-components';
+import { Tag } from "antd";
+import { CopyOutlined } from '@ant-design/icons';
+
+const SubTask = styled( Tag )`
+  position: absolute;
+  top: 100%;
+  margin-top: 6px;
+  transform-origin: top right;
+
+`;
+
+const Circle = styled.div`
+  position: absolute; 
+  border: 2px solid #4F2DC8;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  top:-50%;
+  transform: translate(0%,-50%);
+  background: #FFFFFF;
+  z-index:2;
+`;
 
 
-import
-{
-    Tag
-} from 'antd';
+
 import { scaleToScreen } from '../../utils';
 
 
@@ -62,6 +81,7 @@ const DraggableTab = React.forwardRef( ( {
 
     return (
         <Draggable
+            axis="x"
             onStop={ handleStop }
             bounds="parent"
             position={ pos }
@@ -81,66 +101,73 @@ const DraggableTab = React.forwardRef( ( {
     );
 } );
 
-const DraggableTask = React.forwardRef( ( {
-    disable,
-    index,
-    onStop,
-    children,
-    val }, ref ) => 
+const DraggableSubTask = React.forwardRef( ( { item, index, taskStart, taskEnd, disabled,
+    handleStop }, ref ) =>
 {
-    const nodeRef = useRef();
-
+    const subTaskRef = useRef( null );
     const [ pos, setPos ] = useState(
         {
             x: 0,
+            y: 0
         }
     );
 
     useEffect( () =>
     {
-        if ( nodeRef?.current )
+        if ( subTaskRef?.current )
         {
-
-            const node = nodeRef?.current.getBoundingClientRect();
+            const node = subTaskRef?.current.getBoundingClientRect();
             const nodeWidth = node.width;
 
             const parent = ref?.current.getBoundingClientRect();
             const parentWidth = parent.width;
-
-
             const maxPossibleX = parentWidth - nodeWidth;
+
+            const offset = new Date( item.endDate ).getTime() - new Date( taskStart ).getTime();
+
+            const duration = new Date( taskEnd ).getTime() - new Date( taskStart ).getTime();
+
+
             setPos(
                 {
-                    x: scaleToScreen( val.x, maxPossibleX ),
+                    x: scaleToScreen( offset, maxPossibleX, duration ),
+                    y: 0
                 }
             );
 
         }
-    }, [ val, ref ] );
+    }, [ item, ref, taskStart, taskEnd ] );
 
-    const handleStop = ( e, data ) =>
+    const onStop = ( e, itemData ) =>
     {
-
-        onStop( e, data, index );
+        handleStop( e, itemData, index );
     };
 
-    return (
-        <Draggable
-            onStop={ handleStop }
-            bounds="parent"
-            position={ pos }
-            nodeRef={ nodeRef }
-            disabled={ disable }
 
+
+
+    return ( <Draggable
+        axis="x"
+        bounds="parent"
+        position={ pos }
+        nodeRef={ subTaskRef }
+        disabled={ disabled }
+        onStop={ onStop }>
+        <SubTask
+            ref={ subTaskRef }
+            className="flex items-center space-x-1 border-2 border-[#006378]  px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
+            icon={ <CopyOutlined /> }
         >
-            { children }
-        </Draggable>
+            { item.name }
 
-    );
+            <Circle />
+        </SubTask>
+
+    </Draggable> );
+
 } );
 
 DraggableTab.displayName = "DraggableTab";
+DraggableSubTask.displayName = "DraggableSubTask";
 
-DraggableTask.displayName = "DraggableTask";
-
-export { DraggableTab, DraggableTask };
+export { DraggableTab, DraggableSubTask };
