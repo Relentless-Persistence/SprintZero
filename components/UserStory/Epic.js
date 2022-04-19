@@ -55,7 +55,7 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
               placeholder="New Epic"
               type="text"
               maxLength="16"
-              className="max-w-[70px] bg-transparent border-none outline-none focus:outline-none placeholder:text-[#4F2DC8] p-0"
+              className="max-w-[70px] bg-transparent border-none capitalize outline-none focus:outline-none placeholder:text-[#4F2DC8] p-0"
               value={ epic.name }
               onChange={ ( e ) => handleChangeEpic( i, e.target.value ) }
               // onKeyDown={ ( e ) => handleChangeStatus( i, e ) }
