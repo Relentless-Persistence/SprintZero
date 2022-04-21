@@ -3,31 +3,31 @@
         {
             "createdAt": "2022-02-09T20:29:33.733Z",
             "info": {
-                "targetCustomer": "Customer a",
-                "need": "customer_a need",
-                "keyBenefits": "customer_a benefit",
-                "competitors": "customer_a competitor",
-                "differentiators": "doloremque ,laboriosam"
+                "targetCustomer": "our target customer",
+                "need": "customer need",
+                "keyBenefits": "unique benefits and selling points",
+                "competitors": "competitors or current methods",
+                "differentiators": "main differentiators"
             }
         },
         {
             "createdAt": "2022-02-07T20:29:33.733Z",
             "info": {
-                "targetCustomer": "Customer a",
-                "need": "customer_a need",
-                "keyBenefits": "customer_a benefit",
-                "competitors": "customer_a competitor",
-                "differentiators": "dolor, distinctio"
+                "targetCustomer": "our target customer",
+                "need": "customer need",
+                "keyBenefits": "unique benefits and selling points",
+                "competitors": "competitors or current methods",
+                "differentiators": "main differentiators"
             }
         },
         {
             "createdAt": "2022-02-02T20:29:33.733Z",
             "info": {
-                "targetCustomer": "Customer a",
-                "need": "customer_a need",
-                "keyBenefits": "customer_a benefit",
-                "competitors": "customer_a competitor",
-                "differentiators": "lorem,ipsum"
+                "targetCustomer": "our target customer",
+                "need": "customer need",
+                "keyBenefits": "unique benefits and selling points",
+                "competitors": "competitors or current methods",
+                "differentiators": "main differentiators"
             }
         }
     ],

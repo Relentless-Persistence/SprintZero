@@ -9,10 +9,9 @@ import
 
 
 const StyledCard = styled( Card )`
-   transform:  ${ props => props.invert };
-   margin-bottom: 135px;
-   box-shadow: ${ props => props.$active ? "0px 4px 4px rgba(0, 0, 0, 0.25), 1px -1px 4px rgba(0, 0, 0, 0.1)" : "" };
+   box-shadow: ${ props => props.$active ? "0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)" : "" };
   border-radius: 2px;
+
 
   .ant-card-head
     {
@@ -35,6 +34,7 @@ const StyledCard = styled( Card )`
 `;
 
 import { CardTitle } from '../../Dashboard/CardTitle';
+import { CardHeaderLink } from '../../Dashboard/CardHeaderButton';
 
 
 const StatementCard = (
@@ -43,56 +43,63 @@ const StatementCard = (
         onEditClick,
         info,
         product,
-        isActive
+        isActive,
+        style,
+        isDown,
     }
 ) =>
 {
+    const ref = useRef();
+    const [ trans, setTrans ] = useState( {} );
 
-    const oldHeight = useRef();
-    const animateRef = useRef();
-    const elRef = useRef();
-    const [ invert, setInvert ] = useState( "" );
-
-    useEffect( () => 
+    useEffect( () =>
     {
-        if ( elRef && elRef.current )
+
+        if ( isDown && ref?.current )
         {
-            let el = elRef.current;
-            let newOffset = el.getBoundingClientRect().top;
-            let invert = ( +oldHeight.current ) - newOffset;
-            oldHeight.current = newOffset;
-            setInvert( `translateY(${ invert }px)` );
-
-            animateRef.current = requestAnimationFrame( () => 
-            {
-                setInvert( "" );
+            setTrans( {
+                position: "relative",
+                marginTop: "50px",
+                transform: `translateY(00%)`,
             } );
-
-            return () => cancelAnimationFrame( animateRef.current );
         }
-    }, [ index ] );
+    }, [ isDown ] );
+
+    if ( !info )
+    {
+        return <></>;
+    }
+
+
 
     return (
-        <StyledCard
-            ref={ elRef }
-            invert={ invert }
-            className={ invert ? "" : "deck-animate" }
-            $active={ isActive }
-            extra={ <Button className="text-[#262626] text-[14px] leading[22px]" onClick={ () => onEditClick( info ) } >Edit</Button> }
-            title={ <CardTitle className='!text-[16px] !leading[24px]'>Guiding Statement</CardTitle> }>
+        <div
+            ref={ ref }
+            style={ {
+                ...style,
+                ...trans
+            } } className='absolute top-0 left-0 right-0 max-w-full transition-transform'>
+            <StyledCard
+                $active={ isActive }
+                extra={ <CardHeaderLink onClick={ () => onEditClick( info ) } >
+                    Edit
+                </CardHeaderLink>
+                }
+                title={ <CardTitle className='!text-[16px] !leading[24px]'>Guiding Statement</CardTitle> }>
 
 
-            <p className='text-[30px] leading-[38px]'>  { `For ${ info.targetCustomer }, who ${ info.need }, the ${ product } is a [product category or description] that ${ info.keyBenefits }.` }</p>
+                <p className='text-[30px] leading-[38px]'>  { `For ${ info.targetCustomer }, who ${ info.need }, the ${ product } is a [product category or description] that ${ info.keyBenefits }.` }</p>
 
 
-            <br />
+                <br />
 
-            <p className='text-[30px] leading-[38px]'>
+                <p className='text-[30px] leading-[38px]'>
 
-                { `Unlike ${ info.competitors }, our product ${ info.differentiators }.` }
+                    { `Unlike ${ info.competitors }, our product ${ info.differentiators }.` }
 
-            </p>
-        </StyledCard>
+                </p>
+            </StyledCard>
+        </div>
     );
 };
 

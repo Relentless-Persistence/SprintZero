@@ -57,6 +57,7 @@ export default function Visions ()
         const visionIndex = visions.findIndex( v => v.createdAt === visionDate );
 
 
+
         if ( visionIndex > -1 )
         {
             const vision = visions[ visionIndex ];
