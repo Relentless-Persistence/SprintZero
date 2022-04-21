@@ -128,7 +128,6 @@ export default function Release ()
     const onCancel = () =>
     {
 
-
         const activeData = dataRef.current[ activeProduct ][ activeDataIndex ];
         setActiveData( activeData );
         setData( dataRef.current );
