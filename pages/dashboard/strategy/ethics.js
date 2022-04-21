@@ -312,7 +312,7 @@ export default function Ethics ()
 
             <div onClick={ () => setVisible( true ) }>
                 <CustomTag
-                    type={ index % 2 === 0 ? "feature" : "epic" }
+                    type={ "status" }
                     text={ card.title } />
                 {/* <StyledItem
                     $color={ card.color }>
@@ -476,7 +476,7 @@ export default function Ethics ()
 
 
                                             <Button
-                                                className="inline-flex justify-between items-center"
+                                                className="inline-flex items-center justify-between"
                                                 danger>
                                                 <FlagOutlined />
                                                 Flag
