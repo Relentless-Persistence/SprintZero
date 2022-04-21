@@ -12,8 +12,19 @@ import
     splitRoutes,
 } from "../../../utils";
 
+
 import fakeData from "../../../fakeData/release.json";
 import products from "../../../fakeData/products.json";
+
+import ActionButtons from '../../../components/Personas/ActionButtons';
+import { cloneDeep } from 'lodash';
+
+const logOldData = ( data, activeProduct, activeDataIndex ) =>
+{
+    const activeData = data[ activeProduct ][ activeDataIndex ];
+
+    console.log( activeData?.taskList[ 0 ].subTasks[ 0 ] );
+};
 
 
 const getName = list => list?.map( l => l.name );
@@ -26,15 +37,22 @@ export default function Release ()
 
     const [ data, setData ] = useState( fakeData );
     const [ disabled, setDisabled ] = useState( true );
+    const dataRef = useRef( null );
 
     const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
     const [ activeDataIndex, setActiveDataIndex ] = useState( 0 );
 
     const [ activeVersion, setActiveVersion ] = useState( data[ activeProduct ][ activeDataIndex ]?.name );
 
-    const activeData = data[ activeProduct ][ activeDataIndex ];
-    const sprintCount = activeData.sprints.length;
+    const [ activeData, setActiveData ] = useState( data[ activeProduct ][ activeDataIndex ] );
+    const sprintCount = activeData?.sprints.length || 1;
     const percentage = 100 / sprintCount;
+
+    const enableDrag = () =>
+    {
+
+        setDisabled( false );
+    };
 
     const setProduct = product =>
     {
@@ -57,8 +75,8 @@ export default function Release ()
 
     const getDuration = () =>
     {
-        const end = new Date( activeData.target ).getTime();
-        const start = new Date( activeData.start ).getTime();
+        const end = new Date( activeData?.target ).getTime();
+        const start = new Date( activeData?.start ).getTime();
 
         const duration = end - start;
 
@@ -69,7 +87,7 @@ export default function Release ()
     const getOffset = ( subStart ) =>
     {
         const subtaskStart = new Date( subStart ).getTime();
-        const start = new Date( activeData.start ).getTime();
+        const start = new Date( activeData?.start ).getTime();
 
         const dayOffset = subtaskStart - start;
         const duration = getDuration();
@@ -90,7 +108,11 @@ export default function Release ()
     const onStop = ( subTaskIndex, taskIndex, newDateInMs ) =>
     {
         const newData = { ...data };
-        const list = newData[ activeProduct ][ activeDataIndex ].taskList[ taskIndex ].subTasks;
+        dataRef.current = cloneDeep( data );
+
+        const activeData = newData[ activeProduct ][ activeDataIndex ];
+
+        const list = activeData.taskList[ taskIndex ].subTasks;
 
         list[ subTaskIndex ] =
         {
@@ -98,8 +120,20 @@ export default function Release ()
             "endDate": new Date( newDateInMs ).toISOString()
         };
 
+        setActiveData( activeData );
         setData( newData );
 
+    };
+
+    const onCancel = () =>
+    {
+
+
+        const activeData = dataRef.current[ activeProduct ][ activeDataIndex ];
+        setActiveData( activeData );
+        setData( dataRef.current );
+
+        setDisabled( true );
     };
 
     const taskList = activeData?.taskList || [];
@@ -125,106 +159,104 @@ export default function Release ()
                 activeRightItem={ activeVersion }
                 ignoreLast={ true }
                 topExtra={ disabled ? <Button
-                    onClick={ () => setDisabled( false ) }
+                    onClick={ enableDrag }
                     size="small"
                     className='px-2 font[600] bg-white border-[#4A801D] text-[14px] leading-[22px] text-[#4A801D]'
                 >
                     Edit
                 </Button>
                     :
-                    <Button
-                        style={ {
-                            color: "#fff",
-                            backgroundColor: "#4A801D"
-                        } }
-                        onClick={ () => setDisabled( true ) }
-                        size="small"
-                        className='px-2 font[600] border-[#4A801D] text-[14px] leading-[22px] bg-[#4A801D] text-white'
-                    >
-                        Done
-                    </Button> }
+
+                    <ActionButtons
+                        className="ml-[12px]"
+                        onCancel={ onCancel }
+                        onSubmit={ () => setDisabled( true ) }
+                    /> }
 
             >
 
-
-                <div
-                    style={ {
-                        height: "500px",
-                        position: "relative",
-                        paddingTop: "20px",
-                        overflowX: "scroll",
-                        overflowY: "hidden"
-                    } }>
-                    <div
-                        ref={ chartRef }
-                        style={ {
-                            width: `${ sprintCount * 339 }px`, margin: "20px",
-                            minHeight: "100%",
-                            position: "relative",
-                            background: !disabled ? "#fff" : "transparent"
-
-                        } }>
-
-
-                        {/* Vertical didviders */ }
-
-                        {
-                            activeData?.sprints?.map( ( s, i ) => ( <Divider
-                                key={ s.id }
+                {
+                    activeData ? <>
+                        <div
+                            style={ {
+                                height: "500px",
+                                position: "relative",
+                                paddingTop: "20px",
+                                overflowX: "scroll",
+                                overflowY: "hidden"
+                            } }>
+                            <div
+                                ref={ chartRef }
                                 style={ {
-                                    left: `${ ( i + 1 ) * percentage }%`,
-                                    ...( ( i + 1 ) === activeData?.sprints.length ? { border: "none" } : {} )
+                                    width: `${ sprintCount * 339 }px`, margin: "20px",
+                                    minHeight: "100%",
+                                    position: "relative",
+                                    background: !disabled ? "#fff" : "transparent"
 
-                                } }
-                                type="vertical"
-                                className='absolute border-[#A6AE9D] border-dashed w-1px h-full m-0' /> ) )
-                        }
-
-                        {/* Sprint titles */ }
+                                } }>
 
 
-                        {
-                            activeData?.sprints?.map( ( s, i ) => ( <p
-                                style={ {
-                                    left: `${ ( ( i + 1 ) * ( percentage ) ) - ( percentage / 2 ) }%`,
-                                    transform: "translateY(-30px)"
+                                {/* Vertical didviders */ }
 
-                                } }
-                                className='absolute text-[#A6AE9D]'
-                                key={ s.id }>
-                                { s.name }
-                            </p> )
-                            )
-                        }
-
-                        <div>
-
-                            {
-                                taskList.map( ( t, i ) => (
-                                    <Task
-                                        taskIndex={ i }
-                                        ref={ chartRef }
+                                {
+                                    activeData?.sprints?.map( ( s, i ) => ( <Divider
+                                        key={ s.id }
                                         style={ {
-                                            top: i == 0 ? `65px` : `${ 65 + ( i * ( 35 + 150 ) ) }px`,
-                                            left: `${ getOffset( t.startDate ) }%`
+                                            left: `${ ( i + 1 ) * percentage }%`,
+                                            ...( ( i + 1 ) === activeData?.sprints.length ? { border: "none" } : {} )
+
                                         } }
-                                        key={ t.id }
-                                        subTasks={ t.subTasks }
-                                        name={ t.name }
-                                        start={ t.startDate }
-                                        end={ t.endDate }
-                                        duration={ duration }
-                                        onStop={ onStop }
-                                        disabled={ disabled }
-                                    />
-                                ) )
-                            }
+                                        type="vertical"
+                                        className='absolute border-[#A6AE9D] border-dashed w-1px h-full m-0' /> ) )
+                                }
 
+                                {/* Sprint titles */ }
+
+
+                                {
+                                    activeData?.sprints?.map( ( s, i ) => ( <p
+                                        style={ {
+                                            left: `${ ( ( i + 1 ) * ( percentage ) ) - ( percentage / 2 ) }%`,
+                                            transform: "translateY(-30px)"
+
+                                        } }
+                                        className='absolute text-[#A6AE9D]'
+                                        key={ s.id }>
+                                        { s.name }
+                                    </p> )
+                                    )
+                                }
+
+                                <div>
+
+                                    {
+                                        taskList.map( ( t, i ) => (
+                                            <Task
+                                                taskIndex={ i }
+                                                ref={ chartRef }
+                                                style={ {
+                                                    top: i == 0 ? `65px` : `${ 65 + ( i * ( 35 + 150 ) ) }px`,
+                                                    left: `${ getOffset( t.startDate ) }%`
+                                                } }
+                                                key={ t.id }
+                                                subTasks={ t.subTasks }
+                                                name={ t.name }
+                                                start={ t.startDate }
+                                                end={ t.endDate }
+                                                duration={ duration }
+                                                onStop={ onStop }
+                                                disabled={ disabled }
+                                            />
+                                        ) )
+                                    }
+
+                                </div>
+
+
+                            </div>
                         </div>
-
-
-                    </div>
-                </div>
+                    </> : null
+                }
 
             </AppLayout>
         </div>
