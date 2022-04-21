@@ -299,7 +299,7 @@ const UserStory = () => {
           <Tag
             className="flex items-center space-x-1 border-2 border-[#4F2DC8] border-dashed px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded cursor-pointer"
             icon={<ReadOutlined />}
-            // onClick={addEpic}
+            onClick={addEpic}
           >
             Add Epic
           </Tag>
