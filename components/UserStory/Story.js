@@ -22,9 +22,7 @@ const Story = ({
   return (
     <div
       key={i}
-      className={`flex items-center border-2 border-[#0073B3] cursor-pointer ${
-        !story.name ? "border-dashed" : ""
-      } rounded mb-[10px]`}
+      className={`flex items-center border-2 border-[#0073B3] cursor-pointer rounded mb-[10px]`}
       onClick={() => (story.status === "saved" ? setOpenDetail(true) : null)}
     >
       <div className="bg-[#0073B3] text-white py-[7px] px-[2px] -ml-[1px]">
