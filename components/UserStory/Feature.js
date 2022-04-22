@@ -26,7 +26,8 @@ const Feature = ({
             label:
               last(epic.features) === feature ? (
                 <PlusCircleFilled
-                  className="h-full text-[#73C92D]"
+                  style={{ background: "#f0f2f5" }}
+                  className="h-[18px] w-[18px] text-[#4A801D] text-[18px]"
                   onClick={() => addFeature(i)}
                 />
               ) : null,
