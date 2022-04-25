@@ -36,7 +36,9 @@ export default function Home() {
         hasMainAdd={true}
         rightNavItems={versions}
         activeRightItem={version}
-        mainClass="mr-[110px]"
+        mainClass="mr-[100px]"
+        sideBarClass={"min-w-[82px]"}
+        addNewText="Add Version"
         setActiveRightNav={handleActiveVersion}
       >
         <UserStory />

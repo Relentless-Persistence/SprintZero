@@ -1,21 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import
-{
-  Layout,
-  Breadcrumb,
-  Input,
-  Divider,
-  Button,
-} from "antd";
+import { Layout, Breadcrumb, Input, Divider, Button } from "antd";
 
 import SideBar from "./SideBar";
 import AppHeader from "./Header";
 import { useAuth } from "../../contexts/AuthContext";
 
-
 const { Content, Sider } = Layout;
-
 
 const Versions = styled.ul`
   list-style: none;
@@ -26,42 +17,40 @@ const Versions = styled.ul`
 const Version = styled.li`
   border-left-width: 4px;
   border-left-style: solid;
-  border-left-color: ${ ( props ) => ( props.active ? "#315613" : "#3156131a" ) };
+  border-left-color: ${(props) => (props.active ? "#315613" : "#3156131a")};
   cursor: pointer;
-  padding-bottom:28px;
+  padding-bottom: 28px;
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
 `;
 
-const AddNew = styled( Button )`
-align-items:center;
-display:flex;
-margin-left:10px;
-background:#fff;
-overflow:hidden;
-
+const AddNew = styled(Button)`
+  align-items: center;
+  display: flex;
+  margin-left: 10px;
+  background: #fff;
+  overflow: hidden;
 `;
 
-const AddSide = styled( Button )`
-background:transparent !important ;
-border: none;
-color: #262626 !important ;
-box-shadow:none;
-font-size: 16px;
-line-height: 24px;
-margin:0;
-padding:0;
-text-align:start;
-font-weight:600;
-
+const AddSide = styled(Button)`
+  background: transparent !important ;
+  border: none;
+  color: #262626 !important ;
+  box-shadow: none;
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0;
+  padding: 0;
+  text-align: start;
+  font-weight: 600;
 `;
 
-const capitalize = text => `${ text[ 0 ]?.toUpperCase() }${ text?.substring( 1 ).toLowerCase() }`;
+const capitalize = (text) =>
+  `${text[0]?.toUpperCase()}${text?.substring(1).toLowerCase()}`;
 
-
-const AppLayout = ( {
+const AppLayout = ({
   rightNavItems = [],
   activeRightItem = "test",
   breadCrumbItems = [],
@@ -86,160 +75,161 @@ const AppLayout = ( {
   breadCrumbClass,
   sideBarClass,
   onSideAddClick,
-  children } ) =>
-{
+  children,
+}) => {
   const { user } = useAuth();
-  const [ showSideAdd, setShowSideAdd ] = useState( false );
+  const [showSideAdd, setShowSideAdd] = useState(false);
 
-  const [ value, setValue ] = useState( "" );
+  const [value, setValue] = useState("");
 
-  const toggleSideAdd = () =>
-  {
-    setShowSideAdd( s => !s );
+  const toggleSideAdd = () => {
+    setShowSideAdd((s) => !s);
   };
 
-  const onEnter = ( e ) =>
-  {
-
-    if ( e.key === "Enter" && value.trim() )
-    {
-      onSideAdd( value.trim() );
+  const onEnter = (e) => {
+    if (e.key === "Enter" && value.trim()) {
+      onSideAdd(value.trim());
       toggleSideAdd();
-      setValue( "" );
-
+      setValue("");
     }
   };
 
-
-
-  const handleChange = e =>
-  {
-    setValue( e.target.value );
+  const handleChange = (e) => {
+    setValue(e.target.value);
   };
 
   //if ( !user ) return <div>Loading...</div>;
 
   return (
-    <Layout style={ { minHeight: "100vh" } }>
-      <AppHeader onChangeProduct={ onChangeProduct } />
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader onChangeProduct={onChangeProduct} />
       <Layout>
         <Sider
-          width={ 200 }
+          width={200}
           className="site-layout-background"
           breakpoint="sm"
-          style={ { position: "fixed", zIndex: 1, height: "100%", marginTop: "64px" } }
+          style={{
+            position: "fixed",
+            zIndex: 1,
+            height: "100%",
+            marginTop: "64px",
+          }}
         >
           <SideBar />
         </Sider>
         <Layout
-          className={ mainClass }
-          style={
-            {
-              marginTop: "65px",
-              marginLeft: "200px"
-            } }>
+          className={mainClass}
+          style={{
+            marginTop: "70px",
+            marginLeft: "200px",
+          }}
+        >
           <div
             style={
               useGrid
                 ? {
-                  display: "grid",
-                  "grid-template-columns": "minmax(0,1fr) auto",
-                }
+                    display: "grid",
+                    "grid-template-columns": "minmax(0,1fr) auto",
+                  }
                 : {}
             }
-            className={ useGrid ? null : "flex justify-between" }
+            className={useGrid ? null : "flex justify-between"}
           >
-            <div className={ `flex-1 pt-[24px] pl-[42px] pr-[33px]` }>
-              <div className={ `flex justify-between items-center ${ breadCrumbClass }` }>
+            <div className={`flex-1 pt-[24px] pl-[42px] pr-[33px]`}>
+              <div
+                className={`flex justify-between items-center ${breadCrumbClass}`}
+              >
                 <Breadcrumb>
-                  { breadCrumbItems.map( ( item, i ) => (
-                    <Breadcrumb.Item key={ i }>
-                      { capitalize( item ) }
+                  {breadCrumbItems.map((item, i) => (
+                    <Breadcrumb.Item key={i}>
+                      {capitalize(item)}
                     </Breadcrumb.Item>
-                  ) ) }
+                  ))}
 
-                  { ignoreLast ? null : (
+                  {ignoreLast ? null : (
                     <Breadcrumb.Item className="text-green-800 ">
-                      { capitalizeText
-                        ? capitalize( defaultText || activeRightItem )
-                        : defaultText || activeRightItem }
+                      {capitalizeText
+                        ? capitalize(defaultText || activeRightItem)
+                        : defaultText || activeRightItem}
                     </Breadcrumb.Item>
-                  ) }
+                  )}
                 </Breadcrumb>
 
                 <div className="flex justify-between items-center">
-                  { <div>{ topExtra }</div> }
+                  {<div>{topExtra}</div>}
 
-                  { hasMainAdd ? (
-                    <AddNew
-                      className={ addNewClass }
-                      onClick={ onMainAdd }>{ addNewText }</AddNew>
-                  ) : null }
+                  {hasMainAdd ? (
+                    <AddNew className={addNewClass} onClick={onMainAdd}>
+                      {addNewText}
+                    </AddNew>
+                  ) : null}
                 </div>
               </div>
 
-              <Content className={ `px-0 pt-[12px]  m-0  ${ contentClass }` }>
-                { children }
+              <Content className={`px-0 pt-[12px]  m-0  ${contentClass}`}>
+                {children}
               </Content>
             </div>
 
-            { hideSideBar ? null : (
+            {hideSideBar ? null : (
               <div
               //style={ { minWidth: "180px" } }
               >
-                <div className={ `fixed right-0 min-w-[100px] max-w-[160px] z-[500] bg-[#F0F2F5] min-h-full max-h-full overflow-y-auto pb-[80px] ${ sideBarClass }` }>
+                <div
+                  className={`fixed right-0 min-w-[50px] z-[500] bg-[#F0F2F5] min-h-full max-h-full overflow-y-auto pb-[80px] ${sideBarClass}`}
+                >
                   <Versions>
-                    { rightNavItems.map( ( item, i ) => (
+                    {rightNavItems.map((item, i) => (
                       <Version
-                        className={ `py-[16px] px-[24px] ${ versionClass || "" } ${ activeRightItem === ( item.value || item ) ? "font-[600]" : "" }` }
-                        key={ i }
-                        active={ activeRightItem === ( item.value || item ) }
-                        onClick={ () =>
-                          setActiveRightNav( item.value ? item.value : item )
+                        className={`py-[16px] px-[24px] ${versionClass || ""} ${
+                          activeRightItem === (item.value || item)
+                            ? "font-[600]"
+                            : ""
+                        }`}
+                        key={i}
+                        active={activeRightItem === (item.value || item)}
+                        onClick={() =>
+                          setActiveRightNav(item.value ? item.value : item)
                         }
                       >
-                        { item.render ? item.render() : item }
+                        {item.render ? item.render() : item}
                       </Version>
-                    ) ) }
+                    ))}
 
-                    { hasSideAdd && showSideAdd ? (
+                    {hasSideAdd && showSideAdd ? (
                       <Version
-                        className={ `py-[16px] px-[24px] ${ versionClass || "" }` }
+                        className={`py-[16px] px-[24px] ${versionClass || ""}`}
                       >
                         <Input
                           className="mx-0 my-0 "
-                          type={ type || "number" }
-                          maxLength={ 20 }
+                          type={type || "number"}
+                          maxLength={20}
                           autoFocus
-                          value={ value }
-                          onChange={ handleChange }
-                          onKeyPress={ onEnter }
-                          style={ { maxWidth: "90px" } }
+                          value={value}
+                          onChange={handleChange}
+                          onKeyPress={onEnter}
+                          style={{ maxWidth: "90px" }}
                         />
                       </Version>
-                    ) : null }
+                    ) : null}
 
-                    {
-                      ( hasSideAdd && onSideAddClick ) ?
-                        <Version className="py-[16px] px-[24px]">
-                          <AddSide onClick={ onSideAddClick }>
-                            Add
-                          </AddSide>
-                        </Version>
-                        : null
-                    }
-
-                    { ( hasSideAdd && !onSideAddClick ) ? (
+                    {hasSideAdd && onSideAddClick ? (
                       <Version className="py-[16px] px-[24px]">
-                        <AddSide onClick={ toggleSideAdd }>
-                          { showSideAdd ? "Close" : "Add" }
+                        <AddSide onClick={onSideAddClick}>Add</AddSide>
+                      </Version>
+                    ) : null}
+
+                    {hasSideAdd && !onSideAddClick ? (
+                      <Version className="py-[16px] px-[24px]">
+                        <AddSide onClick={toggleSideAdd}>
+                          {showSideAdd ? "Close" : "Add"}
                         </AddSide>
                       </Version>
-                    ) : null }
+                    ) : null}
                   </Versions>
                 </div>
               </div>
-            ) }
+            )}
           </div>
         </Layout>
       </Layout>
