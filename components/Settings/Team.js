@@ -6,11 +6,11 @@ import {
   PoweroffOutlined,
 } from "@ant-design/icons";
 
-const Share = ({ addPerson, setAddPerson }) => {
+const Team = ({ addPerson, setAddPerson }) => {
   return (
     <div id="billings">
       <div className="mb-[42px]">
-        <h3 className="font-semibold text-16 mb-3">Active</h3>
+        <h3 className="font-semibold text-16 mb-3">Members</h3>
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -18,12 +18,7 @@ const Share = ({ addPerson, setAddPerson }) => {
               <p>twebb@example.com</p>
             </div>
             <Space>
-              <Button
-                className="flex items-center"
-                icon={<HourglassOutlined />}
-              >
-                Unlimited
-              </Button>
+              <DatePicker placeholder="Unlimited" />
               <Button className="flex items-center" icon={<DeleteOutlined />}>
                 Remove
               </Button>
@@ -37,12 +32,7 @@ const Share = ({ addPerson, setAddPerson }) => {
               <p>twebb@example.com</p>
             </div>
             <Space>
-              <Button
-                className="flex items-center"
-                icon={<HourglassOutlined />}
-              >
-                12 Days left
-              </Button>
+              <DatePicker placeholder="Unlimited" />
               <Button className="flex items-center" icon={<DeleteOutlined />}>
                 Remove
               </Button>
@@ -51,7 +41,21 @@ const Share = ({ addPerson, setAddPerson }) => {
         </Card>
       </div>
       <div>
-        <h3 className="font-semibold text-16 mb-3">Inactive</h3>
+        <h3 className="font-semibold text-16 mb-3">Viewers</h3>
+        <Card className="mb-[9px]">
+          <div className="flex items-center justify-between">
+            <div>
+              <p>Theresa Webb</p>
+              <p>twebb@example.com</p>
+            </div>
+            <Space>
+              <DatePicker placeholder="Unlimited" />
+              <Button className="flex items-center" icon={<DeleteOutlined />}>
+                Remove
+              </Button>
+            </Space>
+          </div>
+        </Card>
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -180,4 +184,4 @@ const Share = ({ addPerson, setAddPerson }) => {
   );
 };
 
-export default Share;
+export default Team;
