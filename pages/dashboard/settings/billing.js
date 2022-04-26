@@ -10,7 +10,7 @@ import { findIndex } from "lodash";
 export default function billing() {
   const router = useRouter();
   const { pathname } = useRouter();
-  const menus = ["Account", "Billing", "Config", "Share", "Members"];
+  const menus = ["Account", "Billing", "Config", "Team"];
   const [activeMenuIndex, setActiveMenuIndex] = useState(1);
 
   const setActiveRightNav = (h) => {
