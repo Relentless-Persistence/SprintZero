@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  FileOutlined,
-  ReadOutlined,
-  CopyOutlined,
-  PlusCircleFilled,
-  LinkOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
+import { FileOutlined, LinkOutlined, CloseOutlined } from "@ant-design/icons";
 import { Input, Drawer, Space, Tag } from "antd";
 import StoryDetails from "./StoryDetails";
 
@@ -51,6 +44,7 @@ const Story = ({
       </div>
       {story.status === "saved" && (
         <Drawer
+          headerStyle={{ background: "#F5F5F5" }}
           title={
             <div className="flex items-center space-x-2">
               <h3 className="text-xl font-semibold capitalize">{story.name}</h3>
