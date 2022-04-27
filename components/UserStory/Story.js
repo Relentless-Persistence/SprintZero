@@ -90,58 +90,56 @@ const Story = ({
         </div>
       </div>
 
-      {openDetail ? (
-        <Drawer
-          headerStyle={{ background: "#F5F5F5" }}
-          title={
-            <DrawerTitle gutter={[16, 16]}>
-              <Col span={12}>
-                <h3 className="capitalize">{story.name}</h3>
-                <StyledTag color="#91D5FF">3 points</StyledTag>
-                <StyledTag color="#A4DF74">$1,230</StyledTag>
-                <StyledTag icon={<LinkOutlined />} color="#096DD9">
-                  Design
-                </StyledTag>
-                <StyledTag
-                  $border
-                  $textColor="#BFBFBF"
-                  icon={
-                    <LinkOutlined
-                      style={{
-                        color: "#BFBFBF",
-                      }}
-                    />
-                  }
-                >
-                  Code
-                </StyledTag>
-              </Col>
-              <Col className="flex items-center justify-end" span={12}>
-                <CloseTime>
-                  <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
-                    Last modified 2 hrs ago
-                  </p>
-                  <CloseOutlined
+      <Drawer
+        headerStyle={{ background: "#F5F5F5" }}
+        title={
+          <DrawerTitle gutter={[16, 16]}>
+            <Col span={12}>
+              <h3 className="capitalize">{story.name}</h3>
+              <StyledTag color="#91D5FF">3 points</StyledTag>
+              <StyledTag color="#A4DF74">$1,230</StyledTag>
+              <StyledTag icon={<LinkOutlined />} color="#096DD9">
+                Design
+              </StyledTag>
+              <StyledTag
+                $border
+                $textColor="#BFBFBF"
+                icon={
+                  <LinkOutlined
                     style={{
-                      color: "#101D06",
-                      fontSize: "12px",
-                    }}
-                    onClick={() => {
-                      //console.log(99);
-                      handleDrawerVisible(false);
+                      color: "#BFBFBF",
                     }}
                   />
-                </CloseTime>
-              </Col>
-            </DrawerTitle>
-          }
-          closable={false}
-          placement="bottom"
-          visible={openDetail}
-        >
-          <StoryDetails story={story} />
-        </Drawer>
-      ) : null}
+                }
+              >
+                Code
+              </StyledTag>
+            </Col>
+            <Col className="flex items-center justify-end" span={12}>
+              <CloseTime>
+                <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
+                  Last modified 2 hrs ago
+                </p>
+                <CloseOutlined
+                  style={{
+                    color: "#101D06",
+                    fontSize: "12px",
+                  }}
+                  onClick={() => {
+                    //console.log(99);
+                    handleDrawerVisible(false);
+                  }}
+                />
+              </CloseTime>
+            </Col>
+          </DrawerTitle>
+        }
+        closable={false}
+        placement="bottom"
+        visible={openDetail}
+      >
+        <StoryDetails story={story} />
+      </Drawer>
     </>
   );
 };
