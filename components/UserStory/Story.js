@@ -1,7 +1,39 @@
 import React, { useState } from "react";
+import styled from "styled-components";
 import { FileOutlined, LinkOutlined, CloseOutlined } from "@ant-design/icons";
-import { Input, Drawer, Space, Tag } from "antd";
+import { Input, Drawer, Row, Col, Tag } from "antd";
 import StoryDetails from "./StoryDetails";
+import { CardTitle } from "../Dashboard/CardTitle";
+
+const StyledTag = styled(Tag)`
+  background: #f5f5f5;
+  border: ${(props) => (props.$border ? "1px solid #BFBFBF" : "")};
+  color: ${(props) => props.$textColor || "#262626"} !important;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 22px;
+`;
+
+const DrawerTitle = styled(Row)`
+  h3 {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    display: inline-block;
+    margin-right: 10px;
+    color: #262626;
+  }
+`;
+
+const CloseTime = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  p {
+    color: #a6ae9d;
+  }
+`;
 
 const Story = ({
   story,
@@ -12,90 +44,105 @@ const Story = ({
   handleChangeStoryStatus,
 }) => {
   const [openDetail, setOpenDetail] = useState(false);
+
+  const handleDrawerVisible = (value) => {
+    let newVal = !openDetail;
+
+    if (value !== undefined) {
+      newVal = value;
+    }
+
+    console.log(newVal, openDetail);
+    setOpenDetail(newVal);
+  };
+
   return (
-    <div
-      key={i}
-      className={`flex items-center border-2 border-[#0073B3] cursor-pointer rounded mb-[10px]`}
-      onClick={() => (story.status === "saved" ? setOpenDetail(true) : null)}
-    >
-      <div className="bg-[#0073B3] text-white py-[7px] px-[2px] -ml-[1px]">
-        <p className="-rotate-90 text-xs">1.0</p>
+    <>
+      <div
+        className={`flex items-center border-2 border-[#0073B3] cursor-pointer rounded mb-[10px]`}
+        onClick={() =>
+          story.status === "saved" ? handleDrawerVisible(true) : null
+        }
+      >
+        <div className="bg-[#0073B3] text-white py-[7px] px-[2px] -ml-[1px]">
+          <p className="text-xs -rotate-90">1.0</p>
+        </div>
+
+        <div className="flex items-center justify-center text-[#0073B3] text-[14px] px-[8px]">
+          <FileOutlined className="mr-1" />
+          {story.status !== "saved" ? (
+            <Input
+              placeholder="New User Story"
+              type="text"
+              maxLength="16"
+              className="max-w-[70px] focus:outline-none outline-none placeholder:text-[#4F2DC8] bg-transparent capitalize border-none"
+              value={story.name}
+              onChange={(e) => {
+                handleChangeStory(i, featureIndex, storyIndex, e.target.value);
+              }}
+              onKeyDown={(e) => {
+                handleChangeStoryStatus(i, featureIndex, storyIndex, e);
+              }}
+            />
+          ) : (
+            <p className="capitalize">{story.name}</p>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center justify-center text-[#0073B3] text-[14px] px-[8px]">
-        <FileOutlined className="mr-1" />
-        {story.status !== "saved" ? (
-          <Input
-            placeholder="New User Story"
-            type="text"
-            maxLength="16"
-            className="max-w-[70px] focus:outline-none outline-none placeholder:text-[#4F2DC8] bg-transparent capitalize border-none"
-            value={story.name}
-            onChange={(e) =>
-              handleChangeStory(i, featureIndex, storyIndex, e.target.value)
-            }
-            onKeyDown={(e) =>
-              handleChangeStoryStatus(i, featureIndex, storyIndex, e)
-            }
-          />
-        ) : (
-          <p className="capitalize">{story.name}</p>
-        )}
-      </div>
-      {story.status === "saved" && (
+      {openDetail ? (
         <Drawer
           headerStyle={{ background: "#F5F5F5" }}
           title={
-            <div className="flex items-center space-x-2">
-              <h3 className="text-xl font-semibold capitalize">{story.name}</h3>
-              <Tag className="font-semibold text-sm text-black bg-[#91D5FF] px-2">
-                3 points
-              </Tag>
-              <Tag className="font-semibold text-sm text-black bg-[#A4DF74] px-2">
-                $1,230
-              </Tag>
-              <Tag
-                className="flex items-center px-2 font-semibold text-sm"
-                color="#096DD9"
-                icon={<LinkOutlined />}
-              >
-                <span>Design</span>
-              </Tag>
-              <Tag
-                className="flex items-center text-[#BFBFBF] px-2 font-semibold text-sm"
-                icon={<LinkOutlined />}
-              >
-                Code
-              </Tag>
-              <p className="text-[#1890FF] text-sm cursor-pointer font-semibold">
-                Edit
-              </p>
-            </div>
+            <DrawerTitle gutter={[16, 16]}>
+              <Col span={12}>
+                <h3 className="capitalize">{story.name}</h3>
+                <StyledTag color="#91D5FF">3 points</StyledTag>
+                <StyledTag color="#A4DF74">$1,230</StyledTag>
+                <StyledTag icon={<LinkOutlined />} color="#096DD9">
+                  Design
+                </StyledTag>
+                <StyledTag
+                  $border
+                  $textColor="#BFBFBF"
+                  icon={
+                    <LinkOutlined
+                      style={{
+                        color: "#BFBFBF",
+                      }}
+                    />
+                  }
+                >
+                  Code
+                </StyledTag>
+              </Col>
+              <Col className="flex items-center justify-end" span={12}>
+                <CloseTime>
+                  <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
+                    Last modified 2 hrs ago
+                  </p>
+                  <CloseOutlined
+                    style={{
+                      color: "#101D06",
+                      fontSize: "12px",
+                    }}
+                    onClick={() => {
+                      //console.log(99);
+                      handleDrawerVisible(false);
+                    }}
+                  />
+                </CloseTime>
+              </Col>
+            </DrawerTitle>
           }
           closable={false}
           placement="bottom"
-          width={"30%"}
-          onClose={() => setOpenDetail(false)}
           visible={openDetail}
-          maskClosable={true}
-          extra={
-            <Space>
-              <div className="flex items-center space-x-1">
-                <p className="text-[#BFBFBF] text-xs">
-                  Last modified 2 hrs ago
-                </p>
-                <CloseOutlined
-                  onClick={() => setOpenDetail(false)}
-                  className="text-sm cursor-pointer text-[#8C8C8C]"
-                />
-              </div>
-            </Space>
-          }
         >
           <StoryDetails story={story} />
         </Drawer>
-      )}
-    </div>
+      ) : null}
+    </>
   );
 };
 
