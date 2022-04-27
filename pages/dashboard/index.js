@@ -10,7 +10,7 @@ const versions = ["v1", "v2", "v3", "All"];
 
 export default function Home() {
   const { pathname } = useRouter();
-  console.log(pathname);
+  //console.log(pathname);
   const [version, setVersion] = useState(versions[0]);
 
   const handleActiveVersion = (version) => {
