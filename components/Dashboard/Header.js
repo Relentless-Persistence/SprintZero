@@ -17,11 +17,11 @@ const { Search } = Input;
 
 const HeaderMenu = styled.div`
   color: #fff;
-  font-weight: ${ ( props ) => ( props.active ? 600 : 400 ) };
+  font-weight: ${(props) => (props.active ? 600 : 400)};
   cursor: pointer;
   border-bottom-width: 4px;
   border-bottom-style: solid;
-  border-bottom-color: ${ ( props ) => ( props.active ? "#73c92d" : "transparent" ) };
+  border-bottom-color: ${(props) => (props.active ? "#73c92d" : "transparent")};
 
   /* &:hover {
     color: var(--kelly);
@@ -29,45 +29,50 @@ const HeaderMenu = styled.div`
   } */
 `;
 
-const AppHeader = ( { onChangeProduct } ) =>
-{
+const CustomHeader = styled(Header)`
+  &.ant-layout-header {
+    padding: 0 17.45px !important;
+    height: auto;
+  }
+`;
+
+const AppHeader = ({ onChangeProduct }) => {
   const router = useRouter();
   const { user } = useAuth();
-  const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
-  const [ settingsMenuDrawer, setSettingsMenuDrawer ] = useState( false );
+  const [activeProduct, setActiveProduct] = useState(products[0]);
+  const [settingsMenuDrawer, setSettingsMenuDrawer] = useState(false);
 
-  const onProductChange = ( product ) =>
-  {
-    setActiveProduct( product );
-    onChangeProduct && onChangeProduct( product );
+  const onProductChange = (product) => {
+    setActiveProduct(product);
+    onChangeProduct && onChangeProduct(product);
   };
 
   return (
-    <Header
+    <CustomHeader
       className="header"
-      style={ { position: "fixed", zIndex: 1000000, width: "100%" } }
+      style={{ position: "fixed", zIndex: 1000000, width: "100%" }}
     >
       <div className="flex items-center">
         <Image
           src="/images/logo.png"
           alt="Logo"
           className="w-[178px] h-[42px]"
-          preview={ false }
+          preview={false}
         />
         {/* <Title level={2} className="m-0 dashboard-logo">
           
         </Title> */}
-        <div className="flex items-center mb-1 ml-11">
-          { products.map( ( item, i ) => (
+        <div className="flex items-center ml-11">
+          {products.slice(0, 1).map((item, i) => (
             <HeaderMenu
-              key={ i }
+              key={i}
               className="mr-10"
-              active={ activeProduct === item }
-              onClick={ () => onProductChange( item ) }
+              active={activeProduct === item}
+              onClick={() => onProductChange(item)}
             >
-              { item }
+              {item}
             </HeaderMenu>
-          ) ) }
+          ))}
         </div>
       </div>
       <div className="flex items-center">
@@ -83,24 +88,25 @@ const AppHeader = ( { onChangeProduct } ) =>
                     className="mr-6"
                 /> */}
         <Avatar
-          onClick={ () => setSettingsMenuDrawer( true ) }
-          src={ user?.photoURL }
-          style={ { border: "2px solid #73c92d", cursor: "pointer" } }
+          onClick={() => setSettingsMenuDrawer(true)}
+          src={user?.photoURL}
+          style={{ border: "2px solid #73c92d", cursor: "pointer" }}
         />
       </div>
       <Drawer
         id="settingsDrawer"
-        title={ <span className="font-semibold text-16">Settings</span> }
+        title={<span className="font-semibold text-16">Settings</span>}
         placement="right"
-        visible={ settingsMenuDrawer }
+        visible={settingsMenuDrawer}
         width="161px"
-        closable={ false }
+        style={{ zIndex: 1000000000 }}
+        closable={false}
         extra={
           <Space>
             <div className="flex items-center h-full">
               <CloseOutlined
-                style={ { width: "10px", height: "10px" } }
-                onClick={ () => setSettingsMenuDrawer( false ) }
+                style={{ width: "10px", height: "10px" }}
+                onClick={() => setSettingsMenuDrawer(false)}
               />
             </div>
           </Space>
@@ -108,7 +114,7 @@ const AppHeader = ( { onChangeProduct } ) =>
       >
         <SettingsMenu />
       </Drawer>
-    </Header>
+    </CustomHeader>
   );
 };
 

@@ -10,7 +10,7 @@ const versions = ["v1", "v2", "v3", "All"];
 
 export default function Home() {
   const { pathname } = useRouter();
-  console.log(pathname);
+  //console.log(pathname);
   const [version, setVersion] = useState(versions[0]);
 
   const handleActiveVersion = (version) => {
@@ -36,7 +36,9 @@ export default function Home() {
         hasMainAdd={true}
         rightNavItems={versions}
         activeRightItem={version}
-        mainClass="mr-[110px]"
+        mainClass="mr-[100px]"
+        sideBarClass={"min-w-[82px]"}
+        addNewText="Add Version"
         setActiveRightNav={handleActiveVersion}
       >
         <UserStory />
