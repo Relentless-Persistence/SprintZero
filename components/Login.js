@@ -6,20 +6,34 @@ import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
 import { googleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
 import { auth } from "../config/firebase-config";
+import { db } from "../config/firebase-config";
 // import { usePaymentConfirm } from "../contexts/PaymentContext";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
   const router = useRouter();
+  const { type, product } = router.query;
   // const paid = usePaymentConfirm();
 
   const handleOnClick = (provider) => {
     try {
-      auth.signInWithPopup(provider).then((res) => {
+      auth.signInWithPopup(provider).then(async (res) => {
+        var user = res.user;
         if (res.additionalUserInfo.isNewUser) {
-          var user = res.user;
-          if (!/@gmail.com\s*$/.test(user.email)) {
+          if (type && product) {
+            await db.collection("teams").add({
+              user: {
+                uid: user.uid,
+                email: user.email,
+                name: user.displayName,
+              },
+              expiry: "unlimited",
+              type: type,
+              product_id: "1",
+            });
+            router.push("/dashboard");
+          } else if (!/@gmail.com\s*$/.test(user.email)) {
             router.push("/enterprise-contact");
           } else {
             message.success({
@@ -29,7 +43,21 @@ const Login = () => {
             router.push("/loginsuccess");
           }
         } else {
-          router.push("/dashboard");
+          if (type && product) {
+            await db.collection("teams").add({
+              user: {
+                uid: user.uid,
+                email: user.email,
+                name: user.displayName,
+              },
+              expiry: "unlimited",
+              type: type,
+              product_id: "1",
+            });
+            router.push("/dashboard");
+          } else {
+            router.push("/dashboard");
+          }
         }
       });
     } catch (error) {
@@ -64,6 +92,7 @@ const Login = () => {
             alt="microsoft"
             width={40.32}
             height={40.32}
+            preview={false}
           />
           <span style={{ marginLeft: "15px" }}>Sign in with Google</span>
         </button>

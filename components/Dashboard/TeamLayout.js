@@ -9,11 +9,14 @@ import {
   Menu,
   Dropdown,
   message,
+  notification,
+  Tooltip,
 } from "antd";
-import { UserAddOutlined } from "@ant-design/icons";
+import { UserAddOutlined, CopyOutlined } from "@ant-design/icons";
 import SideBar from "./SideBar";
 import AppHeader from "./Header";
 import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../config/firebase-config";
 
 const { Content, Sider } = Layout;
 
@@ -59,6 +62,9 @@ const AddSide = styled(Button)`
 const capitalize = (text) =>
   `${text[0]?.toUpperCase()}${text?.substring(1).toLowerCase()}`;
 
+const characters =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 const TeamLayout = ({
   rightNavItems = [],
   activeRightItem = "test",
@@ -88,7 +94,8 @@ const TeamLayout = ({
 }) => {
   const { user } = useAuth();
   const [showSideAdd, setShowSideAdd] = useState(false);
-
+  const [inviteType, setInviteType] = useState(null);
+  const [token, setToken] = useState(null);
   const [value, setValue] = useState("");
 
   const toggleSideAdd = () => {
@@ -112,10 +119,83 @@ const TeamLayout = ({
     console.log("click", e);
   }
 
+  const generateToken = () => {
+    let result = " ";
+    const charactersLength = characters.length;
+    for (let i = 0; i <= 8; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+  };
+
+  const createToken = async (type) => {
+    notification.destroy();
+    const inviteTypeCode = type === "member" ? "mb" : "vr";
+    await db
+      .collection("inviteToken")
+      .add({
+        token: generateToken(),
+        type: type,
+        product_id: "1",
+      })
+      .then((docRef) => {
+        setToken(docRef.id);
+        notification.info({
+          message: (
+            <p className="font-semibold">Please share the URL with invitee</p>
+          ),
+          description: (
+            <div className="flex items-center space-x-3">
+              <p className="pb-1 border-b-2 border-gray-300 text-lg text-gray-600">{`${window.location.origin}/invite?type=${inviteTypeCode}&token=${docRef.id}`}</p>
+            </div>
+          ),
+          className: "w-full",
+          placement: "bottomRight",
+          duration: 0,
+        });
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  };
+
+  const invite = async (type) => {
+    notification.destroy();
+    const inviteTypeCode = type === "member" ? "mb" : "vr";
+    const querySnapshot = await db
+      .collection("inviteToken")
+      .where("type", "==", type)
+      .get();
+    if (querySnapshot.size > 0) {
+      setToken(querySnapshot.docs[0].id);
+      notification.info({
+        message: (
+          <p className="font-semibold">Please share the URL with invitee</p>
+        ),
+        description: (
+          <div className="flex items-center space-x-3">
+            <p className="pb-1 border-b-2 border-gray-300 text-lg text-gray-600">{`${window.location.origin}/invite?type=${inviteTypeCode}&token=${querySnapshot.docs[0].id}`}</p>
+          </div>
+        ),
+        className: "w-full",
+        placement: "bottomRight",
+        duration: 0,
+      });
+    } else {
+      await createToken(type);
+    }
+    
+  };
+
   const menu = (
     <Menu>
-      <Menu.Item key="0">Member</Menu.Item>
-      <Menu.Item key="1">Viewer</Menu.Item>
+      <Menu.Item key="0" onClick={() => invite("member")}>
+        Member
+      </Menu.Item>
+      <Menu.Item key="1" onClick={() => invite("viewer")}>
+        Viewer
+      </Menu.Item>
     </Menu>
   );
 
