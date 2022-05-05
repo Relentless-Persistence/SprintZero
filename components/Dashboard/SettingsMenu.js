@@ -82,7 +82,7 @@ const SettingsMenu = () => {
             <a>Configuration</a>
           </Link>
         </MenuItem>
-        <MenuItem
+        {/* <MenuItem
           $highlight={pathname === "/settings/share"}
           key="1"
           icon={<ShareAltOutlined />}
@@ -90,13 +90,13 @@ const SettingsMenu = () => {
           <Link href="/dashboard/settings/share">
             <a>Share</a>
           </Link>
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem
           $highlight={pathname === "/settings/team"}
           key="1"
           icon={<TeamOutlined />}
         >
-          <Link href="#">
+          <Link href="/dashboard/settings/team">
             <a>Team</a>
           </Link>
         </MenuItem>

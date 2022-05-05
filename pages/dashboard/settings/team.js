@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import TeamLayout from "../../../components/Dashboard/TeamLayout";
 import { splitRoutes } from "../../../utils";
@@ -14,11 +14,23 @@ const share = () => {
   const menus = ["Account", "Billing", "Config", "Team"];
   const [activeMenuIndex, setActiveMenuIndex] = useState(3);
   const [addPerson, setAddPerson] = useState(false);
+  
+
+  const generateToken = () => {
+    let result = " ";
+    const charactersLength = characters.length;
+    for (let i = 0; i <= 8; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+  }
 
   const setActiveRightNav = (h) => {
     const menuTypeIndex = findIndex(menus, (o) => o === h);
     router.push(`/dashboard/settings/${menus[menuTypeIndex].toLowerCase()}`);
   };
+
 
   return (
     <div>
@@ -40,7 +52,7 @@ const share = () => {
         activeRightItem={menus[activeMenuIndex]}
         setActiveRightNav={setActiveRightNav}
       >
-        <Team addPerson={addPerson} setAddPerson={setAddPerson} />
+        <Team />
       </TeamLayout>
     </div>
   );
