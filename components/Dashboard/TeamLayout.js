@@ -97,6 +97,7 @@ const TeamLayout = ({
   const [inviteType, setInviteType] = useState(null);
   const [token, setToken] = useState(null);
   const [value, setValue] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
 
   const toggleSideAdd = () => {
     setShowSideAdd((s) => !s);
@@ -147,7 +148,28 @@ const TeamLayout = ({
           ),
           description: (
             <div className="flex items-center space-x-3">
-              <p className="pb-1 border-b-2 border-gray-300 text-lg text-gray-600">{`${window.location.origin}/invite?type=${inviteTypeCode}&token=${docRef.id}`}</p>
+              <input
+                className="pb-1 border-b-2 border-gray-300 text-lg text-gray-600 outline-none focus:outline-none"
+                value={`${window.location.origin}/invite?type=${inviteTypeCode}&token=${docRef.id}`}
+                readOnly
+                onClick={(e) =>
+                  e.target.setSelectionRange(0, e.target.value.length)
+                }
+              />
+              {isCopied ? (
+                <span>Copied!</span>
+              ) : (
+                <Tooltip title={isCopied ? "Copied!" : "Copy"}>
+                  <CopyOutlined
+                    onClick={() =>
+                      handleCopyClick(
+                        `${window.location.origin}/invite?type=${inviteTypeCode}&token=${docRef.id}`
+                      )
+                    }
+                    className="text-2xl text-gray-500 cursor-pointer"
+                  />
+                </Tooltip>
+              )}
             </div>
           ),
           className: "w-full",
@@ -175,7 +197,26 @@ const TeamLayout = ({
         ),
         description: (
           <div className="flex items-center space-x-3">
-            <p className="pb-1 border-b-2 border-gray-300 text-lg text-gray-600">{`${window.location.origin}/invite?type=${inviteTypeCode}&token=${querySnapshot.docs[0].id}`}</p>
+            <input
+              className="pb-1 border-b-2 border-gray-300 text-lg text-gray-600 outline-none focus:outline-none"
+              readOnly
+              value={`${window.location.origin}/invite?type=${inviteTypeCode}&token=${querySnapshot.docs[0].id}`}
+              onClick={(e) => e.target.setSelectionRange(0, e.target.value.length)}
+            />
+            {isCopied ? (
+              <span>Copied!</span>
+            ) : (
+              <Tooltip title={isCopied ? "Copied!" : "Copy"}>
+                <CopyOutlined
+                  onClick={() =>
+                    handleCopyClick(
+                      `${window.location.origin}/invite?type=${inviteTypeCode}&token=${querySnapshot.docs[0].id}`
+                    )
+                  }
+                  className="text-2xl text-gray-500 cursor-pointer"
+                />
+              </Tooltip>
+            )}
           </div>
         ),
         className: "w-full",
@@ -185,7 +226,30 @@ const TeamLayout = ({
     } else {
       await createToken(type);
     }
-    
+  };
+
+  async function copyTextToClipboard(text) {
+    if ("clipboard" in navigator) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      return document.execCommand("copy", true, text);
+    }
+  }
+
+  const handleCopyClick = (copyText) => {
+    // Asynchronously call copyTextToClipboard
+    copyTextToClipboard(copyText)
+      .then(() => {
+        // If successful, update the isCopied state value
+      message.success("Invite link Copied!");
+        setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2500);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const menu = (
