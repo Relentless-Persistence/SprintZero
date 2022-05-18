@@ -52,16 +52,16 @@ const AppHeader = ({ onChangeProduct }) => {
         .collection("Product")
         .where("owner", "==", user.uid)
         .get();
-      const products = res.docs.map((doc) => doc.data());
+    const products = res.docs.map((doc) => ({id: doc.id, ...doc.data()}));
       setProducts(products);
-      setActiveProduct(products[0].product);
+      setActiveProduct(products[0]);
     }
   };
 
   useEffect(() => {
       fetchProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   return (
     <CustomHeader
@@ -81,8 +81,8 @@ const AppHeader = ({ onChangeProduct }) => {
               <HeaderMenu
                 key={i}
                 className="mr-10"
-                active={activeProduct === product.product}
-                onClick={() => setActiveProduct(product.product)}
+                active={activeProduct === product}
+                onClick={() => setActiveProduct(product)}
               >
                 {product.product}
               </HeaderMenu>
