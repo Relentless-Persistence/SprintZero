@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { db } from "../../config/firebase-config";
 
 import {
   List,
@@ -12,6 +14,7 @@ import {
   Tag,
   Col,
   Radio,
+  message,
 } from "antd";
 
 import {
@@ -110,6 +113,7 @@ const StoryDetails = ({ story }) => {
   const [show, setShow] = useState(false);
   const [val, setVal] = useState("");
   const [data, setData] = useState([...init]);
+  const [flagged, setFlagged] = useState(null)
 
   const addItemDone = (e) => {
     if (e.key === "Enter" && val.trim()) {
@@ -129,6 +133,31 @@ const StoryDetails = ({ story }) => {
   const onChange = (e) => {
     setVal(e.target.value);
   };
+
+  const onFLag = async () => {
+    await db.collection("Ethics").add({
+      storyId: story.id,
+      type: "identified"
+    })
+    message.success("Story flagged")
+  }
+  
+  const checkFlag = async () => {
+      const flag = await db
+        .collection("Ethics")
+        .where("storyId", "==", story.id)
+        .get();
+      if (flag.empty) {
+        setFlagged(false)
+      } else {
+        setFlagged(true);
+      }
+      
+  }
+
+  useEffect(() => {
+    checkFlag();
+  }, [story])
 
   return (
     <Row gutter={[16, 16]}>
@@ -224,6 +253,8 @@ const StoryDetails = ({ story }) => {
                 <Button
                   className="inline-flex items-center justify-between"
                   danger
+                  disabled={flagged}
+                  onClick={()=> alert("Not implemented yet")}
                 >
                   <FlagOutlined />
                   Flag

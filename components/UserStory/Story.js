@@ -44,6 +44,7 @@ const Story = ({
   handleChangeStoryStatus,
 }) => {
   const [openDetail, setOpenDetail] = useState(false);
+  console.log("story", story);
 
   const handleDrawerVisible = (value) => {
     let newVal = !openDetail;
@@ -138,7 +139,7 @@ const Story = ({
         placement="bottom"
         visible={openDetail}
       >
-        <StoryDetails story={story} />
+        <StoryDetails story={{ id: i.toString(), ...story }} />
       </Drawer>
     </>
   );
