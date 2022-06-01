@@ -107,7 +107,6 @@ const CloseTime = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-
   p {
     color: #a6ae9d;
   }
@@ -295,7 +294,6 @@ export default function Ethics() {
           {/* <StyledItem
                     $color={ card.color }>
                     <span>x</span>
-
                     <p>
                         { card.title }</p>
                 </StyledItem> */}

@@ -1,5 +1,5 @@
 {
-    "Insight Meeting": [
+    "Sprinting": [
         {
             "boardName": "Board 0",
             "columns": [
@@ -27,11 +27,8 @@
                 {
                     "columnId": "1",
                     "columnName": "Under Review"
-                },
-                {
-                    "columnId": "2",
-                    "columnName": "Adjudicated"
                 }
+                
             ]
         },
         {
@@ -69,7 +66,7 @@
             ]
         }
     ],
-    "Alpha Sheet": [
+    "Task App": [
         {
             "boardName": "Board 0",
             "columns": [
