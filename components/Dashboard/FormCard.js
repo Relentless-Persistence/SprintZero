@@ -122,7 +122,7 @@ export default function FormCard({
         onChange={(e) => handleChange(e, "description")}
         placeholder="Result description..."
       />
-      ;{extraItems}
+      {extraItems}
     </Card>
   );
 }

@@ -37,6 +37,7 @@ const ItemCard = ({
   version = 2,
   headerSmall = false,
   extraItems,
+  index
 }) => {
   const [isEdit, setIsEdit] = useState(false);
 
@@ -79,7 +80,7 @@ const ItemCard = ({
           </CardHeaderLink>
         )
       }
-      title={<Title>{item.name}</Title>}
+      title={<Title>{item.name || `Result #${index}`}</Title>}
       headStyle={{
         background: "#F5F5F5",
       }}

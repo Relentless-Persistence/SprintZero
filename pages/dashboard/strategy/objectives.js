@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import { useRouter } from 'next/router';
-import
-{
-    Input
-} from 'antd';
-import { AimOutlined } from '@ant-design/icons';
+import { useRouter } from "next/router";
+import { Input, message } from "antd";
+import { AimOutlined } from "@ant-design/icons";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import FormCard from "../../../components/Dashboard/FormCard";
@@ -16,151 +14,182 @@ import { splitRoutes } from "../../../utils";
 import fakeData from "../../../fakeData/productData.json";
 import products from "../../../fakeData/products.json";
 import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
+import { findIndex } from "lodash";
 
+export default function Objectives() {
+  const { pathname } = useRouter();
 
-const getGoalNames = ( goals ) =>
-{
-    const goalNames = goals.map( g => g.name );
+  const [data, setData] = useState(null);
+  const [goalNames, setGoalNames] = useState([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const activeProduct = useRecoilValue(activeProductState);
 
-    return goalNames;
-};
+  const [activeGoal, setActiveGoal] = useState(null);
+  const [activeGoalIndex, setActiveGoalIndex] = useState(0);
+  const [results, setResults] = useState(null);
 
+  const fetchGoals = async () => {
+    if (activeProduct) {
+      const res = await db
+        .collection("Goals")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        });
+    }
+  };
 
-export default function Objectives ()
-{
-    const { pathname } = useRouter();
+  useEffect(() => {
+    fetchGoals();
+  }, [activeProduct]);
 
-    const [ data, setData ] = useState( fakeData );
-    const [ showAdd, setShowAdd ] = useState( false );
+  const getGoalNames = () => {
+    if (data) {
+      let goalNames = [];
+      data.map((g) => goalNames.push(g.name));
+      setGoalNames(goalNames);
+      setActiveGoal(goalNames[0]);
+    }
+  };
 
-    const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
+  useEffect(() => {
+    getGoalNames();
+  }, [data]);
 
-    const [ activeGoal, setActiveGoal ] = useState( data[ activeProduct ][ 0 ] );
+  const fetchResults = async () => {
+    if (data) {
+      db.collection("Result")
+        .where("goal_id", "==", data[activeGoalIndex].id)
+        .onSnapshot((snapshot) => {
+          setResults(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
+  };
 
+  useEffect(() => {
+    fetchResults();
+  }, [data, activeGoalIndex]);
 
-    const handleTitleChange = ( e ) =>
-    {
-        const { value } = e.target;
+  const handleTitleChange = async (e) => {
+    const { value } = e.target;
+    await db
+      .collection("Goals")
+      .doc(data[activeGoalIndex].id)
+      .update({
+        description: value,
+      })
+      .then(() => message.success("Goal updated successfully"));
+  };
 
-        const newData = { ...data };
-        const goalIndex = data[ activeProduct ].findIndex( goal => goal.name === activeGoal.name );
+  const onClose = () => {
+    setVisible(false);
+  };
 
-        newData[ activeProduct ][ goalIndex ].title = value;
+  const setGoal = (goalName) => {
+    const goal = findIndex(goalNames, (o) => o === goalName);
+    setActiveGoalIndex(goal);
+    setActiveGoal(goalNames[goal]);
+  };
 
-        setData( newData );
+  const onAddGoal = () => {
+    const newData = { ...data };
+    const length = newData[activeProduct]?.length || 0;
+    const goal = {
+      name: String(length + 1).padStart(3, "0"),
+      title: String(length + 1).padStart(3, "0"),
+      results: [],
     };
+    newData[activeProduct].push(goal);
 
-    const onClose = () =>
-    {
-        setVisible( false );
-    };
+    setData(newData);
+  };
 
-    const setGoal = ( goalName, product ) =>
-    {
-        const goal = data[ product || activeProduct ].find( goal => goal.name === goalName );
+  const addItem = () => {
+    setShowAdd(true);
+  };
 
-        setActiveGoal( goal );
-    };
+  const addItemDone = (item) => {
+    const id = data[activeGoalIndex].id;
+    if (id) {
+      const data = {
+        goal_id: id,
+        description: item.description,
+      };
+      db.collection("Result")
+        .add(data)
+        .then((docRef) => {
+          message.success("New result added successfully");
+        })
+        .catch((error) => {
+          message.error("Error adding result");
+        });
 
+      setShowAdd(false);
+    }
+  };
 
-    const onAddGoal = () =>
-    {
-        const newData = { ...data };
-        const length = newData[ activeProduct ]?.length || 0;
-        const goal =
-        {
-            name: String( length + 1 ).padStart( 3, '0' ),
-            title: String( length + 1 ).padStart( 3, '0' ),
-            results: []
-        };
-        newData[ activeProduct ].push( goal );
+  const editItem = async (id, item) => {
+    await db.collection("Result").doc(id).update({
+      description: item.description,
+    })
+    .then(() => {
+      message.success("Result updated successfully");
+    })
+  };
 
-        setData( newData );
-    };
+  return (
+    <div className="mb-8">
+      <Head>
+        <title>Objectives | Sprint Zero</title>
+        <meta name="description" content="Sprint Zero strategy objectives" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-    const setProduct = ( product ) =>
-    {
-        setActiveProduct( product );
-        const goalName = data[ product ][ 0 ].name;
-        setGoal( goalName, product );
-        setShowAdd( false );
-    };
+      <AppLayout
+        // onChangeProduct={setProduct}
+        rightNavItems={goalNames}
+        activeRightItem={activeGoal}
+        setActiveRightNav={setGoal}
+        onMainAdd={addItem}
+        // onSideAddClick={onAddGoal}
+        hasMainAdd
+        versionClass="px-[28px] py-[14px]"
+        mainClass="mr-[86px]"
+        breadCrumbItems={splitRoutes(pathname)}
+      >
+        {data && (
+          <Input
+            prefix={<AimOutlined />}
+            maxLength={80}
+            className="mb-[16px]"
+            onChange={handleTitleChange}
+            value={data[activeGoalIndex]?.description}
+          />
+        )}
 
-    const addItem = () =>
-    {
-        setShowAdd( true );
-    };
-
-    const addItemDone = ( item ) =>
-    {
-        const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
-
-        goal?.results.push( item );
-
-        setData( newData );
-        setShowAdd( false );
-    };
-
-    const editItem = ( resultIndex, item ) =>
-    {
-        const newData = { ...data };
-        const goal = newData[ activeProduct ].find( goal => goal.name === activeGoal.name );
-
-        goal.results[ resultIndex ] = item;
-        setData( newData );
-    };
-
-
-
-    return (
-        <div className="mb-8">
-            <Head>
-                <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero strategy objectives" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-
-
-            <AppLayout
-                onChangeProduct={ setProduct }
-                rightNavItems={ getGoalNames( data[ activeProduct ] ) }
-                activeRightItem={ activeGoal?.name }
-                setActiveRightNav={ setGoal }
-                onMainAdd={ addItem }
-                onSideAddClick={ onAddGoal }
-                hasMainAdd
-                versionClass="px-[28px] py-[14px]"
-                mainClass="mr-[86px]"
-                breadCrumbItems={ splitRoutes( pathname ) }>
-
-                <Input
-                    prefix={ <AimOutlined /> }
-                    maxLength={ 80 }
-                    className="mb-[16px]"
-                    onChange={ handleTitleChange }
-                    value={ activeGoal?.title } />
-
-                <MasonryGrid>
-                    {
-                        activeGoal?.results.map( ( res, i ) => (
-                            <ItemCard
-                                key={ i }
-                                onEdit={ ( item ) => editItem( i, item ) }
-                                item={ res } />
-                        ) )
-                    }
-
-
-
-                    {
-                        showAdd ? <FormCard
-                            onSubmit={ addItemDone } /> : null
-                    }
-                </MasonryGrid>
-
-
-            </AppLayout>
-        </div>
-    );
+        {results && results.length > 0 ? (
+          <MasonryGrid>
+            {results.map((result, i) => (
+              <ItemCard
+                key={i}
+                onEdit={(item) => editItem(result.id, item)}
+                item={result}
+                index={i + 1}
+              />
+            ))}
+            {showAdd ? <FormCard onSubmit={addItemDone} /> : null}
+          </MasonryGrid>
+        ) : (
+          <MasonryGrid>
+            <FormCard onSubmit={addItemDone} />
+          </MasonryGrid>
+        )}
+      </AppLayout>
+    </div>
+  );
 }
