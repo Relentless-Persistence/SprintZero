@@ -33,7 +33,7 @@ export default function Objectives() {
 
   const fetchGoals = async () => {
     if (activeProduct) {
-      const res = await db
+      const res = db
         .collection("Goals")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
