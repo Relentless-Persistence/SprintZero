@@ -1,5 +1,5 @@
 {
-    "Insight Meeting": [
+    "Sprinting": [
         {
             "id": "1",
             "journeyName": "Scheduling",
@@ -118,5 +118,5 @@
             ]
         }
     ],
-    "Alpha Sheet": []
+    "Task App": []
 }
