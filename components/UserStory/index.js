@@ -12,6 +12,9 @@ import { last } from "lodash";
 import Epic from "./Epic";
 import Feature from "./Feature";
 import Story from "./Story";
+import { db } from "../../config/firebase-config";
+import { activeProductState } from "../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
 
 const UserStory = () => {
   const [epics, setEpics] = useState([
@@ -22,6 +25,31 @@ const UserStory = () => {
       features: [],
     },
   ]);
+
+  // Fetch Epics from firebase
+  const fetchEpics = async () => {
+    // console.log(activeProduct.id);
+    if (activeProduct) {
+      const res = await db
+        .collection("Epics")
+        .where("product_id", "==", activeProduct.id)
+        .get();
+      console.log(res);
+      const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      if (epics.length > 0) {
+        setEpics(epics);
+      } else {
+        setEpics([
+          {
+            id: Math.floor(Math.random() * 0x1000000).toString(),
+            name: "",
+            status: "",
+            features: [],
+          },
+        ]);
+      }
+    }
+  };
 
   const addEpic = () => {
     setEpics([

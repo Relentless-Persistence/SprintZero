@@ -141,15 +141,15 @@ const AppLayout = ({
               >
                 <Breadcrumb>
                   {breadCrumbItems.map((item, i) => (
-                    <Breadcrumb.Item key={i}>
-                      {capitalize(item)}
+                    <Breadcrumb.Item className="capitalize" key={i}>
+                      {item}
                     </Breadcrumb.Item>
                   ))}
 
                   {ignoreLast ? null : (
                     <Breadcrumb.Item className="text-green-800 ">
                       {capitalizeText
-                        ? capitalize(defaultText || activeRightItem)
+                        ? defaultText || activeRightItem
                         : defaultText || activeRightItem}
                     </Breadcrumb.Item>
                   )}

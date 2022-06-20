@@ -1,5 +1,5 @@
 {
-    "Insight Meeting": [
+    "Sprinting": [
         {
             "taskId": "ea11c725-8bb7-4a5b-bc08-ca41bc2a8f4c",
             "name": "v1.0",
@@ -293,7 +293,7 @@
             ]
         }
     ],
-    "Alpha Sheet": [
+    "Task App": [
         {
             "taskId": "ea11c725-8bb7-4a5b-bc08-ca41bc2a8f4c",
             "name": "v1.0",

@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 
 import { Layout, Typography, Input, Avatar, Drawer, Space, Image } from "antd";
 import { MessageFilled, CloseOutlined } from "@ant-design/icons";
 
-import products from "../../fakeData/products.json";
+// import products from "../../fakeData/products.json";
 
 import { useAuth } from "../../contexts/AuthContext";
 import SettingsMenu from "./SettingsMenu";
 import light from "../light.svg";
+import { productsState, activeProductState } from "../../atoms/productAtom";
+import { db } from "../../config/firebase-config";
+import { useRecoilState } from "recoil";
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -39,13 +42,26 @@ const CustomHeader = styled(Header)`
 const AppHeader = ({ onChangeProduct }) => {
   const router = useRouter();
   const { user } = useAuth();
-  const [activeProduct, setActiveProduct] = useState(products[0]);
+  const [products, setProducts] = useRecoilState(productsState);
+  const [activeProduct, setActiveProduct] = useRecoilState(activeProductState);
   const [settingsMenuDrawer, setSettingsMenuDrawer] = useState(false);
 
-  const onProductChange = (product) => {
-    setActiveProduct(product);
-    onChangeProduct && onChangeProduct(product);
+  const fetchProducts = async () => {
+    if(user) {
+      const res = await db
+        .collection("Product")
+        .where("owner", "==", user.uid)
+        .get();
+    const products = res.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+      setProducts(products);
+      setActiveProduct(products[0]);
+    }
   };
+
+  useEffect(() => {
+      fetchProducts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <CustomHeader
@@ -59,20 +75,18 @@ const AppHeader = ({ onChangeProduct }) => {
           className="w-[178px] h-[42px]"
           preview={false}
         />
-        {/* <Title level={2} className="m-0 dashboard-logo">
-          
-        </Title> */}
         <div className="flex items-center ml-11">
-          {products.slice(0, 1).map((item, i) => (
-            <HeaderMenu
-              key={i}
-              className="mr-10"
-              active={activeProduct === item}
-              onClick={() => onProductChange(item)}
-            >
-              {item}
-            </HeaderMenu>
-          ))}
+          {products &&
+            products.map((product, i) => (
+              <HeaderMenu
+                key={i}
+                className="mr-10"
+                active={activeProduct === product}
+                onClick={() => setActiveProduct(product)}
+              >
+                {product.product}
+              </HeaderMenu>
+            ))}
         </div>
       </div>
       <div className="flex items-center">

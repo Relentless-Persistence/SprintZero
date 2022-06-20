@@ -1,5 +1,5 @@
 {
-    "Insight Meeting": [
+    "Sprinting": [
         {
             "name": "Perceivable",
             "title": "Users can identify content and interface elements by means of the senses. For many users, this means perceiving a system primarily visually, while for others, perceivability may be a matter of sound or touch.",
@@ -145,7 +145,7 @@
             ]
         }
     ],
-    "Alpha Sheet": [
+    "Task App": [
         {
             "name": "Perceivable",
             "title": "Users can identify content and interface elements by means of the senses. For many users, this means perceiving a system primarily visually, while for others, perceivability may be a matter of sound or touch.",

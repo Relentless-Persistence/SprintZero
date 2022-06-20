@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import { functions } from "../config/firebase-config";
 import { Button, notification, Divider, Space } from "antd";
+import Kanban from "../ui/Kanban";
 
 const test = () => {
   const addMessage = functions.httpsCallable("addMessage");
@@ -38,6 +39,8 @@ const test = () => {
       >
         Click me!
       </button>
+
+      <Kanban />
     </div>
   );
 };
