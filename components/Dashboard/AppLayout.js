@@ -5,6 +5,7 @@ import { Layout, Breadcrumb, Input, Divider, Button } from "antd";
 import SideBar from "./SideBar";
 import AppHeader from "./Header";
 import { useAuth } from "../../contexts/AuthContext";
+import withAuth from "../../hoc/withAuth";
 
 const { Content, Sider } = Layout;
 
@@ -237,4 +238,4 @@ const AppLayout = ({
   );
 };
 
-export default AppLayout;
+export default withAuth(AppLayout) 

@@ -30,16 +30,6 @@ function MyApp({ Component, pageProps }) {
       </AuthProvider>
     );
   }
-
-  // return (
-  //   <AuthProvider>
-  //     <RecoilRoot>
-  //       <PaymentProvider>
-  //         <Component {...pageProps} />
-  //       </PaymentProvider>
-  //     </RecoilRoot>
-  //   </AuthProvider>
-  // );
 }
 
 export default MyApp;

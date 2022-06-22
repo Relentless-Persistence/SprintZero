@@ -5,10 +5,11 @@ import { useState } from "react";
 import UserStory from "../../components/UserStory";
 import { findIndex } from "lodash";
 import { splitRoutes } from "../../utils";
+import withAuth from "../../hoc/withAuth"
 
 const versions = ["v1", "v2", "v3", "All"];
 
-export default function Home() {
+function Home() {
   const { pathname } = useRouter();
   //console.log(pathname);
   const [version, setVersion] = useState(versions[0]);
@@ -46,3 +47,6 @@ export default function Home() {
     </div>
   );
 }
+
+
+export default withAuth(Home);
