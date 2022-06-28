@@ -219,7 +219,7 @@ const UserStory = () => {
         <p className="text-right">Low Value</p>
       </div>
 
-      <div className="flex justify-center mt-8">
+      <div id="sprint0Dashboard" className="flex justify-center mt-8">
         <div className="flex justify-center space-x-10 overflow-x-auto">
           {epics.map((epic, i) => (
             <div key={i}>
@@ -234,7 +234,7 @@ const UserStory = () => {
 
                 {epic.name === "" ? null : (
                   <div className="mt-[42.5px]">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex justify-center space-x-4">
                       {epic.features.length <= 0 ? (
                         <ArcherElement id={"add_feature"}>
                           <Tag
@@ -274,6 +274,8 @@ const UserStory = () => {
                                         arrowThickness: 1.5,
                                       },
                                     },
+                                    lineStyle: 'straight',
+                                    endMarker: false,
                                   },
                                 },
                               ]}
@@ -336,5 +338,7 @@ const UserStory = () => {
     </>
   );
 };
+
+// AG: added sprint0Dashboard id - fix that permanently
 
 export default UserStory;

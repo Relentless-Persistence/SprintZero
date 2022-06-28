@@ -15,7 +15,8 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
 {
   const [ openDetail, setOpenDetail ] = useState( false );
   return (
-    <div className="flex items-center justify-start">
+    // AG: i have removed here justify-start
+    <div className="flex justify-center">
       <ArcherElement
         id={ epic.id }
         relations={
@@ -36,6 +37,7 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
                         arrowThickness: 1.5,
                       },
                     },
+                    endMarker: false,
                   },
                 },
               ]

@@ -347,3 +347,8 @@ body {
   background-color: #4A801D !important;
   border-color: #4A801D !important;
 }
+
+/* AG: this needs to be fixed */
+#sprint0Dashboard .ant-tag {
+  margin-right: 0px !important;
+}

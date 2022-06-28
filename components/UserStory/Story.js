@@ -60,7 +60,7 @@ const Story = ({
   return (
     <>
       <div
-        className={`flex items-center border-2 border-[#0073B3] cursor-pointer rounded mb-[10px]`}
+        className={`flex justify-center border-2 border-[#0073B3] cursor-pointer rounded mb-[10px]`}
         onClick={() =>
           story.status === "saved" ? handleDrawerVisible(true) : null
         }

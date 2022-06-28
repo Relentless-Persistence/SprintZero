@@ -14,7 +14,7 @@ const Feature = ({
   handleChangeFeatureStatus,
 }) => {
   return (
-    <div className="flex items-center justify-start">
+    <div className="flex justify-center">
       <ArcherElement
         key={feature.id}
         id={feature.id}
@@ -39,6 +39,7 @@ const Feature = ({
                   arrowThickness: 1.5,
                 },
               },
+              endMarker: false,
             },
           },
         ]}
