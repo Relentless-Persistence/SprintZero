@@ -47,9 +47,10 @@ const Feature = ({
         ]}
       >
         <Tag
-          className={`flex items-center space-x-1 border-2 border-[#006378] ${
+          className={`flex items-center justify-center space-x-1 border-2 border-[#006378] ${
             !feature.name ? "border-dashed" : ""
           } px-[8px] py-[4px] text-[#006378] text-sm rounded`}
+          style={{width:"200px"}}
           icon={<CopyOutlined />}
         >
           {/* {feature.status !== "saved" ? ( */}

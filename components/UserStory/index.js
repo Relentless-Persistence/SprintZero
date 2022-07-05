@@ -241,6 +241,7 @@ const UserStory = () => {
                             className="flex items-center space-x-1 border-2 border-[#006378] border-dashed px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
                             icon={<CopyOutlined />}
                             onClick={() => addFeature(i)}
+                            style={{width:"200px"}}
                           >
                             Add Feature
                           </Tag>
@@ -326,9 +327,9 @@ const UserStory = () => {
           ))}
         </div>
 
-        <div>
+        <div className="space-x-10 overflow-x-auto">
           <Tag
-            className="flex items-center space-x-1 border-2 border-[#4F2DC8] border-dashed px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded cursor-pointer"
+            className="flex items-center space-x-1 border-2 border-[#4F2DC8] border-dashed px-[8px] ml-5 py-[4px] text-[#4F2DC8] text-sm rounded cursor-pointer"
             icon={<ReadOutlined />}
             onClick={addEpic}
           >

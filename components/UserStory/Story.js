@@ -65,9 +65,9 @@ const Story = ({
           story.status === "saved" ? handleDrawerVisible(true) : null
         }
       >
-        <div className="bg-[#0073B3] text-white py-[7px] px-[2px] -ml-[1px]">
+        {/* <div className="bg-[#0073B3] text-white py-[7px] px-[2px] -ml-[1px]">
           <p className="text-xs -rotate-90">1.0</p>
-        </div>
+        </div> */}
 
         <div className="flex items-center justify-center text-[#0073B3] text-[14px] px-[8px]">
           <FileOutlined className="mr-1" />
@@ -76,7 +76,7 @@ const Story = ({
               placeholder="New User Story"
               type="text"
               maxLength="16"
-              className="max-w-[70px] focus:outline-none outline-none placeholder:text-[#4F2DC8] bg-transparent capitalize border-none"
+              className="max-w-[70px] focus:outline-none outline-none placeholder:text-[#4F2DC8] pl-0 bg-transparent capitalize border-none"
               value={story.name}
               onChange={(e) => {
                 handleChangeStory(i, featureIndex, storyIndex, e.target.value);

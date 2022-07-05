@@ -48,6 +48,7 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
           className={ `flex items-center justify-center space-x-1 border-2 border-[#4F2DC8] ${ !epic.name ? "border-dashed" : ""
             } px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded` }
           icon={ <ReadOutlined /> }
+          style={{width:"200px"}}
           // onClick={ () =>
           // {
           //   epic.status === "saved" ? setOpenDetail( true ) : null;
