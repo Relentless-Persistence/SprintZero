@@ -14,6 +14,7 @@ const Feature = ({
   handleChangeFeatureStatus,
 }) => {
   return (
+    // AG: added justify-left here
     <div className="flex justify-center">
       <ArcherElement
         key={feature.id}
@@ -32,7 +33,8 @@ const Feature = ({
                 />
               ) : null,
             style: {
-              strokeDasharray: "4,3",
+              strokeWidth: "1.5",
+              //strokeDasharray: "4,3",
               endShape: {
                 arrow: {
                   arrowLength: 4,
@@ -54,7 +56,7 @@ const Feature = ({
           <Input
             placeholder="New Feature"
             type="text"
-            maxLength="16"
+            maxLength="17"
             className="max-w-[70px] capitalize focus:outline-none placeholder:text-[#4F2DC8] p-0 bg-transparent outline-none border-none"
             value={feature.name}
             onChange={(e) =>

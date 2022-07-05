@@ -15,8 +15,8 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
 {
   const [ openDetail, setOpenDetail ] = useState( false );
   return (
-    // AG: i have removed here justify-start
-    <div className="flex justify-center">
+    // AG: i have removed here justify-start and put justify-left
+    <div className="flex justify-left">
       <ArcherElement
         id={ epic.id }
         relations={
@@ -30,7 +30,8 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
                   targetAnchor: "top",
                   sourceAnchor: "bottom",
                   style: {
-                    strokeDasharray: "4,3",
+                    strokeWidth: "1.5",
+                    //strokeDasharray: "4,3",
                     endShape: {
                       arrow: {
                         arrowLength: 4,
@@ -56,7 +57,7 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
             <Input
               placeholder="New Epic"
               type="text"
-              maxLength="16"
+              maxLength="17"
               className="max-w-[70px] bg-transparent border-none capitalize outline-none focus:outline-none placeholder:text-[#4F2DC8] p-0"
               value={ epic.name }
               onChange={ ( e ) => handleChangeEpic( i, e.target.value ) }

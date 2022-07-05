@@ -267,7 +267,8 @@ const UserStory = () => {
                                   targetAnchor: "bottom",
                                   sourceAnchor: "top",
                                   style: {
-                                    strokeDasharray: "4,3",
+                                    strokeWidth: "1.5",
+                                    //strokeDasharray: "4,3",
                                     endShape: {
                                       arrow: {
                                         arrowLength: 4,
