@@ -20,20 +20,24 @@ const Login = () => {
     try {
       auth.signInWithPopup(provider).then(async (res) => {
         var user = res.user;
+        // Adding user to a product team
+        if (type && product) {
+          await db.collection("teams").add({
+            user: {
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName,
+            },
+            expiry: "unlimited",
+            type: type,
+            product_id: product,
+          });
+        }
+
+        // Checking if user is new
         if (res.additionalUserInfo.isNewUser) {
-          if (type && product) {
-            await db.collection("teams").add({
-              user: {
-                uid: user.uid,
-                email: user.email,
-                name: user.displayName,
-              },
-              expiry: "unlimited",
-              type: type,
-              product_id: "1",
-            });
-            router.push("/dashboard");
-          } else if (!/@gmail.com\s*$/.test(user.email)) {
+          // if user has a company custom email
+          if (!/@gmail.com\s*$/.test(user.email)) {
             router.push("/enterprise-contact");
           } else {
             message.success({
@@ -43,21 +47,11 @@ const Login = () => {
             router.push("/loginsuccess");
           }
         } else {
-          if (type && product) {
-            await db.collection("teams").add({
-              user: {
-                uid: user.uid,
-                email: user.email,
-                name: user.displayName,
-              },
-              expiry: "unlimited",
-              type: type,
-              product_id: "1",
-            });
-            router.push("/dashboard");
-          } else {
-            router.push("/dashboard");
-          }
+          message.success({
+            content: "Successfully logged in",
+            className: "custom-message",
+          });
+          router.push("/dashboard");
         }
       });
     } catch (error) {
