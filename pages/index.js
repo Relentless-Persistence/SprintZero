@@ -19,42 +19,25 @@
 //   );
 // }
 
+import React from "react";
 import Head from "next/head";
-import AppLayout from "../components/Dashboard/AppLayout";
-import { useState } from "react";
+import Layout from "../components/Layout";
+import Login from "../components/Login";
 
-const versions = ["v1", "v2", "v3"];
-
-export default function Home() {
-  const [version, setVersion] = useState(versions[0]);
-
-  const handleActiveVersion = (version) => {
-    const versionIndex = versions.findIndex((v) => v === version);
-
-    if (versionIndex > -1) {
-      setVersion(versions[versionIndex]);
-    }
-  };
-
+const login = () => {
   return (
-    <div className="mb-8">
+    <div>
       <Head>
-        <title>Dashboard | Sprint Zero</title>
-        <meta name="description" content="Sprint Zero dashboard" />
+        <title>Login | Sprint Zero</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <AppLayout
-        breadCrumbItems={["StoryMap"]}
-        hasSideAdd={false}
-        hasMainAdd={false}
-        rightNavItems={versions}
-        activeRightItem={version}
-        setActiveRightNav={handleActiveVersion}
-      >
-        <p>Node chart will go here.</p>
-      </AppLayout>
+      <Layout>
+        <Login />
+      </Layout>
     </div>
   );
-}
+};
+
+export default login;
 

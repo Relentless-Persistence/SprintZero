@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 // import Image from "next/image";
@@ -7,19 +8,28 @@ import { googleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
 import { auth } from "../config/firebase-config";
 import { db } from "../config/firebase-config";
+import { useAuth } from "../contexts/AuthContext";
 // import { usePaymentConfirm } from "../contexts/PaymentContext";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
   const router = useRouter();
+  const {user} = useAuth();
   const { type, product } = router.query;
   // const paid = usePaymentConfirm();
+
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [user])
 
   const handleOnClick = (provider) => {
     try {
       auth.signInWithPopup(provider).then(async (res) => {
         var user = res.user;
+        console.log(res);
         // Adding user to a product team
         if (type && product) {
           await db.collection("teams").add({
