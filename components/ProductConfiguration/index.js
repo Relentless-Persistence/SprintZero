@@ -9,6 +9,7 @@ import ProductCost from "./ProductCost";
 // import withAuth from "../../hoc/withAuth";
 import {db} from "../../config/firebase-config";
 import firebase from "firebase";
+import { useRouter } from "next/router";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -21,6 +22,7 @@ SwiperCore.use([Pagination, Navigation]);
 
 const ProductConfiguration = () => {
   const { user } = useAuth();
+  const router = useRouter();
   const [product, setProduct] = useState("");
   const [email1, setEmail1] = useState("");
   const [email2, setEmail2] = useState("");
@@ -50,13 +52,15 @@ const ProductConfiguration = () => {
           currency,
           cost,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          owner: user.uid,
         })
         .then(() =>
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
           })
-        );
+        )
+        .then(() => router.push("/dashboard"));
     } else {
       message.warning({
         content: "Some field can't be empty",
