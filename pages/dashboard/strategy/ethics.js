@@ -312,10 +312,10 @@ export default function Ethics() {
 
       <AppLayout
         ignoreLast={true}
-        onChangeProduct={setProduct}
-        rightNavItems={getBoardNames(data[activeProduct])}
-        activeRightItem={activeBoard?.boardName}
-        setActiveRightNav={setBoard}
+        // onChangeProduct={setProduct}
+        // rightNavItems={getBoardNames(data[activeProduct])}
+        // activeRightItem={activeBoard?.boardName}
+        // setActiveRightNav={setBoard}
         hasMainAdd={false}
         hasSideAdd={false}
         hideSideBar
