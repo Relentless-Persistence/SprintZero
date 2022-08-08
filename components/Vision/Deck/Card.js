@@ -51,6 +51,7 @@ const StatementCard = (
 {
     const ref = useRef();
     const [ trans, setTrans ] = useState( {} );
+    console.log(info)
 
     useEffect( () =>
     {
@@ -67,7 +68,7 @@ const StatementCard = (
 
     if ( !info )
     {
-        return <></>;
+        return <>a</>;
     }
 
 

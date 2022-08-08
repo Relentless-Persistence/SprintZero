@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import StatementCard from "./Card";
+import StatementForm from "../StatementForm";
 
-const Deck = ({ setInfo, activeIndex = 0, list = [], product }) => {
-  const [cards, setCards] = useState([]);
+const Deck = ({ setInfo, activeIndex, list, product, inEditMode }) => {
+  const [cards, setCards] = useState(list);
   const cardRefs = useRef();
+
+  console.log(activeIndex);
 
   useEffect(() => {
     setCards(list);
@@ -19,7 +22,7 @@ const Deck = ({ setInfo, activeIndex = 0, list = [], product }) => {
   return (
     <div className="pt-[18px] relative">
       <StatementCard
-        info={atTop[0]?.info}
+        info={atTop[0]}
         onEditClick={null}
         style={{
           position: "relative",
@@ -31,7 +34,7 @@ const Deck = ({ setInfo, activeIndex = 0, list = [], product }) => {
 
       {atTop?.map((o, i) => (
         <StatementCard
-          info={o.info}
+          info={o}
           onEditClick={setInfo}
           style={{
             transform: `translateY(${(length - i - 1) * 10}px)`,
@@ -46,7 +49,7 @@ const Deck = ({ setInfo, activeIndex = 0, list = [], product }) => {
 
       {movedDown?.map((o, i) => (
         <StatementCard
-          info={o.info}
+          info={o}
           onEditClick={setInfo}
           index={i}
           product={product}

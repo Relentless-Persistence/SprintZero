@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -14,6 +15,7 @@ import {
 import products from "../../../fakeData/products.json";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
 
 
 import fakeData from "../../../fakeData/visionData.json";
@@ -31,32 +33,30 @@ const generateRightNav = (items) => {
 };
 
 export default function Visions() {
-  const [visionData, setVisionData] = useState(fakeData);
-  const [activeProduct, setActiveProduct] = useState(products[0]);
-  // const activeProduct = useRecoilValue(activeProductState); // get active product from recoil state
+  const [visionData, setVisionData] = useState([]);
+  // const [activeProduct, setActiveProduct] = useState(products[0]);
+  const activeProduct = useRecoilValue(activeProductState); // get active product from recoil state
   const [vision, setVision] = useState(
-    checkEmptyArray(visionData[activeProduct])
-      ? "Now"
-      : visionData[activeProduct][0].createdAt
+    visionData.length > 0 ? visionData[0].createdAt : "Now"
   );
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState();
   const [inEditMode, setEditMode] = useState(false);
-  const [visionIndex, setVisionIndex] = useState(0);
+  const [visionIndex, setVisionIndex] = useState(null);
 
   const { pathname } = useRouter();
 
-  const onChangeProduct = (productName) => {
-    setActiveProduct(productName);
+  // const onChangeProduct = (productName) => {
+  //   setActiveProduct(productName);
 
-    const vision = checkEmptyArray(visionData[productName])
-      ? "Now"
-      : visionData[productName][0].createdAt;
-    setVision(vision);
-  };
+  //   const vision = checkEmptyArray(visionData)
+  //     ? "Now"
+  //     : visionData[0].createdAt;
+  //   setVision(vision);
+  // };
 
   // Fetch vision data from firebase
   const fetchVisions = async () => {
-    console.log(activeProduct);
+    // console.log(activeProduct);
     if (activeProduct) {
       db.collection("Visions")
         .where("product_id", "==", activeProduct.id)
@@ -64,12 +64,17 @@ export default function Visions() {
           setVisionData(
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
-          console.log(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
+          setVisionIndex(0)
+          // console.log(
+          //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          // );
         });
     }
   };
+
+  useEffect(() => {
+    fetchVisions();
+  }, [activeProduct]);
 
   // Create Vision
   const addVision = () => {
@@ -106,7 +111,7 @@ export default function Visions() {
   };
 
   const handleActiveVision = (visionDate) => {
-    const visions = visionData[activeProduct];
+    const visions = visionData;
 
     const visionIndex = visions.findIndex((v) => v.createdAt === visionDate);
 
@@ -114,7 +119,7 @@ export default function Visions() {
       const vision = visions[visionIndex];
       setVision(vision.createdAt);
       setVisionIndex(visionIndex);
-      setInfo({});
+      // setInfo({});
       setEditMode(false);
     }
   };
@@ -149,25 +154,32 @@ export default function Visions() {
       </Head>
 
       <AppLayout
-        rightNavItems={generateRightNav(visionData[activeProduct])}
-        activeRightItem={vision}
+        rightNavItems={generateRightNav(visionData)}
+        activeRightItem={
+          visionData.length > 0 ? visionData[0].createdAt : "Now"
+        }
         setActiveRightNav={handleActiveVision}
         hasSideAdd={false}
-        defaultText={getTimeAgo(vision)}
-        onChangeProduct={onChangeProduct}
+        defaultText={getTimeAgo(
+          visionData.length > 0 ? visionData[0].createdAt : "Now"
+        )}
+        // onChangeProduct={onChangeProduct}
         mainClass="mr-[160px]"
         breadCrumbItems={splitRoutes(pathname)}
       >
-        {checkEmptyObject(info) ? (
-          <Deck
-            product={activeProduct}
-            setInfo={handleSetInfo}
-            list={visionData[activeProduct]}
-            activeIndex={visionIndex}
-          />
-        ) : null}
+        {activeProduct
+          ? (
+              <Deck
+                product={activeProduct.product}
+                // setInfo={handleSetInfo}
+                list={visionData}
+                activeIndex={visionIndex}
+                inEditMode={inEditMode}
+              />
+            )
+          : null}
 
-        {inEditMode || !visionData[activeProduct].length ? (
+        {inEditMode || !visionData.length ? (
           <StatementForm info={info} handleSubmit={handleSubmit} />
         ) : null}
       </AppLayout>

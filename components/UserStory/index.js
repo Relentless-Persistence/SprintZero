@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ReadOutlined,
   CopyOutlined,
 } from "@ant-design/icons";
-import { Divider, Tag } from "antd";
+import { Divider, message, Tag, Button } from "antd";
 import update from "immutability-helper";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { last } from "lodash";
@@ -16,40 +17,37 @@ import { db } from "../../config/firebase-config";
 import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 
-const UserStory = () => {
-  const [epics, setEpics] = useState([
-    {
-      id: Math.floor(Math.random() * 0x1000000).toString(),
-      name: "",
-      status: "",
-      features: [],
-    },
-  ]);
+const UserStory = ({ epics, setEpics, activeProduct }) => {
+ 
 
-  // Fetch Epics from firebase
-  const fetchEpics = async () => {
-    // console.log(activeProduct.id);
-    if (activeProduct) {
-      const res = await db
-        .collection("Epics")
-        .where("product_id", "==", activeProduct.id)
-        .get();
-      console.log(res);
-      const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      if (epics.length > 0) {
-        setEpics(epics);
-      } else {
-        setEpics([
-          {
-            id: Math.floor(Math.random() * 0x1000000).toString(),
-            name: "",
-            status: "",
-            features: [],
-          },
-        ]);
-      }
-    }
-  };
+  // // Fetch Epics from firebase
+  // const fetchEpics = async () => {
+  //   // console.log(activeProduct.id);
+  //   if (activeProduct) {
+  //     const res = await db
+  //       .collection("Epics")
+  //       .where("product_id", "==", activeProduct.id)
+  //       .get();
+  //     console.log(res.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+  //     const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  //     if (epics.length > 0) {
+  //       setEpics(epics);
+  //     } else {
+  //       setEpics([
+  //         {
+  //           id: Math.floor(Math.random() * 0x1000000).toString(),
+  //           name: "",
+  //           status: "",
+  //           features: [],
+  //         },
+  //       ]);
+  //     }
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchEpics();
+  // }, [activeProduct]);
 
   const addEpic = () => {
     setEpics([
@@ -207,6 +205,50 @@ const UserStory = () => {
     }
   };
 
+  // // Persist Epic to DB
+  // const saveEpic = (data) => {
+  //   const { id, ...info } = data;
+  //   db.collection("Epics")
+  //     .doc(id)
+  //     .set(info)
+  //     .then((docRef) => {
+  //       message.success("User Stories saved");
+  //     })
+  //     .catch((error) => {
+  //       message.error("Problem saving story");
+  //     });
+  // };
+
+  // // Update Epic in DB
+  // const updateEpic = async (data) => {
+  //   const { id, ...info } = data;
+  //   await db
+  //     .collection("Epics")
+  //     .doc(id)
+  //     .update(info)
+  //     .then(() => {
+  //       message.success("Challenge updated successfully");
+  //     })
+  //     .catch((error) => {
+  //       message.error("Problem updating the story");
+  //     });
+  // };
+
+  // // Choose between saving and updating
+  // const handleSave = (data) => {
+  //   const res = db
+  //     .collection("Epics")
+  //     .doc(data.id)
+  //     .get()
+  //     .then((docSnapshot) => {
+  //       if (docSnapshot.exists) {
+  //         updateEpic(data);
+  //       } else {
+  //         saveEpic(data);
+  //       }
+  //     });
+  // };
+
   return (
     <>
       <div className="flex items-center text-[#A6AE9D] text-[8px] m-0">
@@ -218,109 +260,112 @@ const UserStory = () => {
         <p>High Value</p>
         <p className="text-right">Low Value</p>
       </div>
-
+      
       <div className="flex justify-center mt-8">
         <div className="flex justify-center space-x-10 overflow-x-auto">
-          {epics.map((epic, i) => (
-            <div key={i}>
-              <ArcherContainer strokeColor="#0073B3" noCurves>
-                <Epic
-                  epic={epic}
-                  i={i}
-                  addEpic={addEpic}
-                  handleChangeEpic={handleChangeEpic}
-                  handleChangeStatus={handleChangeStatus}
-                />
+          {epics &&
+            epics.map((epic, i) => (
+              <div key={i}>
+                <ArcherContainer strokeColor="#0073B3" noCurves>
+                  <Epic
+                    epic={epic}
+                    i={i}
+                    addEpic={addEpic}
+                    handleChangeEpic={handleChangeEpic}
+                    handleChangeStatus={handleChangeStatus}
+                  />
 
-                {epic.name === "" ? null : (
-                  <div className="mt-[42.5px]">
-                    <div className="flex items-center space-x-4">
-                      {epic.features.length <= 0 ? (
-                        <ArcherElement id={"add_feature"}>
-                          <Tag
-                            className="flex items-center space-x-1 border-2 border-[#006378] border-dashed px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
-                            icon={<CopyOutlined />}
-                            onClick={() => addFeature(i)}
-                          >
-                            Add Feature
-                          </Tag>
-                        </ArcherElement>
-                      ) : (
-                        epic.features.map((feature, featureIndex) => (
-                          <div key={feature.id}>
-                            <Feature
-                              epic={epic}
-                              feature={feature}
-                              i={i}
-                              featureIndex={featureIndex}
-                              addFeature={addFeature}
-                              handleChangeFeature={handleChangeFeature}
-                              handleChangeFeatureStatus={
-                                handleChangeFeatureStatus
-                              }
-                            />
-                            <ArcherElement
-                              id={`${feature.id}-1`}
-                              relations={[
-                                {
-                                  targetId: feature.id,
-                                  targetAnchor: "bottom",
-                                  sourceAnchor: "top",
-                                  style: {
-                                    strokeDasharray: "4,3",
-                                    endShape: {
-                                      arrow: {
-                                        arrowLength: 4,
-                                        arrowThickness: 1.5,
+                  {epic.name === "" ? null : (
+                    <div className="mt-[42.5px]">
+                      <div className="flex items-center space-x-4">
+                        {epic.features.length <= 0 ? (
+                          <ArcherElement id={"add_feature"}>
+                            <Tag
+                              className="flex items-center space-x-1 border-2 border-[#006378] border-dashed px-[8px] py-[4px] text-[#006378] text-sm rounded cursor-pointer"
+                              icon={<CopyOutlined />}
+                              onClick={() => addFeature(i)}
+                            >
+                              Add Feature
+                            </Tag>
+                          </ArcherElement>
+                        ) : (
+                          epic.features.map((feature, featureIndex) => (
+                            <div key={feature.id}>
+                              <Feature
+                                epic={epic}
+                                feature={feature}
+                                i={i}
+                                featureIndex={featureIndex}
+                                addFeature={addFeature}
+                                handleChangeFeature={handleChangeFeature}
+                                handleChangeFeatureStatus={
+                                  handleChangeFeatureStatus
+                                }
+                              />
+                              <ArcherElement
+                                id={`${feature.id}-1`}
+                                relations={[
+                                  {
+                                    targetId: feature.id,
+                                    targetAnchor: "bottom",
+                                    sourceAnchor: "top",
+                                    style: {
+                                      strokeDasharray: "4,3",
+                                      endShape: {
+                                        arrow: {
+                                          arrowLength: 4,
+                                          arrowThickness: 1.5,
+                                        },
                                       },
                                     },
                                   },
-                                },
-                              ]}
-                            >
-                              <div className="mt-[42.5px] flex flex-col p-[14px] border-2 border-[#0073B3] rounded">
-                                {feature.name === "" ? null : (
-                                  <>
-                                    {feature.stories.length <= 0
-                                      ? null
-                                      : feature.stories.map(
-                                          (story, storyIndex) => (
-                                            <div key={story.id}>
-                                              <Story
-                                                featureIndex={featureIndex}
-                                                story={story}
-                                                storyIndex={storyIndex}
-                                                i={i}
-                                                addStory={addStory}
-                                                handleChangeStory={
-                                                  handleChangeStory
-                                                }
-                                                handleChangeStoryStatus={
-                                                  handleChangeStoryStatus
-                                                }
-                                              />
-                                            </div>
-                                          )
-                                        )}
-                                    <Tag
-                                      className="flex items-center space-x-1 border-2 border-[#0073B3] border-dashed px-[8px] py-[4px] text-[#0073B3] text-sm rounded cursor-pointer"
-                                      onClick={() => addStory(i, featureIndex)}
-                                    >
-                                      Add Story
-                                    </Tag>
-                                  </>
-                                )}
-                              </div>
-                            </ArcherElement>
-                          </div>
-                        ))
-                      )}
+                                ]}
+                              >
+                                <div className="mt-[42.5px] flex flex-col p-[14px] border-2 border-[#0073B3] rounded">
+                                  {feature.name === "" ? null : (
+                                    <>
+                                      {feature.stories.length <= 0
+                                        ? null
+                                        : feature.stories.map(
+                                            (story, storyIndex) => (
+                                              <div key={story.id}>
+                                                <Story
+                                                  featureIndex={featureIndex}
+                                                  story={story}
+                                                  storyIndex={storyIndex}
+                                                  i={i}
+                                                  addStory={addStory}
+                                                  handleChangeStory={
+                                                    handleChangeStory
+                                                  }
+                                                  handleChangeStoryStatus={
+                                                    handleChangeStoryStatus
+                                                  }
+                                                />
+                                              </div>
+                                            )
+                                          )}
+                                      <Tag
+                                        className="flex items-center space-x-1 border-2 border-[#0073B3] border-dashed px-[8px] py-[4px] text-[#0073B3] text-sm rounded cursor-pointer"
+                                        onClick={() =>
+                                          addStory(i, featureIndex)
+                                        }
+                                      >
+                                        Add Story
+                                      </Tag>
+                                    </>
+                                  )}
+                                </div>
+                              </ArcherElement>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </ArcherContainer>
-            </div>
-          ))}
+                  )}
+                </ArcherContainer>
+              </div>
+            ))}
         </div>
 
         <div>

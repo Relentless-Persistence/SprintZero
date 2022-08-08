@@ -141,7 +141,7 @@ export default function Accessiblity() {
         breadCrumbItems={splitRoutes(pathname)}
         mainClass="mr-[174px]"
       >
-        <MainSub>{data && data[0].title}</MainSub>
+        <MainSub>{data ? data[0].title : null}</MainSub>
 
         <MasonryGrid>
           {challengesData && challengesData.length > 0 ? (
