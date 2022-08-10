@@ -44,7 +44,6 @@ const Story = ({
   handleChangeStoryStatus,
 }) => {
   const [openDetail, setOpenDetail] = useState(false);
-  console.log("story", story);
 
   const handleDrawerVisible = (value) => {
     let newVal = !openDetail;
