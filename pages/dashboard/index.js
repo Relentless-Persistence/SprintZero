@@ -11,6 +11,7 @@ import { Button, message } from "antd";
 import { db } from "../../config/firebase-config";
 import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
+import generateString from "../../utils/generateRandomStrings";
 
 const versions = ["v1", "v2", "v3", "All"];
 
@@ -19,8 +20,26 @@ function Home() {
   const activeProduct = useRecoilValue(activeProductState);
   const [epics, setEpics] = useState(null);
   //console.log(pathname);
-  const [version, setVersion] = useState(versions[0]);
+  // const [versions, setVersions] = useState(null);
+  const [version, setVersion] = useState(versions[3]);
   const [savingMode, setSavingMode] = useState(false);
+  const [newVersion, setNewVersion] = useState("")
+
+  const fetchVersions = async () => {
+    if (activeProduct) {
+      const res = await db.collection("versions").where("product_id", "==", activeProduct.id).get();
+      const versions = res.docs.map(doc => ({id: doc.id, ...doc.data()}))
+      setVersions([...versions, {version: "All"}]);
+    }
+  }
+
+  const getVersions = async (versions) => {
+    let newVersion = []
+    await versions.map(item => newVersion.push(item.version))
+    console.log(newVersion);
+    return newVersion
+  }
+  
 
   // Fetch Epics from firebase
   const fetchEpics = async () => {
@@ -30,14 +49,14 @@ function Home() {
         .collection("Epics")
         .where("product_id", "==", activeProduct.id)
         .get();
-      console.log(res.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      
       const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       if (epics.length > 0) {
         setEpics(epics);
       } else {
         setEpics([
           {
-            id: Math.floor(Math.random() * 0x1000000).toString(),
+            id: generateString(20),
             name: "",
             status: "",
             features: [],
@@ -110,7 +129,12 @@ function Home() {
         }
       });
     })
+  
   };
+
+  const addVersion = () => {
+    versions.push("v4")
+  }
 
   return (
     <div className="realtive mb-8">
@@ -123,7 +147,8 @@ function Home() {
       <AppLayout
         ignoreLast={true}
         breadCrumbItems={[`Story Map / ${version}`]}
-        hasSideAdd={false}
+        hasSideAdd={true}
+        onSideAdd={() => addVersion()}
         hasMainAdd={true}
         rightNavItems={versions}
         activeRightItem={version}
@@ -134,14 +159,16 @@ function Home() {
         setActiveRightNav={handleActiveVersion}
       >
         <>
-          {savingMode ? <div className="fixed right-0 bottom-0 w-screen h-screen z-[1000] overflow-hidden bg-gray-900 opacity-60 flex flex-col items-center justify-center">
-            <h2 className="text-center text-white text-xl font-semibold">
-              Saving...
-            </h2>
-            <p className="w-1/3 text-center text-white">
-              This may take a few seconds, please don&apos;t close this page.
-            </p>
-          </div>: null}
+          {savingMode ? (
+            <div className="fixed right-0 bottom-0 w-screen h-screen z-[1000] overflow-hidden bg-gray-900 opacity-60 flex flex-col items-center justify-center">
+              <h2 className="text-center text-white text-xl font-semibold">
+                Saving...
+              </h2>
+              <p className="w-1/3 text-center text-white">
+                This may take a few seconds, please don&apos;t close this page.
+              </p>
+            </div>
+          ) : null}
 
           <UserStory
             epics={epics}

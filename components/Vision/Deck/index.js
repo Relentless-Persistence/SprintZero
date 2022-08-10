@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import StatementCard from "./Card";
 import StatementForm from "../StatementForm";
+import EditVision from '../EditVision';
 
-const Deck = ({ setInfo, activeIndex, list, product, inEditMode }) => {
+const Deck = ({
+  setInfo,
+  activeIndex,
+  list,
+  product,
+  inEditMode,
+  setEditMode,
+}) => {
   const [cards, setCards] = useState(list);
   const cardRefs = useRef();
-
-  console.log(activeIndex);
 
   useEffect(() => {
     setCards(list);
@@ -23,7 +29,7 @@ const Deck = ({ setInfo, activeIndex, list, product, inEditMode }) => {
     <div className="pt-[18px] relative">
       <StatementCard
         info={atTop[0]}
-        onEditClick={null}
+        onEditClick={() => setEditMode(true)}
         style={{
           position: "relative",
           visibility: "hidden",
@@ -33,9 +39,9 @@ const Deck = ({ setInfo, activeIndex, list, product, inEditMode }) => {
       />
 
       {atTop?.map((o, i) => (
-        <StatementCard
+        inEditMode == false ? <StatementCard
           info={o}
-          onEditClick={setInfo}
+          onEditClick={() => setEditMode(true)}
           style={{
             transform: `translateY(${(length - i - 1) * 10}px)`,
             zIndex: i,
@@ -44,13 +50,13 @@ const Deck = ({ setInfo, activeIndex, list, product, inEditMode }) => {
           product={product}
           isActive={i === cards.length - activeIndex - 1}
           key={o.createdAt}
-        />
+        /> : <EditVision info={o} inEditMode={inEditMode} setEditMode={setEditMode} />
       ))}
 
       {movedDown?.map((o, i) => (
         <StatementCard
           info={o}
-          onEditClick={setInfo}
+          onEditClick={() => setEditMode(true)}
           index={i}
           product={product}
           style={{

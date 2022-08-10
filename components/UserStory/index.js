@@ -16,44 +16,15 @@ import Story from "./Story";
 import { db } from "../../config/firebase-config";
 import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
+import generateString from '../../utils/generateRandomStrings';
 
 const UserStory = ({ epics, setEpics, activeProduct }) => {
- 
-
-  // // Fetch Epics from firebase
-  // const fetchEpics = async () => {
-  //   // console.log(activeProduct.id);
-  //   if (activeProduct) {
-  //     const res = await db
-  //       .collection("Epics")
-  //       .where("product_id", "==", activeProduct.id)
-  //       .get();
-  //     console.log(res.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-  //     const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  //     if (epics.length > 0) {
-  //       setEpics(epics);
-  //     } else {
-  //       setEpics([
-  //         {
-  //           id: Math.floor(Math.random() * 0x1000000).toString(),
-  //           name: "",
-  //           status: "",
-  //           features: [],
-  //         },
-  //       ]);
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchEpics();
-  // }, [activeProduct]);
 
   const addEpic = () => {
     setEpics([
       ...epics,
       {
-        id: Math.floor(Math.random() * 0x1000000).toString(),
+        id: generateString(20),
         name: "",
         features: [],
       },
@@ -95,7 +66,7 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
         features: {
           $push: [
             {
-              id: Math.floor(Math.random() * 0x1000000).toString(),
+              id: generateString(20),
               name: "",
               status: "",
               stories: [],
@@ -150,7 +121,7 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
             stories: {
               $push: [
                 {
-                  id: Math.floor(Math.random() * 0x1000000).toString(),
+                  id: generateString(20),
                   name: "",
                   status: "",
                 },
@@ -205,49 +176,6 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
     }
   };
 
-  // // Persist Epic to DB
-  // const saveEpic = (data) => {
-  //   const { id, ...info } = data;
-  //   db.collection("Epics")
-  //     .doc(id)
-  //     .set(info)
-  //     .then((docRef) => {
-  //       message.success("User Stories saved");
-  //     })
-  //     .catch((error) => {
-  //       message.error("Problem saving story");
-  //     });
-  // };
-
-  // // Update Epic in DB
-  // const updateEpic = async (data) => {
-  //   const { id, ...info } = data;
-  //   await db
-  //     .collection("Epics")
-  //     .doc(id)
-  //     .update(info)
-  //     .then(() => {
-  //       message.success("Challenge updated successfully");
-  //     })
-  //     .catch((error) => {
-  //       message.error("Problem updating the story");
-  //     });
-  // };
-
-  // // Choose between saving and updating
-  // const handleSave = (data) => {
-  //   const res = db
-  //     .collection("Epics")
-  //     .doc(data.id)
-  //     .get()
-  //     .then((docSnapshot) => {
-  //       if (docSnapshot.exists) {
-  //         updateEpic(data);
-  //       } else {
-  //         saveEpic(data);
-  //       }
-  //     });
-  // };
 
   return (
     <>
