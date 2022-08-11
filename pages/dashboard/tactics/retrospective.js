@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { Dropdown, Card, Avatar, Divider } from "antd";
+import { Dropdown, Card, Avatar, Divider, message } from "antd";
 
 import { SortAscendingOutlined } from "@ant-design/icons";
 
@@ -23,11 +23,11 @@ import AddItem from "../../../components/Retrospective/AddItem";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
-import {useAuth} from '../../../contexts/AuthContext'
+import { useAuth } from "../../../contexts/AuthContext";
 import { findIndex } from "lodash";
 
 const { Meta } = Card;
-const types = ["Enjoyable", "Puzzling", "Frustrating"]
+const types = ["Enjoyable", "Puzzling", "Frustrating"];
 
 const MyCard = styled(Card)`
   position: relative;
@@ -62,10 +62,9 @@ const MyCard = styled(Card)`
 `;
 
 export default function Retrospective() {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const { pathname } = useRouter();
-  // const user = "Arlene McCoy";
-  console.log(user);
+
   const activeProduct = useRecoilValue(activeProductState);
   const [data, setData] = useState(null);
 
@@ -77,7 +76,7 @@ export default function Retrospective() {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const handleRightNav = (name) => {
-    const index = findIndex(types, (o) => o === name)
+    const index = findIndex(types, (o) => o === name);
 
     if (index > -1) {
       setActiveTabIndex(index);
@@ -92,29 +91,33 @@ export default function Retrospective() {
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
           setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-          console.log(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
         });
     }
   };
 
   useEffect(() => {
     fetchRetrospects();
-  },[activeProduct])
+  }, [activeProduct]);
 
-  const onEdit = (item) => {
-    const newData = { ...data };
+  const onEdit = async (item) => {
+    console.log(item);
 
-    const card =
-      newData[activeProduct][activeTabIndex].comments[activeEditIndex];
-
-    card.title = item.title;
-    card.text = item.description;
-
-    setData(newData);
-
-    setActiveEditIndex(null);
+    const data = {
+      title: item.title,
+      description: item.description,
+    };
+    await db
+      .collection("Retrospectives")
+      .doc(item.id)
+      .update(data)
+      .then(() => {
+        message.success("Retrospective updated successfully");
+        setActiveEditIndex(null);
+      })
+      .catch((error) => {
+        console.log(error);
+        message.error("An error occurred");
+      });
   };
 
   const addRetro = () => {
@@ -156,63 +159,73 @@ export default function Retrospective() {
         onMainAdd={() => setShowAdd(true)}
         breadCrumbItems={splitRoutes(pathname)}
       >
-        {/* {data[activeProduct][activeTabIndex]?.comments?.length ? (
+        {data ? (
           <MasonryGrid>
-            {data[activeProduct][activeTabIndex].comments.map((c, i) =>
-              i === activeEditIndex ? (
-                <>
-                  <ActionFormCard
-                    title={c.title}
-                    description={c.text}
+            {data
+              .filter((item) => item.type === types[activeTabIndex])
+              .map((c, i) =>
+                i === activeEditIndex ? (
+                  <>
+                    <ActionFormCard
+                      title={c.title}
+                      description={c.description}
+                      id={c.id}
+                      className="mb-[16px]"
+                      onCancel={() => setActiveEditIndex(null)}
+                      onSubmit={onEdit}
+                    />
+                  </>
+                ) : (
+                  <MyCard
                     className="mb-[16px]"
-                    onCancel={() => setActiveEditIndex(null)}
-                    onSubmit={onEdit}
-                  />
-                </>
-              ) : (
-                <MyCard
-                  className="mb-[16px]"
-                  //extra={ user === c.name ? <CardHeaderLink>Edit</CardHeaderLink> : null }
-                  key={i}
-                >
-                  <Meta
-                    avatar={
-                      <Avatar
-                        size={48}
-                        src={c.avatar}
-                        style={{
-                          border: "2px solid #315613",
-                        }}
-                      />
-                    }
-                    title={c.name}
-                    description={c.role}
-                  />
+                    // extra={ user === c.name ? <CardHeaderLink>Edit</CardHeaderLink> : null }
+                    key={i}
+                  >
+                    <Meta
+                      avatar={
+                        <Avatar
+                          size={48}
+                          src={c.user?.photo}
+                          style={{
+                            border: "2px solid #315613",
+                          }}
+                        />
+                      }
+                      title={c.user?.name}
+                      // description={c.role}
+                    />
 
-                  {user === c.name ? (
-                    <CardHeaderLink
-                      onClick={() => setActiveEditIndex(i)}
-                      className="absolute top-[28px] right-[16px]"
-                    >
-                      Edit
-                    </CardHeaderLink>
-                  ) : null}
+                    {user.uid === c.user?.id ? (
+                      <CardHeaderLink
+                        onClick={() => setActiveEditIndex(i)}
+                        className="absolute top-[28px] right-[16px]"
+                      >
+                        Edit
+                      </CardHeaderLink>
+                    ) : null}
 
-                  <article>
-                    <h5>{c.title}</h5>
-                    <p>{c.text}</p>
-                  </article>
+                    <article>
+                      <h5>{c.title}</h5>
+                      <p>{c.description}</p>
+                    </article>
 
-                  <br />
-                </MyCard>
-              )
-            )}
+                    <br />
+                  </MyCard>
+                )
+              )}
           </MasonryGrid>
         ) : (
           <h3 className="text-center">Add Item</h3>
-        )} */}
+        )}
 
-        <AddItem show={showAdd} onSubmit={addRetro} setShow={setShowAdd} user={user} product={activeProduct} type={types[activeTabIndex]} />
+        <AddItem
+          show={showAdd}
+          onSubmit={addRetro}
+          setShow={setShowAdd}
+          user={user}
+          product={activeProduct}
+          type={types[activeTabIndex]}
+        />
       </AppLayout>
     </div>
   );
