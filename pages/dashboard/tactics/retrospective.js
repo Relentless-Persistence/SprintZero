@@ -23,9 +23,11 @@ import AddItem from "../../../components/Retrospective/AddItem";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
+import {useAuth} from '../../../contexts/AuthContext'
+import { findIndex } from "lodash";
 
 const { Meta } = Card;
-const boards = ["Board 0", "Board 1", "Board 2", "Board 3", "Board 4"]
+const types = ["Enjoyable", "Puzzling", "Frustrating"]
 
 const MyCard = styled(Card)`
   position: relative;
@@ -60,12 +62,14 @@ const MyCard = styled(Card)`
 `;
 
 export default function Retrospective() {
+  const {user} = useAuth();
   const { pathname } = useRouter();
-  const user = "Arlene McCoy";
+  // const user = "Arlene McCoy";
+  console.log(user);
+  const activeProduct = useRecoilValue(activeProductState);
+  const [data, setData] = useState(null);
 
-  const [data, setData] = useState(fakeData);
-
-  const [activeProduct, setActiveProduct] = useState(products[0]);
+  // const [activeProduct, setActiveProduct] = useState(products[0]);
   const [activeEditIndex, setActiveEditIndex] = useState(null);
 
   const [showAdd, setShowAdd] = useState(false);
@@ -73,30 +77,31 @@ export default function Retrospective() {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const handleRightNav = (name) => {
-    const index = data[activeProduct].findIndex((card) => card.title === name);
+    const index = findIndex(types, (o) => o === name)
 
     if (index > -1) {
       setActiveTabIndex(index);
     }
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    setActiveTabIndex(0);
-  };
-
   // Fetch data from firebase
   const fetchRetrospects = async () => {
     if (activeProduct) {
       const res = db
-        .collection("Restrospects")
+        .collection("Retrospectives")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
           setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
         });
     }
   };
 
+  useEffect(() => {
+    fetchRetrospects();
+  },[activeProduct])
 
   const onEdit = (item) => {
     const newData = { ...data };
@@ -112,7 +117,7 @@ export default function Retrospective() {
     setActiveEditIndex(null);
   };
 
-  const addRetro = (dto) => {
+  const addRetro = () => {
     const newData = { ...data };
 
     const comments = newData[activeProduct][activeTabIndex].comments;
@@ -141,26 +146,17 @@ export default function Retrospective() {
       </Head>
 
       <AppLayout
-        rightNavItems={["Enjoyable", "Puzzling", "Frustrating"]}
-        activeRightItem={data[activeProduct][activeTabIndex].title}
-        onChangeProduct={setProduct}
+        rightNavItems={types}
+        activeRightItem={types[activeTabIndex]}
         setActiveRightNav={handleRightNav}
         mainClass="mr-[128px]"
         addNewClass="px-[16px] min-w-[92px]"
         hasSideAdd={false}
-        // topExtra={ <MyBtn
-        //     className=""
-        //     overlay={ <></> }
-        //     onClick={ () => { } }
-        // //icon={ <SortAscendingOutlined /> }
-        // >
-        //     Sort
-        // </MyBtn> }
         hasMainAdd
         onMainAdd={() => setShowAdd(true)}
         breadCrumbItems={splitRoutes(pathname)}
       >
-        {data[activeProduct][activeTabIndex]?.comments?.length ? (
+        {/* {data[activeProduct][activeTabIndex]?.comments?.length ? (
           <MasonryGrid>
             {data[activeProduct][activeTabIndex].comments.map((c, i) =>
               i === activeEditIndex ? (
@@ -214,9 +210,9 @@ export default function Retrospective() {
           </MasonryGrid>
         ) : (
           <h3 className="text-center">Add Item</h3>
-        )}
+        )} */}
 
-        <AddItem show={showAdd} onSubmit={addRetro} setShow={setShowAdd} />
+        <AddItem show={showAdd} onSubmit={addRetro} setShow={setShowAdd} user={user} product={activeProduct} type={types[activeTabIndex]} />
       </AppLayout>
     </div>
   );
