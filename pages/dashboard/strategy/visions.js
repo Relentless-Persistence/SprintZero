@@ -34,7 +34,6 @@ const generateRightNav = (items) => {
 
 export default function Visions() {
   const [visionData, setVisionData] = useState([]);
-  // const [activeProduct, setActiveProduct] = useState(products[0]);
   const activeProduct = useRecoilValue(activeProductState); // get active product from recoil state
   const [vision, setVision] = useState(
     visionData.length > 0 ? visionData[0].createdAt : "Now"
