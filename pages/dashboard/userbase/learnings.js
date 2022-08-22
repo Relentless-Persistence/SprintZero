@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Radio } from "antd";
+import { Radio, message } from "antd";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import {
@@ -9,33 +10,32 @@ import {
   ActionFormCard2,
 } from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
-import { splitRoutes } from "../../../utils";
+import { splitRoutes, timeScale } from "../../../utils";
 
 import fakeData from "../../../fakeData/learnings.json";
 import products from "../../../fakeData/products.json";
 import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 import { RadioButtonWithFill } from "../../../components/AppRadioBtn";
 import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
+import { findIndex } from "lodash";
 
-const getNames = (learnings) => {
-  const names = learnings.map((g) => g.name);
-
-  return names;
-};
+const names = ["Validated", "Assumed", "Disproven"];
 
 export default function Learnings() {
   const { pathname } = useRouter();
 
-  const [data, setData] = useState(fakeData);
+  const activeProduct = useRecoilValue(activeProductState);
+  const [data, setData] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
 
-  const [activeProduct, setActiveProduct] = useState(products[0]);
 
-  const [activeLearning, setActiveLearning] = useState(data[activeProduct][0]);
+  const [activeLearning, setActiveLearning] = useState(names[0]);
 
-  const [learningName, setLearningName] = useState(activeLearning.name);
+  const [learningName, setLearningName] = useState(activeLearning);
 
-  const [temp, setTemp] = useState(learningName);
+  const [temp, setTemp] = useState(null);
 
   // Fetch data from firebase
   const fetchLearnings = async () => {
@@ -43,20 +43,27 @@ export default function Learnings() {
       const res = db
         .collection("Learnings")
         .where("product_id", "==", activeProduct.id)
+        .where("type", "==", activeLearning)
         .onSnapshot((snapshot) => {
           setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
         });
     }
   };
 
+  useEffect(() => {
+    fetchLearnings();
+  }, [activeProduct, activeLearning]);
+
   const setLearning = (name, product) => {
-    const learning = data[product || activeProduct].find(
-      (learning) => learning.name === name
+    const learningIndex = findIndex(
+      names,
+      (o) => o === name
     );
 
-    setActiveLearning(learning);
-    setLearningName(learning.name);
-    setTemp(learning.name);
+    setActiveLearning(names[learningIndex]);
   };
 
   const setProduct = (product) => {
@@ -73,50 +80,48 @@ export default function Learnings() {
   };
 
   const addItemDone = (item) => {
-    const newData = { ...data };
-    const learning = newData[activeProduct].find(
-      (learning) => learning.name === learningName
-    );
-
-    learning?.data.push({
+    console.log(item)
+    const data = {
       name: item.title,
       description: item.description,
-      id: new Date().getTime(),
-    });
-
-    setData(newData);
+      type: activeLearning,
+      product_id: activeProduct.id,
+    };
+    db.collection("Learnings")
+      .add(data)
+      .then((docRef) => {
+        message.success("New item added successfully");
+      })
+      .catch((error) => {
+        message.error("Error adding item");
+      });
     setShowAdd(false);
   };
 
-  const editItem = (resultIndex, item) => {
-    const newData = { ...data };
-    const learning = newData[activeProduct].find(
-      (learning) => learning.name === learningName
-    );
+  const editItem = async (id, item) => {
+    
+    const data = temp
+      ? {
+          name: item.title,
+          description: item.description,
+          type: temp,
+        }
+      : {
+          name: item.title,
+          description: item.description,
+        };
 
-    const newItem = {
-      id: item.id,
-      name: item.title,
-      description: item.description,
-    };
-
-    if (temp && temp !== learningName) {
-      learning.data = learning.data.filter((d) => d.id !== newItem.id);
-
-      const newLearning = newData[activeProduct].find(
-        (learning) => learning.name === temp
-      );
-
-      newLearning.data.push(newItem);
-    } else {
-      learning.data[resultIndex] = newItem;
-    }
-
-    setData(newData);
-    setTemp("");
+    await db.collection("Learnings").doc(id).update(data)
+    .then(() => {
+      message.success("Learning updated successfully");
+    })
+    .catch(err => {
+      console.log(err);
+    })
+    
   };
 
-  const rightNav = getNames(data[activeProduct]);
+  // const rightNav = getNames(data[activeProduct]);
 
   return (
     <div className="mb-8">
@@ -127,9 +132,8 @@ export default function Learnings() {
       </Head>
 
       <AppLayout
-        onChangeProduct={setProduct}
-        rightNavItems={rightNav}
-        activeRightItem={activeLearning?.name}
+        rightNavItems={names}
+        activeRightItem={activeLearning}
         setActiveRightNav={setLearning}
         onMainAdd={addItem}
         hasMainAdd
@@ -142,28 +146,29 @@ export default function Learnings() {
             <ActionFormCard
               headerSmall
               className="mb-[16px]"
+              onCancel={() => setShowAdd(false)}
               onSubmit={addItemDone}
-              extraItems={
-                <Radio.Group
-                  className="mt-[12px] grid grid-cols-3"
-                  size="small"
-                >
-                  {rightNav.map((opt, i) => (
-                    <RadioButtonWithFill
-                      key={i}
-                      checked={opt === learningName}
-                      onChange={() => setLearningName(opt)}
-                      value={opt}
-                    >
-                      {opt}
-                    </RadioButtonWithFill>
-                  ))}
-                </Radio.Group>
-              }
+              // extraItems={
+              //   <Radio.Group
+              //     className="mt-[12px] grid grid-cols-3"
+              //     size="small"
+              //   >
+              //     {names.map((opt, i) => (
+              //       <RadioButtonWithFill
+              //         key={i}
+              //         checked={opt === learningName}
+              //         onChange={() => setLearningName(opt)}
+              //         value={opt}
+              //       >
+              //         {opt}
+              //       </RadioButtonWithFill>
+              //     ))}
+              //   </Radio.Group>
+              // }
             />
           ) : null}
 
-          {activeLearning?.data.map((res, i) => (
+          {data && data.map((res, i) => (
             <ItemCard
               headerSmall
               extraItems={
@@ -171,10 +176,10 @@ export default function Learnings() {
                   className="mt-[12px] grid grid-cols-3"
                   size="small"
                 >
-                  {rightNav.map((opt, i) => (
+                  {names.map((opt, i) => (
                     <RadioButtonWithFill
                       key={i}
-                      checked={opt === temp}
+                      checked={opt === res.type}
                       onChange={() => setTemp(opt)}
                       value={opt}
                     >
@@ -184,8 +189,8 @@ export default function Learnings() {
                 </Radio.Group>
               }
               useBtn
-              key={i}
-              onEdit={(item) => editItem(i, item)}
+              key={res.id}
+              onEdit={(item) => editItem(res.id, item)}
               item={res}
             />
           ))}
