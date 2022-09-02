@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 // import Image from "next/image";
 import { Button, Typography, message, Image } from "antd";
@@ -23,9 +23,10 @@ const Login = () => {
     if (user) {
       router.push("/dashboard");
     }
-  }, [user])
+  }, [])
 
   const handleOnClick = (provider) => {
+    
     try {
       auth.signInWithPopup(provider).then(async (res) => {
         var user = res.user;

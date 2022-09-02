@@ -9,11 +9,12 @@ import { splitRoutes, getTimeAgo } from "../../../utils";
 
 import fakeData from "../../../fakeData/huddleData.json";
 import products from "../../../fakeData/products.json";
-import HuddleCard from "../../../components/Hubble/Huddle";
+import HuddleCard from "../../../components/Huddle";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const generateRightNav = (items) => {
   if (!items?.length) {
@@ -28,9 +29,11 @@ const generateRightNav = (items) => {
 
 export default function Huddle() {
   const { pathname } = useRouter();
+  const user = useAuth();
   const activeProduct = useRecoilValue(activeProductState);
 
   const [data, setData] = useState([]);
+  const [blockers, setBlockers] = useState(null);
   const [activeTimeIndex, setActiveTimeIndex] = useState(0);
   const [activeTime, setActiveTime] = useState(
     data.length > 0 ? data[0].createdAt : "Now"
@@ -59,8 +62,23 @@ export default function Huddle() {
     }
   };
 
+  const fetchHuddleBlockers = async () => {
+    if (activeProduct) {
+      const res = db
+        .collection("huddleBlockers")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setBlockers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
+  };
+
   useEffect(() => {
     fetchHuddles();
+    fetchHuddleBlockers();
   }, [activeProduct])
 
   const setActiveRightNav = (date) => {
@@ -146,14 +164,15 @@ export default function Huddle() {
         <Row className="max-w-[1200px] overflow-x-auto" gutter={[16, 16]}>
           {activeTime ? (
             <>
-              {data?.map((c, index) => (
+              {data?.map((huddle, index) => (
                 <Col className="flex" key={index} span={8}>
                   <HuddleCard
-                    comment={c}
+                    huddle={huddle}
                     handleCheck={handleCheck}
                     onClickAddNew={onClickAddNew}
                     doneAddNew={doneAddNew}
                     index={index}
+                    blockers={blockers}
                   />
                 </Col>
               ))}

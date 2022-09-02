@@ -34,13 +34,14 @@ const MyCard = styled(Card)`
 `;
 
 const HuddleCard = ({
-  comment,
+  huddle,
   handleCheck,
   onClickAddNew,
-  doneAddNew,
+  doneAddNew, 
   index,
+  blockers
 }) => {
-    console.log(comment)
+  console.log(huddle);
   const [showAddNews, setShowAddNews] = useState({
     blockers: false,
     today: false,
@@ -53,42 +54,42 @@ const HuddleCard = ({
     yesterday: "",
   });
 
-  const clickAddNew = (sectionKey, cardIndex) => {
-    setShowAddNews({
-      ...showAddNews,
-      [sectionKey]: true,
-    });
+  // const clickAddNew = (sectionKey, cardIndex) => {
+  //   setShowAddNews({
+  //     ...showAddNews,
+  //     [sectionKey]: true,
+  //   });
 
-    onClickAddNew(sectionKey, cardIndex);
-  };
+  //   onClickAddNew(sectionKey, cardIndex);
+  // };
 
-  const onChange = (e, field) => {
-    setAddText({
-      ...addText,
-      [field]: e.target.value,
-    });
-  };
+  // const onChange = (e, field) => {
+  //   setAddText({
+  //     ...addText,
+  //     [field]: e.target.value,
+  //   });
+  // };
 
-  const reset = (sectionKey) => {
-    setShowAddNews({
-      ...showAddNews,
-      [sectionKey]: false,
-    });
+  // const reset = (sectionKey) => {
+  //   setShowAddNews({
+  //     ...showAddNews,
+  //     [sectionKey]: false,
+  //   });
 
-    setAddText({
-      ...addText,
-      [sectionKey]: "",
-    });
-  };
+  //   setAddText({
+  //     ...addText,
+  //     [sectionKey]: "",
+  //   });
+  // };
 
-  const onDone = (e, sectionKey, cardIndex) => {
-    const val = addText[sectionKey];
+  // const onDone = (e, sectionKey, cardIndex) => {
+  //   const val = addText[sectionKey];
 
-    if (e.key === "Enter") {
-      console.log(88);
-      doneAddNew(sectionKey, cardIndex, val, () => reset(sectionKey));
-    }
-  };
+  //   if (e.key === "Enter") {
+  //     console.log(88);
+  //     doneAddNew(sectionKey, cardIndex, val, () => reset(sectionKey));
+  //   }
+  // };
 
   return (
     <MyCard
@@ -98,14 +99,14 @@ const HuddleCard = ({
           avatar={
             <Avatar
               size={48}
-              src={comment.user.avatar}
+              src={huddle.user.avatar}
               style={{
                 border: "2px solid #315613",
               }}
             />
           }
-          title={comment.user.name}
-          description={comment.role || "Developer"}
+          title={huddle.user.name}
+          description={huddle.role || "Developer"}
         />
       }
     >
@@ -113,11 +114,11 @@ const HuddleCard = ({
         <div className="section">
           <h4>Blockers</h4>
 
-          {comment.data?.blockers?.length ? (
+          {huddle.data?.blockers?.length ? (
             <ul>
-              {comment.data?.blockers.map((d, i) =>
+              {huddle.data?.blockers.map((d, i) =>
                 !(
-                  i == comment.data?.blockers.length - 1 && showAddNews.blockers
+                  i == huddle.data?.blockers.length - 1 && showAddNews.blockers
                 ) ? (
                   <li key={i}>
                     <Checkbox
@@ -155,10 +156,10 @@ const HuddleCard = ({
         <div className="section">
           <h4>Today</h4>
 
-          {comment.data?.today?.length ? (
+          {huddle.data?.today?.length ? (
             <ul>
-              {comment.data?.today?.map((d, i) =>
-                !(i == comment.data?.today.length - 1 && showAddNews.today) ? (
+              {huddle.data?.today?.map((d, i) =>
+                !(i == huddle.data?.today.length - 1 && showAddNews.today) ? (
                   <li key={i}>
                     <Checkbox
                       onChange={() => handleCheck(i, "today", index)}
@@ -195,11 +196,11 @@ const HuddleCard = ({
         <div className="section">
           <h4>Yesterday</h4>
 
-          {comment.data?.yesterday?.length ? (
+          {huddle.data?.yesterday?.length ? (
             <ul>
-              {comment.data?.yesterday?.map((d, i) =>
+              {huddle.data?.yesterday?.map((d, i) =>
                 !(
-                  i == comment.data?.yesterday.length - 1 &&
+                  i == huddle.data?.yesterday.length - 1 &&
                   showAddNews.yesterday
                 ) ? (
                   <li key={i}>

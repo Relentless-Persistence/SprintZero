@@ -485,14 +485,16 @@ export default function Sprint() {
               marginBottom: "20px",
             }}
           >
-            <Board
-              colCount={data.length}
-              onDrop={handleDrop}
-              // onSwap={handleSwap}
-              columns={data}
-              renderColumn={renderCol}
-              columnHeaderRenders={[null, null, null]}
-            />
+            {data && (
+              <Board
+                colCount={data.length}
+                onDrop={handleDrop}
+                // onSwap={handleSwap}
+                columns={data}
+                renderColumn={renderCol}
+                columnHeaderRenders={[null, null, null]}
+              />
+            )}
           </div>
         </div>
 

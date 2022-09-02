@@ -51,6 +51,7 @@ function Home() {
         .get();
       
       const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      console.log(epics)
       if (epics.length > 0) {
         setEpics(epics);
       } else {

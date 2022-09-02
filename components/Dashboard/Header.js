@@ -13,6 +13,7 @@ import light from "../light.svg";
 import { productsState, activeProductState } from "../../atoms/productAtom";
 import { db } from "../../config/firebase-config";
 import { useRecoilState } from "recoil";
+import { isEmpty } from "lodash";
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -47,20 +48,24 @@ const AppHeader = ({ onChangeProduct }) => {
   const [settingsMenuDrawer, setSettingsMenuDrawer] = useState(false);
 
   const fetchProducts = async () => {
-    if(user) {
+    if (user) {
       const res = await db
         .collection("Product")
         .where("owner", "==", user.uid)
         .get();
-    const products = res.docs.map((doc) => ({id: doc.id, ...doc.data()}));
-      setProducts(products);
-      setActiveProduct(products[0]);
+      const products = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      if (isEmpty(products)) {
+        router.push("/product");
+      } else {
+        setProducts(products);
+        setActiveProduct(products[0]);
+      }
     }
   };
 
   useEffect(() => {
-      fetchProducts();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (
