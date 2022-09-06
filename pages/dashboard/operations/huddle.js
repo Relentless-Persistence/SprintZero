@@ -17,18 +17,15 @@ import { findIndex } from "lodash";
 import { useAuth } from "../../../contexts/AuthContext";
 import { isToday, isYesterday } from "date-fns";
 
-const intervals = ["Today", "Yesterday", "2 days ago", "3 days ago", "1 week ago", "2 weeks ago", "1 month ago"]
-
-const generateRightNav = (items) => {
-  if (!items?.length) {
-    return ["Now"];
-  }
-
-  return items.map((it) => ({
-    render: () => getTimeAgo(it.createdAt),
-    value: it.createdAt,
-  }));
-};
+const intervals = [
+  "Today",
+  "Yesterday",
+  "2 days ago",
+  "3 days ago",
+  "1 week ago",
+  "2 weeks ago",
+  "1 month ago",
+];
 
 export default function Huddle() {
   const { pathname } = useRouter();
@@ -39,13 +36,14 @@ export default function Huddle() {
   const [team, setTeam] = useState(null);
   const [blockers, setBlockers] = useState(null);
   const [activeTimeIndex, setActiveTimeIndex] = useState(0);
-  const [activeTime, setActiveTime] = useState(
-    data.length > 0 ? data[0].createdAt : "Now"
-  );
+  const [activeTime, setActiveTime] = useState(intervals[0]);
+  const [today, setToday] = useState(null);
+  const [yesterday, setYesterday] = useState(null);
+  const [blocker, setBlocker] = useState(null);
 
   // Fetch teams form firebase
   const fetchTeam = async () => {
-    if(activeProduct) {
+    if (activeProduct) {
       const res = db
         .collection("teams")
         .where("product_id", "==", activeProduct.id)
@@ -53,7 +51,7 @@ export default function Huddle() {
           setTeam(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         });
     }
-  }
+  };
 
   // Fetch data from firebase
   const fetchHuddles = async () => {
@@ -66,18 +64,7 @@ export default function Huddle() {
           console.log(
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
-          // setActiveTime(
-          //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).length >
-          //     0
-          //     ? snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))[0]
-          //         .createdAt
-          //     : "Now"
-          // );
-        //   console.log(
-        //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        // );
         });
-       
     }
   };
 
@@ -87,7 +74,9 @@ export default function Huddle() {
         .collection("huddleBlockers")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
-          setBlockers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          setBlockers(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
           // console.log(
           //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           // );
@@ -99,70 +88,64 @@ export default function Huddle() {
     fetchTeam();
     fetchHuddles();
     fetchHuddleBlockers();
-  }, [activeProduct])
+  }, [activeProduct]);
 
-  const setActiveRightNav = (date) => {
-    const activeData = data;
-
-    const huddleIndex = activeData.findIndex((v) => v.createdAt === date);
-
-    if (huddleIndex > -1) {
-      const huddle = activeData[huddleIndex];
-      setActiveTime(huddle.createdAt);
-      setActiveTimeIndex(huddleIndex);
+  const todayFilterInterval = (item) => {
+    switch (activeTime) {
+      case "Today":
+        setToday(
+          data.filter(
+            (huddle) =>
+              huddle.user.uid === item.user.uid &&
+              isToday(new Date(huddle.createdAt))
+          )
+        );
+        break;
+      default:
+        break;
     }
   };
 
-  const handleCheck = (itemIndex, sectionKey, cardIndex) => {
-    // const newData = { ...data };
-    // const activeData = newData;
-    // const comments = activeData[activeTimeIndex].comments;
-
-    // comments[cardIndex].data[sectionKey][itemIndex].complete =
-    //   !comments[cardIndex].data[sectionKey][itemIndex].complete;
-
-    // setData(newData);
-    alert("More discussions needed here")
+  const yesterdayFilterInterval = (item) => {
+    switch (activeTime) {
+      case "Today":
+        setYesterday(
+          data.filter(
+            (huddle) =>
+              huddle.user.uid === item.user.uid &&
+              isYesterday(new Date(huddle.createdAt))
+          )
+        );
+        break;
+      default:
+        break;
+    }
   };
 
-  const onClickAddNew = (sectionKey, cardIndex) => {
-    // const newData = { ...data };
-    // const activeData = newData[activeProduct];
-    // const comments = activeData[activeTimeIndex].comments;
-
-    // comments[cardIndex].data[sectionKey].push({
-    //   text: "",
-    //   complete: false,
-    // });
-
-    // setData(newData);
-    alert("More discussions needed here");
+  const blockerFilterInterval = (item) => {
+    switch (activeTime) {
+      case "Today":
+        setBlocker(
+          blockers.filter(
+            (blocker) =>
+              blocker.user.uid === item.user.uid &&
+              isToday(new Date(blocker.createdAt))
+          )
+        );
+        break;
+      default:
+        break;
+    }
   };
 
-  const doneAddNew = (sectionKey, cardIndex, value, callback) => {
-    // const newData = { ...data };
-    // const activeData = newData[activeProduct];
-    // let comments = activeData[activeTimeIndex].comments;
+  const setActiveRightNav = (interval) => {
+    const huddleIndex = findIndex(intervals, (v) => v === interval);
 
-    // const val = value?.trim() || "";
-
-    // if (val) {
-    //   const length = comments[cardIndex].data[sectionKey].length - 1;
-    //   comments[cardIndex].data[sectionKey][length].text = val;
-    // } else {
-    //   comments[cardIndex].data[sectionKey] = comments[cardIndex].data[
-    //     sectionKey
-    //   ].filter((x) => {
-    //     return x?.text?.trim().length > 0;
-    //   });
-    // }
-
-    // setData(newData);
-    // callback();
-    alert("More discussions needed here");
+    if (huddleIndex > -1) {
+      setActiveTime(intervals[huddleIndex]);
+      setActiveTimeIndex(huddleIndex);
+    }
   };
-
-  const rightNav = generateRightNav(data);
 
   return (
     <div>
@@ -176,8 +159,8 @@ export default function Huddle() {
         hasSideAdd={false}
         // defaultText={getTimeAgo(data.length > 0 ? data[0].createdAt : "Now")}
         rightNavItems={intervals}
-        // setActiveRightNav={setActiveRightNav}
-        // activeRightItem={activeTime}
+        setActiveRightNav={setActiveRightNav}
+        activeRightItem={activeTime}
         mainClass="mr-[140px]"
         breadCrumbItems={splitRoutes(pathname)}
       >
@@ -187,16 +170,18 @@ export default function Huddle() {
               {team?.map((item, index) => (
                 <Col className="flex" key={index} span={8}>
                   <HuddleCard
-                    today={data
-                      .filter((huddle) => huddle.user.uid === item.user.uid && isToday(new Date(huddle.createdAt)))}
-                    yesterday={data
-                      .filter((huddle) => huddle.user.uid === item.user.uid && isYesterday(new Date(huddle.createdAt)))}
+                    today={data.filter(
+                      (huddle) =>
+                        huddle.user.uid === item.user.uid &&
+                        isToday(new Date(huddle.createdAt))
+                    )}
+                    yesterday={data.filter(
+                      (huddle) =>
+                        huddle.user.uid === item.user.uid &&
+                        isYesterday(new Date(huddle.createdAt))
+                    )}
                     member={item}
                     product={activeProduct}
-                    // handleCheck={handleCheck}
-                    // onClickAddNew={onClickAddNew}
-                    // doneAddNew={doneAddNew}
-                    // index={index}
                     blockers={blockers.filter(
                       (blocker) => blocker.user.uid === item.user.uid
                     )}

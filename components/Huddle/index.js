@@ -40,10 +40,6 @@ const HuddleCard = ({
   yesterday,
   member,
   product,
-  handleCheck,
-  onClickAddNew,
-  doneAddNew, 
-  index,
   blockers
 }) => {
   const [showAddNewBlocker, setShowAddNewBlocker] = useState(false);
@@ -62,7 +58,7 @@ const HuddleCard = ({
             user: member.user,
             completed: false,
             title: newBlocker,
-            createdAt: new Date(),
+            createdAt: new Date().toString(),
             product_id: product.id,
           })
           .then((docRef) => {
@@ -134,7 +130,7 @@ const HuddleCard = ({
             user: member.user,
             completed: false,
             title: newYesterday,
-            createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
+            createdAt: new Date(new Date().setDate(new Date().getDate() - 1)).toString(),
             product_id: product.id,
           })
           .then((docRef) => {
