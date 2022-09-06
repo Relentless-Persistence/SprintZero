@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Card, Checkbox, Input, Avatar } from "antd";
+import { Card, Checkbox, Input, Avatar, message } from "antd";
 import AppCheckbox from "../AppCheckbox";
+import { db, serverTimestamp } from "../../config/firebase-config";
+import {isToday, isYesterday} from 'date-fns'
 
 const MyCard = styled(Card)`
   border: 1px solid #d9d9d9;
@@ -34,62 +36,130 @@ const MyCard = styled(Card)`
 `;
 
 const HuddleCard = ({
-  huddle,
+  today,
+  yesterday,
+  member,
+  product,
   handleCheck,
   onClickAddNew,
   doneAddNew, 
   index,
   blockers
 }) => {
-  console.log(huddle);
-  const [showAddNews, setShowAddNews] = useState({
-    blockers: false,
-    today: false,
-    yesterday: false,
-  });
+  const [showAddNewBlocker, setShowAddNewBlocker] = useState(false);
+  const [newBlocker, setNewBlocker] = useState("");
+  const [showAddNewToday, setShowAddNewToday] = useState(false);
+  const [newToday, setNewToday] = useState("");
+  const [showAddNewYesterday, setShowAddNewYesterday] = useState(false);
+  const [newYesterday, setNewYesterday] = useState("");
+  
 
-  const [addText, setAddText] = useState({
-    blockers: "",
-    today: "",
-    yesterday: "",
-  });
+  const onBlockerDone = (e) => {
+    if (newBlocker !== "") {
+      if (e.key === "Enter") {
+        db.collection("huddleBlockers")
+          .add({
+            user: member.user,
+            completed: false,
+            title: newBlocker,
+            createdAt: new Date(),
+            product_id: product.id,
+          })
+          .then((docRef) => {
+            message.success("New blocker added successfully");
+          })
+          .catch((error) => {
+            message.error("Error adding blocker item");
+          });
+        setShowAddNewBlocker(false);
+        setNewBlocker("");
+      }
+    }
+  };
 
-  // const clickAddNew = (sectionKey, cardIndex) => {
-  //   setShowAddNews({
-  //     ...showAddNews,
-  //     [sectionKey]: true,
-  //   });
+  const updateBlocker = async (id, checked) => {
+    await db
+      .collection("huddleBlockers")
+      .doc(id)
+      .update({
+        completed: checked,
+      })
+      .then(() => {
+        message.success("Blocker updated successfully");
+      });
+  };
 
-  //   onClickAddNew(sectionKey, cardIndex);
-  // };
+  // Today
+  const onTodayDone = (e) => {
+    if (newToday !== "") {
+      if (e.key === "Enter") {
+        db.collection("huddles")
+          .add({
+            user: member.user,
+            completed: false,
+            title: newToday,
+            createdAt: new Date().toString(),
+            product_id: product.id,
+          })
+          .then((docRef) => {
+            message.success("New huddle added successfully");
+          })
+          .catch((error) => {
+            message.error("Error adding huddle item");
+          });
+        setShowAddNewToday(false);
+        setNewToday("");
+      }
+    }
+  };
 
-  // const onChange = (e, field) => {
-  //   setAddText({
-  //     ...addText,
-  //     [field]: e.target.value,
-  //   });
-  // };
+  const updateToday = async (id, checked) => {
+    await db
+      .collection("huddles")
+      .doc(id)
+      .update({
+        completed: checked,
+      })
+      .then(() => {
+        message.success("Huddle updated successfully");
+      });
+  };
 
-  // const reset = (sectionKey) => {
-  //   setShowAddNews({
-  //     ...showAddNews,
-  //     [sectionKey]: false,
-  //   });
+  // Yesterday
+  const onYesterdayDone = (e) => {
+    if (newYesterday !== "") {
+      if (e.key === "Enter") {
+        db.collection("huddles")
+          .add({
+            user: member.user,
+            completed: false,
+            title: newYesterday,
+            createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
+            product_id: product.id,
+          })
+          .then((docRef) => {
+            message.success("New huddle added successfully");
+          })
+          .catch((error) => {
+            message.error("Error adding huddle item");
+          });
+        setShowAddNewYesterday(false);
+        setNewYesterday("");
+      }
+    }
+  };
 
-  //   setAddText({
-  //     ...addText,
-  //     [sectionKey]: "",
-  //   });
-  // };
-
-  // const onDone = (e, sectionKey, cardIndex) => {
-  //   const val = addText[sectionKey];
-
-  //   if (e.key === "Enter") {
-  //     console.log(88);
-  //     doneAddNew(sectionKey, cardIndex, val, () => reset(sectionKey));
-  //   }
-  // };
+  const updateYesterday = async (id, checked) => {
+    await db
+      .collection("huddles")
+      .doc(id)
+      .update({
+        completed: checked,
+      })
+      .then(() => {
+        message.success("Yesterday huddle updated successfully");
+      });
+  };
 
   return (
     <MyCard
@@ -99,14 +169,14 @@ const HuddleCard = ({
           avatar={
             <Avatar
               size={48}
-              src={huddle.user.avatar}
+              src={member.user.avatar || "https://joeschmoe.io/api/v1/random"}
               style={{
                 border: "2px solid #315613",
               }}
             />
           }
-          title={huddle.user.name}
-          description={huddle.role || "Developer"}
+          title={member?.user?.name}
+          description={member.role || "Developer"}
         />
       }
     >
@@ -114,34 +184,31 @@ const HuddleCard = ({
         <div className="section">
           <h4>Blockers</h4>
 
-          {huddle.data?.blockers?.length ? (
+          {blockers?.length ? (
             <ul>
-              {huddle.data?.blockers.map((d, i) =>
-                !(
-                  i == huddle.data?.blockers.length - 1 && showAddNews.blockers
-                ) ? (
-                  <li key={i}>
-                    <Checkbox
-                      onChange={() => handleCheck(i, "blockers", index)}
-                      checked={d.completed}
-                    >
-                      {d.completed ? <strike>{d.text}</strike> : d.text}
-                    </Checkbox>
-                  </li>
-                ) : null
-              )}
+              {blockers.map((d, i) => (
+                <li key={i}>
+                  <Checkbox
+                    onChange={() => updateBlocker(d.id, !d.completed)}
+                    checked={d.completed}
+                  >
+                    {d.completed ? <strike>{d.title}</strike> : d.title}
+                  </Checkbox>
+                </li>
+              ))}
 
               <li>
-                {showAddNews.blockers ? (
+                {showAddNewBlocker ? (
                   <Input
-                    value={addText.blockers}
-                    onKeyPress={(e) => onDone(e, "blockers", index)}
-                    onChange={(e) => onChange(e, "blockers")}
+                    value={newBlocker}
+                    onKeyPress={(e) => onBlockerDone(e)}
+                    onChange={(e) => setNewBlocker(e.target.value)}
+                    size="small"
                   />
                 ) : (
                   <AppCheckbox
                     checked={false}
-                    onChange={() => clickAddNew("blockers", index)}
+                    onChange={() => setShowAddNewBlocker(true)}
                   >
                     <span className="text-[#BFBFBF]">Add New</span>
                   </AppCheckbox>
@@ -149,39 +216,55 @@ const HuddleCard = ({
               </li>
             </ul>
           ) : (
-            <p className="text-[#595959]">None</p>
+            <ul>
+              <li>
+                {showAddNewBlocker ? (
+                  <Input
+                    value={newBlocker}
+                    onKeyPress={(e) => onBlockerDone(e)}
+                    onChange={(e) => setNewBlocker(e.target.value)}
+                    size="small"
+                  />
+                ) : (
+                  <AppCheckbox
+                    checked={false}
+                    onChange={() => setShowAddNewBlocker(true)}
+                  >
+                    <span className="text-[#BFBFBF]">Add New Blocker</span>
+                  </AppCheckbox>
+                )}
+              </li>
+            </ul>
           )}
         </div>
 
         <div className="section">
           <h4>Today</h4>
 
-          {huddle.data?.today?.length ? (
+          {today?.length ? (
             <ul>
-              {huddle.data?.today?.map((d, i) =>
-                !(i == huddle.data?.today.length - 1 && showAddNews.today) ? (
-                  <li key={i}>
-                    <Checkbox
-                      onChange={() => handleCheck(i, "today", index)}
-                      checked={d.completed}
-                    >
-                      {d.completed ? <strike>{d.text}</strike> : d.text}
-                    </Checkbox>
-                  </li>
-                ) : null
-              )}
+              {today?.map((d, i) => (
+                <li key={i}>
+                  <Checkbox
+                    onChange={() => updateToday(d.id, !d.completed)}
+                    checked={d.completed}
+                  >
+                    {d.completed ? <strike>{d.title}</strike> : d.title}
+                  </Checkbox>
+                </li>
+              ))}
 
               <li>
-                {showAddNews.today ? (
+                {showAddNewToday ? (
                   <Input
-                    value={addText.today}
-                    onKeyPress={(e) => onDone(e, "today", index)}
-                    onChange={(e) => onChange(e, "today")}
+                    value={newToday}
+                    onKeyPress={(e) => onTodayDone(e)}
+                    onChange={(e) => setNewToday(e.target.value)}
                   />
                 ) : (
                   <AppCheckbox
                     checked={false}
-                    onChange={() => clickAddNew("today", index)}
+                    onChange={() => setShowAddNewToday(true)}
                   >
                     <span className="text-[#BFBFBF]">Add New</span>
                   </AppCheckbox>
@@ -189,42 +272,55 @@ const HuddleCard = ({
               </li>
             </ul>
           ) : (
-            <p className="text-[#595959]">None</p>
+            <ul>
+              <li>
+                {showAddNewToday ? (
+                  <Input
+                    value={newToday}
+                    onKeyPress={(e) => onTodayDone(e)}
+                    onChange={(e) => setNewToday(e.target.value)}
+                  />
+                ) : (
+                  <AppCheckbox
+                    checked={false}
+                    onChange={() => setShowAddNewToday(true)}
+                  >
+                    <span className="text-[#BFBFBF]">Add New</span>
+                  </AppCheckbox>
+                )}
+              </li>
+            </ul>
           )}
         </div>
 
         <div className="section">
           <h4>Yesterday</h4>
 
-          {huddle.data?.yesterday?.length ? (
+          {yesterday?.length ? (
             <ul>
-              {huddle.data?.yesterday?.map((d, i) =>
-                !(
-                  i == huddle.data?.yesterday.length - 1 &&
-                  showAddNews.yesterday
-                ) ? (
-                  <li key={i}>
-                    <Checkbox
-                      onChange={() => handleCheck(i, "yesterday", index)}
-                      checked={d.completed}
-                    >
-                      {d.completed ? <strike>{d.text}</strike> : d.text}
-                    </Checkbox>
-                  </li>
-                ) : null
-              )}
+              {yesterday?.map((d, i) => (
+                <li key={i}>
+                  <Checkbox
+                    onChange={() => updateYesterday(d.uid, !d.completed)}
+                    checked={d.completed}
+                  >
+                    {d.completed ? <strike>{d.title}</strike> : d.title}
+                  </Checkbox>
+                </li>
+              ))}
 
               <li>
-                {showAddNews.yesterday ? (
+                {showAddNewYesterday ? (
                   <Input
-                    value={addText.yesterday}
-                    onKeyPress={(e) => onDone(e, "yesterday", index)}
-                    onChange={(e) => onChange(e, "yesterday")}
+                    value={newYesterday}
+                    onKeyPress={(e) => onYesterdayDone(e)}
+                    onChange={(e) => setNewYesterday(e.target.value)}
                   />
                 ) : (
                   <AppCheckbox
                     checked={false}
-                    onChange={() => clickAddNew("yesterday", index)}
+                    on
+                    onChange={() => setShowAddNewYesterday(true)}
                   >
                     <span className="text-[#BFBFBF]">Add New</span>
                   </AppCheckbox>
@@ -232,7 +328,25 @@ const HuddleCard = ({
               </li>
             </ul>
           ) : (
-            <p className="text-[#595959]">None</p>
+            <ul>
+              <li>
+                {showAddNewYesterday ? (
+                  <Input
+                    value={newYesterday}
+                    onKeyPress={(e) => onYesterdayDone(e)}
+                    onChange={(e) => setNewYesterday(e.target.value)}
+                  />
+                ) : (
+                  <AppCheckbox
+                    checked={false}
+                    on
+                    onChange={() => setShowAddNewYesterday(true)}
+                  >
+                    <span className="text-[#BFBFBF]">Add New</span>
+                  </AppCheckbox>
+                )}
+              </li>
+            </ul>
           )}
         </div>
       </section>

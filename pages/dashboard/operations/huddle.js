@@ -15,6 +15,9 @@ import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
 import { useAuth } from "../../../contexts/AuthContext";
+import { isToday, isYesterday } from "date-fns";
+
+const intervals = ["Today", "Yesterday", "2 days ago", "3 days ago", "1 week ago", "2 weeks ago", "1 month ago"]
 
 const generateRightNav = (items) => {
   if (!items?.length) {
@@ -33,11 +36,24 @@ export default function Huddle() {
   const activeProduct = useRecoilValue(activeProductState);
 
   const [data, setData] = useState([]);
+  const [team, setTeam] = useState(null);
   const [blockers, setBlockers] = useState(null);
   const [activeTimeIndex, setActiveTimeIndex] = useState(0);
   const [activeTime, setActiveTime] = useState(
     data.length > 0 ? data[0].createdAt : "Now"
   );
+
+  // Fetch teams form firebase
+  const fetchTeam = async () => {
+    if(activeProduct) {
+      const res = db
+        .collection("teams")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setTeam(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        });
+    }
+  }
 
   // Fetch data from firebase
   const fetchHuddles = async () => {
@@ -46,17 +62,20 @@ export default function Huddle() {
         .collection("huddles")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
-          setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))); 
-          setActiveTime(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).length >
-              0
-              ? snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))[0]
-                  .createdAt
-              : "Now"
-          );
+          setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
           console.log(
-          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        );
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+          // setActiveTime(
+          //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).length >
+          //     0
+          //     ? snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))[0]
+          //         .createdAt
+          //     : "Now"
+          // );
+        //   console.log(
+        //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        // );
         });
        
     }
@@ -69,14 +88,15 @@ export default function Huddle() {
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
           setBlockers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-          console.log(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
+          // console.log(
+          //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          // );
         });
     }
   };
 
   useEffect(() => {
+    fetchTeam();
     fetchHuddles();
     fetchHuddleBlockers();
   }, [activeProduct])
@@ -154,31 +174,36 @@ export default function Huddle() {
 
       <AppLayout
         hasSideAdd={false}
-        defaultText={getTimeAgo(data.length > 0 ? data[0].createdAt : "Now")}
-        rightNavItems={rightNav}
-        setActiveRightNav={setActiveRightNav}
-        activeRightItem={activeTime}
+        // defaultText={getTimeAgo(data.length > 0 ? data[0].createdAt : "Now")}
+        rightNavItems={intervals}
+        // setActiveRightNav={setActiveRightNav}
+        // activeRightItem={activeTime}
         mainClass="mr-[140px]"
         breadCrumbItems={splitRoutes(pathname)}
       >
         <Row className="max-w-[1200px] overflow-x-auto" gutter={[16, 16]}>
-          {activeTime ? (
+          {team && data && blockers && (
             <>
-              {data?.map((huddle, index) => (
+              {team?.map((item, index) => (
                 <Col className="flex" key={index} span={8}>
                   <HuddleCard
-                    huddle={huddle}
-                    handleCheck={handleCheck}
-                    onClickAddNew={onClickAddNew}
-                    doneAddNew={doneAddNew}
-                    index={index}
-                    blockers={blockers}
+                    today={data
+                      .filter((huddle) => huddle.user.uid === item.user.uid && isToday(new Date(huddle.createdAt)))}
+                    yesterday={data
+                      .filter((huddle) => huddle.user.uid === item.user.uid && isYesterday(new Date(huddle.createdAt)))}
+                    member={item}
+                    product={activeProduct}
+                    // handleCheck={handleCheck}
+                    // onClickAddNew={onClickAddNew}
+                    // doneAddNew={doneAddNew}
+                    // index={index}
+                    blockers={blockers.filter(
+                      (blocker) => blocker.user.uid === item.user.uid
+                    )}
                   />
                 </Col>
               ))}
             </>
-          ) : (
-            <h2 className="text-[#595959] text-center">Nothing to see</h2>
           )}
         </Row>
       </AppLayout>

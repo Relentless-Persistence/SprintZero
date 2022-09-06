@@ -38,6 +38,7 @@ const Login = () => {
               uid: user.uid,
               email: user.email,
               name: user.displayName,
+              avatar: user.photoURL,
             },
             expiry: "unlimited",
             type: type,

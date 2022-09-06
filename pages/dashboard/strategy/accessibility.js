@@ -77,12 +77,12 @@ export default function Accessiblity() {
     setActiveChallenge(challenges[activeChallengeIndex]);
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    const challengeName = data[product][0].name;
-    setChallenge(challengeName, product);
-    setShowAdd(false);
-  };
+  // const setProduct = (product) => {
+  //   setActiveProduct(product);
+  //   const challengeName = data[product][0].name;
+  //   setChallenge(challengeName, product);
+  //   setShowAdd(false);
+  // };
 
   const addItem = () => {
     const top =
