@@ -122,8 +122,8 @@ const Board = ({
               >
                 {col?.data?.map((card, i) => (
                   <Card
-                    key={card.id}
-                    id={card.id}
+                    key={card.order}
+                    id={card.order}
                     colId={col.columnId}
                     onCardDrop={swapCard}
                   >

@@ -1,7 +1,6 @@
 {
     "Sprinting": [
         {
-            "boardName": "Board 0",
             "columns": [
                 {
                     "columnId": "0",
@@ -27,6 +26,10 @@
                 {
                     "columnId": "1",
                     "columnName": "Under Review"
+                },
+                {
+                    "columnId": "2",
+                    "columnName": "Adjudicated"
                 }
                 
             ]

@@ -29,11 +29,7 @@ export default function Calendar() {
   const [activeProduct, setActiveProduct] = useState(products[0]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [activeCalendarTypeIndex, setActiveCalendarTypeIndex] = useState(0);
-  const [calendarType, setCalendarType] = useState([
-    "Agenda",
-    "Month",
-    "Year",
-  ]);
+  const [calendarType, setCalendarType] = useState(["Month", "Year"]);
 
   const setProduct = (product) => {
     setActiveProduct(product);
@@ -76,15 +72,18 @@ export default function Calendar() {
         }
       >
         <Row gutter={[12, 12]}>
-          {calendarType[activeCalendarTypeIndex] === "Agenda" ? (
-            <Agenda />
-          ) : calendarType[activeCalendarTypeIndex] === "Month" ? (
-            <Month />
-          ) : calendarType[activeCalendarTypeIndex] === "Year" ? (
-            <Year />
-          ) : (
-            "Week"
-          )}
+          {
+            // calendarType[activeCalendarTypeIndex] === "Agenda" ? (
+            //   <Agenda />
+            // ) :
+            calendarType[activeCalendarTypeIndex] === "Month" ? (
+              <Month />
+            ) : calendarType[activeCalendarTypeIndex] === "Year" ? (
+              <Year />
+            ) : (
+              "Week"
+            )
+          }
         </Row>
         <Drawer
           title={<h3 className="text-20 font-semibold">Event</h3>}

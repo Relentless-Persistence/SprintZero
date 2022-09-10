@@ -77,12 +77,12 @@ export default function Accessiblity() {
     setActiveChallenge(challenges[activeChallengeIndex]);
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    const challengeName = data[product][0].name;
-    setChallenge(challengeName, product);
-    setShowAdd(false);
-  };
+  // const setProduct = (product) => {
+  //   setActiveProduct(product);
+  //   const challengeName = data[product][0].name;
+  //   setChallenge(challengeName, product);
+  //   setShowAdd(false);
+  // };
 
   const addItem = () => {
     const top =
@@ -141,7 +141,7 @@ export default function Accessiblity() {
         breadCrumbItems={splitRoutes(pathname)}
         mainClass="mr-[174px]"
       >
-        <MainSub>{data && data[0].title}</MainSub>
+        <MainSub>{data ? data[0].title : null}</MainSub>
 
         <MasonryGrid>
           {challengesData && challengesData.length > 0 ? (

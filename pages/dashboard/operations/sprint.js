@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -14,6 +15,7 @@ import {
   Tag,
   Col,
   Radio,
+  message,
 } from "antd";
 
 import {
@@ -38,6 +40,10 @@ import CustomTag from "../../../components/Dashboard/Tag";
 import AppCheckbox from "../../../components/AppCheckbox";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 import RadioButton from "../../../components/AppRadioBtn";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
+import { findIndex, set } from "lodash";
 
 const getBoardNames = (boards) => {
   const boardNames = boards.map((g) => g.boardName);
@@ -230,34 +236,142 @@ const comments = [
   ],
 ];
 
+const versions = ["v1.0", "v1.1", "v1.2"];
+
 export default function Sprint() {
   const { pathname } = useRouter();
 
-  const [data, setData] = useState(fakeData);
+  const [data, setData] = useState(null);
   const [visible, setVisible] = useState(false);
-
+  const activeProduct = useRecoilValue(activeProductState);
   const [commentsIndex, setCommentsIndex] = useState(0);
 
-  const [activeProduct, setActiveProduct] = useState(products[0]);
+  // const [activeProduct, setActiveProduct] = useState(products[0]);
 
-  const [activeBoard, setActiveBoard] = useState(data[activeProduct][0]);
+  const [activeBoard, setActiveBoard] = useState(versions[0]);
   const [activeBoardIndex, setActiveBoardIndex] = useState(0);
 
-  const setBoard = (boardName, product) => {
-    const boardIndex = data[product || activeProduct].findIndex(
-      (b) => b.boardName === boardName
-    );
-
-    if (boardIndex > -1) {
-      setActiveBoard(data[product || activeProduct][boardIndex]);
-      setActiveBoardIndex(boardIndex);
+  // Fetch data from firebase
+  const fetchSprints = async () => {
+    let stories = [];
+    if (activeProduct) {
+      const res = db
+        .collection("Epics")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          snapshot.docs
+            .map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))
+            .map((item) => {
+              item.features.map((feature) => {
+                feature.stories.map((story) => {
+                  stories.push(story);
+                });
+              });
+            });
+          setData([
+            {
+              columnId: "0",
+              columnName: "Backlog",
+              data: stories.filter((item) => item.status === "Backlog"),
+            },
+            {
+              columnId: "1",
+              columnName: "Designing",
+              data: stories.filter((item) => item.status === "Designing"),
+            },
+            {
+              columnId: "2",
+              columnName: "Critique",
+              data: stories.filter((item) => item.status === "Critique"),
+            },
+            {
+              columnId: "3",
+              columnName: "Ready for Dev",
+              data: stories.filter((item) => item.status === "Ready for Dev"),
+            },
+            {
+              columnId: "4",
+              columnName: "Developing",
+              data: stories.filter((item) => item.status === "Developing"),
+            },
+            {
+              columnId: "5",
+              columnName: "Quality Assurance",
+              data: stories.filter((item) => item.status === "Quality Assurance"),
+            },
+            {
+              columnId: "6",
+              columnName: "Ready",
+              data: stories.filter((item) => item.status === "Ready"),
+            },
+            {
+              columnId: "7",
+              columnName: "Shipped",
+              data: stories.filter((item) => item.status === "Shipped"),
+            },
+          ]);
+          console.log([
+            {
+              columnId: "0",
+              columnName: "Backlog",
+              data: stories.filter((item) => item.status === "Backlog"),
+            },
+            {
+              columnId: "1",
+              columnName: "Designing",
+              data: stories.filter((item) => item.status === "Designing"),
+            },
+            {
+              columnId: "2",
+              columnName: "Critique",
+              data: stories.filter((item) => item.status === "Critique"),
+            },
+            {
+              columnId: "3",
+              columnName: "Ready for Dev",
+              data: stories.filter((item) => item.status === "Ready for Dev"),
+            },
+            {
+              columnId: "4",
+              columnName: "Developing",
+              data: stories.filter((item) => item.status === "Developing"),
+            },
+            {
+              columnId: "5",
+              columnName: "Quality Assurance",
+              data: stories.filter(
+                (item) => item.status === "Quality Assurance"
+              ),
+            },
+            {
+              columnId: "6",
+              columnName: "Ready",
+              data: stories.filter((item) => item.status === "Ready"),
+            },
+            {
+              columnId: "7",
+              columnName: "Shipped",
+              data: stories.filter((item) => item.status === "Shipped"),
+            },
+          ]);
+        });
     }
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    const boardName = data[product][0]?.boardName;
-    setBoard(boardName, product);
+  useEffect(() => {
+    fetchSprints();
+  }, [activeProduct]);
+
+  const setBoard = (board) => {
+    const boardIndex = findIndex(versions, (o) => o === board);
+
+    if (boardIndex > -1) {
+      setActiveBoard(versions[boardIndex]);
+      setActiveBoardIndex(boardIndex);
+    }
   };
 
   const handleDrop = (card, targetColId) => {
@@ -337,7 +451,7 @@ export default function Sprint() {
         <Index>{index + 1}</Index>
 
         <div onClick={() => setVisible(true)}>
-          <CustomTag icon={<CopyOutlined />} text={"System Status"} />
+          <CustomTag icon={<CopyOutlined />} text={card.name} />
         </div>
       </>
     );
@@ -353,9 +467,8 @@ export default function Sprint() {
 
       <AppLayout
         useGrid
-        onChangeProduct={setProduct}
-        rightNavItems={getBoardNames(data[activeProduct])}
-        activeRightItem={activeBoard?.boardName}
+        rightNavItems={versions}
+        activeRightItem={activeBoard}
         setActiveRightNav={setBoard}
         hasMainAdd={false}
         hasSideAdd={false}
@@ -372,14 +485,16 @@ export default function Sprint() {
               marginBottom: "20px",
             }}
           >
-            <Board
-              colCount={8}
-              onDrop={handleDrop}
-              onSwap={handleSwap}
-              columns={activeBoard?.columns}
-              renderColumn={renderCol}
-              columnHeaderRenders={[null, null, null]}
-            />
+            {data && (
+              <Board
+                colCount={data.length}
+                onDrop={handleDrop}
+                // onSwap={handleSwap}
+                columns={data}
+                renderColumn={renderCol}
+                columnHeaderRenders={[null, null, null]}
+              />
+            )}
           </div>
         </div>
 

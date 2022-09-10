@@ -113,7 +113,7 @@ const StoryDetails = ({ story }) => {
   const [show, setShow] = useState(false);
   const [val, setVal] = useState("");
   const [data, setData] = useState([...init]);
-  const [flagged, setFlagged] = useState(null)
+  const [flagged, setFlagged] = useState(false)
 
   const addItemDone = (e) => {
     if (e.key === "Enter" && val.trim()) {
@@ -134,7 +134,7 @@ const StoryDetails = ({ story }) => {
     setVal(e.target.value);
   };
 
-  const onFLag = async () => {
+  const onFlag = async () => {
     await db.collection("Ethics").add({
       storyId: story.id,
       type: "identified"
@@ -254,7 +254,7 @@ const StoryDetails = ({ story }) => {
                   className="inline-flex items-center justify-between"
                   danger
                   disabled={flagged}
-                  onClick={()=> alert("Not implemented yet")}
+                  onClick={onFlag}
                 >
                   <FlagOutlined />
                   Flag

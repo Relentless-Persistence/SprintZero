@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 // import Image from "next/image";
 import { Button, Typography, message, Image } from "antd";
@@ -7,33 +8,48 @@ import { googleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
 import { auth } from "../config/firebase-config";
 import { db } from "../config/firebase-config";
+import { useAuth } from "../contexts/AuthContext";
 // import { usePaymentConfirm } from "../contexts/PaymentContext";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
   const router = useRouter();
+  const {user} = useAuth();
   const { type, product } = router.query;
   // const paid = usePaymentConfirm();
 
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [])
+
   const handleOnClick = (provider) => {
+    
     try {
       auth.signInWithPopup(provider).then(async (res) => {
         var user = res.user;
+        console.log(res);
+        // Adding user to a product team
+        if (type && product) {
+          await db.collection("teams").add({
+            user: {
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName,
+              avatar: user.photoURL,
+            },
+            expiry: "unlimited",
+            type: type,
+            product_id: product,
+          });
+        }
+
+        // Checking if user is new
         if (res.additionalUserInfo.isNewUser) {
-          if (type && product) {
-            await db.collection("teams").add({
-              user: {
-                uid: user.uid,
-                email: user.email,
-                name: user.displayName,
-              },
-              expiry: "unlimited",
-              type: type,
-              product_id: "1",
-            });
-            router.push("/dashboard");
-          } else if (!/@gmail.com\s*$/.test(user.email)) {
+          // if user has a company custom email
+          if (!/@gmail.com\s*$/.test(user.email)) {
             router.push("/enterprise-contact");
           } else {
             message.success({
@@ -43,21 +59,11 @@ const Login = () => {
             router.push("/loginsuccess");
           }
         } else {
-          if (type && product) {
-            await db.collection("teams").add({
-              user: {
-                uid: user.uid,
-                email: user.email,
-                name: user.displayName,
-              },
-              expiry: "unlimited",
-              type: type,
-              product_id: "1",
-            });
-            router.push("/dashboard");
-          } else {
-            router.push("/dashboard");
-          }
+          message.success({
+            content: "Successfully logged in",
+            className: "custom-message",
+          });
+          router.push("/dashboard");
         }
       });
     } catch (error) {

@@ -3,6 +3,7 @@ import Head from "next/head";
 import ProductConfiguration from "../components/ProductConfiguration";
 import { Typography, Avatar } from "antd";
 const { Title, Text } = Typography;
+import withAuth from "../hoc/withAuth";
 
 const product = () => {
   return (
@@ -17,4 +18,4 @@ const product = () => {
   );
 };
 
-export default product;
+export default withAuth(product);

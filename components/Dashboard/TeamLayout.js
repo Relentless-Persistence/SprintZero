@@ -17,6 +17,8 @@ import SideBar from "./SideBar";
 import AppHeader from "./Header";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../config/firebase-config";
+import { activeProductState } from "../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
 
 const { Content, Sider } = Layout;
 
@@ -93,6 +95,7 @@ const TeamLayout = ({
   children,
 }) => {
   const { user } = useAuth();
+  const activeProduct = useRecoilValue(activeProductState);
   const [showSideAdd, setShowSideAdd] = useState(false);
   const [inviteType, setInviteType] = useState(null);
   const [token, setToken] = useState(null);
@@ -138,7 +141,7 @@ const TeamLayout = ({
       .add({
         token: generateToken(),
         type: type,
-        product_id: "1",
+        product_id: activeProduct.id,
       })
       .then((docRef) => {
         setToken(docRef.id);

@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ReadOutlined,
   CopyOutlined,
 } from "@ant-design/icons";
-import { Divider, Tag } from "antd";
+import { Divider, message, Tag, Button } from "antd";
 import update from "immutability-helper";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { last } from "lodash";
@@ -15,47 +16,15 @@ import Story from "./Story";
 import { db } from "../../config/firebase-config";
 import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
+import generateString from '../../utils/generateRandomStrings';
 
-const UserStory = () => {
-  const [epics, setEpics] = useState([
-    {
-      id: Math.floor(Math.random() * 0x1000000).toString(),
-      name: "",
-      status: "",
-      features: [],
-    },
-  ]);
-
-  // Fetch Epics from firebase
-  const fetchEpics = async () => {
-    // console.log(activeProduct.id);
-    if (activeProduct) {
-      const res = await db
-        .collection("Epics")
-        .where("product_id", "==", activeProduct.id)
-        .get();
-      console.log(res);
-      const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      if (epics.length > 0) {
-        setEpics(epics);
-      } else {
-        setEpics([
-          {
-            id: Math.floor(Math.random() * 0x1000000).toString(),
-            name: "",
-            status: "",
-            features: [],
-          },
-        ]);
-      }
-    }
-  };
+const UserStory = ({ epics, setEpics, activeProduct }) => {
 
   const addEpic = () => {
     setEpics([
       ...epics,
       {
-        id: Math.floor(Math.random() * 0x1000000).toString(),
+        id: generateString(20),
         name: "",
         features: [],
       },
@@ -97,7 +66,7 @@ const UserStory = () => {
         features: {
           $push: [
             {
-              id: Math.floor(Math.random() * 0x1000000).toString(),
+              id: generateString(20),
               name: "",
               status: "",
               stories: [],
@@ -152,7 +121,7 @@ const UserStory = () => {
             stories: {
               $push: [
                 {
-                  id: Math.floor(Math.random() * 0x1000000).toString(),
+                  id: generateString(20),
                   name: "",
                   status: "",
                 },
@@ -207,6 +176,7 @@ const UserStory = () => {
     }
   };
 
+
   return (
     <>
       <div className="flex items-center text-[#A6AE9D] text-[8px] m-0">
@@ -221,16 +191,17 @@ const UserStory = () => {
 
       <div id="sprint0Dashboard" className="flex justify-center mt-8">
         <div className="flex justify-center space-x-10 overflow-x-auto">
-          {epics.map((epic, i) => (
-            <div key={i}>
-              <ArcherContainer strokeColor="#0073B3" noCurves>
-                <Epic
-                  epic={epic}
-                  i={i}
-                  addEpic={addEpic}
-                  handleChangeEpic={handleChangeEpic}
-                  handleChangeStatus={handleChangeStatus}
-                />
+          {epics &&
+            epics.map((epic, i) => (
+              <div key={i}>
+                <ArcherContainer strokeColor="#0073B3" noCurves>
+                  <Epic
+                    epic={epic}
+                    i={i}
+                    addEpic={addEpic}
+                    handleChangeEpic={handleChangeEpic}
+                    handleChangeStatus={handleChangeStatus}
+                  />
 
                 {epic.name === "" ? null : (
                   <div className="mt-[42.5px]">

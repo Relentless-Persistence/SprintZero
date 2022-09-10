@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
 
-import { Card, Input, Form, Space, message } from "antd";
+import { Card, Input, Form, Space, Button, message } from "antd";
 
 import CardHeaderButton from "../Dashboard/CardHeaderButton";
 import { checkEmptyObject } from "../../utils";
+import { divide } from "lodash";
 import { db } from "../../config/firebase-config";
 
 const FormItem = styled(Form.Item)`
@@ -25,57 +26,60 @@ const init = {
   differentiators: "",
 };
 
-const StatementForm = ({ activeProduct, setAddMode }) => {
-  const [form] = Form.useForm();
-  const [targetCustomer, setTargetCustomer] = useState("");
-  const [need, setNeed] = useState("");
-  const [keyBenefits, setKeyBenefits] = useState("");
-  const [competitors, setCompetitors] = useState("");
-  const [differentiators, setDifferentiators] = useState("");
+const EditVision = ({ info, inEditMode, setEditMode }) => {
+  // const initialValues = checkEmptyObject(info) ? init : info;
+  const [targetCustomer, setTargetCustomer] = useState(info.targetCustomer);
+  const [need, setNeed] = useState(info.need);
+  const [keyBenefits, setKeyBenefits] = useState(info.keyBenefits);
+  const [competitors, setCompetitors] = useState(info.competitors);
+  const [differentiators, setDifferentiators] = useState(info.differentiators);
 
-  const onReset = () => {
-    form.resetFields();
-  };
+ 
 
-  const onFinish = (values) => {
-    handleSubmit(values);
-  };
-
-  const validate = async () => {
-    try {
-      const values = await form.validateFields();
-      onFinish(values);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // Create Vision
-  const addVision = () => {
+  // Update Vision
+  const updateVision = async (id) => {
     const data = {
-      createdAt: new Date().toISOString(),
-      product_id: activeProduct.id,
       targetCustomer,
       need,
       keyBenefits,
       competitors,
       differentiators,
     };
-
-    db.collection("Visions")
-      .add(data)
-      .then((docRef) => {
-        message.success("New vision added successfully");
+    await db
+      .collection("Visions")
+      .doc(id)
+      .update(data)
+      .then(() => {
+        message.success("Vision updated successfully");
         setTargetCustomer("");
         setNeed("");
         setKeyBenefits("");
         setCompetitors("");
         setDifferentiators("");
-        setAddMode(false);
-      })
-      .catch((error) => {
-        message.error("Error adding vision");
+        setEditMode(false);
       });
+  };
+
+  const onFinish = (values) => {
+    handleSubmit(values);
+  };
+
+  // const validate = async () => {
+  //   try {
+  //     const values = await form.validateFields();
+  //     onFinish(values);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  const endEditMode = () => {
+    setTargetCustomer("");
+    setNeed("");
+    setKeyBenefits("");
+    setCompetitors("");
+    setDifferentiators("");
+    setEditMode(false);
   };
 
   return (
@@ -83,15 +87,17 @@ const StatementForm = ({ activeProduct, setAddMode }) => {
       bordered={false}
       extra={
         <Space>
-          <div className="text-red-800 text-xs" onClick={() => setAddMode(false)}>
+          <div className="text-red-800 text-xs" onClick={() => endEditMode()}>
             Cancel
           </div>
-          <CardHeaderButton onClick={() => addVision()}>Done</CardHeaderButton>
+          <CardHeaderButton onClick={() => updateVision(info.id)}>
+            Done
+          </CardHeaderButton>
         </Space>
       }
       title="Guiding Statement"
     >
-      <Form labelAlign="left" form={form} onFinish={onFinish}>
+      <Form labelAlign="left" onFinish={() => updateVision(info.id)}>
         <Form.Item
           label="Target Customer"
           tooltip="Identify the target of this product"
@@ -181,4 +187,4 @@ const StatementForm = ({ activeProduct, setAddMode }) => {
   );
 };
 
-export default StatementForm;
+export default EditVision;
