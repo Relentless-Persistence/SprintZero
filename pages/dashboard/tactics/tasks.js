@@ -148,7 +148,6 @@ export default function Tasks() {
   };
 
   const handleDrop = async (card, targetColId) => {
-    const info = { ...data };
     console.log("card: ", card);
     console.log("targetColId: ", targetColId);
 
@@ -188,39 +187,6 @@ export default function Tasks() {
       targetTask,
       targetTaskOrder
     })
-
-    // const newData = info[activeProduct][activeBoardIndex];
-    // const columns = newData?.columns;
-
-    // const currentCardColumn = columns.find(
-    //   (c) => c.columnId === currentCard.colId
-    // );
-    // const targetCardColumn = columns.find(
-    //   (c) => c.columnId === targetCard.colId
-    // );
-
-    // const currentCardIndex = currentCardColumn?.data?.findIndex(
-    //   (c) => c.id === currentCard.id
-    // );
-    // const targetCardIndex = targetCardColumn?.data?.findIndex(
-    //   (c) => c.id === targetCard.id
-    // );
-
-    // //swap cards
-    // if (currentCard.colId === targetCard.colId) {
-    //   [
-    //     currentCardColumn.data[currentCardIndex],
-    //     targetCardColumn.data[targetCardIndex],
-    //   ] = [
-    //     targetCardColumn.data[targetCardIndex],
-    //     currentCardColumn.data[currentCardIndex],
-    //   ];
-    // } else {
-    //   //fake drop
-    //   handleDrop(currentCard, targetCard.colId);
-    // }
-
-    // setData(info);
   };
 
   const renderCol = (card, index) => {

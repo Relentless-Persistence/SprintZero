@@ -4,54 +4,65 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import AppLayout from "../../components/Dashboard/AppLayout";
 import UserStory from "../../components/UserStory";
-import { findIndex } from "lodash";
+import { findIndex, sortBy } from "lodash";
 import { splitRoutes } from "../../utils";
 import withAuth from "../../hoc/withAuth";
 import { Button, message } from "antd";
 import { db } from "../../config/firebase-config";
 import { activeProductState } from "../../atoms/productAtom";
-import { useRecoilValue } from "recoil";
+import { versionState } from "../../atoms/versionAtom";
+import { useRecoilValue, useRecoilState } from "recoil";
 import generateString from "../../utils/generateRandomStrings";
-
-const versions = ["v1", "v2", "v3", "All"];
 
 function Home() {
   const { pathname } = useRouter();
   const activeProduct = useRecoilValue(activeProductState);
+  const [version, setVersion] = useRecoilState(versionState)
   const [epics, setEpics] = useState(null);
-  //console.log(pathname);
-  // const [versions, setVersions] = useState(null);
-  const [version, setVersion] = useState(versions[3]);
+  const [versions, setVersions] = useState(null);
   const [savingMode, setSavingMode] = useState(false);
-  const [newVersion, setNewVersion] = useState("")
+  const [rightNav, setRightNav] = useState(["1.0"])
+
 
   const fetchVersions = async () => {
     if (activeProduct) {
-      const res = await db.collection("versions").where("product_id", "==", activeProduct.id).get();
-      const versions = res.docs.map(doc => ({id: doc.id, ...doc.data()}))
-      setVersions([...versions, {version: "All"}]);
+       db.collection("versions").where("product_id", "==", activeProduct.id).onSnapshot((snapshot) => {
+        setVersions(
+          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
+        const versions = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })).sort();
+        console.log(versions)
+        setVersion(versions[0])
+      })
     }
   }
 
-  const getVersions = async (versions) => {
+  const getVersions = async () => {
     let newVersion = []
-    await versions.map(item => newVersion.push(item.version))
-    console.log(newVersion);
-    return newVersion
+    if (versions) {
+      versions.map((item) => newVersion.push(item.version));
+      console.log(newVersion);
+      return newVersion;
+    }
   }
   
 
   // Fetch Epics from firebase
   const fetchEpics = async () => {
-    // console.log(activeProduct.id);
-    if (activeProduct) {
+    console.log("version", version)
+    console.log("product", activeProduct);
+    if (activeProduct && version) {
       const res = await db
         .collection("Epics")
         .where("product_id", "==", activeProduct.id)
+        .where("version", "==", version.id)
         .get();
       
       const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      console.log(epics)
+      console.log("epics", epics)
       if (epics.length > 0) {
         setEpics(epics);
       } else {
@@ -66,6 +77,10 @@ function Home() {
       }
     }
   };
+
+  useEffect(() => {
+    fetchVersions();
+  }, [activeProduct])
 
   useEffect(() => {
     fetchEpics();
@@ -147,12 +162,12 @@ function Home() {
 
       <AppLayout
         ignoreLast={true}
-        breadCrumbItems={[`Story Map / ${version}`]}
+        // breadCrumbItems={versions && [`Story Map / ${version.version}`]}
         hasSideAdd={true}
         onSideAdd={() => addVersion()}
         hasMainAdd={true}
-        rightNavItems={versions}
-        activeRightItem={version}
+        rightNavItems={rightNav}
+        // activeRightItem={version}
         mainClass="mr-[100px]"
         sideBarClass={"min-w-[82px]"}
         addNewText={"Save"}

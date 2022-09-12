@@ -44,6 +44,7 @@ const Story = ({
   handleChangeStoryStatus,
 }) => {
   const [openDetail, setOpenDetail] = useState(false);
+  console.log(story)
 
   const handleDrawerVisible = (value) => {
     let newVal = !openDetail;
@@ -78,7 +79,7 @@ const Story = ({
               className="max-w-[70px] focus:outline-none outline-none placeholder:text-[#4F2DC8] bg-transparent capitalize border-none"
               value={story.name}
               onChange={(e) => {
-                handleChangeStory(i, featureIndex, storyIndex, e.target.value);
+                handleChangeStory(i, featureIndex, storyIndex, e.target.value, story);
               }}
               onKeyDown={(e) => {
                 handleChangeStoryStatus(i, featureIndex, storyIndex, e);

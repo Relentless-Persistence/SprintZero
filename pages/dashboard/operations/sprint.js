@@ -267,7 +267,7 @@ export default function Sprint() {
             .map((item) => {
               item.features.map((feature) => {
                 feature.stories.map((story) => {
-                  stories.push(story);
+                  stories.push({...story, feature: feature, epic: item});
                 });
               });
             });

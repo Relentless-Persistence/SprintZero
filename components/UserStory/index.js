@@ -17,6 +17,7 @@ import { db } from "../../config/firebase-config";
 import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import generateString from '../../utils/generateRandomStrings';
+import {debounce} from "lodash";
 
 const UserStory = ({ epics, setEpics, activeProduct }) => {
 
@@ -114,6 +115,7 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
   };
 
   const addStory = (epicIndex, featureIndex) => {
+    const id = generateString(20);
     const newData = update(epics, {
       [epicIndex]: {
         features: {
@@ -121,8 +123,8 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
             stories: {
               $push: [
                 {
-                  id: generateString(20),
-                  name: "",
+                  id: id,
+                  name: "", 
                   status: "",
                 },
               ],
@@ -132,10 +134,20 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
       },
     });
 
+    db.collection("Stories").doc(id).set({name: "", status: "Backlog", product_id: activeProduct.id})
+
     setEpics(newData);
   };
 
-  const handleChangeStory = (epicIndex, featureIndex, storyIndex, e) => {
+  const updateStory = async (e, id) => {
+    await db.collection("Stories").doc(id).update({
+      name: e,
+    })
+  }
+
+  const handleChangeStory = (epicIndex, featureIndex, storyIndex, e, story) => {
+    console.log(e, story)
+    updateStory(e, story.id);
     const newData = update(epics, {
       [epicIndex]: {
         features: {
@@ -151,7 +163,7 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
         },
       },
     });
-
+    // debounce(() => updateStory(e, story.id), 3000)
     setEpics(newData);
   };
 
