@@ -14,7 +14,8 @@ const Feature = ({
   handleChangeFeatureStatus,
 }) => {
   return (
-    <div className="flex items-center justify-start">
+    // AG: added justify-left here
+    <div className="flex justify-center">
       <ArcherElement
         key={feature.id}
         id={feature.id}
@@ -32,28 +33,31 @@ const Feature = ({
                 />
               ) : null,
             style: {
-              strokeDasharray: "4,3",
+              strokeWidth: "1.5",
+              //strokeDasharray: "4,3",
               endShape: {
                 arrow: {
                   arrowLength: 4,
                   arrowThickness: 1.5,
                 },
               },
+              endMarker: false,
             },
           },
         ]}
       >
         <Tag
-          className={`flex items-center space-x-1 border-2 border-[#006378] ${
+          className={`flex items-center justify-center space-x-1 border-2 border-[#006378] ${
             !feature.name ? "border-dashed" : ""
           } px-[8px] py-[4px] text-[#006378] text-sm rounded`}
+          style={{width:"200px"}}
           icon={<CopyOutlined />}
         >
           {/* {feature.status !== "saved" ? ( */}
           <Input
             placeholder="New Feature"
             type="text"
-            maxLength="16"
+            maxLength="17"
             className="max-w-[70px] capitalize focus:outline-none placeholder:text-[#4F2DC8] p-0 bg-transparent outline-none border-none"
             value={feature.name}
             onChange={(e) =>

@@ -15,7 +15,8 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
 {
   const [ openDetail, setOpenDetail ] = useState( false );
   return (
-    <div className="flex items-center justify-start">
+    // AG: i have removed here justify-start and put justify-left
+    <div className="flex justify-left">
       <ArcherElement
         id={ epic.id }
         relations={
@@ -29,13 +30,15 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
                   targetAnchor: "top",
                   sourceAnchor: "bottom",
                   style: {
-                    strokeDasharray: "4,3",
+                    strokeWidth: "1.5",
+                    //strokeDasharray: "4,3",
                     endShape: {
                       arrow: {
                         arrowLength: 4,
                         arrowThickness: 1.5,
                       },
                     },
+                    endMarker: false,
                   },
                 },
               ]
@@ -45,6 +48,7 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
           className={ `flex items-center justify-center space-x-1 border-2 border-[#4F2DC8] ${ !epic.name ? "border-dashed" : ""
             } px-[8px] py-[4px] text-[#4F2DC8] text-sm rounded` }
           icon={ <ReadOutlined /> }
+          style={{width:"200px"}}
           // onClick={ () =>
           // {
           //   epic.status === "saved" ? setOpenDetail( true ) : null;
@@ -54,7 +58,7 @@ const Epic = ( { epic, i, addEpic, handleChangeEpic, handleChangeStatus } ) =>
             <Input
               placeholder="New Epic"
               type="text"
-              maxLength="16"
+              maxLength="17"
               className="max-w-[70px] bg-transparent border-none capitalize outline-none focus:outline-none placeholder:text-[#4F2DC8] p-0"
               value={ epic.name }
               onChange={ ( e ) => handleChangeEpic( i, e.target.value ) }
