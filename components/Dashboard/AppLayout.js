@@ -75,6 +75,8 @@ const AppLayout = ({
   mainClass,
   breadCrumbClass,
   sideBarClass,
+  sideAddValue,
+  setSideAddValue,
   onSideAddClick,
   children,
 }) => {
@@ -88,10 +90,10 @@ const AppLayout = ({
   };
 
   const onEnter = (e) => {
-    if (e.key === "Enter" && value.trim()) {
-      onSideAdd(value.trim());
+    if (e.key === "Enter") {
+      onSideAdd();
       toggleSideAdd();
-      setValue("");
+      setSideAddValue("");
     }
   };
 
@@ -206,8 +208,8 @@ const AppLayout = ({
                           type={type || "number"}
                           maxLength={20}
                           autoFocus
-                          value={value}
-                          onChange={handleChange}
+                          value={sideAddValue}
+                          onChange={(e) => setSideAddValue(e.target.value)}
                           onKeyPress={onEnter}
                           style={{ maxWidth: "90px" }}
                         />

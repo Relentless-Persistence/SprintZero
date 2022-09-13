@@ -22,6 +22,7 @@ function Home() {
   const [versions, setVersions] = useState(null);
   const [savingMode, setSavingMode] = useState(false);
   const [rightNav, setRightNav] = useState(["1.0"])
+  const [newVersion, setNewVersion] = useState("")
 
 
   const fetchVersions = async () => {
@@ -33,8 +34,7 @@ function Home() {
         const versions = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })).sort();
-        console.log(versions)
+        }));
         setVersion(versions[0])
       })
     }
@@ -43,17 +43,18 @@ function Home() {
   const getVersions = async () => {
     let newVersion = []
     if (versions) {
-      versions.map((item) => newVersion.push(item.version));
-      console.log(newVersion);
-      return newVersion;
+      setRightNav(versions.map(({version}) => version));
+      console.table("Navs", versions.map(({ version }) => version));
     }
   }
+
+  useEffect(() => {
+    getVersions();
+  }, [versions])
   
 
   // Fetch Epics from firebase
   const fetchEpics = async () => {
-    console.log("version", version)
-    console.log("product", activeProduct);
     if (activeProduct && version) {
       const res = await db
         .collection("Epics")
@@ -62,7 +63,7 @@ function Home() {
         .get();
       
       const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      console.log("epics", epics)
+      
       if (epics.length > 0) {
         setEpics(epics);
       } else {
@@ -84,10 +85,10 @@ function Home() {
 
   useEffect(() => {
     fetchEpics();
-  }, [activeProduct]);
+  }, [activeProduct, version]);
 
   const handleActiveVersion = (version) => {
-    const versionIndex = versions.findIndex((v) => v === version);
+    const versionIndex = findIndex(versions, (v) => v.version === version);
 
     if (versionIndex > -1) {
       setVersion(versions[versionIndex]);
@@ -149,7 +150,17 @@ function Home() {
   };
 
   const addVersion = () => {
-    versions.push("v4")
+    db.collection("versions")
+      .add({
+        version: newVersion,
+        product_id: activeProduct.id
+      })
+      .then((docRef) => {
+        message.success("New version added successfully");
+      })
+      .catch((error) => {
+        message.error("Error adding version");
+      });
   }
 
   return (
@@ -162,17 +173,19 @@ function Home() {
 
       <AppLayout
         ignoreLast={true}
-        // breadCrumbItems={versions && [`Story Map / ${version.version}`]}
+        breadCrumbItems={splitRoutes(pathname)}
         hasSideAdd={true}
         onSideAdd={() => addVersion()}
         hasMainAdd={true}
         rightNavItems={rightNav}
-        // activeRightItem={version}
+        activeRightItem={version && version.version}
         mainClass="mr-[100px]"
         sideBarClass={"min-w-[82px]"}
         addNewText={"Save"}
         onMainAdd={() => handleSave(epics)}
         setActiveRightNav={handleActiveVersion}
+        sideAddValue={newVersion}
+        setSideAddValue={setNewVersion}
       >
         <>
           {savingMode ? (
