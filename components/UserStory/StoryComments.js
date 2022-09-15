@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Comment, Tooltip, List, Avatar, Form, Button, Input } from "antd";
 import { SendOutlined, FlagOutlined } from "@ant-design/icons";
 
@@ -26,9 +26,9 @@ const data = [
   },
 ];
 
-const EpicComments = ({ type }) => {
-  const [comments, setComments] = React.useState(data);
-  const [comment, setComment] = React.useState("");
+ 
+
+const StoryComments = ({ comments }) => {
 
   const addComment = () => {
     setComments([...comments,
@@ -44,42 +44,31 @@ const EpicComments = ({ type }) => {
   };
 
   return (
-    <div className="h-full overflow-y-auto">
-      <List
-        className="comment-list"
-        // header={`${data.length} replies`}
-        itemLayout="horizontal"
-        dataSource={comments.filter((item) => item.type === type)}
-        renderItem={(item) => (
-          <li>
-            <Comment
-              actions={item.actions}
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              // datetime={item.datetime}
-            />
-          </li>
-        )}
-      />
-      <Comment
-        avatar={
-          <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />
-        }
-        content={
-          <Editor
-          onChange={(e) => setComment(e.target.value)}
-          onSubmit={addComment}
-          // submitting={submitting}
-          value={comment}
-          />
-        }
-      />
+    <div className="overflow-y-auto">
+      {comments && (
+        <List
+          className="comment-list"
+          // header={`${data.length} replies`}
+          itemLayout="horizontal"
+          dataSource={comments}
+          renderItem={(item) => (
+            <li>
+              <Comment
+                // actions={actions}
+                author={item.author.name}
+                avatar={item.author.avatar}
+                content={item.comment}
+                // datetime={item.datetime}
+              />
+            </li>
+          )}
+        />
+      )}
     </div>
   );
 };
 
-export default EpicComments;
+export default StoryComments;
 
 const Editor = ({ onChange, onSubmit, value }) => (
   <>

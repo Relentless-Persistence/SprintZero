@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Row, Col, Input, Checkbox, Tag } from "antd";
-import EpicComments from "./EpicComments";
+// import EpicComments from "./EpicComments";
 
 const { TextArea } = Input;
 
@@ -77,7 +77,7 @@ const EpicDetails = ({ epic }) => {
               </Tag>
             </div>
           </div>
-          <EpicComments type={CommentType} />
+          {/* <EpicComments type={CommentType} /> */}
         </Col>
       </Row>
     </div>

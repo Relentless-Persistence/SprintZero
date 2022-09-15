@@ -118,9 +118,9 @@ const Story = ({
             </Col>
             <Col className="flex items-center justify-end" span={12}>
               <CloseTime>
-                <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
+                {/* <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
                   Last modified 2 hrs ago
-                </p>
+                </p> */}
                 <CloseOutlined
                   style={{
                     color: "#101D06",
@@ -139,7 +139,7 @@ const Story = ({
         placement="bottom"
         visible={openDetail}
       >
-        <StoryDetails story={{ id: i.toString(), ...story }} />
+        <StoryDetails story={{ id: i.toString(), ...story }} storyIndex={storyIndex} featureIndex={featureIndex} i={i} handleChangeStory={handleChangeStory} />
       </Drawer>
     </>
   );

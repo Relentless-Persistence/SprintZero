@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { db } from "../../config/firebase-config";
+import { db, serverTimestamp } from "../../config/firebase-config";
 
 import {
   List,
@@ -28,6 +28,8 @@ import {
 import { Title } from "../Dashboard/SectionTitle";
 import AppCheckbox from "../AppCheckbox";
 import RadioButton from "../AppRadioBtn";
+import StoryComments from "./StoryComments";
+import {useAuth} from "../../contexts/AuthContext"
 
 const Story = styled.p`
   padding: 12px 19px;
@@ -35,57 +37,6 @@ const Story = styled.p`
   color: #262626;
   border: 1px solid #d9d9d9;
 `;
-
-const comments = [
-  [
-    {
-      author: "Han Solo",
-      avatar: "https://joeschmoe.io/api/v1/random",
-      content: (
-        <p>
-          We supply a series of design principles, practical patterns and high
-          quality design resources (Sketch and Axure), to help people create
-          their product prototypes beautifully and efficiently.
-        </p>
-      ),
-    },
-    {
-      author: "Han Solo",
-      avatar: "https://joeschmoe.io/api/v1/random",
-      content: (
-        <p>
-          We supply a series of design principles, practical patterns and high
-          quality design resources (Sketch and Axure), to help people create
-          their product prototypes beautifully and efficiently.
-        </p>
-      ),
-    },
-  ],
-  [
-    {
-      author: "Jane Doe",
-      avatar: "https://joeschmoe.io/api/v1/random",
-      content: (
-        <p>
-          We supply a series of design principles, practical patterns and high
-          quality design resources (Sketch and Axure), to help people create
-          their product prototypes beautifully and efficiently.
-        </p>
-      ),
-    },
-    {
-      author: "Han Solo",
-      avatar: "https://joeschmoe.io/api/v1/random",
-      content: (
-        <p>
-          We supply a series of design principles, practical patterns and high
-          quality design resources (Sketch and Axure), to help people create
-          their product prototypes beautifully and efficiently.
-        </p>
-      ),
-    },
-  ],
-];
 
 const init = [
   {
@@ -108,12 +59,64 @@ const init = [
 
 const { TextArea } = Input;
 
-const StoryDetails = ({ story }) => {
-  const [commentsIndex, setCommentsIndex] = useState(0);
+const StoryDetails = ({
+  story,
+  storyIndex,
+  featureIndex,
+  i,
+  handleChangeStory,
+}) => {
+  const {user} = useAuth();
+  const [commentType, setCommentType] = useState("design");
+  const [comments, setComments] = useState(null);
+  const [comment, setComment] = useState("");
   const [show, setShow] = useState(false);
   const [val, setVal] = useState("");
   const [data, setData] = useState([...init]);
-  const [flagged, setFlagged] = useState(false)
+  const [flagged, setFlagged] = useState(false);
+
+  const fetchComments = () => {
+    if (story) {
+      db.collection("storiesComments")
+        .where("story_id", "==", story.id)
+        .where("type", "==", commentType)
+        .onSnapshot((snapshot) => {
+          setComments(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
+  }
+
+  const submitComment = () => {
+    const data = {
+        story_id: story.id,
+        author: {
+          name: user.displayName,
+          avatar: user.photoURL,
+        },
+        comment: comment,
+        type: commentType,
+        createdAt: serverTimestamp,
+      }
+    db.collection("storiesComments")
+      .add(data)
+      .then((docRef) => {
+        message.success("Comment added successfully");
+        setComment("");
+      })
+      .catch((error) => {
+        message.error("Error adding comment");
+      });
+  };
+  
+
+  useEffect(() => {
+    fetchComments()
+  }, [story, commentType])
 
   const addItemDone = (e) => {
     if (e.key === "Enter" && val.trim()) {
@@ -137,45 +140,40 @@ const StoryDetails = ({ story }) => {
   const onFlag = async () => {
     await db.collection("Ethics").add({
       storyId: story.id,
-      type: "identified"
-    })
-    message.success("Story flagged")
-  }
-  
+      type: "identified",
+    });
+    message.success("Story flagged");
+  };
+
   const checkFlag = async () => {
-      const flag = await db
-        .collection("Ethics")
-        .where("storyId", "==", story.id)
-        .get();
-      if (flag.empty) {
-        setFlagged(false)
-      } else {
-        setFlagged(true);
-      }
-      
-  }
+    const flag = await db
+      .collection("Ethics")
+      .where("storyId", "==", story.id)
+      .get();
+    if (flag.empty) {
+      setFlagged(false);
+    } else {
+      setFlagged(true);
+    }
+  };
 
   useEffect(() => {
     checkFlag();
-  }, [story])
+  }, [story]);
 
   return (
     <Row gutter={[16, 16]}>
       <Col span={12}>
         <Title>User Story</Title>
 
-        <Story>
-          As a user I need to be aware of any issues with the platform so that I
-          can pre-emptively warn attendees and provide any new contact
-          information to join the meeting
-        </Story>
+        <Story>{story.description}</Story>
 
         <Title className="mt-[24px]">Acceptance Criteria</Title>
 
         <div className="max-h-[140px] overflow-y-auto">
-          {data.map((d, i) => (
+          {story?.acceptance_criteria?.map((d, i) => (
             <p key={i}>
-              <AppCheckbox checked={d.checked}>{d.label}</AppCheckbox>
+              <AppCheckbox checked={d.completed}>{d.name}</AppCheckbox>
             </p>
           ))}
 
@@ -199,70 +197,60 @@ const StoryDetails = ({ story }) => {
 
           <Radio.Group size="small">
             <RadioButton
-              checked={commentsIndex === 0}
-              onChange={() => setCommentsIndex(0)}
-              value={0}
+              checked={commentType === "design"}
+              onChange={() => setCommentType("design")}
+              value={commentType}
             >
               Design
             </RadioButton>
             <RadioButton
-              checked={commentsIndex === 1}
-              onChange={() => setCommentsIndex(1)}
-              value={1}
+              checked={commentType === "code"}
+              onChange={() => setCommentType("code")}
+              value={commentType}
             >
               Code
             </RadioButton>
           </Radio.Group>
         </div>
 
-        <List
-          className="comment-list"
-          itemLayout="horizontal"
-          dataSource={comments[commentsIndex]}
-          renderItem={(item) => (
-            <li>
-              <Comment
-                actions={item.actions}
-                author={item.author}
-                avatar={item.avatar}
-                content={item.content}
-              />
-            </li>
-          )}
-        />
+        <StoryComments comments={comments} />
 
-        <Comment
-          avatar={
-            <Avatar src="https://joeschmoe.io/api/v1/random" alt="Han Solo" />
-          }
-          content={
-            <>
-              <Form.Item>
-                <TextArea rows={2} />
-              </Form.Item>
+        {user && (
+          <Comment
+            avatar={
+              <Avatar src={user.photoURL} alt="avatar" />
+            }
+            content={
+              <Form onFinish={submitComment}>
+                <Form.Item>
+                  <TextArea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
+                </Form.Item>
 
-              <Form.Item>
-                <Button
-                  className="inline-flex justify-between items-center mr-[8px]"
-                  disabled
-                >
-                  <SendOutlined />
-                  Post
-                </Button>
+                <Form.Item>
+                  <Button
+                    className="inline-flex justify-between items-center mr-[8px]"
+                    type="submit"
+                    disabled={comment.length < 2}
+                    onClick={submitComment}
+                  >
+                    <SendOutlined />
+                    Post
+                  </Button>
 
-                <Button
-                  className="inline-flex items-center justify-between"
-                  danger
-                  disabled={flagged}
-                  onClick={onFlag}
-                >
-                  <FlagOutlined />
-                  Flag
-                </Button>
-              </Form.Item>
-            </>
-          }
-        />
+                  <Button
+                    className="inline-flex items-center justify-between"
+                    danger
+                    disabled={flagged}
+                    onClick={onFlag}
+                  >
+                    <FlagOutlined />
+                    Flag
+                  </Button>
+                </Form.Item>
+              </Form>
+            }
+          />
+        )}
       </Col>
     </Row>
   );
