@@ -71,8 +71,8 @@ function Home() {
           {
             id: generateString(20),
             name: "",
-            status: "",
             features: [],
+            version: version.id
           },
         ]);
       }

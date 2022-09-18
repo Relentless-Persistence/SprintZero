@@ -1,13 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Button, Typography, Carousel, Card, Col, Row, message, Avatar, Image } from "antd";
+import {
+  Button,
+  Typography,
+  Carousel,
+  Card,
+  Col,
+  Row,
+  message,
+  Avatar,
+  Image,
+} from "antd";
 import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
 import ProductGate from "./ProductGate";
 import ProductCost from "./ProductCost";
 // import withAuth from "../../hoc/withAuth";
-import {db} from "../../config/firebase-config";
+import { db } from "../../config/firebase-config";
 import firebase from "firebase";
 import { useRouter } from "next/router";
 
@@ -54,12 +64,13 @@ const ProductConfiguration = () => {
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           owner: user.uid,
         })
-        .then(() =>
+        .then((res) => {
+          newVersion(res.data);
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
-          })
-        )
+          });
+        })
         .then(() => router.push("/dashboard"));
     } else {
       message.warning({
@@ -67,6 +78,20 @@ const ProductConfiguration = () => {
         className: "custom-message mt-12",
       });
     }
+  };
+
+  const newVersion = (product) => {
+    db.collection("Versions")
+      .add({
+        product_id: product.id,
+        version: "1.0",
+      })
+      .then(() =>
+        message.success({
+          content: "Product version added",
+          className: "custom-message mt-12",
+        })
+      );
   };
 
   const PrevArrow = ({ index }) => {
@@ -115,7 +140,9 @@ const ProductConfiguration = () => {
 
   return (
     <>
-      <div style={{ padding: "0 153px", marginTop: "50px", marginBottom: "30px" }}>
+      <div
+        style={{ padding: "0 153px", marginTop: "50px", marginBottom: "30px" }}
+      >
         <Image
           src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/Dark.png?alt=media&token=48f74ba5-b0cc-4026-803c-ca8c8d727eda"
           alt="Logo"
@@ -239,4 +266,4 @@ const ProductConfiguration = () => {
   );
 };
 
-export default ProductConfiguration
+export default ProductConfiguration;

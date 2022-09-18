@@ -29,7 +29,7 @@ import {
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
-import { Board } from "../../../components/Boards";
+import { Board } from "../../../components/Dashboard/Sprint/Board";
 
 import { splitRoutes } from "../../../utils";
 
@@ -42,14 +42,10 @@ import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 import RadioButton from "../../../components/AppRadioBtn";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { findIndex, set } from "lodash";
-
-const getBoardNames = (boards) => {
-  const boardNames = boards.map((g) => g.boardName);
-
-  return boardNames;
-};
+import { versionState } from "../../../atoms/versionAtom";
+import update from "immutability-helper";
 
 const { TextArea } = Input;
 
@@ -236,8 +232,6 @@ const comments = [
   ],
 ];
 
-const versions = ["v1.0", "v1.1", "v1.2"];
-
 export default function Sprint() {
   const { pathname } = useRouter();
 
@@ -245,29 +239,80 @@ export default function Sprint() {
   const [visible, setVisible] = useState(false);
   const activeProduct = useRecoilValue(activeProductState);
   const [commentsIndex, setCommentsIndex] = useState(0);
+  const [versions, setVersions] = useState(null);
+  const [version, setVersion] = useRecoilState(versionState);
+  const [rightNav, setRightNav] = useState(["1.0"]);
+  const [newVersion, setNewVersion] = useState("");
 
   // const [activeProduct, setActiveProduct] = useState(products[0]);
 
-  const [activeBoard, setActiveBoard] = useState(versions[0]);
-  const [activeBoardIndex, setActiveBoardIndex] = useState(0);
+  // const [activeBoard, setActiveBoard] = useState(versions[0]);
+  // const [activeBoardIndex, setActiveBoardIndex] = useState(0);
+
+  const fetchVersions = async () => {
+    if (activeProduct) {
+      db.collection("versions")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setVersions(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+          const versions = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setVersion(versions[0]);
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchVersions();
+  }, [activeProduct]);
+
+   const getVersions = async () => {
+     let newVersion = [];
+     if (versions) {
+       setRightNav(versions.map(({ version }) => version));
+       console.table(
+         "Navs",
+         versions.map(({ version }) => version)
+       );
+     }
+   };
+
+   useEffect(() => {
+     getVersions();
+   }, [versions]);
+  
 
   // Fetch data from firebase
   const fetchSprints = async () => {
     let stories = [];
-    if (activeProduct) {
+    if (activeProduct && version) {
       const res = db
         .collection("Epics")
         .where("product_id", "==", activeProduct.id)
+        .where("version", "==", version.id)
         .onSnapshot((snapshot) => {
           snapshot.docs
             .map((doc) => ({
               id: doc.id,
               ...doc.data(),
             }))
-            .map((item) => {
-              item.features.map((feature) => {
-                feature.stories.map((story) => {
-                  stories.push({...story, feature: feature, epic: item});
+            .map((item, epicIndex) => {
+              item.features.map((feature, featureIndex) => {
+                feature.stories.map((story, storyIndex) => {
+                  stories.push({
+                    ...story,
+                    order: storyIndex,
+                    storyIndex: storyIndex,
+                    epicIndex,
+                    featureIndex,
+                    feature: feature,
+                    epic: item,
+                  });
+                  console.log("stories",stories)
                 });
               });
             });
@@ -275,86 +320,92 @@ export default function Sprint() {
             {
               columnId: "0",
               columnName: "Backlog",
-              data: stories.filter((item) => item.status === "Backlog"),
+              data: stories.filter((item) => item.sprint_type === "Backlog"),
             },
             {
               columnId: "1",
               columnName: "Designing",
-              data: stories.filter((item) => item.status === "Designing"),
+              data: stories.filter((item) => item.sprint_type === "Designing"),
             },
             {
               columnId: "2",
               columnName: "Critique",
-              data: stories.filter((item) => item.status === "Critique"),
+              data: stories.filter((item) => item.sprint_type === "Critique"),
             },
             {
               columnId: "3",
               columnName: "Ready for Dev",
-              data: stories.filter((item) => item.status === "Ready for Dev"),
+              data: stories.filter(
+                (item) => item.sprint_type === "Ready for Dev"
+              ),
             },
             {
               columnId: "4",
               columnName: "Developing",
-              data: stories.filter((item) => item.status === "Developing"),
+              data: stories.filter((item) => item.sprint_type === "Developing"),
             },
             {
               columnId: "5",
               columnName: "Quality Assurance",
-              data: stories.filter((item) => item.status === "Quality Assurance"),
+              data: stories.filter(
+                (item) => item.sprint_type === "Quality Assurance"
+              ),
             },
             {
               columnId: "6",
               columnName: "Ready",
-              data: stories.filter((item) => item.status === "Ready"),
+              data: stories.filter((item) => item.sprint_type === "Ready"),
             },
             {
               columnId: "7",
               columnName: "Shipped",
-              data: stories.filter((item) => item.status === "Shipped"),
+              data: stories.filter((item) => item.sprint_type === "Shipped"),
             },
           ]);
           console.log([
             {
               columnId: "0",
               columnName: "Backlog",
-              data: stories.filter((item) => item.status === "Backlog"),
+              data: stories.filter((item) => item.sprint_type === "Backlog"),
             },
             {
               columnId: "1",
               columnName: "Designing",
-              data: stories.filter((item) => item.status === "Designing"),
+              data: stories.filter((item) => item.sprint_type === "Designing"),
             },
             {
               columnId: "2",
               columnName: "Critique",
-              data: stories.filter((item) => item.status === "Critique"),
+              data: stories.filter((item) => item.sprint_type === "Critique"),
             },
             {
               columnId: "3",
               columnName: "Ready for Dev",
-              data: stories.filter((item) => item.status === "Ready for Dev"),
+              data: stories.filter(
+                (item) => item.sprint_type === "Ready for Dev"
+              ),
             },
             {
               columnId: "4",
               columnName: "Developing",
-              data: stories.filter((item) => item.status === "Developing"),
+              data: stories.filter((item) => item.sprint_type === "Developing"),
             },
             {
               columnId: "5",
               columnName: "Quality Assurance",
               data: stories.filter(
-                (item) => item.status === "Quality Assurance"
+                (item) => item.sprint_type === "Quality Assurance"
               ),
             },
             {
               columnId: "6",
               columnName: "Ready",
-              data: stories.filter((item) => item.status === "Ready"),
+              data: stories.filter((item) => item.sprint_type === "Ready"),
             },
             {
               columnId: "7",
               columnName: "Shipped",
-              data: stories.filter((item) => item.status === "Shipped"),
+              data: stories.filter((item) => item.sprint_type === "Shipped"),
             },
           ]);
         });
@@ -363,50 +414,49 @@ export default function Sprint() {
 
   useEffect(() => {
     fetchSprints();
-  }, [activeProduct]);
+  }, [activeProduct, version]);
 
-  const setBoard = (board) => {
-    const boardIndex = findIndex(versions, (o) => o === board);
+  const handleActiveVersion = (version) => {
+    const versionIndex = findIndex(versions, (v) => v.version === version);
 
-    if (boardIndex > -1) {
-      setActiveBoard(versions[boardIndex]);
-      setActiveBoardIndex(boardIndex);
+    if (versionIndex > -1) {
+      setVersion(versions[versionIndex]);
     }
   };
 
-  const handleDrop = (card, targetColId) => {
-    const info = { ...data };
-    const newData = info[activeProduct][activeBoardIndex];
-    const cardIndex = newData?.columns[card.colId]?.data?.findIndex(
-      (c) => c.id === card.id
-    );
+  const handleDrop = async (card, targetColId) => {
+    console.log("card", card);
+    console.log("targetColId", targetColId)
 
-    if (cardIndex > -1) {
-      const cardInfo = newData.columns[card.colId].data[cardIndex];
-      const newColumn = newData?.columns?.findIndex(
-        (col) => col.columnId === targetColId
-      );
+    const selectedStory = data[card.colId].data[card.id];
+    const targetStory = data[targetColId]
 
-      if (
-        !newData.columns[newColumn].data ||
-        !newData.columns[newColumn].data.length
-      ) {
-        newData.columns[newColumn].data = [cardInfo];
-      } else {
-        newData.columns[newColumn].data = [
-          ...newData.columns[newColumn].data,
-          cardInfo,
-        ];
-      }
+    console.log("selectedStory", selectedStory)
 
-      newData.columns[card.colId].data = newData.columns[
-        card.colId
-      ].data.filter((_, i) => i !== cardIndex);
+    selectedStory.epic.features[selectedStory.featureIndex].stories[
+      selectedStory.storyIndex
+    ].sprint_type = targetStory.columnName
+
+
+    console.log("selectedStory", selectedStory);
+
+    // console.log("newData", newData)
+
+    if (
+      selectedStory.epic.features[selectedStory.featureIndex].stories[
+        selectedStory.storyIndex
+      ].sprint_type === targetStory.columnName
+    ) {
+      console.log("epic", selectedStory.epic);
+      await db
+        .collection("Epics")
+        .doc(selectedStory.epic.id)
+        .update(selectedStory.epic)
+        .then(() => {
+          fetchSprints();
+          message.success("story updated successfully");
+        });
     }
-
-    info[activeProduct][activeBoardIndex] = newData;
-
-    setData(info);
   };
 
   const handleSwap = (currentCard, targetCard) => {
@@ -467,9 +517,9 @@ export default function Sprint() {
 
       <AppLayout
         useGrid
-        rightNavItems={versions}
-        activeRightItem={activeBoard}
-        setActiveRightNav={setBoard}
+        rightNavItems={rightNav}
+        activeRightItem={version && version.version}
+        setActiveRightNav={handleActiveVersion}
         hasMainAdd={false}
         hasSideAdd={false}
         breadCrumbItems={splitRoutes(pathname)}
@@ -489,7 +539,7 @@ export default function Sprint() {
               <Board
                 colCount={data.length}
                 onDrop={handleDrop}
-                // onSwap={handleSwap}
+                onSwap={() => console.log(this)}
                 columns={data}
                 renderColumn={renderCol}
                 columnHeaderRenders={[null, null, null]}

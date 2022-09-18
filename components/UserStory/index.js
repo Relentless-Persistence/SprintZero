@@ -38,9 +38,6 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
         name: {
           $set: e,
         },
-        // status: {
-        //   $set: "saved",
-        // },
       },
     });
 
@@ -75,7 +72,8 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
           ],
         },
       },
-    });
+    })
+
 
     setEpics(newData);
   };
@@ -126,6 +124,7 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
                   id: id,
                   name: "", 
                   status: "",
+                  sprint_type: "Backlog"
                 },
               ],
             },
@@ -133,8 +132,6 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
         },
       },
     });
-
-    db.collection("Stories").doc(id).set({name: "", status: "Backlog", product_id: activeProduct.id})
 
     setEpics(newData);
   };
