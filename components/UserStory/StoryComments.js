@@ -4,44 +4,9 @@ import { SendOutlined, FlagOutlined } from "@ant-design/icons";
 
 const { TextArea } = Input;
 
-const data = [
-  {
-    actions: [<span key="comment-list-reply-to-0">Reply to</span>],
-    author: "Han Solo",
-    avatar: "https://joeschmoe.io/api/v1/random",
-    content: (
-      <p>
-        Authoritatively disseminate prospective leadership via opportunities
-        economically sound.
-      </p>
-    ),
-    type: "design",
-  },
-  {
-    actions: [<span key="comment-list-reply-to-0">Reply to</span>],
-    author: "Kim James",
-    avatar: "https://joeschmoe.io/api/v1/random",
-    content: <p>Is this really want we think the story should be?</p>,
-    type: "code",
-  },
-];
-
  
 
 const StoryComments = ({ comments }) => {
-
-  const addComment = () => {
-    setComments([...comments,
-      {
-        actions: [<span key="comment-list-reply-to-0">Reply to</span>],
-        author: "James Bond",
-        avatar: "https://joeschmoe.io/api/v1/random",
-        content: <p>{comment}</p>,
-        type: type,
-      },
-    ]);
-    setComment("");
-  };
 
   return (
     <div className="overflow-y-auto">

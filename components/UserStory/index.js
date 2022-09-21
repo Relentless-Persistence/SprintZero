@@ -124,7 +124,7 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
                   id: id,
                   name: "", 
                   status: "",
-                  sprint_type: "Backlog"
+                  sprint_status: "Backlog"
                 },
               ],
             },

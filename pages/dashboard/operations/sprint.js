@@ -46,6 +46,7 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import { findIndex, set } from "lodash";
 import { versionState } from "../../../atoms/versionAtom";
 import update from "immutability-helper";
+import StoryDetails from "../../../components/Sprint/StoryDetails";
 
 const { TextArea } = Input;
 
@@ -237,6 +238,7 @@ export default function Sprint() {
 
   const [data, setData] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [story, setStory] = useState(null);
   const activeProduct = useRecoilValue(activeProductState);
   const [commentsIndex, setCommentsIndex] = useState(0);
   const [versions, setVersions] = useState(null);
@@ -320,92 +322,46 @@ export default function Sprint() {
             {
               columnId: "0",
               columnName: "Backlog",
-              data: stories.filter((item) => item.sprint_type === "Backlog"),
+              data: stories.filter((item) => item.sprint_status === "Backlog"),
             },
             {
               columnId: "1",
               columnName: "Designing",
-              data: stories.filter((item) => item.sprint_type === "Designing"),
+              data: stories.filter((item) => item.sprint_status === "Designing"),
             },
             {
               columnId: "2",
               columnName: "Critique",
-              data: stories.filter((item) => item.sprint_type === "Critique"),
+              data: stories.filter((item) => item.sprint_status === "Critique"),
             },
             {
               columnId: "3",
               columnName: "Ready for Dev",
               data: stories.filter(
-                (item) => item.sprint_type === "Ready for Dev"
+                (item) => item.sprint_status === "Ready for Dev"
               ),
             },
             {
               columnId: "4",
               columnName: "Developing",
-              data: stories.filter((item) => item.sprint_type === "Developing"),
+              data: stories.filter((item) => item.sprint_status === "Developing"),
             },
             {
               columnId: "5",
               columnName: "Quality Assurance",
               data: stories.filter(
-                (item) => item.sprint_type === "Quality Assurance"
+                (item) => item.sprint_status === "Quality Assurance"
               ),
             },
             {
               columnId: "6",
               columnName: "Ready",
-              data: stories.filter((item) => item.sprint_type === "Ready"),
+              data: stories.filter((item) => item.sprint_status === "Ready"),
             },
             {
               columnId: "7",
               columnName: "Shipped",
-              data: stories.filter((item) => item.sprint_type === "Shipped"),
-            },
-          ]);
-          console.log([
-            {
-              columnId: "0",
-              columnName: "Backlog",
-              data: stories.filter((item) => item.sprint_type === "Backlog"),
-            },
-            {
-              columnId: "1",
-              columnName: "Designing",
-              data: stories.filter((item) => item.sprint_type === "Designing"),
-            },
-            {
-              columnId: "2",
-              columnName: "Critique",
-              data: stories.filter((item) => item.sprint_type === "Critique"),
-            },
-            {
-              columnId: "3",
-              columnName: "Ready for Dev",
-              data: stories.filter(
-                (item) => item.sprint_type === "Ready for Dev"
-              ),
-            },
-            {
-              columnId: "4",
-              columnName: "Developing",
-              data: stories.filter((item) => item.sprint_type === "Developing"),
-            },
-            {
-              columnId: "5",
-              columnName: "Quality Assurance",
-              data: stories.filter(
-                (item) => item.sprint_type === "Quality Assurance"
-              ),
-            },
-            {
-              columnId: "6",
-              columnName: "Ready",
-              data: stories.filter((item) => item.sprint_type === "Ready"),
-            },
-            {
-              columnId: "7",
-              columnName: "Shipped",
-              data: stories.filter((item) => item.sprint_type === "Shipped"),
+              data: stories.filter((item) => item.sprint_status === "Shipped"),
             },
           ]);
         });
@@ -435,7 +391,7 @@ export default function Sprint() {
 
     selectedStory.epic.features[selectedStory.featureIndex].stories[
       selectedStory.storyIndex
-    ].sprint_type = targetStory.columnName
+    ].sprint_status = targetStory.columnName
 
 
     console.log("selectedStory", selectedStory);
@@ -445,7 +401,7 @@ export default function Sprint() {
     if (
       selectedStory.epic.features[selectedStory.featureIndex].stories[
         selectedStory.storyIndex
-      ].sprint_type === targetStory.columnName
+      ].sprint_status === targetStory.columnName
     ) {
       console.log("epic", selectedStory.epic);
       await db
@@ -495,12 +451,18 @@ export default function Sprint() {
     setData(info);
   };
 
+  const selectStory = (story) => {
+    setStory(story);
+    setVisible(true);
+  }
+
   const renderCol = (card, index) => {
+    console.table("card", card)
     return (
       <>
         <Index>{index + 1}</Index>
 
-        <div onClick={() => setVisible(true)}>
+        <div onClick={() => selectStory(card)}>
           <CustomTag icon={<CopyOutlined />} text={card.name} />
         </div>
       </>
@@ -548,144 +510,14 @@ export default function Sprint() {
           </div>
         </div>
 
-        <ResizeableDrawer
-          title={
-            <DrawerTitle gutter={[16, 16]}>
-              <Col span={12}>
-                <h3>card_title</h3>
-                <StyledTag color="#91D5FF"># points total</StyledTag>
-                <StyledTag color="#A4DF74">$0.00 total</StyledTag>
-
-                <button className="text-[#1890FF]">Edit</button>
-              </Col>
-              <Col className="flex items-center justify-end" span={12}>
-                <CloseTime>
-                  <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
-                    Last modified 2 hrs ago
-                  </p>
-                  <CloseOutlined
-                    style={{
-                      color: "#101D06",
-                      fontSize: "12px",
-                    }}
-                    onClick={() => setVisible(false)}
-                  />
-                </CloseTime>
-              </Col>
-            </DrawerTitle>
-          }
-          placement={"bottom"}
-          closable={false}
-          onClose={() => setVisible(false)}
-          visible={visible}
-        >
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Title>Epic</Title>
-
-              <Story>
-                As a user I need to be aware of any issues with the platform so
-                that I can pre-emptively warn attendees and provide any new
-                contact information to join the meeting
-              </Story>
-
-              <Title className="mt-[24px]">Keep</Title>
-
-              <p>
-                <AppCheckbox checked>Darrell Steward</AppCheckbox>
-              </p>
-
-              <p>
-                <AppCheckbox>Jane Cooper</AppCheckbox>
-              </p>
-
-              <p>
-                <AppCheckbox checked>Bessie Cooper</AppCheckbox>
-              </p>
-
-              <p>
-                <AppCheckbox>Floyd Miles</AppCheckbox>
-              </p>
-            </Col>
-
-            <Col
-              className="max-h-[250px] overflow-y-scroll pr-[20px]"
-              offset={1}
-              span={11}
-            >
-              <div className="flex items-center justify-between">
-                <Title>Comments</Title>
-
-                <Radio.Group size="small">
-                  <RadioButton
-                    checked={commentsIndex === 0}
-                    onChange={() => setCommentsIndex(0)}
-                    value={0}
-                  >
-                    Design
-                  </RadioButton>
-                  <RadioButton
-                    checked={commentsIndex === 1}
-                    onChange={() => setCommentsIndex(1)}
-                    value={1}
-                  >
-                    Code
-                  </RadioButton>
-                </Radio.Group>
-              </div>
-
-              <List
-                className="comment-list"
-                itemLayout="horizontal"
-                dataSource={comments[commentsIndex]}
-                renderItem={(item) => (
-                  <li>
-                    <Comment
-                      actions={item.actions}
-                      author={item.author}
-                      avatar={item.avatar}
-                      content={item.content}
-                    />
-                  </li>
-                )}
-              />
-
-              <Comment
-                avatar={
-                  <Avatar
-                    src="https://joeschmoe.io/api/v1/random"
-                    alt="Han Solo"
-                  />
-                }
-                content={
-                  <>
-                    <Form.Item>
-                      <TextArea rows={2} />
-                    </Form.Item>
-
-                    <Form.Item>
-                      <Button
-                        className="inline-flex justify-between items-center mr-[8px]"
-                        disabled
-                      >
-                        <SendOutlined />
-                        Post
-                      </Button>
-
-                      <Button
-                        className="inline-flex items-center justify-between"
-                        danger
-                      >
-                        <FlagOutlined />
-                        Flag
-                      </Button>
-                    </Form.Item>
-                  </>
-                }
-              />
-            </Col>
-          </Row>
-        </ResizeableDrawer>
+        {story && (
+          <StoryDetails
+            story={story}
+            setStory={setStory}
+            visible={visible}
+            setVisible={setVisible}
+          />
+        )}
       </AppLayout>
     </div>
   );
