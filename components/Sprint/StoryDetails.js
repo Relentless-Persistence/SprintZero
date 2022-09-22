@@ -106,7 +106,7 @@ const StyledTag = styled(Tag)`
 
 const { TextArea } = Input;
 
-const StoryDetails = ({ story, setStory, visible, setVisible }) => {
+const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) => {
   const { user } = useAuth();
   const [commentType, setCommentType] = useState("design");
   const [comments, setComments] = useState(null);
@@ -116,6 +116,7 @@ const StoryDetails = ({ story, setStory, visible, setVisible }) => {
   const [data, setData] = useState([...init]);
   const [flagged, setFlagged] = useState(false);
   const [editView, setEditView] = useState(false);
+  const [storyDescription, setStoryDescription] = useState(story.description)
 
   const fetchComments = () => {
     if (story) {
@@ -159,15 +160,28 @@ const StoryDetails = ({ story, setStory, visible, setVisible }) => {
     fetchComments();
   }, [story, commentType]);
 
-  const addItemDone = (e) => {
+  const addItemDone = async (e) => {
     if (e.key === "Enter" && val.trim()) {
-      setData([
-        ...data,
-        {
-          label: val,
-          checked: false,
-        },
-      ]);
+      await story.epic.features[story.featureIndex].stories[story.storyIndex]
+        .acceptance_criteria.push({
+          name: val,
+          completed: false
+        })
+      
+        console.log(
+          story.epic.features[story.featureIndex].stories[story.storyIndex]
+            .acceptance_criteria
+        );
+
+      await db
+        .collection("Epics")
+        .doc(story.epic.id)
+        .update(story.epic)
+        .then(() => {
+          fetchSprints();
+          message.success("story updated successfully");
+        });
+
 
       setVal("");
       setShow(false);
@@ -201,6 +215,50 @@ const StoryDetails = ({ story, setStory, visible, setVisible }) => {
   useEffect(() => {
     checkFlag();
   }, [story]);
+
+  const checkAcceptanceCriteria = async (i) => {
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].acceptance_criteria[i].completed =
+      !story.epic.features[story.featureIndex].stories[story.storyIndex]
+        .acceptance_criteria[i].completed;
+
+    console.log(
+      story.epic.features[story.featureIndex].stories[story.storyIndex]
+        .acceptance_criteria[i].completed
+    );
+
+    await db
+      .collection("Epics")
+      .doc(story.epic.id)
+      .update(story.epic)
+      .then(() => {
+        fetchSprints();
+        message.success("story updated successfully");
+      });
+  };
+
+  const updateStoryDescription = async (e) => {
+    if (e.key === "Enter") {
+      story.epic.features[story.featureIndex].stories[
+        story.storyIndex
+      ].description = storyDescription
+
+      console.log(
+        story.epic.features[story.featureIndex].stories[story.storyIndex]
+          .description
+      );
+
+      await db
+        .collection("Epics")
+        .doc(story.epic.id)
+        .update(story.epic)
+        .then(() => {
+          fetchSprints();
+          message.success("story updated successfully");
+        });
+    }
+  }
 
   return !editView ? (
     <ResizeableDrawer
@@ -247,33 +305,49 @@ const StoryDetails = ({ story, setStory, visible, setVisible }) => {
         <Col span={12}>
           <Title>User Story</Title>
 
-          <Story>{story.description}</Story>
+          <TextArea value={storyDescription} onChange={e => setStoryDescription(e.target.value)} onKeyPress={updateStoryDescription} rows={3} />
 
           <Title className="mt-[24px]">Acceptance Criteria</Title>
 
           <div className="max-h-[140px] overflow-y-auto">
-            {story?.acceptance_criteria?.map((d, i) => (
-              <p key={i}>
-                <AppCheckbox checked={d.completed}>
-                  <span className={d.completed ? "line-through" : null}>
-                    {d.name}
-                  </span>
-                </AppCheckbox>
-              </p>
-            ))}
+            <Row>
+              {story?.acceptance_criteria?.map((d, i) => (
+                <Col span={8} key={i}>
+                  <AppCheckbox
+                    checked={d.completed}
+                    onChange={() => checkAcceptanceCriteria(i)}
+                  >
+                    <span className={d.completed ? "line-through" : null}>
+                      {d.name}
+                    </span>
+                  </AppCheckbox>
+                </Col>
+              ))}
 
-            {show ? (
-              <Input value={val} onKeyPress={addItemDone} onChange={onChange} />
-            ) : (
-              <AppCheckbox checked={false} onChange={() => setShow((s) => !s)}>
-                <span className="text-[#BFBFBF]">Add Item</span>
-              </AppCheckbox>
-            )}
+              {show ? (
+                <Col span={8}>
+                  <Input
+                    value={val}
+                    onKeyPress={addItemDone}
+                    onChange={onChange}
+                  />
+                </Col>
+              ) : (
+                <Col span={8}>
+                  <AppCheckbox
+                    checked={false}
+                    onChange={() => setShow((s) => !s)}
+                  >
+                    <span className="text-[#BFBFBF]">Add Item</span>
+                  </AppCheckbox>
+                </Col>
+              )}
+            </Row>
           </div>
         </Col>
 
         <Col
-          className="max-h-[250px] overflow-y-scroll pr-[20px]"
+          className="max-h-[350px] overflow-y-auto pr-[20px]"
           offset={1}
           span={11}
         >

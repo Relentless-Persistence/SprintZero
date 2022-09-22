@@ -9,7 +9,7 @@ const { TextArea } = Input;
 const StoryComments = ({ comments }) => {
 
   return (
-    <div className="overflow-y-auto">
+    <div className="h-[120px] overflow-y-auto">
       {comments && (
         <List
           className="comment-list"

@@ -321,13 +321,17 @@ export default function Sprint() {
           setData([
             {
               columnId: "0",
-              columnName: "Backlog",
-              data: stories.filter((item) => item.sprint_status === "Backlog"),
+              columnName: "Product Backlog",
+              data: stories.filter(
+                (item) => item.sprint_status === "Product Backlog"
+              ),
             },
             {
               columnId: "1",
-              columnName: "Designing",
-              data: stories.filter((item) => item.sprint_status === "Designing"),
+              columnName: "Design Sprint Backlog",
+              data: stories.filter(
+                (item) => item.sprint_status === "Design Sprint Backlog"
+              ),
             },
             {
               columnId: "2",
@@ -336,27 +340,50 @@ export default function Sprint() {
             },
             {
               columnId: "3",
-              columnName: "Ready for Dev",
+              columnName: "Design Done / Dev Ready",
               data: stories.filter(
-                (item) => item.sprint_status === "Ready for Dev"
+                (item) => item.sprint_status === "Design Done / Dev Ready"
+              ),
+            },
+            {
+              columnId: "4",
+              columnName: "Dev Sprint Backlog",
+              data: stories.filter(
+                (item) => item.sprint_status === "Dev Sprint Backlog"
               ),
             },
             {
               columnId: "4",
               columnName: "Developing",
-              data: stories.filter((item) => item.sprint_status === "Developing"),
-            },
-            {
-              columnId: "5",
-              columnName: "Quality Assurance",
               data: stories.filter(
-                (item) => item.sprint_status === "Quality Assurance"
+                (item) => item.sprint_status === "Developing"
               ),
             },
             {
+              columnId: "4",
+              columnName: "Design Review",
+              data: stories.filter(
+                (item) => item.sprint_status === "Design Review"
+              ),
+            },
+            {
+              columnId: "4",
+              columnName: "Peer Code Review",
+              data: stories.filter(
+                (item) => item.sprint_status === "Peer Code Review"
+              ),
+            },
+            {
+              columnId: "5",
+              columnName: "QA",
+              data: stories.filter((item) => item.sprint_status === "QA"),
+            },
+            {
               columnId: "6",
-              columnName: "Ready",
-              data: stories.filter((item) => item.sprint_status === "Ready"),
+              columnName: "Production Queue",
+              data: stories.filter(
+                (item) => item.sprint_status === "Production Queue"
+              ),
             },
             {
               columnId: "7",
@@ -516,6 +543,7 @@ export default function Sprint() {
             setStory={setStory}
             visible={visible}
             setVisible={setVisible}
+            fetchSprints={fetchSprints}
           />
         )}
       </AppLayout>
