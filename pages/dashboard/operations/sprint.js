@@ -241,7 +241,9 @@ export default function Sprint() {
   const [story, setStory] = useState(null);
   const activeProduct = useRecoilValue(activeProductState);
   const [commentsIndex, setCommentsIndex] = useState(0);
-  const [versions, setVersions] = useState(null);
+  // const [versions, setVersions] = useState(null);
+  const [sprints, setSprints] = useState(null);
+  const [sprint, setSprint] = useState(null)
   const [version, setVersion] = useRecoilState(versionState);
   const [rightNav, setRightNav] = useState(["1.0"]);
   const [newVersion, setNewVersion] = useState("");
@@ -251,51 +253,50 @@ export default function Sprint() {
   // const [activeBoard, setActiveBoard] = useState(versions[0]);
   // const [activeBoardIndex, setActiveBoardIndex] = useState(0);
 
-  const fetchVersions = async () => {
+  const getSprints = async () => {
     if (activeProduct) {
-      db.collection("versions")
+      db.collection("Sprints")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
-          setVersions(
+          setSprints(
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
-          const versions = snapshot.docs.map((doc) => ({
+          const sprints = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
-          setVersion(versions[0]);
+          setSprint(sprints[0]);
         });
     }
   };
 
   useEffect(() => {
-    fetchVersions();
+    getSprints();
   }, [activeProduct]);
 
-   const getVersions = async () => {
-     let newVersion = [];
-     if (versions) {
-       setRightNav(versions.map(({ version }) => version));
-       console.table(
-         "Navs",
-         versions.map(({ version }) => version)
-       );
+   const getRightNav = async () => {
+     if (sprints) {
+       setRightNav(sprints.map(({ name }) => name));
+      //  console.table(
+      //    "Navs",
+      //    versions.map(({ version }) => version)
+      //  );
      }
    };
 
    useEffect(() => {
-     getVersions();
-   }, [versions]);
+     getRightNav();
+   }, [sprints]);
   
 
   // Fetch data from firebase
   const fetchSprints = async () => {
     let stories = [];
-    if (activeProduct && version) {
+    if (activeProduct && sprint) {
       const res = db
         .collection("Epics")
         .where("product_id", "==", activeProduct.id)
-        .where("version", "==", version.id)
+        // .where("version", "==", version.id)
         .onSnapshot((snapshot) => {
           snapshot.docs
             .map((doc) => ({
@@ -323,72 +324,99 @@ export default function Sprint() {
               columnId: "0",
               columnName: "Product Backlog",
               data: stories.filter(
-                (item) => item.sprint_status === "Product Backlog"
+                (item) =>
+                  item.sprint_status === "Product Backlog" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "1",
               columnName: "Design Sprint Backlog",
               data: stories.filter(
-                (item) => item.sprint_status === "Design Sprint Backlog"
+                (item) =>
+                  item.sprint_status === "Design Sprint Backlog" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "2",
               columnName: "Critique",
-              data: stories.filter((item) => item.sprint_status === "Critique"),
+              data: stories.filter(
+                (item) =>
+                  item.sprint_status === "Critique" &&
+                  item.sprint_id === sprint.id
+              ),
             },
             {
               columnId: "3",
               columnName: "Design Done / Dev Ready",
               data: stories.filter(
-                (item) => item.sprint_status === "Design Done / Dev Ready"
+                (item) =>
+                  item.sprint_status === "Design Done / Dev Ready" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "4",
               columnName: "Dev Sprint Backlog",
               data: stories.filter(
-                (item) => item.sprint_status === "Dev Sprint Backlog"
+                (item) =>
+                  item.sprint_status === "Dev Sprint Backlog" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "4",
               columnName: "Developing",
               data: stories.filter(
-                (item) => item.sprint_status === "Developing"
+                (item) =>
+                  item.sprint_status === "Developing" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "4",
               columnName: "Design Review",
               data: stories.filter(
-                (item) => item.sprint_status === "Design Review"
+                (item) =>
+                  item.sprint_status === "Design Review" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "4",
               columnName: "Peer Code Review",
               data: stories.filter(
-                (item) => item.sprint_status === "Peer Code Review"
+                (item) =>
+                  item.sprint_status === "Peer Code Review" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "5",
               columnName: "QA",
-              data: stories.filter((item) => item.sprint_status === "QA"),
+              data: stories.filter(
+                (item) =>
+                  item.sprint_status === "QA" && item.sprint_id === sprint.id
+              ),
             },
             {
               columnId: "6",
               columnName: "Production Queue",
               data: stories.filter(
-                (item) => item.sprint_status === "Production Queue"
+                (item) =>
+                  item.sprint_status === "Production Queue" &&
+                  item.sprint_id === sprint.id
               ),
             },
             {
               columnId: "7",
               columnName: "Shipped",
-              data: stories.filter((item) => item.sprint_status === "Shipped"),
+              data: stories.filter(
+                (item) =>
+                  item.sprint_status === "Shipped" &&
+                  item.sprint_id === sprint.id
+              ),
             },
           ]);
         });
@@ -397,13 +425,13 @@ export default function Sprint() {
 
   useEffect(() => {
     fetchSprints();
-  }, [activeProduct, version]);
+  }, [activeProduct, sprint]);
 
-  const handleActiveVersion = (version) => {
-    const versionIndex = findIndex(versions, (v) => v.version === version);
+  const handleActiveSprint = (sprint) => {
+    const sprintIndex = findIndex(sprints, (v) => v.name === sprint);
 
-    if (versionIndex > -1) {
-      setVersion(versions[versionIndex]);
+    if (sprintIndex > -1) {
+      setSprint(sprints[sprintIndex]);
     }
   };
 
@@ -506,12 +534,16 @@ export default function Sprint() {
 
       <AppLayout
         useGrid
-        rightNavItems={rightNav}
-        activeRightItem={version && version.version}
-        setActiveRightNav={handleActiveVersion}
+        // rightNavItems={rightNav}
+        // activeRightItem={sprint && sprint.name}
+        // setActiveRightNav={handleActiveSprint}
         hasMainAdd={false}
         hasSideAdd={false}
         breadCrumbItems={splitRoutes(pathname)}
+        ignoreLast={true}
+        // mainClass="mr-[110px]"
+        // topExtra={<>Hello</>}
+        hideSideBar={true}
       >
         <div
           style={{
@@ -544,6 +576,7 @@ export default function Sprint() {
             visible={visible}
             setVisible={setVisible}
             fetchSprints={fetchSprints}
+            activeProduct={activeProduct}
           />
         )}
       </AppLayout>

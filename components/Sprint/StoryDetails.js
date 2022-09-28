@@ -32,6 +32,7 @@ import AppCheckbox from "../AppCheckbox";
 import RadioButton from "../AppRadioBtn";
 import StoryComments from "../UserStory/StoryComments";
 import { useAuth } from "../../contexts/AuthContext";
+import EditStory from "./EditStory";
 
 const Story = styled.p`
   padding: 12px 19px;
@@ -106,7 +107,14 @@ const StyledTag = styled(Tag)`
 
 const { TextArea } = Input;
 
-const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) => {
+const StoryDetails = ({
+  story,
+  setStory,
+  visible,
+  setVisible,
+  fetchSprints,
+  activeProduct,
+}) => {
   const { user } = useAuth();
   const [commentType, setCommentType] = useState("design");
   const [comments, setComments] = useState(null);
@@ -116,7 +124,14 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
   const [data, setData] = useState([...init]);
   const [flagged, setFlagged] = useState(false);
   const [editView, setEditView] = useState(false);
-  const [storyDescription, setStoryDescription] = useState(story.description)
+  const [storyDescription, setStoryDescription] = useState(story.description);
+  const [versions, setVersions] = useState(null);
+  const [name, setName] = useState(story.name);
+  const [effort, setEffort] = useState(story.effort);
+  const [version, setVersion] = useState(story.epic.version);
+  const [status, setStatus] = useState(story.sprint_status);
+  const [designLink, setDesignLink] = useState(story.design_link);
+  const [codeLink, setCodeLink] = useState(story.code_link);
 
   const fetchComments = () => {
     if (story) {
@@ -162,16 +177,17 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
 
   const addItemDone = async (e) => {
     if (e.key === "Enter" && val.trim()) {
-      await story.epic.features[story.featureIndex].stories[story.storyIndex]
-        .acceptance_criteria.push({
-          name: val,
-          completed: false
-        })
-      
-        console.log(
-          story.epic.features[story.featureIndex].stories[story.storyIndex]
-            .acceptance_criteria
-        );
+      await story.epic.features[story.featureIndex].stories[
+        story.storyIndex
+      ].acceptance_criteria.push({
+        name: val,
+        completed: false,
+      });
+
+      console.log(
+        story.epic.features[story.featureIndex].stories[story.storyIndex]
+          .acceptance_criteria
+      );
 
       await db
         .collection("Epics")
@@ -181,7 +197,6 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
           fetchSprints();
           message.success("story updated successfully");
         });
-
 
       setVal("");
       setShow(false);
@@ -216,6 +231,22 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
     checkFlag();
   }, [story]);
 
+  const getVersions = async () => {
+    if (activeProduct) {
+      db.collection("Versions")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setVersions(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
+  };
+
+  useEffect(() => {
+    getVersions();
+  }, [activeProduct, story]);
+
   const checkAcceptanceCriteria = async (i) => {
     story.epic.features[story.featureIndex].stories[
       story.storyIndex
@@ -242,7 +273,7 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
     if (e.key === "Enter") {
       story.epic.features[story.featureIndex].stories[
         story.storyIndex
-      ].description = storyDescription
+      ].description = storyDescription;
 
       console.log(
         story.epic.features[story.featureIndex].stories[story.storyIndex]
@@ -258,7 +289,42 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
           message.success("story updated successfully");
         });
     }
-  }
+  };
+
+  const updateStory = async () => {
+    story.epic.features[story.featureIndex].stories[story.storyIndex].name =
+      name;
+
+    story.epic.features[story.featureIndex].stories[story.storyIndex].effort =
+      effort;
+
+    story.epic.features[story.featureIndex].stories[story.storyIndex].version =
+      version;
+
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].sprint_status = status;
+
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].design_link = designLink;
+
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].code_link = codeLink;
+
+    console.log(story.epic)
+
+    await db
+      .collection("Epics")
+      .doc(story.epic.id)
+      .update(story.epic)
+      .then(() => {
+        fetchSprints();
+        message.success("story updated successfully");
+        setEditView(false)
+      });
+  };
 
   return !editView ? (
     <ResizeableDrawer
@@ -305,7 +371,12 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
         <Col span={12}>
           <Title>User Story</Title>
 
-          <TextArea value={storyDescription} onChange={e => setStoryDescription(e.target.value)} onKeyPress={updateStoryDescription} rows={3} />
+          <TextArea
+            value={storyDescription}
+            onChange={(e) => setStoryDescription(e.target.value)}
+            onKeyPress={updateStoryDescription}
+            rows={3}
+          />
 
           <Title className="mt-[24px]">Acceptance Criteria</Title>
 
@@ -437,13 +508,30 @@ const StoryDetails = ({ story, setStory, visible, setVisible, fetchSprints }) =>
       extra={
         <Space>
           <Button onClick={() => setEditView(false)}>Cancel</Button>
-          <Button type="primary" danger>
-            OK
+          <Button type="primary" danger onClick={updateStory}>
+            Done
           </Button>
         </Space>
       }
     >
-      Edit Me!
+      {versions && (
+        <EditStory
+          story={story}
+          versions={versions}
+          name={name}
+          setName={setName}
+          effort={effort}
+          setEffort={setEffort}
+          version={version}
+          setVersion={setVersion}
+          status={status}
+          setStatus={setStatus}
+          designLink={designLink}
+          setDesignLink={setDesignLink}
+          codeLink={codeLink}
+          setCodeLink={setCodeLink}
+        />
+      )}
     </ResizeableDrawer>
   );
 };
