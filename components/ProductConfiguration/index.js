@@ -65,7 +65,8 @@ const ProductConfiguration = () => {
           owner: user.uid,
         })
         .then((res) => {
-          newVersion(res.data);
+          newVersion(res.id);
+          addOwnerToTeam(res.id);
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
@@ -83,7 +84,7 @@ const ProductConfiguration = () => {
   const newVersion = (product) => {
     db.collection("Versions")
       .add({
-        product_id: product.id,
+        product_id: product,
         version: "1.0",
       })
       .then(() =>
@@ -93,6 +94,20 @@ const ProductConfiguration = () => {
         })
       );
   };
+
+  const addOwnerToTeam = async (product) => {
+    await db.collection("teams").add({
+      user: {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName,
+        avatar: user.photoURL,
+      },
+      expiry: "unlimited",
+      type: "member",
+      product_id: product,
+    });
+  }
 
   const PrevArrow = ({ index }) => {
     const show = index === 0 ? true : false;
