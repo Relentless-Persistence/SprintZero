@@ -38,14 +38,13 @@ const EditStory = ({
   codeLink,
   setCodeLink,
 }) => {
-  
-  const findVersion = () => {
-    const versionIndex = findIndex(versions, (v) => v.id === story.version);
 
-    if (versionIndex > -1) {
-      return versions[versionIndex].version;
-      console.log(versions[versionIndex].version);
-    }
+
+  const getVersion = (id) => {
+    if(versions && version) {
+      const newArr = versions.filter((version) => version.id === id);
+      if(newArr.length > 0) return newArr[0].version
+    } else return 0;
   };
 
   return (
@@ -74,7 +73,7 @@ const EditStory = ({
         <Col span={2}>
           <h6 className="text-gray-400 ">Release</h6>
           <Select
-            defaultValue={version}
+            defaultValue={getVersion(version)}
             onChange={(value) => setVersion(value)}
             className="w-full"
           >

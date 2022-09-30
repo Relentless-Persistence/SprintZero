@@ -27,7 +27,7 @@ function Home() {
 
   const fetchVersions = async () => {
     if (activeProduct) {
-       db.collection("versions").where("product_id", "==", activeProduct.id).onSnapshot((snapshot) => {
+       db.collection("Versions").where("product_id", "==", activeProduct.id).onSnapshot((snapshot) => {
         setVersions(
           snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         );

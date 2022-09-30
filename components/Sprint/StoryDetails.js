@@ -22,10 +22,8 @@ import ResizeableDrawer from "../../components/Dashboard/ResizeableDrawer";
 import {
   SendOutlined,
   FlagOutlined,
-  LikeOutlined,
-  DislikeOutlined,
-  CopyOutlined,
   CloseOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 import { Title } from "../Dashboard/SectionTitle";
 import AppCheckbox from "../AppCheckbox";
@@ -33,6 +31,7 @@ import RadioButton from "../AppRadioBtn";
 import StoryComments from "../UserStory/StoryComments";
 import { useAuth } from "../../contexts/AuthContext";
 import EditStory from "./EditStory";
+import { formatDistance } from "date-fns";
 
 const Story = styled.p`
   padding: 12px 19px;
@@ -133,6 +132,15 @@ const StoryDetails = ({
   const [designLink, setDesignLink] = useState(story.design_link);
   const [codeLink, setCodeLink] = useState(story.code_link);
 
+  const getLastUpdate = (date) => {
+    if (date)
+      return (
+        "Last Updated " +
+        formatDistance(new Date(date), new Date(), { includeSeconds: true }) +
+        " ago"
+      );
+  };
+
   const fetchComments = () => {
     if (story) {
       db.collection("storiesComments")
@@ -183,6 +191,10 @@ const StoryDetails = ({
         name: val,
         completed: false,
       });
+
+      story.epic.features[story.featureIndex].stories[
+        story.storyIndex
+      ].updatedAt = new Date().toISOString();
 
       console.log(
         story.epic.features[story.featureIndex].stories[story.storyIndex]
@@ -254,6 +266,10 @@ const StoryDetails = ({
       !story.epic.features[story.featureIndex].stories[story.storyIndex]
         .acceptance_criteria[i].completed;
 
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].updatedAt = new Date().toISOString();
+
     console.log(
       story.epic.features[story.featureIndex].stories[story.storyIndex]
         .acceptance_criteria[i].completed
@@ -274,6 +290,10 @@ const StoryDetails = ({
       story.epic.features[story.featureIndex].stories[
         story.storyIndex
       ].description = storyDescription;
+
+      story.epic.features[story.featureIndex].stories[
+        story.storyIndex
+      ].updatedAt = new Date().toISOString();
 
       console.log(
         story.epic.features[story.featureIndex].stories[story.storyIndex]
@@ -313,7 +333,11 @@ const StoryDetails = ({
       story.storyIndex
     ].code_link = codeLink;
 
-    console.log(story.epic)
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].updatedAt = new Date().toISOString();
+
+    console.log(story.epic);
 
     await db
       .collection("Epics")
@@ -322,7 +346,7 @@ const StoryDetails = ({
       .then(() => {
         fetchSprints();
         message.success("story updated successfully");
-        setEditView(false)
+        setEditView(false);
       });
   };
 
@@ -335,7 +359,28 @@ const StoryDetails = ({
             <h3>{story.name}</h3>
             <StyledTag color="#91D5FF"># points total</StyledTag>
             <StyledTag color="#A4DF74">$0.00 total</StyledTag>
-
+            <Space>
+              <a href={story.design_link} target="_blank" rel="noreferrer">
+                <Button
+                  size="small"
+                  className="mr-1 flex items-center justify-center bg-[#096DD9] hover:bg-[#096DD9] focus:bg-[#096DD9] text-white hover:text-white focus:text-white space-x-2 outline-none hover:outline-none"
+                  icon={<LinkOutlined className="text-white" />}
+                  disabled={story.design_link.length <= 0}
+                >
+                  Design
+                </Button>
+              </a>
+              <a href={story.code_link} target="_blank" rel="noreferrer">
+                <Button
+                  size="small"
+                  className="mr-2 flex items-center justify-center bg-[#096DD9] hover:bg-[#096DD9] focus:bg-[#096DD9] text-white hover:text-white focus:text-white space-x-2 outline-none hover:outline-none"
+                  icon={<LinkOutlined />}
+                  disabled={story.code_link.length <= 0}
+                >
+                  Code
+                </Button>
+              </a>
+            </Space>
             <button
               className="text-[#1890FF]"
               onClick={() => setEditView(true)}
@@ -346,7 +391,7 @@ const StoryDetails = ({
           <Col className="flex items-center justify-end" span={12}>
             <CloseTime>
               <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
-                Last modified 2 hrs ago
+                {story && getLastUpdate(story.updatedAt)}
               </p>
               <CloseOutlined
                 style={{
