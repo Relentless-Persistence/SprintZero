@@ -150,7 +150,7 @@ function Home() {
   };
 
   const addVersion = () => {
-    db.collection("versions")
+    db.collection("Versions")
       .add({
         version: newVersion,
         product_id: activeProduct.id

@@ -39,7 +39,7 @@ export default function Accessiblity() {
   const fetchAccessibility = async () => {
     if (activeProduct) {
       const res = await db
-        .collection("Accessibilty")
+        .collection("Accessibility")
         .where("product_id", "==", activeProduct.id)
         .where("type", "==", activeChallenge)
         .get();

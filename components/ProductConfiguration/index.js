@@ -67,6 +67,7 @@ const ProductConfiguration = () => {
         .then((res) => {
           newVersion(res.id);
           addOwnerToTeam(res.id);
+          createAccessibilities(res.id)
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
@@ -107,6 +108,39 @@ const ProductConfiguration = () => {
       type: "member",
       product_id: product,
     });
+  }
+
+  const createAccessibilities = (id) => {
+    const challenges = [
+      {
+        name: "Perceivable",
+        title:
+          "Users can identify content and interface elements by means of the senses. For many users, this means perceiving a system primarily visually, while for others, perceivability may be a matter of sound or touch.",
+      },
+      {
+        name: "Operable",
+        title:
+          "Users can successfully use controls, buttons, navigation, and other interactive elements. For many users this means using assistive technology like voice recognition, keyboards, screen readers etc.",
+      },
+      {
+        name: "Understandable",
+        title:
+          "Users should be able to comprehend the content, and learn and remember how to use your OER site. Your OER should be consistent in its presentation and format, predictable in its design and usage patterns, and appropriate to the audience in its voice and tone.",
+      },
+      {
+        name: "Robust",
+        title:
+          "Content must be robust enough that it can be interpreted reliably by a wide variety of users, allowing them to choose the technology they use to interact with websites, online documents, multimedia, and other information formats. Users should be allowed to choose their own technologies to access OER content.",
+      },
+    ];
+
+    challenges.map((challenge) => {
+        db.collection("Accessibility").add({
+          product_id: id,
+          type: challenge.name,
+          title: challenge.title,
+        });
+    })
   }
 
   const PrevArrow = ({ index }) => {
