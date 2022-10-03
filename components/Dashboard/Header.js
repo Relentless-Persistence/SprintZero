@@ -48,6 +48,7 @@ const AppHeader = ({ onChangeProduct }) => {
   const [settingsMenuDrawer, setSettingsMenuDrawer] = useState(false);
 
   const fetchProducts = async () => {
+    console.log("activeProduct", activeProduct);
     if (user) {
       const res = await db
         .collection("Product")
@@ -58,7 +59,12 @@ const AppHeader = ({ onChangeProduct }) => {
         router.push("/product");
       } else {
         setProducts(products);
-        setActiveProduct(products[0]);
+        if(activeProduct === null) {
+          console.log("activeProduct", activeProduct)
+          setActiveProduct(products[0]);
+        } else {
+          setActiveProduct(activeProduct)
+        }
       }
     }
   };
@@ -86,7 +92,7 @@ const AppHeader = ({ onChangeProduct }) => {
               <HeaderMenu
                 key={i}
                 className="mr-10"
-                active={activeProduct === product}
+                active={activeProduct && activeProduct.product === product.product}
                 onClick={() => setActiveProduct(product)}
               >
                 {product.product}
