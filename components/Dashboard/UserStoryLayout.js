@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Layout, Breadcrumb, Input, Divider, Button } from "antd";
+import { Layout, Breadcrumb, Input, Divider, Button, message } from "antd";
 
 import SideBar from "./SideBar";
 import AppHeader from "./Header";
 import { useAuth } from "../../contexts/AuthContext";
 import withAuth from "../../hoc/withAuth";
+import { db } from "../../config/firebase-config";
 
 const { Content, Sider } = Layout;
 
@@ -79,9 +80,12 @@ const AppLayout = ({
   setSideAddValue,
   onSideAddClick,
   children,
+  activeVersionId,
 }) => {
   const { user } = useAuth();
   const [showSideAdd, setShowSideAdd] = useState(false);
+  const [editVersion, setEditVersion] = useState(false);
+  const [editedVersion, setEditedVersion] = useState("");
 
   const [value, setValue] = useState("");
 
@@ -99,6 +103,26 @@ const AppLayout = ({
 
   const handleChange = (e) => {
     setValue(e.target.value);
+  };
+
+  const handleVersionChange = async (e) => {
+    if (e.key === "Enter") {
+      await db
+      .collection("Versions")
+      .doc(activeVersionId)
+      .update({
+        version: editedVersion,
+      })
+      .then(() => {
+        message.success("Version updated successfully");
+        setEditVersion(false);
+        setEditedVersion("");
+      })
+      .catch((error) => {
+        message.error("Problem updating the version");
+      });
+    }
+    
   };
 
   //if ( !user ) return <div>Loading...</div>;
@@ -195,7 +219,27 @@ const AppLayout = ({
                           setActiveRightNav(item.value ? item.value : item)
                         }
                       >
-                        {item.render ? item.render() : item}
+                        {editVersion ? (
+                          <Input
+                            className="mx-0 my-0 "
+                            type={"number"}
+                            maxLength={20}
+                            autoFocus
+                            value={editedVersion}
+                            onChange={(e) => setEditedVersion(e.target.value)}
+                            onKeyPress={handleVersionChange}
+                            style={{ maxWidth: "90px" }}
+                          />
+                        ) : (
+                          <div
+                            onClick={() => {
+                              setEditVersion(true);
+                              setEditedVersion(item);
+                            }}
+                          >
+                            v{item.render ? item.render() : item}
+                          </div>
+                        )}
                       </Version>
                     ))}
 

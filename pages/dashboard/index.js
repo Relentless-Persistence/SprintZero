@@ -186,6 +186,7 @@ function Home() {
         setActiveRightNav={handleActiveVersion}
         sideAddValue={newVersion}
         setSideAddValue={setNewVersion}
+        activeVersionId={version && version.id}
       >
         <>
           {savingMode ? (
