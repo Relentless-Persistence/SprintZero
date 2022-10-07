@@ -51,7 +51,7 @@ const StatementCard = ({
   }, [isDown]);
 
   if (!info) {
-    return <>a</>;
+    return <></>;
   }
 
   return (

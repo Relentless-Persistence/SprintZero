@@ -144,12 +144,12 @@ const SideBar = () => {
           icon={<NodeExpandOutlined />}
           title="Operations"
         >
-          <MenuItem
+          {/* <MenuItem
             key="11"
             $highlight={isActive(pathname, "/operations/calendar")}
           >
             <Link href="/dashboard/operations/calendar">Calendar</Link>
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem
             key="12"
             $highlight={isActive(pathname, "/operations/huddle")}
@@ -158,14 +158,14 @@ const SideBar = () => {
               <a>Huddle</a>
             </Link>
           </MenuItem>
-          <MenuItem
+          {/* <MenuItem
             key="13"
             $highlight={isActive(pathname, "/operations/performance")}
           >
             <Link href="/dashboard/operations/performance">
               <a>Performance</a>
             </Link>
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem
             key="14"
             $highlight={isActive(pathname, "/operations/sprint")}
