@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Layout, Menu, Breadcrumb, Typography, Input, Avatar, Button, Image } from "antd";
+import {
+  Layout,
+  Menu,
+  Breadcrumb,
+  Typography,
+  Input,
+  Avatar,
+  Button,
+  Image,
+} from "antd";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
@@ -48,7 +57,7 @@ const Version = styled.li`
 
 const products = ["Insight Meeting", "Alpha Sheet"];
 
-const DashboardLayout = ({children}) => {
+const DashboardLayout = ({ children }) => {
   const router = useRouter();
   const { user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
@@ -62,109 +71,65 @@ const DashboardLayout = ({children}) => {
   // if ( !user ) return <div>Loading...</div>;
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Header className="header">
-        <div className="flex items-center">
-          <Image
-            src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/logoDarkLettersWhite%201.png?alt=media&token=e97358f0-8ed9-4026-b9a7-42c224ff4d64"
-            alt="Logo"
-            className="w-[178px] h-[42px]"
-            preview={false}
-          />
-          <div className="flex items-center ml-11">
-            {products.map((item, i) => (
-              <HeaderMenu
-                key={i}
-                className="mr-10"
-                active={product === item ? true : false}
-                onClick={() => setProduct(item)}
-              >
-                {item}
-              </HeaderMenu>
-            ))}
-
-            {/* <div className="mr-10" style={{ color: "#73c92d"}}>Add Product</div> */}
-          </div>
-        </div>
-        <div className="flex items-center">
-          <Search
-            placeholder="Search"
-            allowClear
-            className="mr-6 border-none focus:outline-none outline-none"
-            // onSearch={onSearch}
-            style={{ width: 200 }}
-          />
-          {/* <Avatar
-            src={
-              user.photoURL
-            }
-            style={{ border: "2px solid #73c92d" }}
-          /> */}
-          <Avatar
-            src={
-              "https://www.pngkey.com/png/detail/115-1150152_default-profile-picture-avatar-png-green.png"
-            }
-            style={{ border: "2px solid #73c92d" }}
-          />
-        </div>
+    <Layout>
+      <Header
+        style={{
+          position: "fixed",
+          zIndex: 1,
+          width: "100%",
+        }}
+      >
+        <div className="logo" />
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          defaultSelectedKeys={["2"]}
+          items={new Array(3).fill(null).map((_, index) => ({
+            key: String(index + 1),
+            label: `nav ${index + 1}`,
+          }))}
+        />
       </Header>
       <Layout>
-        <Sider width={200} className="site-layout-background" breakpoint="sm">
-          <SideBar />
-        </Sider>
-        <Layout>
-          <div className="flex justify-between">
-            <div className="flex-1">
-              <div className="flex items-center justify-between mt-4 ml-11 mr-6">
-                <Breadcrumb>
-                  <Breadcrumb.Item>Story Map</Breadcrumb.Item>
-                  <Breadcrumb.Item>{version}</Breadcrumb.Item>
-                </Breadcrumb>
-                <Button className="bg-white">+ Add Version</Button>
-              </div>
-              <Content
-                style={{
-                  padding: "24px 44px",
-                  margin: 0,
-                  minHeight: 280,
-                }}
-              >
-                {children}
-              </Content>
+        <div className="flex">
+          <Sider className="h-[100%]">
+            <div className="h-[64px]"></div>
+            <SideBar />
+          </Sider>
+          <Content
+            className="w-full"
+            style={{
+              padding: "0 50px",
+              marginTop: 64,
+            }}
+          >
+            <Breadcrumb
+              style={{
+                margin: "16px 0",
+              }}
+            >
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item>List</Breadcrumb.Item>
+              <Breadcrumb.Item>App</Breadcrumb.Item>
+            </Breadcrumb>
+            <div
+              className="site-layout-background"
+              style={{
+                padding: 24,
+                minHeight: 380,
+              }}
+            >
+              Content
             </div>
-            <div>
-              <div>
-                <Versions className="">
-                  <Version
-                    active={version === "v1.0" ? true : false}
-                    onClick={() => setVersion("v1.0")}
-                  >
-                    v1.0 [Active]
-                  </Version>
-                  <Version
-                    active={version === "v1.1" ? true : false}
-                    onClick={() => setVersion("v1.1")}
-                  >
-                    v1.1
-                  </Version>
-                  <Version
-                    active={version === "v1.11" ? true : false}
-                    onClick={() => setVersion("v1.11")}
-                  >
-                    v1.11
-                  </Version>
-                  <Version
-                    active={version === "All" ? true : false}
-                    onClick={() => setVersion("All")}
-                  >
-                    All
-                  </Version>
-                  {/* <Version style={{ color: "#009CD5" }}>Add Release</Version> */}
-                </Versions>
-              </div>
-            </div>
-          </div>
-        </Layout>
+          </Content>
+          <Footer
+            style={{
+              textAlign: "center",
+            }}
+          >
+            Ant Design ©2018 Created by Ant UED
+          </Footer>
+        </div>
       </Layout>
     </Layout>
   );

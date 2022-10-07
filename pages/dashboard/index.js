@@ -2,7 +2,7 @@
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import AppLayout from "../../components/Dashboard/AppLayout";
+import UserStoryLayout from "../../components/Dashboard/UserStoryLayout";
 import UserStory from "../../components/UserStory";
 import { findIndex, sortBy } from "lodash";
 import { splitRoutes } from "../../utils";
@@ -171,7 +171,7 @@ function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <AppLayout
+      <UserStoryLayout
         ignoreLast={true}
         breadCrumbItems={splitRoutes(pathname)}
         hasSideAdd={true}
@@ -205,7 +205,7 @@ function Home() {
             activeProduct={activeProduct}
           />
         </>
-      </AppLayout>
+      </UserStoryLayout>
     </div>
   );
 }
