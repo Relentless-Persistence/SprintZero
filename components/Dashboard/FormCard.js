@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import styled from "styled-components";
 
-import { Card, Input } from "antd";
+import { Card, Input, Space, Button } from "antd";
 
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
 import ActionButtons, { LightActionButtons } from "../Personas/ActionButtons";
@@ -10,6 +10,7 @@ import ActionButtons, { LightActionButtons } from "../Personas/ActionButtons";
 const { TextArea } = Input;
 
 const MyCard = styled(Card)`
+  
   .ant-card-head {
     min-height: unset;
     padding: 0 12px;
@@ -33,6 +34,7 @@ export default function FormCard({
   onSubmit,
   className,
   headerSmall = false,
+  onCancel,
 }) {
   const [item, setItem] = useState(
     isEdit
@@ -71,7 +73,12 @@ export default function FormCard({
         extra ? (
           extra
         ) : (
-          <CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
+          <Space>
+            <CardHeaderLink onClick={onCancel}>Cancel</CardHeaderLink>
+            <Button className="ml-2" onClick={handleSubmit}>
+              Done
+            </Button>
+          </Space>
         )
       }
       title={
@@ -102,7 +109,12 @@ export default function FormCard({
         extra ? (
           extra
         ) : (
-          <CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
+          <Space>
+            <CardHeaderLink onClick={onCancel}>Cancel</CardHeaderLink>
+            <Button className="ml-2" danger ghost onClick={handleSubmit}>
+              Done
+            </Button>
+          </Space>
         )
       }
       title={
@@ -138,6 +150,7 @@ export const ActionFormCard = ({
   className,
   extraItems,
   headerSmall = false,
+  onDelete,
 }) => {
   const [item, setItem] = useState({
     title,
@@ -242,6 +255,9 @@ export const ActionFormCard = ({
         placeholder="Result description..."
       />
       {extraItems}
+      <Button block className="bg-[#FF4D4F] text-white mt-2" onClick={onDelete}>
+        Remove
+      </Button>
     </Card>
   );
 };

@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Row, Col, message } from "antd";
+import { Row, Col, message, Button } from "antd";
 import { findIndex } from "lodash";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -38,20 +38,23 @@ export default function Accessiblity() {
 
   const fetchAccessibility = async () => {
     if (activeProduct) {
-      const res = await db
-        .collection("Accessibility")
-        .where("product_id", "==", activeProduct.id)
-        .where("type", "==", activeChallenge)
-        .get();
-      const data = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setData(data);
+      console.log(activeChallenge);
+      db.collection("Accessibility")
+        .where("product_id", "==", activeProduct.id).where("type", "==", activeChallenge)
+        .onSnapshot((snapshot) => {
+          setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          console.log(
+            "access",
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
     }
   };
 
   const fetchChallenges = async () => {
     if (data) {
-      db
-        .collection("Challenges")
+      db.collection("Challenges")
+        .where("product_id", "==", activeProduct.id)
         .where("accessibility_type", "==", activeChallenge)
         .onSnapshot((snapshot) => {
           setChallengesData(
@@ -100,6 +103,7 @@ export default function Accessiblity() {
     const data = {
       accessibility_type: activeChallenge,
       ...item,
+      product_id: activeProduct.id
     };
     db.collection("Challenges")
       .add(data)
@@ -114,14 +118,29 @@ export default function Accessiblity() {
   };
 
   const editItem = async (id, item) => {
-    await db.collection("Challenges").doc(id).update({
-      name: item.title,
-      description: item.description,
-    })
-    .then(() => {
-      message.success("Challenge updated successfully");
-    })
+    await db
+      .collection("Challenges")
+      .doc(id)
+      .update({
+        name: item.title,
+        description: item.description,
+      })
+      .then(() => {
+        message.success("Challenge updated successfully");
+      });
   };
+
+  const deleteItem = async (id) => {
+    db.collection("Challenges")
+      .doc(id)
+      .delete()
+      .then(() => {
+        message.success("Challenge successfully deleted!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+  }
 
   return (
     <div className="mb-8">
@@ -141,7 +160,7 @@ export default function Accessiblity() {
         breadCrumbItems={splitRoutes(pathname)}
         mainClass="mr-[174px]"
       >
-        <MainSub>{data ? data[0].title : null}</MainSub>
+        <MainSub>{data && data[0]?.title}</MainSub>
 
         <MasonryGrid>
           {challengesData && challengesData.length > 0 ? (
@@ -149,11 +168,15 @@ export default function Accessiblity() {
               <ItemCard
                 key={res.id}
                 onEdit={(item) => editItem(res.id, item)}
+                onDelete={() => deleteItem(res.id)}
                 item={res}
               />
             ))
           ) : (
-            <div className="text-xl font-semibold">No data</div>
+            <FormCard
+              className="border border-[#D9D9D9]"
+              onSubmit={addItemDone}
+            />
           )}
 
           <div
@@ -162,7 +185,7 @@ export default function Accessiblity() {
             }}
             ref={ref}
           >
-            <FormCard onSubmit={addItemDone} />
+            <FormCard onSubmit={addItemDone} onCancel={() => setShowAdd(false)} />
           </div>
         </MasonryGrid>
       </AppLayout>

@@ -15,6 +15,8 @@ const StyledCol = styled(Acard)`
   min-height: 72vh;
   min-width: 245px;
 
+  
+
   .ant-card-head {
     min-height: unset;
     border-bottom: 2px solid #d9d9d9;

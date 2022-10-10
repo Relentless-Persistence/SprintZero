@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Card } from "antd";
+import { Button, Card } from "antd";
 
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
 import FormCard, { ActionFormCard } from "./FormCard";
@@ -37,7 +37,8 @@ const ItemCard = ({
   version = 2,
   headerSmall = false,
   extraItems,
-  index
+  index,
+  onDelete
 }) => {
   const [isEdit, setIsEdit] = useState(false);
 
@@ -61,6 +62,7 @@ const ItemCard = ({
         onSubmit={handleEdit}
         onCancel={toggleEdit}
         className="mb-[16px] border-2 border-[#D9D9D9]"
+        onDelete={onDelete}
       />
     );
   }
