@@ -9,6 +9,7 @@ const StyledCard = styled(Card)`
       ? "0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)"
       : ""};
   border-radius: 2px;
+  margin-bottom: 20px;
 
   .ant-card-head {
     min-height: unset;

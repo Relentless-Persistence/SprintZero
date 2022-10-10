@@ -83,7 +83,10 @@ const StatementForm = ({ activeProduct, setAddMode }) => {
       bordered={false}
       extra={
         <Space>
-          <div className="text-red-800 text-xs" onClick={() => setAddMode(false)}>
+          <div
+            className="text-red-800 text-xs cursor-pointer"
+            onClick={() => setAddMode(false)}
+          >
             Cancel
           </div>
           <CardHeaderButton onClick={() => addVision()}>Done</CardHeaderButton>
@@ -91,7 +94,16 @@ const StatementForm = ({ activeProduct, setAddMode }) => {
       }
       title="Guiding Statement"
     >
-      <Form labelAlign="left" form={form} onFinish={onFinish}>
+      <Form
+        labelCol={{
+          span: 6,
+        }}
+        wrapperCol={{
+          span: 24,
+        }}
+        form={form}
+        onFinish={onFinish}
+      >
         <Form.Item
           label="Target Customer"
           tooltip="Identify the target of this product"

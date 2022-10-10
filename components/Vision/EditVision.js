@@ -97,7 +97,15 @@ const EditVision = ({ info, inEditMode, setEditMode }) => {
       }
       title="Guiding Statement"
     >
-      <Form labelAlign="left" onFinish={() => updateVision(info.id)}>
+      <Form
+        labelCol={{
+          span: 6,
+        }}
+        wrapperCol={{
+          span: 24,
+        }}
+        onFinish={() => updateVision(info.id)}
+      >
         <Form.Item
           label="Target Customer"
           tooltip="Identify the target of this product"
