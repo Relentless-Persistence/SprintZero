@@ -26,12 +26,12 @@ import AppLayout from "../../../components/Dashboard/AppLayout";
 import DrawerSubTitle from "../../../components/Dashboard/DrawerSubTitle";
 import { CardTitle } from "../../../components/Dashboard/CardTitle";
 
-import { Board } from "../../../components/Boards";
+import { Board } from "../../../components/Tasks/Boards";
 import { Index } from "../../../components/Boards/NumberIndex";
 
 import { splitRoutes } from "../../../utils";
 
-import CustomTag from "../../../components/Dashboard/Tag";
+import CustomTag from "../../../components/Tasks/CustomTag";
 import ActionButtons from "../../../components/Personas/ActionButtons";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 import { db } from "../../../config/firebase-config";
@@ -191,13 +191,11 @@ export default function Tasks() {
 
   const renderCol = (card, index) => {
     return (
-      <>
-        <Index>{index + 1}</Index>
 
-        <div onClick={() => selectTask(card)}>
-          <CustomTag text={card.title} />
+        <div style={{ widthh: "100%" }} onClick={() => selectTask(card)}>
+          <CustomTag shortTitle={card.title} due_date={card.date} />
         </div>
-      </>
+    
     );
   };
 

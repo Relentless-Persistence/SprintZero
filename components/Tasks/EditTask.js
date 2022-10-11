@@ -24,6 +24,7 @@ import { CardTitle } from "../../components/Dashboard/CardTitle";
 import DrawerSubTitle from "../../components/Dashboard/DrawerSubTitle";
 import { db } from "../../config/firebase-config";
 import { useAuth } from "../../contexts/AuthContext";
+import moment from "moment";
 
 const { TextArea } = Input;
 
@@ -120,6 +121,18 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
     fetchComments();
   }, [task]);
 
+  const updateSubtask = (i) => {
+    task.subtasks[i].completed = !task.subtasks[i].completed;
+
+    db
+      .collection("tasks")
+      .doc(task.id)
+      .update(task)
+      .then(() => {
+        message.success("subtask updated successfully");
+      });
+  }
+
   return (
     <ResizeableDrawer
       visible={editMode}
@@ -173,46 +186,63 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
             <DatePicker
               className="mr-[8px]"
               onChange={handleDrawerDateChange}
+              defaultValue={moment(task.date, "DD/MM/YYYY")}
+              format={"DD/MM/YYYY"}
             />
-            <TimePicker onChange={handleDrawerTimeChange} />,
+            <TimePicker
+              onChange={handleDrawerTimeChange}
+              defaultValue={moment(task.time, "HH:mm:ss")}
+              format={"HH:mm:ss"}
+            />
+            ,
           </div>
 
+          <DrawerSubTitle>Subtasks</DrawerSubTitle>
           <SubTasks>
-            <Checkbox checked>Lorem ipsum</Checkbox>
-            <Checkbox>Amet consectetur adipisicing elit</Checkbox>
-            <Checkbox checked>Ipsam repellendus?</Checkbox>
-            <Checkbox checked>Inventore perspiciatis ratione</Checkbox>
+            {task.subtasks?.map((subtask, i) => (
+              <Checkbox
+                key={subtask.name}
+                checked={subtask.completed}
+                onChange={() => updateSubtask(i)}
+              >
+                {subtask.name}
+              </Checkbox>
+            ))}
           </SubTasks>
         </Col>
-        <Col className="max-h-[250px] overflow-y-scroll pr-[20px]" span={8}>
+        <Col className="pr-[20px]" span={8}>
           <DrawerSubTitle>Discussion</DrawerSubTitle>
 
-          {comments && (
-            <List
-              className="comment-list"
-              itemLayout="horizontal"
-              dataSource={comments}
-              renderItem={(item) => (
-                <li>
-                  <Comment
-                    actions={item.actions}
-                    author={item.author.name}
-                    avatar={item.author.avatar}
-                    content={item.comment}
-                  />
-                </li>
-              )}
-            />
-          )}
+          <div>
+            {comments && (
+              <List
+                className=""
+                itemLayout="horizontal"
+                dataSource={comments}
+                renderItem={(item) => (
+                  <li>
+                    <Comment
+                      actions={item.actions}
+                      author={item.author.name}
+                      avatar={item.author.avatar}
+                      content={item.comment}
+                    />
+                  </li>
+                )}
+              />
+            )}
+          </div>
 
           <Comment
-            avatar={
-              <Avatar src={user.photoURL} alt="Han Solo" />
-            }
+            avatar={<Avatar src={user.photoURL} alt="Han Solo" />}
             content={
               <Form>
                 <Form.Item>
-                  <TextArea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
+                  <TextArea
+                    rows={2}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                  />
                 </Form.Item>
 
                 <Form.Item>
