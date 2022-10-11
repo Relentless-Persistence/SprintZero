@@ -36,7 +36,7 @@ import { splitRoutes } from "../../../utils";
 import fakeData from "../../../fakeData/sprint.json";
 import products from "../../../fakeData/products.json";
 import { Title } from "../../../components/Dashboard/SectionTitle";
-import CustomTag from "../../../components/Dashboard/Tag";
+import CustomTag from "../../../components/Sprint/CustomTag";
 import AppCheckbox from "../../../components/AppCheckbox";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 import RadioButton from "../../../components/AppRadioBtn";
@@ -184,7 +184,6 @@ export default function Sprint() {
                     feature: feature,
                     epic: item,
                   });
-                  console.log("stories",stories)
                 });
               });
             });
@@ -305,29 +304,21 @@ export default function Sprint() {
   };
 
   const handleDrop = async (card, targetColId) => {
-    console.log("card", card);
-    console.log("targetColId", targetColId)
 
     const selectedStory = data[card.colId].data[card.id];
     const targetStory = data[targetColId]
 
-    console.log("selectedStory", selectedStory)
 
     selectedStory.epic.features[selectedStory.featureIndex].stories[
       selectedStory.storyIndex
     ].sprint_status = targetStory.columnName
 
 
-    console.log("selectedStory", selectedStory);
-
-    // console.log("newData", newData)
-
     if (
       selectedStory.epic.features[selectedStory.featureIndex].stories[
         selectedStory.storyIndex
       ].sprint_status === targetStory.columnName
     ) {
-      console.log("epic", selectedStory.epic);
       await db
         .collection("Epics")
         .doc(selectedStory.epic.id)
@@ -381,13 +372,12 @@ export default function Sprint() {
   }
 
   const renderCol = (card, index) => {
-    console.table("card", card)
+    console.log("card", card)
     return (
       <>
-        <Index>{index + 1}</Index>
 
         <div onClick={() => selectStory(card)}>
-          <CustomTag icon={<CopyOutlined />} text={card.name} />
+          <CustomTag shortTitle={card.name} feature={card.feature.name} />
         </div>
       </>
     );

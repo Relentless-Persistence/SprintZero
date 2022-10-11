@@ -34,8 +34,8 @@ const StyledCard = styled.div`
   width: 100%;
   border-bottom: 1px solid #d9d9d9;
   background: #fff;
-  display: grid;
-  grid-template-columns: 40px 1fr;
+  /* display: grid;
+  grid-template-columns: 40px 1fr; */
   padding: 16px;
   align-items: center;
   gap: 10px;

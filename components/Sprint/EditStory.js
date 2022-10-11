@@ -71,7 +71,7 @@ const EditStory = ({
           </Radio.Group>
         </Col>
         <Col span={2}>
-          <h6 className="text-gray-400 ">Release</h6>
+          <h6 className="text-gray-400 ">Version</h6>
           <Select
             defaultValue={getVersion(version)}
             onChange={(value) => setVersion(value)}

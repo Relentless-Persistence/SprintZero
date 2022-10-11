@@ -208,6 +208,7 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
                 {subtask.name}
               </Checkbox>
             ))}
+            
           </SubTasks>
         </Col>
         <Col className="pr-[20px]" span={8}>

@@ -23,6 +23,7 @@ import { CardTitle } from "../../components/Dashboard/CardTitle";
 import DrawerSubTitle from "../../components/Dashboard/DrawerSubTitle";
 import { db } from "../../config/firebase-config";
 import { activeProductState } from "../../atoms/productAtom";
+import moment from "moment"
 
 const { TextArea } = Input;
 
@@ -45,6 +46,9 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
   const [description, setDescription] = useState("")
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [subtasks, setSubtasks] = useState([]);
+  const [show, setShow] = useState(false);
+  const [val, setVal] = useState("");
 
   const handleDrawerDateChange = (date, dateString) => {
     setDate(dateString);
@@ -53,6 +57,18 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
   const handleDrawerTimeChange = (time, timeString) => {
     setTime(timeString);
   };
+
+  const addItemDone = async (e) => {
+    if (e.key === "Enter") {
+      subtasks.push({
+        name: val,
+        completed: false,
+      });
+      setShow(false);
+      setVal("")
+    }
+    
+  }
 
   const createTask = () => {
     const data = {
@@ -64,7 +80,8 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
       status: "Backlog",
       product_id: product.id,
       order,
-      board
+      board,
+      subtasks
     }
 
     db.collection("tasks")
@@ -77,6 +94,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
         setDate("")
         setTime("");
         setCreateMode(false);
+        subtasks([])
       })
       .catch((error) => {
         message.error("Error creating new task");
@@ -142,9 +160,36 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
             <DatePicker
               className="mr-[8px]"
               onChange={handleDrawerDateChange}
+              format={"DD/MM/YYYY"}
             />
-            <TimePicker onChange={handleDrawerTimeChange} />,
+            <TimePicker onChange={handleDrawerTimeChange} format={"HH:mm:ss"} />
+            ,
           </div>
+        </Col>
+
+        <Col span={8}>
+          <DrawerSubTitle>Subtasks</DrawerSubTitle>
+          <SubTasks>
+            {subtasks?.map((subtask, i) => (
+              <Checkbox key={subtask.name} checked={subtask.completed}>
+                {subtask.name}
+              </Checkbox>
+            ))}
+            {show ? (
+                <Input
+                  value={val}
+                  onKeyPress={addItemDone}
+                  onChange={(e) => setVal(e.target.value)}
+                />
+            ) : (
+                <Checkbox
+                  checked={false}
+                  onChange={() => setShow((s) => !s)}
+                >
+                  <span className="text-[#BFBFBF]">Add Item</span>
+                </Checkbox>
+            )}
+          </SubTasks>
         </Col>
       </Row>
     </ResizeableDrawer>

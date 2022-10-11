@@ -119,10 +119,10 @@ export default function Tasks() {
             },
           ]);
 
-          // setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-          // console.log(
-          //   snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          // );
+          if(data.length < 1) {
+            setCreateMode(true)
+          }
+
         });
     }
   };
