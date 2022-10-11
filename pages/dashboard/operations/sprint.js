@@ -122,26 +122,27 @@ export default function Sprint() {
   // const [activeBoard, setActiveBoard] = useState(versions[0]);
   // const [activeBoardIndex, setActiveBoardIndex] = useState(0);
 
-  const getSprints = async () => {
-    if (activeProduct) {
-      db.collection("Sprints")
-        .where("product_id", "==", activeProduct.id)
-        .onSnapshot((snapshot) => {
-          setSprints(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
-          const sprints = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setSprint(sprints[0]);
-        });
-    }
-  };
+  // const getSprints = async () => {
+  //   if (activeProduct) {
+  //     db.collection("Sprints")
+  //       .where("product_id", "==", activeProduct.id)
+  //       .onSnapshot((snapshot) => {
+  //         setSprints(
+  //           snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+  //         );
+  //         console.log("Sprints", snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
+  //         const sprints = snapshot.docs.map((doc) => ({
+  //           id: doc.id,
+  //           ...doc.data(),
+  //         }));
+  //         setSprint(sprints[0]);
+  //       });
+  //   }
+  // };
 
-  useEffect(() => {
-    getSprints();
-  }, [activeProduct]);
+  // useEffect(() => {
+  //   getSprints();
+  // }, [activeProduct]);
 
    const getRightNav = async () => {
      if (sprints) {
@@ -161,7 +162,7 @@ export default function Sprint() {
   // Fetch data from firebase
   const fetchSprints = async () => {
     let stories = [];
-    if (activeProduct && sprint) {
+    if (activeProduct) {
       const res = db
         .collection("Epics")
         .where("product_id", "==", activeProduct.id)
@@ -193,8 +194,7 @@ export default function Sprint() {
               columnName: "Product Backlog",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Product Backlog" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Product Backlog"
               ),
             },
             {
@@ -202,8 +202,7 @@ export default function Sprint() {
               columnName: "Design Sprint Backlog",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Design Sprint Backlog" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Design Sprint Backlog"
               ),
             },
             {
@@ -211,8 +210,7 @@ export default function Sprint() {
               columnName: "Critique",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Critique" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Critique"
               ),
             },
             {
@@ -220,8 +218,7 @@ export default function Sprint() {
               columnName: "Design Done / Dev Ready",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Design Done / Dev Ready" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Design Done / Dev Ready"
               ),
             },
             {
@@ -229,8 +226,7 @@ export default function Sprint() {
               columnName: "Dev Sprint Backlog",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Dev Sprint Backlog" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Dev Sprint Backlog"
               ),
             },
             {
@@ -238,8 +234,7 @@ export default function Sprint() {
               columnName: "Developing",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Developing" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Developing"
               ),
             },
             {
@@ -247,8 +242,7 @@ export default function Sprint() {
               columnName: "Design Review",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Design Review" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Design Review"
               ),
             },
             {
@@ -256,8 +250,7 @@ export default function Sprint() {
               columnName: "Peer Code Review",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Peer Code Review" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Peer Code Review"
               ),
             },
             {
@@ -265,7 +258,7 @@ export default function Sprint() {
               columnName: "QA",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "QA" && item.sprint_id === sprint.id
+                  item.sprint_status === "QA"
               ),
             },
             {
@@ -273,8 +266,7 @@ export default function Sprint() {
               columnName: "Production Queue",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Production Queue" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Production Queue"
               ),
             },
             {
@@ -282,8 +274,7 @@ export default function Sprint() {
               columnName: "Shipped",
               data: stories.filter(
                 (item) =>
-                  item.sprint_status === "Shipped" &&
-                  item.sprint_id === sprint.id
+                  item.sprint_status === "Shipped"
               ),
             },
           ]);
@@ -293,7 +284,7 @@ export default function Sprint() {
 
   useEffect(() => {
     fetchSprints();
-  }, [activeProduct, sprint]);
+  }, [activeProduct]);
 
   const handleActiveSprint = (sprint) => {
     const sprintIndex = findIndex(sprints, (v) => v.name === sprint);
