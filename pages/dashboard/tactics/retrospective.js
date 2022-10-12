@@ -159,7 +159,7 @@ export default function Retrospective() {
         onMainAdd={() => setShowAdd(true)}
         breadCrumbItems={splitRoutes(pathname)}
       >
-        {data.length > 0 ? (
+        {data?.length > 0 ? (
           <MasonryGrid>
             {data
               .filter((item) => item.type === types[activeTabIndex])
@@ -222,8 +222,9 @@ export default function Retrospective() {
                   "0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)",
               }}
               className="w-[320px] h-[187px] bg-white flex items-center justify-center rounded"
-            ><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>
-            
+            >
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </div>
           </div>
         )}
 

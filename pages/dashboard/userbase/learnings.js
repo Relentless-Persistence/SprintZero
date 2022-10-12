@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Radio, message } from "antd";
+import { Radio, message, Empty } from "antd";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import {
@@ -29,7 +29,6 @@ export default function Learnings() {
   const activeProduct = useRecoilValue(activeProductState);
   const [data, setData] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
-
 
   const [activeLearning, setActiveLearning] = useState(names[0]);
 
@@ -58,21 +57,9 @@ export default function Learnings() {
   }, [activeProduct, activeLearning]);
 
   const setLearning = (name, product) => {
-    const learningIndex = findIndex(
-      names,
-      (o) => o === name
-    );
+    const learningIndex = findIndex(names, (o) => o === name);
 
     setActiveLearning(names[learningIndex]);
-  };
-
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    const learningName = data[product][0].name;
-    setGoal(learningName, product);
-    setLearningName(learningName);
-    setShowAdd(false);
-    setTemp(learningName);
   };
 
   const addItem = () => {
@@ -80,7 +67,7 @@ export default function Learnings() {
   };
 
   const addItemDone = (item) => {
-    console.log(item)
+    console.log(item);
     const data = {
       name: item.title,
       description: item.description,
@@ -99,7 +86,6 @@ export default function Learnings() {
   };
 
   const editItem = async (id, item) => {
-    
     const data = temp
       ? {
           name: item.title,
@@ -111,14 +97,16 @@ export default function Learnings() {
           description: item.description,
         };
 
-    await db.collection("Learnings").doc(id).update(data)
-    .then(() => {
-      message.success("Learning updated successfully");
-    })
-    .catch(err => {
-      console.log(err);
-    })
-    
+    await db
+      .collection("Learnings")
+      .doc(id)
+      .update(data)
+      .then(() => {
+        message.success("Learning updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   // const rightNav = getNames(data[activeProduct]);
@@ -168,33 +156,47 @@ export default function Learnings() {
             />
           ) : null}
 
-          {data && data.map((res, i) => (
-            <ItemCard
-              headerSmall
-              extraItems={
-                <Radio.Group
-                  className="mt-[12px] grid grid-cols-3"
-                  size="small"
-                >
-                  {names.map((opt, i) => (
-                    <RadioButtonWithFill
-                      key={i}
-                      checked={opt === res.type}
-                      onChange={() => setTemp(opt)}
-                      value={opt}
-                    >
-                      {opt}
-                    </RadioButtonWithFill>
-                  ))}
-                </Radio.Group>
-              }
-              useBtn
-              key={res.id}
-              onEdit={(item) => editItem(res.id, item)}
-              item={res}
-            />
-          ))}
+          {data &&
+            data.map((res, i) => (
+              <ItemCard
+                headerSmall
+                extraItems={
+                  <Radio.Group
+                    className="mt-[12px] grid grid-cols-3"
+                    size="small"
+                  >
+                    {names.map((opt, i) => (
+                      <RadioButtonWithFill
+                        key={i}
+                        checked={opt === res.type}
+                        onChange={() => setTemp(opt)}
+                        value={opt}
+                      >
+                        {opt}
+                      </RadioButtonWithFill>
+                    ))}
+                  </Radio.Group>
+                }
+                useBtn
+                key={res.id}
+                onEdit={(item) => editItem(res.id, item)}
+                item={res}
+              />
+            ))}
         </MasonryGrid>
+        {data?.length < 1 ? (
+          <div className="h-[600px] flex items-center justify-center">
+            <div
+              style={{
+                boxShadow:
+                  "0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)",
+              }}
+              className="w-[320px] h-[187px] bg-white flex items-center justify-center rounded"
+            >
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </div>
+          </div>
+        ) : null}
       </AppLayout>
     </div>
   );
