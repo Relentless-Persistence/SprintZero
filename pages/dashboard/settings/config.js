@@ -6,8 +6,11 @@ import { splitRoutes } from "../../../utils";
 import { useRouter } from "next/router";
 import Config from "../../../components/Settings/Config";
 import { findIndex } from "lodash";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
 
 const config = () => {
+  const activeProduct = useRecoilValue(activeProductState);
   const router = useRouter();
   const { pathname } = useRouter();
   const menus = ["Account", "Billing", "Config", "Team"];
@@ -36,7 +39,7 @@ const config = () => {
         activeRightItem={menus[activeMenuIndex]}
         setActiveRightNav={setActiveRightNav}
       >
-        <Config />
+        {activeProduct && <Config product={activeProduct} />}
       </AppLayout>
     </div>
   );
