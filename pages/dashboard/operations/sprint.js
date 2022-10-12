@@ -16,6 +16,7 @@ import {
   Col,
   Radio,
   message,
+  Alert
 } from "antd";
 
 import {
@@ -104,7 +105,7 @@ const Index = styled.span`
 
 export default function Sprint() {
   const { pathname } = useRouter();
-
+  const router = useRouter();
   const [data, setData] = useState(null);
   const [visible, setVisible] = useState(false);
   const [story, setStory] = useState(null);
@@ -116,6 +117,7 @@ export default function Sprint() {
   const [version, setVersion] = useRecoilState(versionState);
   const [rightNav, setRightNav] = useState(["1.0"]);
   const [newVersion, setNewVersion] = useState("");
+  const [stories, setStories] = useState(null)
 
   // const [activeProduct, setActiveProduct] = useState(products[0]);
 
@@ -188,6 +190,7 @@ export default function Sprint() {
                 });
               });
             });
+            setStories(stories)
           setData([
             {
               columnId: "0",
@@ -399,6 +402,7 @@ export default function Sprint() {
           style={{
             overflowX: "auto",
           }}
+          className="relative"
         >
           <div
             style={{
@@ -407,14 +411,29 @@ export default function Sprint() {
             }}
           >
             {data && (
-              <Board
-                colCount={data.length}
-                onDrop={handleDrop}
-                onSwap={() => console.log(this)}
-                columns={data}
-                renderColumn={renderCol}
-                columnHeaderRenders={[null, null, null]}
-              />
+              <>
+                <Board
+                  colCount={data.length}
+                  onDrop={handleDrop}
+                  onSwap={() => console.log(this)}
+                  columns={data}
+                  renderColumn={renderCol}
+                  columnHeaderRenders={[null, null, null]}
+                />
+                {stories.length < 1 ? (
+                  <div className="w-[400px] absolute bottom-0 right-0 z-10">
+                    <Alert
+                      message={
+                        <p>
+                          No elements present; Add items to your <span className="font-semibold cursor-pointer" onClick={() => router.push("/dashboard")}>story map</span> to
+                          populate
+                        </p>
+                      }
+                      type="success"
+                    />
+                  </div>
+                ) : null}
+              </>
             )}
           </div>
         </div>

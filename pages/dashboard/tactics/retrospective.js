@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { Dropdown, Card, Avatar, Divider, message } from "antd";
+import { Dropdown, Card, Avatar, Divider, messag, Empty } from "antd";
 
 import { SortAscendingOutlined } from "@ant-design/icons";
 
@@ -159,7 +159,7 @@ export default function Retrospective() {
         onMainAdd={() => setShowAdd(true)}
         breadCrumbItems={splitRoutes(pathname)}
       >
-        {data ? (
+        {data.length > 0 ? (
           <MasonryGrid>
             {data
               .filter((item) => item.type === types[activeTabIndex])
@@ -215,7 +215,16 @@ export default function Retrospective() {
               )}
           </MasonryGrid>
         ) : (
-          <h3 className="text-center">Add Item</h3>
+          <div className="h-[600px] flex items-center justify-center">
+            <div
+              style={{
+                boxShadow:
+                  "0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)",
+              }}
+              className="w-[320px] h-[187px] bg-white flex items-center justify-center rounded"
+            ><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>
+            
+          </div>
         )}
 
         <AddItem
