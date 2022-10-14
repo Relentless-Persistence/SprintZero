@@ -1,243 +1,281 @@
-import React, { useState, useReducer } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import { useRouter } from 'next/router';
-import
-{
-    Row,
-    Col,
-} from 'antd';
+import { useRouter } from "next/router";
+import { Row, Col } from "antd";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import
-{
-    ListCard,
-    DescriptionCard,
-    TimeLineCard
-} from '../../../components/Personas';
+import {
+  ListCard,
+  DescriptionCard,
+  TimeLineCard,
+} from "../../../components/Personas";
 import { splitRoutes } from "../../../utils";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
+import { findIndex } from "lodash";
 
 import fakeData from "../../../fakeData/personas.json";
 import products from "../../../fakeData/products.json";
 
-const getRoles = data => 
-{
-    return data.map( d => d.title );
-};
+// const getCardData = (name, data) => {
+//   return [...data?.find((d) => d.name === name)?.list];
+// };
 
-const getCardData = ( name, data ) =>
-{
-    return [ ...data?.find( d => d.name === name )?.list ];
-};
+export default function Personas() {
+  const { pathname } = useRouter();
+  const activeProduct = useRecoilValue(activeProductState);
+  const [roles, setRoles] = useState(null);
+  const [activeRole, setActiveRole] = useState(null);
+  const [rightNav, setRightNav] = useState([]);
+  const [newRole, setNewRole] = useState("");
 
-export default function Personas ()
-{
-    const { pathname } = useRouter();
+  const fetchPersonas = async () => {
+    if (activeProduct) {
+      const res = db
+        .collection("Personas")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setRoles(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          const roles = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setActiveRole(roles[0]);
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
+  };
 
-    const [ data, setData ] = useState( fakeData );
+  useEffect(() => {
+    fetchPersonas();
+  }, [activeProduct]);
 
-    const [ activeProduct, setActiveProduct ] = useState( products[ 0 ] );
+  const getRoles = () => {
+    // return data.map((d) => d.role);
+    if (roles) {
+      setRightNav(roles.map(({ role }) => role));
+    }
+  };
 
-    const [ activeRole, setActiveRole ] = useState( { ...data[ activeProduct ][ 0 ] } );
+  useEffect(() => {
+    getRoles();
+  }, [roles]);
 
-    const setProduct = ( product ) =>
-    {
-        setActiveProduct( product );
-        const role = { ...data[ product ][ 0 ] };
-        setActiveRole( role );
-    };
+  const setRole = (roleName) => {
+    const roleIndex = findIndex(roles, (r) => r.role === roleName);
 
-    const setRole = ( roleName ) =>
-    {
-        const roleIndex = data[ activeProduct ].findIndex( r => r.title === roleName );
+    if (roleIndex > -1) {
+      setActiveRole(roles[roleIndex]);
+    }
+  };
 
-        if ( roleIndex > -1 )
-        {
-            const role = { ...data[ activeProduct ][ roleIndex ] };
+  const createRole = () => {
+    console.log(newRole);
 
-            setActiveRole( role );
-        }
-    };
+    db.collection("Personas").add({
+      role: newRole,
+      product_id: activeProduct.id,
+      goals: [""],
+      interactions: [""],
+      dailyLife: [""],
+      tasks: [""],
+      responsibilities: [""],
+      priorities: [""],
+      frustrations: [""],
+      changes: [""],
+    });
+  };
 
-    const createRole = ( roleName ) =>
-    {
-        const newRole =
-        {
-            id: new Date().getTime(),
-            title: `${ roleName[ 0 ].toUpperCase() }${ roleName.substring( 1 ).toLowerCase() }`,
-            cards:
-                [
-                    {
-                        name: "Goals",
-                        list: [ "" ]
+  const handleEdit = (roleName, cardName, list, id) => {
+    let data;
 
-                    },
-                    {
-                        name: "Interactions",
-                        list: [ "" ]
-
-                    },
-                    {
-                        name: "Tasks",
-                        list: [ "" ]
-
-                    },
-                    {
-                        name: "Responsiblities",
-                        list: [ "" ]
-
-                    },
-                    {
-                        name: "Description",
-                        list: [ "" ]
-                    },
-                    {
-                        name: "A Day in the life",
-                        list: [ "" ]
-                    }
-                ]
+    switch (cardName) {
+      case "goals":
+        data = {
+          goals: list,
         };
+        break;
+      case "interactions":
+        data = {
+          interactions: list,
+        };
+        break;
+      case "tasks":
+        data = {
+          tasks: list,
+        };
+        break;
+      case "responsibilities":
+        data = {
+          responsibilities: list,
+        };
+        break;
+      case "priorities":
+        data = {
+          priorities: list,
+        };
+        break;
+      case "frustrations":
+        data = {
+          frustrations: list,
+        };
+        break;
+      case "changes":
+        data = {
+          changes: list,
+        };
+        break;
+      case "dailyLife":
+        data = {
+          dailyLife: list,
+        };
+        break;
+      default:
+        break;
+    }
 
-        const newData = { ...data };
-        newData[ activeProduct ].push( newRole );
-        setData( newData );
+    console.log(data);
 
-        setRole( `${ roleName[ 0 ].toUpperCase() }${ roleName.substring( 1 ).toLowerCase() }` );
+    db.collection("Personas").doc(id).update(data);
+  };
 
-    };
+  const handleDescription = (value) => {
+    console.log(value)
+    db.collection("Personas").doc(id).update({ description: value });
+  };
 
-    const handleEdit = ( roleName, cardName, list ) =>
-    {
-        const newData = { ...data };
-        const roleIndex = newData[ activeProduct ].findIndex( r => r.title === roleName );
+  return (
+    <div className="mb-8">
+      <Head>
+        <title>Dashboard | Sprint Zero</title>
+        <meta name="description" content="Sprint Zero personas" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-        if ( roleIndex > -1 )
-        {
-            const role = newData[ activeProduct ][ roleIndex ];
-            const cardIndex = role.cards.findIndex( c => c.name === cardName );
+      <AppLayout
+        rightNavItems={rightNav}
+        breadCrumbItems={splitRoutes(pathname)}
+        activeRightItem={activeRole?.role}
+        capitalizeText={false}
+        setActiveRightNav={setRole}
+        onSideAdd={createRole}
+        hasSideAdd
+        mainClass="mr-[120px]"
+        type="text"
+        sideAddValue={newRole}
+        setSideAddValue={setNewRole}
+      >
+        {activeRole && (
+          <Row gutter={[16, 16]}>
+            <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+              <ListCard
+                handleEdit={(list) =>
+                  handleEdit(activeRole.role, "goals", list, activeRole.id)
+                }
+                title="Goals"
+                cardData={activeRole.goals}
+              />
 
-            if ( cardIndex > -1 )
-            {
-                role.cards[ cardIndex ].list = list;
-            }
+              <br />
 
-            setData( newData );
+              <ListCard
+                handleEdit={(list) =>
+                  handleEdit(
+                    activeRole.role,
+                    "interactions",
+                    list,
+                    activeRole.id
+                  )
+                }
+                title="Interactions"
+                cardData={activeRole.interactions}
+              />
 
+              <br />
 
-        }
+              <ListCard
+                handleEdit={(list) =>
+                  handleEdit(activeRole.role, "tasks", list, activeRole.id)
+                }
+                title="Tasks"
+                cardData={activeRole.tasks}
+              />
 
-    };
+              <br />
 
-    const handleDescription = ( roleName, value ) =>
-    {
-        const newData = { ...data };
-        const roleIndex = newData[ activeProduct ].findIndex( r => r.title === roleName );
+              <ListCard
+                handleEdit={(list) =>
+                  handleEdit(
+                    activeRole.role,
+                    "responsibilities",
+                    list,
+                    activeRole.id
+                  )
+                }
+                title="Responsiblities"
+                cardData={activeRole.responsibilities}
+              />
 
-        if ( roleIndex > -1 )
-        {
-            const cardIndex = newData[ activeProduct ][ roleIndex ].cards.findIndex( c => c.name === "Description" );
+              <br />
 
-            if ( cardIndex > -1 )
-            {
-                newData[ activeProduct ][ roleIndex ].cards[ cardIndex ].list = [ value ];
-            }
+              <ListCard
+                handleEdit={(list) =>
+                  handleEdit(activeRole.role, "priorities", list, activeRole.id)
+                }
+                title="Priorities"
+                cardData={activeRole.priorities}
+              />
 
-            setData( newData );
+              <br />
 
+              <ListCard
+                handleEdit={(list) =>
+                  handleEdit(
+                    activeRole.role,
+                    "frustrations",
+                    list,
+                    activeRole.id
+                  )
+                }
+                title="Frustations"
+                cardData={activeRole.frustrations}
+              />
 
-        }
+              <br />
 
-    };
+              <ListCard
+                handleEdit={(list) =>
+                  handleEdit(activeRole.role, "changes", list, activeRole.id)
+                }
+                title="Changes"
+                cardData={activeRole.changes}
+              />
+            </Col>
+            <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+              <DescriptionCard
+                handleEdit={(value) => handleDescription(value)}
+                title="Description"
+                name={activeRole?.id}
+                cardData={activeRole?.description}
+              />
 
-    return (
-        <div className="mb-8">
-            <Head>
-                <title>Dashboard | Sprint Zero</title>
-                <meta name="description" content="Sprint Zero personas" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
+              <br />
 
-            <AppLayout
-                rightNavItems={ getRoles( data[ activeProduct ] ) }
-                breadCrumbItems={ splitRoutes( pathname ) }
-                onChangeProduct={ setProduct }
-                activeRightItem={ activeRole?.title }
-                capitalizeText={ false }
-                setActiveRightNav={ setRole }
-                onSideAdd={ createRole }
-                hasSideAdd
-                mainClass="mr-[120px]"
-                type="text"
-
-            >
-
-                <Row
-                    key={ activeRole?.id } gutter={ [ 16, 16 ] }>
-                    <Col
-                        xs={ { span: 24 } }
-                        sm={ { span: 12 } }>
-
-                        <ListCard
-                            handleEdit={ ( list ) => handleEdit( activeRole?.title, "Goals", list ) }
-                            title="Goals"
-                            cardData={ getCardData( "Goals", activeRole?.cards ) }
-                        />
-
-                        <br />
-
-                        <ListCard
-
-                            handleEdit={ ( list ) => handleEdit( activeRole?.title, "Interactions", list ) }
-
-                            title="Interactions"
-                            cardData={ getCardData( "Interactions", activeRole?.cards ) }
-                        />
-
-
-                        <br />
-
-                        <ListCard
-                            handleEdit={ ( list ) => handleEdit( activeRole?.title, "Tasks", list ) }
-                            title="Tasks"
-                            cardData={ getCardData( "Tasks", activeRole?.cards ) }
-                        />
-
-
-                        <br />
-
-                        <ListCard
-                            handleEdit={ ( list ) => handleEdit( activeRole?.title, "Responsiblities", list ) }
-                            title="Responsiblities"
-                            cardData={ getCardData( "Responsiblities", activeRole?.cards ) }
-                        />
-
-
-
-                    </Col>
-                    <Col
-                        xs={ { span: 24 } }
-                        sm={ { span: 12 } }>
-
-                        <DescriptionCard
-                            handleEdit={ ( value ) => handleDescription( activeRole?.title, value ) }
-                            title="Description"
-                            name={ activeRole?.id }
-
-                            cardData={ getCardData( "Description", activeRole?.cards ) }
-                        />
-
-                        <br />
-
-                        <TimeLineCard
-                            handleEdit={ ( list ) => handleEdit( activeRole?.title, "A Day in the life", list ) }
-                            title="A Day in the life"
-                            cardData={ getCardData( "A Day in the life", activeRole?.cards ) } />
-
-                    </Col>
-                </Row>
-
-            </AppLayout>
-
-
-        </div>
-    );
+              <TimeLineCard
+                handleEdit={(list) =>
+                  handleEdit(activeRole.role, "dailyLife", list, activeRole.id)
+                }
+                title="A Day in the life"
+                cardData={activeRole.dailyLife}
+              />
+            </Col>
+          </Row>
+        )}
+      </AppLayout>
+    </div>
+  );
 }

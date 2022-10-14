@@ -11,9 +11,6 @@ import {
 } from "../../../components/Dashboard/FormCard";
 import ItemCard from "../../../components/Dashboard/ItemCard";
 import { splitRoutes, timeScale } from "../../../utils";
-
-import fakeData from "../../../fakeData/learnings.json";
-import products from "../../../fakeData/products.json";
 import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 import { RadioButtonWithFill } from "../../../components/AppRadioBtn";
 import { db } from "../../../config/firebase-config";

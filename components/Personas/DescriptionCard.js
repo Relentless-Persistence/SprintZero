@@ -40,7 +40,7 @@ const DescriptionCard = (
 
 
     const [ isEdit, setIsEdit ] = useState( false );
-    const [ state, setState ] = useState( cardData[ 0 ] );
+    const [ state, setState ] = useState(cardData);
 
     const toggleEdit = () => setIsEdit( s => !s );
 
