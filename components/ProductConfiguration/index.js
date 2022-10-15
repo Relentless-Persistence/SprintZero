@@ -11,6 +11,7 @@ import {
   message,
   Avatar,
   Image,
+  List,
 } from "antd";
 import ProductDetails from "./ProductDetails";
 import ProductCadence from "./ProductCadence";
@@ -67,7 +68,7 @@ const ProductConfiguration = () => {
         .then((res) => {
           newVersion(res.id);
           addOwnerToTeam(res.id);
-          createAccessibilities(res.id)
+          createAccessibilities(res.id);
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
@@ -108,7 +109,7 @@ const ProductConfiguration = () => {
       type: "member",
       product_id: product,
     });
-  }
+  };
 
   const createAccessibilities = (id) => {
     const challenges = [
@@ -135,13 +136,13 @@ const ProductConfiguration = () => {
     ];
 
     challenges.map((challenge) => {
-        db.collection("Accessibility").add({
-          product_id: id,
-          type: challenge.name,
-          title: challenge.title,
-        });
-    })
-  }
+      db.collection("Accessibility").add({
+        product_id: id,
+        type: challenge.name,
+        title: challenge.title,
+      });
+    });
+  };
 
   const PrevArrow = ({ index }) => {
     const show = index === 0 ? true : false;
@@ -191,7 +192,7 @@ const ProductConfiguration = () => {
     <>
       <div
         style={{ padding: "0 153px", marginTop: "50px", marginBottom: "30px" }}
-        className="text-right"
+        className="flex items-center justify-between"
       >
         <Image
           src="/images/logo_beta_light.png"
@@ -199,14 +200,23 @@ const ProductConfiguration = () => {
           className="w-[178px] h-[42px]"
           preview={false}
         />
-        {/* {user ? (
-          <div className="flex items-center justify-end -mt-10">
-            <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>
+        {user ? (
+          <div className="">
+            {/* <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>
               {user.displayName}
             </Text>
-            <Avatar src={user.photoURL} />
+            <Avatar src={user.photoURL} /> */}
+            <List className="w-[200px]">
+              <List.Item>
+                <List.Item.Meta
+                  avatar={<Avatar size="large" src={user.photoURL} />}
+                  title={user.displayName}
+                  description={user.email}
+                />
+              </List.Item>
+            </List>
           </div>
-        ) : null} */}
+        ) : null}
       </div>
 
       <div className="flex items-center justify-center mb-6">
