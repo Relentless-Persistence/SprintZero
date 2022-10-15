@@ -81,7 +81,7 @@ const AppHeader = ({ onChangeProduct }) => {
     >
       <div className="flex items-center">
         <Image
-          src="/images/logo.png"
+          src="/images/logo_beta.png"
           alt="Logo"
           className="w-[178px] h-[42px]"
           preview={false}

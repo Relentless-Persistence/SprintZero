@@ -191,21 +191,22 @@ const ProductConfiguration = () => {
     <>
       <div
         style={{ padding: "0 153px", marginTop: "50px", marginBottom: "30px" }}
+        className="text-right"
       >
         <Image
-          src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/Dark.png?alt=media&token=48f74ba5-b0cc-4026-803c-ca8c8d727eda"
+          src="/images/logo_beta_light.png"
           alt="Logo"
           className="w-[178px] h-[42px]"
           preview={false}
         />
-        {user ? (
+        {/* {user ? (
           <div className="flex items-center justify-end -mt-10">
             <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>
               {user.displayName}
             </Text>
             <Avatar src={user.photoURL} />
           </div>
-        ) : null}
+        ) : null} */}
       </div>
 
       <div className="flex items-center justify-center mb-6">
@@ -294,19 +295,19 @@ const ProductConfiguration = () => {
               className="product-card h-72 flex items-center justify-center"
               style={{ border: "none" }}
             >
-              <Button type="primary" onClick={handleSubmit}>
-                <Text className="font-semibold text-white">Start</Text>
+              <Button className="bg-white" onClick={handleSubmit}>
+                <Text>Start</Text>
               </Button>
             </div>
           </div>
         </SwiperSlide>
 
         <div className="flex items-center justify-between lg:mx-72 mx-4">
-          <Button ref={prevRef} type="primary" ghost>
+          <Button className="bg-white" ref={prevRef}>
             Previous
           </Button>
 
-          <Button ref={nextRef} type="primary" ghost>
+          <Button className="bg-white" ref={nextRef}>
             Next
           </Button>
         </div>
