@@ -18,12 +18,6 @@ import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 
-const getChallengeNames = (challenges) => {
-  const challengeNames = challenges.map((g) => g.name);
-
-  return challengeNames;
-};
-
 const challenges = ["Perceivable", "Operable", "Understandable", "Robust"];
 
 export default function Accessiblity() {

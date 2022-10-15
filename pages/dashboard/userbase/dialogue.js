@@ -20,6 +20,8 @@ import {
 } from "../../../components/Dashboard/Dialogue";
 import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
 import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
 
 const getRightNav = (data) => {
   return data.map((d) => d.title);
@@ -35,19 +37,21 @@ const Title = styled.p`
 
 const DEFAULT_HEIGHT = 378;
 
+const types = ["Identified", "Contacted", "Scheduled", "Interviewed", "Analyzing", "Processed"];
+
 export default function Dialogue() {
   const { pathname } = useRouter();
 
-  const [data, setData] = useState(fakeData);
+  const [data, setData] = useState(null);
 
-  const [activeProduct, setActiveProduct] = useState(products[0]);
+  const activeProduct = useRecoilValue(activeProductState);
 
   const [visible, setVisible] = useState(false);
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
 
   const [visibleEdit, setVisibleEdit] = useState(false);
 
-  const [activeDialogue, setActiveDialogue] = useState(data[activeProduct][0]);
+  const [activeDialogue, setActiveDialogue] = useState(types[0]);
   const [activeDialogueIndex, setActiveDialogueIndex] = useState(0);
 
   const [dialogue, setDialogue] = useState(null);
@@ -69,12 +73,6 @@ export default function Dialogue() {
     setHeight(0.7 * window.innerHeight);
   }, []);
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    setActiveDialogueIndex(0);
-    setActiveDialogue(data[product][0]);
-    setDialogue(data[product][0].list.notes[0]);
-  };
 
   const setDia = (name) => {
     const index = data[activeProduct].findIndex((r) => r.title === name);
@@ -136,16 +134,15 @@ export default function Dialogue() {
 
       <AppLayout
         breadCrumbItems={splitRoutes(pathname)}
-        activeRightItem={activeDialogue?.title}
-        onChangeProduct={setProduct}
-        setActiveRightNav={setDia}
+        // activeRightItem={activeDialogue?.title}
+        // setActiveRightNav={setDia}
         mainClass="mr-[130px]"
-        rightNavItems={getRightNav(data[activeProduct])}
+        // rightNavItems={getRightNav(data[activeProduct])}
         hasMainAdd
         onMainAdd={() => setShowAddNew(true)}
         hasSideAdd={false}
       >
-        <Row className="py-6" gutter={[16, 16]}>
+        {/* <Row className="py-6" gutter={[16, 16]}>
           {activeDialogue?.list.map((card, i) => (
             <Col xs={{ span: 24 }} sm={{ span: 8 }} key={i}>
               <DialogueCard
@@ -235,7 +232,7 @@ export default function Dialogue() {
             setVisible={setShowAddNew}
             onSubmit={addDialogueDone}
           />
-        ) : null}
+        ) : null} */}
       </AppLayout>
     </div>
   );

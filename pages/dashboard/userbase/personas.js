@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Row, Col } from "antd";
+import { Row, Col, Input, Space, Button } from "antd";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 import {
@@ -169,111 +169,151 @@ export default function Personas() {
         sideAddValue={newRole}
         setSideAddValue={setNewRole}
       >
-        {activeRole && (
-          <Row gutter={[16, 16]}>
-            <Col xs={{ span: 24 }} sm={{ span: 12 }}>
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(activeRole.role, "goals", list, activeRole.id)
-                }
-                title="Goals"
-                cardData={activeRole.goals}
+        {roles?.length < 1 ? (
+          <div className="h-[450px] flex items-center justify-center">
+            <div className="w-[320px] space-y-2">
+              <h3 className="text-[24px] font-bold">Create Persona</h3>
+              <p className="text-[14px]">Please provide a name</p>
+              <Input
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value)}
               />
+              <div className="flex justify-end space-x-2">
+                <Button
+                  size="small"
+                  type="danger"
+                  ghost
+                  onClick={() => setNewRole("")}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-[#4A801D] text-white"
+                  size="small"
+                  onClick={createRole}
+                >
+                  Submit
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          activeRole && (
+            <Row gutter={[16, 16]}>
+              <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+                <ListCard
+                  handleEdit={(list) =>
+                    handleEdit(activeRole.role, "goals", list, activeRole.id)
+                  }
+                  title="Goals"
+                  cardData={activeRole.goals}
+                />
 
-              <br />
+                <br />
 
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(
-                    activeRole.role,
-                    "interactions",
-                    list,
-                    activeRole.id
-                  )
-                }
-                title="Interactions"
-                cardData={activeRole.interactions}
-              />
+                <ListCard
+                  handleEdit={(list) =>
+                    handleEdit(
+                      activeRole.role,
+                      "interactions",
+                      list,
+                      activeRole.id
+                    )
+                  }
+                  title="Interactions"
+                  cardData={activeRole.interactions}
+                />
 
-              <br />
+                <br />
 
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(activeRole.role, "tasks", list, activeRole.id)
-                }
-                title="Tasks"
-                cardData={activeRole.tasks}
-              />
+                <ListCard
+                  handleEdit={(list) =>
+                    handleEdit(activeRole.role, "tasks", list, activeRole.id)
+                  }
+                  title="Tasks"
+                  cardData={activeRole.tasks}
+                />
 
-              <br />
+                <br />
 
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(
-                    activeRole.role,
-                    "responsibilities",
-                    list,
-                    activeRole.id
-                  )
-                }
-                title="Responsiblities"
-                cardData={activeRole.responsibilities}
-              />
+                <ListCard
+                  handleEdit={(list) =>
+                    handleEdit(
+                      activeRole.role,
+                      "responsibilities",
+                      list,
+                      activeRole.id
+                    )
+                  }
+                  title="Responsiblities"
+                  cardData={activeRole.responsibilities}
+                />
 
-              <br />
+                <br />
 
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(activeRole.role, "priorities", list, activeRole.id)
-                }
-                title="Priorities"
-                cardData={activeRole.priorities}
-              />
+                <ListCard
+                  handleEdit={(list) =>
+                    handleEdit(
+                      activeRole.role,
+                      "priorities",
+                      list,
+                      activeRole.id
+                    )
+                  }
+                  title="Priorities"
+                  cardData={activeRole.priorities}
+                />
 
-              <br />
+                <br />
 
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(
-                    activeRole.role,
-                    "frustrations",
-                    list,
-                    activeRole.id
-                  )
-                }
-                title="Frustations"
-                cardData={activeRole.frustrations}
-              />
+                <ListCard
+                  handleEdit={(list) =>
+                    handleEdit(
+                      activeRole.role,
+                      "frustrations",
+                      list,
+                      activeRole.id
+                    )
+                  }
+                  title="Frustations"
+                  cardData={activeRole.frustrations}
+                />
 
-              <br />
+                <br />
 
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(activeRole.role, "changes", list, activeRole.id)
-                }
-                title="Changes"
-                cardData={activeRole.changes}
-              />
-            </Col>
-            <Col xs={{ span: 24 }} sm={{ span: 12 }}>
-              <DescriptionCard
-                handleEdit={(value) => handleDescription(value)}
-                title="Description"
-                name={activeRole?.id}
-                cardData={activeRole?.description}
-              />
+                <ListCard
+                  handleEdit={(list) =>
+                    handleEdit(activeRole.role, "changes", list, activeRole.id)
+                  }
+                  title="Changes"
+                  cardData={activeRole.changes}
+                />
+              </Col>
+              <Col xs={{ span: 24 }} sm={{ span: 12 }}>
+                <DescriptionCard
+                  handleEdit={(value) => handleDescription(value)}
+                  title="Description"
+                  name={activeRole?.id}
+                  cardData={activeRole?.description}
+                />
 
-              <br />
+                <br />
 
-              <TimeLineCard
-                handleEdit={(list) =>
-                  handleEdit(activeRole.role, "dailyLife", list, activeRole.id)
-                }
-                title="A Day in the life"
-                cardData={activeRole.dailyLife}
-              />
-            </Col>
-          </Row>
+                <TimeLineCard
+                  handleEdit={(list) =>
+                    handleEdit(
+                      activeRole.role,
+                      "dailyLife",
+                      list,
+                      activeRole.id
+                    )
+                  }
+                  title="A Day in the life"
+                  cardData={activeRole.dailyLife}
+                />
+              </Col>
+            </Row>
+          )
         )}
       </AppLayout>
     </div>
