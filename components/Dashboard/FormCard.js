@@ -10,7 +10,6 @@ import ActionButtons, { LightActionButtons } from "../Personas/ActionButtons";
 const { TextArea } = Input;
 
 const MyCard = styled(Card)`
-  
   .ant-card-head {
     min-height: unset;
     padding: 0 12px;
@@ -135,6 +134,9 @@ export default function FormCard({
         placeholder="Result description..."
       />
       {extraItems}
+      <Button disabled block className="bg-[#FF4D4F] text-white mt-2">
+        Remove
+      </Button>
     </Card>
   );
 }
