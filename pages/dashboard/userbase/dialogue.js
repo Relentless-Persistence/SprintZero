@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 
-import { Row, Col, Drawer } from "antd";
+import { Row, Col, Drawer, Select } from "antd";
 
 import { CloseOutlined } from "@ant-design/icons";
 
@@ -22,6 +23,7 @@ import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
+import { findIndex } from "lodash";
 
 const getRightNav = (data) => {
   return data.map((d) => d.title);
@@ -37,7 +39,16 @@ const Title = styled.p`
 
 const DEFAULT_HEIGHT = 378;
 
-const types = ["Identified", "Contacted", "Scheduled", "Interviewed", "Analyzing", "Processed"];
+const types = [
+  "Identified",
+  "Contacted",
+  "Scheduled",
+  "Interviewed",
+  "Analyzing",
+  "Processed",
+];
+
+const { Option } = Select;
 
 export default function Dialogue() {
   const { pathname } = useRouter();
@@ -63,24 +74,31 @@ export default function Dialogue() {
       const res = db
         .collection("Dialogues")
         .where("product_id", "==", activeProduct.id)
+        .where("type", "==", activeDialogue)
         .onSnapshot((snapshot) => {
           setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          console.table(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
         });
     }
   };
 
   useEffect(() => {
+    fetchDialogues();
+  }, [activeProduct, activeDialogue]);
+
+  useEffect(() => {
     setHeight(0.7 * window.innerHeight);
   }, []);
 
-
   const setDia = (name) => {
-    const index = data[activeProduct].findIndex((r) => r.title === name);
+    const index = findIndex(types, (r) => r === name);
 
     if (index > -1) {
       setActiveDialogueIndex(index);
 
-      setActiveDialogue(data[activeProduct][index]);
+      setActiveDialogue(types[index]);
     }
   };
 
@@ -124,6 +142,13 @@ export default function Dialogue() {
     setShowAddNew(false);
   };
 
+  const updateStage = (id, type) => {
+    db.collection("Dialogues").doc(id).update({
+      type,
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
   return (
     <div className="mb-8">
       <Head>
@@ -134,88 +159,113 @@ export default function Dialogue() {
 
       <AppLayout
         breadCrumbItems={splitRoutes(pathname)}
-        // activeRightItem={activeDialogue?.title}
-        // setActiveRightNav={setDia}
+        activeRightItem={activeDialogue}
+        setActiveRightNav={setDia}
         mainClass="mr-[130px]"
-        // rightNavItems={getRightNav(data[activeProduct])}
+        rightNavItems={types}
         hasMainAdd
         onMainAdd={() => setShowAddNew(true)}
         hasSideAdd={false}
       >
-        {/* <Row className="py-6" gutter={[16, 16]}>
-          {activeDialogue?.list.map((card, i) => (
-            <Col xs={{ span: 24 }} sm={{ span: 8 }} key={i}>
-              <DialogueCard
-                setItem={setDrawerDialogue}
-                openDrawer={setVisible}
-                {...card}
-              />
-            </Col>
-          ))}
-        </Row>
-
-        <Drawer
-          height={height}
-          forceRender={true}
-          destroyOnClose={true}
-          placement={"bottom"}
-          closable={false}
-          headerStyle={{
-            background: "#F5F5F5",
-          }}
-          visible={visible}
-          onClose={() => setVisible(false)}
-          title={
-            <Row>
-              <Col span={23}>
-                <>
-                  <span>{dialogue?.name}</span>
-                  &nbsp;
-                  <CardHeaderButton
-                    className="!bg-transparent border-[#4A801D]"
-                    onClick={openEdit}
-                  >
-                    Edit
-                  </CardHeaderButton>
-                </>
-              </Col>
-              <Col span={1}>
-                <CloseOutlined
-                  color="#A6AE9D"
-                  onClick={() => setVisible(false)}
+        <Row className="py-6" gutter={[16, 16]}>
+          {data &&
+            data.map((dialogue, i) => (
+              <Col xs={{ span: 24 }} sm={{ span: 8 }} key={i}>
+                <DialogueCard
+                  setItem={setDrawerDialogue}
+                  openDrawer={setVisible}
+                  dialogue={dialogue}
                 />
               </Col>
-            </Row>
-          }
-        >
-          <Row className="py-6" gutter={[20, 20]}>
-            <Col span={16}>
-              <p>
-                <strong>Notes</strong>
-              </p>
+            ))}
+        </Row>
 
-              {dialogue?.notes.map((note, i) => (
-                <div key={i}>
-                  <Title>{note.title}</Title>
-                  <p>{note.response}</p>
+        {dialogue && (
+          <Drawer
+            height={height}
+            forceRender={true}
+            destroyOnClose={true}
+            placement={"bottom"}
+            closable={false}
+            headerStyle={{
+              background: "#F5F5F5",
+            }}
+            visible={visible}
+            onClose={() => setVisible(false)}
+            title={
+              <Row>
+                <Col span={23}>
+                  <>
+                    <span>{dialogue?.name}</span>
+                    &nbsp;
+                    <CardHeaderButton
+                      className="!bg-transparent border-[#4A801D]"
+                      onClick={openEdit}
+                    >
+                      Edit
+                    </CardHeaderButton>
+                  </>
+                </Col>
+                <Col span={1}>
+                  <CloseOutlined
+                    color="#A6AE9D"
+                    onClick={() => setVisible(false)}
+                  />
+                </Col>
+              </Row>
+            }
+          >
+            <Row className="py-6" gutter={[20, 20]}>
+              <Col span={16}>
+                <p>
+                  <strong>Notes</strong>
+                </p>
 
-                  <br />
+                {dialogue?.notes.map((note, i) => (
+                  <div key={i}>
+                    <Title>{note.title}</Title>
+                    <p>{note.response}</p>
+
+                    <br />
+                  </div>
+                ))}
+              </Col>
+              <Col offset={3} span={4}>
+                <div className="mb-3">
+                  <Title className="text-right">Stage</Title>
+                  <Select
+                    defaultValue={dialogue.type}
+                    onChange={(value) => updateStage(dialogue.id, value)}
+                    className="w-full"
+                  >
+                    {types.map((type, i) => (
+                      <Option key={i} value={type}>
+                        {type}
+                      </Option>
+                    ))}
+                  </Select>
                 </div>
-              ))}
-            </Col>
-            <Col offset={3} span={4}>
-              <Title className="text-right">Region</Title>
-              <p className="text-right text-lg">{dialogue?.region}</p>
 
-              <br />
-              <br />
-              <Title className="text-right">Education</Title>
-              <p className="text-right text-lg">{dialogue?.education}</p>
-            </Col>
-          </Row>
-        </Drawer>
+                <div className="mb-3">
+                  <Title className="text-right">Assigned Persona</Title>
+                  <p className="text-right text-lg">{dialogue?.post}</p>
+                </div>
 
-        {dialogue?.id ? (
+                <div className="mb-3">
+                  <Title className="text-right">Region</Title>
+                  <p className="text-right text-lg">{dialogue?.region}</p>
+                </div>
+
+                <div>
+                  <Title className="text-right">Education</Title>
+                  <p className="text-right text-lg">{dialogue?.education}</p>
+                </div>
+              </Col>
+            </Row>
+          </Drawer>
+        )}
+
+        {dialogue && (
           <EditNote
             height={height}
             visible={visibleEdit}
@@ -223,8 +273,9 @@ export default function Dialogue() {
             setDialogue={setDialogue}
             setVisible={setVisibleEdit}
             onSubmit={editDialogue}
+            activeProduct={activeProduct}
           />
-        ) : null}
+        )}
 
         {showAddNew ? (
           <AddNote
@@ -232,7 +283,7 @@ export default function Dialogue() {
             setVisible={setShowAddNew}
             onSubmit={addDialogueDone}
           />
-        ) : null} */}
+        ) : null}
       </AppLayout>
     </div>
   );

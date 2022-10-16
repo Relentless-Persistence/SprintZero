@@ -60,7 +60,7 @@ const DescriptionCard = (
     const onCancel = () =>
     {
         toggleEdit();
-        setState( cardData[ 0 ] );
+        setState( cardData );
 
     };
 
@@ -92,16 +92,33 @@ const DescriptionCard = (
     }
 
     return (
-        <MyCard
-            className='border-2 border-[#D9D9D9]'
-            extra={ <CardHeaderLink size="small" onClick={ toggleEdit } >Edit</CardHeaderLink> }
-            title={ <strong>{ title }</strong> }
-            headStyle={ {
-                background: "#F5F5F5",
-            } }
-        >
-            <p>{ cardData }</p>
-        </MyCard>
+      <MyCard
+        className="border-2 border-[#D9D9D9]"
+        extra={
+          <CardHeaderLink size="small" onClick={toggleEdit}>
+            Edit
+          </CardHeaderLink>
+        }
+        title={<strong>{title}</strong>}
+        headStyle={{
+          background: "#F5F5F5",
+        }}
+      >
+        {cardData === "" ? (
+          <p>
+            No{" "}
+            <span
+              className="cursor-pointer font-semibold"
+              onClick={() => setIsEdit(true)}
+            >
+              {title}
+            </span>{" "}
+            Added Yet
+          </p>
+        ) : (
+          <p>{cardData}</p>
+        )}
+      </MyCard>
     );
 };
 

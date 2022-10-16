@@ -143,7 +143,7 @@ export default function Personas() {
     db.collection("Personas").doc(id).update(data);
   };
 
-  const handleDescription = (value) => {
+  const handleDescription = (value, id) => {
     console.log(value)
     db.collection("Personas").doc(id).update({ description: value });
   };
@@ -291,7 +291,7 @@ export default function Personas() {
               </Col>
               <Col xs={{ span: 24 }} sm={{ span: 12 }}>
                 <DescriptionCard
-                  handleEdit={(value) => handleDescription(value)}
+                  handleEdit={(value) => handleDescription(value, id)}
                   title="Description"
                   name={activeRole?.id}
                   cardData={activeRole?.description}
