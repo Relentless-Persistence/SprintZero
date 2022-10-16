@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Row, Col, message, Button } from "antd";
+import { Row, Col, message, Button, Empty } from "antd";
 import { findIndex } from "lodash";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -167,10 +167,13 @@ export default function Accessiblity() {
               />
             ))
           ) : (
-            <FormCard
-              className="border border-[#D9D9D9]"
-              onSubmit={addItemDone}
-            />
+            <>
+              {showAdd ? (
+                null
+              ) : (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              )}
+            </>
           )}
 
           <div
@@ -179,7 +182,10 @@ export default function Accessiblity() {
             }}
             ref={ref}
           >
-            <FormCard onSubmit={addItemDone} onCancel={() => setShowAdd(false)} />
+            <FormCard
+              onSubmit={addItemDone}
+              onCancel={() => setShowAdd(false)}
+            />
           </div>
         </MasonryGrid>
       </AppLayout>

@@ -87,6 +87,7 @@ export default function Personas() {
       priorities: [""],
       frustrations: [""],
       changes: [""],
+      description: ""
     });
   };
 

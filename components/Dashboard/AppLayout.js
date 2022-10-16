@@ -53,7 +53,7 @@ const capitalize = (text) =>
 
 const AppLayout = ({
   rightNavItems = [],
-  activeRightItem = "test",
+  activeRightItem,
   breadCrumbItems = [],
   setActiveRightNav,
   onChangeProduct,
