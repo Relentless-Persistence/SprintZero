@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
-import { Row, Col, Input, Select, Divider, DatePicker, Drawer } from "antd";
+import { Row, Col, Input, Select, Divider, DatePicker, Drawer, Button, Space, InputNumber } from "antd";
 import { useRouter } from "next/router";
 import { SettingOutlined } from "@ant-design/icons";
 import AppLayout from "../../../components/Dashboard/AppLayout";
@@ -9,14 +10,14 @@ import { Chart } from "../../../components/Dashboard/Journeys";
 
 import fakeData from "../../../fakeData/journeys.json";
 import products from "../../../fakeData/products.json";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
+import { findIndex } from "lodash";
 import { splitRoutes } from "../../../utils";
 import AddEvent from "../../../components/Dashboard/Journeys/AddEvent";
 
 const { Option } = Select;
-
-const getNames = (list = []) => {
-  return list.map((j) => j.journeyName);
-};
 
 const init = {
   id: "",
@@ -29,31 +30,90 @@ const init = {
 
 export default function Journeys() {
   const { pathname } = useRouter();
-
-  const [activeProduct, setActiveProduct] = useState(products[0]);
+  const activeProduct = useRecoilValue(activeProductState);
+  // const [activeProduct, setActiveProduct] = useState(products[0]);
   const [data, setData] = useState(fakeData);
-
+  const [journeys, setJourneys] = useState(null);
+  const [events, setEvents] = useState(null);
+  const [rightNav, setRightNav] = useState([]);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [addJourney, setAddJourney] = useState(false);
 
-  const initJourney = data[activeProduct][0]?.id
-    ? data[activeProduct][0]
-    : { ...init, events: [] };
+  // New Journey States
+  const [newJourney, setNewJourney] = useState("");
+  const [duration, setDuration] = useState("");
+  const [durationType, setDurationType] = useState("days");
 
-  const [activeJourney, setActiveJourney] = useState(initJourney);
+  // const initJourney = data[activeProduct][0]?.id
+  //   ? data[activeProduct][0]
+  //   : { ...init, events: [] };
 
-  const setJourney = (journeyName) => {
-    const journey = data[activeProduct].find(
-      (j) => j.journeyName === journeyName
-    );
-    setActiveJourney(journey);
+  const [activeJourney, setActiveJourney] = useState(null);
+
+  const fetchJourneys = async () => {
+    if (activeProduct) {
+      db.collection("Journeys")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setJourneys(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+          const journeys = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          if (!snapshot.empty) {
+            setActiveJourney(journeys[0]);
+            setAddJourney(false);
+          } else {
+            setAddJourney(true);
+          }
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    if (data[product][0]) {
-      setActiveJourney(data[product][0]);
-    } else {
-      setActiveJourney({ ...init, events: [] });
+  useEffect(() => {
+    fetchJourneys();
+  }, [activeProduct]);
+
+  const fetchEvents = async () => {
+    if (activeJourney) {
+      db.collection("journeyEvents")
+        .where("journey_id", "==", activeJourney.id)
+        .onSnapshot((snapshot) => {
+          setEvents(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, [activeJourney]);
+
+  const getNames = () => {
+    // return data.map((d) => d.role);
+    if (journeys) {
+      setRightNav(journeys.map(({ name }) => name));
+    }
+  };
+
+  useEffect(() => {
+    getNames();
+  }, [journeys]);
+
+  const setJourney = (journeyName) => {
+    const journeyIndex = findIndex(journeys, (r) => r.name === journeyName);
+
+    if (journeyIndex > -1) {
+      setActiveJourney(journeys[journeyIndex]);
     }
   };
 
@@ -72,7 +132,7 @@ export default function Journeys() {
     }
   };
 
-  const setDuration = (e) => {
+  const getDuration = (e) => {
     setActiveJourney({
       ...activeJourney,
       journeyName:
@@ -91,18 +151,21 @@ export default function Journeys() {
 
   const onAddJourney = (name) => {
     const newJ = {
-      ...init,
-      journeyName: name || `Default_name ${data[activeProduct].length + 1}`,
-      id: new Date().getTime(),
-      events: [],
+      durationType,
+      duration,
+      start: new Date().toISOString(),
+      name: newJourney,
+      product_id: activeProduct.id
     };
+    // console.log(newJ)
 
-    const newData = { ...data };
-
-    newData[activeProduct].push(newJ);
-    setData(newData);
-
-    setActiveJourney(newJ);
+    db.collection("Journeys").add(newJ)
+    .then(() => {
+      setNewJourney("");
+      setDuration("")
+      setDurationType("");
+      setAddJourney(false);
+    })
   };
 
   const addEvent = (event) => {
@@ -146,38 +209,84 @@ export default function Journeys() {
       </Head>
 
       <AppLayout
-        onChangeProduct={setProduct}
-        rightNavItems={getNames(data[activeProduct])}
-        activeRightItem={activeJourney?.journeyName}
+        rightNavItems={rightNav}
+        activeRightItem={activeJourney?.name}
         hasMainAdd
         hasSideAdd
         onSideAdd={onAddJourney}
-        onMainAdd={
-          checkJourney()
-            ? onClickAddEvt
-            : () => alert("Configure journey details")
-        }
+        // onMainAdd={
+        //   checkJourney()
+        //     ? onClickAddEvt
+        //     : () => alert("Configure journey details")
+        // }
         type="text"
         mainClass="mr-[152px]"
         setActiveRightNav={setJourney}
-        defaultText={
-          activeJourney?.journeyName ? activeJourney.journeyName : "Add"
-        }
+        defaultText={activeJourney ? activeJourney.name : "Add"}
         breadCrumbItems={splitRoutes(pathname)}
-        addNewText={
-          <p className="flex items-center">
-            Add Event <Divider className="min-h-[100px]" type="vertical" />{" "}
-            <SettingOutlined className="pl-[5px]" />
-          </p>
-        }
+        addNewText={<p className="flex items-center">Add Event</p>}
       >
-        {activeJourney &&
+        {addJourney ? (
+          <div className="h-[450px] flex items-center justify-center">
+            <div className="w-[320px]">
+              <div>
+                <h3 className="text-[24px] font-bold">Create Journey</h3>
+                <p className="text-[14px] text-[#595959]">
+                  Please provide a name
+                </p>
+                <Input value={newJourney} onChange={(e) => setNewJourney(e.target.value)} />
+              </div>
+
+              <p className="text-[14px] text-[#595959] mt-8">
+                How long does this take end to end?
+              </p>
+              <div className="flex items-center justify-between space-x-3">
+                <InputNumber
+                  value={duration}
+                  onChange={(value) => setDuration(value)}
+                  className="w-full"
+                />
+                <Select
+                  defaultValue="days"
+                  onChange={(value) => setDurationType(value)}
+                  className="w-full"
+                >
+                  <Option value="minutes">Minutes</Option>
+                  <Option value="hours">Hours</Option>
+                  <Option value="days">Days</Option>
+                  <Option value="week">Weeks</Option>
+                  <Option value="month">Months</Option>
+                  <Option value="year">Years</Option>
+                </Select>
+              </div>
+              <div className="flex justify-end space-x-2 mt-[43px]">
+                <Button
+                  size="small"
+                  type="danger"
+                  ghost
+                  onClick={() => setNewRole("")}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-[#4A801D] text-white"
+                  size="small"
+                  onClick={onAddJourney}
+                >
+                  Submit
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* {activeJourney &&
         activeJourney?.start &&
         activeJourney?.events?.length ? (
           <Chart journey={activeJourney} />
-        ) : null}
+        ) : null} */}
 
-        {!activeJourney?.start ||
+            {/* {!activeJourney?.start ||
         (activeJourney?.start && !activeJourney?.events.length) ? (
           <div
             style={{ minHeight: "50vh" }}
@@ -210,7 +319,7 @@ export default function Journeys() {
                   <Option value="minute">Minutes</Option>
                   <Option value="hour">Hours</Option>
                   <Option value="day">Days</Option>
-                  {/* <Option value="week">Weeks</Option> */}
+                  <Option value="week">Weeks</Option>
                   <Option value="month">Months</Option>
                   <Option value="year">Years</Option>
                 </Select>
@@ -219,16 +328,18 @@ export default function Journeys() {
               </div>
             </div>
           </div>
-        ) : null}
+        ) : null} */}
 
-        <AddEvent
+            {/* <AddEvent
           onAdd={addEvent}
           journeyStart={activeJourney?.start}
           journeyDur={activeJourney?.duration}
           journeyType={activeJourney?.durationType}
           onCancel={() => setShowDrawer(false)}
           showDrawer={showDrawer}
-        />
+        /> */}
+          </>
+        )}
       </AppLayout>
     </div>
   );
