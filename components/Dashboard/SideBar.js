@@ -110,8 +110,8 @@ const SideBar = () => {
         icon={<PullRequestOutlined />}
         title="Tactics"
       >
-        <MenuItem $highlight={isActive(pathname, "/strategy/ethics")} key="5">
-          <Link href="/dashboard/strategy/ethics">
+        <MenuItem $highlight={isActive(pathname, "/tactics/ethics")} key="5">
+          <Link href="/dashboard/tactics/ethics">
             <a>Ethics</a>
           </Link>
         </MenuItem>
@@ -172,8 +172,8 @@ const SideBar = () => {
             <a>Sprint</a>
           </Link>
         </MenuItem>
-        <MenuItem key="15" $highlight={isActive(pathname, "/tactics/tasks")}>
-          <Link href="/dashboard/tactics/tasks">
+        <MenuItem key="15" $highlight={isActive(pathname, "/operations/tasks")}>
+          <Link href="/dashboard/operations/tasks">
             <a>Tasks</a>
           </Link>
         </MenuItem>
