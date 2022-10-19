@@ -36,6 +36,8 @@ const MyCard = styled(Card)`
 `;
 
 const HuddleCard = ({
+  todayInTime,
+  yesterdayInTime,
   today,
   yesterday,
   member,
@@ -53,12 +55,12 @@ const HuddleCard = ({
   const onBlockerDone = (e) => {
     if (newBlocker !== "") {
       if (e.key === "Enter") {
-        db.collection("huddleBlockers")
+        db.collection("HuddleBlockers")
           .add({
             user: member.user,
             completed: false,
             title: newBlocker,
-            createdAt: new Date().toString(),
+            createdAt: new Date(),
             product_id: product.id,
           })
           .then((docRef) => {
@@ -75,7 +77,7 @@ const HuddleCard = ({
 
   const updateBlocker = async (id, checked) => {
     await db
-      .collection("huddleBlockers")
+      .collection("HuddleBlockers")
       .doc(id)
       .update({
         completed: checked,
@@ -89,12 +91,12 @@ const HuddleCard = ({
   const onTodayDone = (e) => {
     if (newToday !== "") {
       if (e.key === "Enter") {
-        db.collection("huddles")
+        db.collection("Huddles")
           .add({
             user: member.user,
             completed: false,
             title: newToday,
-            createdAt: new Date().toString(),
+            createdAt: new Date(),
             product_id: product.id,
           })
           .then((docRef) => {
@@ -111,7 +113,7 @@ const HuddleCard = ({
 
   const updateToday = async (id, checked) => {
     await db
-      .collection("huddles")
+      .collection("Huddles")
       .doc(id)
       .update({
         completed: checked,
@@ -125,12 +127,12 @@ const HuddleCard = ({
   const onYesterdayDone = (e) => {
     if (newYesterday !== "") {
       if (e.key === "Enter") {
-        db.collection("huddles")
+        db.collection("Huddles")
           .add({
             user: member.user,
             completed: false,
             title: newYesterday,
-            createdAt: new Date(new Date().setDate(new Date().getDate() - 1)).toString(),
+            createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
             product_id: product.id,
           })
           .then((docRef) => {
@@ -147,7 +149,7 @@ const HuddleCard = ({
 
   const updateYesterday = async (id, checked) => {
     await db
-      .collection("huddles")
+      .collection("Huddles")
       .doc(id)
       .update({
         completed: checked,
@@ -185,6 +187,7 @@ const HuddleCard = ({
               {blockers.map((d, i) => (
                 <li key={i}>
                   <Checkbox
+                  disabled={(todayInTime != (new Date()).setHours(0,0,0,0))}
                     onChange={() => updateBlocker(d.id, !d.completed)}
                     checked={d.completed}
                   >
@@ -193,6 +196,7 @@ const HuddleCard = ({
                 </li>
               ))}
 
+{(todayInTime == (new Date()).setHours(0,0,0,0)) &&
               <li>
                 {showAddNewBlocker ? (
                   <Input
@@ -210,9 +214,11 @@ const HuddleCard = ({
                   </AppCheckbox>
                 )}
               </li>
+}
             </ul>
           ) : (
             <ul>
+              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
               <li>
                 {showAddNewBlocker ? (
                   <Input
@@ -230,6 +236,7 @@ const HuddleCard = ({
                   </AppCheckbox>
                 )}
               </li>
+}
             </ul>
           )}
         </div>
@@ -241,7 +248,8 @@ const HuddleCard = ({
             <ul>
               {today?.map((d, i) => (
                 <li key={i}>
-                  <Checkbox
+                  <Checkbox 
+                    disabled={(todayInTime != (new Date()).setHours(0,0,0,0))}
                     onChange={() => updateToday(d.id, !d.completed)}
                     checked={d.completed}
                   >
@@ -249,7 +257,9 @@ const HuddleCard = ({
                   </Checkbox>
                 </li>
               ))}
-
+              
+              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
+              
               <li>
                 {showAddNewToday ? (
                   <Input
@@ -266,9 +276,11 @@ const HuddleCard = ({
                   </AppCheckbox>
                 )}
               </li>
+            }
             </ul>
           ) : (
             <ul>
+              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
               <li>
                 {showAddNewToday ? (
                   <Input
@@ -285,6 +297,7 @@ const HuddleCard = ({
                   </AppCheckbox>
                 )}
               </li>
+}
             </ul>
           )}
         </div>
@@ -297,6 +310,7 @@ const HuddleCard = ({
               {yesterday?.map((d, i) => (
                 <li key={i}>
                   <Checkbox
+                  disabled={(todayInTime != (new Date()).setHours(0,0,0,0))}
                     onChange={() => updateYesterday(d.uid, !d.completed)}
                     checked={d.completed}
                   >
@@ -305,6 +319,7 @@ const HuddleCard = ({
                 </li>
               ))}
 
+{(todayInTime == (new Date()).setHours(0,0,0,0)) &&
               <li>
                 {showAddNewYesterday ? (
                   <Input
@@ -322,9 +337,11 @@ const HuddleCard = ({
                   </AppCheckbox>
                 )}
               </li>
+}
             </ul>
           ) : (
             <ul>
+              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
               <li>
                 {showAddNewYesterday ? (
                   <Input
@@ -342,6 +359,7 @@ const HuddleCard = ({
                   </AppCheckbox>
                 )}
               </li>
+}
             </ul>
           )}
         </div>

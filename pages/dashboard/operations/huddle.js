@@ -17,6 +17,13 @@ import { findIndex } from "lodash";
 import { useAuth } from "../../../contexts/AuthContext";
 import { isToday, isYesterday } from "date-fns";
 
+function subtractDays(numOfDays, date_today) {
+  let datee = new Date(date_today)
+  datee.setDate(datee.getDate() - numOfDays);
+
+  return datee;
+}
+
 const intervals = [
   "Today",
   "Yesterday",
@@ -27,6 +34,45 @@ const intervals = [
   "1 month ago",
 ];
 
+// const intervals_dates = new Map([
+//   ["Today", new Date()],
+//   ["Yesterday", new Date() - 1],
+//   ["2 days ago", new Date() -2],
+//   ["3 days ago", new Date() -3],
+//   ["7 days ago", new Date() -7],
+//   ["1 month ago", new Date() - 30],
+// ]);
+
+//const today = new Date()
+
+//const today_fixed = new Date();
+const today_fixeddd = new Date(new Date().toJSON().slice(0, 10));
+const yesterday_fixed = subtractDays(1, today_fixeddd);
+const twodaysago_fixed = subtractDays(2, today_fixeddd);
+const threedaysago_fixed = subtractDays(3, today_fixeddd);
+const oneweekago_fixed = subtractDays(7, today_fixeddd);
+const twoweeksago_fixed = subtractDays(14, today_fixeddd);
+const onemonthago_fixed = subtractDays(30, today_fixeddd);
+
+const intervals_dictt = {
+  "Today": today_fixeddd,
+  "Yesterday": yesterday_fixed,
+  "2 days ago": twodaysago_fixed,
+  "3 days ago": threedaysago_fixed,
+  "1 week ago": oneweekago_fixed,
+  "2 weeks ago": twoweeksago_fixed,
+  "1 month ago": onemonthago_fixed,
+};
+
+// const intervals_dictt = [
+//   today_fixeddd,
+//   yesterday_fixed,
+//   twodaysago_fixed,
+//   threedaysago_fixed,
+//   sevendaysago_fixed,
+//   onemonthago_fixed,
+// ];
+
 export default function Huddle() {
   const { pathname } = useRouter();
   const user = useAuth();
@@ -36,13 +82,13 @@ export default function Huddle() {
   const [team, setTeam] = useState(null);
   const [blockers, setBlockers] = useState(null);
   const [activeTimeIndex, setActiveTimeIndex] = useState(0);
-  const [activeTime, setActiveTime] = useState(intervals[0]);
-  const [today, setToday] = useState(null);
-  const [yesterday, setYesterday] = useState(null);
+  const [activeTime, setActiveTime] = useState("Today");
+  const [todayInTime, setTodayInTime] = useState(null);
+  const [yesterdayInTime, setYesterdayInTime] = useState(null);
   const [blocker, setBlocker] = useState(null);
 
   // Fetch teams form firebase
-  const fetchTeam = async () => {
+  const fetchTeam = () => {
     if (activeProduct) {
       const res = db
         .collection("teams")
@@ -54,13 +100,15 @@ export default function Huddle() {
   };
 
   // Fetch data from firebase
-  const fetchHuddles = async () => {
+  const fetchHuddles = () => {
+    console.log("active product" + activeProduct);
     if (activeProduct) {
       const res = db
-        .collection("huddles")
+        .collection("Huddles")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
           setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          
           console.log(
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
@@ -68,10 +116,10 @@ export default function Huddle() {
     }
   };
 
-  const fetchHuddleBlockers = async () => {
+  const fetchHuddleBlockers = () => {
     if (activeProduct) {
       const res = db
-        .collection("huddleBlockers")
+        .collection("HuddleBlockers")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
           setBlockers(
@@ -88,59 +136,61 @@ export default function Huddle() {
     fetchTeam();
     fetchHuddles();
     fetchHuddleBlockers();
-  }, [activeProduct]);
+    
+    setTodayInTime((intervals_dictt[activeTime]).setHours(0,0,0,0))
+    setYesterdayInTime((subtractDays(1, intervals_dictt[activeTime])).setHours(0,0,0,0))
+    
+    console.log("Interval dict aydaa " + activeProduct.product + activeTime + intervals_dictt["Today"] + intervals_dictt["Yesterday"] + intervals_dictt["2 days ago"] + today_fixeddd + yesterdayInTime);
 
-  const todayFilterInterval = (item) => {
-    switch (activeTime) {
-      case "Today":
-        setToday(
-          data.filter(
-            (huddle) =>
-              huddle.user.uid === item.user.uid &&
-              isToday(new Date(huddle.createdAt))
-          )
-        );
-        break;
-      default:
-        break;
-    }
-  };
+  }, [activeProduct, activeTime]);
 
-  const yesterdayFilterInterval = (item) => {
-    switch (activeTime) {
-      case "Today":
-        setYesterday(
-          data.filter(
-            (huddle) =>
-              huddle.user.uid === item.user.uid &&
-              isYesterday(new Date(huddle.createdAt))
-          )
-        );
-        break;
-      default:
-        break;
-    }
-  };
+  // const todayFilterInterval = (item) => {
+  //   switch (activeTime) {
+  //     case "Today":
+  //       setToday(
+  //         data.filter(
+  //           (huddle) =>
+  //             huddle.user.uid === item.user.uid && isToday(huddle.createdAt)
+  //         )
+  //       );
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
 
-  const blockerFilterInterval = (item) => {
-    switch (activeTime) {
-      case "Today":
-        setBlocker(
-          blockers.filter(
-            (blocker) =>
-              blocker.user.uid === item.user.uid &&
-              isToday(new Date(blocker.createdAt))
-          )
-        );
-        break;
-      default:
-        break;
-    }
-  };
+  // const yesterdayFilterInterval = (item) => {
+  //   switch (activeTime) {
+  //     case "Today":
+  //       setYesterday(
+  //         data.filter(
+  //           (huddle) =>
+  //             huddle.user.uid === item.user.uid && isYesterday(huddle.createdAt)
+  //         )
+  //       );
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
+
+  // const blockerFilterInterval = (item) => {
+  //   switch (activeTime) {
+  //     case "Today":
+  //       setBlocker(
+  //         blockers.filter(
+  //           (blocker) =>
+  //             blocker.user.uid === item.user.uid && isToday(blocker.createdAt)
+  //         )
+  //       );
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
 
   const setActiveRightNav = (interval) => {
     const huddleIndex = findIndex(intervals, (v) => v === interval);
-
     if (huddleIndex > -1) {
       setActiveTime(intervals[huddleIndex]);
       setActiveTimeIndex(huddleIndex);
@@ -168,22 +218,31 @@ export default function Huddle() {
           {team && data && blockers && (
             <>
               {team?.map((item, index) => (
+                
                 <Col className="flex" key={index} span={8}>
                   <HuddleCard
+                    todayInTime={todayInTime}
+                    yesterdayInTime={yesterdayInTime}
                     today={data.filter(
                       (huddle) =>
+                      
                         huddle.user.uid === item.user.uid &&
-                        isToday(new Date(huddle.createdAt))
+                        //isToday(huddle.createdAt)
+                        //((intervals_dict[activeTime]).setHours(0,0,0,0) == huddle.createdAt.toDate().setHours(0,0,0,0))
+                        (todayInTime == huddle.createdAt.toDate().setHours(0,0,0,0))
                     )}
                     yesterday={data.filter(
                       (huddle) =>
                         huddle.user.uid === item.user.uid &&
-                        isYesterday(new Date(huddle.createdAt))
+                        (yesterdayInTime == huddle.createdAt.toDate().setHours(0,0,0,0))
+                        //((subtractDays(1, intervals_dict[activeTime])).setHours(0,0,0,0) == huddle.createdAt.toDate().setHours(0,0,0,0))
+                        //isYesterday(huddle.createdAt)
                     )}
                     member={item}
                     product={activeProduct}
                     blockers={blockers.filter(
-                      (blocker) => blocker.user.uid === item.user.uid
+                      (blocker) => blocker.user.uid === item.user.uid &&
+                      (todayInTime == blocker.createdAt.toDate().setHours(0,0,0,0))
                     )}
                   />
                 </Col>
