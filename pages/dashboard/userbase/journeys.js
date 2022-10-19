@@ -1,10 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
-import { Row, Col, Input, Select, Divider, DatePicker, Drawer, Button, Space, InputNumber } from "antd";
+import {
+  Row,
+  Col,
+  Input,
+  Select,
+  Divider,
+  DatePicker,
+  Drawer,
+  Button,
+  Space,
+  InputNumber,
+} from "antd";
 import { useRouter } from "next/router";
 import { SettingOutlined } from "@ant-design/icons";
-import AppLayout from "../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../components/Dashboard/Journeys/AppLayout";
 
 import { Chart } from "../../../components/Dashboard/Journeys";
 
@@ -38,6 +49,7 @@ export default function Journeys() {
   const [rightNav, setRightNav] = useState([]);
   const [showDrawer, setShowDrawer] = useState(false);
   const [addJourney, setAddJourney] = useState(false);
+  const [personas, setPersonas] = useState(null);
 
   // New Journey States
   const [newJourney, setNewJourney] = useState("");
@@ -68,9 +80,6 @@ export default function Journeys() {
           } else {
             setAddJourney(true);
           }
-          console.log(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
         });
     }
   };
@@ -85,9 +94,6 @@ export default function Journeys() {
         .where("journey_id", "==", activeJourney.id)
         .onSnapshot((snapshot) => {
           setEvents(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
-          console.log(
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
         });
@@ -108,6 +114,32 @@ export default function Journeys() {
   useEffect(() => {
     getNames();
   }, [journeys]);
+
+  const fetchPersonas = async () => {
+    let participants = []
+    if (activeProduct) {
+      const res = db
+        .collection("Personas")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          const personas = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          for (let i = 0; i < personas.length; i++) {
+            participants.push({
+              label: personas[i].role,
+              checked: false
+            })
+          }
+          setPersonas(participants);
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchPersonas();
+  }, [activeProduct, showDrawer]);
 
   const setJourney = (journeyName) => {
     const journeyIndex = findIndex(journeys, (r) => r.name === journeyName);
@@ -155,37 +187,31 @@ export default function Journeys() {
       duration,
       start: new Date().toISOString(),
       name: newJourney,
-      product_id: activeProduct.id
+      product_id: activeProduct.id,
     };
     // console.log(newJ)
 
-    db.collection("Journeys").add(newJ)
-    .then(() => {
-      setNewJourney("");
-      setDuration("")
-      setDurationType("");
-      setAddJourney(false);
-    })
+    db.collection("Journeys")
+      .add(newJ)
+      .then(() => {
+        setNewJourney("");
+        setDuration("");
+        setDurationType("");
+        setAddJourney(false);
+      });
   };
 
   const addEvent = (event) => {
-    const journey = { ...activeJourney };
-    journey.events.push(event);
-    const newData = { ...data };
-
-    const jIndex = newData[activeProduct].findIndex((j) => j.id === journey.id);
-
-    if (jIndex > -1) {
-      newData[activeProduct][jIndex] = journey;
-    } else {
-      newData[activeProduct].push(journey);
-    }
-
-    setData(newData);
-
-    setActiveJourney(journey);
-
-    setShowDrawer(false);
+    console.log(event)
+    const data = {
+      journey_id: activeJourney.id,
+      ...event,
+    };
+    db.collection("journeyEvents")
+      .add(data)
+      .then(() => {
+        setShowDrawer(false);
+      });
   };
 
   const checkJourney = () => {
@@ -196,8 +222,16 @@ export default function Journeys() {
     );
   };
 
-  const onClickAddEvt = () => {
+  const onClickAddEvt = async () => {
+    await fetchPersonas();
     setShowDrawer(true);
+  };
+
+  const onCancel = () => {
+    setNewJourney("");
+    setDuration("");
+    setDurationType("");
+    setAddJourney(false);
   };
 
   return (
@@ -213,12 +247,12 @@ export default function Journeys() {
         activeRightItem={activeJourney?.name}
         hasMainAdd
         hasSideAdd
-        onSideAdd={onAddJourney}
-        // onMainAdd={
-        //   checkJourney()
-        //     ? onClickAddEvt
-        //     : () => alert("Configure journey details")
-        // }
+        onSideAdd={() => setAddJourney(true)}
+        onMainAdd={
+          checkJourney()
+            ? onClickAddEvt
+            : () => alert("Configure journey details")
+        }
         type="text"
         mainClass="mr-[152px]"
         setActiveRightNav={setJourney}
@@ -234,7 +268,10 @@ export default function Journeys() {
                 <p className="text-[14px] text-[#595959]">
                   Please provide a name
                 </p>
-                <Input value={newJourney} onChange={(e) => setNewJourney(e.target.value)} />
+                <Input
+                  value={newJourney}
+                  onChange={(e) => setNewJourney(e.target.value)}
+                />
               </div>
 
               <p className="text-[14px] text-[#595959] mt-8">
@@ -260,12 +297,7 @@ export default function Journeys() {
                 </Select>
               </div>
               <div className="flex justify-end space-x-2 mt-[43px]">
-                <Button
-                  size="small"
-                  type="danger"
-                  ghost
-                  onClick={() => setNewRole("")}
-                >
+                <Button size="small" type="danger" ghost onClick={onCancel}>
                   Cancel
                 </Button>
                 <Button
@@ -280,14 +312,12 @@ export default function Journeys() {
           </div>
         ) : (
           <>
-            {/* {activeJourney &&
-        activeJourney?.start &&
-        activeJourney?.events?.length ? (
-          <Chart journey={activeJourney} />
-        ) : null} */}
+            {activeJourney && events && (
+              <Chart journey={activeJourney} events={events} />
+            )}
 
             {/* {!activeJourney?.start ||
-        (activeJourney?.start && !activeJourney?.events.length) ? (
+        (activeJourney?.start && !events?.length) ? (
           <div
             style={{ minHeight: "50vh" }}
             className="flex items-center justify-center"
@@ -330,14 +360,17 @@ export default function Journeys() {
           </div>
         ) : null} */}
 
-            {/* <AddEvent
-          onAdd={addEvent}
-          journeyStart={activeJourney?.start}
-          journeyDur={activeJourney?.duration}
-          journeyType={activeJourney?.durationType}
-          onCancel={() => setShowDrawer(false)}
-          showDrawer={showDrawer}
-        /> */}
+            {personas && activeJourney && (
+              <AddEvent
+                onAdd={addEvent}
+                journeyStart={activeJourney?.start}
+                journeyDur={activeJourney?.duration}
+                journeyType={activeJourney?.durationType}
+                onCancel={() => setShowDrawer(false)}
+                showDrawer={showDrawer}
+                personas={personas}
+              />
+            )}
           </>
         )}
       </AppLayout>

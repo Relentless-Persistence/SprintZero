@@ -24,13 +24,14 @@ const map =
 const Chart = (
     {
         journey,
+        events
     }
 ) =>
 {
     const wrapper = useRef( null );
     const [ chartWidth, setChartWidth ] = useState( 0 );
     const jStart = journey?.start;
-    const events = journey?.events;
+    // const events = journey?.events;
 
     useEffect( () =>
     {
