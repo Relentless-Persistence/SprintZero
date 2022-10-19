@@ -48,7 +48,6 @@ const AppHeader = ({ onChangeProduct }) => {
   const [settingsMenuDrawer, setSettingsMenuDrawer] = useState(false);
 
   const fetchProducts = async () => {
-    console.log("activeProduct", activeProduct);
     if (user) {
       const res = await db
         .collection("Product")
