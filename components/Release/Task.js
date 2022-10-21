@@ -39,6 +39,8 @@ const Name = styled( Tag )`
 `;
 
 const Task = React.forwardRef( ( {
+    epicId,
+    epic,
     name = "Task name",
     taskIndex,
     disabled,
@@ -105,7 +107,7 @@ const Task = React.forwardRef( ( {
         const newEndDate = timeScale( 0, maxPossibleX, _start, _end, newX );
 
 
-        onStop( i, taskIndex, newEndDate );
+        onStop( i, taskIndex, newEndDate, epic, epicId );
 
     };
 

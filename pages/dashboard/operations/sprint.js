@@ -421,7 +421,7 @@ export default function Sprint() {
                   columnHeaderRenders={[null, null, null]}
                 />
                 {stories.length < 1 ? (
-                  <div className="w-[400px] absolute bottom-0 right-0 z-10">
+                  <div className="w-[400px] fixed bottom-2 right-2 z-10">
                     <Alert
                       message={
                         <p>
