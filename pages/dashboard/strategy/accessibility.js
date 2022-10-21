@@ -159,14 +159,14 @@ export default function Accessiblity() {
 
         {challengesData && challengesData.length > 0 ? (
           <MasonryGrid>
-            challengesData.map((res) => (
+            {challengesData.map((res) => (
             <ItemCard
               key={res.id}
               onEdit={(item) => editItem(res.id, item)}
               onDelete={() => deleteItem(res.id)}
               item={res}
             />
-            ))
+            ))}
             <div
               style={{
                 visibility: showAdd ? "visible" : "hidden",
