@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -195,6 +195,8 @@ export default function Ethics() {
 
   const [activeBoard, setActiveBoard] = useState(data[activeProduct][0]);
   const [activeBoardIndex, setActiveBoardIndex] = useState(0);
+
+
 
   const setBoard = (boardName, product) => {
     const boardIndex = data[product || activeProduct].findIndex(
