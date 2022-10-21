@@ -34,7 +34,8 @@ export default function Accessiblity() {
     if (activeProduct) {
       console.log(activeChallenge);
       db.collection("Accessibility")
-        .where("product_id", "==", activeProduct.id).where("type", "==", activeChallenge)
+        .where("product_id", "==", activeProduct.id)
+        .where("type", "==", activeChallenge)
         .onSnapshot((snapshot) => {
           setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
           console.log(
@@ -97,7 +98,7 @@ export default function Accessiblity() {
     const data = {
       accessibility_type: activeChallenge,
       ...item,
-      product_id: activeProduct.id
+      product_id: activeProduct.id,
     };
     db.collection("Challenges")
       .add(data)
@@ -134,7 +135,7 @@ export default function Accessiblity() {
       .catch((error) => {
         console.error("Error removing document: ", error);
       });
-  }
+  };
 
   return (
     <div className="mb-8">
@@ -156,38 +157,34 @@ export default function Accessiblity() {
       >
         <MainSub>{data && data[0]?.title}</MainSub>
 
-        <MasonryGrid>
-          {challengesData && challengesData.length > 0 ? (
+        {challengesData && challengesData.length > 0 ? (
+          <MasonryGrid>
             challengesData.map((res) => (
-              <ItemCard
-                key={res.id}
-                onEdit={(item) => editItem(res.id, item)}
-                onDelete={() => deleteItem(res.id)}
-                item={res}
-              />
-            ))
-          ) : (
-            <>
-              {showAdd ? (
-                null
-              ) : (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-              )}
-            </>
-          )}
-
-          <div
-            style={{
-              visibility: showAdd ? "visible" : "hidden",
-            }}
-            ref={ref}
-          >
-            <FormCard
-              onSubmit={addItemDone}
-              onCancel={() => setShowAdd(false)}
+            <ItemCard
+              key={res.id}
+              onEdit={(item) => editItem(res.id, item)}
+              onDelete={() => deleteItem(res.id)}
+              item={res}
             />
-          </div>
-        </MasonryGrid>
+            ))
+            <div
+              style={{
+                visibility: showAdd ? "visible" : "hidden",
+              }}
+              ref={ref}
+            >
+              <FormCard
+                onSubmit={addItemDone}
+                onCancel={() => setShowAdd(false)}
+              />
+            </div>
+          </MasonryGrid>
+        ) : (
+          <>
+          <br />
+          <br />
+          {showAdd ? null : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}</>
+        )}  
       </AppLayout>
     </div>
   );
