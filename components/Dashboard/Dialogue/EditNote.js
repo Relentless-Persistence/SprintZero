@@ -128,10 +128,10 @@ const EditNote = ({
       onClose={onClose}
       title={
         <Row>
-          <Col span={20}>
+          <Col span={10}>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </Col>
-          <Col offset={3} span={1}>
+          <Col offset={13} span={1}>
             <ActionButtons
               className="justify-end"
               onCancel={onClose}

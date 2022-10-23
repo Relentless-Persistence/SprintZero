@@ -138,7 +138,7 @@ const AddNote = (
             onClose={ onClose }
             title={
                 <Row>
-                    <Col span={ 20 }>
+                    <Col span={ 10 }>
                         <Input
                             value={ item.name }
                             placeholder="John Doe"
@@ -147,7 +147,7 @@ const AddNote = (
 
                     </Col>
                     <Col
-                        offset={ 3 }
+                        offset={ 13 }
                         span={ 1 }>
                         <ActionButtons
                             className="justify-end"
