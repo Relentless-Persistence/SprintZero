@@ -12,6 +12,8 @@ import {
   Button,
   Space,
   InputNumber,
+  Form,
+  message
 } from "antd";
 import { useRouter } from "next/router";
 import { SettingOutlined } from "@ant-design/icons";
@@ -191,14 +193,18 @@ export default function Journeys() {
     };
     // console.log(newJ)
 
-    db.collection("Journeys")
-      .add(newJ)
-      .then(() => {
-        setNewJourney("");
-        setDuration("");
-        setDurationType("");
-        setAddJourney(false);
-      });
+    if(duration !== "" && name !== "") {
+      db.collection("Journeys")
+        .add(newJ)
+        .then(() => {
+          setNewJourney("");
+          setDuration("");
+          setDurationType("");
+          setAddJourney(false);
+        });
+    } else {
+      message.error("Please fill all required field");
+    }
   };
 
   const addEvent = (event) => {
@@ -231,7 +237,9 @@ export default function Journeys() {
     setNewJourney("");
     setDuration("");
     setDurationType("");
-    setAddJourney(false);
+    if(journeys.length >= 1) {
+      setAddJourney(false);
+    }
   };
 
   return (
@@ -262,53 +270,63 @@ export default function Journeys() {
       >
         {addJourney ? (
           <div className="h-[450px] flex items-center justify-center">
-            <div className="w-[320px]">
-              <div>
-                <h3 className="text-[24px] font-bold">Create Journey</h3>
-                <p className="text-[14px] text-[#595959]">
-                  Please provide a name
-                </p>
-                <Input
-                  value={newJourney}
-                  onChange={(e) => setNewJourney(e.target.value)}
-                />
-              </div>
+            <form onSubmit={onAddJourney}>
+              <div className="w-[320px]">
+                <div>
+                  <h3 className="text-[24px] font-bold">Create Journey</h3>
+                  <p className="text-[14px] text-[#595959]">
+                    Please provide a name
+                  </p>
+                  <Input
+                    value={newJourney}
+                    onChange={(e) => setNewJourney(e.target.value)}
+                    required
+                  />
+                </div>
 
-              <p className="text-[14px] text-[#595959] mt-8">
-                How long does this take end to end?
-              </p>
-              <div className="flex items-center justify-between space-x-3">
-                <InputNumber
-                  value={duration}
-                  onChange={(value) => setDuration(value)}
-                  className="w-full"
-                />
-                <Select
-                  defaultValue="days"
-                  onChange={(value) => setDurationType(value)}
-                  className="w-full"
-                >
-                  <Option value="minutes">Minutes</Option>
-                  <Option value="hours">Hours</Option>
-                  <Option value="days">Days</Option>
-                  <Option value="week">Weeks</Option>
-                  <Option value="month">Months</Option>
-                  <Option value="year">Years</Option>
-                </Select>
+                <p className="text-[14px] text-[#595959] mt-8">
+                  How long does this take end to end?
+                </p>
+                <div className="flex items-center justify-between space-x-3">
+                  <InputNumber
+                    value={duration}
+                    onChange={(value) => setDuration(value)}
+                    className="w-full"
+                    required
+                  />
+                  <Select
+                    defaultValue="days"
+                    onChange={(value) => setDurationType(value)}
+                    className="w-full"
+                  >
+                    <Option value="minutes">Minutes</Option>
+                    <Option value="hours">Hours</Option>
+                    <Option value="days">Days</Option>
+                    <Option value="week">Weeks</Option>
+                    <Option value="month">Months</Option>
+                    <Option value="year">Years</Option>
+                  </Select>
+                </div>
+                <div className="flex justify-end space-x-2 mt-[43px]">
+                  <Button
+                    size="small"
+                    type="danger"
+                    ghost
+                    onClick={onCancel}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-[#4A801D] text-white"
+                    size="small"
+                    // onClick={onAddJourney}
+                    htmlType="submit"
+                  >
+                    Submit
+                  </Button>
+                </div>
               </div>
-              <div className="flex justify-end space-x-2 mt-[43px]">
-                <Button size="small" type="danger" ghost onClick={onCancel}>
-                  Cancel
-                </Button>
-                <Button
-                  className="bg-[#4A801D] text-white"
-                  size="small"
-                  onClick={onAddJourney}
-                >
-                  Submit
-                </Button>
-              </div>
-            </div>
+            </form>
           </div>
         ) : (
           <>
