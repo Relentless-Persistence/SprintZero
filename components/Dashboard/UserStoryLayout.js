@@ -167,19 +167,18 @@ const AppLayout = ({
                 className={`flex justify-between items-center ${breadCrumbClass}`}
               >
                 <Breadcrumb>
-                  {breadCrumbItems.map((item, i) => (
-                    <Breadcrumb.Item className="capitalize" key={i}>
-                      {item}
-                    </Breadcrumb.Item>
-                  ))}
+                  <Breadcrumb.Item className="capitalize">
+                    <span className="text-[#8C8C8C]">Story Map</span> /{" "} 
+                     {breadCrumbItems}
+                  </Breadcrumb.Item>
 
-                  {ignoreLast ? null : (
+                  {/* {ignoreLast ? null : (
                     <Breadcrumb.Item className="text-green-800 ">
                       {capitalizeText
                         ? defaultText || activeRightItem
                         : defaultText || activeRightItem}
                     </Breadcrumb.Item>
-                  )}
+                  )} */}
                 </Breadcrumb>
 
                 <div className="flex justify-between items-center">
@@ -237,7 +236,7 @@ const AppLayout = ({
                               setEditedVersion(item);
                             }}
                           >
-                            v{item.render ? item.render() : item}
+                            {item.render ? item.render() : item}
                           </div>
                         )}
                       </Version>

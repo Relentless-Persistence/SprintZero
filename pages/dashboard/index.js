@@ -161,7 +161,7 @@ function Home() {
 
       <UserStoryLayout
         ignoreLast={true}
-        breadCrumbItems={splitRoutes(pathname)}
+        breadCrumbItems={version && version.version}
         hasSideAdd={true}
         onSideAdd={() => addVersion()}
         hasMainAdd={true}
