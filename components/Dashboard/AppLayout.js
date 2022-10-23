@@ -206,7 +206,7 @@ const AppLayout = ({
                         <Input
                           className="mx-0 my-0 "
                           type={type || "number"}
-                          maxLength={20}
+                          maxLength={15}
                           autoFocus
                           value={sideAddValue}
                           onChange={(e) => setSideAddValue(e.target.value)}
