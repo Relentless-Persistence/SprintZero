@@ -17,71 +17,60 @@ import generateString from "../../utils/generateRandomStrings";
 function Home() {
   const { pathname } = useRouter();
   const activeProduct = useRecoilValue(activeProductState);
-  const [version, setVersion] = useRecoilState(versionState)
+  const [version, setVersion] = useRecoilState(versionState);
   const [epics, setEpics] = useState(null);
   const [versions, setVersions] = useState(null);
   const [savingMode, setSavingMode] = useState(false);
-  const [rightNav, setRightNav] = useState(["1.0"])
-  const [newVersion, setNewVersion] = useState("")
-
+  const [rightNav, setRightNav] = useState(["1.0"]);
+  const [newVersion, setNewVersion] = useState("");
 
   const fetchVersions = async () => {
     if (activeProduct) {
-       db.collection("Versions").where("product_id", "==", activeProduct.id).onSnapshot((snapshot) => {
-        setVersions(
-          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        );
-        const versions = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setVersion(versions[0])
-      })
+      db.collection("Versions")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setVersions(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+          const versions = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setVersion(versions[0]);
+        });
     }
-  }
+  };
 
   const getVersions = async () => {
-    let newVersion = []
+    let newVersion = [];
     if (versions) {
-      setRightNav(versions.map(({version}) => version));
-      console.table("Navs", versions.map(({ version }) => version));
+      setRightNav(versions.map(({ version }) => version));
+      console.table(
+        "Navs",
+        versions.map(({ version }) => version)
+      );
     }
-  }
+  };
 
   useEffect(() => {
     getVersions();
-  }, [versions])
-  
+  }, [versions]);
 
   // Fetch Epics from firebase
   const fetchEpics = async () => {
     if (activeProduct && version) {
-      const res = await db
-        .collection("Epics")
+      db.collection("Epics")
         .where("product_id", "==", activeProduct.id)
         .where("version", "==", version.id)
-        .get();
-      
-      const epics = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      
-      if (epics.length > 0) {
-        setEpics(epics);
-      } else {
-        setEpics([
-          {
-            id: generateString(20),
-            name: "",
-            features: [],
-            version: version.id
-          },
-        ]);
-      }
+        .onSnapshot((snapshot) => {
+          setEpics(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        });
     }
   };
 
   useEffect(() => {
     fetchVersions();
-  }, [activeProduct])
+  }, [activeProduct]);
 
   useEffect(() => {
     fetchEpics();
@@ -100,7 +89,7 @@ function Home() {
     const { id, ...info } = data;
     db.collection("Epics")
       .doc(id)
-      .set({...info, product_id: activeProduct.id})
+      .set({ ...info, product_id: activeProduct.id })
       .then((docRef) => {
         message.success("User Stories saved");
         setSavingMode(false);
@@ -122,7 +111,7 @@ function Home() {
       .then(() => {
         message.success("User Stories updated successfully");
         setSavingMode(false);
-        fetchEpics()
+        fetchEpics();
       })
       .catch((error) => {
         message.error("Problem updating the story");
@@ -133,27 +122,26 @@ function Home() {
   // Choose between saving and updating
   const handleSave = (epics) => {
     setSavingMode(true);
-    epics.map(data => {
+    epics.map((data) => {
       const res = db
-      .collection("Epics")
-      .doc(data.id)
-      .get()
-      .then((docSnapshot) => {
-        if (docSnapshot.exists) {
-          updateEpic(data);
-        } else {
-          saveEpic(data);
-        }
-      });
-    })
-  
+        .collection("Epics")
+        .doc(data.id)
+        .get()
+        .then((docSnapshot) => {
+          if (docSnapshot.exists) {
+            updateEpic(data);
+          } else {
+            saveEpic(data);
+          }
+        });
+    });
   };
 
   const addVersion = () => {
     db.collection("Versions")
       .add({
         version: newVersion,
-        product_id: activeProduct.id
+        product_id: activeProduct.id,
       })
       .then((docRef) => {
         message.success("New version added successfully");
@@ -161,7 +149,7 @@ function Home() {
       .catch((error) => {
         message.error("Error adding version");
       });
-  }
+  };
 
   return (
     <div className="realtive mb-8">
