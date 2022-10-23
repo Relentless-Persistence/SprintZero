@@ -41,6 +41,9 @@ const init = {
   events: [],
 };
 
+const capitalize = (text) =>
+  `${text[0]?.toUpperCase()}${text?.substring(1).toLowerCase()}`;
+
 export default function Journeys() {
   const { pathname } = useRouter();
   const activeProduct = useRecoilValue(activeProductState);
@@ -188,7 +191,7 @@ export default function Journeys() {
       durationType,
       duration,
       start: new Date().toISOString(),
-      name: newJourney,
+      name: capitalize(newJourney),
       product_id: activeProduct.id,
     };
     // console.log(newJ)

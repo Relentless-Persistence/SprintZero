@@ -14,7 +14,7 @@ import { splitRoutes } from "../../../utils";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
-import { findIndex } from "lodash";
+import { capitalize, findIndex } from "lodash";
 
 import fakeData from "../../../fakeData/personas.json";
 import products from "../../../fakeData/products.json";
@@ -77,7 +77,7 @@ export default function Personas() {
     console.log(newRole);
 
     db.collection("Personas").add({
-      role: newRole,
+      role: capitalize(newRole),
       product_id: activeProduct.id,
       goals: [""],
       interactions: [""],
@@ -87,7 +87,7 @@ export default function Personas() {
       priorities: [""],
       frustrations: [""],
       changes: [""],
-      description: ""
+      description: "",
     });
   };
 

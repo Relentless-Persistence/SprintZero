@@ -64,6 +64,9 @@ const init = {
   // ],
 };
 
+const capitalize = (text) =>
+  `${text[0]?.toUpperCase()}${text?.substring(1).toLowerCase()}`;
+
 const AddEvent = ({
   onAdd,
   onCancel,
@@ -101,7 +104,8 @@ const AddEvent = ({
   };
 
   const handleNameChange = (e) => {
-    setEvt({ ...evt, title: e.target.value });
+    const name = capitalize(e.target.name)
+    setEvt({ ...evt, title: name });
   };
 
   const handleDescChange = (e) => {
