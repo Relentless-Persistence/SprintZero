@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -15,6 +16,7 @@ import {
   Drawer,
   Comment,
   Form,
+  Alert
 } from "antd";
 import {
   DislikeOutlined,
@@ -27,16 +29,20 @@ import {
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
 
-import { Board } from "../../../components/Boards";
-import { Index } from "../../../components/Boards/NumberIndex";
+import { Board } from "../../../components/Dashboard/Sprint/Board";
+// import { Index } from "../../../components/Boards/NumberIndex";
 
 import { splitRoutes } from "../../../utils";
 
 import fakeData from "../../../fakeData/ethics.json";
-import products from "../../../fakeData/products.json";
+// import products from "../../../fakeData/products.json";
 import { Title } from "../../../components/Dashboard/SectionTitle";
-import CustomTag from "../../../components/Dashboard/Tag";
+import CustomTag from "../../../components/Sprint/CustomTag";
 import AppCheckbox from "../../../components/AppCheckbox";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
+import StoryDetails from "../../../components/Ethics/StoryDetails";
 
 const { TextArea } = Input;
 
@@ -187,67 +193,129 @@ const comments = [
 export default function Ethics() {
   const { pathname } = useRouter();
 
-  const [data, setData] = useState(fakeData);
-  const [allow, setAllow] = useState("");
+  const activeProduct = useRecoilValue(activeProductState);
+  const [data, setData] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [story, setStory] = useState(null);
 
-  const [activeProduct, setActiveProduct] = useState(products[0]);
-
-  const [activeBoard, setActiveBoard] = useState(data[activeProduct][0]);
+  // const [activeBoard, setActiveBoard] = useState(data[activeProduct][0]);
   const [activeBoardIndex, setActiveBoardIndex] = useState(0);
 
-
-
-  const setBoard = (boardName, product) => {
-    const boardIndex = data[product || activeProduct].findIndex(
-      (b) => b.boardName === boardName
-    );
-
-    if (boardIndex > -1) {
-      setActiveBoard(data[product || activeProduct][boardIndex]);
-      setActiveBoardIndex(boardIndex);
+  const fetchEthics = async () => {
+    let stories = [];
+    if (activeProduct) {
+      const res = db
+        .collection("Epics")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          snapshot.docs
+            .map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))
+            .map((item, epicIndex) => {
+              item.features.map((feature, featureIndex) => {
+                feature.stories.map((story, storyIndex) => {
+                  stories.push({
+                    ...story,
+                    order: storyIndex,
+                    storyIndex: storyIndex,
+                    epicIndex,
+                    featureIndex,
+                    feature: feature,
+                    epic: item,
+                  });
+                });
+              });
+            });
+          const ethics = stories.filter(story => story.flagged === true)
+          setData([
+            {
+              columnId: "0",
+              columnName: "Identified",
+              data: ethics.filter(
+                (item) => item.ethics_status === "Identified"
+              ),
+            },
+            {
+              columnId: "1",
+              columnName: "Under Review",
+              data: stories.filter(
+                (item) => item.ethics_status === "Under Review"
+              ),
+            },
+            {
+              columnId: "2",
+              columnName: "Adjuticated",
+              data: stories.filter((item) => item.ethics_status === "Adjuticated"),
+            },
+          ]);
+          console.log([
+            {
+              columnId: "0",
+              columnName: "Identified",
+              data: ethics.filter(
+                (item) => item.ethics_status === "Identified"
+              ),
+            },
+            {
+              columnId: "1",
+              columnName: "Under Review",
+              data: stories.filter(
+                (item) => item.ethics_status === "Under Review"
+              ),
+            },
+            {
+              columnId: "2",
+              columnName: "Adjuticated",
+              data: stories.filter(
+                (item) => item.ethics_status === "Adjuticated"
+              ),
+            },
+          ]);
+        });
     }
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    const boardName = data[product][0]?.boardName;
-    setBoard(boardName, product);
-  };
+  useEffect(() => {
+    fetchEthics();
+  }, [activeProduct]);
 
-  const handleDrop = (card, targetColId) => {
-    const info = { ...data };
-    const newData = info[activeProduct][activeBoardIndex];
-    const cardIndex = newData?.columns[card.colId]?.data?.findIndex(
-      (c) => c.id === card.id
-    );
 
-    if (cardIndex > -1) {
-      const cardInfo = newData.columns[card.colId].data[cardIndex];
-      const newColumn = newData?.columns?.findIndex(
-        (col) => col.columnId === targetColId
-      );
+  // const setBoard = (boardName, product) => {
+  //   const boardIndex = data[product || activeProduct].findIndex(
+  //     (b) => b.boardName === boardName
+  //   );
 
-      if (
-        !newData.columns[newColumn].data ||
-        !newData.columns[newColumn].data.length
-      ) {
-        newData.columns[newColumn].data = [cardInfo];
-      } else {
-        newData.columns[newColumn].data = [
-          ...newData.columns[newColumn].data,
-          cardInfo,
-        ];
-      }
+  //   if (boardIndex > -1) {
+  //     setActiveBoard(data[product || activeProduct][boardIndex]);
+  //     setActiveBoardIndex(boardIndex);
+  //   }
+  // };
 
-      newData.columns[card.colId].data = newData.columns[
-        card.colId
-      ].data.filter((_, i) => i !== cardIndex);
+  const handleDrop = async (card, targetColId) => {
+    const selectedStory = data[card.colId].data[card.id];
+    const targetStory = data[targetColId]
+
+
+    selectedStory.epic.features[selectedStory.featureIndex].stories[
+      selectedStory.storyIndex
+    ].ethics_status = targetStory.columnName
+
+
+    if (
+      selectedStory.epic.features[selectedStory.featureIndex].stories[
+        selectedStory.storyIndex
+      ].ethics_status === targetStory.columnName
+    ) {
+      await db
+        .collection("Epics")
+        .doc(selectedStory.epic.id)
+        .update(selectedStory.epic)
+        .then(() => {
+          message.success("story updated successfully");
+        });
     }
-
-    info[activeProduct][activeBoardIndex] = newData;
-
-    setData(info);
   };
 
   const handleSwap = (currentCard, targetCard) => {
@@ -258,6 +326,7 @@ export default function Ethics() {
     const currentCardColumn = columns.find(
       (c) => c.columnId === currentCard.colId
     );
+
     const targetCardColumn = columns.find(
       (c) => c.columnId === targetCard.colId
     );
@@ -286,13 +355,16 @@ export default function Ethics() {
     setData(info);
   };
 
+  const selectStory = (story) => {
+    setStory(story);
+    setVisible(true);
+  };
+
   const renderCol = (card, index) => {
     return (
       <>
-        <Index>{index + 1}</Index>
-
-        <div onClick={() => setVisible(true)}>
-          <CustomTag type={"status"} text={card.title} />
+        <div onClick={() => selectStory(card)}>
+          <CustomTag shortTitle={card.name} feature={card.feature.name} />
           {/* <StyledItem
                     $color={ card.color }>
                     <span>x</span>
@@ -323,149 +395,48 @@ export default function Ethics() {
         hideSideBar
         breadCrumbItems={splitRoutes(pathname)}
       >
-        <Board
-          onDrop={handleDrop}
-          onSwap={handleSwap}
-          columns={activeBoard?.columns}
-          renderColumn={renderCol}
-          maxWidthClass="max-w-[1200px]"
-        />
+        {data && (
+          <>
+            <Board
+              colCount={data.length}
+              // onDrop={handleDrop}
+              // onSwap={handleSwap}
+              columns={data}
+              renderColumn={renderCol}
+              maxWidthClass="max-w-[1200px]"
+            />
 
-        <Drawer
-          height="412px"
-          title={
-            <DrawerTitle gutter={[16, 16]}>
-              <Col span={12}>
-                <h3>card_title</h3>
-                <StyledTag color="#91D5FF">3 points</StyledTag>
-                <StyledTag color="#A4DF74">$1,230</StyledTag>
-                <StyledTag icon={<LinkOutlined />} color="#096DD9">
-                  Design
-                </StyledTag>
-                <StyledTag
-                  $border
-                  $textColor="#BFBFBF"
-                  icon={
-                    <LinkOutlined
-                      style={{
-                        color: "#BFBFBF",
-                      }}
-                    />
+            {data.length < 1 ? (
+              <div className="w-[400px] fixed bottom-2 right-2 z-10">
+                <Alert
+                  message={
+                    <p>
+                      No elements present; Add items to your{" "}
+                      <span
+                        className="font-semibold cursor-pointer"
+                        onClick={() => router.push("/dashboard")}
+                      >
+                        story map
+                      </span>{" "}
+                      to populate
+                    </p>
                   }
-                >
-                  Code
-                </StyledTag>
-              </Col>
-              <Col className="flex items-center justify-end" span={12}>
-                <CloseTime>
-                  <p className="text-[12px] mr-[11px] leading-[16px] !text-[#101D06]">
-                    Last modified 2 hrs ago
-                  </p>
-                  <CloseOutlined
-                    style={{
-                      color: "#101D06",
-                      fontSize: "12px",
-                    }}
-                    onClick={() => setVisible(false)}
-                  />
-                </CloseTime>
-              </Col>
-            </DrawerTitle>
-          }
-          placement={"bottom"}
-          closable={false}
-          onClose={() => setVisible(false)}
-          visible={visible}
-        >
-          <Row className="py-6" gutter={[16, 16]}>
-            <Col span={12}>
-              <Title>Adjudication Response</Title>
+                  type="success"
+                />
+              </div>
+            ) : null}
 
-              <p>
-                Do you think this would provide value and reaffirm the
-                commitment to our users?
-              </p>
-              <br />
-
-              <AppCheckbox checked={allow} onChange={() => setAllow(true)}>
-                Allow
-              </AppCheckbox>
-              <AppCheckbox checked={!allow} onChange={() => setAllow(false)}>
-                Reject
-              </AppCheckbox>
-
-              <br />
-              <br />
-
-              <Title>User Story</Title>
-
-              <br />
-              <Story>
-                As a user I need to be aware of any issues with the platform so
-                that I can pre-emptively warn attendees and provide any new
-                contact information to join the meeting
-              </Story>
-            </Col>
-
-            <Col
-              offset={1}
-              className="max-h-[250px] overflow-y-scroll"
-              span={11}
-            >
-              <Title>Comments</Title>
-
-              <List
-                className="comment-list"
-                itemLayout="horizontal"
-                dataSource={comments}
-                renderItem={(item) => (
-                  <li>
-                    <Comment
-                      actions={item.actions}
-                      author={item.author}
-                      avatar={item.avatar}
-                      content={item.content}
-                    />
-                  </li>
-                )}
+            {story && (
+              <StoryDetails
+                story={story}
+                setStory={setStory}
+                visible={visible}
+                setVisible={setVisible}
+                activeProduct={activeProduct}
               />
-
-              <Comment
-                avatar={
-                  <Avatar
-                    src="https://joeschmoe.io/api/v1/random"
-                    alt="Han Solo"
-                  />
-                }
-                content={
-                  <>
-                    <Form.Item>
-                      <TextArea rows={2} />
-                    </Form.Item>
-
-                    <Form.Item>
-                      <Button
-                        className="inline-flex justify-between items-center mr-[8px]"
-                        disabled
-                      >
-                        <SendOutlined />
-                        Post
-                      </Button>
-
-                      <Button
-                        className="inline-flex items-center justify-between"
-                        danger
-                      >
-                        <FlagOutlined />
-                        Flag
-                      </Button>
-                    </Form.Item>
-                  </>
-                }
-              />
-            </Col>
-          </Row>
-        </Drawer>
+            )}
+          </>
+        )}
       </AppLayout>
     </div>
   );

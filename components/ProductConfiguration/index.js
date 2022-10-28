@@ -69,6 +69,7 @@ const ProductConfiguration = () => {
           newVersion(res.id);
           addOwnerToTeam(res.id);
           createAccessibilities(res.id);
+          addPrimaryGoals(res.id)
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
@@ -110,6 +111,18 @@ const ProductConfiguration = () => {
       product_id: product,
     });
   };
+
+  const addPrimaryGoals = (product) => {
+    const goals = ["001", "002", "003"]
+
+    goals.map(goal => {
+      db.collection("Goals").add({
+        product_id: product,
+        description: "",
+        name: goal
+      })
+    })
+  }
 
   const createAccessibilities = (id) => {
     const challenges = [

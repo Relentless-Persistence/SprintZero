@@ -36,6 +36,7 @@ export default function Personas() {
       const res = db
         .collection("Personas")
         .where("product_id", "==", activeProduct.id)
+        .orderBy("role")
         .onSnapshot((snapshot) => {
           setRoles(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
           const roles = snapshot.docs.map((doc) => ({

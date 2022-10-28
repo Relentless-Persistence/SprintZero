@@ -65,9 +65,10 @@ export default function FormCard({
   };
 
   return headerSmall ? (
-    <MyCard
+    <Card
       className={className}
       bordered={false}
+      type="inner"
       extra={
         extra ? (
           extra
@@ -99,11 +100,12 @@ export default function FormCard({
       />
 
       {extraItems}
-    </MyCard>
+    </Card>
   ) : (
     <Card
       className={className}
       bordered={false}
+      type="inner"
       extra={
         extra ? (
           extra
@@ -178,6 +180,7 @@ export const ActionFormCard = ({
     <MyCard
       className={className}
       bordered={false}
+      type="inner"
       extra={
         useAction ? (
           version === 1 ? (
@@ -220,6 +223,7 @@ export const ActionFormCard = ({
     <Card
       className={className}
       bordered={false}
+      type="inner"
       extra={
         useAction ? (
           version === 1 ? (

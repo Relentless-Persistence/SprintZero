@@ -110,8 +110,6 @@ export default function Sprint() {
   const [visible, setVisible] = useState(false);
   const [story, setStory] = useState(null);
   const activeProduct = useRecoilValue(activeProductState);
-  const [commentsIndex, setCommentsIndex] = useState(0);
-  // const [versions, setVersions] = useState(null);
   const [sprints, setSprints] = useState(null);
   const [sprint, setSprint] = useState(null)
   const [version, setVersion] = useRecoilState(versionState);

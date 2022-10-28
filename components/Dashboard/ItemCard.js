@@ -68,9 +68,10 @@ const ItemCard = ({
   }
 
   return (
-    <MyCard
-      $headerSmall={headerSmall}
+    <Card
+      // $headerSmall={headerSmall}
       className="mb-[16px] border-2 border-[#D9D9D9]"
+      type="inner"
       extra={
         useBtn ? (
           <CardHeaderButton size="small" onClick={toggleEdit}>
@@ -88,7 +89,7 @@ const ItemCard = ({
       }}
     >
       <p>{item.description}</p>
-    </MyCard>
+    </Card>
   );
 };
 
