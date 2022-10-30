@@ -6,16 +6,15 @@ import
 } from 'antd';
 
 // background:transparent;
-const More = styled( Button )`
-color: #4A801D !important;
-background:#fff;
-box-shadow:none !important;
-
+const More = styled(Button)`
+  color: #fff !important;
+  background: #4a801d;
+  box-shadow: none !important;
 `;
 
 const Link = styled( Button )`
 color: #4A801D !important;
-box-shadow:none !important;;
+box-shadow:none !important;
 border:none;
 background: transparent !important;
 `;

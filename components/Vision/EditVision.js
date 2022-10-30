@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import { Card, Input, Form, Space, Button, message } from "antd";
@@ -33,8 +33,6 @@ const EditVision = ({ info, inEditMode, setEditMode }) => {
   const [keyBenefits, setKeyBenefits] = useState(info.keyBenefits);
   const [competitors, setCompetitors] = useState(info.competitors);
   const [differentiators, setDifferentiators] = useState(info.differentiators);
-
- 
 
   // Update Vision
   const updateVision = async (id) => {
@@ -87,9 +85,13 @@ const EditVision = ({ info, inEditMode, setEditMode }) => {
       bordered={false}
       extra={
         <Space>
-          <div className="text-red-800 text-xs" onClick={() => endEditMode()}>
+          <Button
+            size="small"
+            className="text-[#4A801D] text-xs ghost"
+            onClick={() => endEditMode()}
+          >
             Cancel
-          </div>
+          </Button>
           <CardHeaderButton onClick={() => updateVision(info.id)}>
             Done
           </CardHeaderButton>

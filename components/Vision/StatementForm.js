@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import { Card, Input, Form, Space, message } from "antd";
+import { Card, Input, Form, Space, message, Button } from "antd";
 
 import CardHeaderButton from "../Dashboard/CardHeaderButton";
 import { checkEmptyObject } from "../../utils";
@@ -80,15 +80,16 @@ const StatementForm = ({ activeProduct, setAddMode }) => {
 
   return (
     <Card
-      bordered={false}
+      className="border border-[#D9D9D9]"
       extra={
         <Space>
-          <div
-            className="text-red-800 text-xs cursor-pointer"
+          <Button
+            className="text-[#4A801D] text-xs ghost"
+            size="small"
             onClick={() => setAddMode(false)}
           >
             Cancel
-          </div>
+          </Button>
           <CardHeaderButton onClick={() => addVision()}>Done</CardHeaderButton>
         </Space>
       }
