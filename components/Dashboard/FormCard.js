@@ -155,6 +155,7 @@ export const ActionFormCard = ({
   extraItems,
   headerSmall = false,
   onDelete,
+  isDisabled = false,
 }) => {
   const [item, setItem] = useState({
     title,
@@ -176,52 +177,9 @@ export const ActionFormCard = ({
     setItem({ item: "", description: "" });
   };
 
-  return headerSmall ? (
-    <MyCard
-      className={className}
-      bordered={false}
-      type="inner"
-      extra={
-        useAction ? (
-          version === 1 ? (
-            <ActionButtons
-              className="ml-[12px]"
-              onCancel={onCancel}
-              onSubmit={handleSubmit}
-            />
-          ) : (
-            <LightActionButtons
-              className="ml-[12px]"
-              onCancel={onCancel}
-              onSubmit={handleSubmit}
-            />
-          )
-        ) : (
-          <CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
-        )
-      }
-      title={
-        <Input
-          value={item.title}
-          onChange={(e) => handleChange(e, "title")}
-          placeholder="Result name..."
-        />
-      }
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      <TextArea
-        autoSize={{ minRows: 6 }}
-        value={item.description}
-        onChange={(e) => handleChange(e, "description")}
-        placeholder="Result description..."
-      />
-      {extraItems}
-    </MyCard>
-  ) : (
+  return (
     <Card
-      className={className}
+      className="border-2 mb-2"
       bordered={false}
       type="inner"
       extra={
@@ -254,14 +212,21 @@ export const ActionFormCard = ({
         background: "#F5F5F5",
       }}
     >
+      {extraItems}
       <TextArea
-        autoSize={{ minRows: 6 }}
+        className="my-4"
+        autoSize={{ minRows: 3 }}
         value={item.description}
         onChange={(e) => handleChange(e, "description")}
         placeholder="Result description..."
       />
-      {extraItems}
-      <Button block className="bg-[#FF4D4F] text-white mt-2" onClick={onDelete}>
+      <Button
+        type="danger"
+        ghost
+        block
+        onClick={onDelete}
+        disabled={isDisabled}
+      >
         Remove
       </Button>
     </Card>

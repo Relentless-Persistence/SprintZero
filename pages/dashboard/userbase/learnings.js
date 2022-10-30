@@ -106,6 +106,10 @@ export default function Learnings() {
       });
   };
 
+  const deleteItem = (id) => {
+    db.collections("Learnings").doc(id).delete();
+  }
+
   // const rightNav = getNames(data[activeProduct]);
 
   return (
@@ -133,6 +137,7 @@ export default function Learnings() {
               className="mb-[16px]"
               onCancel={() => setShowAdd(false)}
               onSubmit={addItemDone}
+              isDisabled={true}
               // extraItems={
               //   <Radio.Group
               //     className="mt-[12px] grid grid-cols-3"
@@ -178,6 +183,7 @@ export default function Learnings() {
                 key={res.id}
                 onEdit={(item) => editItem(res.id, item)}
                 item={res}
+                onDelete={() => deleteItem(res.id)}
               />
             ))}
         </MasonryGrid>

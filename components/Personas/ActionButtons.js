@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Button } from "antd";
 
 const Row = styled.div`
 
     display:flex;
     gap:10px;
+    align-items: center;
 
    button
    {
@@ -41,11 +43,18 @@ const ActionButtons = ( {
 } ) =>
 {
     return (
-        <Row className={ className }>
-            <button className="with-border" onClick={ onCancel } type="button">Cancel</button>
-            <button onClick={ onSubmit } type="button">Done</button>
-
-        </Row>
+      <div className="flex items-center space-x-2 ml-4">
+        <p
+          className="text-[#595959] text-[14px] cursor-pointer"
+          onClick={onCancel}
+          type="text"
+        >
+          Cancel
+        </p>
+        <Button className="border-[#4A801D] text-[#4A801D]" onClick={onSubmit}>
+          Done
+        </Button>
+      </div>
     );
 };
 
@@ -54,11 +63,18 @@ export const LightActionButtons = ( {
 } ) =>
 {
     return (
-        <Row className={ className }>
-            <button className="blank" onClick={ onCancel } type="button">Cancel</button>
-            <button className="with-border" onClick={ onSubmit } type="button">Done</button>
-
-        </Row>
+      <div className="flex items-center space-x-2 ml-4">
+        <p
+          className="text-[#595959] text-[14px] cursor-pointer"
+          onClick={onCancel}
+          type="text"
+        >
+          Cancel
+        </p>
+        <Button className="border-[#4A801D] text-[#4A801D]" onClick={onSubmit}>
+          Done
+        </Button>
+      </div>
     );
 };
 
