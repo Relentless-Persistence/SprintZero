@@ -16,6 +16,7 @@ import {
   Radio,
   message,
   Space,
+  Drawer
 } from "antd";
 import ResizeableDrawer from "../Dashboard/ResizeableDrawer";
 
@@ -24,6 +25,8 @@ import {
   FlagOutlined,
   CloseOutlined,
   LinkOutlined,
+  LikeOutlined,
+  DislikeOutlined,
 } from "@ant-design/icons";
 import { Title } from "../Dashboard/SectionTitle";
 // import AppCheckbox from "../AppCheckbox";
@@ -32,6 +35,7 @@ import StoryComments from "../UserStory/StoryComments";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatDistance } from "date-fns";
 import AppCheckbox from "../../components/AppCheckbox";
+import { useSetState } from "react-use";
 
 const Story = styled.p`
   padding: 12px 19px;
@@ -132,6 +136,10 @@ const StoryDetails = ({
   const [status, setStatus] = useState(story.sprint_status);
   const [designLink, setDesignLink] = useState(story.design_link);
   const [codeLink, setCodeLink] = useState(story.code_link);
+  const [accept, setAccept] = useState(false);
+  const [reject, setReject] = useState(false);
+  const [votingResult, setVotingResult] = useState(null)
+  const [votingDone, setVotingDone] = useState(false);
 
   const getLastUpdate = (date) => {
     if (date)
@@ -255,31 +263,6 @@ const StoryDetails = ({
     getVersions();
   }, [activeProduct, story]);
 
-  const checkAcceptanceCriteria = async (i) => {
-    story.epic.features[story.featureIndex].stories[
-      story.storyIndex
-    ].acceptance_criteria[i].completed =
-      !story.epic.features[story.featureIndex].stories[story.storyIndex]
-        .acceptance_criteria[i].completed;
-
-    story.epic.features[story.featureIndex].stories[
-      story.storyIndex
-    ].updatedAt = new Date().toISOString();
-
-    console.log(
-      story.epic.features[story.featureIndex].stories[story.storyIndex]
-        .acceptance_criteria[i].completed
-    );
-
-    await db
-      .collection("Epics")
-      .doc(story.epic.id)
-      .update(story.epic)
-      .then(() => {
-        fetchSprints();
-        message.success("story updated successfully");
-      });
-  };
 
   const updateStoryDescription = async (e) => {
     if (e.key === "Enter") {
@@ -346,8 +329,92 @@ const StoryDetails = ({
       });
   };
 
+  const acceptStory = async () => {
+    setReject(false);
+    setAccept(true)
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].ethics_votes.accepts =
+      story.epic.features[story.featureIndex].stories[story.storyIndex]
+        .ethics_votes.accepts + 1;
+
+    await db
+        .collection("Epics")
+        .doc(story.epic.id)
+        .update(story.epic)
+        .then(() => {
+          message.success("story updated successfully");
+          checkVotes();
+        });
+  }
+
+  const rejectStory = async () => {
+    setReject(true);
+    setAccept(false);
+    story.epic.features[story.featureIndex].stories[
+      story.storyIndex
+    ].ethics_votes.rejects =
+      story.epic.features[story.featureIndex].stories[story.storyIndex]
+        .ethics_votes.rejects + 1;
+
+    await db
+        .collection("Epics")
+        .doc(story.epic.id)
+        .update(story.epic)
+        .then(() => {
+          message.success("story updated successfully");
+          checkVotes()
+        });
+  }
+
+  const checkVotes = async () => {
+    if(teams) {
+      const totalVotes =
+        story.epic.features[story.featureIndex].stories[story.storyIndex]
+          .ethics_votes.accepts +
+        story.epic.features[story.featureIndex].stories[story.storyIndex]
+          .ethics_votes.rejects;
+      if (
+        teams.length === totalVotes &&
+        story.epic.features[story.featureIndex].stories[story.storyIndex]
+          .ethics_votes.accepts >
+          story.epic.features[story.featureIndex].stories[story.storyIndex]
+            .ethics_votes.rejects
+      ) {
+        setVotingDone(true);
+        setVotingResult("Allowed");
+        story.epic.features[story.featureIndex].stories[story.storyIndex]
+          .ethics_status === "Adjuticated";
+
+        await db
+          .collection("Epics")
+          .doc(story.epic.id)
+          .update(story.epic)
+          .then(() => {
+            message.success("story updated successfully");
+          });
+      } else if (
+        teams.length === totalVotes &&
+        story.epic.features[story.featureIndex].stories[story.storyIndex]
+          .ethics_votes.accepts <
+          story.epic.features[story.featureIndex].stories[story.storyIndex]
+            .ethics_votes.rejects
+      ) {
+        setVotingDone(true);
+        setVotingResult("Rejected");
+      }
+
+      return;
+    }
+  }
+
+  useEffect(() => {
+    checkVotes();
+  }, [teams, story]);
+
   return (
-    <ResizeableDrawer
+    <Drawer
+      destroyOnClose={true}
       headerStyle={{ background: "#F5F5F5" }}
       title={
         <DrawerTitle gutter={[16, 16]}>
@@ -388,7 +455,10 @@ const StoryDetails = ({
                   color: "#101D06",
                   fontSize: "12px",
                 }}
-                onClick={() => setVisible(false)}
+                onClick={() => {
+                  setVisible(false);
+                  setStory(null);
+                }}
               />
             </CloseTime>
           </Col>
@@ -404,17 +474,41 @@ const StoryDetails = ({
     >
       <Row gutter={[16, 0]}>
         <Col span={12}>
-          {story.ethics_status === "Under Review" ? (
+          {story.ethics_status !== "Identified" ? (
             <div className="mb-8">
               <Title>Adjudication Response</Title>
 
-              <p>
-                Do you think this would provide value and reaffirm the
-                commitment to our users?
-              </p>
+              {votingDone ? (
+                <Button
+                  size="Large"
+                  icon={
+                    votingResult === "Allowed" ? (
+                      <LikeOutlined />
+                    ) : (
+                      <DislikeOutlined />
+                    )
+                  }
+                  className={`flex items-center justify-center ${
+                    votingResult === "Allowed" ? "bg-[#90D855]" : "bg-[#FF7875]"
+                  }`}
+                >
+                  {votingResult}
+                </Button>
+              ) : (
+                <>
+                  <p>
+                    Do you think this would provide value and reaffirm the
+                    commitment to our users?
+                  </p>
 
-              <AppCheckbox onChange={() => setAllow(true)}>Allow</AppCheckbox>
-              <AppCheckbox onChange={() => setAllow(false)}>Reject</AppCheckbox>
+                  <AppCheckbox checked={accept} onChange={() => acceptStory()}>
+                    Allow
+                  </AppCheckbox>
+                  <AppCheckbox checked={reject} onChange={() => rejectStory()}>
+                    Reject
+                  </AppCheckbox>
+                </>
+              )}
             </div>
           ) : null}
 
@@ -489,7 +583,7 @@ const StoryDetails = ({
           )}
         </Col>
       </Row>
-    </ResizeableDrawer>
+    </Drawer>
   );
 };
 

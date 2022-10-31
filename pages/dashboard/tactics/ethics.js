@@ -16,7 +16,8 @@ import {
   Drawer,
   Comment,
   Form,
-  Alert
+  Alert,
+  message,
 } from "antd";
 import {
   DislikeOutlined,
@@ -228,7 +229,7 @@ export default function Ethics() {
                 });
               });
             });
-          const ethics = stories.filter(story => story.flagged === true)
+          const ethics = stories.filter((story) => story.flagged === true);
           setData([
             {
               columnId: "0",
@@ -247,7 +248,9 @@ export default function Ethics() {
             {
               columnId: "2",
               columnName: "Adjuticated",
-              data: stories.filter((item) => item.ethics_status === "Adjuticated"),
+              data: stories.filter(
+                (item) => item.ethics_status === "Adjuticated"
+              ),
             },
           ]);
           console.log([
@@ -281,7 +284,6 @@ export default function Ethics() {
     fetchEthics();
   }, [activeProduct]);
 
-
   // const setBoard = (boardName, product) => {
   //   const boardIndex = data[product || activeProduct].findIndex(
   //     (b) => b.boardName === boardName
@@ -295,26 +297,31 @@ export default function Ethics() {
 
   const handleDrop = async (card, targetColId) => {
     const selectedStory = data[card.colId].data[card.id];
-    const targetStory = data[targetColId]
+    const targetStory = data[targetColId];
 
-
-    selectedStory.epic.features[selectedStory.featureIndex].stories[
-      selectedStory.storyIndex
-    ].ethics_status = targetStory.columnName
-
-
-    if (
+    if (targetStory.columnName === "Adjuticated") {
+      message.info(
+        "Ethics status can't be changed while voting is still active"
+      );
+    } else {
       selectedStory.epic.features[selectedStory.featureIndex].stories[
         selectedStory.storyIndex
-      ].ethics_status === targetStory.columnName
-    ) {
-      await db
-        .collection("Epics")
-        .doc(selectedStory.epic.id)
-        .update(selectedStory.epic)
-        .then(() => {
-          message.success("story updated successfully");
-        });
+      ].ethics_status = targetStory.columnName;
+
+      if (
+        selectedStory.epic.features[selectedStory.featureIndex].stories[
+          selectedStory.storyIndex
+        ].ethics_status === targetStory.columnName
+      ) {
+        await db
+          .collection("Epics")
+          .doc(selectedStory.epic.id)
+          .update(selectedStory.epic)
+          .then(() => {
+            message.success("story updated successfully");
+            fetchEthics();
+          });
+      }
     }
   };
 
@@ -399,7 +406,7 @@ export default function Ethics() {
           <>
             <Board
               colCount={data.length}
-              // onDrop={handleDrop}
+              onDrop={handleDrop}
               // onSwap={handleSwap}
               columns={data}
               renderColumn={renderCol}

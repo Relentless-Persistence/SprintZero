@@ -82,7 +82,7 @@ const EditVision = ({ info, inEditMode, setEditMode }) => {
 
   return (
     <Card
-      bordered={false}
+      className="border border-[#D9D9D9]"
       extra={
         <Space>
           <Button
