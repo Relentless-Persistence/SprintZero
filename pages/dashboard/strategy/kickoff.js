@@ -9,6 +9,7 @@ import {
   ListCard,
   DescriptionCard,
   TimeLineCard,
+  PersonasListCard,
 } from "../../../components/Personas";
 import { splitRoutes } from "../../../utils";
 import { db } from "../../../config/firebase-config";
@@ -27,6 +28,7 @@ export default function Kickoff() {
   const { pathname } = useRouter();
   const activeProduct = useRecoilValue(activeProductState);
   const [kick, setKick] = useState(null);
+  const [personas, setPersonas] = useState(null);
   const [activeRole, setActiveRole] = useState(null);
   const [rightNav, setRightNav] = useState([]);
   const [newRole, setNewRole] = useState("");
@@ -52,6 +54,24 @@ export default function Kickoff() {
     fetchKickoff();
   }, [activeProduct]);
 
+  const fetchPersonas = async () => {
+    if (activeProduct) {
+      const res = db
+        .collection("Personas")
+        .where("product_id", "==", activeProduct.id)
+        .onSnapshot((snapshot) => {
+          setPersonas(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          console.log(
+            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          );
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchPersonas();
+  }, [activeProduct]);
+
   const createKickoff = async () => {
     await db.collection("kickoff").add({
       product_id: activeProduct.id,
@@ -70,11 +90,6 @@ export default function Kickoff() {
       case "success_metrics":
         data = {
           success_metrics: list,
-        };
-        break;
-      case "personas":
-        data = {
-          personas: list,
         };
         break;
       case "priorities":
@@ -145,13 +160,16 @@ export default function Kickoff() {
               <br />
             </Col>
             <Col xs={{ span: 24 }} sm={{ span: 12 }}>
-              <ListCard
-                handleEdit={(list) =>
-                  handleEdit(kick[0].perosnas, "personas", list, kick[0].id)
-                }
-                title="Identified Personas"
-                cardData={kick[0].personas}
-              />
+              {personas && (
+                <PersonasListCard
+                  handleEdit={(list) =>
+                    handleEdit(kick[0].perosnas, "personas", list, kick[0].id)
+                  }
+                  title="Identified Personas"
+                  cardData={personas}
+                  product={activeProduct}
+                />
+              )}
 
               <br />
 

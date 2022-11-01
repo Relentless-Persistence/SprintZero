@@ -28,6 +28,8 @@ const UserStory = ({ epics, setEpics, activeProduct, version }) => {
         id: generateString(20),
         name: "",
         features: [],
+        product_id: activeProduct.id,
+        version: version.id
       },
     ]);
   };
@@ -144,15 +146,14 @@ const UserStory = ({ epics, setEpics, activeProduct, version }) => {
     setEpics(newData);
   };
 
-  const updateStory = async (e, id) => {
-    await db.collection("Stories").doc(id).update({
-      name: e,
-    })
-  }
+  // const updateStory = async (e, id) => {
+  //   await db.collection("Stories").doc(id).update({
+  //     name: e,
+  //   })
+  // }
 
   const handleChangeStory = (epicIndex, featureIndex, storyIndex, e, story) => {
     console.log(e, story)
-    updateStory(e, story.id);
     const newData = update(epics, {
       [epicIndex]: {
         features: {

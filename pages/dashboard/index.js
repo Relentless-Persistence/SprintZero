@@ -45,10 +45,6 @@ function Home() {
     let newVersion = [];
     if (versions) {
       setRightNav(versions.map(({ version }) => version));
-      console.table(
-        "Navs",
-        versions.map(({ version }) => version)
-      );
     }
   };
 
