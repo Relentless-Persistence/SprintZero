@@ -192,6 +192,7 @@ function Home() {
             epics={epics}
             setEpics={setEpics}
             activeProduct={activeProduct}
+            version={version}
           />
         </>
       </UserStoryLayout>

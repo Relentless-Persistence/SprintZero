@@ -19,7 +19,7 @@ import { useRecoilValue } from "recoil";
 import generateString from '../../utils/generateRandomStrings';
 import {debounce} from "lodash";
 
-const UserStory = ({ epics, setEpics, activeProduct }) => {
+const UserStory = ({ epics, setEpics, activeProduct, version }) => {
 
   const addEpic = () => {
     setEpics([
@@ -122,9 +122,17 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
               $push: [
                 {
                   id: id,
-                  name: "", 
+                  name: "",
+                  description: "",
                   status: "",
-                  sprint_status: "Backlog"
+                  version: version.id,
+                  sprint_id: "",
+                  sprint_status: "Backlog",
+                  flagged: false,
+                  ethics_status: "",
+                  ethics_votes: {accepts: 0, rejects: 2},
+                  acceptance_criteria: [],
+                  effort: "",
                 },
               ],
             },
@@ -275,6 +283,7 @@ const UserStory = ({ epics, setEpics, activeProduct }) => {
                                                 story={story}
                                                 storyIndex={storyIndex}
                                                 i={i}
+                                                epic={epic}
                                                 addStory={addStory}
                                                 handleChangeStory={
                                                   handleChangeStory

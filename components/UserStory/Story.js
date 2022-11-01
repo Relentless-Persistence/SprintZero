@@ -40,6 +40,7 @@ const Story = ({
   storyIndex,
   featureIndex,
   i,
+  epic,
   handleChangeStory,
   handleChangeStoryStatus,
 }) => {
@@ -139,7 +140,7 @@ const Story = ({
         placement="bottom"
         visible={openDetail}
       >
-        <StoryDetails story={{ id: i.toString(), ...story }} storyIndex={storyIndex} featureIndex={featureIndex} i={i} handleChangeStory={handleChangeStory} />
+        <StoryDetails story={{ id: i.toString(), ...story }} storyIndex={storyIndex} featureIndex={featureIndex} epic={epic} i={i} handleChangeStory={handleChangeStory} />
       </Drawer>
     </>
   );

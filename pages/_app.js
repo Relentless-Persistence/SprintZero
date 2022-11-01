@@ -11,15 +11,15 @@ import { useWindowSize } from "react-use";
 function MyApp({ Component, pageProps }) {
   const { width } = useWindowSize();
 
-  if (width < 1132) {
-    return (
-      <div className="w-full h-full flex justify-center items-center text-lg p-8">
-        Sorry, we don&apos;t support your current resolution at the moment.
-        Please try either turning your device sideways to landscape mode or
-        share with a device wider than 1133px.
-      </div>
-    );
-  } else {
+  // if (width < 1132) {
+  //   return (
+  //     <div className="w-full h-full flex justify-center items-center text-lg p-8">
+  //       Sorry, we don&apos;t support your current resolution at the moment.
+  //       Please try either turning your device sideways to landscape mode or
+  //       share with a device wider than 1133px.
+  //     </div>
+  //   );
+  // } else {
     return (
       <AuthProvider>
         <PaymentProvider>
@@ -30,6 +30,6 @@ function MyApp({ Component, pageProps }) {
       </AuthProvider>
     );
   }
-}
+// }
 
 export default MyApp;

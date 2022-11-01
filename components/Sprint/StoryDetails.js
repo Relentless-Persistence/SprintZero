@@ -220,11 +220,17 @@ const StoryDetails = ({
   };
 
   const onFlag = async () => {
-    await db.collection("Ethics").add({
-      storyId: story.id,
-      type: "identified",
-    });
-    message.success("Story flagged");
+    story.epic.features[story.featureIndex].stories[story.storyIndex].flagged =
+      !story.epic.features[story.featureIndex].stories[story.storyIndex]
+        .flagged;
+
+    await db
+      .collection("Epics")
+      .doc(story.epic.id)
+      .update(story.epic)
+      .then(() => {
+        message.success("Story flagged");
+      });
   };
 
   const checkFlag = async () => {
@@ -232,10 +238,12 @@ const StoryDetails = ({
       .collection("Ethics")
       .where("storyId", "==", story.id)
       .get();
-    if (flag.empty) {
-      setFlagged(false);
-    } else {
+    if (
+      story.epic.features[story.featureIndex].stories[story.storyIndex].flagged
+    ) {
       setFlagged(true);
+    } else {
+      setFlagged(false);
     }
   };
 

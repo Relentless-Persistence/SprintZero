@@ -29,7 +29,7 @@ import { Title } from "../Dashboard/SectionTitle";
 import AppCheckbox from "../AppCheckbox";
 import RadioButton from "../AppRadioBtn";
 import StoryComments from "./StoryComments";
-import {useAuth} from "../../contexts/AuthContext"
+import { useAuth } from "../../contexts/AuthContext";
 
 const Story = styled.p`
   padding: 12px 19px;
@@ -64,9 +64,10 @@ const StoryDetails = ({
   storyIndex,
   featureIndex,
   i,
+  epic,
   handleChangeStory,
 }) => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [commentType, setCommentType] = useState("design");
   const [comments, setComments] = useState(null);
   const [comment, setComment] = useState("");
@@ -89,19 +90,19 @@ const StoryDetails = ({
           );
         });
     }
-  }
+  };
 
   const submitComment = () => {
     const data = {
-        story_id: story.id,
-        author: {
-          name: user.displayName,
-          avatar: user.photoURL,
-        },
-        comment: comment,
-        type: commentType,
-        createdAt: serverTimestamp,
-      }
+      story_id: story.id,
+      author: {
+        name: user.displayName,
+        avatar: user.photoURL,
+      },
+      comment: comment,
+      type: commentType,
+      createdAt: serverTimestamp,
+    };
     db.collection("storiesComments")
       .add(data)
       .then((docRef) => {
@@ -112,21 +113,31 @@ const StoryDetails = ({
         message.error("Error adding comment");
       });
   };
-  
 
   useEffect(() => {
-    fetchComments()
-  }, [story, commentType])
+    fetchComments();
+  }, [story, commentType]);
 
-  const addItemDone = (e) => {
+  const addItemDone = async (e) => {
     if (e.key === "Enter" && val.trim()) {
-      setData([
-        ...data,
-        {
-          label: val,
-          checked: false,
-        },
-      ]);
+      await epic.features[featureIndex].stories[
+        storyIndex
+      ].acceptance_criteria.push({
+        name: val,
+        completed: false,
+      });
+
+      epic.features[featureIndex].stories[
+        storyIndex
+      ].updatedAt = new Date().toISOString();
+
+      await db
+        .collection("Epics")
+        .doc(epic.id)
+        .update(epic)
+        .then(() => {
+          message.success("story updated successfully");
+        });
 
       setVal("");
       setShow(false);
@@ -138,28 +149,51 @@ const StoryDetails = ({
   };
 
   const onFlag = async () => {
-    await db.collection("Ethics").add({
-      storyId: story.id,
-      type: "identified",
-    });
-    message.success("Story flagged");
+    epic.features[featureIndex].stories[storyIndex].flagged =
+      !epic.features[featureIndex].stories[storyIndex].flagged;
+
+    await db
+      .collection("Epics")
+      .doc(epic.id)
+      .update(story.epic)
+      .then(() => {
+        message.success("Story flagged");
+      });
   };
 
   const checkFlag = async () => {
-    const flag = await db
-      .collection("Ethics")
-      .where("storyId", "==", story.id)
-      .get();
-    if (flag.empty) {
-      setFlagged(false);
-    } else {
-      setFlagged(true);
+    if (story) {
+      if (epic.features[featureIndex].stories[storyIndex].flagged) {
+        setFlagged(true);
+      } else {
+        setFlagged(false);
+      }
     }
   };
 
   useEffect(() => {
     checkFlag();
   }, [story]);
+
+  const checkAcceptanceCriteria = async (i) => {
+    epic.features[featureIndex].stories[
+      storyIndex
+    ].acceptance_criteria[i].completed =
+      !epic.features[featureIndex].stories[storyIndex]
+        .acceptance_criteria[i].completed;
+
+    epic.features[featureIndex].stories[
+      storyIndex
+    ].updatedAt = new Date().toISOString();
+
+    await db
+      .collection("Epics")
+      .doc(epic.id)
+      .update(epic)
+      .then(() => {
+        message.success("story updated successfully");
+      });
+  };
 
   return (
     <Row gutter={[16, 16]}>
@@ -171,19 +205,39 @@ const StoryDetails = ({
         <Title className="mt-[24px]">Acceptance Criteria</Title>
 
         <div className="max-h-[140px] overflow-y-auto">
-          {story?.acceptance_criteria?.map((d, i) => (
-            <p key={i}>
-              <AppCheckbox checked={d.completed}>{d.name}</AppCheckbox>
-            </p>
-          ))}
+          <Row>
+            {story?.acceptance_criteria?.map((d, i) => (
+              <Col span={8} key={i}>
+                <AppCheckbox
+                  checked={d.completed}
+                  onChange={() => checkAcceptanceCriteria(i)}
+                >
+                  <span className={d.completed ? "line-through" : null}>
+                    {d.name}
+                  </span>
+                </AppCheckbox>
+              </Col>
+            ))}
 
-          {show ? (
-            <Input value={val} onKeyPress={addItemDone} onChange={onChange} />
-          ) : (
-            <AppCheckbox checked={false} onChange={() => setShow((s) => !s)}>
-              <span className="text-[#BFBFBF]">Add Item</span>
-            </AppCheckbox>
-          )}
+            {show ? (
+              <Col span={8}>
+                <Input
+                  value={val}
+                  onKeyPress={addItemDone}
+                  onChange={onChange}
+                />
+              </Col>
+            ) : (
+              <Col span={8}>
+                <AppCheckbox
+                  checked={false}
+                  onChange={() => setShow((s) => !s)}
+                >
+                  <span className="text-[#BFBFBF]">Add Item</span>
+                </AppCheckbox>
+              </Col>
+            )}
+          </Row>
         </div>
       </Col>
 
@@ -217,13 +271,15 @@ const StoryDetails = ({
 
         {user && (
           <Comment
-            avatar={
-              <Avatar src={user.photoURL} alt="avatar" />
-            }
+            avatar={<Avatar src={user.photoURL} alt="avatar" />}
             content={
               <Form onFinish={submitComment}>
                 <Form.Item>
-                  <TextArea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
+                  <TextArea
+                    rows={2}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                  />
                 </Form.Item>
 
                 <Form.Item>
