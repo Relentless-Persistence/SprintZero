@@ -164,8 +164,8 @@ export default function Personas() {
         activeRightItem={activeRole?.role}
         capitalizeText={false}
         setActiveRightNav={setRole}
-        onSideAdd={createRole}
-        hasSideAdd
+        // onSideAdd={createRole}
+        hasSideAdd={false}
         mainClass="mr-[120px]"
         type="text"
         sideAddValue={newRole}

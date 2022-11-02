@@ -70,7 +70,7 @@ const ItemCard = ({
   return (
     <Card
       // $headerSmall={headerSmall}
-      className="mb-[16px] border-2 border-[#D9D9D9]"
+      className="mb-[16px] border border-[#D9D9D9]"
       type="inner"
       extra={
         useBtn ? (

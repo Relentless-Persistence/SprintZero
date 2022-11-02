@@ -160,12 +160,12 @@ export default function Accessiblity() {
         {challengesData && challengesData.length > 0 ? (
           <MasonryGrid>
             {challengesData.map((res) => (
-            <ItemCard
-              key={res.id}
-              onEdit={(item) => editItem(res.id, item)}
-              onDelete={() => deleteItem(res.id)}
-              item={res}
-            />
+              <ItemCard
+                key={res.id}
+                onEdit={(item) => editItem(res.id, item)}
+                onDelete={() => deleteItem(res.id)}
+                item={res}
+              />
             ))}
             <div
               style={{
@@ -181,10 +181,20 @@ export default function Accessiblity() {
           </MasonryGrid>
         ) : (
           <>
-          <br />
-          <br />
-          {showAdd ? null : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}</>
-        )}  
+            <br />
+            <br />
+            {showAdd ? (
+              <MasonryGrid>
+                <FormCard
+                  onSubmit={addItemDone}
+                  onCancel={() => setShowAdd(false)}
+                />
+              </MasonryGrid>
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
+          </>
+        )}
       </AppLayout>
     </div>
   );

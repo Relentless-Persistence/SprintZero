@@ -103,8 +103,8 @@ export default function FormCard({
     </Card>
   ) : (
     <Card
-      className={className}
-      bordered={false}
+      className="border border-[#D9D9D9]"
+      // bordered={false}
       type="inner"
       extra={
         extra ? (
@@ -112,7 +112,11 @@ export default function FormCard({
         ) : (
           <Space>
             <CardHeaderLink onClick={onCancel}>Cancel</CardHeaderLink>
-            <Button className="ml-2" danger ghost onClick={handleSubmit}>
+            <Button
+              size="small"
+              className="text-[#4A801D] border border-[#4A801D]"
+              onClick={handleSubmit}
+            >
               Done
             </Button>
           </Space>
