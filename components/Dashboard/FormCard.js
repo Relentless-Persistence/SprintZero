@@ -74,10 +74,11 @@ export default function FormCard({
           extra
         ) : (
           <Space>
-            <CardHeaderLink onClick={onCancel}>Cancel</CardHeaderLink>
+            {/* <CardHeaderLink onClick={onCancel}>Cancel</CardHeaderLink>
             <Button className="ml-2" onClick={handleSubmit}>
               Done
-            </Button>
+            </Button> */}
+            <ActionButtons onCancel={onCancel} onSubmit={handleSubmit} />
           </Space>
         )
       }
@@ -111,14 +112,15 @@ export default function FormCard({
           extra
         ) : (
           <Space>
-            <CardHeaderLink onClick={onCancel}>Cancel</CardHeaderLink>
+            {/* <CardHeaderLink onClick={onCancel}>Cancel</CardHeaderLink>
             <Button
               size="small"
               className="text-[#4A801D] border border-[#4A801D]"
               onClick={handleSubmit}
             >
               Done
-            </Button>
+            </Button> */}
+            <ActionButtons onCancel={onCancel} onSubmit={handleSubmit} />
           </Space>
         )
       }

@@ -68,14 +68,18 @@ export const LightActionButtons = ( {
 {
     return (
       <div className="flex items-center space-x-2 ml-4">
-        <p
-          className="text-[#4A801D] text-[14px] cursor-pointer"
+        <Button
+          className="text-[#4A801D] text-[14px] border border-[#4A801D] cursor-pointer"
+          size="small"
           onClick={onCancel}
-          type="text"
         >
           Cancel
-        </p>
-        <Button size="small" className="border-[#4A801D] text-[#4A801D]" onClick={onSubmit}>
+        </Button>
+        <Button
+          size="small"
+          className="bg-[#4A801D] border-[#4A801D] text-white text-[14px]"
+          onClick={onSubmit}
+        >
           Done
         </Button>
       </div>

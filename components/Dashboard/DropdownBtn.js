@@ -1,36 +1,25 @@
-import React from 'react';
-import { FilterOutlined } from '@ant-design/icons';
-import
-{
-    Dropdown
-} from 'antd';
+import React from "react";
+import { FilterOutlined } from "@ant-design/icons";
+import { Dropdown } from "antd";
 
 import styled from "styled-components";
 
-export const DropdownBtn = styled( Dropdown.Button )`
-    background:#fff !important;
-    padding:0;
-    margin:0;
+export const DropdownBtn = styled(Dropdown.Button)`
+  background: #fff !important;
+  padding: 0;
+  margin: 0;
 `;
 
-
-export const DropDwnBtn = (
-    {
-        value = "All",
-        menu,
-        key,
-        icon = <FilterOutlined />,
-        placement
-    }
-) =>
-{
-    return (
-        <DropdownBtn
-            overlay={ menu }
-            key={ key }
-            placement={ placement }
-            icon={ icon }>
-            { value }
-        </DropdownBtn>
-    );
+export const DropDwnBtn = ({
+  value = "All",
+  menu,
+  key,
+  icon = <FilterOutlined />,
+  placement,
+}) => {
+  return (
+    <DropdownBtn overlay={menu} key={key} placement={placement} icon={icon}>
+      {value}
+    </DropdownBtn>
+  );
 };

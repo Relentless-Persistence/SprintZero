@@ -135,6 +135,8 @@ const UserStory = ({ epics, setEpics, activeProduct, version }) => {
                   ethics_votes: {accepts: 0, rejects: 2},
                   acceptance_criteria: [],
                   effort: "",
+                  design_link: "",
+                  code_link: ""
                 },
               ],
             },

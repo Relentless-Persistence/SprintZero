@@ -75,6 +75,9 @@ const StoryDetails = ({
   const [val, setVal] = useState("");
   const [data, setData] = useState([...init]);
   const [flagged, setFlagged] = useState(false);
+  const [storyDescription, setStoryDescription] = useState(story.description);
+  const [designLink, setDesignLink] = useState(story.design_link);
+  const [codeLink, setCodeLink] = useState(story.code_link);
 
   const fetchComments = () => {
     if (story) {
@@ -152,12 +155,14 @@ const StoryDetails = ({
     epic.features[featureIndex].stories[storyIndex].flagged =
       !epic.features[featureIndex].stories[storyIndex].flagged;
 
+    epic.features[featureIndex].stories[storyIndex].ethics_status = "Identified"
+
     await db
       .collection("Epics")
       .doc(epic.id)
-      .update(story.epic)
+      .update(epic)
       .then(() => {
-        message.success("Story flagged");
+        message.success("Story has been flagged");
       });
   };
 
@@ -195,12 +200,42 @@ const StoryDetails = ({
       });
   };
 
+  const updateStoryDescription = async (e) => {
+    if (e.key === "Enter") {
+      epic.features[featureIndex].stories[
+        storyIndex
+      ].description = storyDescription;
+
+      epic.features[featureIndex].stories[
+        storyIndex
+      ].updatedAt = new Date().toISOString();
+
+      console.log(
+        epic
+      );
+
+      await db
+        .collection("Epics")
+        .doc(epic.id)
+        .update(epic)
+        .then(() => {
+          fetchSprints();
+          message.success("story updated successfully");
+        });
+    }
+  };
+
   return (
     <Row gutter={[16, 16]}>
       <Col span={12}>
         <Title>User Story</Title>
 
-        <Story>{story.description}</Story>
+        <TextArea
+          value={storyDescription}
+          onChange={(e) => setStoryDescription(e.target.value)}
+          onKeyPress={updateStoryDescription}
+          rows={3}
+        />
 
         <Title className="mt-[24px]">Acceptance Criteria</Title>
 
