@@ -119,9 +119,9 @@ export default function Tasks() {
             },
           ]);
 
-          if(data.length < 1) {
-            setCreateMode(true)
-          }
+          // if(data.length < 1) {
+          //   setCreateMode(true)
+          // }
 
         });
     }

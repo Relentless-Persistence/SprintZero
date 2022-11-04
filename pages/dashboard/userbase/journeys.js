@@ -311,16 +311,11 @@ export default function Journeys() {
                   </Select>
                 </div>
                 <div className="flex justify-end space-x-2 mt-[43px]">
-                  <Button
-                    size="small"
-                    type="danger"
-                    ghost
-                    onClick={onCancel}
-                  >
+                  <Button size="small" type="danger" ghost onClick={onCancel}>
                     Cancel
                   </Button>
                   <Button
-                    className="bg-[#4A801D] text-white"
+                    className="bg-[#4A801D] hover:bg-[#5A9D24] border-none hover:border-none text-white hover:text-white text-[14px]"
                     size="small"
                     // onClick={onAddJourney}
                     htmlType="submit"

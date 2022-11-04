@@ -53,7 +53,7 @@ const ActionButtons = ( {
         </Button>
         <Button
           size="small"
-          className="bg-[#4A801D] border-[#4A801D] text-white text-[14px]"
+          className="bg-[#4A801D] hover:bg-[#5A9D24] border-none hover:border-none text-white hover:text-white text-[14px]"
           onClick={onSubmit}
         >
           Done
@@ -77,7 +77,7 @@ export const LightActionButtons = ( {
         </Button>
         <Button
           size="small"
-          className="bg-[#4A801D] border-[#4A801D] text-white text-[14px]"
+          className="bg-[#4A801D] hover:bg-[#5A9D24] border-none hover:border-none text-white hover:text-white text-[14px]"
           onClick={onSubmit}
         >
           Done

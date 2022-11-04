@@ -190,7 +190,7 @@ export default function Personas() {
                   Cancel
                 </Button>
                 <Button
-                  className="bg-[#4A801D] text-white"
+                  className="bg-[#4A801D] hover:bg-[#5A9D24] border-none hover:border-none text-white hover:text-white text-[14px]"
                   size="small"
                   onClick={createRole}
                 >
