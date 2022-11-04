@@ -167,7 +167,7 @@ const PersonasListCard = ({
       }}
     >
       <OL>
-        {cardData[0] === "" ? (
+        {cardData.length < 1 ? (
           <p>
             No{" "}
             <span

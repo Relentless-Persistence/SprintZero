@@ -82,6 +82,7 @@ const EditVision = ({ info, inEditMode, setEditMode }) => {
 
   return (
     <Card
+      type="inner"
       className="border border-[#D9D9D9]"
       extra={
         <Space>

@@ -142,6 +142,13 @@ export default function Objectives() {
     })
   };
 
+  const deleteItem = (id) => {
+    db.collection("Result").doc(id).delete()
+    .then(() => {
+      message.success("Item removed successfully");
+    })
+  }
+
   return (
     <div className="mb-8">
       <Head>
@@ -180,6 +187,7 @@ export default function Objectives() {
                 onEdit={(item) => editItem(result.id, item)}
                 item={result}
                 index={i + 1}
+                onDelete={() => deleteItem(result.id)}
               />
             ))}
             {showAdd ? <FormCard onSubmit={addItemDone} /> : null}

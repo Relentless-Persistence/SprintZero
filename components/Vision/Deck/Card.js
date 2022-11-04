@@ -64,7 +64,8 @@ const StatementCard = ({
       }}
       className="absolute top-0 left-0 right-0 max-w-full transition-transform"
     >
-      <StyledCard
+      <Card
+        type="inner"
         $active={isActive}
         extra={
           <CardHeaderLink onClick={() => onEditClick(info)}>
@@ -87,7 +88,7 @@ const StatementCard = ({
         <p className="text-[30px] leading-[38px]">
           {`Unlike ${info.competitors}, our product ${info.differentiators}.`}
         </p>
-      </StyledCard>
+      </Card>
     </div>
   );
 };
