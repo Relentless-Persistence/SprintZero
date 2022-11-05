@@ -17,6 +17,7 @@ import products from "../../../fakeData/products.json";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
+import Link from "next/link";
 
 const challenges = ["Perceivable", "Operable", "Understandable", "Robust"];
 
@@ -155,7 +156,22 @@ export default function Accessiblity() {
         breadCrumbItems={splitRoutes(pathname)}
         mainClass="mr-[174px]"
       >
-        <MainSub>{data && data[0]?.title}</MainSub>
+        <MainSub>
+          {data && (
+            <p>
+              {data[0]?.title} To learn more visit{" "}
+              <span className="text-[#2D73C8] font-semibold">
+                <a
+                  href="https://www.w3.org/WAI/standards-guidelines/wcag/glance/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  WCAG 2.1 at a Glance
+                </a>
+              </span>
+            </p>
+          )}
+        </MainSub>
 
         {challengesData && challengesData.length > 0 ? (
           <MasonryGrid>

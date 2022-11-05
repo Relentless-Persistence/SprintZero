@@ -42,11 +42,12 @@ const MyCard = styled(Card)`
 `;
 
 const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
-  const [list, setList] = useState([...cardData]);
+  console.log(title, cardData)
+  const [list, setList] = useState(cardData);
 
   const [isEdit, setIsEdit] = useState(false);
 
-  const toggleEdit = () => setIsEdit((s) => !s);
+  const toggleEdit = () => setIsEdit(true);
 
   const onFinish = () => {
     const values = list.filter((it) => it.trim().length > 0);
@@ -56,7 +57,18 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
 
   const onCancel = () => {
     setIsEdit(false);
+    setList(null);
   };
+
+  const onEdit = () => {
+    if(list[0] === "" || list.length < 1) {
+      const newList = [...list, ""];
+      setList(newList);
+      setIsEdit(true)
+    } else {
+      setIsEdit(true)
+    }
+  }
 
   const add = () => {
     const newList = [...list, ""];
@@ -84,11 +96,11 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
         background: "#F5F5F5",
       }}
     >
-      {list.map((it, i) => (
+      {cardData && list.map((it, i) => (
         <MyInput
           key={i}
           value={it}
-          className="mb-[12px]"
+          className="mb-[12px] outline-none hover:outline-none"
           onChange={(e) => onChange(e, i)}
           addonBefore={
             <div className="flex items-center justify-between">
@@ -140,7 +152,7 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
             No{" "}
             <span
               className="cursor-pointer font-semibold"
-              onClick={() => setIsEdit(true)}
+              onClick={() => onEdit()}
             >
               {title}
             </span>{" "}

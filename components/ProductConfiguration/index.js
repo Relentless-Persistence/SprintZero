@@ -69,7 +69,8 @@ const ProductConfiguration = () => {
           newVersion(res.id);
           addOwnerToTeam(res.id);
           createAccessibilities(res.id);
-          addPrimaryGoals(res.id)
+          addPrimaryGoals(res.id);
+          createKickoff(id);
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
@@ -113,16 +114,16 @@ const ProductConfiguration = () => {
   };
 
   const addPrimaryGoals = (product) => {
-    const goals = ["001", "002", "003"]
+    const goals = ["001", "002", "003"];
 
-    goals.map(goal => {
+    goals.map((goal) => {
       db.collection("Goals").add({
         product_id: product,
         description: "",
-        name: goal
-      })
-    })
-  }
+        name: goal,
+      });
+    });
+  };
 
   const createAccessibilities = (id) => {
     const challenges = [
@@ -154,6 +155,15 @@ const ProductConfiguration = () => {
         type: challenge.name,
         title: challenge.title,
       });
+    });
+  };
+
+  const createKickoff = async (id) => {
+    await db.collection("kickoff").add({
+      product_id: id,
+      problem_statement: "",
+      success_metrics: [""],
+      priorities: [""],
     });
   };
 
