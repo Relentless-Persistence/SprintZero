@@ -149,6 +149,78 @@ export default function FormCard({
   );
 }
 
+export function ObjectiveFormCard({
+  isEdit,
+  extra,
+  itemToEdit,
+  extraItems,
+  onSubmit,
+  onCancel,
+  title
+}) {
+  const [item, setItem] = useState(
+    isEdit
+      ? { ...itemToEdit }
+      : {
+          name: "",
+          description: "",
+        }
+  );
+
+  const handleChange = (e, key) => {
+    const { value } = e.target;
+
+    setItem({
+      ...item,
+      [key]: value,
+    });
+  };
+
+  const handleSubmit = () => {
+    if (isEdit) {
+      onSubmit({
+        name: item.name || itemToEdit.name,
+        description: item.description || itemToEdit.description,
+      });
+    } else {
+      onSubmit(item);
+    }
+  };
+
+  return (
+    <Card
+      className="border border-[#D9D9D9]"
+      type="inner"
+      extra={
+        extra ? (
+          extra
+        ) : (
+          <Space>
+            <ActionButtons onCancel={onCancel} onSubmit={handleSubmit} />
+          </Space>
+        )
+      }
+      // title={
+      //   title
+      // }
+      headStyle={{
+        background: "#F5F5F5",
+      }}
+    >
+      <TextArea
+        autoSize={{ minRows: 6 }}
+        value={item.description}
+        onChange={(e) => handleChange(e, "description")}
+        placeholder="Result description..."
+      />
+      {extraItems}
+      <Button disabled block className="bg-[#FF4D4F] text-white mt-2">
+        Remove
+      </Button>
+    </Card>
+  );
+}
+
 export const ActionFormCard = ({
   title,
   description,
@@ -214,6 +286,92 @@ export const ActionFormCard = ({
           placeholder="Result name..."
         />
       }
+      headStyle={{
+        background: "#F5F5F5",
+      }}
+    >
+      {extraItems}
+      <TextArea
+        className="my-4"
+        autoSize={{ minRows: 3 }}
+        value={item.description}
+        onChange={(e) => handleChange(e, "description")}
+        placeholder="Result description..."
+      />
+      <Button
+        type="danger"
+        ghost
+        block
+        onClick={onDelete}
+        disabled={isDisabled}
+      >
+        Remove
+      </Button>
+    </Card>
+  );
+};
+
+export const ObjectiveActionFormCard = ({
+  title,
+  description,
+  id,
+  useAction = true,
+  version = 1,
+  onSubmit,
+  onCancel,
+  className,
+  extraItems,
+  headerSmall = false,
+  onDelete,
+  isDisabled = false,
+}) => {
+  const [item, setItem] = useState({
+    title,
+    description,
+  });
+
+  const handleChange = (e, key) => {
+    const { value } = e.target;
+
+    setItem({
+      ...item,
+      id,
+      [key]: value,
+    });
+  };
+
+  const handleSubmit = () => {
+    onSubmit(item);
+    setItem({ item: "", description: "" });
+  };
+
+  return (
+    <Card
+      className="border-2 mb-2"
+      bordered={false}
+      type="inner"
+      extra={
+        useAction ? (
+          version === 1 ? (
+            <ActionButtons
+              className="ml-[12px]"
+              onCancel={onCancel}
+              onSubmit={handleSubmit}
+            />
+          ) : (
+            <LightActionButtons
+              className="ml-[12px]"
+              onCancel={onCancel}
+              onSubmit={handleSubmit}
+            />
+          )
+        ) : (
+          <CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
+        )
+      }
+      // title={
+      //   title
+      // }
       headStyle={{
         background: "#F5F5F5",
       }}

@@ -6,8 +6,8 @@ import { Input, message } from "antd";
 import { AimOutlined } from "@ant-design/icons";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import FormCard from "../../../components/Dashboard/FormCard";
-import ItemCard from "../../../components/Dashboard/ItemCard";
+import {ObjectiveFormCard} from "../../../components/Dashboard/FormCard";
+import ItemCard, {ObjectiveItemCard} from "../../../components/Dashboard/ItemCard";
 
 import { splitRoutes } from "../../../utils";
 
@@ -113,33 +113,48 @@ export default function Objectives() {
     setShowAdd(true);
   };
 
+  const cancelAdd = () => {
+    setShowAdd(false);
+  }
+
   const addItemDone = (item) => {
     const id = data[activeGoalIndex].id;
     if (id) {
-      const data = {
-        goal_id: id,
-        description: item.description,
-      };
-      db.collection("Result")
-        .add(data)
-        .then((docRef) => {
-          message.success("New result added successfully");
-        })
-        .catch((error) => {
-          message.error("Error adding result");
-        });
+      if(item.description !== "") {
+        const data = {
+          goal_id: id,
+          description: item.description,
+        };
+        db.collection("Result")
+          .add(data)
+          .then((docRef) => {
+            message.success("New result added successfully");
+          })
+          .catch((error) => {
+            message.error("Error adding result");
+          });
 
-      setShowAdd(false);
+        setShowAdd(false);
+      } else {
+        message.error("Please fill all the fields");
+      }
     }
   };
 
   const editItem = async (id, item) => {
-    await db.collection("Result").doc(id).update({
-      description: item.description,
-    })
-    .then(() => {
-      message.success("Result updated successfully");
-    })
+    if(id && item.description !== "") {
+      await db
+        .collection("Result")
+        .doc(id)
+        .update({
+          description: item.description,
+        })
+        .then(() => {
+          message.success("Result updated successfully");
+        });
+    } else {
+      message.error("Please fill all fields");
+    }
   };
 
   const deleteItem = (id) => {
@@ -182,7 +197,7 @@ export default function Objectives() {
         {results && results.length > 0 ? (
           <MasonryGrid>
             {results.map((result, i) => (
-              <ItemCard
+              <ObjectiveItemCard
                 key={i}
                 onEdit={(item) => editItem(result.id, item)}
                 item={result}
@@ -190,11 +205,13 @@ export default function Objectives() {
                 onDelete={() => deleteItem(result.id)}
               />
             ))}
-            {showAdd ? <FormCard onSubmit={addItemDone} /> : null}
+            {showAdd ? (
+              <ObjectiveFormCard onSubmit={addItemDone} onCancel={cancelAdd} />
+            ) : null}
           </MasonryGrid>
         ) : (
           <MasonryGrid>
-            <FormCard onSubmit={addItemDone} />
+            <ObjectiveFormCard onSubmit={addItemDone} onCancel={cancelAdd} />
           </MasonryGrid>
         )}
       </AppLayout>

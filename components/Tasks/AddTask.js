@@ -98,6 +98,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
       })
       .catch((error) => {
         message.error("Error creating new task");
+        console.log(error)
       });
   }
 
@@ -135,6 +136,8 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
               className="mb-[24px]"
               onChange={(e) => setTitle(e.target.value)}
               value={title}
+              maxLength="50"
+              required
             />
 
             <DrawerSubTitle>Description</DrawerSubTitle>
@@ -143,6 +146,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
               onChange={(e) => setDescription(e.target.value)}
               value={description}
               rows={4}
+              required
             />
           </div>
         </Col>
@@ -153,6 +157,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
             className="mb-[24px]"
             onChange={(e) => setSubject(e.target.value)}
             value={subject}
+            required
           />
           <DrawerSubTitle>Due</DrawerSubTitle>
 
@@ -161,8 +166,9 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
               className="mr-[8px]"
               onChange={handleDrawerDateChange}
               format={"DD/MM/YYYY"}
+              required
             />
-            <TimePicker onChange={handleDrawerTimeChange} format={"HH:mm:ss"} />
+            <TimePicker onChange={handleDrawerTimeChange} format={"HH:mm:ss"} required />
             ,
           </div>
         </Col>
