@@ -94,12 +94,16 @@ export default function Learnings() {
           description: item.description,
         };
 
+      console.log(id)
+      
+
     await db
       .collection("Learnings")
       .doc(id)
       .update(data)
       .then(() => {
         message.success("Learning updated successfully");
+        setTemp(null)
       })
       .catch((err) => {
         console.log(err);
@@ -161,7 +165,7 @@ export default function Learnings() {
           {data &&
             data.map((res, i) => (
               <ItemCard
-                headerSmall
+                
                 extraItems={
                   <Radio.Group
                     className="mt-[12px] grid grid-cols-3"
@@ -179,7 +183,7 @@ export default function Learnings() {
                     ))}
                   </Radio.Group>
                 }
-                useBtn
+                // useBtn
                 key={res.id}
                 onEdit={(item) => editItem(res.id, item)}
                 item={res}

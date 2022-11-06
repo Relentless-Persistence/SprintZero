@@ -96,42 +96,43 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
         background: "#F5F5F5",
       }}
     >
-      {cardData && list.map((it, i) => (
-        <MyInput
-          key={i}
-          value={it}
-          className="mb-[12px] outline-none hover:outline-none"
-          onChange={(e) => onChange(e, i)}
-          addonBefore={
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => remove(i)}
-                className="flex items-center mr-[5px]"
-              >
-                <MinusCircleOutlined
-                  style={{
-                    color: "#C82D73",
-                  }}
-                />
-              </button>
-              {`${i + 1}.`}
-            </div>
-          }
-          autoFocus
-          $removeRightBorder={i === list.length - 1}
-          addonAfter={
-            i === list.length - 1 ? (
-              <Add onClick={add}>
-                <PlusCircleOutlined
-                  style={{
-                    color: "#009C7E",
-                  }}
-                />
-              </Add>
-            ) : null
-          }
-        />
-      ))}
+      {cardData &&
+        list.map((it, i) => (
+          <MyInput
+            key={i}
+            value={it}
+            className="mb-[12px] outline-none hover:outline-none"
+            onChange={(e) => onChange(e, i)}
+            addonBefore={
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => remove(i)}
+                  className="flex items-center mr-[5px]"
+                >
+                  <MinusCircleOutlined
+                    style={{
+                      color: "#C82D73",
+                    }}
+                  />
+                </button>
+                {`${i + 1}.`}
+              </div>
+            }
+            autoFocus
+            $removeRightBorder={i === list.length - 1}
+            addonAfter={
+              i === list.length - 1 ? (
+                <Add onClick={add}>
+                  <PlusCircleOutlined
+                    style={{
+                      color: "#009C7E",
+                    }}
+                  />
+                </Add>
+              ) : null
+            }
+          />
+        ))}
     </MyCard>
   ) : (
     <MyCard
@@ -146,22 +147,22 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
         background: "#F5F5F5",
       }}
     >
-      <OL>
-        {cardData[0] === "" ? (
-          <p>
-            No{" "}
-            <span
-              className="cursor-pointer font-semibold"
-              onClick={() => onEdit()}
-            >
-              {title}
-            </span>{" "}
-            Added Yet
-          </p>
-        ) : (
-          cardData.map((item, i) => <li key={i}>{item}</li>)
-        )}
-      </OL>
+      {cardData[0] === "" ? (
+        <p>
+          No{" "}
+          <span
+            className="cursor-pointer font-semibold"
+            onClick={() => onEdit()}
+          >
+            {title}
+          </span>{" "}
+          Added Yet
+        </p>
+      ) : (
+        <OL>
+          {cardData.map((item, i) => <li key={i}>{item}</li>)}
+        </OL>
+      )}
     </MyCard>
   );
 };
