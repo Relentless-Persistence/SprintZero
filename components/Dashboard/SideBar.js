@@ -84,7 +84,7 @@ const SideBar = () => {
         </MenuItem>
         <MenuItem
           $highlight={isActive(pathname, "/strategy/accessibility")}
-          key="2"
+          key="3"
         >
           <Link href="/dashboard/strategy/accessibility">
             <a>Accessibility</a>
@@ -92,14 +92,14 @@ const SideBar = () => {
         </MenuItem>
         <MenuItem
           $highlight={isActive(pathname, "/strategy/objectives")}
-          key="3"
+          key="4"
         >
           <Link href="/dashboard/strategy/objectives">
             <a>Objectives</a>
           </Link>
         </MenuItem>
 
-        <MenuItem key="4" $highlight={isActive(pathname, "/strategy/visions")}>
+        <MenuItem key="5" $highlight={isActive(pathname, "/strategy/visions")}>
           <Link href="/dashboard/strategy/visions">
             <a>Vision</a>
           </Link>
@@ -110,26 +110,26 @@ const SideBar = () => {
         icon={<PullRequestOutlined />}
         title="Tactics"
       >
-        <MenuItem $highlight={isActive(pathname, "/tactics/ethics")} key="5">
+        <MenuItem $highlight={isActive(pathname, "/tactics/ethics")} key="6">
           <Link href="/dashboard/tactics/ethics">
             <a>Ethics</a>
           </Link>
         </MenuItem>
         <MenuItem
-          key="6"
+          key="7"
           $highlight={isActive(pathname, "/tactics/priorities")}
         >
           <Link href="/dashboard/tactics/priorities">
             <a>Priorities</a>
           </Link>
         </MenuItem>
-        <MenuItem key="7" $highlight={isActive(pathname, "/tactics/release")}>
+        <MenuItem key="8" $highlight={isActive(pathname, "/tactics/release")}>
           <Link href="/dashboard/tactics/release">
             <a>Release</a>
           </Link>
         </MenuItem>
         <MenuItem
-          key="8"
+          key="9"
           $highlight={isActive(pathname, "/tactics/retrospective")}
         >
           <Link href="/dashboard/tactics/retrospective">
