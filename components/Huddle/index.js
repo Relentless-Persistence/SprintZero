@@ -51,6 +51,7 @@ const HuddleCard = ({
   const [showAddNewYesterday, setShowAddNewYesterday] = useState(false);
   const [newYesterday, setNewYesterday] = useState("");
   
+  console.log("blockers", blockers)
 
   const onBlockerDone = (e) => {
     if (newBlocker !== "") {
@@ -174,7 +175,7 @@ const HuddleCard = ({
             />
           }
           title={member?.user?.name}
-          description={member.role || "Developer"}
+          // description={member.role || "Developer"}
         />
       }
     >
@@ -196,7 +197,7 @@ const HuddleCard = ({
                 </li>
               ))}
 
-{(todayInTime == (new Date()).setHours(0,0,0,0)) &&
+{(todayInTime === (new Date()).setHours(0,0,0,0)) &&
               <li>
                 {showAddNewBlocker ? (
                   <Input

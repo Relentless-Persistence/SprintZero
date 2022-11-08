@@ -140,7 +140,7 @@ export default function Huddle() {
     setTodayInTime((intervals_dictt[activeTime]).setHours(0,0,0,0))
     setYesterdayInTime((subtractDays(1, intervals_dictt[activeTime])).setHours(0,0,0,0))
     
-    console.log("Interval dict aydaa " + activeProduct.product + activeTime + intervals_dictt["Today"] + intervals_dictt["Yesterday"] + intervals_dictt["2 days ago"] + today_fixeddd + yesterdayInTime);
+    // console.log("Interval dict aydaa " + activeProduct.product + activeTime + intervals_dictt["Today"] + intervals_dictt["Yesterday"] + intervals_dictt["2 days ago"] + today_fixeddd + yesterdayInTime);
 
   }, [activeProduct, activeTime]);
 

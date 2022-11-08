@@ -30,10 +30,10 @@ const Deck = ({
       <StatementCard
         info={atTop[0]}
         onEditClick={() => setEditMode(true)}
-        style={{
-          position: "relative",
-          visibility: "hidden",
-        }}
+        // style={{
+        //   position: "relative",
+        //   visibility: "hidden",
+        // }}
         index={0}
         product={product}
       />
