@@ -51,7 +51,7 @@ const HuddleCard = ({
   const [showAddNewYesterday, setShowAddNewYesterday] = useState(false);
   const [newYesterday, setNewYesterday] = useState("");
   
-  console.log("blockers", blockers)
+  console.log("todayInTime", todayInTime);
 
   const onBlockerDone = (e) => {
     if (newBlocker !== "") {
