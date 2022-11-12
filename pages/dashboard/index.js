@@ -13,6 +13,7 @@ import { activeProductState } from "../../atoms/productAtom";
 import { versionState } from "../../atoms/versionAtom";
 import { useRecoilValue, useRecoilState } from "recoil";
 import generateString from "../../utils/generateRandomStrings";
+import Script from "next/script";
 
 function Home() {
   const { pathname } = useRouter();
@@ -155,6 +156,16 @@ function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Script
+        async
+        type="text/javascript"
+        src="https://cdn.weglot.com/weglot.min.js"
+        onLoad={() => {
+          Weglot.initialize({
+            api_key: "wg_22f9b5a096e59c4526f1da3019b8e63a9",
+          });
+        }}
+      />
       <UserStoryLayout
         ignoreLast={true}
         breadCrumbItems={version && version.version}

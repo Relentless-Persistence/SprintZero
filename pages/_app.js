@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import "antd/dist/antd.css";
 
 import "../styles/globals.css";
@@ -6,15 +7,15 @@ import { PaymentProvider } from "../contexts/PaymentContext";
 import { RecoilRoot } from "recoil";
 import { useLayoutEffect, useState, useEffect } from "react";
 import { useWindowSize } from "react-use";
-import { analytics } from "../config/firebase-config"
+import { analytics } from "../config/firebase-config";
 import { useRouter } from "next/router";
-
+import Script from "next/script";
 
 function MyApp({ Component, pageProps }) {
   const routers = useRouter();
   useEffect(() => {
     // if (process.env.NODE_ENV === "production") {
-      analytics();
+    analytics();
     // }
   }, []);
 
@@ -33,7 +34,7 @@ function MyApp({ Component, pageProps }) {
     return () => {
       routers.events.off("routeChangeComplete", logEvent);
     };
-  }, [])
+  }, []);
 
   const { width } = useWindowSize();
 
@@ -46,7 +47,19 @@ function MyApp({ Component, pageProps }) {
   //     </div>
   //   );
   // } else {
-    return (
+  return (
+    <>
+      {/* <Script
+        async
+        type="text/javascript"
+        src="https://cdn.weglot.com/weglot.min.js"
+        onLoad={() => {
+          Weglot.initialize({
+            api_key: "wg_22f9b5a096e59c4526f1da3019b8e63a9",
+          });
+        }}
+      /> */}
+
       <AuthProvider>
         <PaymentProvider>
           <RecoilRoot>
@@ -54,8 +67,9 @@ function MyApp({ Component, pageProps }) {
           </RecoilRoot>
         </PaymentProvider>
       </AuthProvider>
-    );
-  }
+    </>
+  );
+}
 // }
 
 export default MyApp;
