@@ -10,6 +10,7 @@ import { useWindowSize } from "react-use";
 import { analytics } from "../config/firebase-config";
 import { useRouter } from "next/router";
 import Script from "next/script";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
 function MyApp({ Component, pageProps }) {
   const routers = useRouter();
@@ -63,7 +64,17 @@ function MyApp({ Component, pageProps }) {
       <AuthProvider>
         <PaymentProvider>
           <RecoilRoot>
-            <Component {...pageProps} />
+            <GoogleReCaptchaProvider
+              reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+              scriptProps={{
+                async: false, // optional, default to false,
+                defer: true, // optional, default to false
+                appendTo: "body", // optional, default to "head", can be "head" or "body",
+                nonce: undefined,
+              }}
+            >
+              <Component {...pageProps} />
+            </GoogleReCaptchaProvider>
           </RecoilRoot>
         </PaymentProvider>
       </AuthProvider>

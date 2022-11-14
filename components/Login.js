@@ -11,12 +11,15 @@ import { db } from "../config/firebase-config";
 import { useAuth } from "../contexts/AuthContext";
 // import { usePaymentConfirm } from "../contexts/PaymentContext";
 
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+
 const { Title, Text } = Typography;
 
 const Login = () => {
   const router = useRouter();
   const {user} = useAuth();
   const { type, product } = router.query;
+  const { executeRecaptcha } = useGoogleReCaptcha();
   // const paid = usePaymentConfirm();
 
   useEffect(() => {
@@ -25,54 +28,70 @@ const Login = () => {
     }
   }, [])
 
-  const handleOnClick = (provider) => {
-    
-    try {
-      auth.signInWithPopup(provider).then(async (res) => {
-        var user = res.user;
-        console.log(res);
-        // Adding user to a product team
-        if (type && product) {
-          await db.collection("teams").add({
-            user: {
-              uid: user.uid,
-              email: user.email,
-              name: user.displayName,
-              avatar: user.photoURL,
-            },
-            expiry: "unlimited",
-            type: type,
-            product_id: product,
-          });
-        }
+  const handleOnClick = async (provider) => {
 
-        // Checking if user is new
-        if (res.additionalUserInfo.isNewUser) {
-          // if user has a company custom email
-          if (!/@gmail.com\s*$/.test(user.email)) {
-            router.push("/enterprise-contact");
-          } else {
-            message.success({
-              content: "Successfully logged in",
-              className: "custom-message",
-            });
-            router.push("/loginsuccess");
-          }
-        } else {
-          message.success({
-            content: "Successfully logged in",
-            className: "custom-message",
-          });
-          router.push("/dashboard");
-        }
-      });
-    } catch (error) {
-      console.log(error.message);
-      message.error({
-        content: "An error occurred while trying to log you in",
-        className: "custom-message",
-      });
+    if (!executeRecaptcha) {
+      return;
     }
+
+    try {
+      const token = await executeRecaptcha();
+      if (!token) {
+        message.error("Failed to Sign in!!!")
+        return;
+      }
+      console.log(token);
+    } catch (error) {
+      console.log("Error", error)
+    }
+
+    
+    // try {
+    //   auth.signInWithPopup(provider).then(async (res) => {
+    //     var user = res.user;
+    //     console.log(res);
+    //     // Adding user to a product team
+    //     if (type && product) {
+    //       await db.collection("teams").add({
+    //         user: {
+    //           uid: user.uid,
+    //           email: user.email,
+    //           name: user.displayName,
+    //           avatar: user.photoURL,
+    //         },
+    //         expiry: "unlimited",
+    //         type: type,
+    //         product_id: product,
+    //       });
+    //     }
+
+    //     // Checking if user is new
+    //     if (res.additionalUserInfo.isNewUser) {
+    //       // if user has a company custom email
+    //       if (!/@gmail.com\s*$/.test(user.email)) {
+    //         router.push("/enterprise-contact");
+    //       } else {
+    //         message.success({
+    //           content: "Successfully logged in",
+    //           className: "custom-message",
+    //         });
+    //         router.push("/loginsuccess");
+    //       }
+    //     } else {
+    //       message.success({
+    //         content: "Successfully logged in",
+    //         className: "custom-message",
+    //       });
+    //       router.push("/dashboard");
+    //     }
+    //   });
+    // } catch (error) {
+    //   console.log(error.message);
+    //   message.error({
+    //     content: "An error occurred while trying to log you in",
+    //     className: "custom-message",
+    //   });
+    // }
   };
 
   return (
