@@ -162,7 +162,7 @@ function Home() {
         src="https://cdn.weglot.com/weglot.min.js"
         onLoad={() => {
           Weglot.initialize({
-            api_key: "wg_22f9b5a096e59c4526f1da3019b8e63a9",
+            api_key: process.env.NEXT_PUBLIC_WEGLOT_API_KEY,
           });
         }}
       />

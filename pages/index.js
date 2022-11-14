@@ -23,6 +23,7 @@ import React from "react";
 import Head from "next/head";
 import Layout from "../components/Layout";
 import Login from "../components/Login";
+import Script from "next/script";
 
 const login = () => {
   return (
@@ -31,6 +32,17 @@ const login = () => {
         <title>Login | Sprint Zero</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <Script
+        async
+        type="text/javascript"
+        src="https://cdn.weglot.com/weglot.min.js"
+        onLoad={() => {
+          Weglot.initialize({
+            api_key: process.env.NEXT_PUBLIC_WEGLOT_API_KEY,
+          });
+        }}
+      />
 
       <Layout>
         <Login />
