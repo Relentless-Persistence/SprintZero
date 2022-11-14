@@ -12,12 +12,13 @@ import { useAuth } from "../contexts/AuthContext";
 // import { usePaymentConfirm } from "../contexts/PaymentContext";
 
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import axios from "axios";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
   const router = useRouter();
-  const {user} = useAuth();
+  const { user } = useAuth();
   const { type, product } = router.query;
   const { executeRecaptcha } = useGoogleReCaptcha();
   // const paid = usePaymentConfirm();
@@ -26,10 +27,9 @@ const Login = () => {
     if (user) {
       router.push("/dashboard");
     }
-  }, [])
+  }, []);
 
   const handleOnClick = async (provider) => {
-
     if (!executeRecaptcha) {
       return;
     }
@@ -37,61 +37,66 @@ const Login = () => {
     try {
       const token = await executeRecaptcha();
       if (!token) {
-        message.error("Failed to Sign in!!!")
+        message.error("Failed to Sign in!!!");
         return;
       }
-      console.log(token);
+      // console.log(token);
+
+      const result = await axios.post("/api/verifyRecaptcha", {
+        token,
+      });
+
+      if (result.data) {
+        try {
+          auth.signInWithPopup(provider).then(async (res) => {
+            var user = res.user;
+            console.log(res);
+            // Adding user to a product team
+            if (type && product) {
+              await db.collection("teams").add({
+                user: {
+                  uid: user.uid,
+                  email: user.email,
+                  name: user.displayName,
+                  avatar: user.photoURL,
+                },
+                expiry: "unlimited",
+                type: type,
+                product_id: product,
+              });
+            }
+
+            // Checking if user is new
+            if (res.additionalUserInfo.isNewUser) {
+              // if user has a company custom email
+              if (!/@gmail.com\s*$/.test(user.email)) {
+                router.push("/enterprise-contact");
+              } else {
+                message.success({
+                  content: "Successfully logged in",
+                  className: "custom-message",
+                });
+                router.push("/loginsuccess");
+              }
+            } else {
+              message.success({
+                content: "Successfully logged in",
+                className: "custom-message",
+              });
+              router.push("/dashboard");
+            }
+          });
+        } catch (error) {
+          console.log(error.message);
+          message.error({
+            content: "An error occurred while trying to log you in",
+            className: "custom-message",
+          });
+        }
+      }
     } catch (error) {
-      console.log("Error", error)
+      console.log("Error", error);
     }
-
-    
-    // try {
-    //   auth.signInWithPopup(provider).then(async (res) => {
-    //     var user = res.user;
-    //     console.log(res);
-    //     // Adding user to a product team
-    //     if (type && product) {
-    //       await db.collection("teams").add({
-    //         user: {
-    //           uid: user.uid,
-    //           email: user.email,
-    //           name: user.displayName,
-    //           avatar: user.photoURL,
-    //         },
-    //         expiry: "unlimited",
-    //         type: type,
-    //         product_id: product,
-    //       });
-    //     }
-
-    //     // Checking if user is new
-    //     if (res.additionalUserInfo.isNewUser) {
-    //       // if user has a company custom email
-    //       if (!/@gmail.com\s*$/.test(user.email)) {
-    //         router.push("/enterprise-contact");
-    //       } else {
-    //         message.success({
-    //           content: "Successfully logged in",
-    //           className: "custom-message",
-    //         });
-    //         router.push("/loginsuccess");
-    //       }
-    //     } else {
-    //       message.success({
-    //         content: "Successfully logged in",
-    //         className: "custom-message",
-    //       });
-    //       router.push("/dashboard");
-    //     }
-    //   });
-    // } catch (error) {
-    //   console.log(error.message);
-    //   message.error({
-    //     content: "An error occurred while trying to log you in",
-    //     className: "custom-message",
-    //   });
-    // }
   };
 
   return (
