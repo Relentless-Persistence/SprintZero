@@ -29,68 +29,52 @@ const Login = () => {
     }
   }, [user]);
 
-  const handleOnClick = async (provider) => {
-    // if (!executeRecaptcha) {
-    //   return;
-    // }
-    console.log("I am alive")
-
-    if(executeRecaptcha) {
-      try {
-        const token = await executeRecaptcha();
-        if (!token) {
-          message.error("Failed to Sign in!!!");
-          return;
-        }
-        console.log(token);
-
-        const result = await axios.post("/api/verifyRecaptcha", {
-          token,
-        });
-
-        if (result.data === true) {
-          auth.signInWithPopup(provider).then(async (res) => {
-            var user = res.user;
-            console.log("This also works")
-            // Adding user to a product team
-            if (type && product) {
-              await db.collection("teams").add({
-                user: {
-                  uid: user.uid,
-                  email: user.email,
-                  name: user.displayName,
-                  avatar: user.photoURL,
-                },
-                expiry: "unlimited",
-                type: type,
-                product_id: product,
-              });
-            }
-
-            // Checking if user is new
-            if (res.additionalUserInfo.isNewUser) {
-              // if user has a company custom email
-              if (!/@gmail.com\s*$/.test(user.email)) {
-                router.push("/enterprise-contact");
-              } else {
-                message.success({
-                  content: "Successfully logged in",
-                  className: "custom-message",
-                });
-                router.push("/loginsuccess");
-              }
-            } else {
-              message.success({
-                content: "Successfully logged in",
-                className: "custom-message",
-              });
-              router.push("/dashboard");
-            }
+  const handleOnClick = (provider) => {
+    try {
+      auth.signInWithPopup(provider).then(async (res) => {
+        var user = res.user;
+        console.log(res);
+        // Adding user to a product team
+        if (type && product) {
+          await db.collection("teams").add({
+            user: {
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName,
+              avatar: user.photoURL,
+            },
+            expiry: "unlimited",
+            type: type,
+            product_id: product,
           });
         }
-      } catch (error) {
-        console.log("Error", error);
-      }
+
+        // Checking if user is new
+        if (res.additionalUserInfo.isNewUser) {
+          // if user has a company custom email
+          if (!/@gmail.com\s*$/.test(user.email)) {
+            router.push("/enterprise-contact");
+          } else {
+            message.success({
+              content: "Successfully logged in",
+              className: "custom-message",
+            });
+            router.push("/loginsuccess");
+          }
+        } else {
+          message.success({
+            content: "Successfully logged in",
+            className: "custom-message",
+          });
+          router.push("/dashboard");
+        }
+      });
+    } catch (error) {
+      console.log(error.message);
+      message.error({
+        content: "An error occurred while trying to log you in",
+        className: "custom-message",
+      });
     }
   };
 
