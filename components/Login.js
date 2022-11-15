@@ -27,30 +27,31 @@ const Login = () => {
     if (user) {
       router.push("/dashboard");
     }
-  }, []);
+  }, [user]);
 
   const handleOnClick = async (provider) => {
-    if (!executeRecaptcha) {
-      return;
-    }
+    // if (!executeRecaptcha) {
+    //   return;
+    // }
+    console.log("I am alive")
 
-    try {
-      const token = await executeRecaptcha();
-      if (!token) {
-        message.error("Failed to Sign in!!!");
-        return;
-      }
-      // console.log(token);
+    if(executeRecaptcha) {
+      try {
+        const token = await executeRecaptcha();
+        if (!token) {
+          message.error("Failed to Sign in!!!");
+          return;
+        }
+        console.log(token);
 
-      const result = await axios.post("/api/verifyRecaptcha", {
-        token,
-      });
+        const result = await axios.post("/api/verifyRecaptcha", {
+          token,
+        });
 
-      if (result.data) {
-        try {
+        if (result.data === true) {
           auth.signInWithPopup(provider).then(async (res) => {
             var user = res.user;
-            console.log(res);
+            console.log("This also works")
             // Adding user to a product team
             if (type && product) {
               await db.collection("teams").add({
@@ -86,16 +87,10 @@ const Login = () => {
               router.push("/dashboard");
             }
           });
-        } catch (error) {
-          console.log(error.message);
-          message.error({
-            content: "An error occurred while trying to log you in",
-            className: "custom-message",
-          });
         }
+      } catch (error) {
+        console.log("Error", error);
       }
-    } catch (error) {
-      console.log("Error", error);
     }
   };
 
