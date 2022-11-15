@@ -1,0 +1,3 @@
+      steps:
+      - name: gcr.io/velvety-tube-328418/firebase
+        args: ['deploy', '--project=sprintzero-657f3', '--only=hosting']
