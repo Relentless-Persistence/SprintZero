@@ -19,11 +19,12 @@ import {
   AddNote,
   EditNote,
 } from "../../../components/Dashboard/Dialogue";
-import CardHeaderButton from "../../../components/Dashboard/CardHeaderButton";
+import {CardHeaderLink} from "../../../components/Dashboard/CardHeaderButton";
 import { db } from "../../../config/firebase-config";
 import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
+import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 
 const getRightNav = (data) => {
   return data.map((d) => d.title);
@@ -181,9 +182,9 @@ export default function Dialogue() {
         </Row>
 
         {dialogue && (
-          <Drawer
+          <ResizeableDrawer
             height={height}
-            forceRender={true}
+            // forceRender={true}
             destroyOnClose={true}
             placement={"bottom"}
             closable={false}
@@ -193,20 +194,17 @@ export default function Dialogue() {
             visible={visible}
             onClose={() => setVisible(false)}
             title={
-              <Row>
-                <Col span={23}>
-                  <>
-                    <span>{dialogue?.name}</span>
-                    &nbsp;
-                    <CardHeaderButton
-                      className="!bg-transparent border-[#4A801D]"
-                      onClick={openEdit}
-                    >
-                      Edit
-                    </CardHeaderButton>
-                  </>
+              <Row gutter={[16, 16]}>
+                <Col span={12} className="flex items-center space-x-[12px]">
+                  <h3 className="text-[16px] text-[#262626] font-semibold">
+                    {dialogue?.name}
+                  </h3>
+
+                  <button className="text-[#396417] text-sm" onClick={openEdit}>
+                    Edit
+                  </button>
                 </Col>
-                <Col span={1}>
+                <Col span={12} className="flex items-center justify-end">
                   <CloseOutlined
                     color="#A6AE9D"
                     onClick={() => setVisible(false)}
@@ -262,7 +260,7 @@ export default function Dialogue() {
                 </div>
               </Col>
             </Row>
-          </Drawer>
+          </ResizeableDrawer>
         )}
 
         {dialogue && (

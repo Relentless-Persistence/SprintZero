@@ -128,21 +128,17 @@ const EditNote = ({
       onClose={onClose}
       title={
         <Row>
-          <Col span={10}>
+          <Col span={12}>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </Col>
-          <Col offset={13} span={1}>
-            <ActionButtons
-              className="justify-end"
-              onCancel={onClose}
-              onSubmit={updateDialogue}
-            />
+          <Col span={12} className="flex items-center justify-end">
+            <ActionButtons onCancel={onClose} onSubmit={updateDialogue} />
           </Col>
         </Row>
       }
     >
       <Row gutter={[20, 20]}>
-        <Col span={16}>
+        <Col span={18}>
           <p>
             <strong>Notes</strong>
           </p>
@@ -170,22 +166,22 @@ const EditNote = ({
             ))}
 
             <Button
-              className="text-[#4A801D] border-[#4A801D]"
+              className="text-[#4A801D] text-[16px] font-semibold border-[2px] border-[#4A801D] rounded-[2px]"
               onClick={() => add()}
+              size="large"
             >
-              Add More
+              Add Response
             </Button>
           </div>
         </Col>
-
-        <Col offset={3} span={4}>
-          <div className="mb-3">
+        <Col offset={2} span={4} className="-mt-3">
+          <div className="mb-3 text-right">
             <Title className="text-right">Stage</Title>
             <Select
               disabled
               defaultValue={dialogue.type}
               onChange={(value) => setType(value)}
-              className="w-full"
+              className="max-w-fit"
             ></Select>
           </div>
 
