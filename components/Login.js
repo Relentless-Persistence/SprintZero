@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-// import Image from "next/image";
-import { Button, Typography, message, Image } from "antd";
+import Image from "next/image";
+import { Button, Typography, message } from "antd";
 import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
-import { googleProvider } from "../config/authMethods";
+import { googleProvider, microsoftProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
 import { auth } from "../config/firebase-config";
 import { db } from "../config/firebase-config";
@@ -91,8 +91,33 @@ const Login = () => {
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center mt-10">
+      <div className="flex flex-col items-center justify-center space-y-[42px] mt-10">
         <button
+          className="flex items-center justify-center space-x-[8px] bg-white w-[220px] h-[50.32px] text-[#595959] text-[16px] rounded-[2px] googleBtn"
+          onClick={() => handleOnClick(googleProvider)}
+        >
+          <Image
+            src="/images/googleIcon.png"
+            alt="microsoft"
+            width={34.32}
+            height={34.32}
+          />
+          <p>Sign in with Google</p>
+        </button>
+
+        <button
+          className="flex items-center justify-center space-x-[8px] bg-white w-[220px] h-[50.32px] text-[#595959] text-[16px] rounded-[2px] googleBtn"
+          onClick={() => handleOnClick(microsoftProvider)}
+        >
+          <Image
+            src="/images/microsoftIcon.png"
+            alt="microsoft"
+            width={34.32}
+            height={34.32}
+          />
+          <p>Sign in with Microsoft</p>
+        </button>
+        {/* <button
           className="googleBtn flex items-center m-10"
           onClick={() => handleOnClick(googleProvider)}
         >
@@ -104,14 +129,14 @@ const Login = () => {
             preview={false}
           />
           <span style={{ marginLeft: "15px" }}>Sign in with Google</span>
-        </button>
+        </button> */}
         {/* <button
           className="microsoft flex items-center"
           onClick={() => handleOnClick(microsoftProvider)}
         >
           <Image
             src="https://docs.microsoft.com/en-us/azure/active-directory/develop/media/howto-add-branding-in-azure-ad-apps/ms-symbollockup_mssymbol_19.svg"
-            alt="microsoft"
+            alt="microsoft" 
             width={24}
             height={24}
           />
