@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import Image from "next/image";
-import { Button, Typography, message } from "antd";
+// import Image from "next/image";
+import { Button, Typography, message, Image } from "antd";
 import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
 import { googleProvider, microsoftProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
@@ -101,6 +101,7 @@ const Login = () => {
             alt="microsoft"
             width={34.32}
             height={34.32}
+            preview={false}
           />
           <p>Sign in with Google</p>
         </button>
@@ -114,6 +115,7 @@ const Login = () => {
             alt="microsoft"
             width={34.32}
             height={34.32}
+            preview={false}
           />
           <p>Sign in with Microsoft</p>
         </button>
