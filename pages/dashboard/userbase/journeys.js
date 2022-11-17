@@ -250,7 +250,7 @@ export default function Journeys() {
       <Head>
         <title>Dashboard | Sprint Zero</title>
         <meta name="description" content="Sprint Zero journey" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.ico" />                         
       </Head>
 
       <AppLayout
@@ -329,7 +329,10 @@ export default function Journeys() {
         ) : (
           <>
             {activeJourney && events && (
-              <Chart journey={activeJourney} events={events} />
+              <Chart
+                journey={activeJourney}
+                events={events}
+              />
             )}
 
             {/* {!activeJourney?.start ||

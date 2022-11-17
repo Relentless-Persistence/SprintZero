@@ -11,12 +11,15 @@ import {
   DatePicker,
   TimePicker,
   Drawer,
+  Button,
+  message,
 } from "antd";
 import { Title } from "../SectionTitle";
 import ActionButtons from "../../Personas/ActionButtons";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 
 import { add, isWithinInterval } from "../../../utils";
+import { db } from "../../../config/firebase-config";
 
 const { TextArea } = Input;
 
@@ -68,17 +71,17 @@ const init = {
 const capitalize = (text) =>
   `${text[0]?.toUpperCase()}${text?.substring(1).toLowerCase()}`;
 
-const AddEvent = ({
-  onAdd,
-  onCancel,
-  journeyType,
+const EditEvent = ({
+  event,
+  editEvent,
+  setEditEvent,
   journeyStart,
   journeyDur,
-  showDrawer,
-  personas
+  journeyType,
 }) => {
-  const [evt, setEvt] = useState({ ...init, participants: personas });
-  const [participants, setParticipants] = useState([])
+  console.log("event", event);
+  const [evt, setEvt] = useState({ ...event });
+  const [participants, setParticipants] = useState([]);
 
   const validateEvtDur = (start, end) => {
     if (start && end) {
@@ -87,25 +90,21 @@ const AddEvent = ({
       const jEnd = add(jStart, {
         [`${[journeyType]}s`]: journeyDur,
       });
-
       const validStart = isWithinInterval(new Date(start), {
         start: jStart,
         end: jEnd,
       });
-
       const validEnd = isWithinInterval(new Date(end), {
         start: jStart,
         end: jEnd,
       });
-
       return validStart && validEnd;
     }
-
     return false;
   };
 
   const handleNameChange = (e) => {
-    const name = capitalize(e.target.name)
+    const name = capitalize(e.target.name);
     setEvt({ ...evt, title: name });
   };
 
@@ -118,7 +117,6 @@ const AddEvent = ({
     if (dateTime) {
       time = new Date(dateTime._d).toISOString();
     }
-
     setEvt({ ...evt, [field]: time });
   };
 
@@ -131,12 +129,12 @@ const AddEvent = ({
   };
 
   const handleParticipants = (i) => {
-    let newPersonas = evt.participants
+    let newPersonas = evt.participants;
     newPersonas[i].checked = !newPersonas[i].checked;
     setEvt({ ...evt, participants: newPersonas });
-  }
+  };
 
-  const addNewEvent = () => {
+  const updateEvent = () => {
     const newEvt = {
       ...evt,
       isDelighted: !!+evt.isDelighted,
@@ -158,20 +156,25 @@ const AddEvent = ({
     }
 
     if (isValid) {
-      onAdd(newEvt);
-      setEvt({ ...init });
+      db.collection("journeyEvents").doc(event.id)
+      .update(evt)
+      .then(() => message.success("Event updated!"))
+      setEditEvent(false);
+      setEvt(null);
     } else {
       alert("Please fill all fields");
     }
   };
 
-  const renderPicker = (field) => {
+  const renderPicker = (field, time) => {
     switch (journeyType) {
       case "year":
         return (
           <DatePicker
             picker="year"
             onChange={(dateTime) => handleTimeChange(field, dateTime)}
+            defaultValue={moment(new Date(time), "YYYY")}
+            format={"YYYY"}
           />
         );
 
@@ -180,6 +183,8 @@ const AddEvent = ({
           <DatePicker
             picker="month"
             onChange={(dateTime) => handleTimeChange(field, dateTime)}
+            defaultValue={moment(new Date(time), "MM/YYYY")}
+            format={"MM/YYYY"}
           />
         );
 
@@ -189,6 +194,8 @@ const AddEvent = ({
         return (
           <TimePicker
             onChange={(dateTime) => handleTimeChange(field, dateTime)}
+            defaultValue={moment(time, "HH:mm:ss")}
+            format={"HH:mm:ss"}
           />
         );
 
@@ -196,9 +203,16 @@ const AddEvent = ({
         return (
           <DatePicker
             onChange={(dateTime) => handleTimeChange(field, dateTime)}
+            defaultValue={moment(new Date(time), "DD/MM/YYYY")}
+            format={"DD/MM/YYYY"}
           />
         );
     }
+  };
+
+  const onDelete = () => {
+    db.collection("journeyEvents").doc(event.id).delete();
+    setEditEvent(false);
   };
 
   return (
@@ -206,19 +220,29 @@ const AddEvent = ({
       destroyOnClose={true}
       title={
         <Row>
-          <Col span={12}>
+          <Col span={12} className="flex items-center space-x-4">
             <h1 className="font-[600] font[#262626] font-[20px] leading-[28px]">
               Touchpoint
             </h1>
+            <Button
+              size="small"
+              className="bg-[#FF4D4F] hover:bg-[#FF4D4F] text-white hover:border-none hover:text-white"
+              onClick={onDelete}
+            >
+              Delete
+            </Button>
           </Col>
           <Col span={12} className="flex items-center justify-end">
-            <ActionButtons onCancel={onCancel} onSubmit={addNewEvent} />
+            <ActionButtons
+              onCancel={() => setEditEvent(false)}
+              onSubmit={updateEvent}
+            />
           </Col>
         </Row>
       }
       placement={"bottom"}
       closable={false}
-      visible={showDrawer}
+      visible={editEvent}
       headerStyle={{
         background: "#F5F5F5",
       }}
@@ -248,13 +272,13 @@ const AddEvent = ({
             <div className="mr-[8px]">
               <Title className="mb-[8px]">Start</Title>
 
-              {renderPicker("start")}
+              {renderPicker("start", evt.start)}
             </div>
 
             <div>
               <Title className="mb-[8px]">End</Title>
 
-              {renderPicker("end")}
+              {renderPicker("end", evt.end)}
             </div>
           </div>
 
@@ -266,10 +290,10 @@ const AddEvent = ({
             value={evt.isDelighted}
             buttonStyle="solid"
           >
-            <Radio.Button size="small" value="0">
+            <Radio.Button size="small" value={false}>
               Frustrated
             </Radio.Button>
-            <Radio.Button size="small" value="1">
+            <Radio.Button size="small" value={true}>
               Delighted
             </Radio.Button>
           </MyRadioBtns>
@@ -301,6 +325,7 @@ const AddEvent = ({
                 className={`${
                   e.checked ? "bg-[#4A801D]" : "bg-[#BFBFBF]"
                 } mr-[8px]`}
+                checked={e.checked}
               />
               <p>{e.label}</p>
             </div>
@@ -311,4 +336,4 @@ const AddEvent = ({
   );
 };
 
-export default AddEvent;
+export default EditEvent;
