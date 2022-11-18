@@ -3,7 +3,7 @@ import React, { useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 // import Image from "next/image";
 import { Button, Typography, message, Image } from "antd";
-import { GoogleOutlined, WindowsFilled } from "@ant-design/icons";
+import { GoogleOutlined, WindowsFilled, AppleFilled } from "@ant-design/icons";
 import { googleProvider, microsoftProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
 import { auth } from "../config/firebase-config";
@@ -92,33 +92,40 @@ const Login = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center space-y-[42px] mt-10">
-        <button
-          className="flex items-center justify-center space-x-[8px] bg-white w-[220px] h-[50.32px] text-[#595959] text-[16px] rounded-[2px] googleBtn"
+        <Button
+          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
+          onClick={() => handleOnClick(googleProvider)}
+          icon={<AppleFilled style={{ fontSize: "20px", marginTop: "-5px" }} />}
+        >
+          <p>Sign in with Apple</p>
+        </Button>
+        <Button
+          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
           onClick={() => handleOnClick(googleProvider)}
         >
           <Image
             src="/images/googleIcon.png"
-            alt="microsoft"
-            width={34.32}
-            height={34.32}
+            alt="google"
+            width={23}
+            height={23}
             preview={false}
           />
           <p>Sign in with Google</p>
-        </button>
+        </Button>
 
-        <button
-          className="flex items-center justify-center space-x-[8px] bg-white w-[220px] h-[50.32px] text-[#595959] text-[16px] rounded-[2px] googleBtn"
+        <Button
+          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
           onClick={() => handleOnClick(microsoftProvider)}
         >
           <Image
             src="/images/microsoftIcon.png"
             alt="microsoft"
-            width={34.32}
-            height={34.32}
+            width={24}
+            height={24}
             preview={false}
           />
           <p>Sign in with Microsoft</p>
-        </button>
+        </Button>
         {/* <button
           className="googleBtn flex items-center m-10"
           onClick={() => handleOnClick(googleProvider)}
@@ -145,8 +152,8 @@ const Login = () => {
           <span style={{ marginLeft: "15px" }}>Sign in with Microsoft</span>
         </button> */}
       </div>
-      <div className="absolute bottom-20 lg:left-80">
-        <Button onClick={() => router.push("/")}>Go Back</Button>
+      <div className="absolute bottom-20 lg:right-80">
+        <Button onClick={() => router.push("/")}>Cancel</Button>
       </div>
     </>
   );
