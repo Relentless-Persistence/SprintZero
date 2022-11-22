@@ -45,7 +45,7 @@ const AddNote = (
         onSubmit,
         height = 378
     }
-) => 
+) =>
 {
     const ref = useRef();
     const [ item, setItem ] = useState( { ...init } );
@@ -91,7 +91,7 @@ const AddNote = (
 
     };
 
-    const handleFinish = () => 
+    const handleFinish = () =>
     {
         const filteredNotes = item.notes.filter( it =>
         {
@@ -137,25 +137,19 @@ const AddNote = (
             } }
             onClose={ onClose }
             title={
-                <Row>
-                    <Col span={ 10 }>
-                        <Input
-                            value={ item.name }
-                            placeholder="John Doe"
-                            onChange={ handleName }
-                        />
-
-                    </Col>
-                    <Col
-                        offset={ 13 }
-                        span={ 1 }>
-                        <ActionButtons
-                            className="justify-end"
-                            onCancel={ onClose }
-                            onSubmit={ handleFinish }
-                        />
-                    </Col>
-                </Row>
+                <div className="flex gap-4 justify-between">
+                    <Input
+                        value={ item.name }
+                        placeholder="John Doe"
+                        onChange={ handleName }
+                        className="max-w-sm"
+                    />
+                    <ActionButtons
+                        className="justify-end"
+                        onCancel={ onClose }
+                        onSubmit={ handleFinish }
+                    />
+                </div>
             }
         >
 
