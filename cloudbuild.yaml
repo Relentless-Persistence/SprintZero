@@ -1,3 +1,7 @@
-      steps:
-      - name: gcr.io/sprintzero-657f3/firebase
-        args: ['deploy', '--project=sprintzero-657f3', '--only=hosting']
+steps:
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['ci']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'export']
