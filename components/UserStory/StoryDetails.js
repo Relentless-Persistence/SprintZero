@@ -30,6 +30,8 @@ import AppCheckbox from "../AppCheckbox";
 import RadioButton from "../AppRadioBtn";
 import StoryComments from "./StoryComments";
 import { useAuth } from "../../contexts/AuthContext";
+import { activeProductState } from "../../atoms/productAtom";
+import { useRecoilValue } from "recoil";
 
 const Story = styled.p`
   padding: 12px 19px;
@@ -68,6 +70,7 @@ const StoryDetails = ({
   handleChangeStory,
 }) => {
   const { user } = useAuth();
+  const activeProduct = useRecoilValue(activeProductState);
   const [commentType, setCommentType] = useState("design");
   const [comments, setComments] = useState(null);
   const [comment, setComment] = useState("");
@@ -105,6 +108,7 @@ const StoryDetails = ({
       comment: comment,
       type: commentType,
       createdAt: serverTimestamp,
+      product_id: activeProduct.id,
     };
     db.collection("storiesComments")
       .add(data)

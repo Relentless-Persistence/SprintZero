@@ -92,13 +92,13 @@ const Login = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center space-y-[42px] mt-10">
-        <Button
+        {/* <Button
           className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
           onClick={() => handleOnClick(googleProvider)}
           icon={<AppleFilled style={{ fontSize: "20px", marginTop: "-5px" }} />}
         >
           <p>Sign in with Apple</p>
-        </Button>
+        </Button> */}
         <Button
           className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
           onClick={() => handleOnClick(googleProvider)}

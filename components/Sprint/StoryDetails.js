@@ -167,6 +167,7 @@ const StoryDetails = ({
       comment: comment,
       type: commentType,
       createdAt: serverTimestamp,
+      product_id: activeProduct.id
     };
     db.collection("storiesComments")
       .add(data)
