@@ -42,7 +42,7 @@ const CustomHeader = styled(Header)`
 
 const AppHeader = ({ onChangeProduct }) => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [products, setProducts] = useRecoilState(productsState);
   const [activeProduct, setActiveProduct] = useRecoilState(activeProductState);
   const [settingsMenuDrawer, setSettingsMenuDrawer] = useState(false);

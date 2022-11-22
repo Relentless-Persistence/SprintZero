@@ -8,3 +8,4 @@ microsoftProvider.setCustomParameters({
   prompt: "consent",
   tenant: process.env.NEXT_PUBLIC_MICROSOFT_TENANT_ID,
 });
+export const appleProvider = new firebase.auth.OAuthProvider("apple.com");

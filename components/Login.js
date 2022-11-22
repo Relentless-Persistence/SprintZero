@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 // import Image from "next/image";
 import { Button, Typography, message, Image } from "antd";
 import { GoogleOutlined, WindowsFilled, AppleFilled } from "@ant-design/icons";
-import { googleProvider, microsoftProvider } from "../config/authMethods";
+import { googleProvider, microsoftProvider, appleProvider } from "../config/authMethods";
 import SocialMediaAuth from "../service/auth";
 import { auth } from "../config/firebase-config";
 import { db } from "../config/firebase-config";
@@ -92,13 +92,13 @@ const Login = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center space-y-[42px] mt-10">
-        {/* <Button
+        <Button
           className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
-          onClick={() => handleOnClick(googleProvider)}
+          onClick={() => handleOnClick(appleProvider)}
           icon={<AppleFilled style={{ fontSize: "20px", marginTop: "-5px" }} />}
         >
           <p>Sign in with Apple</p>
-        </Button> */}
+        </Button>
         <Button
           className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
           onClick={() => handleOnClick(googleProvider)}

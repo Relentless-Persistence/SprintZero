@@ -50,9 +50,9 @@ function MyApp({ Component, pageProps }) {
   // } else {
   return (
     <>
-      <AuthProvider>
-        <PaymentProvider>
-          <RecoilRoot>
+      <RecoilRoot>
+        <AuthProvider>
+          <PaymentProvider>
             <GoogleReCaptchaProvider
               reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
               scriptProps={{
@@ -64,9 +64,9 @@ function MyApp({ Component, pageProps }) {
             >
               <Component {...pageProps} />
             </GoogleReCaptchaProvider>
-          </RecoilRoot>
-        </PaymentProvider>
-      </AuthProvider>
+          </PaymentProvider>
+        </AuthProvider>
+      </RecoilRoot>
     </>
   );
 }
