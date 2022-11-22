@@ -33,6 +33,7 @@
     "react-draggable": "^4.4.4",
     "react-google-recaptcha-v3": "^1.10.0",
     "react-indiana-drag-scroll": "^2.1.0",
+    "react-is": "^18.2.0",
     "react-masonry-css": "^1.0.16",
     "react-sdndk": "^1.0.2",
     "react-use": "^17.3.2",
