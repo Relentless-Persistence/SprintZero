@@ -114,7 +114,7 @@ const StoryDetails = ({
   fetchSprints,
   activeProduct,
 }) => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const [commentType, setCommentType] = useState("design");
   const [comments, setComments] = useState(null);
   const [comment, setComment] = useState("");
@@ -390,12 +390,14 @@ const StoryDetails = ({
                 </Button>
               </a>
             </Space>
-            <button
-              className="text-[#1890FF]"
-              onClick={() => setEditView(true)}
-            >
-              Edit
-            </button>
+            {userRole && userRole !== "viewer" ? (
+              <button
+                className="text-[#1890FF]"
+                onClick={() => setEditView(true)}
+              >
+                Edit
+              </button>
+            ) : null}
           </Col>
           <Col className="flex items-center justify-end" span={12}>
             <CloseTime>
@@ -427,7 +429,9 @@ const StoryDetails = ({
 
           <TextArea
             value={storyDescription}
-            onChange={(e) => setStoryDescription(e.target.value)}
+            onChange={(e) =>
+              userRole !== "viewer" ? setStoryDescription(e.target.value) : null
+            }
             onKeyPress={updateStoryDescription}
             rows={3}
           />
@@ -440,7 +444,7 @@ const StoryDetails = ({
                 <Col span={8} key={i}>
                   <AppCheckbox
                     checked={d.completed}
-                    onChange={() => checkAcceptanceCriteria(i)}
+                    onChange={() => userRole !== "viewer" ? checkAcceptanceCriteria(i) : null}
                   >
                     <span className={d.completed ? "line-through" : null}>
                       {d.name}
@@ -457,7 +461,7 @@ const StoryDetails = ({
                     onChange={onChange}
                   />
                 </Col>
-              ) : (
+              ) : userRole && userRole !== "viewer" ? (
                 <Col span={8}>
                   <AppCheckbox
                     checked={false}
@@ -466,7 +470,7 @@ const StoryDetails = ({
                     <span className="text-[#BFBFBF]">Add Item</span>
                   </AppCheckbox>
                 </Col>
-              )}
+              ) : null}
             </Row>
           </div>
         </Col>

@@ -5,6 +5,7 @@ import { Button, Card } from "antd";
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
 import FormCard, { ActionFormCard, ObjectiveActionFormCard } from "./FormCard";
 import { CardTitle as Title } from "./CardTitle";
+import { useAuth } from "../../contexts/AuthContext"
 
 const MyCard = styled(Card)`
   .ant-card-head {
@@ -40,6 +41,7 @@ const ItemCard = ({
   index,
   onDelete
 }) => {
+  const { userRole } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
 
   const toggleEdit = () => setIsEdit((s) => !s);
@@ -68,28 +70,34 @@ const ItemCard = ({
   }
 
   return (
-    <Card
-      // $headerSmall={headerSmall}
-      className="mb-[16px] border border-[#D9D9D9]"
-      type="inner"
-      extra={
-        useBtn ? (
-          <CardHeaderButton size="small" onClick={toggleEdit}>
-            {itemBtnText}
-          </CardHeaderButton>
-        ) : (
-          <CardHeaderLink size="small" onClick={toggleEdit}>
-            Edit
-          </CardHeaderLink>
-        )
-      }
-      title={<Title>{item.name || `Result #${index}`}</Title>}
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      <p>{item.description}</p>
-    </Card>
+    <>
+      {userRole && (
+        <Card
+          // $headerSmall={headerSmall}
+          className="mb-[16px] border border-[#D9D9D9]"
+          type="inner"
+          extra={
+            userRole !== "viewer" ? (
+              useBtn ? (
+                <CardHeaderButton size="small" onClick={toggleEdit}>
+                  {itemBtnText}
+                </CardHeaderButton>
+              ) : (
+                <CardHeaderLink size="small" onClick={toggleEdit}>
+                  Edit
+                </CardHeaderLink>
+              )
+            ) : null
+          }
+          title={<Title>{item.name || `Result #${index}`}</Title>}
+          headStyle={{
+            background: "#F5F5F5",
+          }}
+        >
+          <p>{item.description}</p>
+        </Card>
+      )}
+    </>
   );
 };
 
@@ -104,6 +112,8 @@ export const ObjectiveItemCard = ({
   index,
   onDelete,
 }) => {
+  const { userRole } = useAuth();
+  console.log(userRole);
   const [isEdit, setIsEdit] = useState(false);
 
   const toggleEdit = () => setIsEdit((s) => !s);
@@ -132,28 +142,34 @@ export const ObjectiveItemCard = ({
   }
 
   return (
-    <Card
-      // $headerSmall={headerSmall}
-      className="mb-[16px] border border-[#D9D9D9]"
-      type="inner"
-      extra={
-        useBtn ? (
-          <CardHeaderButton size="small" onClick={toggleEdit}>
-            {itemBtnText}
-          </CardHeaderButton>
-        ) : (
-          <CardHeaderLink size="small" onClick={toggleEdit}>
-            Edit
-          </CardHeaderLink>
-        )
-      }
-      title={<Title>{item.name || `Result #${index}`}</Title>}
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      <p>{item.description}</p>
-    </Card>
+    <>
+      {userRole && (
+        <Card
+          // $headerSmall={headerSmall}
+          className="mb-[16px] border border-[#D9D9D9]"
+          type="inner"
+          extra={
+            userRole !== "viewer" ? (
+              useBtn ? (
+                <CardHeaderButton size="small" onClick={toggleEdit}>
+                  {itemBtnText}
+                </CardHeaderButton>
+              ) : (
+                <CardHeaderLink size="small" onClick={toggleEdit}>
+                  Edit
+                </CardHeaderLink>
+              )
+            ) : null
+          }
+          title={<Title>{item.name || `Result #${index}`}</Title>}
+          headStyle={{
+            background: "#F5F5F5",
+          }}
+        >
+          <p>{item.description}</p>
+        </Card>
+      )}
+    </>
   );
 };
 

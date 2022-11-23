@@ -29,6 +29,7 @@ import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
 import { splitRoutes } from "../../../utils";
 import AddEvent from "../../../components/Dashboard/Journeys/AddEvent";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const { Option } = Select;
 
@@ -45,6 +46,7 @@ const capitalize = (text) =>
   `${text[0]?.toUpperCase()}${text?.substring(1).toLowerCase()}`;
 
 export default function Journeys() {
+  const {userRole} = useAuth();
   const { pathname } = useRouter();
   const activeProduct = useRecoilValue(activeProductState);
   // const [activeProduct, setActiveProduct] = useState(products[0]);
@@ -379,7 +381,7 @@ export default function Journeys() {
           </div>
         ) : null} */}
 
-            {personas && activeJourney && (
+            {userRole && userRole !== "viewer" && personas && activeJourney ? (
               <AddEvent
                 onAdd={addEvent}
                 journeyStart={activeJourney?.start}
@@ -389,7 +391,7 @@ export default function Journeys() {
                 showDrawer={showDrawer}
                 personas={personas}
               />
-            )}
+            ) : "Not Authorized"}
           </>
         )}
       </AppLayout>

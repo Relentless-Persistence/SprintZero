@@ -11,6 +11,7 @@ import { CardHeaderLink } from "../Dashboard/CardHeaderButton";
 import ActionButtons from "./ActionButtons";
 import { db } from "../../config/firebase-config";
 import { capitalize, debounce } from "lodash";
+import { useAuth } from "../../contexts/AuthContext";
 
 const MyInput = styled(Input)`
   .ant-input-group-wrapper {
@@ -50,7 +51,7 @@ const PersonasListCard = ({
   id,
   product
 }) => {
-
+  const { userRole } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
 
   const toggleEdit = () => setIsEdit((s) => !s);
@@ -154,35 +155,41 @@ const PersonasListCard = ({
       ))}
     </MyCard>
   ) : (
-    <MyCard
-      className="border-2 border-[#D9D9D9]"
-      extra={
-        <CardHeaderLink size="small" onClick={toggleEdit}>
-          Edit
-        </CardHeaderLink>
-      }
-      title={<strong>{title}</strong>}
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      <OL>
-        {cardData.length < 1 ? (
-          <p>
-            No{" "}
-            <span
-              className="cursor-pointer font-semibold"
-              onClick={() => setIsEdit(true)}
-            >
-              {title}
-            </span>{" "}
-            Added Yet
-          </p>
-        ) : (
-          cardData.map((item, i) => <li key={i}>{item.role}</li>)
-        )}
-      </OL>
-    </MyCard>
+    <>
+      {userRole && (
+        <MyCard
+          className="border-2 border-[#D9D9D9]"
+          extra={
+            userRole !== "viewer" ? (
+              <CardHeaderLink size="small" onClick={toggleEdit}>
+                Edit
+              </CardHeaderLink>
+            ) : null
+          }
+          title={<strong>{title}</strong>}
+          headStyle={{
+            background: "#F5F5F5",
+          }}
+        >
+          <OL>
+            {cardData.length < 1 ? (
+              <p>
+                No{" "}
+                <span
+                  className="cursor-pointer font-semibold"
+                  onClick={() => setIsEdit(true)}
+                >
+                  {title}
+                </span>{" "}
+                Added Yet
+              </p>
+            ) : (
+              cardData.map((item, i) => <li key={i}>{item.role}</li>)
+            )}
+          </OL>
+        </MyCard>
+      )}
+    </>
   );
 };
 

@@ -2,13 +2,6 @@ import firebase from "firebase";
 import "firebase/analytics"
 
 const firebaseConfig = {
-  // apiKey: "AIzaSyCEIRGjIAhyoIGqSROfEA88ncg4dFuau_k",
-  // authDomain: "sprintzero-657f3.firebaseapp.com",
-  // projectId: "sprintzero-657f3",
-  // storageBucket: "sprintzero-657f3.appspot.com",
-  // messagingSenderId: "561875172363",
-  // appId: "1:561875172363:web:72e83818377f28d8405b0e",
-  // measurementId: "G-JY3X68KTNN"
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,

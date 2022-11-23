@@ -25,6 +25,7 @@ import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const getRightNav = (data) => {
   return data.map((d) => d.title);
@@ -52,6 +53,7 @@ const types = [
 const { Option } = Select;
 
 export default function Dialogue() {
+  const {userRole} = useAuth();
   const { pathname } = useRouter();
 
   const [data, setData] = useState(null);
@@ -200,9 +202,14 @@ export default function Dialogue() {
                     {dialogue?.name}
                   </h3>
 
-                  <button className="text-[#396417] text-sm" onClick={openEdit}>
-                    Edit
-                  </button>
+                  {userRole && userRole !== "viewer" ? (
+                    <button
+                      className="text-[#396417] text-sm"
+                      onClick={openEdit}
+                    >
+                      Edit
+                    </button>
+                  ) : null}
                 </Col>
                 <Col span={12} className="flex items-center justify-end">
                   <CloseOutlined
@@ -233,7 +240,7 @@ export default function Dialogue() {
                   <Title className="text-right">Stage</Title>
                   <Select
                     defaultValue={dialogue.type}
-                    onChange={(value) => updateStage(dialogue.id, value)}
+                    onChange={(value) => userRole && userRole !== "viewer" ? updateStage(dialogue.id, value) : null}
                     className="w-full"
                   >
                     {types.map((type, i) => (

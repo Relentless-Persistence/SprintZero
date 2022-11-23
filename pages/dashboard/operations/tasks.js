@@ -40,6 +40,7 @@ import { useRecoilValue } from "recoil";
 import { findIndex, set } from "lodash";
 import EditTask from "../../../components/Tasks/EditTask";
 import AddTask from "../../../components/Tasks/AddTask";
+import { userRole } from "../../../contexts/AuthContext"
 
 const boards = ["Board 0", "Board 1", "Board 2", "Board 3", "Board 4"];
 
@@ -148,8 +149,6 @@ export default function Tasks() {
   };
 
   const handleDrop = async (card, targetColId) => {
-    console.log("card: ", card);
-    console.log("targetColId: ", targetColId);
 
     const selectedTask = data[card.colId].data[card.id];
     const targetTask = data[targetColId];
@@ -200,8 +199,10 @@ export default function Tasks() {
   };
 
   const selectTask = (task) => {
-    setTask(task)
-    setEditMode(true)
+    if(userRole && userRole !== "viewer") {
+      setTask(task);
+      setEditMode(true);
+    }
   }
 
   return (

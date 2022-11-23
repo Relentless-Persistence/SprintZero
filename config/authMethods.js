@@ -9,3 +9,5 @@ microsoftProvider.setCustomParameters({
   tenant: process.env.NEXT_PUBLIC_MICROSOFT_TENANT_ID,
 });
 export const appleProvider = new firebase.auth.OAuthProvider("apple.com");
+appleProvider.addScope("email");
+appleProvider.addScope("name");

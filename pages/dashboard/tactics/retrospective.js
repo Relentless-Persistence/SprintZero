@@ -62,7 +62,7 @@ const MyCard = styled(Card)`
 `;
 
 export default function Retrospective() {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { pathname } = useRouter();
 
   const activeProduct = useRecoilValue(activeProductState);
@@ -195,7 +195,7 @@ export default function Retrospective() {
                       // description={c.role}
                     />
 
-                    {user.uid === c.user?.id ? (
+                    {userRole && userRole !== "viewer" && user.uid === c.user?.id ? (
                       <CardHeaderLink
                         onClick={() => setActiveEditIndex(i)}
                         className="absolute top-[28px] right-[16px]"
