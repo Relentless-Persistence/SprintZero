@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 import { Card, Button } from "antd";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const StyledCard = styled(Card)`
   box-shadow: ${(props) =>
@@ -39,6 +40,7 @@ const StatementCard = ({
   style,
   isDown,
 }) => {
+  const { userRole } = useAuth();
   const ref = useRef();
   const [trans, setTrans] = useState({});
   useEffect(() => {
@@ -68,9 +70,11 @@ const StatementCard = ({
         type="inner"
         $active={isActive}
         extra={
-          <CardHeaderLink onClick={() => onEditClick(info)}>
-            Edit
-          </CardHeaderLink>
+          userRole && userRole !== "viewer" ? (
+            <CardHeaderLink onClick={() => onEditClick(info)}>
+              Edit
+            </CardHeaderLink>
+          ) : null
         }
         title={
           <CardTitle className="!text-[16px] !leading[24px]">

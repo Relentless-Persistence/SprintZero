@@ -9,6 +9,7 @@ import { OL } from "./NumberList";
 
 import { CardHeaderLink } from "../Dashboard/CardHeaderButton";
 import ActionButtons from "./ActionButtons";
+import { useAuth } from "../../contexts/AuthContext";
 
 const MyInput = styled(Input)`
   .ant-input-group-wrapper {
@@ -42,7 +43,7 @@ const MyCard = styled(Card)`
 `;
 
 const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
-  console.log(title, cardData)
+  const { userRole } = useAuth();
   const [list, setList] = useState(cardData);
 
   const [isEdit, setIsEdit] = useState(false);
@@ -135,35 +136,43 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
         ))}
     </MyCard>
   ) : (
-    <MyCard
-      className="border-2 border-[#D9D9D9]"
-      extra={
-        <CardHeaderLink size="small" onClick={toggleEdit}>
-          Edit
-        </CardHeaderLink>
-      }
-      title={<strong>{title}</strong>}
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      {cardData[0] === "" ? (
-        <p>
-          No{" "}
-          <span
-            className="cursor-pointer font-semibold"
-            onClick={() => onEdit()}
-          >
-            {title}
-          </span>{" "}
-          Added Yet
-        </p>
-      ) : (
-        <OL>
-          {cardData.map((item, i) => <li key={i}>{item}</li>)}
-        </OL>
+    <>
+      {userRole && (
+        <MyCard
+          className="border-2 border-[#D9D9D9]"
+          extra={
+            userRole !== "viewer" ? (
+              <CardHeaderLink size="small" onClick={toggleEdit}>
+                Edit
+              </CardHeaderLink>
+            ) : null
+          }
+          title={<strong>{title}</strong>}
+          headStyle={{
+            background: "#F5F5F5",
+          }}
+        >
+          {cardData[0] === "" ? (
+            <p>
+              No{" "}
+              <span
+                className="cursor-pointer font-semibold"
+                onClick={() => onEdit()}
+              >
+                {title}
+              </span>{" "}
+              Added Yet
+            </p>
+          ) : (
+            <OL>
+              {cardData.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </OL>
+          )}
+        </MyCard>
       )}
-    </MyCard>
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ import { Card, Input, Form, Button } from "antd";
 
 import { CardHeaderLink } from "../Dashboard/CardHeaderButton";
 import ActionButtons from "./ActionButtons";
+import { useAuth } from "../../contexts/AuthContext";
 
 const { TextArea } = Input;
 
@@ -21,6 +22,7 @@ const DescriptionCard = ({
   name = "",
   cardData = [],
 }) => {
+  const { userRole } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
   const [state, setState] = useState(cardData);
 
@@ -64,33 +66,39 @@ const DescriptionCard = ({
   }
 
   return (
-    <MyCard
-      className="border-2 border-[#D9D9D9]"
-      extra={
-        <CardHeaderLink size="small" onClick={toggleEdit}>
-          Edit
-        </CardHeaderLink>
-      }
-      title={<strong>{title}</strong>}
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      {cardData === "" ? (
-        <p>
-          No{" "}
-          <span
-            className="cursor-pointer font-semibold"
-            onClick={() => setIsEdit(true)}
-          >
-            {title}
-          </span>{" "}
-          Added Yet
-        </p>
-      ) : (
-        <p>{cardData}</p>
+    <>
+      {userRole && (
+        <MyCard
+          className="border-2 border-[#D9D9D9]"
+          extra={
+            userRole !== "viewer" ? (
+              <CardHeaderLink size="small" onClick={toggleEdit}>
+                Edit
+              </CardHeaderLink>
+            ) : null
+          }
+          title={<strong>{title}</strong>}
+          headStyle={{
+            background: "#F5F5F5",
+          }}
+        >
+          {cardData === "" ? (
+            <p>
+              No{" "}
+              <span
+                className="cursor-pointer font-semibold"
+                onClick={() => setIsEdit(true)}
+              >
+                {title}
+              </span>{" "}
+              Added Yet
+            </p>
+          ) : (
+            <p>{cardData}</p>
+          )}
+        </MyCard>
       )}
-    </MyCard>
+    </>
   );
 };
 

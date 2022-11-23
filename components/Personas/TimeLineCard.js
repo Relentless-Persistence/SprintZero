@@ -7,6 +7,7 @@ import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 
 import { CardHeaderLink } from "../Dashboard/CardHeaderButton";
 import ActionButtons from "./ActionButtons";
+import { useAuth } from "../../contexts/AuthContext";
 
 const MyCard = styled(Card)`
   .ant-card-head {
@@ -48,6 +49,7 @@ const Remove = styled(Button)`
 `;
 
 const TimeLineCard = ({ handleEdit, title = "Goals", cardData = [] }) => {
+  const { userRole } = useAuth();
   const [list, setList] = useState([...cardData]);
 
   const [isEdit, setIsEdit] = useState(false);
@@ -201,40 +203,52 @@ const TimeLineCard = ({ handleEdit, title = "Goals", cardData = [] }) => {
   }
 
   return (
-    <MyCard
-      className="border-2 border-[#D9D9D9]"
-      extra={<CardHeaderLink onClick={toggleEdit}>Edit</CardHeaderLink>}
-      title={<strong>{title}</strong>}
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      <Timeline>
-        {cardData[0] === "" ? (
-          <p>
-            No{" "}
-            <span
-              className="cursor-pointer font-semibold"
-              onClick={() => setIsEdit(true)}
-            >
-              {title}
-            </span>{" "}
-            Added Yet
-          </p>
-        ) : (
-          cardData.map((item, i) => (
-            <Timeline.Item
-              key={i}
-              color={
-                i === 0 ? "green" : i === cardData.length - 1 ? "black" : "blue"
-              }
-            >
-              <p>{item}</p>
-            </Timeline.Item>
-          ))
-        )}
-      </Timeline>
-    </MyCard>
+    <>
+      {userRole && (
+        <MyCard
+          className="border-2 border-[#D9D9D9]"
+          extra={
+            userRole !== "viewer" ? (
+              <CardHeaderLink onClick={toggleEdit}>Edit</CardHeaderLink>
+            ) : null
+          }
+          title={<strong>{title}</strong>}
+          headStyle={{
+            background: "#F5F5F5",
+          }}
+        >
+          <Timeline>
+            {cardData[0] === "" ? (
+              <p>
+                No{" "}
+                <span
+                  className="cursor-pointer font-semibold"
+                  onClick={() => setIsEdit(true)}
+                >
+                  {title}
+                </span>{" "}
+                Added Yet
+              </p>
+            ) : (
+              cardData.map((item, i) => (
+                <Timeline.Item
+                  key={i}
+                  color={
+                    i === 0
+                      ? "green"
+                      : i === cardData.length - 1
+                      ? "black"
+                      : "blue"
+                  }
+                >
+                  <p>{item}</p>
+                </Timeline.Item>
+              ))
+            )}
+          </Timeline>
+        </MyCard>
+      )}
+    </>
   );
 };
 

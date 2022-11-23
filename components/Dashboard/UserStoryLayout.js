@@ -82,7 +82,7 @@ const AppLayout = ({
   children,
   activeVersionId,
 }) => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const [showSideAdd, setShowSideAdd] = useState(false);
   const [editVersion, setEditVersion] = useState(false);
   const [editedVersion, setEditedVersion] = useState("");
@@ -168,8 +168,8 @@ const AppLayout = ({
               >
                 <Breadcrumb>
                   <Breadcrumb.Item className="capitalize">
-                    <span className="text-[#8C8C8C]">Story Map</span> /{" "} 
-                     {breadCrumbItems}
+                    <span className="text-[#8C8C8C]">Story Map</span> /{" "}
+                    {breadCrumbItems}
                   </Breadcrumb.Item>
 
                   {/* {ignoreLast ? null : (
@@ -181,15 +181,17 @@ const AppLayout = ({
                   )} */}
                 </Breadcrumb>
 
-                <div className="flex justify-between items-center">
-                  {<div>{topExtra}</div>}
+                {userRole && userRole !== "viewer" ? (
+                  <div className="flex justify-between items-center">
+                    {<div>{topExtra}</div>}
 
-                  {hasMainAdd ? (
-                    <AddNew className={addNewClass} onClick={onMainAdd}>
-                      {addNewText}
-                    </AddNew>
-                  ) : null}
-                </div>
+                    {hasMainAdd ? (
+                      <AddNew className={addNewClass} onClick={onMainAdd}>
+                        {addNewText}
+                      </AddNew>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
 
               <Content className={`px-0 pt-[12px] m-0 ${contentClass}`}>
@@ -259,13 +261,19 @@ const AppLayout = ({
                       </Version>
                     ) : null}
 
-                    {hasSideAdd && onSideAddClick ? (
+                    {hasSideAdd &&
+                    onSideAddClick &&
+                    userRole &&
+                    userRole !== "viewer" ? (
                       <Version className="py-[16px] px-[24px]">
                         <AddSide onClick={onSideAddClick}>Add</AddSide>
                       </Version>
                     ) : null}
 
-                    {hasSideAdd && !onSideAddClick ? (
+                    {hasSideAdd &&
+                    !onSideAddClick &&
+                    userRole &&
+                    userRole !== "viewer" ? (
                       <Version className="py-[16px] px-[24px]">
                         <AddSide onClick={toggleSideAdd}>
                           {showSideAdd ? "Close" : "Add"}

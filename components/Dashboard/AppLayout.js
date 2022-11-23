@@ -80,7 +80,7 @@ const AppLayout = ({
   onSideAddClick,
   children,
 }) => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const [showSideAdd, setShowSideAdd] = useState(false);
 
   const [value, setValue] = useState("");
@@ -158,15 +158,17 @@ const AppLayout = ({
                   )}
                 </Breadcrumb>
 
-                <div className="flex justify-between items-center">
-                  {<div>{topExtra}</div>}
+                {userRole && userRole !== "viewer" ? (
+                  <div className="flex justify-between items-center">
+                    {<div>{topExtra}</div>}
 
-                  {hasMainAdd ? (
-                    <AddNew className={addNewClass} onClick={onMainAdd}>
-                      {addNewText}
-                    </AddNew>
-                  ) : null}
-                </div>
+                    {hasMainAdd ? (
+                      <AddNew className={addNewClass} onClick={onMainAdd}>
+                        {addNewText}
+                      </AddNew>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
 
               <Content className={`px-0 pt-[12px] m-0 ${contentClass}`}>
@@ -216,7 +218,7 @@ const AppLayout = ({
                       </Version>
                     ) : null}
 
-                    {hasSideAdd && onSideAddClick ? (
+                    {hasSideAdd && onSideAddClick && userRole && userRole !== "viewer" ? (
                       <Version className="py-[16px] px-[24px]">
                         <AddSide onClick={onSideAddClick}>Add</AddSide>
                       </Version>
