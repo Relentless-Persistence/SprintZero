@@ -1,7 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import "antd/dist/antd.css";
-
-import "../styles/globals.css";
 import { AuthProvider } from "../contexts/AuthContext";
 import { PaymentProvider } from "../contexts/PaymentContext";
 import { RecoilRoot } from "recoil";
@@ -11,6 +8,10 @@ import { analytics } from "../config/firebase-config";
 import { useRouter } from "next/router";
 import Script from "next/script";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+
+import "antd/dist/antd.css";
+
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
   const routers = useRouter();

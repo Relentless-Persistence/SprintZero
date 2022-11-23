@@ -14,16 +14,19 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "preserve",
-		"downlevelIteration": true,
+		// "downlevelIteration": true,
 		"incremental": true,
-		"strictNullChecks": true,
-		"baseUrl": ".",
-		"noUncheckedIndexedAccess": true,
-		"paths": {
-			"~/*": ["./*"]
-		},
+		// "strictNullChecks": true,
+		// "baseUrl": ".",
+		// "noUncheckedIndexedAccess": true,
+		// "paths": {
+		// 	"~/*": ["./*"]
+		// },
 		"plugins": [{"name": "next"}]
 	},
 	"include": ["**/*.d.ts", "**/*.ts", "**/*.tsx"],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules"],
+	"types": [
+      "node"
+    ],
 }

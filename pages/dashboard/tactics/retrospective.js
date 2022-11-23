@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { Dropdown, Card, Avatar, Divider, messag, Empty } from "antd";
+import { Dropdown, Card, Avatar, Divider, message, Empty } from "antd";
 
 import { SortAscendingOutlined } from "@ant-design/icons";
 

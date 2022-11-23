@@ -1,27 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
 import { db, serverTimestamp } from "../../config/firebase-config";
 
 import {
-  List,
   Avatar,
   Form,
   Comment,
   Button,
   Input,
   Row,
-  Tag,
   Col,
   Radio,
   message,
 } from "antd";
 
 import {
-  LikeOutlined,
-  DislikeOutlined,
-  CopyOutlined,
-  CloseOutlined,
   SendOutlined,
   FlagOutlined,
 } from "@ant-design/icons";
@@ -33,31 +26,9 @@ import { useAuth } from "../../contexts/AuthContext";
 import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 
-const Story = styled.p`
-  padding: 12px 19px;
-  background: #fff;
-  color: #262626;
-  border: 1px solid #d9d9d9;
-`;
 
-const init = [
-  {
-    label: "Connect with Amy",
-    checked: true,
-  },
-  {
-    label: "Request Data from Finance Dept",
-    checked: false,
-  },
-  {
-    label: "Send sheet to John",
-    checked: true,
-  },
-  {
-    label: "Finalize presentation",
-    checked: false,
-  },
-];
+
+
 
 const { TextArea } = Input;
 
@@ -65,9 +36,7 @@ const StoryDetails = ({
   story,
   storyIndex,
   featureIndex,
-  i,
   epic,
-  handleChangeStory,
 }) => {
   const { user } = useAuth();
   const activeProduct = useRecoilValue(activeProductState);
@@ -76,11 +45,11 @@ const StoryDetails = ({
   const [comment, setComment] = useState("");
   const [show, setShow] = useState(false);
   const [val, setVal] = useState("");
-  const [data, setData] = useState([...init]);
+  // const [data, setData] = useState([...init]);
   const [flagged, setFlagged] = useState(false);
   const [storyDescription, setStoryDescription] = useState(story.description);
-  const [designLink, setDesignLink] = useState(story.design_link);
-  const [codeLink, setCodeLink] = useState(story.code_link);
+  // const [designLink, setDesignLink] = useState(story.design_link);
+  // const [codeLink, setCodeLink] = useState(story.code_link);
 
   const fetchComments = () => {
     if (story) {
@@ -89,9 +58,6 @@ const StoryDetails = ({
         .where("type", "==", commentType)
         .onSnapshot((snapshot) => {
           setComments(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
-          console.log(
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
         });
@@ -112,11 +78,11 @@ const StoryDetails = ({
     };
     db.collection("storiesComments")
       .add(data)
-      .then((docRef) => {
+      .then(() => {
         message.success("Comment added successfully");
         setComment("");
       })
-      .catch((error) => {
+      .catch(() => {
         message.error("Error adding comment");
       });
   };
@@ -214,16 +180,12 @@ const StoryDetails = ({
         storyIndex
       ].updatedAt = new Date().toISOString();
 
-      console.log(
-        epic
-      );
-
       await db
         .collection("Epics")
         .doc(epic.id)
         .update(epic)
         .then(() => {
-          fetchSprints();
+          // fetchSprints();
           message.success("story updated successfully");
         });
     }
