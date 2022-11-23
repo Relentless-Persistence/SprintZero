@@ -40,7 +40,7 @@ import { useRecoilValue } from "recoil";
 import { findIndex, set } from "lodash";
 import EditTask from "../../../components/Tasks/EditTask";
 import AddTask from "../../../components/Tasks/AddTask";
-import { userRole } from "../../../contexts/AuthContext"
+import { useAuth } from "../../../contexts/AuthContext"
 
 const boards = ["Board 0", "Board 1", "Board 2", "Board 3", "Board 4"];
 
