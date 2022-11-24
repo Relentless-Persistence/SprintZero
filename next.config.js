@@ -30,7 +30,6 @@ const securityHeaders = [
 ];
 
 module.exports = {
-  reactStrictMode: true,
   async headers() {
     return [
       {
@@ -40,13 +39,7 @@ module.exports = {
       },
     ];
   },
-  // async redirects() {
-  //   return [
-  //     {
-  //       source: "/",
-  //       destination: "/dashboard",
-  //       permanent: true,
-  //     },
-  //   ];
-  // },
+  experimental: {
+    appDir: true
+  }
 };

@@ -49,7 +49,7 @@ module.exports = {
 			plugins: [`@typescript-eslint`],
 			extends: `plugin:@typescript-eslint/recommended`,
 			rules: {
-				"@typescript-eslint/ban-ts-comment": `warn`,
+				"@typescript-eslint/ban-ts-comment": [`warn`, {"ts-ignore": `allow-with-description`}],
 				"@typescript-eslint/consistent-type-imports": `warn`,
 				"@typescript-eslint/explicit-module-boundary-types": `off`,
 				"@typescript-eslint/no-empty-function": `off`,

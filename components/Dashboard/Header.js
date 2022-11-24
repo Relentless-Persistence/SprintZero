@@ -40,7 +40,7 @@ const CustomHeader = styled(Header)`
   }
 `;
 
-const AppHeader = ({ onChangeProduct }) => {
+const AppHeader = () => {
   const router = useRouter();
   const { user, role } = useAuth();
   const [products, setProducts] = useRecoilState(productsState);
@@ -59,7 +59,6 @@ const AppHeader = ({ onChangeProduct }) => {
       } else {
         setProducts(products);
         if(activeProduct === null) {
-          console.log("activeProduct", activeProduct)
           setActiveProduct(products[0]);
         } else {
           setActiveProduct(activeProduct)
