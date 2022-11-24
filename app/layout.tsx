@@ -1,6 +1,6 @@
 import type {ReactElement, ReactNode} from "react"
 
-import "./styles.css"
+// import "./styles.css"
 
 type Props = {
 	children: ReactNode
