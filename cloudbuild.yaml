@@ -9,7 +9,7 @@ steps:
       - 'NEXT_PUBLIC_PUBLISHABLE_KEY=${_NEXT_PUBLIC_PUBLISHABLE_KEY}'
       - 'NEXT_PUBLIC_SECRET_KEY=${_NEXT_PUBLIC_SECRET_KEY}'
   - name: 'gcr.io/cloud-builders/npm'
-    args: ['ci']
+    args: ['install']
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
   - name: 'gcr.io/cloud-builders/npm'
