@@ -1,3 +1,16 @@
-      steps:
-      - name: gcr.io/sprintzero-657f3/firebase
-        args: ['deploy', '--project=sprintzero-657f3', '--only=hosting']
+steps:
+  - name: node:10.15.1
+    entrypoint: npm
+    args: ["install"]
+  - name: node:10.15.1
+    entrypoint: npm
+    args: ["run", "create-env"]
+    env:
+      - 'NEXT_PUBLIC_PUBLISHABLE_KEY=${_NEXT_PUBLIC_PUBLISHABLE_KEY}'
+      - 'NEXT_PUBLIC_SECRET_KEY=${_NEXT_PUBLIC_SECRET_KEY}'
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['ci']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'export']
