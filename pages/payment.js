@@ -8,9 +8,8 @@ import axios from "axios";
 import { useRecoilValue } from "recoil";
 import { selectedPlanState } from "../atoms/planAtom";
 import Script from "next/script";
-import { NEXT_PUBLIC_PUBLISHABLE_KEY } from "../config";
 
-const stripePromise = loadStripe(NEXT_PUBLIC_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_PUBLISHABLE_KEY);
 
 const getCountries = async () => {
   const res = await axios.get(

@@ -1,7 +1,6 @@
 import Stripe from "stripe";
-import { NEXT_PUBLIC_SECRET_KEY } from "../../config";
 
-const stripe = new Stripe(NEXT_PUBLIC_SECRET_KEY);
+const stripe = new Stripe(process.env.NEXT_PUBLIC_SECRET_KEY);
 
 export default async function handler(req, res) {
   try {
