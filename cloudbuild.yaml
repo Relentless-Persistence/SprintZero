@@ -1,13 +1,13 @@
 steps:
   - name: node:10.15.1
     entrypoint: npm
-    args: ["install"]
+    args: ["ci"]
   - name: node:10.15.1
     entrypoint: npm
     args: ["run", "create-env"]
     env:
-      - 'NEXT_PUBLIC_PUBLISHABLE_KEY=${_NEXT_PUBLIC_PUBLISHABLE_KEY}'
-      - 'NEXT_PUBLIC_SECRET_KEY=${_NEXT_PUBLIC_SECRET_KEY}'
+      - 'NEXT_PUBLIC_PUBLISHABLE_KEY=${{ _NEXT_PUBLIC_PUBLISHABLE_KEY }}'
+      - 'NEXT_PUBLIC_SECRET_KEY=${{ _NEXT_PUBLIC_SECRET_KEY }}'
   - name: 'gcr.io/cloud-builders/npm:node-16.18.0'
     args: ['ci']
   - name: 'gcr.io/cloud-builders/npm:node-16.18.0'
