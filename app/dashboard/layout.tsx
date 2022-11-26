@@ -1,21 +1,30 @@
 "use client"
 
 import {
+	ApiOutlined,
+	CloseOutlined,
 	DeploymentUnitOutlined,
+	DollarOutlined,
+	FormOutlined,
 	HomeOutlined,
+	LogoutOutlined,
 	NodeExpandOutlined,
 	PullRequestOutlined,
+	SettingOutlined,
+	TeamOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
-import {Avatar, Layout, Menu} from "antd5"
+import {Avatar, Drawer, Layout, Menu} from "antd5"
 import Image from "next/image"
 import Link from "next/link"
 import {usePathname} from "next/navigation"
+import {useState} from "react"
 
 import type {ReactElement, ReactNode} from "react"
 
 import {getAllProducts} from "~/app/dashboard/fetch"
+import {auth} from "~/config/firebase"
 import useMainStore from "~/stores/mainStore"
 
 const isActive = (pathname: string, currentPath: string) => pathname.toLowerCase() === currentPath.toLowerCase()
@@ -36,6 +45,8 @@ const DashboardLayout = ({children}: Props): ReactElement | null => {
 
 	const setActiveProductId = useMainStore((state) => state.setActiveProductId)
 	const activeProductId = useMainStore((state) => state.activeProductId)
+
+	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
 	return (
 		<Layout className="h-full">
@@ -61,7 +72,9 @@ const DashboardLayout = ({children}: Props): ReactElement | null => {
 
 					<div className="grow" />
 
-					<Avatar src={user?.photoURL} className="border-2 border-green" />
+					<button type="button" onClick={() => void setIsSettingsOpen(true)}>
+						<Avatar src={user?.photoURL} className="border-2 border-green" />
+					</button>
 				</div>
 			</Layout.Header>
 			<Layout>
@@ -121,10 +134,67 @@ const DashboardLayout = ({children}: Props): ReactElement | null => {
 								],
 							},
 						]}
+						style={{borderInlineEnd: `unset`}}
 					/>
 				</Layout.Sider>
 				{children}
 			</Layout>
+
+			<Drawer
+				title="Settings"
+				closable={false}
+				width="192px"
+				open={isSettingsOpen}
+				onClose={() => void setIsSettingsOpen(false)}
+				extra={<CloseOutlined onClick={() => void setIsSettingsOpen(false)} />}
+				bodyStyle={{padding: `12px`}}
+			>
+				<div className="flex h-full flex-col justify-between">
+					<Menu
+						selectedKeys={[`settings-${(pathname ?? ``).split(`/`).at(-1)}`]}
+						items={[
+							{
+								key: `settings-account`,
+								icon: <UserOutlined />,
+								label: <Link href="/dashboard/settings/account">Account</Link>,
+							},
+							{
+								key: `settings-billing`,
+								icon: <DollarOutlined />,
+								label: <Link href="/dashboard/settings/billing">Billing</Link>,
+							},
+							{
+								key: `settings-config`,
+								icon: <SettingOutlined />,
+								label: <Link href="/dashboard/settings/config">Configuration</Link>,
+							},
+							{key: `settings-team`, icon: <TeamOutlined />, label: <Link href="/dashboard/settings/team">Team</Link>},
+							{
+								key: `settings-integrations`,
+								icon: <ApiOutlined />,
+								label: <Link href="/dashboard/settings/integrations">Integrations</Link>,
+							},
+						]}
+						style={{borderInlineEnd: `unset`}}
+					/>
+					<Menu
+						items={[
+							{
+								key: `settings-support`,
+								icon: <FormOutlined />,
+								label: <Link href="/dashboard/settings/support">Support</Link>,
+							},
+							{
+								key: `settings-logout`,
+								icon: <LogoutOutlined />,
+								label: `Logout`,
+								onClick: () => void auth.signOut(),
+							},
+						]}
+						style={{borderInlineEnd: `unset`}}
+					/>
+				</div>
+			</Drawer>
 		</Layout>
 	)
 }
