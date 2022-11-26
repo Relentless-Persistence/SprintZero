@@ -93,14 +93,14 @@ const Login = () => {
 
       <div className="flex flex-col items-center justify-center space-y-[42px] mt-10">
         <Button
-          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
+          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-[20px] font-semibold"
           onClick={() => handleOnClick(appleProvider)}
           icon={<AppleFilled style={{ fontSize: "20px", marginTop: "-5px" }} />}
         >
           <p>Sign in with Apple</p>
         </Button>
         <Button
-          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
+          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-[20px] font-semibold"
           onClick={() => handleOnClick(googleProvider)}
         >
           <Image
@@ -114,7 +114,7 @@ const Login = () => {
         </Button>
 
         <Button
-          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-20 font-semibold"
+          className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-[20px] font-semibold"
           onClick={() => handleOnClick(microsoftProvider)}
         >
           <Image
@@ -145,7 +145,7 @@ const Login = () => {
         >
           <Image
             src="https://docs.microsoft.com/en-us/azure/active-directory/develop/media/howto-add-branding-in-azure-ad-apps/ms-symbollockup_mssymbol_19.svg"
-            alt="microsoft" 
+            alt="microsoft"
             width={24}
             height={24}
           />

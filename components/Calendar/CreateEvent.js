@@ -39,7 +39,7 @@ const CreateEvent = () => {
         <Row gutter={24}>
           <Col span={8}>
             <div className="mb-4">
-              <p className="font-semibold text-20 mb-2">Subject</p>
+              <p className="font-semibold text-[20px] mb-2">Subject</p>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -47,7 +47,7 @@ const CreateEvent = () => {
               />
             </div>
             <div className="mb-4">
-              <p className="font-semibold text-20 mb-2">Description</p>
+              <p className="font-semibold text-[20px] mb-2">Description</p>
               <TextArea
                 rows={6}
                 value={description}
@@ -60,14 +60,14 @@ const CreateEvent = () => {
           <Col span={8}>
             <Row>
               <Col span={12}>
-                <p className="font-semibold text-20 mb-2">Date</p>
+                <p className="font-semibold text-[20px] mb-2">Date</p>
                 <DatePicker
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                 />
               </Col>
               <Col span={12}>
-                <p className="font-semibold text-20 mb-2">Time</p>
+                <p className="font-semibold text-[20px] mb-2">Time</p>
                 <TimePicker
                   value={time}
                   onChange={(e) => setDate(e.target.value)}
@@ -75,7 +75,7 @@ const CreateEvent = () => {
               </Col>
             </Row>
             <div className="mt-4 mb-4">
-              <p className="font-semibold text-20 mb-2">Frequency</p>
+              <p className="font-semibold text-[20px] mb-2">Frequency</p>
               <Select
                 style={{ width: 120 }}
                 value={frequency}
@@ -86,7 +86,7 @@ const CreateEvent = () => {
               </Select>
             </div>
             <div className="mt-4 mb-4">
-              <p className="font-semibold text-20 mb-2">Day</p>
+              <p className="font-semibold text-[20px] mb-2">Day</p>
               <Radio.Group
                 options={options}
                 // onChange={this.onChange3}
@@ -98,7 +98,7 @@ const CreateEvent = () => {
 
           <Col span={8}>
             <div className="mt-4 mb-4">
-              <p className="font-semibold text-20 mb-2">Attendees</p>
+              <p className="font-semibold text-[20px] mb-2">Attendees</p>
               <div className="flex flex-col items-start justify-start">
                 <Checkbox>Kathryn</Checkbox>
                 <Checkbox>

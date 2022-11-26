@@ -45,7 +45,7 @@ const Config = ({
 
   return (
     <div id="config">
-      <h3 className="font-semibold font-16 mb-3">Configuration</h3>
+      <h3 className="font-semibold mb-3">Configuration</h3>
       <div className="mb-[20px]">
         <h4 className="mb-[4px]">Cadence (Weeks)</h4>
 
@@ -96,7 +96,7 @@ const Config = ({
             )}
           </Col>
           <Col span={4}>
-           
+
               <InputNumber
                 className="w-full"
                 placeholder="$0.00"

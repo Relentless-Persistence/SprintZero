@@ -57,7 +57,7 @@ const Team = ({ teams }) => {
       <div className="mb-[42px]">
         <Tabs defaultActiveKey="1">
           <Tabs.TabPane
-            tab={<div className="font-semibold text-16">Members</div>}
+            tab={<div className="font-semibold text-[16px]">Members</div>}
             key="1"
           >
             <>
@@ -92,7 +92,7 @@ const Team = ({ teams }) => {
                     </div>
                   </Card>
                 ))}
-              <div className="font-semibold text-16 mt-4 mb-4">Archive</div>
+              <div className="font-semibold text-[16px] mt-4 mb-4">Archive</div>
               {teams
                 .filter((item) => item.type === "member")
                 .filter((item) => new Date(item.expiry) > new Date())
@@ -127,7 +127,7 @@ const Team = ({ teams }) => {
           </Tabs.TabPane>
 
           <Tabs.TabPane
-            tab={<h3 className="font-semibold text-16">Viewers</h3>}
+            tab={<h3 className="font-semibold text-[16px]">Viewers</h3>}
             key="2"
           >
             <>
@@ -162,7 +162,7 @@ const Team = ({ teams }) => {
                     </div>
                   </Card>
                 ))}
-              <div className="font-semibold text-16 mt-4 mb-4">Archive</div>
+              <div className="font-semibold text-[16px] mt-4 mb-4">Archive</div>
               {teams
                 .filter((item) => item.type === "viewer")
                 .filter((item) => new Date(item.expiry) > new Date())

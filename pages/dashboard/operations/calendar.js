@@ -86,7 +86,7 @@ export default function Calendar() {
           }
         </Row>
         <Drawer
-          title={<h3 className="text-20 font-semibold">Event</h3>}
+          title={<h3 className="text-[20px] font-semibold">Event</h3>}
           closable={false}
           placement="bottom"
           width={"30%"}

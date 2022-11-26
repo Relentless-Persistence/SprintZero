@@ -23,7 +23,7 @@ const Members = () => {
   return (
     <div id="billings">
       <div className="mb-[42px]">
-        <h3 className="font-semibold text-16 mb-3">Active</h3>
+        <h3 className="font-semibold text-[16px] mb-3">Active</h3>
         <Card className="mb-[9px]">
           <div className="flex items-center justify-between">
             <div>
@@ -89,7 +89,7 @@ const Members = () => {
         </Card>
       </div>
       <div>
-        <h3 className="font-semibold text-16 mb-3">Inactive</h3>
+        <h3 className="font-semibold text-[16px] mb-3">Inactive</h3>
         <Card>
           <div className="flex items-center justify-between">
             <div>

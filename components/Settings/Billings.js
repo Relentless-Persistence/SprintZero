@@ -26,7 +26,7 @@ const Billings = () => {
 
   return (
     <div id="billings">
-      <h3 className="font-semibold font-16 mb-3">Credit Card Details</h3>
+      <h3 className="font-semibold mb-3">Credit Card Details</h3>
       <Form>
         <Row gutter={16}>
           <Col>
@@ -126,7 +126,7 @@ const Billings = () => {
       </Form>
 
       <div className="mt-[42px]">
-        <h3 className="font-semibold font-16 mb-3">Billing History</h3>
+        <h3 className="font-semibold mb-3">Billing History</h3>
         <div className="space-y-3">
           <p>2022</p>
           <Card>

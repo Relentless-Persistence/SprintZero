@@ -1,22 +1,41 @@
 module.exports = {
-  content: [ "./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}" ],
-  // corePlugins: {
-  //   preflight: false,
-  // },
-  theme: {
-    extend: {
-      fontSize:
-      {
-        "12": "12px",
-        "14": "14px",
-        "16": "16px",
-        "18": "18px",
-        "20": "20px",
-      },
-      spacing:
-      {
-      }
-    },
-  },
-  plugins: [],
-};
+	content: [`./pages/**/*.{js,ts,jsx,tsx}`, `./components/**/*.{js,ts,jsx,tsx}`, `./app/**/*.{js,jsx,ts,tsx}`],
+	theme: {
+		colors: {
+			transparent: `transparent`,
+			green: {
+				DEFAULT: `#73c92d`,
+				s100: `#6ab92a`,
+				s200: `#62ab27`,
+				s300: `#5a9d24`,
+				s400: `#528f20`,
+				s500: `#4a801d`,
+				s600: `#42721a`,
+				s700: `#396417`,
+				s800: `#315613`,
+				s900: `#294710`,
+				s1000: `#21390d`,
+				s1100: `#192b0a`,
+				s1200: `#101d06`,
+				s1300: `#080e03`,
+				t100: `#7cd136`,
+				t200: `#86d546`,
+				t300: `#90d855`,
+				t400: `#9adc65`,
+				t500: `#a4df74`,
+				t600: `#aee383`,
+				t700: `#b9e693`,
+				t800: `#c3eaa2`,
+				t900: `#cdedb2`,
+				t1000: `#d7f1c1`,
+				t1100: `#e1f4d1`,
+				t1200: `#ebf8e0`,
+				t1300: `#f5fbf0`,
+			},
+			pine: `#101d06`,
+			laurel: `#a6ae9d`,
+			sky: `#00d4ff`,
+			blue: `#009cd5`,
+		},
+	},
+}

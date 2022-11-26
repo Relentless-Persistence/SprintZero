@@ -11,6 +11,7 @@ module.exports = {
 		},
 	},
 	rules: {
+		"import/named": `off`,
 		"import/no-duplicates": `error`,
 		"import/no-named-as-default": `off`,
 		"import/no-unresolved": `off`,

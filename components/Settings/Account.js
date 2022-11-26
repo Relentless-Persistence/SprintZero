@@ -18,7 +18,7 @@ const Account = () => {
   return (
     <Row gutter={62}>
       <Col span={20}>
-        <h3 className="text-16 font-semibold">Personal Details</h3>
+        <h3 className="text-[16px] font-semibold">Personal Details</h3>
         <Form
           labelCol={{
             span: 6,
@@ -77,7 +77,7 @@ const Account = () => {
         </Form>
       </Col>
       <Col span={4}>
-        <h3 className="w-16 mb-2 text-16 font-semibold text-center">Avatar</h3>
+        <h3 className="w-16 mb-2 text-[16px] font-semibold text-center">Avatar</h3>
         <Avatar
           className="flex items-center justify-center"
           src={user?.photoURL}

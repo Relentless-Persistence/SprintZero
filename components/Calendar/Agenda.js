@@ -12,7 +12,7 @@ const Agenda = () => {
           key={event.title}
           className="mb-4"
           title={
-            <span className="font-semibold text-16">
+            <span className="font-semibold text-[16px]">
               {formatDate(event.date)}
             </span>
           }

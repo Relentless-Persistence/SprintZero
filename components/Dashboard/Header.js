@@ -118,7 +118,7 @@ const AppHeader = () => {
       </div>
       <Drawer
         id="settingsDrawer"
-        title={<span className="font-semibold text-16">Settings</span>}
+        title={<span className="font-semibold text-[16px]">Settings</span>}
         placement="right"
         visible={settingsMenuDrawer}
         width="161px"
