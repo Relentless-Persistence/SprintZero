@@ -1,78 +1,73 @@
+import {Timestamp} from "firebase9/firestore"
 import {z, ZodTypeAny} from "zod"
+
+// Workaround https://github.com/swc-project/swc/issues/6514
+Timestamp
+
+export type Feature = {
+	id: string
+	name: string
+	description: string
+	comments: string[]
+	stories: Story[]
+}
+
+export type Story = {
+	id: string
+	name: string
+	description: string
+	comments: string[]
+	accepanceCriteria: Array<{
+		name: string
+		checked: boolean
+	}>
+}
 
 export type Epics = {
 	id: string
 
 	name: string
-	features: Array<{
-		id: string
-		name: string
-		priority_level: number
-		feasibility_level: number
-		status: string
-		stories: Array<{
-			id: string
-			name: string
-			description: string
-			status: string
-			effort: string
-			priority_level: number
-			feasibility_level: number
-			flagged: boolean
-			ethics_status: string
-			ethics_votes: {}[]
-			acceptance_criteria: {}[]
-			accepts: number
-			rejects: number
-			code_link: string
-			design_link: string
-			sprint_status: string
-
-			sprint_id: string
-			version: string
-		}>
-	}>
+	description: string
+	keepers: string[]
+	comments: string[]
+	features: Feature[]
 
 	product_id: string
 	version: string
+	updatedAt: Timestamp
 }
 
 export const EpicsSchema = z.object({
 	id: z.string(),
 	name: z.string(),
+	description: z.string(),
+	keepers: z.array(z.string()),
+	comments: z.array(z.string()),
 	features: z.array(
 		z.object({
 			id: z.string(),
 			name: z.string(),
-			priority_level: z.number(),
-			feasibility_level: z.number(),
-			status: z.string(),
+			description: z.string(),
+			comments: z.array(z.string()),
 			stories: z.array(
 				z.object({
 					id: z.string(),
 					name: z.string(),
 					description: z.string(),
-					status: z.string(),
-					effort: z.string(),
-					priority_level: z.number(),
-					feasibility_level: z.number(),
-					flagged: z.boolean(),
-					ethics_status: z.string(),
-					ethics_votes: z.array(z.object({})),
-					acceptance_criteria: z.array(z.object({})),
-					accepts: z.number(),
-					rejects: z.number(),
-					code_link: z.string(),
-					design_link: z.string(),
-					sprint_status: z.string(),
-					sprint_id: z.string(),
-					version: z.string(),
+					comments: z.array(z.string()),
+					accepanceCriteria: z.array(
+						z.object({
+							name: z.string(),
+							checked: z.boolean(),
+						}),
+					),
 				}),
 			),
 		}),
 	),
 	product_id: z.string(),
 	version: z.string(),
+	updatedAt: z.instanceof(Timestamp),
 } satisfies {[key in keyof Epics]: ZodTypeAny})
 
 export const EpicsCollectionSchema = z.array(EpicsSchema)

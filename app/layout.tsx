@@ -8,10 +8,10 @@ import {useEffect} from "react"
 import type {ReactElement, ReactNode} from "react"
 
 import "./styles.css"
-import {getAllProducts} from "~/utils/fetch"
 import {auth} from "~/config/firebase"
 import {queryClient} from "~/config/reactQuery"
 import useMainStore from "~/stores/mainStore"
+import {getAllProducts} from "~/utils/fetch"
 
 type Props = {
 	children: ReactNode

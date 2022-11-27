@@ -1,16 +1,17 @@
 "use client"
 
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
-import {useQuery} from "@tanstack/react-query"
-import {Breadcrumb, Button, Menu} from "antd5"
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
+import {Breadcrumb, Button, Input, Menu} from "antd5"
 import {useEffect, useState} from "react"
 
 import type {ReactElement} from "react"
 
 import useMainStore from "~/stores/mainStore"
-import {getAllVersions} from "~/utils/fetch"
+import {addVersion, getAllVersions} from "~/utils/fetch"
 
 const StoryMap = (): ReactElement | null => {
+	const queryClient = useQueryClient()
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const {data: versions} = useQuery({
 		queryKey: [`allVersions`, activeProductId],
@@ -19,10 +20,19 @@ const StoryMap = (): ReactElement | null => {
 	})
 
 	const [currentVersion, setCurrentVersion] = useState(``)
+	const [newVersionInput, setNewVersionInput] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (currentVersion === `` && versions?.[0]) setCurrentVersion(versions[0].id)
 	}, [setCurrentVersion, currentVersion, versions])
+
+	const addVersionMutation = useMutation({
+		mutationFn: activeProductId ? addVersion(activeProductId) : async () => {},
+		onSuccess: () => {
+			setNewVersionInput(null)
+			queryClient.invalidateQueries({queryKey: [`allVersions`, activeProductId], exact: true})
+		},
+	})
 
 	return (
 		<div className="grid grid-cols-[1fr_minmax(6rem,max-content)]">
@@ -33,7 +43,7 @@ const StoryMap = (): ReactElement | null => {
 						<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersion)?.version}</Breadcrumb.Item>
 					</Breadcrumb>
 
-					<Button>+ Add version</Button>
+					<Button onClick={() => void setNewVersionInput(``)}>+ Add version</Button>
 				</div>
 				<div className="text-laurel">
 					<div className="relative text-[0.6rem]">
@@ -51,14 +61,35 @@ const StoryMap = (): ReactElement | null => {
 			<div>
 				<Menu
 					selectedKeys={[currentVersion]}
-					items={
-						versions?.map((version) => ({
+					items={[
+						...(versions ?? []).map((version) => ({
 							key: version.id,
 							label: version.version,
 							onClick: () => void setCurrentVersion(version.id),
-						})) || []
-					}
+						})),
+						{key: `__ALL_VERSIONS__`, label: `All`, onClick: () => void setCurrentVersion(`__ALL_VERSIONS__`)},
+					]}
 				/>
+				{newVersionInput !== null && (
+					<form
+						onSubmit={(evt) => {
+							evt.preventDefault()
+							addVersionMutation.mutate(newVersionInput)
+						}}
+						className="flex flex-col gap-2"
+					>
+						<Input
+							value={newVersionInput}
+							onChange={(evt) => void setNewVersionInput(evt.target.value)}
+							htmlSize={1}
+							className="w-full"
+						/>
+						<Button htmlType="submit">Add</Button>
+						{addVersionMutation.isError && addVersionMutation.error instanceof Error && (
+							<p>{addVersionMutation.error.message}</p>
+						)}
+					</form>
+				)}
 			</div>
 		</div>
 	)
