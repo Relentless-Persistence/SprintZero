@@ -39,7 +39,7 @@ const RootLayout = ({children}: Props): ReactElement | null => {
 		})
 
 		return unsubscribe
-	}, [setUser, activeProductId, setActiveProductId])
+	}, [setUser, activeProductId, setActiveProductId, replace])
 
 	return (
 		<ConfigProvider theme={{token: {colorPrimary: `#73c92d`}}}>

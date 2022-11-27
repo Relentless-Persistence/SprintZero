@@ -1,3 +1,5 @@
+"use client"
+
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import {Button} from "antd5"
 
@@ -21,6 +23,7 @@ const StoryMap = (): ReactElement | null => {
 		onSuccess: () => void queryClient.invalidateQueries({queryKey: [`all-epics`, activeProductId], exact: true}),
 	})
 
+	// console.log(epics)
 	return (
 		<div>
 			{epics?.map((epic) => (

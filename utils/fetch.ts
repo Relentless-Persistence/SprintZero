@@ -66,7 +66,7 @@ export const addEpic =
 		await addDoc(collection(db, NEpics.n), data)
 	}
 
-export const getAllEpics = (productId: string) => async (): Promise<Epic[]> => {
+export const getAllEpics = (productId: Id) => async (): Promise<Epic[]> => {
 	const _data = await getDocs(
 		query(collection(db, NEpics.n), where(NEpics.product.n, `==`, productId), orderBy(NEpics.name.n)),
 	)

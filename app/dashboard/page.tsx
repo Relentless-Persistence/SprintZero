@@ -7,10 +7,11 @@ import {useEffect, useState} from "react"
 
 import type {ReactElement} from "react"
 
+import StoryMap from "~/app/dashboard/StoryMap"
 import useMainStore from "~/stores/mainStore"
 import {addVersion, getAllVersions} from "~/utils/fetch"
 
-const StoryMap = (): ReactElement | null => {
+const Dashboard = (): ReactElement | null => {
 	const queryClient = useQueryClient()
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const {data: versions} = useQuery({
@@ -57,7 +58,7 @@ const StoryMap = (): ReactElement | null => {
 					</div>
 				</div>
 
-				{/* <StoryMap /> */}
+				<StoryMap />
 			</div>
 
 			<div>
@@ -97,4 +98,4 @@ const StoryMap = (): ReactElement | null => {
 	)
 }
 
-export default StoryMap
+export default Dashboard
