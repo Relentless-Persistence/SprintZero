@@ -1,7 +1,11 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Personas = {
-	id: string
+import type {Id} from "~/types"
+
+import {idSchema} from "~/types"
+
+export type Persona = {
+	id: Id
 
 	changes: string[]
 	dailyLife: string[]
@@ -13,11 +17,12 @@ export type Personas = {
 	role: string
 	tasks: string[]
 
-	product_id: string
+	product: Id
 }
 
-export const PersonasSchema = z.object({
-	id: z.string(),
+export const PersonaSchema = z.object({
+	id: idSchema,
+
 	changes: z.array(z.string()),
 	dailyLife: z.array(z.string()),
 	frustrations: z.array(z.string()),
@@ -27,7 +32,8 @@ export const PersonasSchema = z.object({
 	responsibilities: z.array(z.string()),
 	role: z.string(),
 	tasks: z.array(z.string()),
-	product_id: z.string(),
-} satisfies {[key in keyof Personas]: ZodTypeAny})
 
-export const PersonasCollectionSchema = z.array(PersonasSchema)
+	product: idSchema,
+} satisfies {[key in keyof Persona]: ZodTypeAny})
+
+export const PersonaCollectionSchema = z.array(PersonaSchema)

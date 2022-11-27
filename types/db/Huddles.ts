@@ -1,34 +1,32 @@
 import {Timestamp} from "firebase9/firestore"
 import {z, ZodTypeAny} from "zod"
 
-export type Huddles = {
-	id: string
+import type {Id} from "~/types"
 
-	title: string
+import {idSchema} from "~/types"
+
+export type Huddle = {
+	id: Id
+
 	completed: boolean
-	user: {
-		uid: string
-		name: string
-		email: string
-		avatar: string
-	}
+	title: string
 
-	product_id: string
+	product: Id
+	user: Id
+
 	createdAt: Timestamp
 }
 
 export const HuddlesSchema = z.object({
-	id: z.string(),
-	title: z.string(),
+	id: idSchema,
+
 	completed: z.boolean(),
-	user: z.object({
-		uid: z.string(),
-		name: z.string(),
-		email: z.string(),
-		avatar: z.string(),
-	}),
-	product_id: z.string(),
+	title: z.string(),
+
+	product: idSchema,
+	user: idSchema,
+
 	createdAt: z.instanceof(Timestamp),
-} satisfies {[key in keyof Huddles]: ZodTypeAny})
+} satisfies {[key in keyof Huddle]: ZodTypeAny})
 
 export const HuddlesCollectionSchema = z.array(HuddlesSchema)

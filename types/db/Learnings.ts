@@ -1,21 +1,27 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Learnings = {
-	id: string
+import type {Id} from "~/types"
 
-	name: string
+import {idSchema} from "~/types"
+
+export type Learning = {
+	id: Id
+
 	description: string
+	name: string
 	type: `Assumed` | `Validated`
 
-	product_id: string
+	product: Id
 }
 
-export const LearningsSchema = z.object({
-	id: z.string(),
-	name: z.string(),
-	description: z.string(),
-	type: z.union([z.literal(`Assumed`), z.literal(`Validated`)]),
-	product_id: z.string(),
-} satisfies {[key in keyof Learnings]: ZodTypeAny})
+export const LearningSchema = z.object({
+	id: idSchema,
 
-export const LearningsCollectionSchema = z.array(LearningsSchema)
+	description: z.string(),
+	name: z.string(),
+	type: z.union([z.literal(`Assumed`), z.literal(`Validated`)]),
+
+	product: idSchema,
+} satisfies {[key in keyof Learning]: ZodTypeAny})
+
+export const LearningCollectionSchema = z.array(LearningSchema)

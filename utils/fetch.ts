@@ -1,9 +1,10 @@
-import {addDoc, collection, doc, getDocs, orderBy, query, setDoc, where} from "firebase9/firestore"
+import {addDoc, collection, getDocs, orderBy, query, where} from "firebase9/firestore"
 
 import type {Product} from "~/types/db/Product"
 import type {Version} from "~/types/db/Versions"
 
 import {db} from "~/config/firebase"
+import {EpicSchema} from "~/types/db/Epics"
 import {ProductCollectionSchema} from "~/types/db/Product"
 import {VersionSchema, VersionCollectionSchema} from "~/types/db/Versions"
 
@@ -33,4 +34,18 @@ export const addVersion =
 
 		const data = VersionSchema.omit({id: true}).parse({version: versionName, product_id: productId})
 		await addDoc(collection(db, `Versions`), data)
+	}
+
+type AddEpicInput = {
+	name: string
+	description: string
+}
+export const addEpic =
+	(productId: string) =>
+	async ({name, description}: AddEpicInput): Promise<void> => {
+		const data = EpicSchema.pick({id: true, name: true, description: true, product_id: true}).parse({
+			name,
+			description,
+			product_id: productId,
+		})
 	}

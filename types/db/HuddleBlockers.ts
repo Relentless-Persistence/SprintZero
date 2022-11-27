@@ -1,14 +1,18 @@
 import {Timestamp} from "firebase9/firestore"
 import {z, ZodTypeAny} from "zod"
 
+import type {Id} from "~/types"
+
+import {idSchema} from "~/types"
+
 // Workaround https://github.com/swc-project/swc/issues/6514
 Timestamp
 
-export type HuddleBlockers = {
-	id: string
+export type HuddleBlocker = {
+	id: Id
 
-	title: string
 	completed: boolean
+	title: string
 	user: {
 		uid: string
 		name: string
@@ -16,22 +20,26 @@ export type HuddleBlockers = {
 		avatar: string
 	}
 
-	product_id: string
+	product: Id
+
 	createdAt: Timestamp
 }
 
-export const HuddleBlockersSchema = z.object({
-	id: z.string(),
-	title: z.string(),
+export const HuddleBlockerSchema = z.object({
+	id: idSchema,
+
 	completed: z.boolean(),
+	title: z.string(),
 	user: z.object({
 		uid: z.string(),
 		name: z.string(),
 		email: z.string(),
 		avatar: z.string(),
 	}),
-	product_id: z.string(),
-	createdAt: z.instanceof(Timestamp),
-} satisfies {[key in keyof HuddleBlockers]: ZodTypeAny})
 
-export const HuddleBlockersCollectionSchema = z.array(HuddleBlockersSchema)
+	product: idSchema,
+
+	createdAt: z.instanceof(Timestamp),
+} satisfies {[key in keyof HuddleBlocker]: ZodTypeAny})
+
+export const HuddleBlockerCollectionSchema = z.array(HuddleBlockerSchema)

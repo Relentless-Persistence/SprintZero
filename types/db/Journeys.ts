@@ -1,23 +1,29 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Journeys = {
-	id: string
+import type {Id} from "~/types"
 
-	name: string
-	start: string
+import {idSchema} from "~/types"
+
+export type Journey = {
+	id: Id
+
 	duration: string
 	durationType: string
+	name: string
+	start: string
 
-	product_id: string
+	product: Id
 }
 
-export const JourneysSchema = z.object({
-	id: z.string(),
-	name: z.string(),
-	start: z.string(),
+export const JourneySchema = z.object({
+	id: idSchema,
+
 	duration: z.string(),
 	durationType: z.string(),
-	product_id: z.string(),
-} satisfies {[key in keyof Journeys]: ZodTypeAny})
+	name: z.string(),
+	start: z.string(),
 
-export const JourneysCollectionSchema = z.array(JourneysSchema)
+	product: idSchema,
+} satisfies {[key in keyof Journey]: ZodTypeAny})
+
+export const JourneyCollectionSchema = z.array(JourneySchema)

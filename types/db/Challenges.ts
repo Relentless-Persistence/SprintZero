@@ -1,26 +1,27 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Challenges = {
-	id: string
+import type {Id} from "~/types"
 
-	name: string
-	accessibility_type: `Perceivable` | `Operable` | `Understandable` | `Robust`
+import {idSchema} from "~/types"
+
+export type Challenge = {
+	id: Id
+
 	description: string
+	name: string
+	type: `Perceivable` | `Operable` | `Understandable` | `Robust`
 
-	product_id: string
+	product: Id
 }
 
-export const ChallengesSchema = z.object({
-	id: z.string(),
-	name: z.string(),
-	accessibility_type: z.union([
-		z.literal(`Perceivable`),
-		z.literal(`Operable`),
-		z.literal(`Understandable`),
-		z.literal(`Robust`),
-	]),
-	description: z.string(),
-	product_id: z.string(),
-} satisfies {[key in keyof Challenges]: ZodTypeAny})
+export const ChallengeSchema = z.object({
+	id: idSchema,
 
-export const ChallengesCollectionSchema = z.array(ChallengesSchema)
+	description: z.string(),
+	name: z.string(),
+	type: z.union([z.literal(`Perceivable`), z.literal(`Operable`), z.literal(`Understandable`), z.literal(`Robust`)]),
+
+	product: idSchema,
+} satisfies {[key in keyof Challenge]: ZodTypeAny})
+
+export const ChallengeCollectionSchema = z.array(ChallengeSchema)

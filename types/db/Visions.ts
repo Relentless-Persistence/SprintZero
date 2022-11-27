@@ -1,7 +1,11 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Visions = {
-	id: string
+import type {Id} from "~/types"
+
+import {idSchema} from "~/types"
+
+export type Vision = {
+	id: Id
 
 	competitors: string
 	differentiators: string
@@ -9,19 +13,23 @@ export type Visions = {
 	need: string
 	targetCustomer: string
 
-	product_id: string
+	product: Id
+
 	createdAt: Date
 }
 
-export const VisionsSchema = z.object({
-	id: z.string(),
+export const VisionSchema = z.object({
+	id: idSchema,
+
 	competitors: z.string(),
 	differentiators: z.string(),
 	keyBenefits: z.string(),
 	need: z.string(),
 	targetCustomer: z.string(),
-	product_id: z.string(),
-	createdAt: z.date(),
-} satisfies {[key in keyof Visions]: ZodTypeAny})
 
-export const VisionsCollectionSchema = z.array(VisionsSchema)
+	product: idSchema,
+
+	createdAt: z.date(),
+} satisfies {[key in keyof Vision]: ZodTypeAny})
+
+export const VisionCollectionSchema = z.array(VisionSchema)

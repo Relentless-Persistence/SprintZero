@@ -1,21 +1,27 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Sprints = {
-	id: string
+import type {Id} from "~/types"
 
+import {idSchema} from "~/types"
+
+export type Sprint = {
+	id: Id
+
+	endDate: Date
 	name: string
 	startDate: Date
-	endDate: Date
 
-	product_id: string
+	product: Id
 }
 
-export const SprintsSchema = z.object({
-	id: z.string(),
+export const SprintSchema = z.object({
+	id: idSchema,
+
+	endDate: z.date(),
 	name: z.string(),
 	startDate: z.date(),
-	endDate: z.date(),
-	product_id: z.string(),
-} satisfies {[key in keyof Sprints]: ZodTypeAny})
 
-export const SprintsCollectionSchema = z.array(SprintsSchema)
+	product: idSchema,
+} satisfies {[key in keyof Sprint]: ZodTypeAny})
+
+export const SprintCollectionSchema = z.array(SprintSchema)

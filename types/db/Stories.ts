@@ -1,19 +1,37 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Stories = {
-	id: string
+import type {Id} from "~/types"
+
+import {idSchema} from "~/types"
+
+export type Story = {
+	id: Id
 
 	name: string
-	status: `Backlog` | `In Progress` | `Done`
+	description: string
+	accepanceCriteria: Array<{
+		name: string
+		checked: boolean
+	}>
 
-	product_id: string
+	comments: Id[]
+	feature: Id
 }
 
-export const StoriesSchema = z.object({
-	id: z.string(),
-	name: z.string(),
-	status: z.union([z.literal(`Backlog`), z.literal(`In Progress`), z.literal(`Done`)]),
-	product_id: z.string(),
-} satisfies {[key in keyof Stories]: ZodTypeAny})
+export const StorySchema = z.object({
+	id: idSchema,
 
-export const StoriesCollectionSchema = z.array(StoriesSchema)
+	name: z.string(),
+	description: z.string(),
+	accepanceCriteria: z.array(
+		z.object({
+			name: z.string(),
+			checked: z.boolean(),
+		}),
+	),
+
+	comments: z.array(idSchema),
+	feature: idSchema,
+} satisfies {[key in keyof Story]: ZodTypeAny})
+
+export const StoryCollectionSchema = z.array(StorySchema)

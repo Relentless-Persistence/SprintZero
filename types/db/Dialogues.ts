@@ -1,14 +1,18 @@
 import {Timestamp} from "firebase9/firestore"
 import {z, ZodTypeAny} from "zod"
 
+import type {Id} from "~/types"
+
+import {idSchema} from "~/types"
+
 // Workaround https://github.com/swc-project/swc/issues/6514
 Timestamp
 
-export type Dialogues = {
-	id: string
+export type Dialogue = {
+	id: Id
 
-	name: string
 	education: string
+	name: string
 	notes: Array<{
 		title: string
 		response: string
@@ -17,14 +21,16 @@ export type Dialogues = {
 	region: string
 	type: `Identified` | `Contacted` | `Scheduled` | `Interviewed` | `Analyzing` | `Processed`
 
-	product_id: string
+	product: Id
+
 	updatedAt: Timestamp
 }
 
-export const DialoguesSchema = z.object({
-	id: z.string(),
-	name: z.string(),
+export const DialogueSchema = z.object({
+	id: idSchema,
+
 	education: z.string(),
+	name: z.string(),
 	notes: z.array(
 		z.object({
 			title: z.string(),
@@ -41,8 +47,10 @@ export const DialoguesSchema = z.object({
 		z.literal(`Analyzing`),
 		z.literal(`Processed`),
 	]),
-	product_id: z.string(),
-	updatedAt: z.instanceof(Timestamp),
-} satisfies {[key in keyof Dialogues]: ZodTypeAny})
 
-export const DialoguesCollectionSchema = z.array(DialoguesSchema)
+	product: idSchema,
+
+	updatedAt: z.instanceof(Timestamp),
+} satisfies {[key in keyof Dialogue]: ZodTypeAny})
+
+export const DialogueCollectionSchema = z.array(DialogueSchema)

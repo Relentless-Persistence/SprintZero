@@ -1,16 +1,23 @@
 import {z, ZodTypeAny} from "zod"
 
+import type {Id} from "~/types"
+
+import {idSchema} from "~/types"
+
 export type Result = {
-	id: string
+	id: Id
 
 	description: string
-	goal_id: string
+
+	goal: Id
 }
 
 export const ResultSchema = z.object({
-	id: z.string(),
+	id: idSchema,
+
 	description: z.string(),
-	goal_id: z.string(),
+
+	goal: idSchema,
 } satisfies {[key in keyof Result]: ZodTypeAny})
 
 export const ResultCollectionSchema = z.array(ResultSchema)

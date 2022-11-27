@@ -1,10 +1,14 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Retrospectives = {
-	id: string
+import type {Id} from "~/types"
 
-	title: string
+import {idSchema} from "~/types"
+
+export type Retrospective = {
+	id: Id
+
 	description: string
+	title: string
 	type: `Enjoyable` | `Puzzling`
 	user: {
 		id: string
@@ -12,20 +16,22 @@ export type Retrospectives = {
 		photo: string
 	}
 
-	product_id: string
+	product: Id
 }
 
-export const RetrospectivesSchema = z.object({
-	id: z.string(),
-	title: z.string(),
+export const RetrospectiveSchema = z.object({
+	id: idSchema,
+
 	description: z.string(),
+	title: z.string(),
 	type: z.union([z.literal(`Enjoyable`), z.literal(`Puzzling`)]),
 	user: z.object({
 		id: z.string(),
 		name: z.string(),
 		photo: z.string(),
 	}),
-	product_id: z.string(),
-} satisfies {[key in keyof Retrospectives]: ZodTypeAny})
 
-export const RetrospectivesCollectionSchema = z.array(RetrospectivesSchema)
+	product: idSchema,
+} satisfies {[key in keyof Retrospective]: ZodTypeAny})
+
+export const RetrospectiveCollectionSchema = z.array(RetrospectiveSchema)

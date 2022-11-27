@@ -1,19 +1,25 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Goals = {
-	id: string
+import type {Id} from "~/types"
 
-	name: string
+import {idSchema} from "~/types"
+
+export type Goal = {
+	id: Id
+
 	description: string
+	name: string
 
-	product_id: string
+	product: Id
 }
 
-export const GoalsSchema = z.object({
-	id: z.string(),
-	name: z.string(),
-	description: z.string(),
-	product_id: z.string(),
-} satisfies {[key in keyof Goals]: ZodTypeAny})
+export const GoalSchema = z.object({
+	id: idSchema,
 
-export const GoalsCollectionSchema = z.array(GoalsSchema)
+	description: z.string(),
+	name: z.string(),
+
+	product: idSchema,
+} satisfies {[key in keyof Goal]: ZodTypeAny})
+
+export const GoalCollectionSchema = z.array(GoalSchema)

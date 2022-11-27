@@ -1,9 +1,12 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Tasks = {
-	id: string
+import type {Id} from "~/types"
 
-	title: string
+import {idSchema} from "~/types"
+
+export type Task = {
+	id: Id
+
 	board: string
 	date: Date
 	description: string
@@ -11,13 +14,14 @@ export type Tasks = {
 	status: `Backlog`
 	subject: string
 	time: string
+	title: string
 
-	product_id: string
+	product: Id
 }
 
-export const TasksSchema = z.object({
-	id: z.string(),
-	title: z.string(),
+export const TaskSchema = z.object({
+	id: idSchema,
+
 	board: z.string(),
 	date: z.date(),
 	description: z.string(),
@@ -25,7 +29,9 @@ export const TasksSchema = z.object({
 	status: z.literal(`Backlog`),
 	subject: z.string(),
 	time: z.string(),
-	product_id: z.string(),
-} satisfies {[key in keyof Tasks]: ZodTypeAny})
+	title: z.string(),
 
-export const TasksCollectionSchema = z.array(TasksSchema)
+	product: idSchema,
+} satisfies {[key in keyof Task]: ZodTypeAny})
+
+export const TaskCollectionSchema = z.array(TaskSchema)

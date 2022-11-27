@@ -1,11 +1,13 @@
 import {z, ZodTypeAny} from "zod"
 
-export type JourneyEvents = {
-	id: string
+import type {Id} from "~/types"
 
-	title: string
+import {idSchema} from "~/types"
+
+export type JourneyEvent = {
+	id: Id
+
 	description: string
-	start: Date
 	end: Date
 	isDelighted: string
 	level: number
@@ -13,15 +15,16 @@ export type JourneyEvents = {
 		label: string
 		checked: boolean
 	}>
+	start: Date
+	title: string
 
-	journey_id: string
+	journey: Id
 }
 
-export const JourneyEventsSchema = z.object({
-	id: z.string(),
-	title: z.string(),
+export const JourneyEventSchema = z.object({
+	id: idSchema,
+
 	description: z.string(),
-	start: z.date(),
 	end: z.date(),
 	isDelighted: z.string(),
 	level: z.number(),
@@ -31,7 +34,10 @@ export const JourneyEventsSchema = z.object({
 			checked: z.boolean(),
 		}),
 	),
-	journey_id: z.string(),
-} satisfies {[key in keyof JourneyEvents]: ZodTypeAny})
+	start: z.date(),
+	title: z.string(),
 
-export const JourneyEventsCollectionSchema = z.array(JourneyEventsSchema)
+	journey: idSchema,
+} satisfies {[key in keyof JourneyEvent]: ZodTypeAny})
+
+export const JourneyEventCollectionSchema = z.array(JourneyEventSchema)

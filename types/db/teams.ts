@@ -1,7 +1,11 @@
 import {z, ZodTypeAny} from "zod"
 
-export type Teams = {
-	id: string
+import type {Id} from "~/types"
+
+import {idSchema} from "~/types"
+
+export type Team = {
+	id: Id
 
 	expiry: Date
 	type: `member`
@@ -12,11 +16,12 @@ export type Teams = {
 		avatar: string
 	}
 
-	product_id: string
+	product: Id
 }
 
-export const TeamsSchema = z.object({
-	id: z.string(),
+export const TeamSchema = z.object({
+	id: idSchema,
+
 	expiry: z.date(),
 	type: z.literal(`member`),
 	user: z.object({
@@ -25,7 +30,8 @@ export const TeamsSchema = z.object({
 		email: z.string(),
 		avatar: z.string(),
 	}),
-	product_id: z.string(),
-} satisfies {[key in keyof Teams]: ZodTypeAny})
 
-export const TeamsCollectionSchema = z.array(TeamsSchema)
+	product: idSchema,
+} satisfies {[key in keyof Team]: ZodTypeAny})
+
+export const TeamCollectionSchema = z.array(TeamSchema)
