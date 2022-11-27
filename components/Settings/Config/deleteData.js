@@ -174,7 +174,7 @@ const deleteData = async (id) => {
       db.collection("Versions").doc(doc.id).delete();
     });
 
-    db.collection("Product").doc(id).delete()
+    db.collection("Products").doc(id).delete()
     .then(() => Router.push("/product"))
   }
 };

@@ -52,7 +52,7 @@ const ProductConfiguration = () => {
 
   const handleSubmit = () => {
     if ((product !== "" && email1 !== "" && cadence !== "", gate !== "")) {
-      db.collection("Product")
+      db.collection("Products")
         .add({
           product,
           email1,
@@ -70,7 +70,7 @@ const ProductConfiguration = () => {
           addOwnerToTeam(res.id);
           createAccessibilities(res.id);
           addPrimaryGoals(res.id);
-          createKickoff(id);
+          createKickoff(res.id);
           message.success({
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",

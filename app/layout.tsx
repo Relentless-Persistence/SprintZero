@@ -3,6 +3,7 @@
 import {QueryClientProvider} from "@tanstack/react-query"
 import {ConfigProvider} from "antd5"
 import {onAuthStateChanged} from "firebase9/auth"
+import {useRouter} from "next/navigation"
 import {useEffect} from "react"
 
 import type {ReactElement, ReactNode} from "react"
@@ -22,13 +23,18 @@ const RootLayout = ({children}: Props): ReactElement | null => {
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const setActiveProductId = useMainStore((state) => state.setActiveProductId)
 
+	const {replace} = useRouter()
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, async (user) => {
 			setUser(user)
 			if (!user) return
 
 			if (activeProductId) return
-			const firstProduct = (await getAllProducts(user.uid)())[0]!
+			const firstProduct = (await getAllProducts(user.uid)())[0]
+			if (!firstProduct) {
+				replace(`/product`)
+				return
+			}
 			setActiveProductId(firstProduct.id)
 		})
 

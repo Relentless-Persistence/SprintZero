@@ -21,7 +21,8 @@ const DashboardLayout = ({children}: Props): ReactElement | null => {
 	const user = useMainStore((state) => state.user)
 	const {data: products} = useQuery({
 		queryKey: [`allProducts`, user?.uid],
-		queryFn: getAllProducts(user?.uid),
+		// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+		queryFn: getAllProducts(user?.uid!),
 		enabled: user?.uid !== undefined,
 	})
 

@@ -1,8 +1,11 @@
-import {z, ZodTypeAny} from "zod"
+import {z} from "zod"
 
 import type {Id} from "~/types"
 
-import {idSchema} from "~/types"
+import {idSchema, DbName, ZodSchema} from "~/types"
+
+// Workaround https://github.com/swc-project/swc/issues/6514
+idSchema
 
 export type Feature = {
 	id: Id
@@ -16,6 +19,16 @@ export type Feature = {
 	epic: Id
 }
 
+export const NFeatures = {
+	n: `Features`,
+	id: {n: `id`},
+	description: {n: `description`},
+	name: {n: `name`},
+	comments: {n: `comments`},
+	stories: {n: `stories`},
+	epic: {n: `epic`},
+} satisfies DbName<Feature>
+
 export const FeatureSchema = z.object({
 	id: idSchema,
 
@@ -26,6 +39,6 @@ export const FeatureSchema = z.object({
 	stories: z.array(idSchema),
 
 	epic: idSchema,
-} satisfies {[key in keyof Feature]: ZodTypeAny})
+} satisfies ZodSchema<Feature>)
 
 export const FeatureCollectionSchema = z.array(FeatureSchema)

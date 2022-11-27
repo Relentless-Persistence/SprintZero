@@ -1,8 +1,11 @@
-import {z, ZodTypeAny} from "zod"
+import {z} from "zod"
 
 import type {Id} from "~/types"
 
-import {idSchema} from "~/types"
+import {idSchema, DbName, ZodSchema} from "~/types"
+
+// Workaround https://github.com/swc-project/swc/issues/6514
+idSchema
 
 export type Journey = {
 	id: Id
@@ -15,6 +18,16 @@ export type Journey = {
 	product: Id
 }
 
+export const NJourneys = {
+	n: `Journeys`,
+	id: {n: `id`},
+	duration: {n: `duration`},
+	durationType: {n: `durationType`},
+	name: {n: `name`},
+	start: {n: `start`},
+	product: {n: `product`},
+} satisfies DbName<Journey>
+
 export const JourneySchema = z.object({
 	id: idSchema,
 
@@ -24,6 +37,6 @@ export const JourneySchema = z.object({
 	start: z.string(),
 
 	product: idSchema,
-} satisfies {[key in keyof Journey]: ZodTypeAny})
+} satisfies ZodSchema<Journey>)
 
 export const JourneyCollectionSchema = z.array(JourneySchema)

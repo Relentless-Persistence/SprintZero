@@ -57,7 +57,7 @@ const config = () => {
   };
 
   const updateCadence = (cadence) => {
-    db.collection("Product")
+    db.collection("Products")
       .doc(product.id)
       .update({
         cadence,
@@ -69,7 +69,7 @@ const config = () => {
   };
 
   const updateGate = (gate) => {
-    db.collection("Product")
+    db.collection("Products")
       .doc(product.id)
       .update({
         gate,
@@ -87,7 +87,7 @@ const config = () => {
       } else {
         console.error("You have no authorization here!");
       }
-      // db.collection("Product")
+      // db.collection("Products")
       // .where("owner", "==", user.uid)
       // .onSnapshot((snapshot) => {
       //   const products = snapshot.docs.map((doc) => ({

@@ -1,11 +1,12 @@
 import {Timestamp} from "firebase9/firestore"
-import {z, ZodTypeAny} from "zod"
+import {z} from "zod"
 
 import type {Id} from "~/types"
 
-import {idSchema} from "~/types"
+import {idSchema, DbName, ZodSchema} from "~/types"
 
 // Workaround https://github.com/swc-project/swc/issues/6514
+idSchema
 Timestamp
 
 export type Epic = {
@@ -22,6 +23,18 @@ export type Epic = {
 	updatedAt: Timestamp
 }
 
+export const NEpics = {
+	n: `Epics`,
+	id: {n: `id`},
+	description: {n: `description`},
+	name: {n: `name`},
+	comments: {n: `comments`},
+	features: {n: `features`},
+	keepers: {n: `keepers`},
+	product: {n: `product`},
+	updatedAt: {n: `updatedAt`},
+} satisfies DbName<Epic>
+
 export const EpicSchema = z.object({
 	id: idSchema,
 
@@ -34,6 +47,6 @@ export const EpicSchema = z.object({
 	product: idSchema,
 
 	updatedAt: z.instanceof(Timestamp),
-} satisfies {[key in keyof Epic]: ZodTypeAny})
+} satisfies ZodSchema<Epic>)
 
 export const EpicCollectionSchema = z.array(EpicSchema)

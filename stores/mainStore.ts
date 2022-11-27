@@ -2,12 +2,13 @@ import create from "zustand"
 import {immer} from "zustand/middleware/immer"
 
 import type {User} from "firebase9/auth"
+import type {Id} from "~/types"
 
 type MainStore = {
 	user: User | null
 	setUser: (user: User | null) => void
-	activeProductId: string | null
-	setActiveProductId: (id: string) => void
+	activeProductId: Id | null
+	setActiveProductId: (id: Id) => void
 }
 
 const useMainStore = create(

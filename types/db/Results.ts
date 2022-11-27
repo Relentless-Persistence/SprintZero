@@ -1,8 +1,11 @@
-import {z, ZodTypeAny} from "zod"
+import {z} from "zod"
 
 import type {Id} from "~/types"
 
-import {idSchema} from "~/types"
+import {idSchema, DbName, ZodSchema} from "~/types"
+
+// Workaround https://github.com/swc-project/swc/issues/6514
+idSchema
 
 export type Result = {
 	id: Id
@@ -12,12 +15,19 @@ export type Result = {
 	goal: Id
 }
 
+export const NResults = {
+	n: `Results`,
+	id: {n: `id`},
+	description: {n: `description`},
+	goal: {n: `goal`},
+} satisfies DbName<Result>
+
 export const ResultSchema = z.object({
 	id: idSchema,
 
 	description: z.string(),
 
 	goal: idSchema,
-} satisfies {[key in keyof Result]: ZodTypeAny})
+} satisfies ZodSchema<Result>)
 
 export const ResultCollectionSchema = z.array(ResultSchema)

@@ -15,7 +15,7 @@ const StoryMap = (): ReactElement | null => {
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const {data: versions} = useQuery({
 		queryKey: [`allVersions`, activeProductId],
-		queryFn: getAllVersions(activeProductId),
+		queryFn: getAllVersions(activeProductId!),
 		enabled: activeProductId !== null,
 	})
 
@@ -40,7 +40,7 @@ const StoryMap = (): ReactElement | null => {
 				<div className="flex justify-between">
 					<Breadcrumb>
 						<Breadcrumb.Item>Story Map</Breadcrumb.Item>
-						<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersion)?.version}</Breadcrumb.Item>
+						<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersion)?.name}</Breadcrumb.Item>
 					</Breadcrumb>
 
 					<Button onClick={() => void setNewVersionInput(``)}>+ Add version</Button>
@@ -56,6 +56,8 @@ const StoryMap = (): ReactElement | null => {
 						<p>High value</p>
 					</div>
 				</div>
+
+				{/* <StoryMap /> */}
 			</div>
 
 			<div>
@@ -64,7 +66,7 @@ const StoryMap = (): ReactElement | null => {
 					items={[
 						...(versions ?? []).map((version) => ({
 							key: version.id,
-							label: version.version,
+							label: version.name,
 							onClick: () => void setCurrentVersion(version.id),
 						})),
 						{key: `__ALL_VERSIONS__`, label: `All`, onClick: () => void setCurrentVersion(`__ALL_VERSIONS__`)},
