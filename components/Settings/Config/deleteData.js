@@ -166,12 +166,12 @@ const deleteData = async (id) => {
     });
 
     const versions = await db
-      .collection("versions")
+      .collection("Versions")
       .where("product_id", "==", id)
       .get();
 
     versions.docs.map((doc) => {
-      db.collection("versions").doc(doc.id).delete();
+      db.collection("Versions").doc(doc.id).delete();
     });
 
     db.collection("Product").doc(id).delete()

@@ -8,7 +8,7 @@ import {useEffect} from "react"
 import type {ReactElement, ReactNode} from "react"
 
 import "./styles.css"
-import {getAllProducts} from "~/app/dashboard/fetch"
+import {getAllProducts} from "~/utils/fetch"
 import {auth} from "~/config/firebase"
 import {queryClient} from "~/config/reactQuery"
 import useMainStore from "~/stores/mainStore"
@@ -40,7 +40,7 @@ const RootLayout = ({children}: Props): ReactElement | null => {
 			<QueryClientProvider client={queryClient}>
 				<html lang="en" className="h-full">
 					<head></head>
-					<body className="h-full">{children}</body>
+					<body className="h-full bg-[#f0f2f5]">{children}</body>
 				</html>
 			</QueryClientProvider>
 		</ConfigProvider>
