@@ -1,41 +1,6 @@
 import {z} from "zod"
 
-import type {Id} from "~/types"
-
-import {idSchema, DbName, ZodSchema} from "~/types"
-
-// Workaround https://github.com/swc-project/swc/issues/6514
-idSchema
-
-export type Team = {
-	id: Id
-
-	expiry: Date
-	type: `member`
-	user: {
-		uid: string
-		name: string
-		email: string
-		avatar: string
-	}
-
-	product: Id
-}
-
-export const NTeams = {
-	n: `Teams`,
-	id: {n: `id`},
-	expiry: {n: `expiry`},
-	type: {n: `type`},
-	user: {
-		n: `user`,
-		uid: {n: `user.uid`},
-		name: {n: `user.name`},
-		email: {n: `user.email`},
-		avatar: {n: `user.avatar`},
-	},
-	product: {n: `product`},
-} satisfies DbName<Team>
+import {genDbNames, idSchema} from "~/types"
 
 export const TeamSchema = z.object({
 	id: idSchema,
@@ -50,6 +15,8 @@ export const TeamSchema = z.object({
 	}),
 
 	product: idSchema,
-} satisfies ZodSchema<Team>)
-
+})
 export const TeamCollectionSchema = z.array(TeamSchema)
+
+export const Teams = genDbNames(`Teams`, TeamSchema)
+export type Team = z.infer<typeof TeamSchema>

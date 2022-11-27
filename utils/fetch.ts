@@ -6,13 +6,13 @@ import type {Product} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
 import {db} from "~/config/firebase"
-import {NEpics, EpicCollectionSchema} from "~/types/db/Epics"
-import {NProducts, ProductCollectionSchema} from "~/types/db/Products"
-import {NVersions, VersionCollectionSchema} from "~/types/db/Versions"
+import {Epics, EpicCollectionSchema} from "~/types/db/Epics"
+import {Products, ProductCollectionSchema} from "~/types/db/Products"
+import {Versions, VersionCollectionSchema} from "~/types/db/Versions"
 
 export const getAllProducts = (userId: string) => async (): Promise<Product[]> => {
 	const _data = await getDocs(
-		query(collection(db, NProducts.n), where(NProducts.owner.n, `==`, userId), orderBy(NProducts.product.n)),
+		query(collection(db, Products._), where(Products.owner, `==`, userId), orderBy(Products.product)),
 	)
 	const data = ProductCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
@@ -20,7 +20,7 @@ export const getAllProducts = (userId: string) => async (): Promise<Product[]> =
 
 export const getAllVersions = (productId: string) => async (): Promise<Version[]> => {
 	const _data = await getDocs(
-		query(collection(db, NVersions.n), where(NVersions.product.n, `==`, productId), orderBy(NVersions.name.n)),
+		query(collection(db, Versions._), where(Versions.product, `==`, productId), orderBy(Versions.name)),
 	)
 	const data = VersionCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
@@ -32,9 +32,9 @@ export const addVersion =
 		const existingDoc = (
 			await getDocs(
 				query(
-					collection(db, NVersions.n),
-					where(NVersions.product.n, `==`, productId),
-					where(NVersions.name.n, `==`, versionName),
+					collection(db, Versions._),
+					where(Versions.product, `==`, productId),
+					where(Versions.name, `==`, versionName),
 				),
 			)
 		).docs[0]
@@ -44,7 +44,7 @@ export const addVersion =
 			name: versionName,
 			product: productId,
 		}
-		await addDoc(collection(db, NVersions.n), data)
+		await addDoc(collection(db, Versions._), data)
 	}
 
 type AddEpicInput = {
@@ -63,13 +63,33 @@ export const addEpic =
 			features: [],
 			product: productId,
 		}
-		await addDoc(collection(db, NEpics.n), data)
+		await addDoc(collection(db, Epics._), data)
 	}
 
 export const getAllEpics = (productId: Id) => async (): Promise<Epic[]> => {
 	const _data = await getDocs(
-		query(collection(db, NEpics.n), where(NEpics.product.n, `==`, productId), orderBy(NEpics.name.n)),
+		query(collection(db, Epics._), where(Epics.product, `==`, productId), orderBy(Epics.name)),
 	)
 	const data = EpicCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
+
+export const addFeature =
+	(epicId: Id) =>
+	async (featureName: Id): Promise<void> => {
+		const existingDoc = (
+			await getDocs(
+				query(
+					collection(db, Epics._),
+					where(Epics.id, `==`, epicId),
+					where(Epics.features, `array-contains`, featureName),
+				),
+			)
+		).docs[0]
+		if (existingDoc) throw new Error(`Feature name taken.`)
+
+		const data: Omit<Epic, `id` | `updatedAt`> = {
+			features: [featureName],
+		}
+		await addDoc(collection(db, Epics._), data)
+	}

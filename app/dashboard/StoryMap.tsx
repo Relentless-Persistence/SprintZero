@@ -5,6 +5,7 @@ import {Button} from "antd5"
 
 import type {ReactElement} from "react"
 
+import Epic from "./Epic"
 import useMainStore from "~/stores/mainStore"
 import {addEpic, getAllEpics} from "~/utils/fetch"
 
@@ -23,11 +24,10 @@ const StoryMap = (): ReactElement | null => {
 		onSuccess: () => void queryClient.invalidateQueries({queryKey: [`all-epics`, activeProductId], exact: true}),
 	})
 
-	// console.log(epics)
 	return (
 		<div>
 			{epics?.map((epic) => (
-				<p key={epic.id}>{epic.name}</p>
+				<Epic key={epic.id} epic={epic} />
 			))}
 			<Button onClick={() => void addEpicMutation.mutate({name: `Epic`, description: `description`})}>Add epic</Button>
 		</div>

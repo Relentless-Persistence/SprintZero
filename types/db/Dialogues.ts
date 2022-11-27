@@ -1,44 +1,7 @@
 import {Timestamp} from "firebase9/firestore"
 import {z} from "zod"
 
-import type {Id} from "~/types"
-
-import {idSchema, DbName, ZodSchema} from "~/types"
-
-// Workaround https://github.com/swc-project/swc/issues/6514
-idSchema
-Timestamp
-
-export type Dialogue = {
-	id: Id
-
-	education: string
-	name: string
-	notes: Array<{
-		title: string
-		response: string
-	}>
-	post: string
-	region: string
-	type: `Identified` | `Contacted` | `Scheduled` | `Interviewed` | `Analyzing` | `Processed`
-
-	product: Id
-
-	updatedAt: Timestamp
-}
-
-export const NDialogue = {
-	n: `Dialogue`,
-	id: {n: `id`},
-	education: {n: `education`},
-	name: {n: `name`},
-	notes: {n: `notes`, title: {n: `title`}, response: {n: `response`}},
-	post: {n: `post`},
-	region: {n: `region`},
-	type: {n: `type`},
-	product: {n: `product`},
-	updatedAt: {n: `updatedAt`},
-} satisfies DbName<Dialogue>
+import {genDbNames, idSchema} from "~/types"
 
 export const DialogueSchema = z.object({
 	id: idSchema,
@@ -65,6 +28,8 @@ export const DialogueSchema = z.object({
 	product: idSchema,
 
 	updatedAt: z.instanceof(Timestamp),
-} satisfies ZodSchema<Dialogue>)
-
+})
 export const DialogueCollectionSchema = z.array(DialogueSchema)
+
+export const Dialogues = genDbNames(`Dialogues`, DialogueSchema)
+export type Dialogue = z.infer<typeof DialogueSchema>
