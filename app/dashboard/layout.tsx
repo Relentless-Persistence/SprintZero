@@ -20,7 +20,7 @@ type Props = {
 const DashboardLayout = ({children}: Props): ReactElement | null => {
 	const user = useMainStore((state) => state.user)
 	const {data: products} = useQuery({
-		queryKey: [`allProducts`, user?.uid],
+		queryKey: [`all-products`, user?.uid],
 		// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 		queryFn: getAllProducts(user?.uid!),
 		enabled: user?.uid !== undefined,
@@ -45,15 +45,13 @@ const DashboardLayout = ({children}: Props): ReactElement | null => {
 							key: product.id,
 							label: (
 								<button type="button" onClick={() => void setActiveProductId(product.id)} className="relative">
-									{product.product}
+									{product.name}
 									{activeProductId === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
 								</button>
 							),
 						}))}
-						className="bg-transparent"
+						className="grow bg-transparent"
 					/>
-
-					<div className="grow" />
 
 					<button type="button" onClick={() => void setIsSettingsOpen(true)}>
 						<Avatar src={user?.photoURL} className="border-2 border-green" />

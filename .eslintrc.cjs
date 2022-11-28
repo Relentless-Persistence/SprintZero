@@ -67,8 +67,13 @@ module.exports = {
 		},
 		{
 			files: [`**/*.jsx`, `**/*.tsx`],
-			plugins: [`react`, `react-hooks`],
-			extends: [`plugin:react/recommended`, `plugin:react-hooks/recommended`, `plugin:react/jsx-runtime`],
+			plugins: [`react`, `react-hooks`, `@tanstack/query`],
+			extends: [
+				`plugin:react/recommended`,
+				`plugin:react-hooks/recommended`,
+				`plugin:react/jsx-runtime`,
+				`plugin:@tanstack/eslint-plugin-query/recommended`,
+			],
 			rules: {
 				"react/button-has-type": `warn`,
 				"react/display-name": `warn`,

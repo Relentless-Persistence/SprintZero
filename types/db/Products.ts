@@ -21,7 +21,7 @@ export const ProductSchema = z.object({
 		z.literal(`Saturday`),
 		z.literal(`Sunday`),
 	]),
-	product: z.string(),
+	name: z.string(),
 
 	owner: idSchema,
 

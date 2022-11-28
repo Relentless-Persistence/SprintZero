@@ -11,6 +11,7 @@ export const FeatureSchema = z.object({
 	comments: z.array(idSchema),
 	stories: z.array(idSchema),
 
+	product: idSchema,
 	epic: idSchema,
 })
 export const FeatureCollectionSchema = z.array(FeatureSchema)

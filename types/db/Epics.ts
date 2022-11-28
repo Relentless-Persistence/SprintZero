@@ -11,6 +11,8 @@ export const EpicSchema = z.object({
 	comments: z.array(idSchema),
 	features: z.array(idSchema),
 	keepers: z.array(idSchema),
+	nextEpic: idSchema.nullable(),
+	prevEpic: idSchema.nullable(),
 	product: idSchema,
 })
 export const EpicCollectionSchema = z.array(EpicSchema)
