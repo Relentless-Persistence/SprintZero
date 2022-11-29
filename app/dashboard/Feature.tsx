@@ -66,29 +66,29 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 					</div>
 
 					<div className="flex items-center">
-						<div className="flex items-center">
-							<div className="mt-4 flex gap-1">
-								{stories.map((story) => (
-									<Story key={story.id} story={story} />
-								))}
-							</div>
+						<div
+							className={clsx(`flex gap-1`, (stories.length > 0 || currentVersion !== `__ALL_VERSIONS__`) && `mt-4`)}
+						>
+							{stories.map((story) => (
+								<Story key={story.id} story={story} />
+							))}
+							{currentVersion !== `__ALL_VERSIONS__` && (
+								<div className="p-4">
+									<Button
+										onClick={() =>
+											void addStoryMutation.mutate({
+												name: `story`,
+												description: `description`,
+												version: currentVersion,
+											})
+										}
+										className="bg-white"
+									>
+										Add story
+									</Button>
+								</div>
+							)}
 						</div>
-						{currentVersion !== `__ALL_VERSIONS__` && (
-							<div className="p-4">
-								<Button
-									onClick={() =>
-										void addStoryMutation.mutate({
-											name: `story`,
-											description: `description`,
-											version: currentVersion,
-										})
-									}
-									className="bg-white"
-								>
-									Add story
-								</Button>
-							</div>
-						)}
 					</div>
 				</div>
 			</Draggable>

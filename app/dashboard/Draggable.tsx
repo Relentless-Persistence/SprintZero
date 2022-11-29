@@ -28,21 +28,24 @@ const Draggable: ForwardRefRenderFunction<HTMLDivElement, DraggableProps> = ({ch
 	}, [id, isActive, layer, prevIsActive, setCurrentLayerHover])
 
 	return (
-		<motion.div
-			drag
-			dragSnapToOrigin
-			data-layer={layer}
-			onPointerMove={(e) => void setIsHovering(!(e.target as HTMLElement).hasAttribute(`data-nondraggable`))}
-			onPointerLeave={() => void setIsHovering(false)}
-			onPointerDown={(e) => {
-				if ((e.target as HTMLElement).hasAttribute(`data-nodraggable`)) e.stopPropagation()
-				setIsHolding(true)
-			}}
-			onPointerUp={() => void setIsHolding(false)}
-			onPointerCancel={() => void setIsHolding(false)}
-			ref={ref}
-		>
-			{children}
+		<motion.div drag dragSnapToOrigin data-layer={layer} ref={ref}>
+			<div
+				onPointerMove={(e) => {
+					const isDraggable = !(e.target as HTMLElement).hasAttribute(`data-nondraggable`)
+					setIsHovering(isDraggable)
+					if (!isDraggable) e.stopPropagation()
+				}}
+				onPointerLeave={() => void setIsHovering(false)}
+				onPointerDown={(e) => {
+					const isDraggable = !(e.target as HTMLElement).hasAttribute(`data-nondraggable`)
+					setIsHolding(isDraggable)
+					if (!isDraggable) e.stopPropagation()
+				}}
+				onPointerUp={() => void setIsHolding(false)}
+				onPointerCancel={() => void setIsHolding(false)}
+			>
+				{children}
+			</div>
 		</motion.div>
 	)
 }
@@ -73,6 +76,7 @@ const Input: FC<InputProps> = ({value, onChange}) => {
 				}}
 				className="grow bg-transparent text-center"
 				style={{width: `${textWidth}px`}}
+				ref={() => void updateTextWidth()}
 			/>
 
 			{typeof window !== `undefined` &&

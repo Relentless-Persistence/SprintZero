@@ -66,14 +66,14 @@ const Epic: FC<EpicProps> = ({epic}) => {
 							{features.map((feature) => (
 								<Feature key={feature.id} epicId={epic.id} feature={feature} />
 							))}
-						</div>
-						<div className="p-4">
-							<Button
-								onClick={() => void addFeatureMutation.mutate({name: `feature`, description: `description`})}
-								className="bg-white"
-							>
-								Add feature
-							</Button>
+							<div className="p-4">
+								<Button
+									onClick={() => void addFeatureMutation.mutate({name: `feature`, description: `description`})}
+									className="bg-white"
+								>
+									Add feature
+								</Button>
+							</div>
 						</div>
 					</div>
 				</div>
