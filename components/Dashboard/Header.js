@@ -90,7 +90,7 @@ const AppHeader = ({ onChangeProduct }) => {
             products.map((product, i) => (
               <HeaderMenu
                 key={i}
-                className="mr-10"
+                className="mr-10 capitalize"
                 active={activeProduct && activeProduct.product === product.product}
                 onClick={() => setActiveProduct(product)}
               >

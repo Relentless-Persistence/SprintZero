@@ -53,6 +53,7 @@ const PersonasListCard = ({
 }) => {
   const { userRole } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
+  const [newPersona, setNewPersona] = useState();
 
   const toggleEdit = () => setIsEdit((s) => !s);
 
@@ -84,6 +85,24 @@ const PersonasListCard = ({
     });
   };
 
+  const addPersona = () => {
+		db.collection("Personas").add({
+			role: newPersona,
+			product_id: product.id,
+			goals: [""],
+			interactions: [""],
+			dailyLife: [""],
+			tasks: [""],
+			responsibilities: [""],
+			priorities: [""],
+			frustrations: [""],
+			changes: [""],
+			description: "",
+		}).then(() => { 
+      setNewPersona();
+    })
+	}
+
   const remove = (id) => {
     // const newList = list.filter((_, i) => i !== index);
     // setList(newList);
@@ -109,88 +128,101 @@ const PersonasListCard = ({
   };
 
   return isEdit ? (
-    <MyCard
-      className="border-2 border-[#D9D9D9]"
-      extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
-      title={<strong>{title}</strong>}
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      {cardData.map((it, i) => (
-        <MyInput
-          key={it.id}
-          value={it.role}
-          className="mb-[12px]"
-          onChange={(e) => onChange(e.target.value, it.id)}
-          addonBefore={
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => remove(it.id)}
-                className="flex items-center mr-[5px]"
-              >
-                <MinusCircleOutlined
-                  style={{
-                    color: "#C82D73",
-                  }}
-                />
-              </button>
-              {`${i + 1}.`}
-            </div>
-          }
-          autoFocus
-          $removeRightBorder={i === cardData.length - 1}
-          addonAfter={
-            i === cardData.length - 1 ? (
-              <Add onClick={add}>
-                <PlusCircleOutlined
-                  style={{
-                    color: "#009C7E",
-                  }}
-                />
-              </Add>
-            ) : null
-          }
-        />
-      ))}
-    </MyCard>
-  ) : (
-    <>
-      {userRole && (
-        <MyCard
-          className="border-2 border-[#D9D9D9]"
-          extra={
-            userRole !== "viewer" ? (
-              <CardHeaderLink size="small" onClick={toggleEdit}>
-                Edit
-              </CardHeaderLink>
-            ) : null
-          }
-          title={<strong>{title}</strong>}
-          headStyle={{
-            background: "#F5F5F5",
-          }}
-        >
-          <OL>
-            {cardData.length < 1 ? (
-              <p>
-                No{" "}
-                <span
-                  className="cursor-pointer font-semibold"
-                  onClick={() => setIsEdit(true)}
-                >
-                  {title}
-                </span>{" "}
-                Added Yet
-              </p>
-            ) : (
-              cardData.map((item, i) => <li key={i}>{item.role}</li>)
-            )}
-          </OL>
-        </MyCard>
-      )}
-    </>
-  );
+		<MyCard
+			className="border-2 border-[#D9D9D9]"
+			extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
+			title={<strong>{title}</strong>}
+			headStyle={{
+				background: "#F5F5F5",
+			}}
+		>
+			{cardData.length >= 1 ? (
+				cardData.map((it, i) => (
+					<MyInput
+						key={it.id}
+						value={it.role}
+						className="mb-[12px]"
+						onChange={(e) => onChange(e.target.value, it.id)}
+						addonBefore={
+							<div className="flex items-center justify-between">
+								<button onClick={() => remove(it.id)} className="mr-[5px] flex items-center">
+									<MinusCircleOutlined
+										style={{
+											color: "#C82D73",
+										}}
+									/>
+								</button>
+								{`${i + 1}.`}
+							</div>
+						}
+						autoFocus
+						$removeRightBorder={i === cardData.length - 1}
+						addonAfter={
+							i === cardData.length - 1 ? (
+								<Add onClick={add}>
+									<PlusCircleOutlined
+										style={{
+											color: "#009C7E",
+										}}
+									/>
+								</Add>
+							) : null
+						}
+					/>
+				))
+			) : (
+				<MyInput
+					value={newPersona}
+					className="mb-[12px]"
+					onChange={(e) => setNewPersona(e.target.value)}
+					autoFocus
+					addonAfter={
+						
+							<Add onClick={addPersona}>
+								<PlusCircleOutlined
+									style={{
+										color: "#009C7E",
+									}}
+								/>
+							</Add>
+					}
+				/>
+			)}
+		</MyCard>
+	) : (
+		<>
+			{userRole && (
+				<MyCard
+					className="border-2 border-[#D9D9D9]"
+					extra={
+						userRole !== "viewer" ? (
+							<CardHeaderLink size="small" onClick={toggleEdit}>
+								Edit
+							</CardHeaderLink>
+						) : null
+					}
+					title={<strong>{title}</strong>}
+					headStyle={{
+						background: "#F5F5F5",
+					}}
+				>
+					<OL>
+						{cardData.length < 1 ? (
+							<p>
+								No{" "}
+								<span className="cursor-pointer font-semibold" onClick={() => setIsEdit(true)}>
+									{title}
+								</span>{" "}
+								Added Yet
+							</p>
+						) : (
+							cardData.map((item, i) => <li key={i}>{item.role}</li>)
+						)}
+					</OL>
+				</MyCard>
+			)}
+		</>
+	)
 };
 
 export { PersonasListCard };

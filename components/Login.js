@@ -29,31 +29,70 @@ const Login = () => {
     }
   }, [user]);
 
+  // const handleOnClick = (provider) => {
+  //   try {
+  //     auth.signInWithPopup(provider).then(async (res) => {
+  //       var user = res.user;
+  //       console.log(res);
+  //       // Adding user to a product team
+  //       if (type && product) {
+  //         await db.collection("teams").add({
+  //           user: {
+  //             uid: user.uid,
+  //             email: user.email,
+  //             name: user.displayName,
+  //             avatar: user.photoURL,
+  //           },
+  //           expiry: "unlimited",
+  //           type: type,
+  //           product_id: product,
+  //         });
+  //       }
+
+  //       // Checking if user is new
+  //       if (res.additionalUserInfo.isNewUser) {
+  //         // if user has a company custom email
+  //         if (!/@gmail.com\s*$/.test(user.email)) {
+  //           router.push("/enterprise-contact");
+  //         } else {
+  //           message.success({
+  //             content: "Successfully logged in",
+  //             className: "custom-message",
+  //           });
+  //           router.push("/loginsuccess");
+  //         }
+  //       } else {
+  //         message.success({
+  //           content: "Successfully logged in",
+  //           className: "custom-message",
+  //         });
+  //         router.push("/dashboard");
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     message.error({
+  //       content: "An error occurred while trying to log you in",
+  //       className: "custom-message",
+  //     });
+  //   }
+  // };
+
   const handleOnClick = (provider) => {
     try {
       auth.signInWithPopup(provider).then(async (res) => {
         var user = res.user;
-        console.log(res);
-        // Adding user to a product team
-        if (type && product) {
-          await db.collection("teams").add({
-            user: {
-              uid: user.uid,
-              email: user.email,
-              name: user.displayName,
-              avatar: user.photoURL,
-            },
-            expiry: "unlimited",
-            type: type,
-            product_id: product,
-          });
-        }
 
         // Checking if user is new
         if (res.additionalUserInfo.isNewUser) {
           // if user has a company custom email
-          if (!/@gmail.com\s*$/.test(user.email)) {
-            router.push("/enterprise-contact");
+          if (!/@relentlesspersistenceinc.com\s*$/.test(user.email)) {
+            message.error({
+              content: "Sorry, you can't login at this moment.",
+              className: "custom-message",
+            });
+            await auth.signOut()
+            router.push("https://www.sprintzero.app/")
           } else {
             message.success({
               content: "Successfully logged in",
@@ -77,7 +116,7 @@ const Login = () => {
       });
     }
   };
-
+  
   return (
     <>
       <div className="flex items-center justify-center mb-4">

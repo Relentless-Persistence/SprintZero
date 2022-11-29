@@ -171,7 +171,7 @@ export default function Personas() {
         sideAddValue={newRole}
         setSideAddValue={setNewRole}
       >
-        {roles?.length < 1 ? (
+        {roles && roles?.length < 1 ? (
           <div className="h-[450px] flex items-center justify-center">
             <div className="w-[320px] space-y-2">
               <h3 className="text-[24px] font-bold">Create Persona</h3>
