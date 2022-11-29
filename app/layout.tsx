@@ -27,7 +27,10 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, async (user) => {
 			setUser(user)
-			if (!user) return
+			if (!user) {
+				replace(`/`)
+				return
+			}
 
 			if (activeProductId) return
 			const firstProduct = (await getAllProducts(user.uid)())[0]

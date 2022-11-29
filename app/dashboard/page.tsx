@@ -3,32 +3,20 @@
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import {Breadcrumb, Button, Input, Menu} from "antd5"
-import {collection, onSnapshot, query, where} from "firebase9/firestore"
-import {useEffect, useLayoutEffect, useRef, useState} from "react"
+import {useEffect, useState} from "react"
 
 import type {FC} from "react"
-import type {Epic as EpicType} from "~/types/db/Epics"
-import type {Feature as FeatureType} from "~/types/db/Features"
-import type {Story as StoryType} from "~/types/db/Stories"
 
-import {useFinishedFetching, useStoryMapStore} from "./storyMapStore"
+import {useStoryMapStore} from "./storyMapStore"
 import StoryMap from "~/app/dashboard/StoryMap"
-import {db} from "~/config/firebase"
 import useMainStore from "~/stores/mainStore"
-import {EpicCollectionSchema, Epics} from "~/types/db/Epics"
-import {FeatureCollectionSchema, Features} from "~/types/db/Features"
-import {Stories, StoryCollectionSchema} from "~/types/db/Stories"
-import {addVersion, getAllVersions} from "~/utils/fetch"
+import {addVersion, getAllEpics, getAllVersions, getFeaturesByEpic, getStoriesByFeature} from "~/utils/fetch"
 
 const Dashboard: FC = () => {
 	const queryClient = useQueryClient()
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
 	const setCurrentVersion = useStoryMapStore((state) => state.setCurrentVersion)
-	const fetchedEpics = useStoryMapStore((state) => state.fetchedEpics)
-	const fetchedFeatures = useStoryMapStore((state) => state.fetchedFeatures)
-	const fetchedStories = useStoryMapStore((state) => state.fetchedStories)
-	const initialize = useStoryMapStore((state) => state.initialize)
 	const [newVersionInput, setNewVersionInput] = useState<string | null>(null)
 
 	const {data: versions} = useQuery({
@@ -49,49 +37,70 @@ const Dashboard: FC = () => {
 		},
 	})
 
-	const data = useRef({
-		epics: [] as EpicType[],
-		features: [] as FeatureType[],
-		stories: [] as StoryType[],
+	const setEpics = useStoryMapStore((state) => state.setEpics)
+	const setFeatures = useStoryMapStore((state) => state.setFeatures)
+	const setStories = useStoryMapStore((state) => state.setStories)
+
+	const {data: epics, isSuccess: isSuccessEpics} = useQuery({
+		queryKey: [`all-epics`, activeProductId],
+		queryFn: getAllEpics(activeProductId!),
+		select: (data) =>
+			data.sort((epic1, epic2) => {
+				// Sort epics by prevEpic and nextEpic
+				if (epic1.prevEpic === null) return -1
+				if (epic2.prevEpic === null) return 1
+				if (epic1.prevEpic === epic2.id) return 1
+				if (epic2.prevEpic === epic1.id) return -1
+				return 0
+			}),
+		onSuccess: (epics) => void setEpics(epics),
+		enabled: activeProductId !== null,
+		staleTime: Infinity,
 	})
-	useEffect(() => {
-		if (!activeProductId) return
 
-		const unsubscribeEpics = onSnapshot(
-			query(collection(db, Epics._), where(Epics.product, `==`, activeProductId)),
-			(doc) => {
-				data.current.epics = EpicCollectionSchema.parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-				fetchedEpics()
-			},
-		)
+	const epicIds = epics?.map((epic) => epic.id) ?? []
+	const {data: features, isSuccess: isSuccessFeatures} = useQuery({
+		queryKey: [`all-features`, epicIds],
+		queryFn: async () => await Promise.all(epicIds.map((epicId) => getFeaturesByEpic(epicId)())),
+		select: (data) =>
+			data
+				.map((featureList) =>
+					featureList.sort((feature1, feature2) => {
+						if (feature1.prevFeature === null) return -1
+						if (feature2.prevFeature === null) return 1
+						if (feature1.prevFeature === feature2.id) return 1
+						if (feature2.prevFeature === feature1.id) return -1
+						return 0
+					}),
+				)
+				.flat(),
+		onSuccess: (features) => void setFeatures(features),
+		enabled: epics !== undefined,
+		staleTime: Infinity,
+	})
 
-		const unsubscribeFeatures = onSnapshot(
-			query(collection(db, Features._), where(Features.product, `==`, activeProductId)),
-			(doc) => {
-				data.current.features = FeatureCollectionSchema.parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-				fetchedFeatures()
-			},
-		)
+	const featureIds = features?.map((feature) => feature.id) ?? []
+	const {isSuccess: isSuccessStories} = useQuery({
+		queryKey: [`all-stories`, featureIds],
+		queryFn: async () => await Promise.all(featureIds.map((featureId) => getStoriesByFeature(featureId)())),
+		select: (data) =>
+			data
+				.map((storyList) =>
+					storyList.sort((story1, story2) => {
+						if (story1.prevStory === null) return -1
+						if (story2.prevStory === null) return 1
+						if (story1.prevStory === story2.id) return 1
+						if (story2.prevStory === story1.id) return -1
+						return 0
+					}),
+				)
+				.flat(),
+		onSuccess: (stories) => void setStories(stories),
+		enabled: features !== undefined,
+		staleTime: Infinity,
+	})
 
-		const unsubscribeStories = onSnapshot(
-			query(collection(db, Stories._), where(Stories.product, `==`, activeProductId)),
-			(doc) => {
-				data.current.stories = StoryCollectionSchema.parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-				fetchedStories()
-			},
-		)
-
-		return () => {
-			unsubscribeEpics()
-			unsubscribeFeatures()
-			unsubscribeStories()
-		}
-	}, [activeProductId, fetchedEpics, fetchedFeatures, fetchedStories])
-
-	const finishedFetching = useFinishedFetching()
-	useLayoutEffect(() => {
-		if (finishedFetching) initialize(data.current.epics, data.current.features, data.current.stories)
-	}, [initialize, finishedFetching])
+	const finishedFetching = isSuccessEpics && isSuccessFeatures && isSuccessStories
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_minmax(6rem,max-content)]">
@@ -117,9 +126,7 @@ const Dashboard: FC = () => {
 				</div>
 
 				<div className="relative w-full grow">
-					<div className="absolute inset-0 overflow-x-auto px-12 pb-8">
-						<StoryMap />
-					</div>
+					<div className="absolute inset-0 overflow-x-auto px-12 pb-8">{finishedFetching && <StoryMap />}</div>
 				</div>
 			</div>
 

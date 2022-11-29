@@ -29,7 +29,11 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const [isActive, setIsActive] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 
-	const stories = useStoryMapStore((state) => Array.from(state.stories.values()).map((story) => story.story))
+	const stories = useStoryMapStore((state) =>
+		Array.from(state.stories.values())
+			.map((story) => story.story)
+			.filter((story) => story.feature === feature.id),
+	)
 
 	const addStoryMutation = useMutation({
 		mutationFn: addStory(activeProductId!, epicId, feature.id),
@@ -64,7 +68,9 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 					<div className="flex items-center">
 						<div className="flex items-center">
 							<div className="mt-4 flex gap-1">
-								{stories.map((story) => (story ? <Story key={story.id} story={story} /> : null))}
+								{stories.map((story) => (
+									<Story key={story.id} story={story} />
+								))}
 							</div>
 						</div>
 						{currentVersion !== `__ALL_VERSIONS__` && (

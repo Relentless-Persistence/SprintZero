@@ -5,10 +5,12 @@ type Divider = {
 	border: boolean
 }
 
-export const findDividers = (items: HTMLElement[]): Divider[] =>
+export const findDividers = (items: Array<>): Divider[] =>
 	items.reduce(
 		(acc, item) => {
 			const itemPos = item.offsetLeft
+      const lastPos = acc.at(-1)!.pos
+      const isBorder =
 			return [...acc, {pos: avg(acc.at(-1)!.pos, itemPos), border: false}, {pos: itemPos, border: false}]
 		},
 		[{pos: items[0]!.offsetLeft, border: false}],

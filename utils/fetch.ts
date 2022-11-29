@@ -19,7 +19,7 @@ import {db} from "~/config/firebase"
 import {Epic, EpicSchema, Epics, EpicCollectionSchema} from "~/types/db/Epics"
 import {Feature, FeatureSchema, Features, FeatureCollectionSchema} from "~/types/db/Features"
 import {Products, ProductCollectionSchema} from "~/types/db/Products"
-import {Story, StorySchema, Stories} from "~/types/db/Stories"
+import {Story, StorySchema, Stories, StoryCollectionSchema} from "~/types/db/Stories"
 import {VersionSchema, Versions, VersionCollectionSchema} from "~/types/db/Versions"
 
 export const getAllProducts = (userId: string) => async (): Promise<Product[]> => {
@@ -85,9 +85,7 @@ export const addEpic =
 	}
 
 export const getAllEpics = (productId: Id) => async (): Promise<Epic[]> => {
-	const _data = await getDocs(
-		query(collection(db, Epics._), where(Epics.product, `==`, productId), orderBy(Epics.name)),
-	)
+	const _data = await getDocs(query(collection(db, Epics._), where(Epics.product, `==`, productId)))
 	const data = EpicCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
@@ -155,10 +153,8 @@ export const addFeature =
 			} satisfies Partial<Feature>)
 	}
 
-export const getAllFeatures = (productId: Id) => async (): Promise<Feature[]> => {
-	const _data = await getDocs(
-		query(collection(db, Features._), where(Features.product, `==`, productId), orderBy(Features.name)),
-	)
+export const getFeaturesByEpic = (epicId: Id) => async (): Promise<Feature[]> => {
+	const _data = await getDocs(query(collection(db, Features._), where(Features.epic, `==`, epicId)))
 	const data = FeatureCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
@@ -206,6 +202,12 @@ export const addStory =
 				nextStory: newStoryDoc.id as Id,
 			} satisfies Partial<Story>)
 	}
+
+export const getStoriesByFeature = (featureId: Id) => async (): Promise<Story[]> => {
+	const _data = await getDocs(query(collection(db, Stories._), where(Stories.feature, `==`, featureId)))
+	const data = StoryCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	return data
+}
 
 export const renameStory =
 	(storyId: Id) =>

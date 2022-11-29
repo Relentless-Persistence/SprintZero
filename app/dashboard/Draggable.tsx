@@ -15,27 +15,27 @@ const Draggable: ForwardRefRenderFunction<HTMLDivElement, DraggableProps> = (
 	{children, onActiveStart, onActiveEnd},
 	ref,
 ) => {
-	const [isHovering, setIsHovering] = useState(false)
-	const [isHolding, setIsHolding] = useState(false)
-	const isActive = isHovering || isHolding
-	const prevIsActive = usePreviousDistinct(isActive)
-	useEffect(() => {
-		if (isActive && !prevIsActive) onActiveStart()
-		if (!isActive && prevIsActive) onActiveEnd()
-	}, [isActive, onActiveEnd, onActiveStart, prevIsActive])
+	// const [isHovering, setIsHovering] = useState(false)
+	// const [isHolding, setIsHolding] = useState(false)
+	// const isActive = isHovering || isHolding
+	// const prevIsActive = usePreviousDistinct(isActive)
+	// useEffect(() => {
+	// 	if (isActive && !prevIsActive) onActiveStart()
+	// 	if (!isActive && prevIsActive) onActiveEnd()
+	// }, [isActive, onActiveEnd, onActiveStart, prevIsActive])
 
 	return (
 		<motion.div
 			drag
 			dragSnapToOrigin
-			onPointerMove={(e) => void setIsHovering(!(e.target as HTMLElement).hasAttribute(`data-nondraggable`))}
-			onPointerLeave={() => void setIsHovering(false)}
-			onPointerDown={(e) => {
-				if ((e.target as HTMLElement).hasAttribute(`data-nodraggable`)) e.stopPropagation()
-				setIsHolding(true)
-			}}
-			onPointerUp={() => void setIsHolding(false)}
-			onPointerCancel={() => void setIsHolding(false)}
+			// onPointerMove={(e) => void setIsHovering(!(e.target as HTMLElement).hasAttribute(`data-nondraggable`))}
+			// onPointerLeave={() => void setIsHovering(false)}
+			// onPointerDown={(e) => {
+			// 	if ((e.target as HTMLElement).hasAttribute(`data-nodraggable`)) e.stopPropagation()
+			// 	setIsHolding(true)
+			// }}
+			// onPointerUp={() => void setIsHolding(false)}
+			// onPointerCancel={() => void setIsHolding(false)}
 			ref={ref}
 		>
 			{children}
