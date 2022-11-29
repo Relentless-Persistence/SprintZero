@@ -11,9 +11,9 @@ import {Menu} from "antd5"
 import Link from "next/link"
 import {usePathname} from "next/navigation"
 
-import type {ReactElement} from "react"
+import type {FC} from "react"
 
-const SideMenu = (): ReactElement | null => {
+const SideMenu: FC = () => {
 	const pathname = usePathname()
 
 	return (

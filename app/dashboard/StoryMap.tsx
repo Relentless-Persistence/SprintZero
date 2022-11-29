@@ -3,10 +3,9 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query"
 import {Button} from "antd5"
 import {collection, onSnapshot, query, where} from "firebase9/firestore"
-import {Reorder} from "framer-motion"
 import {useEffect, useState} from "react"
 
-import type {ReactElement} from "react"
+import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
 
 import Epic from "./Epic"
@@ -15,7 +14,7 @@ import useMainStore from "~/stores/mainStore"
 import {EpicCollectionSchema, Epics} from "~/types/db/Epics"
 import {addEpic, reorderEpic} from "~/utils/fetch"
 
-const StoryMap = (): ReactElement | null => {
+const StoryMap: FC = () => {
 	const queryClient = useQueryClient()
 	const activeProductId = useMainStore((state) => state.activeProductId)
 
@@ -55,15 +54,20 @@ const StoryMap = (): ReactElement | null => {
 	})
 
 	return (
-		<div>
-			<Reorder.Group axis="x" values={epics} onReorder={handleReorder} className="flex gap-8">
+		<div className="flex w-max">
+			<div className="flex gap-1">
 				{epics.map((epic) => (
-					<Reorder.Item key={epic.id} value={epic}>
-						<Epic epic={epic} />
-					</Reorder.Item>
+					<Epic key={epic.id} epic={epic} />
 				))}
-			</Reorder.Group>
-			<Button onClick={() => void addEpicMutation.mutate({name: `Epic`, description: `description`})}>Add epic</Button>
+			</div>
+			<div className="p-8">
+				<Button
+					onClick={() => void addEpicMutation.mutate({name: `Epic`, description: `description`})}
+					className="bg-white"
+				>
+					Add epic
+				</Button>
+			</div>
 		</div>
 	)
 }

@@ -1,3 +1,5 @@
+"use client"
+
 import {
 	ApiOutlined,
 	DollarOutlined,
@@ -11,11 +13,11 @@ import {Menu} from "antd5"
 import Link from "next/link"
 import {usePathname} from "next/navigation"
 
-import type {ReactElement} from "react"
+import type {FC} from "react"
 
 import {auth} from "~/config/firebase"
 
-const SettingsMenu = (): ReactElement | null => {
+const SettingsMenu: FC = () => {
 	const pathname = usePathname()
 
 	return (

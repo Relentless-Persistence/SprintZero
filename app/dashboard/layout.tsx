@@ -6,18 +6,18 @@ import {Avatar, Drawer, Layout, Menu} from "antd5"
 import Image from "next/image"
 import {useState} from "react"
 
-import type {ReactElement, ReactNode} from "react"
+import type {ReactNode, FC} from "react"
 
 import SettingsMenu from "~/app/dashboard/SettingsMenu"
 import SideMenu from "~/app/dashboard/SideMenu"
 import useMainStore from "~/stores/mainStore"
 import {getAllProducts} from "~/utils/fetch"
 
-type Props = {
+export type DashboardLayoutProps = {
 	children: ReactNode
 }
 
-const DashboardLayout = ({children}: Props): ReactElement | null => {
+const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	const user = useMainStore((state) => state.user)
 	const {data: products} = useQuery({
 		queryKey: [`all-products`, user?.uid],

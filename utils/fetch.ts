@@ -1,15 +1,26 @@
-import {addDoc, collection, doc, getDocs, orderBy, query, updateDoc, where, writeBatch} from "firebase9/firestore"
+import {
+	addDoc,
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	orderBy,
+	query,
+	updateDoc,
+	where,
+	writeBatch,
+} from "firebase9/firestore"
 
 import type {Id} from "~/types"
-import type {Feature} from "~/types/db/Features"
 import type {Product} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
 import {db} from "~/config/firebase"
 import {Epic, EpicSchema, Epics, EpicCollectionSchema} from "~/types/db/Epics"
-import {Features, FeatureCollectionSchema} from "~/types/db/Features"
+import {Feature, FeatureSchema, Features, FeatureCollectionSchema} from "~/types/db/Features"
 import {Products, ProductCollectionSchema} from "~/types/db/Products"
-import {Versions, VersionCollectionSchema} from "~/types/db/Versions"
+import {Story, StorySchema, Stories} from "~/types/db/Stories"
+import {VersionSchema, Versions, VersionCollectionSchema} from "~/types/db/Versions"
 
 export const getAllProducts = (userId: string) => async (): Promise<Product[]> => {
 	const _data = await getDocs(
@@ -56,13 +67,6 @@ type AddEpicInput = {
 export const addEpic =
 	(productId: Id) =>
 	async ({name, description}: AddEpicInput): Promise<void> => {
-		const existingDoc = (
-			await getDocs(
-				query(collection(db, Epics._), where(Epics.product, `==`, productId), where(Epics.name, `==`, name)),
-			)
-		).docs[0]
-		if (existingDoc) throw new Error(`Epic already exists.`)
-
 		const lastEpicData = (await getDocs(query(collection(db, Epics._), where(Epics.nextEpic, `==`, null)))).docs[0]
 		const lastEpic = lastEpicData ? EpicSchema.parse({id: lastEpicData.id, ...lastEpicData.data()}) : null
 		const data: Omit<Epic, `id` | `updatedAt`> = {
@@ -76,7 +80,8 @@ export const addEpic =
 			product: productId,
 		}
 		const newEpicDoc = await addDoc(collection(db, Epics._), data)
-		if (lastEpicData) updateDoc(doc(db, Epics._, lastEpicData.id), {nextEpic: newEpicDoc.id})
+		if (lastEpicData)
+			updateDoc(doc(db, Epics._, lastEpicData.id), {nextEpic: newEpicDoc.id as Id} satisfies Partial<Epic>)
 	}
 
 export const getAllEpics = (productId: Id) => async (): Promise<Epic[]> => {
@@ -124,22 +129,30 @@ type AddFeatureInput = {
 export const addFeature =
 	(productId: Id, epicId: Id) =>
 	async ({description, name}: AddFeatureInput): Promise<void> => {
-		const existingDoc = (
+		const lastFeatureData = (
 			await getDocs(
-				query(collection(db, Features._), where(Features.epic, `==`, epicId), where(Features.name, `==`, name)),
+				query(collection(db, Features._), where(Features.epic, `==`, epicId), where(Features.nextFeature, `==`, null)),
 			)
 		).docs[0]
-		if (existingDoc) throw new Error(`Feature already exists.`)
+		const lastFeature = lastFeatureData
+			? FeatureSchema.parse({id: lastFeatureData.id, ...lastFeatureData.data()})
+			: null
 
 		const data: Omit<Feature, `id`> = {
 			description,
 			name,
 			comments: [],
 			stories: [],
-			product: productId,
 			epic: epicId,
+			prevFeature: lastFeature?.id ?? null,
+			nextFeature: null,
+			product: productId,
 		}
-		await addDoc(collection(db, Features._), data)
+		const newFeatureDoc = await addDoc(collection(db, Features._), data)
+		if (lastFeatureData)
+			updateDoc(doc(db, Features._, lastFeatureData.id), {
+				nextFeature: newFeatureDoc.id as Id,
+			} satisfies Partial<Feature>)
 	}
 
 export const getAllFeatures = (productId: Id) => async (): Promise<Feature[]> => {
@@ -151,10 +164,60 @@ export const getAllFeatures = (productId: Id) => async (): Promise<Feature[]> =>
 }
 
 export const renameFeature =
-	(productId: Id, epicId: Id, featureId: Id) =>
+	(featureId: Id) =>
 	async (newName: string): Promise<void> => {
 		const data: Partial<Feature> = {
 			name: newName,
 		}
 		await updateDoc(doc(db, Features._, featureId), data)
 	}
+
+type AddStoryInput = {
+	description: string
+	name: string
+	version: Id
+}
+
+export const addStory =
+	(productId: Id, epicId: Id, featureId: Id) =>
+	async ({description, name, version}: AddStoryInput): Promise<void> => {
+		const lastStoryData = (
+			await getDocs(
+				query(collection(db, Stories._), where(Stories.feature, `==`, featureId), where(Stories.nextStory, `==`, null)),
+			)
+		).docs[0]
+		const lastStory = lastStoryData ? StorySchema.parse({id: lastStoryData.id, ...lastStoryData.data()}) : null
+
+		const data: Omit<Story, `id`> = {
+			accepanceCriteria: [],
+			name,
+			description,
+			comments: [],
+			epic: epicId,
+			feature: featureId,
+			nextStory: null,
+			prevStory: lastStory?.id ?? null,
+			product: productId,
+			version,
+		}
+		const newStoryDoc = await addDoc(collection(db, Stories._), data)
+		if (lastStoryData)
+			updateDoc(doc(db, Stories._, lastStoryData.id), {
+				nextStory: newStoryDoc.id as Id,
+			} satisfies Partial<Story>)
+	}
+
+export const renameStory =
+	(storyId: Id) =>
+	async (newName: string): Promise<void> => {
+		const data: Partial<Story> = {
+			name: newName,
+		}
+		await updateDoc(doc(db, Stories._, storyId), data)
+	}
+
+export const getVersion = (versionId: Id) => async (): Promise<Version> => {
+	const versionDoc = await getDoc(doc(db, Versions._, versionId))
+	const data = VersionSchema.parse({id: versionDoc.id, ...versionDoc.data()})
+	return data
+}

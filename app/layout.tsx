@@ -6,7 +6,7 @@ import {onAuthStateChanged} from "firebase9/auth"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
 
-import type {ReactElement, ReactNode} from "react"
+import type {ReactNode, FC} from "react"
 
 import "./styles.css"
 import {auth} from "~/config/firebase"
@@ -14,11 +14,11 @@ import {queryClient} from "~/config/reactQuery"
 import useMainStore from "~/stores/mainStore"
 import {getAllProducts} from "~/utils/fetch"
 
-type Props = {
+export type RootLayoutProps = {
 	children: ReactNode
 }
 
-const RootLayout = ({children}: Props): ReactElement | null => {
+const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	const setUser = useMainStore((state) => state.setUser)
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const setActiveProductId = useMainStore((state) => state.setActiveProductId)
@@ -46,7 +46,7 @@ const RootLayout = ({children}: Props): ReactElement | null => {
 			<QueryClientProvider client={queryClient}>
 				<html lang="en" className="h-full">
 					<head></head>
-					<body className="h-full bg-[#f0f2f5]">{children}</body>
+					<body className="h-full bg-[#f0f2f5] text-sm">{children}</body>
 				</html>
 			</QueryClientProvider>
 		</ConfigProvider>
