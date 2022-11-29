@@ -10,7 +10,7 @@ import {useCallback, useState} from "react"
 import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
 
-import Draggable from "./Draggable"
+import Draggable, {useIsHovering} from "./Draggable"
 import {useStoryMapStore} from "./storyMapStore"
 import Feature from "~/app/dashboard/Feature"
 import useMainStore from "~/stores/mainStore"
@@ -23,8 +23,8 @@ export type EpicProps = {
 const Epic: FC<EpicProps> = ({epic}) => {
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const [isActive, setIsActive] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
+	const isActive = useIsHovering(0, epic.id)
 
 	const features = useStoryMapStore((state) =>
 		Array.from(state.features.values())
@@ -48,15 +48,15 @@ const Epic: FC<EpicProps> = ({epic}) => {
 
 	return (
 		<>
-			<Draggable onActiveStart={() => void setIsActive(true)} onActiveEnd={() => void setIsActive(false)} ref={ref}>
+			<Draggable layer={0} id={epic.id} ref={ref}>
 				<div
 					className={clsx(
 						`flex flex-col items-center gap-4 rounded-md p-4 transition-colors`,
-						isActive && `cursor-grab bg-[#00000022]`,
+						isActive && `cursor-grab bg-[#00000011]`,
 					)}
 				>
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]">
-						<button type="button" onClick={() => void setIsDrawerOpen(true)}>
+						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<ReadOutlined />
 						</button>
 						<Draggable.Input value={epic.name} onChange={(value) => void renameEpicMutation.mutate(value)} />

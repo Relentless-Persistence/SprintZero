@@ -11,7 +11,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Feature as FeatureType} from "~/types/db/Features"
 
-import Draggable from "./Draggable"
+import Draggable, {useIsHovering} from "./Draggable"
 import Story from "./Story"
 import {useStoryMapStore} from "./storyMapStore"
 import useMainStore from "~/stores/mainStore"
@@ -26,8 +26,8 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const activeProductId = useMainStore((state) => state.activeProductId)
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const [isActive, setIsActive] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
+	const isActive = useIsHovering(1, feature.id)
 
 	const stories = useStoryMapStore((state) =>
 		Array.from(state.stories.values())
@@ -51,15 +51,15 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 
 	return (
 		<>
-			<Draggable onActiveStart={() => void setIsActive(true)} onActiveEnd={() => void setIsActive(false)} ref={ref}>
+			<Draggable layer={1} id={feature.id} ref={ref}>
 				<div
 					className={clsx(
 						`flex flex-col items-center rounded-md p-4 transition-colors`,
-						isActive && `cursor-grab bg-[#00000022]`,
+						isActive && `cursor-grab bg-[#00000011]`,
 					)}
 				>
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378]">
-						<button type="button" onClick={() => void setIsDrawerOpen(true)}>
+						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />
 						</button>
 						<Draggable.Input value={feature.name} onChange={(value) => void renameFeatureMutation.mutate(value)} />

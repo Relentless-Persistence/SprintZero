@@ -7,7 +7,7 @@ import {useCallback, useState} from "react"
 import type {FC} from "react"
 import type {Story as StoryType} from "~/types/db/Stories"
 
-import Draggable from "./Draggable"
+import Draggable, {useIsHovering} from "./Draggable"
 import {useStoryMapStore} from "./storyMapStore"
 import {getVersion, renameStory} from "~/utils/fetch"
 
@@ -17,8 +17,8 @@ type Props = {
 
 const Story: FC<Props> = ({story}) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const [isActive, setIsActive] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
+	const isActive = useIsHovering(2, story.id)
 
 	const {data: version} = useQuery({queryKey: [`version`, story.version], queryFn: getVersion(story.version)})
 
@@ -34,10 +34,10 @@ const Story: FC<Props> = ({story}) => {
 
 	return (
 		<>
-			<Draggable onActiveStart={() => void setIsActive(true)} onActiveEnd={() => void setIsActive(false)} ref={ref}>
-				<div className={clsx(`rounded-md p-4 transition-colors`, isActive && `cursor-grab bg-[#00000022]`)}>
+			<Draggable layer={2} id={story.id} ref={ref}>
+				<div className={clsx(`rounded-md p-4 transition-colors`, isActive && `cursor-grab bg-[#00000011]`)}>
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-laurel bg-green-t1300 px-2 py-1 text-laurel">
-						<button type="button" onClick={() => void setIsDrawerOpen(true)}>
+						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							{version?.name}
 						</button>
 						<Draggable.Input value={story.name} onChange={(value) => void renameStoryMutation.mutate(value)} />

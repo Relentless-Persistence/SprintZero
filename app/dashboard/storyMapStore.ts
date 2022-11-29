@@ -25,6 +25,8 @@ type StoryMapStore = {
 	setStories: (story: Story[]) => void
 	dividers: [EpicStructure | undefined, EpicStructure | undefined, EpicStructure | undefined]
 	registerElement: (layer: number, id: Id, element: HTMLElement) => void
+	currentlyHovering: [Id | null, Id | null, Id | null]
+	setCurrentLayerHover: (layer: number, id: Id | null) => void
 }
 
 export const useStoryMapStore = create(
@@ -69,6 +71,11 @@ export const useStoryMapStore = create(
 						break
 					}
 				}
+			}),
+		currentlyHovering: [null, null, null],
+		setCurrentLayerHover: (layer, id) =>
+			void set((state) => {
+				state.currentlyHovering[layer] = id
 			}),
 	})),
 )
