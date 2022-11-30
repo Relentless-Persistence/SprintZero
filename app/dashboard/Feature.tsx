@@ -57,7 +57,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 		<>
 			<Draggable layer={1} id={feature.id} ref={ref}>
 				<div className="flex flex-col items-center rounded-md p-4 transition-colors">
-					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378]">
+					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378] transition-transform hover:scale-105">
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />
 						</button>

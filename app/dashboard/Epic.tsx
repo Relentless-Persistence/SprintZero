@@ -51,7 +51,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 		<>
 			<Draggable layer={0} id={epic.id} ref={ref}>
 				<div className="flex flex-col items-center gap-6 rounded-md p-4 transition-colors">
-					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]">
+					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8] transition-transform hover:scale-105">
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<ReadOutlined />
 						</button>

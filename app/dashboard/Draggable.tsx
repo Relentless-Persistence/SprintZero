@@ -42,7 +42,7 @@ const Input: FC<InputProps> = ({value, onChange}) => {
 				className="w-full grow bg-transparent text-center leading-none"
 				size={1}
 			/>
-			<p className="h-0 overflow-hidden whitespace-pre text-sm opacity-0">{value}</p>
+			<p className="h-0 overflow-hidden whitespace-pre text-[1em] opacity-0">{value}</p>
 		</div>
 	)
 }

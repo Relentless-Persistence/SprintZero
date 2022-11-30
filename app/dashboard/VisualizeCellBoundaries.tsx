@@ -10,7 +10,7 @@ const VisualizeCellBoundaries: FC = () => {
 	const dividers = useStoryMapStore((state) => state.dividers)
 
 	return (
-		<div className="pointer-events-none absolute inset-0">
+		<div className="pointer-events-none absolute inset-0 opacity-30">
 			<div className="absolute w-full" style={{height: `${layerBoundaries[0]}px`, top: `0px`}}>
 				{dividers[0]?.map((pos) => (
 					<div

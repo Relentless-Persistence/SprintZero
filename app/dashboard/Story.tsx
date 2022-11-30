@@ -42,7 +42,7 @@ const Story: FC<Props> = ({story}) => {
 		<>
 			<Draggable layer={2} id={story.id} ref={ref}>
 				<div className="rounded-md p-2 transition-colors">
-					<div className="flex min-w-[4rem] items-center gap-1 overflow-hidden rounded border border-laurel bg-green-t1300 pr-1 text-laurel">
+					<div className="flex min-w-[4rem] items-center gap-1 overflow-hidden rounded border border-laurel bg-green-t1300 pr-1 text-laurel transition-transform hover:scale-105">
 						<button
 							type="button"
 							onClick={() => void setIsDrawerOpen(true)}
@@ -51,7 +51,7 @@ const Story: FC<Props> = ({story}) => {
 						>
 							<p className="-rotate-90">{version?.name}</p>
 						</button>
-						<div className="text-xs text-black">
+						<div className="mx-auto text-xs text-black">
 							<Draggable.Input
 								value={story.name}
 								onChange={(value) => void updateStoryMutation.mutate({name: value})}
