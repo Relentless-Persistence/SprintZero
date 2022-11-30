@@ -52,7 +52,7 @@ const ProductConfiguration = () => {
 
   const handleSubmit = () => {
     if ((product !== "" && email1 !== "" && cadence !== "", gate !== "")) {
-      db.collection("Product")
+      db.collection("Products")
         .add({
           product: product.toLowerCase(),
           email1,

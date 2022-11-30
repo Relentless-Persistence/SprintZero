@@ -77,11 +77,15 @@ const AddItem = ({show, setShow, product, user, type}) => {
 	}
 
 	const handleKeyDown = (e) => {
+    // let newActions = [...actions]
 		if (e.key === "Enter") {
-			actions.push({
+      let newActions = [...actions]
+			newActions.push({
 				name: e.target.value,
 				completed: false,
 			})
+      setVal();
+      setActions(newActions);
 			setAddAction(false)
 		}
 	}
