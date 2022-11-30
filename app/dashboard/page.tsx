@@ -3,7 +3,7 @@
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import {Breadcrumb, Button, Input, Menu} from "antd5"
-import {useEffect, useState} from "react"
+import {useEffect, useLayoutEffect, useState} from "react"
 
 import type {FC} from "react"
 
@@ -20,7 +20,7 @@ const Dashboard: FC = () => {
 	const [newVersionInput, setNewVersionInput] = useState<string | null>(null)
 
 	const {data: versions} = useQuery({
-		queryKey: [`allVersions`, activeProductId],
+		queryKey: [`all-versions`, activeProductId],
 		queryFn: getAllVersions(activeProductId!),
 		enabled: activeProductId !== null,
 	})
@@ -101,6 +101,12 @@ const Dashboard: FC = () => {
 	})
 
 	const finishedFetching = isSuccessEpics && isSuccessFeatures && isSuccessStories
+
+	const allElementsRegistered = useStoryMapStore((state) => state.allElementsRegistered)
+	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
+	useLayoutEffect(() => {
+		if (allElementsRegistered) calculateDividers()
+	}, [allElementsRegistered, calculateDividers, currentVersion])
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_minmax(6rem,max-content)]">

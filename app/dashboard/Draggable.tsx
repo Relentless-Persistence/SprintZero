@@ -1,5 +1,5 @@
 import {motion} from "framer-motion"
-import {forwardRef, useEffect, useRef, useState} from "react"
+import {forwardRef, useEffect, useInsertionEffect, useRef, useState} from "react"
 import ReactDOM from "react-dom"
 import {usePreviousDistinct} from "react-use"
 
@@ -56,27 +56,28 @@ export type InputProps = {
 }
 
 const Input: FC<InputProps> = ({value, onChange}) => {
-	const [textWidth, setTextWidth] = useState<number | null>(null)
 	const referenceText = useRef<HTMLParagraphElement>(null)
 
-	const updateTextWidth = () => {
-		if (referenceText.current) setTextWidth(referenceText.current.offsetWidth)
-	}
+	const textWidth = useRef<number>()
+	useInsertionEffect(() => {
+		const referenceText = document.createElement(`p`)
+		referenceText.style.cssText = `position: fixed; top: 0px; left: 0px; font-size: 14px;`
+		referenceText.textContent = value
+		document.body.appendChild(referenceText)
+		textWidth.current = referenceText.offsetWidth
+		referenceText.remove()
 
-	useEffect(() => void updateTextWidth(), [value])
+		return () => void referenceText.remove()
+	}, [value])
 
 	return (
 		<>
 			<input
 				data-nondraggable
 				value={value}
-				onChange={(e) => {
-					updateTextWidth()
-					onChange(e.target.value)
-				}}
+				onChange={(e) => void onChange(e.target.value)}
 				className="grow bg-transparent text-center"
-				style={{width: `${textWidth}px`}}
-				ref={() => void updateTextWidth()}
+				style={{width: `${textWidth.current}px`}}
 			/>
 
 			{typeof window !== `undefined` &&

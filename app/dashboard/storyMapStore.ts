@@ -2,15 +2,19 @@ import {enableMapSet} from "immer"
 import create from "zustand"
 import {immer} from "zustand/middleware/immer"
 
-import type {Divider} from "./utils"
 import type {Id} from "~/types"
 import type {Epic} from "~/types/db/Epics"
 import type {Feature} from "~/types/db/Features"
 import type {Story} from "~/types/db/Stories"
 
-import {findDividers} from "./utils"
+import {avg} from "./utils"
 
 enableMapSet()
+
+type Divider = {
+	pos: number
+	border: boolean
+}
 
 type StoryMapStore = {
 	currentVersion: Id | `__ALL_VERSIONS__`
@@ -26,8 +30,9 @@ type StoryMapStore = {
 	currentlyHovering: [Id | null, Id | null, Id | null]
 	setCurrentLayerHover: (layer: number, id: Id | null) => void
 
-	dividers: [Divider[] | undefined, Divider[] | undefined, Divider[] | undefined]
+	dividers: [Divider[] | null, Divider[] | null, Divider[] | null]
 	registerElement: (layer: number, id: Id, element: HTMLElement) => void
+	allElementsRegistered: boolean
 	calculateDividers: () => void
 }
 
@@ -61,7 +66,7 @@ export const useStoryMapStore = create(
 				state.currentlyHovering[layer] = id
 			}),
 
-		dividers: [undefined, undefined, undefined],
+		dividers: [null, null, null],
 		registerElement: (layer, id, element) =>
 			void set((state) => {
 				switch (layer) {
@@ -81,24 +86,66 @@ export const useStoryMapStore = create(
 						break
 					}
 				}
+
+				if (
+					Array.from(state.epics.values()).every((epic) => epic.element) &&
+					Array.from(state.features.values()).every((feature) => feature.element) &&
+					Array.from(state.stories.values()).every((story) => story.element)
+				)
+					state.allElementsRegistered = true
 			}),
+		allElementsRegistered: false,
 		calculateDividers: () =>
 			void set((state) => {
 				const epics = Array.from(state.epics.values())
 				const features = Array.from(state.features.values())
 				const stories = Array.from(state.stories.values())
+
 				if (
 					epics.every((epic) => epic.element) &&
 					features.every((feature) => feature.element) &&
 					stories.every((story) => story.element)
 				) {
-					const epicPositions = epics.map((epic) => epic.element!.offsetLeft + epic.element!.offsetWidth / 2)
-					const featurePositions = features.map(
-						(feature) => feature.element!.offsetLeft + feature.element!.offsetWidth / 2,
-					)
-					const storyPositions = stories.map((story) => story.element!.offsetLeft + story.element!.offsetWidth / 2)
-					state.dividers = [findDividers(epicPositions), findDividers(featurePositions), findDividers(storyPositions)]
-					// debugger
+					let epicPositions: Divider[] = []
+					epics.forEach((epic, i) => {
+						const epicPos = epic.element!.offsetLeft + epic.element!.offsetWidth / 2
+						if (i === 0) {
+							epicPositions.push({pos: epicPos, border: false})
+						} else {
+							epicPositions.push({pos: avg(epicPositions.at(-1)!.pos, epicPos), border: false})
+							epicPositions.push({pos: epicPos, border: false})
+						}
+					})
+
+					let featurePositions: Divider[] = []
+					features.forEach((feature, i) => {
+						const featurePos = feature.element!.offsetLeft + feature.element!.offsetWidth / 2
+						if (i === 0) {
+							featurePositions.push({pos: featurePos, border: false})
+						} else {
+							featurePositions.push({
+								pos: avg(featurePositions.at(-1)!.pos, featurePos),
+								border: feature.feature.prevFeature === null,
+							})
+							featurePositions.push({pos: featurePos, border: false})
+						}
+					})
+
+					let storyPositions: Divider[] = []
+					stories.forEach((story, i) => {
+						const storyPos = story.element!.offsetLeft + story.element!.offsetWidth / 2
+						if (i === 0) {
+							storyPositions.push({pos: storyPos, border: false})
+						} else {
+							storyPositions.push({
+								pos: avg(storyPositions.at(-1)!.pos, storyPos),
+								border: story.story.prevStory === null,
+							})
+							storyPositions.push({pos: storyPos, border: false})
+						}
+					})
+
+					state.dividers = [epicPositions, featurePositions, storyPositions]
 				}
 			}),
 	})),

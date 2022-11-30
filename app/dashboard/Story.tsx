@@ -1,4 +1,4 @@
-import {useMutation, useQuery} from "@tanstack/react-query"
+import {useMutation, useQueryClient} from "@tanstack/react-query"
 import {Drawer} from "antd5"
 import TextArea from "antd5/es/input/TextArea"
 import clsx from "clsx"
@@ -6,10 +6,12 @@ import {useCallback, useState} from "react"
 
 import type {FC} from "react"
 import type {Story as StoryType} from "~/types/db/Stories"
+import type {Version} from "~/types/db/Versions"
 
 import Draggable, {useIsHovering} from "./Draggable"
 import {useStoryMapStore} from "./storyMapStore"
-import {getVersion, renameStory} from "~/utils/fetch"
+import useMainStore from "~/stores/mainStore"
+import {renameStory} from "~/utils/fetch"
 
 type Props = {
 	story: StoryType
@@ -20,7 +22,10 @@ const Story: FC<Props> = ({story}) => {
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 	const isActive = useIsHovering(2, story.id)
 
-	const {data: version} = useQuery({queryKey: [`version`, story.version], queryFn: getVersion(story.version)})
+	const activeProductId = useMainStore((state) => state.activeProductId)
+	const version = useQueryClient()
+		.getQueryData<Version[]>([`all-versions`, activeProductId])
+		?.find((version) => version.id === story.version)
 
 	const renameStoryMutation = useMutation({mutationFn: renameStory(story.id)})
 
