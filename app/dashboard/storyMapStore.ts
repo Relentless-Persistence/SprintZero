@@ -52,12 +52,6 @@ export const useStoryMapStore = create(
 				calculateDividers(state)
 			}),
 
-		currentlyHovering: [null, null, null],
-		setCurrentLayerHover: (layer, id) =>
-			void set((state) => {
-				state.currentlyHovering[layer] = id
-			}),
-
 		dividers: [null, null, null],
 		registerElement: (layer, id, element) =>
 			void set((state) => {

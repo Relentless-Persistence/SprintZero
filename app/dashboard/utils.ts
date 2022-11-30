@@ -156,9 +156,6 @@ export type StoryMapStore = {
 	stories: Array<{element?: HTMLElement; story: Story}>
 	setStories: (story: Story[]) => void
 
-	currentlyHovering: [Id | null, Id | null, Id | null]
-	setCurrentLayerHover: (layer: number, id: Id | null) => void
-
 	dividers: [number[] | null, FeatureDivider[] | null, Array<StoryDivider> | null]
 	registerElement: (layer: number, id: Id, element: HTMLElement) => void
 	calculateDividers: () => void

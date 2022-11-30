@@ -10,7 +10,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Feature as FeatureType} from "~/types/db/Features"
 
-import Draggable, {useIsHovering} from "./Draggable"
+import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
 import Story from "./Story"
 import {useStoryMapStore} from "./storyMapStore"
@@ -27,7 +27,6 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
-	const isActive = useIsHovering(1, feature.id)
 
 	const stories = useStoryMapStore((state) =>
 		state.stories.map((story) => story.story).filter((story) => story.feature === feature.id),
@@ -57,12 +56,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	return (
 		<>
 			<Draggable layer={1} id={feature.id} ref={ref}>
-				<div
-					className={clsx(
-						`flex flex-col items-center rounded-md p-4 transition-colors`,
-						isActive && `cursor-grab bg-[#00000008]`,
-					)}
-				>
+				<div className="flex flex-col items-center rounded-md p-4 transition-colors">
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378]">
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />

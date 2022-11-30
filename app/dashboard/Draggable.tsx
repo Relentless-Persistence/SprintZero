@@ -1,8 +1,7 @@
 "use client"
 
 import {motion} from "framer-motion"
-import {forwardRef, useEffect, useLayoutEffect, useState} from "react"
-import {usePreviousDistinct} from "react-use"
+import {forwardRef, useLayoutEffect} from "react"
 
 import type {ReactNode, FC, ForwardRefRenderFunction} from "react"
 import type {Id} from "~/types"
@@ -16,37 +15,9 @@ export type DraggableProps = {
 }
 
 const Draggable: ForwardRefRenderFunction<HTMLDivElement, DraggableProps> = ({children, layer, id}, ref) => {
-	const [isHovering, setIsHovering] = useState(false)
-	const [isHolding, setIsHolding] = useState(false)
-	const isActive = isHovering || isHolding
-
-	const setCurrentLayerHover = useStoryMapStore((state) => state.setCurrentLayerHover)
-
-	const prevIsActive = usePreviousDistinct(isActive)
-	useEffect(() => {
-		if (isActive && !prevIsActive) setCurrentLayerHover(layer, id)
-		if (!isActive && prevIsActive) setCurrentLayerHover(layer, null)
-	}, [id, isActive, layer, prevIsActive, setCurrentLayerHover])
-
 	return (
 		<motion.div drag dragSnapToOrigin data-layer={layer} ref={ref}>
-			<div
-				onPointerMove={(e) => {
-					const isDraggable = !(e.target as HTMLElement).hasAttribute(`data-nondraggable`)
-					setIsHovering(isDraggable)
-					if (!isDraggable) e.stopPropagation()
-				}}
-				onPointerLeave={() => void setIsHovering(false)}
-				onPointerDown={(e) => {
-					const isDraggable = !(e.target as HTMLElement).hasAttribute(`data-nondraggable`)
-					setIsHolding(isDraggable)
-					if (!isDraggable) e.stopPropagation()
-				}}
-				onPointerUp={() => void setIsHolding(false)}
-				onPointerCancel={() => void setIsHolding(false)}
-			>
-				{children}
-			</div>
+			<div>{children}</div>
 		</motion.div>
 	)
 }
@@ -77,8 +48,3 @@ const Input: FC<InputProps> = ({value, onChange}) => {
 }
 
 export default Object.assign(forwardRef(Draggable), {Input: Input})
-
-export const useIsHovering = (layer: number, id: Id) => {
-	const currentlyHovering = useStoryMapStore((state) => state.currentlyHovering)
-	return currentlyHovering[layer] === id && !currentlyHovering[layer + 1]
-}

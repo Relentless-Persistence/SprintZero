@@ -47,6 +47,7 @@ const VersionList: FC = () => {
 					})),
 					{key: `__ALL_VERSIONS__`, label: `All`, onClick: () => void setCurrentVersion(`__ALL_VERSIONS__`)},
 				]}
+				className="bg-transparent"
 			/>
 			{newVersionInput !== null && (
 				<form

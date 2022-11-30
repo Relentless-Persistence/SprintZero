@@ -3,13 +3,12 @@
 import {CopyOutlined, ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
-import clsx from "clsx"
 import {useCallback, useState} from "react"
 
 import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
 
-import Draggable, {useIsHovering} from "./Draggable"
+import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
 import {useStoryMapStore} from "./storyMapStore"
 import Feature from "~/app/dashboard/Feature"
@@ -24,7 +23,6 @@ const Epic: FC<EpicProps> = ({epic}) => {
 	const activeProduct = useMainStore((state) => state.activeProduct)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
-	const isActive = useIsHovering(0, epic.id)
 
 	const features = useStoryMapStore((state) =>
 		state.features.map((feature) => feature.feature).filter((feature) => feature.epic === epic.id),
@@ -52,12 +50,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 	return (
 		<>
 			<Draggable layer={0} id={epic.id} ref={ref}>
-				<div
-					className={clsx(
-						`flex flex-col items-center gap-6 rounded-md p-4 transition-colors`,
-						isActive && `cursor-grab bg-[#00000008]`,
-					)}
-				>
+				<div className="flex flex-col items-center gap-6 rounded-md p-4 transition-colors">
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]">
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<ReadOutlined />

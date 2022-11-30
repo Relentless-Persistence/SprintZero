@@ -1,14 +1,13 @@
 "use client"
 
 import {useMutation, useQueryClient} from "@tanstack/react-query"
-import clsx from "clsx"
 import {useCallback, useState} from "react"
 
 import type {FC} from "react"
 import type {Story as StoryType} from "~/types/db/Stories"
 import type {Version} from "~/types/db/Versions"
 
-import Draggable, {useIsHovering} from "./Draggable"
+import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
 import {useStoryMapStore} from "./storyMapStore"
 import useMainStore from "~/stores/mainStore"
@@ -21,7 +20,6 @@ type Props = {
 const Story: FC<Props> = ({story}) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
-	const isActive = useIsHovering(2, story.id)
 
 	const activeProduct = useMainStore((state) => state.activeProduct)
 	const version = useQueryClient()
@@ -43,7 +41,7 @@ const Story: FC<Props> = ({story}) => {
 	return (
 		<>
 			<Draggable layer={2} id={story.id} ref={ref}>
-				<div className={clsx(`rounded-md p-2 transition-colors`, isActive && `cursor-grab bg-[#00000008]`)}>
+				<div className="rounded-md p-2 transition-colors">
 					<div className="flex min-w-[4rem] items-center gap-1 overflow-hidden rounded border border-laurel bg-green-t1300 pr-1 text-laurel">
 						<button
 							type="button"
