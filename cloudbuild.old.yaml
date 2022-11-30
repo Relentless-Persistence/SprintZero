@@ -1,0 +1,3 @@
+steps:
+  - name: gcr.io/sprintzero-657f3/firebase
+    args: ["deploy", "--project=sprintzero-657f3", "--only=hosting"]
