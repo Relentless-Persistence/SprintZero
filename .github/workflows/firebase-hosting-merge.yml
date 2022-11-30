@@ -2,7 +2,7 @@
 # https://github.com/firebase/firebase-tools
 
 name: Deploy to Firebase Hosting on merge
-'on':
+"on":
   push:
     branches:
       - main
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: npm ci && npm run build && npm run export
+      - run: pnpm install && pnpm run build && pnpm run export
         env:
           NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY }}
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
@@ -22,7 +22,7 @@ jobs:
           NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SPRINTZERO_657F3 }}'
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_SPRINTZERO_657F3 }}"
           channelId: live
           projectId: sprintzero-657f3
