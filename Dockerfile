@@ -1,31 +1,22 @@
-# Get NPM packages
-FROM node:14-alpine AS dependencies
-RUN apk add --no-cache libc6-compat
+# Install packages
+FROM hydrogen-alpine3.15
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --only=production
+COPY package.json pnpm-lock.yamp ./
+RUN corepack enable
+RUN pnpm install
 
-# Rebuild the source code only when needed
-FROM node:14-alpine AS builder
+# Build
+FROM hydrogen-alpine3.15
 WORKDIR /app
-COPY . .
-COPY --from=dependencies /app/node_modules ./node_modules
-RUN npm run build
+COPY --from=0 /app/node_modules ./node_modules
+RUN pnpm build
 
-# Production image, copy all the files and run next
-FROM node:14-alpine AS runner
+# Run
+FROM hydrogen-alpine3.15
 WORKDIR /app
-
 ENV NODE_ENV production
+COPY --from=1 /app/.next ./.next
+COPY --from=1 /app/node_modules ./node_modules
+COPY --from=1 /app/package.json ./package.json
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-
-USER nextjs
-EXPOSE 3000
-
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
