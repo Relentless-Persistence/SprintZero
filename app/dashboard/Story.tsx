@@ -1,3 +1,5 @@
+"use client"
+
 import {useMutation, useQueryClient} from "@tanstack/react-query"
 import {Drawer} from "antd5"
 import TextArea from "antd5/es/input/TextArea"
@@ -22,9 +24,9 @@ const Story: FC<Props> = ({story}) => {
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 	const isActive = useIsHovering(2, story.id)
 
-	const activeProductId = useMainStore((state) => state.activeProductId)
+	const activeProduct = useMainStore((state) => state.activeProduct)
 	const version = useQueryClient()
-		.getQueryData<Version[]>([`all-versions`, activeProductId])
+		.getQueryData<Version[]>([`all-versions`, activeProduct])
 		?.find((version) => version.id === story.version)
 
 	const renameStoryMutation = useMutation({mutationFn: renameStory(story.id)})
@@ -40,12 +42,15 @@ const Story: FC<Props> = ({story}) => {
 	return (
 		<>
 			<Draggable layer={2} id={story.id} ref={ref}>
-				<div className={clsx(`rounded-md p-4 transition-colors`, isActive && `cursor-grab bg-[#00000011]`)}>
+				<div className={clsx(`rounded-md p-4 transition-colors`, isActive && `cursor-grab bg-[#00000008]`)}>
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-laurel bg-green-t1300 px-2 py-1 text-laurel">
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							{version?.name}
 						</button>
-						<Draggable.Input value={story.name} onChange={(value) => void renameStoryMutation.mutate(value)} />
+						<Draggable.Input
+							value={story.name}
+							onChange={useCallback((value) => void renameStoryMutation.mutate(value), [renameStoryMutation])}
+						/>
 					</div>
 				</div>
 			</Draggable>

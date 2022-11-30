@@ -1,5 +1,7 @@
+"use client"
+
 import {motion} from "framer-motion"
-import {forwardRef, useEffect, useInsertionEffect, useRef, useState} from "react"
+import {forwardRef, memo, useEffect, useInsertionEffect, useRef, useState} from "react"
 import ReactDOM from "react-dom"
 import {usePreviousDistinct} from "react-use"
 
@@ -58,11 +60,12 @@ export type InputProps = {
 const Input: FC<InputProps> = ({value, onChange}) => {
 	const referenceText = useRef<HTMLParagraphElement>(null)
 
+	const inputRef = useRef<HTMLInputElement | null>(null)
 	const textWidth = useRef<number>()
 	useInsertionEffect(() => {
 		const referenceText = document.createElement(`p`)
 		referenceText.style.cssText = `position: fixed; top: 0px; left: 0px; font-size: 14px;`
-		referenceText.textContent = value
+		referenceText.textContent = inputRef.current?.value ?? value
 		document.body.appendChild(referenceText)
 		textWidth.current = referenceText.offsetWidth
 		referenceText.remove()
@@ -91,7 +94,7 @@ const Input: FC<InputProps> = ({value, onChange}) => {
 	)
 }
 
-export default Object.assign(forwardRef(Draggable), {Input})
+export default Object.assign(forwardRef(Draggable), {Input: memo(Input)})
 
 export const useIsHovering = (layer: number, id: Id) => {
 	const currentlyHovering = useStoryMapStore((state) => state.currentlyHovering)

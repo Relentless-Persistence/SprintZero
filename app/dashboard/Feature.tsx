@@ -23,7 +23,7 @@ export type FeatureProps = {
 }
 
 const Feature: FC<FeatureProps> = ({epicId, feature}) => {
-	const activeProductId = useMainStore((state) => state.activeProductId)
+	const activeProduct = useMainStore((state) => state.activeProduct)
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
@@ -36,7 +36,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	)
 
 	const addStoryMutation = useMutation({
-		mutationFn: addStory(activeProductId!, epicId, feature.id),
+		mutationFn: addStory(activeProduct!, epicId, feature.id),
 	})
 
 	const renameFeatureMutation = useMutation({mutationFn: renameFeature(feature.id)})
@@ -55,14 +55,17 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 				<div
 					className={clsx(
 						`flex flex-col items-center rounded-md p-4 transition-colors`,
-						isActive && `cursor-grab bg-[#00000011]`,
+						isActive && `cursor-grab bg-[#00000008]`,
 					)}
 				>
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378]">
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />
 						</button>
-						<Draggable.Input value={feature.name} onChange={(value) => void renameFeatureMutation.mutate(value)} />
+						<Draggable.Input
+							value={feature.name}
+							onChange={useCallback((value) => void renameFeatureMutation.mutate(value), [renameFeatureMutation])}
+						/>
 					</div>
 
 					<div className="flex items-center">

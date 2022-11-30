@@ -21,19 +21,17 @@ export type EpicProps = {
 }
 
 const Epic: FC<EpicProps> = ({epic}) => {
-	const activeProductId = useMainStore((state) => state.activeProductId)
+	const activeProduct = useMainStore((state) => state.activeProduct)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 	const isActive = useIsHovering(0, epic.id)
 
 	const features = useStoryMapStore((state) =>
-		Array.from(state.features.values())
-			.map((feature) => feature.feature)
-			.filter((feature) => feature.epic === epic.id),
+		state.features.map((feature) => feature.feature).filter((feature) => feature.epic === epic.id),
 	)
 
 	const addFeatureMutation = useMutation({
-		mutationFn: addFeature(activeProductId!, epic.id),
+		mutationFn: addFeature(activeProduct!, epic.id),
 	})
 
 	const renameEpicMutation = useMutation({mutationFn: renameEpic(epic.id)})
@@ -52,14 +50,17 @@ const Epic: FC<EpicProps> = ({epic}) => {
 				<div
 					className={clsx(
 						`flex flex-col items-center gap-4 rounded-md p-4 transition-colors`,
-						isActive && `cursor-grab bg-[#00000011]`,
+						isActive && `cursor-grab bg-[#00000008]`,
 					)}
 				>
 					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]">
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<ReadOutlined />
 						</button>
-						<Draggable.Input value={epic.name} onChange={(value) => void renameEpicMutation.mutate(value)} />
+						<Draggable.Input
+							value={epic.name}
+							onChange={useCallback((value) => void renameEpicMutation.mutate(value), [renameEpicMutation])}
+						/>
 					</div>
 					<div className="flex items-center">
 						<div className="flex gap-1">

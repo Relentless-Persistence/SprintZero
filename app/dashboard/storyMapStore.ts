@@ -1,4 +1,3 @@
-import {enableMapSet} from "immer"
 import create from "zustand"
 import {immer} from "zustand/middleware/immer"
 
@@ -9,8 +8,6 @@ import type {Story} from "~/types/db/Stories"
 
 import {avg} from "./utils"
 
-enableMapSet()
-
 type Divider = {
 	pos: number
 	border: boolean
@@ -19,12 +16,14 @@ type Divider = {
 type StoryMapStore = {
 	currentVersion: Id | `__ALL_VERSIONS__`
 	setCurrentVersion: (version: Id | `__ALL_VERSIONS__`) => void
+	newVersionInput: string | null
+	setNewVersionInput: (version: string | null) => void
 
-	epics: Map<Id, {element?: HTMLElement; epic: Epic}>
+	epics: Array<{element?: HTMLElement; epic: Epic}>
 	setEpics: (epics: Epic[]) => void
-	features: Map<Id, {element?: HTMLElement; feature: Feature}>
+	features: Array<{element?: HTMLElement; feature: Feature}>
 	setFeatures: (feature: Feature[]) => void
-	stories: Map<Id, {element?: HTMLElement; story: Story}>
+	stories: Array<{element?: HTMLElement; story: Story}>
 	setStories: (story: Story[]) => void
 
 	currentlyHovering: [Id | null, Id | null, Id | null]
@@ -32,7 +31,6 @@ type StoryMapStore = {
 
 	dividers: [Divider[] | null, Divider[] | null, Divider[] | null]
 	registerElement: (layer: number, id: Id, element: HTMLElement) => void
-	allElementsRegistered: boolean
 	calculateDividers: () => void
 }
 
@@ -43,21 +41,32 @@ export const useStoryMapStore = create(
 			void set((state) => {
 				state.currentVersion = version
 			}),
+		newVersionInput: null,
+		setNewVersionInput: (version) =>
+			void set((state) => {
+				state.newVersionInput = version
+			}),
 
-		epics: new Map(),
+		epics: [],
 		setEpics: (epics) =>
 			void set((state) => {
-				epics.forEach((epic) => state.epics.set(epic.id, {epic}))
+				state.epics = epics.map((epic) => ({epic, element: state.epics.find((e) => e.epic.id === epic.id)?.element}))
 			}),
-		features: new Map(),
+		features: [],
 		setFeatures: (features) =>
 			void set((state) => {
-				features.forEach((feature) => state.features.set(feature.id, {feature}))
+				state.features = features.map((feature) => ({
+					feature,
+					element: state.features.find((f) => f.feature.id === feature.id)?.element,
+				}))
 			}),
-		stories: new Map(),
+		stories: [],
 		setStories: (stories) =>
 			void set((state) => {
-				stories.forEach((story) => state.stories.set(story.id, {story}))
+				state.stories = stories.map((story) => ({
+					story,
+					element: state.stories.find((s) => s.story.id === story.id)?.element,
+				}))
 			}),
 
 		currentlyHovering: [null, null, null],
@@ -72,29 +81,21 @@ export const useStoryMapStore = create(
 				switch (layer) {
 					case 0: {
 						// @ts-expect-error -- weird type error
-						state.epics.get(id).element = element
+						state.epics.find((epic) => epic.epic.id === id)!.element = element
 						break
 					}
 					case 1: {
 						// @ts-expect-error -- weird type error
-						state.features.get(id).element = element
+						state.features.find((feature) => feature.feature.id === id).element = element
 						break
 					}
 					case 2: {
 						// @ts-expect-error -- weird type error
-						state.stories.get(id).element = element
+						state.stories.find((story) => story.story.id === id).element = element
 						break
 					}
 				}
-
-				if (
-					Array.from(state.epics.values()).every((epic) => epic.element) &&
-					Array.from(state.features.values()).every((feature) => feature.element) &&
-					Array.from(state.stories.values()).every((story) => story.element)
-				)
-					state.allElementsRegistered = true
 			}),
-		allElementsRegistered: false,
 		calculateDividers: () =>
 			void set((state) => {
 				const epics = Array.from(state.epics.values())

@@ -26,8 +26,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 		enabled: user?.uid !== undefined,
 	})
 
-	const setActiveProductId = useMainStore((state) => state.setActiveProductId)
-	const activeProductId = useMainStore((state) => state.activeProductId)
+	const setActiveProduct = useMainStore((state) => state.setActiveProduct)
+	const activeProduct = useMainStore((state) => state.activeProduct)
 
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
@@ -40,13 +40,13 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 					<Menu
 						theme="dark"
 						mode="horizontal"
-						selectedKeys={activeProductId ? [activeProductId] : []}
+						selectedKeys={activeProduct ? [activeProduct] : []}
 						items={products?.map((product) => ({
 							key: product.id,
 							label: (
-								<button type="button" onClick={() => void setActiveProductId(product.id)} className="relative">
+								<button type="button" onClick={() => void setActiveProduct(product.id)} className="relative">
 									{product.name}
-									{activeProductId === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
+									{activeProduct === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
 								</button>
 							),
 						}))}

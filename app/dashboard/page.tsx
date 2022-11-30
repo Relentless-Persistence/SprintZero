@@ -1,40 +1,35 @@
 "use client"
 
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-import {Breadcrumb, Button, Input, Menu} from "antd5"
-import {useEffect, useLayoutEffect, useState} from "react"
+import {useQuery} from "@tanstack/react-query"
+import {Breadcrumb, Button} from "antd5"
+import {useLayoutEffect} from "react"
 
 import type {FC} from "react"
 
 import {useStoryMapStore} from "./storyMapStore"
+import {sortEpics, sortFeatures, sortStories} from "./utils"
+import VersionList from "./VersionList"
 import StoryMap from "~/app/dashboard/StoryMap"
 import useMainStore from "~/stores/mainStore"
-import {addVersion, getAllEpics, getAllVersions, getFeaturesByEpic, getStoriesByFeature} from "~/utils/fetch"
+import {getAllEpics, getAllVersions, getFeaturesByEpic, getStoriesByFeature} from "~/utils/fetch"
+
+const layerBoundaries = [62, 124]
+const visualizeCellBoundaries = true
 
 const Dashboard: FC = () => {
-	const queryClient = useQueryClient()
-	const activeProductId = useMainStore((state) => state.activeProductId)
+	const activeProduct = useMainStore((state) => state.activeProduct)
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
 	const setCurrentVersion = useStoryMapStore((state) => state.setCurrentVersion)
-	const [newVersionInput, setNewVersionInput] = useState<string | null>(null)
+	const setNewVersionInput = useStoryMapStore((state) => state.setNewVersionInput)
 
 	const {data: versions} = useQuery({
-		queryKey: [`all-versions`, activeProductId],
-		queryFn: getAllVersions(activeProductId!),
-		enabled: activeProductId !== null,
-	})
-
-	useEffect(() => {
-		if (currentVersion === `` && versions?.[0]) setCurrentVersion(versions[0].id)
-	}, [setCurrentVersion, currentVersion, versions])
-
-	const addVersionMutation = useMutation({
-		mutationFn: activeProductId ? addVersion(activeProductId) : async () => {},
-		onSuccess: () => {
-			setNewVersionInput(null)
-			queryClient.invalidateQueries({queryKey: [`allVersions`, activeProductId], exact: true})
+		queryKey: [`all-versions`, activeProduct],
+		queryFn: getAllVersions(activeProduct!),
+		onSuccess: (versions) => {
+			if (currentVersion === `` && versions[0]) setCurrentVersion(versions[0].id)
 		},
+		enabled: activeProduct !== null,
 	})
 
 	const setEpics = useStoryMapStore((state) => state.setEpics)
@@ -42,19 +37,11 @@ const Dashboard: FC = () => {
 	const setStories = useStoryMapStore((state) => state.setStories)
 
 	const {data: epics, isSuccess: isSuccessEpics} = useQuery({
-		queryKey: [`all-epics`, activeProductId],
-		queryFn: getAllEpics(activeProductId!),
-		select: (data) =>
-			data.sort((epic1, epic2) => {
-				// Sort epics by prevEpic and nextEpic
-				if (epic1.prevEpic === null) return -1
-				if (epic2.prevEpic === null) return 1
-				if (epic1.prevEpic === epic2.id) return 1
-				if (epic2.prevEpic === epic1.id) return -1
-				return 0
-			}),
+		queryKey: [`all-epics`, activeProduct],
+		queryFn: getAllEpics(activeProduct!),
+		select: (epicList) => sortEpics(epicList),
 		onSuccess: (epics) => void setEpics(epics),
-		enabled: activeProductId !== null,
+		enabled: activeProduct !== null,
 		staleTime: Infinity,
 	})
 
@@ -62,18 +49,7 @@ const Dashboard: FC = () => {
 	const {data: features, isSuccess: isSuccessFeatures} = useQuery({
 		queryKey: [`all-features`, epicIds],
 		queryFn: async () => await Promise.all(epicIds.map((epicId) => getFeaturesByEpic(epicId)())),
-		select: (data) =>
-			data
-				.map((featureList) =>
-					featureList.sort((feature1, feature2) => {
-						if (feature1.prevFeature === null) return -1
-						if (feature2.prevFeature === null) return 1
-						if (feature1.prevFeature === feature2.id) return 1
-						if (feature2.prevFeature === feature1.id) return -1
-						return 0
-					}),
-				)
-				.flat(),
+		select: (data) => data.map((featureList) => sortFeatures(featureList)).flat(),
 		onSuccess: (features) => void setFeatures(features),
 		enabled: epics !== undefined,
 		staleTime: Infinity,
@@ -83,18 +59,7 @@ const Dashboard: FC = () => {
 	const {isSuccess: isSuccessStories} = useQuery({
 		queryKey: [`all-stories`, featureIds],
 		queryFn: async () => await Promise.all(featureIds.map((featureId) => getStoriesByFeature(featureId)())),
-		select: (data) =>
-			data
-				.map((storyList) =>
-					storyList.sort((story1, story2) => {
-						if (story1.prevStory === null) return -1
-						if (story2.prevStory === null) return 1
-						if (story1.prevStory === story2.id) return 1
-						if (story2.prevStory === story1.id) return -1
-						return 0
-					}),
-				)
-				.flat(),
+		select: (data) => data.map((storyList) => sortStories(storyList)).flat(),
 		onSuccess: (stories) => void setStories(stories),
 		enabled: features !== undefined,
 		staleTime: Infinity,
@@ -102,11 +67,11 @@ const Dashboard: FC = () => {
 
 	const finishedFetching = isSuccessEpics && isSuccessFeatures && isSuccessStories
 
-	const allElementsRegistered = useStoryMapStore((state) => state.allElementsRegistered)
 	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
 	useLayoutEffect(() => {
-		if (allElementsRegistered) calculateDividers()
-	}, [allElementsRegistered, calculateDividers, currentVersion])
+		calculateDividers()
+	}, [calculateDividers, currentVersion])
+	const dividers = useStoryMapStore((state) => state.dividers)
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_minmax(6rem,max-content)]">
@@ -132,43 +97,55 @@ const Dashboard: FC = () => {
 				</div>
 
 				<div className="relative w-full grow">
-					<div className="absolute inset-0 overflow-x-auto px-12 pb-8">{finishedFetching && <StoryMap />}</div>
+					<div className="absolute inset-0 overflow-x-auto px-12 pb-8">
+						{finishedFetching && (
+							<>
+								<StoryMap />
+								{/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+								{visualizeCellBoundaries && (
+									<div className="pointer-events-none absolute inset-0">
+										<div className="absolute w-full" style={{height: `${layerBoundaries[0]}px`, top: `0px`}}>
+											{dividers[0]?.map((divider) => (
+												<div
+													key={`divider-0-${divider.pos}`}
+													className="absolute top-0 h-full w-px border-[1px] border-dashed border-[red]"
+													style={{left: divider.pos}}
+												/>
+											))}
+										</div>
+										<div
+											className="absolute w-full"
+											style={{
+												height: `${(layerBoundaries[1] ?? 0) - (layerBoundaries[0] ?? 0)}px`,
+												top: `${layerBoundaries[0]}px`,
+											}}
+										>
+											{dividers[1]?.map((divider) => (
+												<div
+													key={`divider-1-${divider.pos}`}
+													className="absolute top-0 h-full w-px border-[1px] border-dashed border-[green]"
+													style={{left: divider.pos}}
+												/>
+											))}
+										</div>
+										<div className="absolute w-full" style={{height: `300px`, top: `${layerBoundaries[1]}px`}}>
+											{dividers[2]?.map((divider) => (
+												<div
+													key={`divider-2-${divider.pos}`}
+													className="absolute top-0 h-full w-px border-[1px] border-dashed border-[blue]"
+													style={{left: divider.pos}}
+												/>
+											))}
+										</div>
+									</div>
+								)}
+							</>
+						)}
+					</div>
 				</div>
 			</div>
 
-			<div>
-				<Menu
-					selectedKeys={[currentVersion]}
-					items={[
-						...(versions ?? []).map((version) => ({
-							key: version.id,
-							label: version.name,
-							onClick: () => void setCurrentVersion(version.id),
-						})),
-						{key: `__ALL_VERSIONS__`, label: `All`, onClick: () => void setCurrentVersion(`__ALL_VERSIONS__`)},
-					]}
-				/>
-				{newVersionInput !== null && (
-					<form
-						onSubmit={(evt) => {
-							evt.preventDefault()
-							addVersionMutation.mutate(newVersionInput)
-						}}
-						className="flex flex-col gap-2"
-					>
-						<Input
-							value={newVersionInput}
-							onChange={(evt) => void setNewVersionInput(evt.target.value)}
-							htmlSize={1}
-							className="w-full"
-						/>
-						<Button htmlType="submit">Add</Button>
-						{addVersionMutation.isError && addVersionMutation.error instanceof Error && (
-							<p>{addVersionMutation.error.message}</p>
-						)}
-					</form>
-				)}
-			</div>
+			<VersionList />
 		</div>
 	)
 }

@@ -7,8 +7,8 @@ import type {Id} from "~/types"
 type MainStore = {
 	user: User | null
 	setUser: (user: User | null) => void
-	activeProductId: Id | null
-	setActiveProductId: (id: Id) => void
+	activeProduct: Id | null
+	setActiveProduct: (id: Id) => void
 }
 
 const useMainStore = create(
@@ -18,10 +18,10 @@ const useMainStore = create(
 			void set((state) => {
 				state.user = user
 			}),
-		activeProductId: null,
-		setActiveProductId: (id) =>
+		activeProduct: null,
+		setActiveProduct: (id) =>
 			void set((state) => {
-				state.activeProductId = id
+				state.activeProduct = id
 			}),
 	})),
 )
