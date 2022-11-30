@@ -42,12 +42,22 @@ const Story: FC<Props> = ({story}) => {
 	return (
 		<>
 			<Draggable layer={2} id={story.id} ref={ref}>
-				<div className={clsx(`rounded-md p-4 transition-colors`, isActive && `cursor-grab bg-[#00000008]`)}>
-					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-laurel bg-green-t1300 px-2 py-1 text-laurel">
-						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
-							{version?.name}
+				<div className={clsx(`rounded-md p-2 transition-colors`, isActive && `cursor-grab bg-[#00000008]`)}>
+					<div className="flex min-w-[4rem] items-center gap-1 overflow-hidden rounded border border-laurel bg-green-t1300 pr-1 text-laurel">
+						<button
+							type="button"
+							onClick={() => void setIsDrawerOpen(true)}
+							data-nondraggable
+							className="border-r-[1px] border-laurel bg-green-t1200 p-0.5 text-[0.6rem]"
+						>
+							<p className="-rotate-90">{version?.name}</p>
 						</button>
-						<Draggable.Input value={story.name} onChange={(value) => void updateStoryMutation.mutate({name: value})} />
+						<div className="text-xs text-black">
+							<Draggable.Input
+								value={story.name}
+								onChange={(value) => void updateStoryMutation.mutate({name: value})}
+							/>
+						</div>
 					</div>
 				</div>
 			</Draggable>

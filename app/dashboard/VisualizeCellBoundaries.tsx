@@ -2,7 +2,7 @@ import type {FC} from "react"
 
 import {useStoryMapStore} from "./storyMapStore"
 
-const layerBoundaries = [62, 124]
+const layerBoundaries = [70, 164]
 
 const VisualizeCellBoundaries: FC = () => {
 	const dividers = useStoryMapStore((state) => state.dividers)
@@ -13,7 +13,7 @@ const VisualizeCellBoundaries: FC = () => {
 				{dividers[0]?.map((divider) => (
 					<div
 						key={`divider-0-${divider.pos}`}
-						className="absolute top-0 h-full w-px border-[1px] border-dashed border-[red]"
+						className="absolute top-0 h-full w-px border border-dashed border-[red]"
 						style={{left: divider.pos}}
 					/>
 				))}
@@ -28,7 +28,7 @@ const VisualizeCellBoundaries: FC = () => {
 				{dividers[1]?.map((divider) => (
 					<div
 						key={`divider-1-${divider.pos}`}
-						className="absolute top-0 h-full w-px border-[1px] border-dashed border-[green]"
+						className="absolute top-0 h-full w-px border border-dashed border-[green]"
 						style={{left: divider.pos}}
 					/>
 				))}
@@ -37,8 +37,8 @@ const VisualizeCellBoundaries: FC = () => {
 				{dividers[2]?.map((divider) => (
 					<div
 						key={`divider-2-${divider.pos}`}
-						className="absolute top-0 h-full w-px border-[1px] border-dashed border-[blue]"
-						style={{left: divider.pos}}
+						className="absolute top-0 h-px w-full border border-dashed border-[blue]"
+						style={{top: `${divider.pos - layerBoundaries[1]!}px`}}
 					/>
 				))}
 			</div>

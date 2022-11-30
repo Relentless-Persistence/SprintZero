@@ -1,7 +1,7 @@
 "use client"
 
 import {motion} from "framer-motion"
-import {forwardRef, useEffect, useState} from "react"
+import {forwardRef, useEffect, useLayoutEffect, useState} from "react"
 import {usePreviousDistinct} from "react-use"
 
 import type {ReactNode, FC, ForwardRefRenderFunction} from "react"
@@ -57,13 +57,18 @@ export type InputProps = {
 }
 
 const Input: FC<InputProps> = ({value, onChange}) => {
+	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
+	useLayoutEffect(() => {
+		calculateDividers()
+	}, [calculateDividers, value])
+
 	return (
 		<div className="w-max">
 			<input
 				data-nondraggable
 				value={value}
 				onChange={(e) => void onChange(e.target.value)}
-				className="w-full grow bg-transparent text-center"
+				className="w-full grow bg-transparent text-center leading-none"
 				size={1}
 			/>
 			<p className="h-0 overflow-hidden whitespace-pre text-sm opacity-0">{value}</p>

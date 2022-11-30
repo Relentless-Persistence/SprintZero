@@ -73,30 +73,35 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 						/>
 					</div>
 
-					<div className="flex items-center">
-						<div
-							className={clsx(`flex gap-1`, (stories.length > 0 || currentVersion !== `__ALL_VERSIONS__`) && `mt-4`)}
-						>
-							{stories.map((story) => (
-								<Story key={story.id} story={story} />
-							))}
-							{currentVersion !== `__ALL_VERSIONS__` && (
-								<div className="p-4">
-									<Button
-										onClick={() =>
-											void addStoryMutation.mutate({
-												name: `story`,
-												description: `description`,
-												version: currentVersion,
-											})
-										}
-										className="bg-white"
-									>
-										Add story
-									</Button>
-								</div>
-							)}
-						</div>
+					<div
+						className={clsx(
+							`flex flex-col items-start`,
+							(stories.length > 0 || currentVersion !== `__ALL_VERSIONS__`) &&
+								`mt-12 rounded-md border border-[#006378] bg-white p-1`,
+						)}
+					>
+						{stories.map((story) => (
+							<Story key={story.id} story={story} />
+						))}
+						{currentVersion !== `__ALL_VERSIONS__` && (
+							<div className="p-2">
+								<Button
+									type="dashed"
+									size="small"
+									onClick={() =>
+										void addStoryMutation.mutate({
+											name: `story`,
+											description: `description`,
+											version: currentVersion,
+										})
+									}
+									className="bg-white transition-colors hover:bg-[#f2fbfe]"
+									style={{borderColor: `#006378`, color: `#006378`, fontSize: `0.75rem`}}
+								>
+									Add story
+								</Button>
+							</div>
+						)}
 					</div>
 				</div>
 			</Draggable>

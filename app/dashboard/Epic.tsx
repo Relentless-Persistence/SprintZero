@@ -1,6 +1,6 @@
 "use client"
 
-import {ReadOutlined} from "@ant-design/icons"
+import {CopyOutlined, ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
 import clsx from "clsx"
@@ -54,7 +54,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 			<Draggable layer={0} id={epic.id} ref={ref}>
 				<div
 					className={clsx(
-						`flex flex-col items-center gap-4 rounded-md p-4 transition-colors`,
+						`flex flex-col items-center gap-6 rounded-md p-4 transition-colors`,
 						isActive && `cursor-grab bg-[#00000008]`,
 					)}
 				>
@@ -74,10 +74,13 @@ const Epic: FC<EpicProps> = ({epic}) => {
 							))}
 							<div className="p-4">
 								<Button
+									type="dashed"
 									onClick={() => void addFeatureMutation.mutate({name: `feature`, description: `description`})}
-									className="bg-white"
+									className="flex items-center bg-white transition-colors hover:bg-[#f2fbfe]"
+									style={{borderColor: `#006378`, color: `#006378`, padding: `0.25rem 0.5rem`}}
 								>
-									Add feature
+									<CopyOutlined />
+									<span>Add feature</span>
 								</Button>
 							</div>
 						</div>

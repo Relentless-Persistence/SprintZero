@@ -197,7 +197,7 @@ export const calculateDividers = (state: WritableDraft<StoryMapStore>): void => 
 
 		let storyPositions: Divider[] = []
 		state.stories.forEach((story, i) => {
-			const storyPos = story.element!.offsetLeft + story.element!.offsetWidth / 2
+			const storyPos = story.element!.offsetTop + story.element!.offsetHeight / 2
 			if (i === 0) {
 				storyPositions.push({pos: storyPos, border: false})
 			} else {

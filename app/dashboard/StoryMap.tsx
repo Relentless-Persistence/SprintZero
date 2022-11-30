@@ -1,5 +1,6 @@
 "use client"
 
+import {ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
 
@@ -17,8 +18,6 @@ const StoryMap: FC = () => {
 	useSubscribeToData()
 
 	const epics = useStoryMapStore((state) => state.epics.map((epic) => epic.epic))
-	// const stories = useStoryMapStore((state) => state.stories)
-	// console.log(stories)
 
 	const addEpicMutation = useMutation({mutationFn: activeProduct ? addEpic(activeProduct) : async () => {}})
 
@@ -31,10 +30,13 @@ const StoryMap: FC = () => {
 			</div>
 			<div className="py-4 px-8">
 				<Button
+					type="dashed"
 					onClick={() => void addEpicMutation.mutate({name: `Epic`, description: `description`})}
-					className="bg-white"
+					className="flex items-center bg-white transition-colors hover:bg-[#faf8ff]"
+					style={{borderColor: `#4f2dc8`, color: `#4f2dc8`, padding: `0.25rem 0.5rem`}}
 				>
-					Add epic
+					<ReadOutlined />
+					<span>Add epic</span>
 				</Button>
 			</div>
 		</div>
