@@ -54,7 +54,7 @@ const ProductConfiguration = () => {
     if ((product !== "" && email1 !== "" && cadence !== "", gate !== "")) {
       db.collection("Products")
         .add({
-          product,
+          product: product.toLowerCase(),
           email1,
           email2,
           email3,

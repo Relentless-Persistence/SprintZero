@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -31,17 +31,22 @@ import { scaleToVal, splitRoutes } from "../../../utils";
 import fakeData from "../../../fakeData/priorities.json";
 import products from "../../../fakeData/products.json";
 import { db } from "../../../config/firebase-config";
+import { findIndex } from "lodash"
 
 import {
   DraggableTab,
   DraggableContainer,
 } from "../../../components/Priorities";
 import DrawerSubTitle from "../../../components/Dashboard/DrawerSubTitle";
+import { activeProductState } from "../../../atoms/productAtom";
+import { useRecoilValue, useRecoilState } from "recoil";
 
 const { TextArea } = Input;
 
-const getNames = (goals) => {
-  const names = goals.map((g) => g.name);
+const names = ["Epics", "Features", "Stories"]
+
+const getNames = () => {
+  const names = ["Epics", "Features", "Stories"]
 
   return names;
 };
@@ -114,14 +119,16 @@ const comments = [
 export default function Priorities() {
   const { pathname } = useRouter();
   const container = useRef();
-
+  const activeProduct = useRecoilValue(activeProductState);
   const [data, setData] = useState(fakeData);
+  const [epics, setEpics] = useState();
+  const [features, setFeatures] = useState();
+  const [stories, setStories] = useState();
   const [visible, setVisible] = useState(false);
-  const [activeProduct, setActiveProduct] = useState(products[0]);
 
-  const [activePriority, setActivePriority] = useState(null);
+  const [activePriority, setActivePriority] = useState(names[0]);
   const [disableDrag, setDisableDrag] = useState(true);
-
+  const [activeData, setActiveData] = useState();
   const [activePriorityIndex, setActivePriorityIndex] = useState(0);
   const [text, setText] = useState(
     "As a user I need to be aware of any issues with the platform so that I can pre-emptivly warn attendees and provide any new contact information to join the meeting"
@@ -129,38 +136,68 @@ export default function Priorities() {
 
   // Fetch data from firebase
   const fetchEpics = async () => {
-    if(activeProduct) {
-      db.collection("Epics")
+    let stories = [];
+    let features = [];
+    if (activeProduct) {
+      db
+        .collection("Epics")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
-          setData(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
-          console.log(
-            snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          );
+          setEpics(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+          // setActiveData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+          console.log("Epics", snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+          snapshot.docs
+            .map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))
+            .map((item, epicIndex) => {
+              item.features.map((feature, featureIndex) => {
+                features.push({ ...feature, epic: item, epicIndex, featureIndex })
+                feature.stories.map((story, storyIndex) => {
+                  stories.push({
+                    ...story,
+                    order: storyIndex,
+                    storyIndex: storyIndex,
+                    epicIndex,
+                    featureIndex,
+                    feature: feature,
+                    epic: item,
+                  });
+                });
+              });
+            });
+          setStories(stories)
+          setFeatures(features)
+          console.log("features", features)
+          console.log("stories", stories)
         });
     }
-  } 
+  }
+
+  useEffect(() => {
+    fetchEpics();
+  }, [activeProduct]);
 
   const changeText = (e) => setText(e.target.value);
 
   const setPriority = (name) => {
-    const activePriorityIndex = data[activeProduct].findIndex(
-      (card) => card.name === name
-    );
+    const index = findIndex(names, (o) => o === name);
 
-    if (activePriorityIndex > -1) {
-      setActivePriorityIndex(activePriorityIndex);
-      setActivePriority(data[activeProduct][activePriorityIndex]);
+    if (index > -1) {
+      setActivePriority(names[index]);
+    }
+
+    if (names[index] === "Epics") {
+      setActiveData(epics)
+    } else if (names[index] === "Features") {
+      setActiveData(features)
+    } else {
+      setActiveData(stories)
     }
   };
 
-  const setProduct = (product) => {
-    setActiveProduct(product);
-    setActivePriorityIndex(0);
-    setActivePriority(data[product][0]);
-  };
+
 
   const toggleDisable = () => setDisableDrag((s) => !s);
 
@@ -169,6 +206,8 @@ export default function Priorities() {
   };
 
   const onStop = (e, itemData, index) => {
+    console.log("itemData", itemData)
+    console.log("index", index)
     const node = itemData.node.getBoundingClientRect();
     const nodeWidth = node.width;
     const nodeHeight = node.height;
@@ -183,27 +222,27 @@ export default function Priorities() {
     const valX = scaleToVal(itemData.x, maxPossibleX);
     const valY = scaleToVal(itemData.y, maxPossibleY);
 
-    const newData = { ...data };
+    if (activePriority === "Epics") {
+      epics[index].feasibility_level = valX;
+      epics[index].priority_level = 100 - valY;
 
-    const list = newData[activeProduct][activePriorityIndex];
+      db.collection("Epics").doc(epics[index].id).update(epics[index]).then(() => fetchEpics())
+    } else if (activePriority === "Features") {
+      features[index].epic.features[features[index].featureIndex].feasibility_level = valX;
 
-    //flip Y cuz graph y axiz is opposite to screen y axes
+      features[index].epic.features[features[index].featureIndex].priority_level = 100 - valY;
 
-    list.data[index] = {
-      ...list.data[index],
-      feasiblity: valX,
-      value: 100 - valY,
-    };
+      db.collection("Epics").doc(features[index].epic.id).update(features[index].epic).then(() => fetchEpics())
+    } else {
+      stories[index].epic.features[stories[index].featureIndex].stories[stories[index].storyIndex].feasibility_level = valX;
 
-    newData[activeProduct][activePriorityIndex] = list;
-    setData(newData);
-  };
+      stories[index].epic.features[stories[index].featureIndex].stories[stories[index].storyIndex].priority_level = 100 - valY;
 
-  useEffect(() => {
-    if (!activePriority) {
-      setActivePriority(data[activeProduct][0]);
+      db.collection("Epics").doc(stories[index].epic.id).update(stories[index].epic).then(() => fetchEpics())
     }
-  }, [activePriority, data, activeProduct]);
+
+    
+  };
 
   return (
     <div className="mb-8">
@@ -214,10 +253,10 @@ export default function Priorities() {
       </Head>
 
       <AppLayout
-        rightNavItems={getNames(data[activeProduct])}
-        onChangeProduct={setProduct}
+        rightNavItems={getNames()}
+        // onChangeProduct={setProduct}
         hasSideAdd={false}
-        activeRightItem={activePriority?.name}
+        activeRightItem={activePriority}
         setActiveRightNav={setPriority}
         breadCrumbItems={splitRoutes(pathname)}
         hasMainAdd
@@ -232,25 +271,57 @@ export default function Priorities() {
           prospects for success
         </MainSub>
 
-        <DraggableContainer disable={disableDrag} ref={container}>
-          {activePriority?.data.map((d, i) => (
+        {epics && features && stories && <DraggableContainer disable={disableDrag} ref={container}>
+          {activePriority === "Epics" ? epics.map((d, i) => (
             <DraggableTab
               onStop={onStop}
               ref={container}
-              label={d.label}
+              label={d.name}
               disable={disableDrag}
               index={i}
               onClickItem={toggleDrawer}
               val={{
-                x: d.feasiblity,
-                y: d.value,
+                x: d.feasibility_level,
+                y: d.priority_level,
               }}
               key={d.id}
             />
-          ))}
-        </DraggableContainer>
+          )) : null}
 
-        <Drawer
+          {activePriority === "Features" ? features.map((d, i) => (
+            <DraggableTab
+              onStop={onStop}
+              ref={container}
+              label={d.name}
+              disable={disableDrag}
+              index={i}
+              onClickItem={toggleDrawer}
+              val={{
+                x: d.feasibility_level,
+                y: d.priority_level,
+              }}
+              key={d.id}
+            />
+          )) : null}
+
+          {activePriority === "Stories" ? stories.map((d, i) => (
+            <DraggableTab
+              onStop={onStop}
+              ref={container}
+              label={d.name}
+              disable={disableDrag}
+              index={i}
+              onClickItem={toggleDrawer}
+              val={{
+                x: d.feasibility_level,
+                y: d.priority_level,
+              }}
+              key={d.id}
+            />
+          )) : null}
+        </DraggableContainer>}
+
+        {/* <Drawer
           visible={visible}
           closable={false}
           placement={"bottom"}
@@ -348,7 +419,7 @@ export default function Priorities() {
               />
             </Col>
           </Row>
-        </Drawer>
+        </Drawer> */}
       </AppLayout>
     </div>
   );

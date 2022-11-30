@@ -323,39 +323,39 @@ export default function Sprint() {
   };
 
   const handleSwap = (currentCard, targetCard) => {
-    const info = { ...data };
-    const newData = info[activeProduct][activeBoardIndex];
-    const columns = newData?.columns;
+    // const info = { ...data };
+    // const newData = info[activeProduct][activeBoardIndex];
+    // const columns = newData?.columns;
 
-    const currentCardColumn = columns.find(
-      (c) => c.columnId === currentCard.colId
-    );
-    const targetCardColumn = columns.find(
-      (c) => c.columnId === targetCard.colId
-    );
+    // const currentCardColumn = columns.find(
+    //   (c) => c.columnId === currentCard.colId
+    // );
+    // const targetCardColumn = columns.find(
+    //   (c) => c.columnId === targetCard.colId
+    // );
 
-    const currentCardIndex = currentCardColumn?.data?.findIndex(
-      (c) => c.id === currentCard.id
-    );
-    const targetCardIndex = targetCardColumn?.data?.findIndex(
-      (c) => c.id === targetCard.id
-    );
+    // const currentCardIndex = currentCardColumn?.data?.findIndex(
+    //   (c) => c.id === currentCard.id
+    // );
+    // const targetCardIndex = targetCardColumn?.data?.findIndex(
+    //   (c) => c.id === targetCard.id
+    // );
 
-    //swap cards
-    if (currentCard.colId === targetCard.colId) {
-      [
-        currentCardColumn.data[currentCardIndex],
-        targetCardColumn.data[targetCardIndex],
-      ] = [
-        targetCardColumn.data[targetCardIndex],
-        currentCardColumn.data[currentCardIndex],
-      ];
-    } else {
-      //fake drop
-      handleDrop(currentCard, targetCard.colId);
-    }
+    // //swap cards
+    // if (currentCard.colId === targetCard.colId) {
+    //   [
+    //     currentCardColumn.data[currentCardIndex],
+    //     targetCardColumn.data[targetCardIndex],
+    //   ] = [
+    //     targetCardColumn.data[targetCardIndex],
+    //     currentCardColumn.data[currentCardIndex],
+    //   ];
+    // } else {
+    //   //fake drop
+    //   handleDrop(currentCard, targetCard.colId);
+    // }
 
-    setData(info);
+    // setData(info);
   };
 
   const selectStory = (story) => {

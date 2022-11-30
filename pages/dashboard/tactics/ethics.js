@@ -192,12 +192,14 @@ const comments = [
 ];
 
 export default function Ethics() {
+  const router = useRouter();
   const { pathname } = useRouter();
 
   const activeProduct = useRecoilValue(activeProductState);
   const [data, setData] = useState(null);
   const [visible, setVisible] = useState(false);
   const [story, setStory] = useState(null);
+  const [ethics, setEthics] = useState();
 
   // const [activeBoard, setActiveBoard] = useState(data[activeProduct][0]);
   const [activeBoardIndex, setActiveBoardIndex] = useState(0);
@@ -230,6 +232,7 @@ export default function Ethics() {
               });
             });
           const ethics = stories.filter((story) => story.flagged === true);
+          setEthics(ethics);
           setData([
             {
               columnId: "0",
@@ -252,30 +255,7 @@ export default function Ethics() {
                 (item) => item.ethics_status === "Adjuticated"
               ),
             },
-          ]);
-          console.log([
-            {
-              columnId: "0",
-              columnName: "Identified",
-              data: ethics.filter(
-                (item) => item.ethics_status === "Identified"
-              ),
-            },
-            {
-              columnId: "1",
-              columnName: "Under Review",
-              data: stories.filter(
-                (item) => item.ethics_status === "Under Review"
-              ),
-            },
-            {
-              columnId: "2",
-              columnName: "Adjuticated",
-              data: stories.filter(
-                (item) => item.ethics_status === "Adjuticated"
-              ),
-            },
-          ]);
+          ])
         });
     }
   };
@@ -283,17 +263,6 @@ export default function Ethics() {
   useEffect(() => {
     fetchEthics();
   }, [activeProduct]);
-
-  // const setBoard = (boardName, product) => {
-  //   const boardIndex = data[product || activeProduct].findIndex(
-  //     (b) => b.boardName === boardName
-  //   );
-
-  //   if (boardIndex > -1) {
-  //     setActiveBoard(data[product || activeProduct][boardIndex]);
-  //     setActiveBoardIndex(boardIndex);
-  //   }
-  // };
 
   const handleDrop = async (card, targetColId) => {
     const selectedStory = data[card.colId].data[card.id];
@@ -326,40 +295,40 @@ export default function Ethics() {
   };
 
   const handleSwap = (currentCard, targetCard) => {
-    const info = { ...data };
-    const newData = info[activeProduct][activeBoardIndex];
-    const columns = newData?.columns;
+    // const info = { ...data };
+    // const newData = info[activeProduct][activeBoardIndex];
+    // const columns = newData?.columns;
 
-    const currentCardColumn = columns.find(
-      (c) => c.columnId === currentCard.colId
-    );
+    // const currentCardColumn = columns.find(
+    //   (c) => c.columnId === currentCard.colId
+    // );
 
-    const targetCardColumn = columns.find(
-      (c) => c.columnId === targetCard.colId
-    );
+    // const targetCardColumn = columns.find(
+    //   (c) => c.columnId === targetCard.colId
+    // );
 
-    const currentCardIndex = currentCardColumn?.data?.findIndex(
-      (c) => c.id === currentCard.id
-    );
-    const targetCardIndex = targetCardColumn?.data?.findIndex(
-      (c) => c.id === targetCard.id
-    );
+    // const currentCardIndex = currentCardColumn?.data?.findIndex(
+    //   (c) => c.id === currentCard.id
+    // );
+    // const targetCardIndex = targetCardColumn?.data?.findIndex(
+    //   (c) => c.id === targetCard.id
+    // );
 
-    //swap cards
-    if (currentCard.colId === targetCard.colId) {
-      [
-        currentCardColumn.data[currentCardIndex],
-        targetCardColumn.data[targetCardIndex],
-      ] = [
-        targetCardColumn.data[targetCardIndex],
-        currentCardColumn.data[currentCardIndex],
-      ];
-    } else {
-      //fake drop
-      handleDrop(currentCard, targetCard.colId);
-    }
+    // //swap cards
+    // if (currentCard.colId === targetCard.colId) {
+    //   [
+    //     currentCardColumn.data[currentCardIndex],
+    //     targetCardColumn.data[targetCardIndex],
+    //   ] = [
+    //     targetCardColumn.data[targetCardIndex],
+    //     currentCardColumn.data[currentCardIndex],
+    //   ];
+    // } else {
+    //   //fake drop
+    //   handleDrop(currentCard, targetCard.colId);
+    // }
 
-    setData(info);
+    // setData(info);
   };
 
   const selectStory = (story) => {
@@ -413,7 +382,7 @@ export default function Ethics() {
               maxWidthClass="max-w-[1200px]"
             />
 
-            {data.length < 1 ? (
+            {ethics.length < 1 ? (
               <div className="w-[400px] fixed bottom-2 right-2 z-10">
                 <Alert
                   message={

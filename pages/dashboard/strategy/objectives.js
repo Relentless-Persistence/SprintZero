@@ -50,7 +50,7 @@ export default function Objectives() {
     if (data) {
       let goalNames = [];
       data.map((g) => goalNames.push(g.name));
-      setGoalNames(goalNames);
+      setGoalNames(goalNames.sort());
       setActiveGoal(goalNames[0]);
     }
   };
@@ -83,7 +83,7 @@ export default function Objectives() {
       .update({
         description: value,
       })
-      .then(() => message.success("Goal updated successfully"));
+      // .then(() => message.success("Goal updated successfully"));
   };
 
   const onClose = () => {

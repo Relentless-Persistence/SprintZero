@@ -29,7 +29,9 @@ const UserStory = ({ epics, setEpics, activeProduct, version }) => {
         name: "",
         features: [],
         product_id: activeProduct.id,
-        version: version.id
+        version: version.id,
+        feasibility_level: 0,
+        priority_level:0
       },
     ]);
   };
@@ -70,6 +72,8 @@ const UserStory = ({ epics, setEpics, activeProduct, version }) => {
               name: "",
               status: "",
               stories: [],
+              feasibility_level: 0,
+              priority_level:0
             },
           ],
         },
@@ -136,7 +140,9 @@ const UserStory = ({ epics, setEpics, activeProduct, version }) => {
                   acceptance_criteria: [],
                   effort: "",
                   design_link: "",
-                  code_link: ""
+                  code_link: "",
+                  feasibility_level: 0,
+                  priority_level:0
                 },
               ],
             },
