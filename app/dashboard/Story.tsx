@@ -1,8 +1,6 @@
 "use client"
 
 import {useMutation, useQueryClient} from "@tanstack/react-query"
-import {Drawer} from "antd5"
-import TextArea from "antd5/es/input/TextArea"
 import clsx from "clsx"
 import {useCallback, useState} from "react"
 
@@ -11,9 +9,10 @@ import type {Story as StoryType} from "~/types/db/Stories"
 import type {Version} from "~/types/db/Versions"
 
 import Draggable, {useIsHovering} from "./Draggable"
+import ItemDrawer from "./ItemDrawer"
 import {useStoryMapStore} from "./storyMapStore"
 import useMainStore from "~/stores/mainStore"
-import {updateStory} from "~/utils/fetch"
+import {addCommentToStory, deleteStory, updateStory} from "~/utils/fetch"
 
 type Props = {
 	story: StoryType
@@ -30,6 +29,8 @@ const Story: FC<Props> = ({story}) => {
 		?.find((version) => version.id === story.version)
 
 	const updateStoryMutation = useMutation({mutationFn: updateStory(story.id)})
+	const deleteStoryMutation = useMutation({mutationFn: deleteStory(story.id)})
+	const addCommentMutation = useMutation({mutationFn: addCommentToStory(story.id)})
 
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -62,16 +63,25 @@ const Story: FC<Props> = ({story}) => {
 				</div>
 			</Draggable>
 
-			<Drawer
+			<ItemDrawer
 				title={story.name}
-				placement="bottom"
-				closable={false}
-				open={isDrawerOpen}
+				itemType="User story"
+				data={{
+					points: story.points,
+					description: story.description,
+					onDescriptionChange: (value) => void updateStoryMutation.mutate({description: value}),
+					checklist: {
+						title: `Acceptance criteria`,
+						items: story.acceptanceCriteria.map((item) => ({id: item.id, label: item.name, checked: item.checked})),
+						onItemToggle: () => {},
+					},
+					comments: story.comments,
+					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
+					onDelete: () => void deleteStoryMutation.mutate(),
+				}}
+				isOpen={isDrawerOpen}
 				onClose={() => void setIsDrawerOpen(false)}
-			>
-				<p>Feature</p>
-				<TextArea />
-			</Drawer>
+			/>
 		</>
 	)
 }

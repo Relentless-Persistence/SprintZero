@@ -18,48 +18,41 @@ import {getAllEpics, getAllFeatures, getAllStories} from "~/utils/fetch"
 
 export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) / arr.length
 
-export const sortEpics = (epics: Epic[]): Epic[] =>
-	epics.sort((epic1, epic2) => {
-		if (epic1.prevEpic === null) return -1
-		if (epic2.prevEpic === null) return 1
-		if (epic1.prevEpic === epic2.id) return 1
-		if (epic2.prevEpic === epic1.id) return -1
-		return 0
-	})
+export const sortEpics = (epics: Epic[]): Epic[] => {
+	const sortedEpics: Epic[] = []
+	let currentEpic = epics.find((epic) => epic.prevEpic === null) || null
+	while (currentEpic) {
+		sortedEpics.push(currentEpic)
+		currentEpic = epics.find((epic) => epic.prevEpic === currentEpic!.id) || null
+	}
+	return sortedEpics
+}
 
 // Relies on epics being sorted
-export const sortFeatures = (epics: Epic[], features: Feature[]): Feature[] =>
-	features
-		.sort((feature1, feature2) => {
-			const feature1Epic = epics.findIndex((epic) => epic.id === feature1.epic)
-			const feature2Epic = epics.findIndex((epic) => epic.id === feature2.epic)
-			if (feature1Epic < feature2Epic) return -1
-			if (feature1Epic > feature2Epic) return 1
-			return 0
-		})
-		.sort((feature1, feature2) => {
-			if (feature1.nextFeature === null && feature2.prevFeature === null) return -1
-			if (feature1.prevFeature === feature2.id) return 1
-			if (feature2.prevFeature === feature1.id) return -1
-			return 0
-		})
+export const sortFeatures = (epics: Epic[], features: Feature[]): Feature[] => {
+	const sortedFeatures: Feature[] = []
+	epics.forEach((epic) => {
+		let currentFeature = features.find((feature) => feature.prevFeature === null && feature.epic === epic.id) || null
+		while (currentFeature) {
+			sortedFeatures.push(currentFeature)
+			currentFeature = features.find((feature) => feature.prevFeature === currentFeature!.id) || null
+		}
+	})
+	return sortedFeatures
+}
 
 // Relies on features being sorted
-export const sortStories = (features: Feature[], stories: Story[]): Story[] =>
-	stories
-		.sort((story1, story2) => {
-			const story1Feature = features.findIndex((feature) => feature.id === story1.feature)
-			const story2Feature = features.findIndex((feature) => feature.id === story2.feature)
-			if (story1Feature < story2Feature) return -1
-			if (story1Feature > story2Feature) return 1
-			return 0
-		})
-		.sort((story1, story2) => {
-			if (story1.nextStory === null && story2.prevStory === null) return -1
-			if (story1.prevStory === story2.id) return 1
-			if (story2.prevStory === story1.id) return -1
-			return 0
-		})
+export const sortStories = (features: Feature[], stories: Story[]): Story[] => {
+	const sortedStories: Story[] = []
+	features.forEach((feature) => {
+		let currentStory = stories.find((story) => story.prevStory === null && story.feature === feature.id) || null
+		while (currentStory) {
+			sortedStories.push(currentStory)
+			currentStory = stories.find((story) => story.prevStory === currentStory!.id) || null
+		}
+	})
+	return sortedStories
+}
 
 // Once this hook has run, the story map will mount. That way, we can always rely on there being data available.
 export const useGetInitialData = (): boolean => {

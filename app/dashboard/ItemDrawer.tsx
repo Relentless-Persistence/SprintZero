@@ -21,7 +21,7 @@ type Props = {
 		onDescriptionChange: (value: string) => void
 		checklist?: {
 			title: string
-			items: Array<{id: Id; label: string; checked: boolean}>
+			items: Array<{id: string; label: string; checked: boolean}>
 			onItemToggle: (id: Id) => void
 		}
 		comments: Id[]

@@ -25,6 +25,7 @@ export const useStoryMapStore = create(
 					epic,
 					element: state.epics.find((e) => e.epic.id === epic.id)?.element,
 				}))
+				calculateDividers(state)
 			}),
 		features: [],
 		setFeatures: (features) =>
@@ -36,6 +37,7 @@ export const useStoryMapStore = create(
 					feature,
 					element: state.features.find((f) => f.feature.id === feature.id)?.element,
 				}))
+				calculateDividers(state)
 			}),
 		stories: [],
 		setStories: (stories) =>
@@ -47,6 +49,7 @@ export const useStoryMapStore = create(
 					story,
 					element: state.stories.find((s) => s.story.id === story.id)?.element,
 				}))
+				calculateDividers(state)
 			}),
 
 		currentlyHovering: [null, null, null],

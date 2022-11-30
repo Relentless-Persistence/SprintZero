@@ -320,7 +320,7 @@ export const addCommentToStory =
 		await updateDoc(doc(db, Stories._, storyId), {comments: [...story.comments, commentDoc.id]})
 	}
 
-export const deleteStory = async (storyId: Id): Promise<void> => {
+export const deleteStory = (storyId: Id) => async (): Promise<void> => {
 	const storyDoc = await getDoc(doc(db, Stories._, storyId))
 	const story = StorySchema.parse({id: storyDoc.id, ...storyDoc.data()})
 
