@@ -131,9 +131,16 @@ export const useSubscribeToData = (): void => {
 	}, [activeProduct, calculateDividers, setEpics, setFeatures, setStories])
 }
 
-export type Divider = {
+export type FeatureDivider = {
 	pos: number
 	border: boolean
+}
+
+export type StoryDivider = {
+	featureId: Id
+	featureLeft: number
+	featureRight: number
+	dividers: number[]
 }
 
 export type StoryMapStore = {
@@ -152,7 +159,7 @@ export type StoryMapStore = {
 	currentlyHovering: [Id | null, Id | null, Id | null]
 	setCurrentLayerHover: (layer: number, id: Id | null) => void
 
-	dividers: [Divider[] | null, Divider[] | null, Divider[] | null]
+	dividers: [number[] | null, FeatureDivider[] | null, Array<StoryDivider> | null]
 	registerElement: (layer: number, id: Id, element: HTMLElement) => void
 	calculateDividers: () => void
 }
@@ -163,45 +170,43 @@ export const calculateDividers = (state: WritableDraft<StoryMapStore>): void => 
 		state.features.every((feature) => feature.element) &&
 		state.stories.every((story) => story.element)
 	) {
-		let epicPositions: Divider[] = []
+		let epicDividers: number[] = []
 		state.epics.forEach((epic, i) => {
 			const epicPos = epic.element!.offsetLeft + epic.element!.offsetWidth / 2
-			if (i === 0) {
-				epicPositions.push({pos: epicPos, border: false})
-			} else {
-				epicPositions.push({pos: avg(epicPositions.at(-1)!.pos, epicPos), border: false})
-				epicPositions.push({pos: epicPos, border: false})
-			}
+			if (i > 0) epicDividers.push(avg(epicDividers.at(-1)!, epicPos))
+			epicDividers.push(epicPos)
 		})
 
-		let featurePositions: Divider[] = []
+		let featureDividers: FeatureDivider[] = []
 		state.features.forEach((feature, i) => {
 			const featurePos = feature.element!.offsetLeft + feature.element!.offsetWidth / 2
 			if (i === 0) {
-				featurePositions.push({pos: featurePos, border: false})
+				featureDividers.push({pos: featurePos, border: false})
 			} else {
-				featurePositions.push({
-					pos: avg(featurePositions.at(-1)!.pos, featurePos),
+				featureDividers.push({
+					pos: avg(featureDividers.at(-1)!.pos, featurePos),
 					border: feature.feature.prevFeature === null,
 				})
-				featurePositions.push({pos: featurePos, border: false})
+				featureDividers.push({pos: featurePos, border: false})
 			}
 		})
 
-		let storyPositions: Divider[] = []
-		state.stories.forEach((story, i) => {
-			const storyPos = story.element!.offsetTop + story.element!.offsetHeight / 2
-			if (i === 0) {
-				storyPositions.push({pos: storyPos, border: false})
-			} else {
-				storyPositions.push({
-					pos: avg(storyPositions.at(-1)!.pos, storyPos),
-					border: story.story.prevStory === null,
+		let storyDividers: StoryDivider[] = state.features.map((feature) => ({
+			featureId: feature.feature.id,
+			featureLeft: feature.element!.offsetLeft,
+			featureRight: feature.element!.offsetLeft + feature.element!.offsetWidth,
+			dividers: (() => {
+				const stories = state.stories.filter((story) => story.story.feature === feature.feature.id)
+				const dividers: number[] = []
+				stories.forEach((story, i) => {
+					const storyPos = story.element!.offsetTop + story.element!.offsetHeight / 2
+					if (i > 0) dividers.push(avg(dividers.at(-1)!, storyPos))
+					dividers.push(storyPos)
 				})
-				storyPositions.push({pos: storyPos, border: false})
-			}
-		})
+				return dividers
+			})(),
+		}))
 
-		state.dividers = [epicPositions, featurePositions, storyPositions]
+		state.dividers = [epicDividers, featureDividers, storyDividers]
 	}
 }
