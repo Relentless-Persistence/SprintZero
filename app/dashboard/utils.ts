@@ -20,10 +20,10 @@ export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) 
 
 export const sortEpics = (epics: Epic[]): Epic[] => {
 	const sortedEpics: Epic[] = []
-	let currentEpic = epics.find((epic) => epic.prevEpic === null) || null
+	let currentEpic = epics.find((epic) => epic.prev_epic === null) || null
 	while (currentEpic) {
 		sortedEpics.push(currentEpic)
-		currentEpic = epics.find((epic) => epic.prevEpic === currentEpic!.id) || null
+		currentEpic = epics.find((epic) => epic.prev_epic === currentEpic!.id) || null
 	}
 	return sortedEpics
 }
@@ -32,10 +32,10 @@ export const sortEpics = (epics: Epic[]): Epic[] => {
 export const sortFeatures = (epics: Epic[], features: Feature[]): Feature[] => {
 	const sortedFeatures: Feature[] = []
 	epics.forEach((epic) => {
-		let currentFeature = features.find((feature) => feature.prevFeature === null && feature.epic === epic.id) || null
+		let currentFeature = features.find((feature) => feature.prev_feature === null && feature.epic === epic.id) || null
 		while (currentFeature) {
 			sortedFeatures.push(currentFeature)
-			currentFeature = features.find((feature) => feature.prevFeature === currentFeature!.id) || null
+			currentFeature = features.find((feature) => feature.prev_feature === currentFeature!.id) || null
 		}
 	})
 	return sortedFeatures
@@ -45,10 +45,10 @@ export const sortFeatures = (epics: Epic[], features: Feature[]): Feature[] => {
 export const sortStories = (features: Feature[], stories: Story[]): Story[] => {
 	const sortedStories: Story[] = []
 	features.forEach((feature) => {
-		let currentStory = stories.find((story) => story.prevStory === null && story.feature === feature.id) || null
+		let currentStory = stories.find((story) => story.prev_story === null && story.feature === feature.id) || null
 		while (currentStory) {
 			sortedStories.push(currentStory)
-			currentStory = stories.find((story) => story.prevStory === currentStory!.id) || null
+			currentStory = stories.find((story) => story.prev_story === currentStory!.id) || null
 		}
 	})
 	return sortedStories
@@ -182,7 +182,7 @@ export const calculateDividers = (state: WritableDraft<StoryMapStore>): void => 
 			} else {
 				featureDividers.push({
 					pos: avg(featureDividers.at(-1)!.pos, featurePos),
-					border: feature.feature.prevFeature === null,
+					border: feature.feature.prev_feature === null,
 				})
 				featureDividers.push({pos: featurePos, border: false})
 			}

@@ -7,11 +7,13 @@ export const FeatureSchema = z.object({
 
 	description: z.string(),
 	name: z.string(),
+	priority_level: z.number(),
+	visibility_level: z.number(),
 
 	comments: z.array(idSchema),
 	epic: idSchema,
-	nextFeature: idSchema.nullable(),
-	prevFeature: idSchema.nullable(),
+	next_feature: idSchema.nullable(),
+	prev_feature: idSchema.nullable(),
 	product: idSchema,
 	stories: z.array(idSchema),
 })

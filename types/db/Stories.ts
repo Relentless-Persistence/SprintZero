@@ -17,12 +17,14 @@ export const StorySchema = z.object({
 	designLink: z.string().url().nullable(),
 	name: z.string(),
 	points: z.number(),
+	priority_level: z.number(),
+	visibility_level: z.number(),
 
 	comments: z.array(idSchema),
 	epic: idSchema,
 	feature: idSchema,
-	nextStory: idSchema.nullable(),
-	prevStory: idSchema.nullable(),
+	next_story: idSchema.nullable(),
+	prev_story: idSchema.nullable(),
 	product: idSchema,
 	version: idSchema,
 })

@@ -94,7 +94,7 @@ type AddEpicInput = {
 export const addEpic =
 	(productId: Id) =>
 	async ({name, description}: AddEpicInput): Promise<void> => {
-		const lastEpicData = (await getDocs(query(collection(db, Epics._), where(Epics.nextEpic, `==`, null)))).docs[0]
+		const lastEpicData = (await getDocs(query(collection(db, Epics._), where(Epics.next_epic, `==`, null)))).docs[0]
 		const lastEpic = lastEpicData ? EpicSchema.parse({id: lastEpicData.id, ...lastEpicData.data()}) : null
 		const data: Omit<Epic, `id` | `updatedAt`> = {
 			description,
@@ -102,13 +102,15 @@ export const addEpic =
 			keepers: [],
 			comments: [],
 			features: [],
-			nextEpic: null,
-			prevEpic: lastEpic?.id ?? null,
+			priority_level: 0,
+			visibility_level: 0,
+			next_epic: null,
+			prev_epic: lastEpic?.id ?? null,
 			product: productId,
 		}
 		const newEpicDoc = await addDoc(collection(db, Epics._), data)
 		if (lastEpicData)
-			updateDoc(doc(db, Epics._, lastEpicData.id), {nextEpic: newEpicDoc.id as Id} satisfies Partial<Epic>)
+			updateDoc(doc(db, Epics._, lastEpicData.id), {next_epic: newEpicDoc.id as Id} satisfies Partial<Epic>)
 	}
 
 export const getEpic = (epicId: Id) => async (): Promise<Epic> => {
@@ -149,8 +151,8 @@ export const deleteEpic = (epicId: Id) => async (): Promise<void> => {
 	const [features, stories] = await Promise.all([getFeaturesByEpic(epicId)(), getStoriesByEpic(epicId)()])
 
 	const batch = writeBatch(db)
-	if (epic.prevEpic) batch.update(doc(db, Epics._, epic.prevEpic), {nextEpic: epic.nextEpic})
-	if (epic.nextEpic) batch.update(doc(db, Epics._, epic.nextEpic), {prevEpic: epic.prevEpic})
+	if (epic.prev_epic) batch.update(doc(db, Epics._, epic.prev_epic), {nextEpic: epic.next_epic})
+	if (epic.next_epic) batch.update(doc(db, Epics._, epic.next_epic), {prevEpic: epic.prev_epic})
 	stories.forEach((story) => void batch.delete(doc(db, Stories._, story.id)))
 	features.forEach((feature) => void batch.delete(doc(db, Features._, feature.id)))
 	batch.delete(doc(db, Epics._, epicId))
@@ -167,7 +169,7 @@ export const addFeature =
 	async ({description, name}: AddFeatureInput): Promise<void> => {
 		const lastFeatureData = (
 			await getDocs(
-				query(collection(db, Features._), where(Features.epic, `==`, epicId), where(Features.nextFeature, `==`, null)),
+				query(collection(db, Features._), where(Features.epic, `==`, epicId), where(Features.next_feature, `==`, null)),
 			)
 		).docs[0]
 		const lastFeature = lastFeatureData
@@ -177,17 +179,19 @@ export const addFeature =
 		const data: Omit<Feature, `id`> = {
 			description,
 			name,
+			priority_level: 0,
+			visibility_level: 0,
 			comments: [],
 			stories: [],
 			epic: epicId,
-			prevFeature: lastFeature?.id ?? null,
-			nextFeature: null,
+			prev_feature: lastFeature?.id ?? null,
+			next_feature: null,
 			product: productId,
 		}
 		const newFeatureDoc = await addDoc(collection(db, Features._), data)
 		if (lastFeatureData)
 			updateDoc(doc(db, Features._, lastFeatureData.id), {
-				nextFeature: newFeatureDoc.id as Id,
+				next_feature: newFeatureDoc.id as Id,
 			} satisfies Partial<Feature>)
 	}
 
@@ -234,8 +238,8 @@ export const deleteFeature = (featureId: Id) => async (): Promise<void> => {
 	const [epic, stories] = await Promise.all([getEpic(feature.epic)(), getStoriesByFeature(featureId)()])
 
 	const batch = writeBatch(db)
-	if (feature.prevFeature) batch.update(doc(db, Features._, feature.prevFeature), {nextFeature: feature.nextFeature})
-	if (feature.nextFeature) batch.update(doc(db, Features._, feature.nextFeature), {prevFeature: feature.prevFeature})
+	if (feature.prev_feature) batch.update(doc(db, Features._, feature.prev_feature), {nextFeature: feature.next_feature})
+	if (feature.next_feature) batch.update(doc(db, Features._, feature.next_feature), {prevFeature: feature.prev_feature})
 	stories.forEach((story) => void batch.delete(doc(db, Stories._, story.id)))
 	batch.update(doc(db, Epics._, epic.id), {features: epic.features.filter((id) => id !== feature.id)})
 	batch.delete(doc(db, Features._, featureId))
@@ -253,7 +257,11 @@ export const addStory =
 	async ({description, name, version}: AddStoryInput): Promise<void> => {
 		const lastStoryData = (
 			await getDocs(
-				query(collection(db, Stories._), where(Stories.feature, `==`, featureId), where(Stories.nextStory, `==`, null)),
+				query(
+					collection(db, Stories._),
+					where(Stories.feature, `==`, featureId),
+					where(Stories.next_story, `==`, null),
+				),
 			)
 		).docs[0]
 		const lastStory = lastStoryData ? StorySchema.parse({id: lastStoryData.id, ...lastStoryData.data()}) : null
@@ -265,18 +273,20 @@ export const addStory =
 			designLink: null,
 			name,
 			points: 0,
+			priority_level: 0,
+			visibility_level: 0,
 			comments: [],
 			epic: epicId,
 			feature: featureId,
-			nextStory: null,
-			prevStory: lastStory?.id ?? null,
+			next_story: null,
+			prev_story: lastStory?.id ?? null,
 			product: productId,
 			version,
 		}
 		const newStoryDoc = await addDoc(collection(db, Stories._), data)
 		if (lastStoryData)
 			updateDoc(doc(db, Stories._, lastStoryData.id), {
-				nextStory: newStoryDoc.id as Id,
+				next_story: newStoryDoc.id as Id,
 			} satisfies Partial<Story>)
 	}
 
@@ -327,8 +337,8 @@ export const deleteStory = (storyId: Id) => async (): Promise<void> => {
 	const feature = await getFeature(story.feature)()
 
 	const batch = writeBatch(db)
-	if (story.prevStory) batch.update(doc(db, Stories._, story.prevStory), {nextStory: story.nextStory})
-	if (story.nextStory) batch.update(doc(db, Stories._, story.nextStory), {prevStory: story.prevStory})
+	if (story.prev_story) batch.update(doc(db, Stories._, story.prev_story), {nextStory: story.next_story})
+	if (story.next_story) batch.update(doc(db, Stories._, story.next_story), {prevStory: story.prev_story})
 	batch.update(doc(db, Features._, feature.id), {stories: feature.stories.filter((id) => id !== story.id)})
 	batch.delete(doc(db, Stories._, storyId))
 	await batch.commit()

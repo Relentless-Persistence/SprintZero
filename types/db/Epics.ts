@@ -7,12 +7,14 @@ export const EpicSchema = z.object({
 
 	description: z.string(),
 	name: z.string(),
+	priority_level: z.number(),
+	visibility_level: z.number(),
 
 	comments: z.array(idSchema),
 	features: z.array(idSchema),
 	keepers: z.array(idSchema),
-	nextEpic: idSchema.nullable(),
-	prevEpic: idSchema.nullable(),
+	next_epic: idSchema.nullable(),
+	prev_epic: idSchema.nullable(),
 	product: idSchema,
 })
 export const EpicCollectionSchema = z.array(EpicSchema)
