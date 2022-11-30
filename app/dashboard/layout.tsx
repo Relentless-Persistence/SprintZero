@@ -71,7 +71,11 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 				width="192px"
 				open={isSettingsOpen}
 				onClose={() => void setIsSettingsOpen(false)}
-				extra={<CloseOutlined onClick={() => void setIsSettingsOpen(false)} />}
+				extra={
+					<button type="button" onClick={() => void setIsSettingsOpen(false)}>
+						<CloseOutlined />
+					</button>
+				}
 				bodyStyle={{padding: `12px`}}
 			>
 				<SettingsMenu />

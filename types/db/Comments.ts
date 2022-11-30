@@ -8,6 +8,7 @@ export const CommentSchema = z.object({
 
 	author: z.string(),
 	text: z.string(),
+	type: z.union([z.literal(`design`), z.literal(`code`)]),
 
 	createdAt: z.instanceof(Timestamp),
 })

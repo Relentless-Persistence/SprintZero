@@ -2,8 +2,7 @@
 
 import {ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
-import {Button, Drawer} from "antd5"
-import TextArea from "antd5/es/input/TextArea"
+import {Button} from "antd5"
 import clsx from "clsx"
 import {useCallback, useState} from "react"
 
@@ -11,10 +10,11 @@ import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
 
 import Draggable, {useIsHovering} from "./Draggable"
+import ItemDrawer from "./ItemDrawer"
 import {useStoryMapStore} from "./storyMapStore"
 import Feature from "~/app/dashboard/Feature"
 import useMainStore from "~/stores/mainStore"
-import {addFeature, renameEpic} from "~/utils/fetch"
+import {addCommentToEpic, addFeature, deleteEpic, updateEpic} from "~/utils/fetch"
 
 export type EpicProps = {
 	epic: EpicType
@@ -29,12 +29,17 @@ const Epic: FC<EpicProps> = ({epic}) => {
 	const features = useStoryMapStore((state) =>
 		state.features.map((feature) => feature.feature).filter((feature) => feature.epic === epic.id),
 	)
+	const points = useStoryMapStore((state) =>
+		state.stories.filter((story) => story.story.epic === epic.id).reduce((acc, story) => acc + story.story.points, 0),
+	)
 
 	const addFeatureMutation = useMutation({
 		mutationFn: addFeature(activeProduct!, epic.id),
 	})
 
-	const renameEpicMutation = useMutation({mutationFn: renameEpic(epic.id)})
+	const updateEpicMutation = useMutation({mutationFn: updateEpic(epic.id)})
+	const addCommentMutation = useMutation({mutationFn: addCommentToEpic(epic.id)})
+	const deleteEpicMutation = useMutation({mutationFn: deleteEpic(epic.id)})
 
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -59,7 +64,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 						</button>
 						<Draggable.Input
 							value={epic.name}
-							onChange={useCallback((value) => void renameEpicMutation.mutate(value), [renameEpicMutation])}
+							onChange={useCallback((value) => void updateEpicMutation.mutate({name: value}), [updateEpicMutation])}
 						/>
 					</div>
 					<div className="flex items-center">
@@ -80,16 +85,25 @@ const Epic: FC<EpicProps> = ({epic}) => {
 				</div>
 			</Draggable>
 
-			<Drawer
+			<ItemDrawer
 				title={epic.name}
-				placement="bottom"
-				closable={false}
-				open={isDrawerOpen}
+				itemType="Epic"
+				data={{
+					points,
+					description: epic.description,
+					onDescriptionChange: (value) => void updateEpicMutation.mutate({description: value}),
+					checklist: {
+						title: `Keepers`,
+						items: [],
+						onItemToggle: () => {},
+					},
+					comments: epic.comments,
+					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
+					onDelete: () => void deleteEpicMutation.mutate(),
+				}}
+				isOpen={isDrawerOpen}
 				onClose={() => void setIsDrawerOpen(false)}
-			>
-				<p>Epic</p>
-				<TextArea />
-			</Drawer>
+			/>
 		</>
 	)
 }

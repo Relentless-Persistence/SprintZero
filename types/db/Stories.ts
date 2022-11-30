@@ -5,14 +5,18 @@ import {genDbNames, idSchema} from "~/types"
 export const StorySchema = z.object({
 	id: idSchema,
 
-	accepanceCriteria: z.array(
+	acceptanceCriteria: z.array(
 		z.object({
+			id: z.string(),
 			name: z.string(),
 			checked: z.boolean(),
 		}),
 	),
+	codeLink: z.string().url().nullable(),
 	description: z.string(),
+	designLink: z.string().url().nullable(),
 	name: z.string(),
+	points: z.number(),
 
 	comments: z.array(idSchema),
 	epic: idSchema,

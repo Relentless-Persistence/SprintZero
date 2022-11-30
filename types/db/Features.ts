@@ -9,12 +9,11 @@ export const FeatureSchema = z.object({
 	name: z.string(),
 
 	comments: z.array(idSchema),
-	stories: z.array(idSchema),
-
 	epic: idSchema,
 	nextFeature: idSchema.nullable(),
 	prevFeature: idSchema.nullable(),
 	product: idSchema,
+	stories: z.array(idSchema),
 })
 export const FeatureCollectionSchema = z.array(FeatureSchema)
 

@@ -13,7 +13,7 @@ import type {Version} from "~/types/db/Versions"
 import Draggable, {useIsHovering} from "./Draggable"
 import {useStoryMapStore} from "./storyMapStore"
 import useMainStore from "~/stores/mainStore"
-import {renameStory} from "~/utils/fetch"
+import {updateStory} from "~/utils/fetch"
 
 type Props = {
 	story: StoryType
@@ -29,7 +29,7 @@ const Story: FC<Props> = ({story}) => {
 		.getQueryData<Version[]>([`all-versions`, activeProduct])
 		?.find((version) => version.id === story.version)
 
-	const renameStoryMutation = useMutation({mutationFn: renameStory(story.id)})
+	const updateStoryMutation = useMutation({mutationFn: updateStory(story.id)})
 
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -47,10 +47,7 @@ const Story: FC<Props> = ({story}) => {
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							{version?.name}
 						</button>
-						<Draggable.Input
-							value={story.name}
-							onChange={useCallback((value) => void renameStoryMutation.mutate(value), [renameStoryMutation])}
-						/>
+						<Draggable.Input value={story.name} onChange={(value) => void updateStoryMutation.mutate({name: value})} />
 					</div>
 				</div>
 			</Draggable>

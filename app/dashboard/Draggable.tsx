@@ -1,8 +1,7 @@
 "use client"
 
 import {motion} from "framer-motion"
-import {forwardRef, memo, useEffect, useInsertionEffect, useRef, useState} from "react"
-import ReactDOM from "react-dom"
+import {forwardRef, useEffect, useState} from "react"
 import {usePreviousDistinct} from "react-use"
 
 import type {ReactNode, FC, ForwardRefRenderFunction} from "react"
@@ -58,43 +57,21 @@ export type InputProps = {
 }
 
 const Input: FC<InputProps> = ({value, onChange}) => {
-	const referenceText = useRef<HTMLParagraphElement>(null)
-
-	const inputRef = useRef<HTMLInputElement | null>(null)
-	const textWidth = useRef<number>()
-	useInsertionEffect(() => {
-		const referenceText = document.createElement(`p`)
-		referenceText.style.cssText = `position: fixed; top: 0px; left: 0px; font-size: 14px;`
-		referenceText.textContent = inputRef.current?.value ?? value
-		document.body.appendChild(referenceText)
-		textWidth.current = referenceText.offsetWidth
-		referenceText.remove()
-
-		return () => void referenceText.remove()
-	}, [value])
-
 	return (
-		<>
+		<div className="w-max">
 			<input
 				data-nondraggable
 				value={value}
 				onChange={(e) => void onChange(e.target.value)}
-				className="grow bg-transparent text-center"
-				style={{width: `${textWidth.current}px`}}
+				className="w-full grow bg-transparent text-center"
+				size={1}
 			/>
-
-			{typeof window !== `undefined` &&
-				ReactDOM.createPortal(
-					<p className="fixed left-full whitespace-pre" ref={referenceText}>
-						{value}
-					</p>,
-					document.body,
-				)}
-		</>
+			<p className="h-0 overflow-hidden whitespace-pre text-sm opacity-0">{value}</p>
+		</div>
 	)
 }
 
-export default Object.assign(forwardRef(Draggable), {Input: memo(Input)})
+export default Object.assign(forwardRef(Draggable), {Input: Input})
 
 export const useIsHovering = (layer: number, id: Id) => {
 	const currentlyHovering = useStoryMapStore((state) => state.currentlyHovering)

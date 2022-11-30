@@ -2,8 +2,7 @@
 
 import {CopyOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
-import {Button, Drawer} from "antd5"
-import TextArea from "antd5/es/input/TextArea"
+import {Button} from "antd5"
 import clsx from "clsx"
 import {useCallback, useState} from "react"
 
@@ -12,10 +11,11 @@ import type {Id} from "~/types"
 import type {Feature as FeatureType} from "~/types/db/Features"
 
 import Draggable, {useIsHovering} from "./Draggable"
+import ItemDrawer from "./ItemDrawer"
 import Story from "./Story"
 import {useStoryMapStore} from "./storyMapStore"
 import useMainStore from "~/stores/mainStore"
-import {addStory, renameFeature} from "~/utils/fetch"
+import {addCommentToFeature, addStory, deleteFeature, updateFeature} from "~/utils/fetch"
 
 export type FeatureProps = {
 	epicId: Id
@@ -30,16 +30,21 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const isActive = useIsHovering(1, feature.id)
 
 	const stories = useStoryMapStore((state) =>
-		Array.from(state.stories.values())
-			.map((story) => story.story)
-			.filter((story) => story.feature === feature.id),
+		state.stories.map((story) => story.story).filter((story) => story.feature === feature.id),
+	)
+	const points = useStoryMapStore((state) =>
+		state.stories
+			.filter((story) => story.story.feature === feature.id)
+			.reduce((acc, story) => acc + story.story.points, 0),
 	)
 
 	const addStoryMutation = useMutation({
 		mutationFn: addStory(activeProduct!, epicId, feature.id),
 	})
 
-	const renameFeatureMutation = useMutation({mutationFn: renameFeature(feature.id)})
+	const updateFeatureMutation = useMutation({mutationFn: updateFeature(feature.id)})
+	const deleteFeatureMutation = useMutation({mutationFn: deleteFeature(feature.id)})
+	const addCommentMutation = useMutation({mutationFn: addCommentToFeature(feature.id)})
 
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -64,7 +69,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 						</button>
 						<Draggable.Input
 							value={feature.name}
-							onChange={useCallback((value) => void renameFeatureMutation.mutate(value), [renameFeatureMutation])}
+							onChange={(value) => void updateFeatureMutation.mutate({name: value})}
 						/>
 					</div>
 
@@ -96,16 +101,20 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 				</div>
 			</Draggable>
 
-			<Drawer
+			<ItemDrawer
 				title={feature.name}
-				placement="bottom"
-				closable={false}
-				open={isDrawerOpen}
+				itemType="Feature"
+				data={{
+					points,
+					description: feature.description,
+					onDescriptionChange: (value) => void updateFeatureMutation.mutate({description: value}),
+					comments: feature.comments,
+					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
+					onDelete: () => void deleteFeatureMutation.mutate(),
+				}}
+				isOpen={isDrawerOpen}
 				onClose={() => void setIsDrawerOpen(false)}
-			>
-				<p>Feature</p>
-				<TextArea />
-			</Drawer>
+			/>
 		</>
 	)
 }
