@@ -1,7 +1,7 @@
 # Install packages
 FROM node:hydrogen-alpine3.15
 WORKDIR /app
-COPY package.json pnpm-lock.yamp ./
+COPY package.json pnpm-lock.yaml ./
 RUN corepack enable
 RUN pnpm install
 
