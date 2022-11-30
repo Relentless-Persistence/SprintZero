@@ -9,6 +9,7 @@ RUN pnpm install
 FROM node:hydrogen-alpine3.15
 WORKDIR /app
 COPY --from=0 /app/node_modules ./node_modules
+COPY . .
 RUN corepack enable
 RUN pnpm build
 
