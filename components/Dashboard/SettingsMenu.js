@@ -61,7 +61,7 @@ const SettingsMenu = () => {
           icon={<UserOutlined />}
         >
           <Link href="/dashboard/settings/account">
-            <a>Account</a>
+            Account
           </Link>
         </MenuItem>
         <MenuItem
@@ -70,7 +70,7 @@ const SettingsMenu = () => {
           icon={<DollarOutlined />}
         >
           <Link href="/dashboard/settings/billing">
-            <a>Billing</a>
+            Billing
           </Link>
         </MenuItem>
         <MenuItem
@@ -79,7 +79,7 @@ const SettingsMenu = () => {
           icon={<SettingOutlined />}
         >
           <Link href="/dashboard/settings/config">
-            <a>Configuration</a>
+            Configuration
           </Link>
         </MenuItem>
         {/* <MenuItem
@@ -88,7 +88,7 @@ const SettingsMenu = () => {
           icon={<ShareAltOutlined />}
         >
           <Link href="/dashboard/settings/share">
-            <a>Share</a>
+            Share
           </Link>
         </MenuItem> */}
         <MenuItem
@@ -97,7 +97,7 @@ const SettingsMenu = () => {
           icon={<TeamOutlined />}
         >
           <Link href="/dashboard/settings/team">
-            <a>Team</a>
+            Team
           </Link>
         </MenuItem>
         <MenuItem
@@ -106,16 +106,16 @@ const SettingsMenu = () => {
           icon={<ApiOutlined />}
         >
           <Link href="#">
-            <a>Integrations</a>
+            Integrations
           </Link>
         </MenuItem>
       </Menu>
       <div className="absolute bottom-[18px] left-[25px] w-full">
         <div className="flex flex-col justify-start space-y-[18px]">
-          <a href="#" className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <FormOutlined />
             <span>Support</span>
-          </a>
+          </div>
           <div
             className="flex items-center space-x-2 cursor-pointer"
             onClick={() => auth.signOut()}

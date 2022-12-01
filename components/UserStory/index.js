@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/exhaustive-deps */ 
 import React, { useState, useEffect } from "react";
 import {
   ArrowLeftOutlined,
@@ -121,35 +121,35 @@ const UserStory = ({ epics, setEpics, activeProduct, version }) => {
   const addStory = (epicIndex, featureIndex) => {
     const id = generateString(20);
     const newData = update(epics, {
-      [epicIndex]: {
-        features: {
-          [featureIndex]: {
-            stories: {
-              $push: [
-                {
-                  id: id,
-                  name: "",
-                  description: "",
-                  status: "",
-                  version: version.id,
-                  sprint_id: "",
-                  sprint_status: "Backlog",
-                  flagged: false,
-                  ethics_status: "",
-                  ethics_votes: {accepts: 0, rejects: 2},
-                  acceptance_criteria: [],
-                  effort: "",
-                  design_link: "",
-                  code_link: "",
-                  feasibility_level: 0,
-                  priority_level:0
-                },
-              ],
-            },
-          },
-        },
-      },
-    });
+			[epicIndex]: {
+				features: {
+					[featureIndex]: {
+						stories: {
+							$push: [
+								{
+									id: id,
+									name: "",
+									description: "",
+									status: "",
+									version: version.id,
+									sprint_id: "",
+									sprint_status: "Product Backlog",
+									flagged: false,
+									ethics_status: "",
+									ethics_votes: {accepts: 0, rejects: 2},
+									acceptance_criteria: [],
+									effort: "",
+									design_link: "",
+									code_link: "",
+									feasibility_level: 0,
+									priority_level: 0,
+								},
+							],
+						},
+					},
+				},
+			},
+		})
 
     setEpics(newData);
   };

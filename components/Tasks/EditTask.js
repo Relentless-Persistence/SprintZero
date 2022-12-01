@@ -134,143 +134,126 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
   }
 
   return (
-    <ResizeableDrawer
-      visible={editMode}
-      closable={false}
-      placement={"bottom"}
-      headerStyle={{ background: "#F5F5F5" }}
-      title={
-        <Row>
-          <Col span={21}>
-            <CardTitle className="inline-block mr-[10px]">Task</CardTitle>
-          </Col>
+		<ResizeableDrawer
+			visible={editMode}
+			closable={false}
+			placement={"bottom"}
+			headerStyle={{background: "#F5F5F5"}}
+			title={
+				<Row>
+					<Col span={21}>
+						<CardTitle className="mr-[10px] inline-block">Task</CardTitle>
+					</Col>
 
-          <Col span={3}>
-            <div className="flex justify-end">
-              <ActionButtons
-                onCancel={() => {
-                  setTask(null);
-                  setEditMode(false);
-                }}
-                onSubmit={updateTask}
-              />
-            </div>
-          </Col>
-        </Row>
-      }
-    >
-      <Row gutter={[24, 24]} className="mt-[15px]">
-        <Col span={8}>
-          <div>
-            <DrawerSubTitle>Subject</DrawerSubTitle>
+					<Col span={3}>
+						<div className="flex justify-end">
+							<ActionButtons
+								onCancel={() => {
+									setTask(null)
+									setEditMode(false)
+								}}
+								onSubmit={updateTask}
+							/>
+						</div>
+					</Col>
+				</Row>
+			}
+		>
+			<Row gutter={[24, 24]} className="mt-[15px]">
+				<Col span={8}>
+					<div>
+						<DrawerSubTitle>Subject</DrawerSubTitle>
 
-            <Input
-              className="mb-[24px]"
-              onChange={(e) => setSubject(e.target.value)}
-              value={subject}
-            />
+						<Input className="mb-[24px]" onChange={(e) => setSubject(e.target.value)} value={subject} />
 
-            <DrawerSubTitle>Description</DrawerSubTitle>
+						<DrawerSubTitle>Description</DrawerSubTitle>
 
-            <TextArea
-              onChange={(e) => setDescription(e.target.value)}
-              value={description}
-              rows={4}
-            />
-          </div>
-        </Col>
-        <Col span={8}>
-          <DrawerSubTitle>Due</DrawerSubTitle>
+						<TextArea onChange={(e) => setDescription(e.target.value)} value={description} rows={4} />
+					</div>
+				</Col>
+				<Col span={8}>
+					<DrawerSubTitle>Due</DrawerSubTitle>
 
-          <div className="mb-[24px]">
-            <DatePicker
-              className="mr-[8px]"
-              onChange={handleDrawerDateChange}
-              defaultValue={moment(task.date, "DD/MM/YYYY")}
-              format={"DD/MM/YYYY"}
-            />
-            <TimePicker
-              onChange={handleDrawerTimeChange}
-              defaultValue={moment(task.time, "HH:mm:ss")}
-              format={"HH:mm:ss"}
-            />
-            ,
-          </div>
+					<div className="mb-[24px]">
+						<DatePicker
+							className="mr-[8px]"
+							onChange={handleDrawerDateChange}
+							defaultValue={moment(task.date, "MM-DD-YYYY")}
+							format={"MM-DD-YYYY"}
+						/>
+						<TimePicker
+							onChange={handleDrawerTimeChange}
+							defaultValue={moment(task.time, "HH:mm:ss")}
+							format={"HH:mm:ss"}
+						/>
+						,
+					</div>
 
-          <DrawerSubTitle>Subtasks</DrawerSubTitle>
-          <SubTasks>
-            {task.subtasks?.map((subtask, i) => (
-              <Checkbox
-                key={subtask.name}
-                checked={subtask.completed}
-                onChange={() => updateSubtask(i)}
-              >
-                {subtask.name}
-              </Checkbox>
-            ))}
-            
-          </SubTasks>
-        </Col>
-        <Col className="pr-[20px]" span={8}>
-          <DrawerSubTitle>Discussion</DrawerSubTitle>
+					<DrawerSubTitle>Subtasks</DrawerSubTitle>
+					<SubTasks>
+						{task.subtasks?.map((subtask, i) => (
+							<Checkbox key={subtask.name} checked={subtask.completed} onChange={() => updateSubtask(i)}>
+								{subtask.name}
+							</Checkbox>
+						))}
+					</SubTasks>
+				</Col>
+				<Col className="pr-[20px]" span={8}>
+					<DrawerSubTitle>Discussion</DrawerSubTitle>
 
-          <div>
-            {comments && (
-              <List
-                className=""
-                itemLayout="horizontal"
-                dataSource={comments}
-                renderItem={(item) => (
-                  <li>
-                    <Comment
-                      actions={item.actions}
-                      author={item.author.name}
-                      avatar={item.author.avatar}
-                      content={item.comment}
-                    />
-                  </li>
-                )}
-              />
-            )}
-          </div>
+					<div>
+						{comments && (
+							<List
+								className=""
+								itemLayout="horizontal"
+								dataSource={comments}
+								renderItem={(item) => (
+									<li>
+										<Comment
+											actions={item.actions}
+											author={item.author.name}
+											avatar={item.author.avatar}
+											content={item.comment}
+										/>
+									</li>
+								)}
+							/>
+						)}
+					</div>
 
-          <Comment
-            avatar={<Avatar src={user.photoURL} alt="Han Solo" />}
-            content={
-              <Form>
-                <Form.Item>
-                  <TextArea
-                    rows={2}
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                  />
-                </Form.Item>
+					<Comment
+						avatar={<Avatar src={user.photoURL} alt="Han Solo" />}
+						content={
+							<Form>
+								<Form.Item>
+									<TextArea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
+								</Form.Item>
 
-                <Form.Item>
-                  <Button
-                    className="inline-flex justify-between items-center mr-[8px]"
-                    disabled={comment.length <= 1}
-                    onClick={submitComment}
-                  >
-                    <SendOutlined />
-                    Post
-                  </Button>
+								<Form.Item>
+									<Button
+										className="mr-[8px] inline-flex items-center justify-between"
+										disabled={comment.length <= 1}
+										onClick={submitComment}
+									>
+										<SendOutlined />
+										Post
+									</Button>
 
-                  <Button
-                    className="inline-flex justify-between items-center text-[#4A801D] border-[#4A801D]"
-                    onClick={() => setComment("")}
-                  >
-                    <UserOutlined />
-                    Cancel
-                  </Button>
-                </Form.Item>
-              </Form>
-            }
-          />
-        </Col>
-      </Row>
-    </ResizeableDrawer>
-  );
+									<Button
+										className="inline-flex items-center justify-between border-[#4A801D] text-[#4A801D]"
+										onClick={() => setComment("")}
+									>
+										<UserOutlined />
+										Cancel
+									</Button>
+								</Form.Item>
+							</Form>
+						}
+					/>
+				</Col>
+			</Row>
+		</ResizeableDrawer>
+	)
 };
 
 export default EditTask;

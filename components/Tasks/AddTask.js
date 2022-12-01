@@ -165,7 +165,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
             <DatePicker
               className="mr-[8px]"
               onChange={handleDrawerDateChange}
-              format={"DD/MM/YYYY"}
+              format={"MM-DD-YYYY"}
               required
             />
             <TimePicker onChange={handleDrawerTimeChange} format={"HH:mm:ss"} required />

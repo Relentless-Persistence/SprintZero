@@ -61,6 +61,7 @@ const SubTasks = styled.div`
 
 export default function Tasks() {
   const { pathname } = useRouter();
+  const {userRole} = useAuth();
   const [createMode, setCreateMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [task, setTask] = useState(null);

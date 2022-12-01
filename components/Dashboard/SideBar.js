@@ -123,11 +123,11 @@ const SideBar = () => {
             Priorities
           </Link>
         </MenuItem>
-        <MenuItem key="8" $highlight={isActive(pathname, "/tactics/release")}>
+        {/* <MenuItem key="8" $highlight={isActive(pathname, "/tactics/release")}>
           <Link href="/dashboard/tactics/release">
             Release
           </Link>
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem
           key="9"
           $highlight={isActive(pathname, "/tactics/retrospective")}
@@ -161,7 +161,7 @@ const SideBar = () => {
             $highlight={isActive(pathname, "/operations/performance")}
           >
             <Link href="/dashboard/operations/performance">
-              <a>Performance</a>
+              Performance
             </Link>
           </MenuItem> */}
         <MenuItem

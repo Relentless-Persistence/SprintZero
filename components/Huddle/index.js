@@ -54,26 +54,32 @@ const HuddleCard = ({
   console.log("todayInTime", todayInTime);
 
   const onBlockerDone = (e) => {
-    if (newBlocker !== "") {
-      if (e.key === "Enter") {
-        db.collection("HuddleBlockers")
-          .add({
-            user: member.user,
-            completed: false,
-            title: newBlocker,
-            createdAt: new Date(),
-            product_id: product.id,
-          })
-          .then((docRef) => {
-            message.success("New blocker added successfully");
-          })
-          .catch((error) => {
-            message.error("Error adding blocker item");
-          });
-        setShowAddNewBlocker(false);
-        setNewBlocker("");
-      }
+    // setShowAddNewBlocker(false)
+    if(e.key === "Escape") {
+      setNewBlocker();
+      setShowAddNewBlocker(false);
+      console.log("working")
     }
+    // if (newBlocker !== "") {
+    //   if (e.key === "Enter") {
+    //     db.collection("HuddleBlockers")
+    //       .add({
+    //         user: member.user,
+    //         completed: false,
+    //         title: newBlocker,
+    //         createdAt: new Date(),
+    //         product_id: product.id,
+    //       })
+    //       .then((docRef) => {
+    //         message.success("New blocker added successfully");
+    //       })
+    //       .catch((error) => {
+    //         message.error("Error adding blocker item");
+    //       });
+    //     setShowAddNewBlocker(false);
+    //     setNewBlocker("");
+    //   }
+    // }
   };
 
   const updateBlocker = async (id, checked) => {
@@ -161,212 +167,231 @@ const HuddleCard = ({
   };
 
   return (
-    <MyCard
-      style={{ display: "flex", flexDirection: "column" }}
-      title={
-        <Card.Meta
-          avatar={
-            <Avatar
-              size={48}
-              src={member.user.avatar || "https://joeschmoe.io/api/v1/random"}
-              style={{
-                border: "2px solid #315613",
-              }}
-            />
-          }
-          title={member?.user?.name}
-          // description={member.role || "Developer"}
-        />
-      }
-    >
-      <section>
-        <div className="section">
-          <h4>Blockers</h4>
+		<MyCard
+			style={{display: "flex", flexDirection: "column"}}
+			title={
+				<Card.Meta
+					avatar={
+						<Avatar
+							size={48}
+							src={member.user.avatar || "https://joeschmoe.io/api/v1/random"}
+							style={{
+								border: "2px solid #315613",
+							}}
+						/>
+					}
+					title={member?.user?.name}
+					// description={member.role || "Developer"}
+				/>
+			}
+		>
+			<section>
+				<div className="section">
+					<h4>Blockers</h4>
 
-          {blockers?.length ? (
-            <ul>
-              {blockers.map((d, i) => (
-                <li key={i}>
-                  <Checkbox
-                  disabled={(todayInTime != (new Date()).setHours(0,0,0,0))}
-                    onChange={() => updateBlocker(d.id, !d.completed)}
-                    checked={d.completed}
-                  >
-                    {d.completed ? <strike>{d.title}</strike> : d.title}
-                  </Checkbox>
-                </li>
-              ))}
+					{blockers?.length ? (
+						<ul>
+							{blockers.map((d, i) => (
+								<li key={i}>
+									<Checkbox
+										disabled={todayInTime != new Date().setHours(0, 0, 0, 0)}
+										onChange={() => updateBlocker(d.id, !d.completed)}
+										checked={d.completed}
+									>
+										{d.completed ? <strike>{d.title}</strike> : d.title}
+									</Checkbox>
+								</li>
+							))}
 
-{(todayInTime === (new Date()).setHours(0,0,0,0)) &&
-              <li>
-                {showAddNewBlocker ? (
-                  <Input
-                    value={newBlocker}
-                    onKeyPress={(e) => onBlockerDone(e)}
-                    onChange={(e) => setNewBlocker(e.target.value)}
-                    size="small"
-                  />
-                ) : (
-                  <AppCheckbox
-                    checked={false}
-                    onChange={() => setShowAddNewBlocker(true)}
-                  >
-                    <span className="text-[#BFBFBF]">Add New</span>
-                  </AppCheckbox>
-                )}
-              </li>
-}
-            </ul>
-          ) : (
-            <ul>
-              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
-              <li>
-                {showAddNewBlocker ? (
-                  <Input
-                    value={newBlocker}
-                    onKeyPress={(e) => onBlockerDone(e)}
-                    onChange={(e) => setNewBlocker(e.target.value)}
-                    size="small"
-                  />
-                ) : (
-                  <AppCheckbox
-                    checked={false}
-                    onChange={() => setShowAddNewBlocker(true)}
-                  >
-                    <span className="text-[#BFBFBF]">Add New Blocker</span>
-                  </AppCheckbox>
-                )}
-              </li>
-}
-            </ul>
-          )}
-        </div>
+							{todayInTime === new Date().setHours(0, 0, 0, 0) && (
+								<li>
+									{showAddNewBlocker ? (
+										<Input
+											value={newBlocker}
+											onKeyPress={(e) => onBlockerDone(e)}
+											onKeyDown={(e) => {
+												if (e.key === "Escape") {
+													setNewBlocker()
+													setShowAddNewBlocker(false)
+												}
+											}}
+											onChange={(e) => setNewBlocker(e.target.value)}
+											size="small"
+										/>
+									) : (
+										<AppCheckbox checked={false} onChange={() => setShowAddNewBlocker(true)}>
+											<span className="text-[#BFBFBF]">Add New</span>
+										</AppCheckbox>
+									)}
+								</li>
+							)}
+						</ul>
+					) : (
+						<ul>
+							{todayInTime == new Date().setHours(0, 0, 0, 0) && (
+								<li>
+									{showAddNewBlocker ? (
+										<Input
+											value={newBlocker}
+											onKeyPress={(e) => onBlockerDone(e)}
+											onKeyDown={(e) => {
+												if (e.key === "Escape") {
+													setNewBlocker()
+													setShowAddNewBlocker(false)
+												}
+											}}
+											onChange={(e) => setNewBlocker(e.target.value)}
+											size="small"
+										/>
+									) : (
+										<AppCheckbox checked={false} onChange={() => setShowAddNewBlocker(true)}>
+											<span className="text-[#BFBFBF]">Add New Blocker</span>
+										</AppCheckbox>
+									)}
+								</li>
+							)}
+						</ul>
+					)}
+				</div>
 
-        <div className="section">
-          <h4>Today</h4>
+				<div className="section">
+					<h4>Today</h4>
 
-          {today?.length ? (
-            <ul>
-              {today?.map((d, i) => (
-                <li key={i}>
-                  <Checkbox 
-                    disabled={(todayInTime != (new Date()).setHours(0,0,0,0))}
-                    onChange={() => updateToday(d.id, !d.completed)}
-                    checked={d.completed}
-                  >
-                    {d.completed ? <strike>{d.title}</strike> : d.title}
-                  </Checkbox>
-                </li>
-              ))}
-              
-              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
-              
-              <li>
-                {showAddNewToday ? (
-                  <Input
-                    value={newToday}
-                    onKeyPress={(e) => onTodayDone(e)}
-                    onChange={(e) => setNewToday(e.target.value)}
-                  />
-                ) : (
-                  <AppCheckbox
-                    checked={false}
-                    onChange={() => setShowAddNewToday(true)}
-                  >
-                    <span className="text-[#BFBFBF]">Add New</span>
-                  </AppCheckbox>
-                )}
-              </li>
-            }
-            </ul>
-          ) : (
-            <ul>
-              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
-              <li>
-                {showAddNewToday ? (
-                  <Input
-                    value={newToday}
-                    onKeyPress={(e) => onTodayDone(e)}
-                    onChange={(e) => setNewToday(e.target.value)}
-                  />
-                ) : (
-                  <AppCheckbox
-                    checked={false}
-                    onChange={() => setShowAddNewToday(true)}
-                  >
-                    <span className="text-[#BFBFBF]">Add New</span>
-                  </AppCheckbox>
-                )}
-              </li>
-}
-            </ul>
-          )}
-        </div>
+					{today?.length ? (
+						<ul>
+							{today?.map((d, i) => (
+								<li key={i}>
+									<Checkbox
+										disabled={todayInTime != new Date().setHours(0, 0, 0, 0)}
+										onChange={() => updateToday(d.id, !d.completed)}
+										checked={d.completed}
+									>
+										{d.completed ? <strike>{d.title}</strike> : d.title}
+									</Checkbox>
+								</li>
+							))}
 
-        <div className="section">
-          <h4>Yesterday</h4>
+							{todayInTime == new Date().setHours(0, 0, 0, 0) && (
+								<li>
+									{showAddNewToday ? (
+										<Input
+											value={newToday}
+											onKeyPress={(e) => onTodayDone(e)}
+											onKeyDown={(e) => {
+												if (e.key === "Escape") {
+													setNewToday()
+													setShowAddNewToday(false)
+												}
+											}}
+											onChange={(e) => setNewToday(e.target.value)}
+											size="small"
+										/>
+									) : (
+										<AppCheckbox checked={false} onChange={() => setShowAddNewToday(true)}>
+											<span className="text-[#BFBFBF]">Add New</span>
+										</AppCheckbox>
+									)}
+								</li>
+							)}
+						</ul>
+					) : (
+						<ul>
+							{todayInTime == new Date().setHours(0, 0, 0, 0) && (
+								<li>
+									{showAddNewToday ? (
+										<Input
+											value={newToday}
+											onKeyPress={(e) => onTodayDone(e)}
+											onKeyDown={(e) => {
+												if (e.key === "Escape") {
+													setNewToday()
+													setShowAddNewToday(false)
+												}
+											}}
+											onChange={(e) => setNewToday(e.target.value)}
+											size="small"
+										/>
+									) : (
+										<AppCheckbox checked={false} onChange={() => setShowAddNewToday(true)}>
+											<span className="text-[#BFBFBF]">Add New</span>
+										</AppCheckbox>
+									)}
+								</li>
+							)}
+						</ul>
+					)}
+				</div>
 
-          {yesterday?.length ? (
-            <ul>
-              {yesterday?.map((d, i) => (
-                <li key={i}>
-                  <Checkbox
-                  disabled={(todayInTime != (new Date()).setHours(0,0,0,0))}
-                    onChange={() => updateYesterday(d.uid, !d.completed)}
-                    checked={d.completed}
-                  >
-                    {d.completed ? <strike>{d.title}</strike> : d.title}
-                  </Checkbox>
-                </li>
-              ))}
+				<div className="section">
+					<h4>Yesterday</h4>
 
-{(todayInTime == (new Date()).setHours(0,0,0,0)) &&
-              <li>
-                {showAddNewYesterday ? (
-                  <Input
-                    value={newYesterday}
-                    onKeyPress={(e) => onYesterdayDone(e)}
-                    onChange={(e) => setNewYesterday(e.target.value)}
-                  />
-                ) : (
-                  <AppCheckbox
-                    checked={false}
-                    on
-                    onChange={() => setShowAddNewYesterday(true)}
-                  >
-                    <span className="text-[#BFBFBF]">Add New</span>
-                  </AppCheckbox>
-                )}
-              </li>
-}
-            </ul>
-          ) : (
-            <ul>
-              {(todayInTime == (new Date()).setHours(0,0,0,0)) &&
-              <li>
-                {showAddNewYesterday ? (
-                  <Input
-                    value={newYesterday}
-                    onKeyPress={(e) => onYesterdayDone(e)}
-                    onChange={(e) => setNewYesterday(e.target.value)}
-                  />
-                ) : (
-                  <AppCheckbox
-                    checked={false}
-                    on
-                    onChange={() => setShowAddNewYesterday(true)}
-                  >
-                    <span className="text-[#BFBFBF]">Add New</span>
-                  </AppCheckbox>
-                )}
-              </li>
-}
-            </ul>
-          )}
-        </div>
-      </section>
-    </MyCard>
-  );
+					{yesterday?.length ? (
+						<ul>
+							{yesterday?.map((d, i) => (
+								<li key={i}>
+									<Checkbox
+										disabled={todayInTime != new Date().setHours(0, 0, 0, 0)}
+										onChange={() => updateYesterday(d.uid, !d.completed)}
+										checked={d.completed}
+									>
+										{d.completed ? <strike>{d.title}</strike> : d.title}
+									</Checkbox>
+								</li>
+							))}
+
+							{todayInTime == new Date().setHours(0, 0, 0, 0) && (
+								<li>
+									{showAddNewYesterday ? (
+										<Input
+											value={newYesterday}
+											onKeyPress={(e) => onYesterdayDone(e)}
+											onKeyDown={(e) => {
+												if (e.key === "Escape") {
+													setNewYesterday()
+													setShowAddNewYesterday(false)
+												}
+											}}
+											onChange={(e) => setNewYesterday(e.target.value)}
+											size="small"
+										/>
+									) : (
+										<AppCheckbox checked={false} on onChange={() => setShowAddNewYesterday(true)}>
+											<span className="text-[#BFBFBF]">Add New</span>
+										</AppCheckbox>
+									)}
+								</li>
+							)}
+						</ul>
+					) : (
+						<ul>
+							{todayInTime == new Date().setHours(0, 0, 0, 0) && (
+								<li>
+									{showAddNewYesterday ? (
+										<Input
+											value={newYesterday}
+											onKeyPress={(e) => onYesterdayDone(e)}
+											onKeyDown={(e) => {
+												if (e.key === "Escape") {
+													setNewYesterday()
+													setShowAddNewYesterday(false)
+												}
+											}}
+											onChange={(e) => setNewYesterday(e.target.value)}
+											size="small"
+										/>
+									) : (
+										<AppCheckbox checked={false} on onChange={() => setShowAddNewYesterday(true)}>
+											<span className="text-[#BFBFBF]">Add New</span>
+										</AppCheckbox>
+									)}
+								</li>
+							)}
+						</ul>
+					)}
+				</div>
+			</section>
+		</MyCard>
+	)
 };
 
 export default HuddleCard;
