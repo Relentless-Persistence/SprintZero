@@ -78,8 +78,6 @@ export default function Learnings() {
 	}
 
 	const editItem = async (id, item) => {
-		console.log(temp)
-
 		const data = temp
 			? {
 					name: item.title,
@@ -191,7 +189,7 @@ export default function Learnings() {
 				{data?.length < 1 ? (
 					<>
 						{showAdd ? null : (
-							<div className="flex h-[600px] items-center justify-center">
+							<div className="flex p-20 items-center justify-center">
 								<div
 									style={{
 										boxShadow:
