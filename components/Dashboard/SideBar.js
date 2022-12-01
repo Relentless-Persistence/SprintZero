@@ -69,7 +69,7 @@ const SideBar = () => {
         icon={<HomeOutlined color="" />}
       >
         <Link href="/dashboard">
-          <a>Home</a>
+          Home
         </Link>
       </MenuItem>
       <StyledSubMenu
@@ -79,7 +79,7 @@ const SideBar = () => {
       >
         <MenuItem $highlight={isActive(pathname, "/strategy/kickoff")} key="2">
           <Link href="/dashboard/strategy/kickoff">
-            <a>Kickoff</a>
+            Kickoff
           </Link>
         </MenuItem>
         <MenuItem
@@ -87,7 +87,7 @@ const SideBar = () => {
           key="3"
         >
           <Link href="/dashboard/strategy/accessibility">
-            <a>Accessibility</a>
+            Accessibility
           </Link>
         </MenuItem>
         <MenuItem
@@ -95,13 +95,13 @@ const SideBar = () => {
           key="4"
         >
           <Link href="/dashboard/strategy/objectives">
-            <a>Objectives</a>
+            Objectives
           </Link>
         </MenuItem>
 
         <MenuItem key="5" $highlight={isActive(pathname, "/strategy/visions")}>
           <Link href="/dashboard/strategy/visions">
-            <a>Vision</a>
+            Vision
           </Link>
         </MenuItem>
       </StyledSubMenu>
@@ -112,7 +112,7 @@ const SideBar = () => {
       >
         <MenuItem $highlight={isActive(pathname, "/tactics/ethics")} key="6">
           <Link href="/dashboard/tactics/ethics">
-            <a>Ethics</a>
+            Ethics
           </Link>
         </MenuItem>
         <MenuItem
@@ -120,12 +120,12 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/tactics/priorities")}
         >
           <Link href="/dashboard/tactics/priorities">
-            <a>Priorities</a>
+            Priorities
           </Link>
         </MenuItem>
         <MenuItem key="8" $highlight={isActive(pathname, "/tactics/release")}>
           <Link href="/dashboard/tactics/release">
-            <a>Release</a>
+            Release
           </Link>
         </MenuItem>
         <MenuItem
@@ -133,7 +133,7 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/tactics/retrospective")}
         >
           <Link href="/dashboard/tactics/retrospective">
-            <a>Retrospective</a>
+            Retrospective
           </Link>
         </MenuItem>
       </StyledSubMenu>
@@ -153,7 +153,7 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/operations/huddle")}
         >
           <Link href="/dashboard/operations/huddle">
-            <a>Huddle</a>
+            Huddle
           </Link>
         </MenuItem>
         {/* <MenuItem
@@ -161,7 +161,7 @@ const SideBar = () => {
             $highlight={isActive(pathname, "/operations/performance")}
           >
             <Link href="/dashboard/operations/performance">
-              <a>Performance</a>
+              Performance
             </Link>
           </MenuItem> */}
         <MenuItem
@@ -169,12 +169,12 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/operations/sprint")}
         >
           <Link href="/dashboard/operations/sprint">
-            <a>Sprint</a>
+            Sprint
           </Link>
         </MenuItem>
         <MenuItem key="15" $highlight={isActive(pathname, "/operations/tasks")}>
           <Link href="/dashboard/operations/tasks">
-            <a>Tasks</a>
+            Tasks
           </Link>
         </MenuItem>
       </StyledSubMenu>
@@ -184,7 +184,7 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/userbase/dialogue")}
         >
           <Link href="/dashboard/userbase/dialogue">
-            <a>Dialogue</a>
+            Dialogue
           </Link>
         </MenuItem>
         <MenuItem
@@ -192,7 +192,7 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/userbase/journeys")}
         >
           <Link href="/dashboard/userbase/journeys">
-            <a>Journeys</a>
+            Journeys
           </Link>
         </MenuItem>
         <MenuItem
@@ -200,7 +200,7 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/userbase/learnings")}
         >
           <Link href="/dashboard/userbase/learnings">
-            <a>Learnings</a>
+            Learnings
           </Link>
         </MenuItem>
 
@@ -209,7 +209,7 @@ const SideBar = () => {
           $highlight={isActive(pathname, "/userbase/personas")}
         >
           <Link href="/dashboard/userbase/personas">
-            <a>Personas</a>
+            Personas
           </Link>
         </MenuItem>
       </StyledSubMenu>
