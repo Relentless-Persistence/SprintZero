@@ -50,7 +50,7 @@ const AppHeader = ({ onChangeProduct }) => {
   const fetchProducts = async () => {
     if (user) {
       const res = await db
-        .collection("Product")
+        .collection("Products")
         .where("owner", "==", user.uid)
         .get();
       const products = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
