@@ -111,7 +111,7 @@ export default function Learnings() {
   };
 
   const deleteItem = (id) => {
-    db.collections("Learnings").doc(id).delete();
+    db.collection("Learnings").doc(id).delete();
   }
 
   // const rightNav = getNames(data[activeProduct]);
