@@ -1,5 +1,6 @@
 import {
 	addDoc,
+	arrayUnion,
 	collection,
 	doc,
 	getDoc,
@@ -19,7 +20,6 @@ import type {Epic} from "~/types/db/Epics"
 import type {Feature} from "~/types/db/Features"
 import type {Product} from "~/types/db/Products"
 import type {Story} from "~/types/db/Stories"
-import type {User} from "~/types/db/Users"
 import type {Version} from "~/types/db/Versions"
 
 import {db} from "~/config/firebase"
@@ -28,14 +28,15 @@ import {EpicSchema, Epics, EpicCollectionSchema} from "~/types/db/Epics"
 import {FeatureSchema, Features, FeatureCollectionSchema} from "~/types/db/Features"
 import {ProductSchema, Products, ProductCollectionSchema} from "~/types/db/Products"
 import {StorySchema, Stories, StoryCollectionSchema} from "~/types/db/Stories"
-import {UserCollectionSchema, Users} from "~/types/db/Users"
-import {VersionSchema, Versions, VersionCollectionSchema} from "~/types/db/Versions"
+import {Versions, VersionCollectionSchema} from "~/types/db/Versions"
 
-export const getUsersById = async (ids: Id[]): Promise<User[]> => {
-	const userDocs = await getDocs(query(collection(db, Users._), where(Users.id, `in`, ids)))
-	const users = UserCollectionSchema.parse(userDocs.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-	return users
-}
+arrayUnion
+
+// export const getUsersById = async (ids: Id[]): Promise<User[]> => {
+// 	const userDocs = await getDocs(query(collection(db, Users._), where(Users.id, `in`, ids)))
+// 	const users = UserCollectionSchema.parse(userDocs.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+// 	return users
+// }
 
 export const getProduct = (id: string) => async (): Promise<Product> => {
 	const productDoc = await getDoc(doc(db, Products._, id))
@@ -48,12 +49,6 @@ export const getAllProducts = (userId: string) => async (): Promise<Product[]> =
 		query(collection(db, Products._), where(Products.owner, `==`, userId), orderBy(Products.name)),
 	)
 	const data = ProductCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-	return data
-}
-
-export const getVersion = (versionId: Id) => async (): Promise<Version> => {
-	const versionDoc = await getDoc(doc(db, Versions._, versionId))
-	const data = VersionSchema.parse({id: versionDoc.id, ...versionDoc.data()})
 	return data
 }
 
@@ -113,7 +108,7 @@ export const addEpic =
 			updateDoc(doc(db, Epics._, lastEpicData.id), {next_epic: newEpicDoc.id as Id} satisfies Partial<Epic>)
 	}
 
-export const getEpic = (epicId: Id) => async (): Promise<Epic> => {
+const getEpic = (epicId: Id) => async (): Promise<Epic> => {
 	const epicDoc = await getDoc(doc(db, Epics._, epicId))
 	const epic = EpicSchema.parse({id: epicDoc.id, ...epicDoc.data()})
 	return epic
@@ -141,7 +136,9 @@ export const addCommentToEpic =
 			createdAt: serverTimestamp() as Timestamp,
 		}
 		const commentDoc = await addDoc(collection(db, Comments._), commentData)
-		await updateDoc(doc(db, Epics._, epicId), {comments: [...epic.comments, commentDoc.id]})
+		await updateDoc(doc(db, Epics._, epicId), {
+			comments: [...epic.comments, commentDoc.id as Id],
+		} satisfies Partial<Epic>)
 	}
 
 export const deleteEpic = (epicId: Id) => async (): Promise<void> => {
@@ -151,22 +148,19 @@ export const deleteEpic = (epicId: Id) => async (): Promise<void> => {
 	const [features, stories] = await Promise.all([getFeaturesByEpic(epicId)(), getStoriesByEpic(epicId)()])
 
 	const batch = writeBatch(db)
-	if (epic.prev_epic) batch.update(doc(db, Epics._, epic.prev_epic), {nextEpic: epic.next_epic})
-	if (epic.next_epic) batch.update(doc(db, Epics._, epic.next_epic), {prevEpic: epic.prev_epic})
+	if (epic.prev_epic)
+		batch.update(doc(db, Epics._, epic.prev_epic), {next_epic: epic.next_epic} satisfies Partial<Epic>)
+	if (epic.next_epic)
+		batch.update(doc(db, Epics._, epic.next_epic), {prev_epic: epic.prev_epic} satisfies Partial<Epic>)
 	stories.forEach((story) => void batch.delete(doc(db, Stories._, story.id)))
 	features.forEach((feature) => void batch.delete(doc(db, Features._, feature.id)))
 	batch.delete(doc(db, Epics._, epicId))
 	await batch.commit()
 }
 
-type AddFeatureInput = {
-	description: string
-	name: string
-}
-
 export const addFeature =
 	(productId: Id, epicId: Id) =>
-	async ({description, name}: AddFeatureInput): Promise<void> => {
+	async (name: string): Promise<void> => {
 		const lastFeatureData = (
 			await getDocs(
 				query(collection(db, Features._), where(Features.epic, `==`, epicId), where(Features.next_feature, `==`, null)),
@@ -177,7 +171,7 @@ export const addFeature =
 			: null
 
 		const data: Omit<Feature, `id`> = {
-			description,
+			description: ``,
 			name,
 			priority_level: 0,
 			visibility_level: 0,
@@ -195,13 +189,13 @@ export const addFeature =
 			} satisfies Partial<Feature>)
 	}
 
-export const getFeature = (featureId: Id) => async (): Promise<Feature> => {
+const getFeature = (featureId: Id) => async (): Promise<Feature> => {
 	const featureDoc = await getDoc(doc(db, Features._, featureId))
 	const feature = FeatureSchema.parse({id: featureDoc.id, ...featureDoc.data()})
 	return feature
 }
 
-export const getFeaturesByEpic = (epicId: Id) => async (): Promise<Feature[]> => {
+const getFeaturesByEpic = (epicId: Id) => async (): Promise<Feature[]> => {
 	const _data = await getDocs(query(collection(db, Features._), where(Features.epic, `==`, epicId)))
 	const data = FeatureCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
@@ -228,7 +222,9 @@ export const addCommentToFeature =
 			createdAt: serverTimestamp() as Timestamp,
 		}
 		const commentDoc = await addDoc(collection(db, Comments._), commentData)
-		await updateDoc(doc(db, Features._, featureId), {comments: [...feature.comments, commentDoc.id]})
+		await updateDoc(doc(db, Features._, featureId), {
+			comments: [...feature.comments, commentDoc.id as Id],
+		} satisfies Partial<Feature>)
 	}
 
 export const deleteFeature = (featureId: Id) => async (): Promise<void> => {
@@ -238,10 +234,18 @@ export const deleteFeature = (featureId: Id) => async (): Promise<void> => {
 	const [epic, stories] = await Promise.all([getEpic(feature.epic)(), getStoriesByFeature(featureId)()])
 
 	const batch = writeBatch(db)
-	if (feature.prev_feature) batch.update(doc(db, Features._, feature.prev_feature), {nextFeature: feature.next_feature})
-	if (feature.next_feature) batch.update(doc(db, Features._, feature.next_feature), {prevFeature: feature.prev_feature})
+	if (feature.prev_feature)
+		batch.update(doc(db, Features._, feature.prev_feature), {
+			next_feature: feature.next_feature,
+		} satisfies Partial<Feature>)
+	if (feature.next_feature)
+		batch.update(doc(db, Features._, feature.next_feature), {
+			prev_feature: feature.prev_feature,
+		} satisfies Partial<Feature>)
 	stories.forEach((story) => void batch.delete(doc(db, Stories._, story.id)))
-	batch.update(doc(db, Epics._, epic.id), {features: epic.features.filter((id) => id !== feature.id)})
+	batch.update(doc(db, Epics._, epic.id), {
+		features: epic.features.filter((id) => id !== feature.id),
+	} satisfies Partial<Epic>)
 	batch.delete(doc(db, Features._, featureId))
 	await batch.commit()
 }
@@ -284,19 +288,23 @@ export const addStory =
 			version,
 		}
 		const newStoryDoc = await addDoc(collection(db, Stories._), data)
-		if (lastStoryData)
+		if (lastStoryData) {
 			updateDoc(doc(db, Stories._, lastStoryData.id), {
 				next_story: newStoryDoc.id as Id,
 			} satisfies Partial<Story>)
+			updateDoc(doc(db, Features._, featureId), {
+				stories: arrayUnion(newStoryDoc.id) as unknown as Id[],
+			} satisfies Partial<Feature>)
+		}
 	}
 
-export const getStoriesByEpic = (epicId: Id) => async (): Promise<Story[]> => {
+const getStoriesByEpic = (epicId: Id) => async (): Promise<Story[]> => {
 	const _data = await getDocs(query(collection(db, Stories._), where(Stories.epic, `==`, epicId)))
 	const data = StoryCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
-export const getStoriesByFeature = (featureId: Id) => async (): Promise<Story[]> => {
+const getStoriesByFeature = (featureId: Id) => async (): Promise<Story[]> => {
 	const _data = await getDocs(query(collection(db, Stories._), where(Stories.feature, `==`, featureId)))
 	const data = StoryCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
@@ -327,7 +335,9 @@ export const addCommentToStory =
 			createdAt: serverTimestamp() as Timestamp,
 		}
 		const commentDoc = await addDoc(collection(db, Comments._), commentData)
-		await updateDoc(doc(db, Stories._, storyId), {comments: [...story.comments, commentDoc.id]})
+		await updateDoc(doc(db, Stories._, storyId), {
+			comments: [...story.comments, commentDoc.id as Id],
+		} satisfies Partial<Story>)
 	}
 
 export const deleteStory = (storyId: Id) => async (): Promise<void> => {
@@ -337,9 +347,13 @@ export const deleteStory = (storyId: Id) => async (): Promise<void> => {
 	const feature = await getFeature(story.feature)()
 
 	const batch = writeBatch(db)
-	if (story.prev_story) batch.update(doc(db, Stories._, story.prev_story), {nextStory: story.next_story})
-	if (story.next_story) batch.update(doc(db, Stories._, story.next_story), {prevStory: story.prev_story})
-	batch.update(doc(db, Features._, feature.id), {stories: feature.stories.filter((id) => id !== story.id)})
+	if (story.prev_story)
+		batch.update(doc(db, Stories._, story.prev_story), {next_story: story.next_story} satisfies Partial<Story>)
+	if (story.next_story)
+		batch.update(doc(db, Stories._, story.next_story), {prev_story: story.prev_story} satisfies Partial<Story>)
+	batch.update(doc(db, Features._, feature.id), {
+		stories: feature.stories.filter((id) => id !== story.id),
+	} satisfies Partial<Feature>)
 	batch.delete(doc(db, Stories._, storyId))
 	await batch.commit()
 }
