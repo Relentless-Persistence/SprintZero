@@ -77,6 +77,8 @@ const Epic: FC<EpicProps> = ({epic}) => {
 					{Array(Math.max(features.length - 1, 0)).fill(<div />)}
 
 					<button
+						type="button"
+						onClick={() => void addFeatureMutation.mutate(`Feature`)}
 						className={clsx(
 							"grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white",
 							features.length === 0 && `invisible`,
