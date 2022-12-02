@@ -155,14 +155,9 @@ export const deleteEpic = (epicId: Id) => async (): Promise<void> => {
 	await batch.commit()
 }
 
-type AddFeatureInput = {
-	description: string
-	name: string
-}
-
 export const addFeature =
 	(productId: Id, epicId: Id) =>
-	async ({description, name}: AddFeatureInput): Promise<void> => {
+	async (name: string): Promise<void> => {
 		const lastFeatureData = (
 			await getDocs(
 				query(collection(db, Features._), where(Features.epic, `==`, epicId), where(Features.next_feature, `==`, null)),
@@ -173,7 +168,7 @@ export const addFeature =
 			: null
 
 		const data: Omit<Feature, `id`> = {
-			description,
+			description: ``,
 			name,
 			priority_level: 0,
 			visibility_level: 0,

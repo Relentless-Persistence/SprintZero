@@ -67,27 +67,24 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 
 	return (
 		<>
-			<Draggable layer={1} id={feature.id} ref={ref}>
-				<div className="flex flex-col items-center rounded-md p-4 transition-colors">
-					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378] transition-transform hover:scale-105">
+			<Draggable layer={1} id={feature.id}>
+				<div className="flex flex-col items-center">
+					<div
+						className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378] transition-transform hover:scale-105"
+						ref={ref}
+					>
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />
 						</button>
 						<Draggable.Input id={feature.id} value={feature.name} onChange={(value) => void setFeatureName(value)} />
 					</div>
 
-					<div
-						className={clsx(
-							`flex flex-col items-start`,
-							(stories.length > 0 || currentVersion !== `__ALL_VERSIONS__`) &&
-								`mt-12 rounded-md border border-[#006378] bg-white p-1`,
-						)}
-					>
-						{stories.map((story) => (
-							<Story key={story.id} story={story} />
-						))}
-						{currentVersion !== `__ALL_VERSIONS__` && (
-							<div className="p-2">
+					{(stories.length > 0 || currentVersion !== `__ALL_VERSIONS__`) && (
+						<div className="mt-12 flex flex-col items-start gap-2 rounded-md border border-[#006378] bg-white p-2">
+							{stories.map((story) => (
+								<Story key={story.id} story={story} />
+							))}
+							{currentVersion !== `__ALL_VERSIONS__` && (
 								<Button
 									type="dashed"
 									size="small"
@@ -103,9 +100,9 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 								>
 									Add story
 								</Button>
-							</div>
-						)}
-					</div>
+							)}
+						</div>
+					)}
 				</div>
 			</Draggable>
 

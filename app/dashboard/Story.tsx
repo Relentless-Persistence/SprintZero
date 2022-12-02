@@ -51,19 +51,17 @@ const Story: FC<Props> = ({story}) => {
 	return (
 		<>
 			<Draggable layer={2} id={story.id} ref={ref}>
-				<div className="rounded-md p-2 transition-colors">
-					<div className="flex min-w-[4rem] items-center gap-1 overflow-hidden rounded border border-laurel bg-green-t1300 pr-1 text-laurel transition-transform hover:scale-105">
-						<button
-							type="button"
-							onClick={() => void setIsDrawerOpen(true)}
-							data-nondraggable
-							className="border-r-[1px] border-laurel bg-green-t1200 p-0.5 text-[0.6rem]"
-						>
-							<p className="-rotate-90">{version?.name}</p>
-						</button>
-						<div className="mx-auto text-xs text-black">
-							<Draggable.Input id={story.id} value={story.name} onChange={(value) => void setStoryName(value)} />
-						</div>
+				<div className="flex min-w-[4rem] items-center gap-1 overflow-hidden rounded border border-laurel bg-green-t1300 pr-1 text-laurel transition-transform hover:scale-105">
+					<button
+						type="button"
+						onClick={() => void setIsDrawerOpen(true)}
+						data-nondraggable
+						className="border-r-[1px] border-laurel bg-green-t1200 p-0.5 text-[0.6rem]"
+					>
+						<p className="-rotate-90">{version?.name}</p>
+					</button>
+					<div className="mx-auto text-xs text-black">
+						<Draggable.Input id={story.id} value={story.name} onChange={(value) => void setStoryName(value)} />
 					</div>
 				</div>
 			</Draggable>

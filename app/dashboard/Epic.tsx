@@ -1,6 +1,6 @@
 "use client"
 
-import {CopyOutlined, ReadOutlined} from "@ant-design/icons"
+import {CopyOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
 import {useCallback, useEffect, useState} from "react"
@@ -14,6 +14,7 @@ import {useStoryMapStore} from "./storyMapStore"
 import Feature from "~/app/dashboard/Feature"
 import useMainStore from "~/stores/mainStore"
 import {addCommentToEpic, addFeature, deleteEpic, updateEpic} from "~/utils/fetch"
+import clsx from "clsx"
 
 export type EpicProps = {
 	epic: EpicType
@@ -54,32 +55,48 @@ const Epic: FC<EpicProps> = ({epic}) => {
 
 	return (
 		<>
-			<Draggable layer={0} id={epic.id} ref={ref}>
-				<div className="flex flex-col items-center gap-6 rounded-md p-4 transition-colors">
-					<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8] transition-transform hover:scale-105">
-						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
-							<ReadOutlined />
-						</button>
-						<Draggable.Input id={epic.id} value={epicName} onChange={(value) => void setEpicName(value)} />
-					</div>
-					<div className="flex items-center">
-						<div className="flex gap-1">
-							{features.map((feature) => (
-								<Feature key={feature.id} epicId={epic.id} feature={feature} />
-							))}
-							<div className="p-4">
-								<Button
-									type="dashed"
-									onClick={() => void addFeatureMutation.mutate({name: `feature`, description: `description`})}
-									className="flex items-center bg-white transition-colors hover:bg-[#f2fbfe]"
-									style={{borderColor: `#006378`, color: `#006378`, padding: `0.25rem 0.5rem`}}
-								>
-									<CopyOutlined />
-									<span>Add feature</span>
-								</Button>
-							</div>
+			<Draggable layer={0} id={epic.id}>
+				<div
+					className="grid justify-items-center gap-4"
+					style={{gridTemplateColumns: `repeat(${features.length}, auto)`}}
+				>
+					<div className="flex flex-col items-center gap-4">
+						<div
+							className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8] transition-transform hover:scale-105"
+							ref={ref}
+						>
+							<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
+								<ReadOutlined />
+							</button>
+							<Draggable.Input id={epic.id} value={epicName} onChange={(value) => void setEpicName(value)} />
 						</div>
+
+						<button
+							className={clsx(
+								"grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white",
+								features.length === 0 && `invisible`,
+							)}
+						>
+							<PlusOutlined />
+						</button>
 					</div>
+
+					{Array(Math.max(features.length - 1, 0)).fill(<div />)}
+
+					{features.map((feature) => (
+						<Feature key={feature.id} epicId={epic.id} feature={feature} />
+					))}
+					{features.length === 0 && (
+						<Button
+							type="dashed"
+							onClick={() => void addFeatureMutation.mutate(`Feature`)}
+							className="flex items-center bg-white transition-colors hover:bg-[#f2fbfe]"
+							style={{borderColor: `#006378`, color: `#006378`, padding: `0.25rem 0.5rem`}}
+						>
+							<CopyOutlined />
+							<span>Add feature</span>
+						</Button>
+					)}
 				</div>
 			</Draggable>
 

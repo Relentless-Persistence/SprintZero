@@ -1,10 +1,12 @@
+"use client"
+
 import clsx from "clsx"
 
 import type {FC} from "react"
 
 import {useStoryMapStore} from "./storyMapStore"
 
-const layerBoundaries = [70, 164]
+const layerBoundaries = [62, 164]
 
 const VisualizeCellBoundaries: FC = () => {
 	const dividers = useStoryMapStore((state) => state.dividers)

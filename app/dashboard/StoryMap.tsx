@@ -23,13 +23,9 @@ const StoryMap: FC = () => {
 		pendingDomChanges.forEach(({type, id}) => {
 			const element = elements[id]
 			if (type === `delete`) {
-				if (!element?.isConnected) {
-					calculateDividers(id)
-				}
+				if (!element?.isConnected) calculateDividers(id)
 			} else {
-				if (element) {
-					calculateDividers(id)
-				}
+				if (element) calculateDividers(id)
 			}
 		})
 	})
@@ -44,23 +40,19 @@ const StoryMap: FC = () => {
 	})
 
 	return (
-		<div className="flex w-max">
-			<div className="flex gap-1">
-				{epics.map((epic) => (
-					<Epic key={epic.id} epic={epic} />
-				))}
-			</div>
-			<div className="py-4 px-8">
-				<Button
-					type="dashed"
-					onClick={() => void addEpicMutation.mutate({name: `Epic`, description: `description`})}
-					className="flex items-center bg-white transition-colors hover:bg-[#faf8ff]"
-					style={{borderColor: `#4f2dc8`, color: `#4f2dc8`, padding: `0.25rem 0.5rem`}}
-				>
-					<ReadOutlined />
-					<span>Add epic</span>
-				</Button>
-			</div>
+		<div className="flex w-max gap-8">
+			{epics.map((epic) => (
+				<Epic key={epic.id} epic={epic} />
+			))}
+			<Button
+				type="dashed"
+				onClick={() => void addEpicMutation.mutate({name: `Epic`, description: `description`})}
+				className="flex items-center bg-white transition-colors hover:bg-[#faf8ff]"
+				style={{borderColor: `#4f2dc8`, color: `#4f2dc8`, padding: `0.25rem 0.5rem`}}
+			>
+				<ReadOutlined />
+				<span>Add epic</span>
+			</Button>
 		</div>
 	)
 }
