@@ -32,7 +32,9 @@ const StoryMapHeader: FC = () => {
 					<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersion)?.name}</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<Button onClick={() => void setNewVersionInput(``)}>+ Add version</Button>
+				<Button onClick={() => void setNewVersionInput(``)} className="bg-white">
+					+ Add version
+				</Button>
 			</div>
 			<div className="px-12 text-laurel">
 				<div className="relative text-[0.6rem]">

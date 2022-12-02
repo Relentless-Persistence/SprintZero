@@ -1,79 +1,95 @@
 import create from "zustand"
-import {immer} from "zustand/middleware/immer"
 
-import type {StoryMapStore} from "./utils"
+import type {FeatureDivider, StoryDivider, StoryMapStore} from "./types"
 
-import {sortEpics, sortFeatures, sortStories, calculateDividers} from "./utils"
+import {
+	avg,
+	epicsByCurrentVersion,
+	featuresByCurrentVersion,
+	sortEpics,
+	sortFeatures,
+	sortStories,
+	storiesByCurrentVersion,
+} from "./utils"
 
-export const useStoryMapStore = create(
-	immer<StoryMapStore>((set, get) => ({
-		currentVersion: `__ALL_VERSIONS__`,
-		setCurrentVersion: (version) =>
-			void set((state) => {
-				state.currentVersion = version
-			}),
-		newVersionInput: null,
-		setNewVersionInput: (version) =>
-			void set((state) => {
-				state.newVersionInput = version
-			}),
+export const useStoryMapStore = create<StoryMapStore>((set, get) => ({
+	currentVersion: `__ALL_VERSIONS__`,
+	setCurrentVersion: (version) => void set(() => ({currentVersion: version})),
+	newVersionInput: null,
+	setNewVersionInput: (input) => void set(() => ({newVersionInput: input})),
 
-		epics: [],
-		setEpics: (epics) =>
-			void set((state) => {
-				state.epics = sortEpics(epics).map((epic) => ({
-					epic,
-					element: state.epics.find((e) => e.epic.id === epic.id)?.element,
-				}))
-				calculateDividers(state)
-			}),
-		features: [],
-		setFeatures: (features) =>
-			void set((state) => {
-				state.features = sortFeatures(
-					get().epics.map((epic) => epic.epic),
-					features,
-				).map((feature) => ({
-					feature,
-					element: state.features.find((f) => f.feature.id === feature.id)?.element,
-				}))
-				calculateDividers(state)
-			}),
-		stories: [],
-		setStories: (stories) =>
-			void set((state) => {
-				state.stories = sortStories(
-					get().features.map((feature) => feature.feature),
-					stories,
-				).map((story) => ({
-					story,
-					element: state.stories.find((s) => s.story.id === story.id)?.element,
-				}))
-				calculateDividers(state)
-			}),
+	epics: [],
+	setEpics: (epics) => void set(() => ({epics: sortEpics(epics)})),
+	features: [],
+	setFeatures: (features) => void set(() => ({features: sortFeatures(get().epics, features)})),
+	stories: [],
+	setStories: (stories) => void set(() => ({stories: sortStories(get().features, stories)})),
 
-		dividers: [null, null, null],
-		registerElement: (layer, id, element) =>
-			void set((state) => {
-				switch (layer) {
-					case 0: {
-						// @ts-expect-error -- weird type error
-						state.epics.find((epic) => epic.epic.id === id)!.element = element
-						break
+	elements: {},
+	registerElement: (id, element) =>
+		void set((state) => {
+			const elements = {...state.elements}
+			elements[id] = element
+			return {elements}
+		}),
+	pendingDomChanges: [],
+	reportPendingDomChange: (update) => void set((state) => ({pendingDomChanges: [...state.pendingDomChanges, update]})),
+	dividers: [null, null, null],
+	calculateDividers: (reason) =>
+		void set(({epics, features, stories, elements, currentVersion, pendingDomChanges}) => {
+			if (
+				epicsByCurrentVersion(epics, stories, currentVersion).every((epic) => !!elements[epic.id]) &&
+				featuresByCurrentVersion(features, stories, currentVersion).every((feature) => !!elements[feature.id]) &&
+				storiesByCurrentVersion(stories, currentVersion).every((story) => !!elements[story.id])
+			) {
+				let epicDividers: number[] = []
+				epics.forEach((epic, i) => {
+					const element = elements[epic.id]!
+					const epicPos = element!.offsetLeft + element!.offsetWidth / 2
+					if (i > 0) epicDividers.push(avg(epicDividers.at(-1)!, epicPos))
+					epicDividers.push(epicPos)
+				})
+
+				let featureDividers: FeatureDivider[] = []
+				features.forEach((feature, i) => {
+					const element = elements[feature.id]!
+					const featurePos = element!.offsetLeft + element!.offsetWidth / 2
+					if (i === 0) {
+						featureDividers.push({pos: featurePos, border: false})
+					} else {
+						featureDividers.push({
+							pos: avg(featureDividers.at(-1)!.pos, featurePos),
+							border: feature.prev_feature === null,
+						})
+						featureDividers.push({pos: featurePos, border: false})
 					}
-					case 1: {
-						// @ts-expect-error -- weird type error
-						state.features.find((feature) => feature.feature.id === id).element = element
-						break
+				})
+
+				let storyDividers: StoryDivider[] = features.map((feature) => {
+					const element = elements[feature.id]!
+					return {
+						featureId: feature.id,
+						featureLeft: element!.offsetLeft,
+						featureRight: element!.offsetLeft + element!.offsetWidth,
+						dividers: (() => {
+							const featureStories = stories.filter((story) => story.feature === feature.id)
+							const dividers: number[] = []
+							featureStories.forEach((story, i) => {
+								const element = elements[story.id]!
+								const storyPos = element!.offsetTop + element!.offsetHeight / 2
+								if (i > 0) dividers.push(avg(dividers.at(-1)!, storyPos))
+								dividers.push(storyPos)
+							})
+							return dividers
+						})(),
 					}
-					case 2: {
-						// @ts-expect-error -- weird type error
-						state.stories.find((story) => story.story.id === id).element = element
-						break
-					}
+				})
+
+				return {
+					dividers: [epicDividers, featureDividers, storyDividers],
+					pendingDomChanges: pendingDomChanges.filter(({id}) => id !== reason),
 				}
-				calculateDividers(state)
-			}),
-		calculateDividers: () => void set(calculateDividers),
-	})),
-)
+			}
+			return {}
+		}),
+}))

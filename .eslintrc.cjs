@@ -15,7 +15,7 @@ module.exports = {
 		"import/no-duplicates": `error`,
 		"import/no-named-as-default": `off`,
 		"import/no-unresolved": `off`,
-		// "import/no-unused-modules": [`warn`, {unusedExports: true, ignoreExports: [`**/*.tsx`, `**/*.config.*`]}],
+		"import/no-unused-modules": [`warn`, {unusedExports: true, ignoreExports: [`**/*.tsx`, `**/*.config.*`]}],
 		"import/order": [
 			`warn`,
 			{

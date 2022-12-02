@@ -10,8 +10,7 @@ import {useGetInitialData} from "./utils"
 import VersionList from "./VersionList"
 import VisualizeCellBoundaries from "./VisualizeCellBoundaries"
 import StoryMap from "~/app/dashboard/StoryMap"
-
-const visualizeCellBoundaries = true
+import TreeLines from "./TreeLines"
 
 const Dashboard: FC = () => {
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
@@ -27,12 +26,12 @@ const Dashboard: FC = () => {
 				<StoryMapHeader />
 
 				<div className="relative w-full grow">
-					<div className="absolute inset-0 overflow-x-auto px-12 pb-8">
+					<div className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2">
 						{finishedFetching && (
 							<>
+								<TreeLines />
 								<StoryMap />
-								{/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-								{visualizeCellBoundaries && <VisualizeCellBoundaries />}
+								{/* <VisualizeCellBoundaries /> */}
 							</>
 						)}
 					</div>
