@@ -89,7 +89,11 @@ type AddEpicInput = {
 export const addEpic =
 	(productId: Id) =>
 	async ({name, description}: AddEpicInput): Promise<void> => {
-		const lastEpicData = (await getDocs(query(collection(db, Epics._), where(Epics.next_epic, `==`, null)))).docs[0]
+		const lastEpicData = (
+			await getDocs(
+				query(collection(db, Epics._), where(Epics.next_epic, `==`, null), where(Epics.product, `==`, productId)),
+			)
+		).docs[0]
 		const lastEpic = lastEpicData ? EpicSchema.parse({id: lastEpicData.id, ...lastEpicData.data()}) : null
 		const data: Omit<Epic, `id` | `updatedAt`> = {
 			description,
