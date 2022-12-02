@@ -4,7 +4,7 @@ import {CopyOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
 import clsx from "clsx"
-import {useCallback, useState} from "react"
+import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -25,25 +25,35 @@ export type FeatureProps = {
 const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const activeProduct = useMainStore((state) => state.activeProduct)
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
+	const [featureName, setFeatureName] = useState(feature.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 
-	const stories = useStoryMapStore((state) =>
-		state.stories.map((story) => story.story).filter((story) => story.feature === feature.id),
-	)
+	const stories = useStoryMapStore((state) => state.stories.filter((story) => story.feature === feature.id))
 	const points = useStoryMapStore((state) =>
-		state.stories
-			.filter((story) => story.story.feature === feature.id)
-			.reduce((acc, story) => acc + story.story.points, 0),
+		state.stories.filter((story) => story.feature === feature.id).reduce((acc, story) => acc + story.points, 0),
 	)
 
 	const addStoryMutation = useMutation({
 		mutationFn: addStory(activeProduct!, epicId, feature.id),
 	})
 
-	const updateFeatureMutation = useMutation({mutationFn: updateFeature(feature.id)})
-	const deleteFeatureMutation = useMutation({mutationFn: deleteFeature(feature.id)})
-	const addCommentMutation = useMutation({mutationFn: addCommentToFeature(feature.id)})
+	const updateFeatureMutation = useMutation({
+		mutationKey: [`update-feature`, feature.id],
+		mutationFn: updateFeature(feature.id),
+	})
+	const deleteFeatureMutation = useMutation({
+		mutationKey: [`delete-feature`, feature.id],
+		mutationFn: deleteFeature(feature.id),
+	})
+	const addCommentMutation = useMutation({
+		mutationKey: [`add-comment`, feature.id],
+		mutationFn: addCommentToFeature(feature.id),
+	})
+
+	useEffect(() => {
+		updateFeature(feature.id)({name: featureName})
+	}, [feature.id, featureName])
 
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -61,10 +71,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />
 						</button>
-						<Draggable.Input
-							value={feature.name}
-							onChange={(value) => void updateFeatureMutation.mutate({name: value})}
-						/>
+						<Draggable.Input value={feature.name} onChange={(value) => void setFeatureName(value)} />
 					</div>
 
 					<div

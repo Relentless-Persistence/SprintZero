@@ -2,7 +2,6 @@ import {useQuery} from "@tanstack/react-query"
 import {collection, onSnapshot, query, where} from "firebase9/firestore"
 import {useEffect} from "react"
 
-import type {WritableDraft} from "immer/dist/types/types-external"
 import type {Id} from "~/types"
 import type {Epic} from "~/types/db/Epics"
 import type {Feature} from "~/types/db/Features"
@@ -29,9 +28,9 @@ export const sortEpics = (epics: Epic[]): Epic[] => {
 }
 
 // Relies on epics being sorted
-export const sortFeatures = (epics: Epic[], features: Feature[]): Feature[] => {
+export const sortFeatures = (sortedEpics: Epic[], features: Feature[]): Feature[] => {
 	const sortedFeatures: Feature[] = []
-	epics.forEach((epic) => {
+	sortedEpics.forEach((epic) => {
 		let currentFeature = features.find((feature) => feature.prev_feature === null && feature.epic === epic.id) || null
 		while (currentFeature) {
 			sortedFeatures.push(currentFeature)
@@ -42,9 +41,9 @@ export const sortFeatures = (epics: Epic[], features: Feature[]): Feature[] => {
 }
 
 // Relies on features being sorted
-export const sortStories = (features: Feature[], stories: Story[]): Story[] => {
+export const sortStories = (sortedFeatures: Feature[], stories: Story[]): Story[] => {
 	const sortedStories: Story[] = []
-	features.forEach((feature) => {
+	sortedFeatures.forEach((feature) => {
 		let currentStory = stories.find((story) => story.prev_story === null && story.feature === feature.id) || null
 		while (currentStory) {
 			sortedStories.push(currentStory)
@@ -143,67 +142,111 @@ export type StoryDivider = {
 	dividers: number[]
 }
 
-export type StoryMapStore = {
-	currentVersion: Id | `__ALL_VERSIONS__`
-	setCurrentVersion: (version: Id | `__ALL_VERSIONS__`) => void
-	newVersionInput: string | null
-	setNewVersionInput: (version: string | null) => void
-
-	epics: Array<{element?: HTMLElement; epic: Epic}>
-	setEpics: (epics: Epic[]) => void
-	features: Array<{element?: HTMLElement; feature: Feature}>
-	setFeatures: (feature: Feature[]) => void
-	stories: Array<{element?: HTMLElement; story: Story}>
-	setStories: (story: Story[]) => void
-
-	dividers: [number[] | null, FeatureDivider[] | null, Array<StoryDivider> | null]
-	registerElement: (layer: number, id: Id, element: HTMLElement) => void
-	calculateDividers: () => void
-}
-
-export const calculateDividers = (state: WritableDraft<StoryMapStore>): void => {
+export const calculateDividers = (
+	epics: Epic[],
+	epicElements: Record<Id, HTMLElement | null>,
+	features: Feature[],
+	featureElements: Record<Id, HTMLElement | null>,
+	stories: Story[],
+	storyElements: Record<Id, HTMLElement | null>,
+	currentVersion: Id | `__ALL_VERSIONS__`,
+): [number[] | null, FeatureDivider[] | null, Array<StoryDivider> | null] | null => {
 	if (
-		state.epics.every((epic) => epic.element) &&
-		state.features.every((feature) => feature.element) &&
-		state.stories.every((story) => story.element)
+		epicsByCurrentVersion(epics, stories, currentVersion).every((epic) => !!epicElements[epic.id]) &&
+		featuresByCurrentVersion(features, stories, currentVersion).every((feature) => !!featureElements[feature.id]) &&
+		storiesByCurrentVersion(stories, currentVersion).every((story) => !!storyElements[story.id])
 	) {
 		let epicDividers: number[] = []
-		state.epics.forEach((epic, i) => {
-			const epicPos = epic.element!.offsetLeft + epic.element!.offsetWidth / 2
+		epics.forEach((epic, i) => {
+			const element = epicElements[epic.id]!
+			const epicPos = element!.offsetLeft + element!.offsetWidth / 2
 			if (i > 0) epicDividers.push(avg(epicDividers.at(-1)!, epicPos))
 			epicDividers.push(epicPos)
 		})
 
 		let featureDividers: FeatureDivider[] = []
-		state.features.forEach((feature, i) => {
-			const featurePos = feature.element!.offsetLeft + feature.element!.offsetWidth / 2
+		features.forEach((feature, i) => {
+			const element = featureElements[feature.id]!
+			const featurePos = element!.offsetLeft + element!.offsetWidth / 2
 			if (i === 0) {
 				featureDividers.push({pos: featurePos, border: false})
 			} else {
 				featureDividers.push({
 					pos: avg(featureDividers.at(-1)!.pos, featurePos),
-					border: feature.feature.prev_feature === null,
+					border: feature.prev_feature === null,
 				})
 				featureDividers.push({pos: featurePos, border: false})
 			}
 		})
 
-		let storyDividers: StoryDivider[] = state.features.map((feature) => ({
-			featureId: feature.feature.id,
-			featureLeft: feature.element!.offsetLeft,
-			featureRight: feature.element!.offsetLeft + feature.element!.offsetWidth,
-			dividers: (() => {
-				const stories = state.stories.filter((story) => story.story.feature === feature.feature.id)
-				const dividers: number[] = []
-				stories.forEach((story, i) => {
-					const storyPos = story.element!.offsetTop + story.element!.offsetHeight / 2
-					if (i > 0) dividers.push(avg(dividers.at(-1)!, storyPos))
-					dividers.push(storyPos)
-				})
-				return dividers
-			})(),
-		}))
+		let storyDividers: StoryDivider[] = features.map((feature) => {
+			const element = featureElements[feature.id]!
+			return {
+				featureId: feature.id,
+				featureLeft: element!.offsetLeft,
+				featureRight: element!.offsetLeft + element!.offsetWidth,
+				dividers: (() => {
+					const featureStories = stories.filter((story) => story.feature === feature.id)
+					const dividers: number[] = []
+					featureStories.forEach((story, i) => {
+						const element = storyElements[story.id]!
+						const storyPos = element!.offsetTop + element!.offsetHeight / 2
+						if (i > 0) dividers.push(avg(dividers.at(-1)!, storyPos))
+						dividers.push(storyPos)
+					})
+					return dividers
+				})(),
+			}
+		})
 
-		state.dividers = [epicDividers, featureDividers, storyDividers]
+		return [epicDividers, featureDividers, storyDividers]
 	}
+	return null
+}
+
+// A combination of epics containing stories with the current version and epics containing no stories
+const epicsByCurrentVersion = (
+	allEpics: Epic[],
+	allStories: Story[],
+	currentVersion: Id | `__ALL_VERSIONS__`,
+): Epic[] => {
+	if (currentVersion === `__ALL_VERSIONS__`) return allEpics
+
+	const storiesWithCurrentVersion = allStories.filter((story) => story.version === currentVersion)
+	const epicsWithCurrentVersion = storiesWithCurrentVersion.map((story) => story.epic)
+
+	const epicsWithStories = allStories.map((story) => story.epic)
+	const epicsWithoutStories = allEpics.filter((epic) => !epicsWithStories.includes(epic.id))
+
+	const epicsToShow = [...new Set([...epicsWithCurrentVersion, ...epicsWithoutStories])]
+
+	// To ensure that the epics are in the same order as in the state.epics array
+	const epics = allEpics.filter((epic) => epicsToShow.includes(epic.id))
+	return epics
+}
+
+// A combination of features containing stories with the current version and features containing no stories
+const featuresByCurrentVersion = (
+	allFeatures: Feature[],
+	allStories: Story[],
+	currentVersion: Id | `__ALL_VERSIONS__`,
+): Feature[] => {
+	if (currentVersion === `__ALL_VERSIONS__`) return allFeatures
+
+	const storiesWithCurrentVersion = allStories.filter((story) => story.version === currentVersion)
+	const featuresWithCurrentVersion = storiesWithCurrentVersion.map((story) => story.feature)
+
+	const featuresWithStories = allStories.map((story) => story.feature)
+	const featuresWithoutStories = allFeatures.filter((feature) => !featuresWithStories.includes(feature.id))
+
+	const featuresToShow = [...new Set([...featuresWithCurrentVersion, ...featuresWithoutStories])]
+
+	// To ensure that the features are in the same order as in the state.features array
+	const features = allFeatures.filter((feature) => featuresToShow.includes(feature.id))
+	return features
+}
+
+const storiesByCurrentVersion = (allStories: Story[], currentVersion: Id | `__ALL_VERSIONS__`): Story[] => {
+	if (currentVersion === `__ALL_VERSIONS__`) return allStories
+	return allStories.filter((story) => story.version === currentVersion)
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import {useMutation, useQueryClient} from "@tanstack/react-query"
-import {useCallback, useState} from "react"
+import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
 import type {Story as StoryType} from "~/types/db/Stories"
@@ -18,6 +18,7 @@ type Props = {
 }
 
 const Story: FC<Props> = ({story}) => {
+	const [storyName, setStoryName] = useState(story.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 
@@ -26,9 +27,16 @@ const Story: FC<Props> = ({story}) => {
 		.getQueryData<Version[]>([`all-versions`, activeProduct])
 		?.find((version) => version.id === story.version)
 
-	const updateStoryMutation = useMutation({mutationFn: updateStory(story.id)})
-	const deleteStoryMutation = useMutation({mutationFn: deleteStory(story.id)})
-	const addCommentMutation = useMutation({mutationFn: addCommentToStory(story.id)})
+	const updateStoryMutation = useMutation({mutationKey: [`update-story`, story.id], mutationFn: updateStory(story.id)})
+	const deleteStoryMutation = useMutation({mutationKey: [`delete-story`, story.id], mutationFn: deleteStory(story.id)})
+	const addCommentMutation = useMutation({
+		mutationKey: [`add-comment`, story.id],
+		mutationFn: addCommentToStory(story.id),
+	})
+
+	useEffect(() => {
+		updateStory(story.id)({name: storyName})
+	}, [story.id, storyName])
 
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -52,10 +60,7 @@ const Story: FC<Props> = ({story}) => {
 							<p className="-rotate-90">{version?.name}</p>
 						</button>
 						<div className="mx-auto text-xs text-black">
-							<Draggable.Input
-								value={story.name}
-								onChange={(value) => void updateStoryMutation.mutate({name: value})}
-							/>
+							<Draggable.Input value={story.name} onChange={(value) => void setStoryName(value)} />
 						</div>
 					</div>
 				</div>

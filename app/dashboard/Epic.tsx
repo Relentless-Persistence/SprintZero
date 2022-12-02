@@ -3,7 +3,7 @@
 import {CopyOutlined, ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
-import {useCallback, useState} from "react"
+import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
@@ -21,23 +21,26 @@ export type EpicProps = {
 
 const Epic: FC<EpicProps> = ({epic}) => {
 	const activeProduct = useMainStore((state) => state.activeProduct)
+	const [epicName, setEpicName] = useState(epic.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 
-	const features = useStoryMapStore((state) =>
-		state.features.map((feature) => feature.feature).filter((feature) => feature.epic === epic.id),
-	)
+	const features = useStoryMapStore((state) => state.features.filter((feature) => feature.epic === epic.id))
 	const points = useStoryMapStore((state) =>
-		state.stories.filter((story) => story.story.epic === epic.id).reduce((acc, story) => acc + story.story.points, 0),
+		state.stories.filter((story) => story.epic === epic.id).reduce((acc, story) => acc + story.points, 0),
 	)
 
 	const addFeatureMutation = useMutation({
 		mutationFn: addFeature(activeProduct!, epic.id),
 	})
 
-	const updateEpicMutation = useMutation({mutationFn: updateEpic(epic.id)})
-	const addCommentMutation = useMutation({mutationFn: addCommentToEpic(epic.id)})
-	const deleteEpicMutation = useMutation({mutationFn: deleteEpic(epic.id)})
+	const updateEpicMutation = useMutation({mutationKey: [`update-epic`, epic.id], mutationFn: updateEpic(epic.id)})
+	const addCommentMutation = useMutation({mutationKey: [`add-comment`, epic.id], mutationFn: addCommentToEpic(epic.id)})
+	const deleteEpicMutation = useMutation({mutationKey: [`delete-epic`, epic.id], mutationFn: deleteEpic(epic.id)})
+
+	useEffect(() => {
+		updateEpic(epic.id)({name: epicName})
+	}, [epic.id, epicName])
 
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
@@ -55,10 +58,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<ReadOutlined />
 						</button>
-						<Draggable.Input
-							value={epic.name}
-							onChange={useCallback((value) => void updateEpicMutation.mutate({name: value}), [updateEpicMutation])}
-						/>
+						<Draggable.Input value={epicName} onChange={(value) => void setEpicName(value)} />
 					</div>
 					<div className="flex items-center">
 						<div className="flex gap-1">

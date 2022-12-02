@@ -17,7 +17,7 @@ const StoryMap: FC = () => {
 
 	useSubscribeToData()
 
-	const epics = useStoryMapStore((state) => state.epics.map((epic) => epic.epic))
+	const epics = useStoryMapStore((state) => state.epics)
 
 	const addEpicMutation = useMutation({mutationFn: activeProduct ? addEpic(activeProduct) : async () => {}})
 
