@@ -128,7 +128,7 @@ export default function Visions() {
       >
         {activeProduct ? (
           <Deck
-            product={activeProduct.product}
+            product={activeProduct.name}
             // setInfo={handleSetInfo}
             list={visionData}
             activeIndex={visionIndex}

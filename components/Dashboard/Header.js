@@ -90,7 +90,7 @@ const AppHeader = () => {
               <HeaderMenu
                 key={i}
                 className="mr-10 capitalize"
-                active={activeProduct && activeProduct.product === product.product}
+                active={activeProduct && activeProduct.name === product.name}
                 onClick={() => setActiveProduct(product)}
               >
                 {product.product}

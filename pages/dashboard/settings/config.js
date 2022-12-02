@@ -45,7 +45,7 @@ const config = () => {
     if (activeProduct) {
       setCadence(activeProduct.cadence);
       setGate(activeProduct.gate);
-      setTitle(activeProduct.product);
+      setTitle(activeProduct.name);
       setCost(activeProduct.cost);
       setCurrency(activeProduct.currency);
     }

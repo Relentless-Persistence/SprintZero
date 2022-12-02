@@ -140,54 +140,8 @@ export default function Huddle() {
     setTodayInTime((intervals_dictt[activeTime]).setHours(0,0,0,0))
     setYesterdayInTime((subtractDays(1, intervals_dictt[activeTime])).setHours(0,0,0,0))
     
-    // console.log("Interval dict aydaa " + activeProduct.product + activeTime + intervals_dictt["Today"] + intervals_dictt["Yesterday"] + intervals_dictt["2 days ago"] + today_fixeddd + yesterdayInTime);
 
   }, [activeProduct, activeTime]);
-
-  // const todayFilterInterval = (item) => {
-  //   switch (activeTime) {
-  //     case "Today":
-  //       setToday(
-  //         data.filter(
-  //           (huddle) =>
-  //             huddle.user.uid === item.user.uid && isToday(huddle.createdAt)
-  //         )
-  //       );
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // };
-
-  // const yesterdayFilterInterval = (item) => {
-  //   switch (activeTime) {
-  //     case "Today":
-  //       setYesterday(
-  //         data.filter(
-  //           (huddle) =>
-  //             huddle.user.uid === item.user.uid && isYesterday(huddle.createdAt)
-  //         )
-  //       );
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // };
-
-  // const blockerFilterInterval = (item) => {
-  //   switch (activeTime) {
-  //     case "Today":
-  //       setBlocker(
-  //         blockers.filter(
-  //           (blocker) =>
-  //             blocker.user.uid === item.user.uid && isToday(blocker.createdAt)
-  //         )
-  //       );
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // };
 
   const setActiveRightNav = (interval) => {
     const huddleIndex = findIndex(intervals, (v) => v === interval);
