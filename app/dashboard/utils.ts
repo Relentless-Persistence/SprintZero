@@ -95,7 +95,6 @@ export const useSubscribeToData = (): void => {
 	const setEpics = useStoryMapStore((state) => state.setEpics)
 	const setFeatures = useStoryMapStore((state) => state.setFeatures)
 	const setStories = useStoryMapStore((state) => state.setStories)
-	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
 
 	useEffect(() => {
 		const unsubscribeEpics = onSnapshot(
@@ -127,85 +126,11 @@ export const useSubscribeToData = (): void => {
 			unsubscribeFeatures()
 			unsubscribeStories()
 		}
-	}, [activeProduct, calculateDividers, setEpics, setFeatures, setStories])
-}
-
-export type FeatureDivider = {
-	pos: number
-	border: boolean
-}
-
-export type StoryDivider = {
-	featureId: Id
-	featureLeft: number
-	featureRight: number
-	dividers: number[]
-}
-
-export const calculateDividers = (
-	epics: Epic[],
-	epicElements: Record<Id, HTMLElement | null>,
-	features: Feature[],
-	featureElements: Record<Id, HTMLElement | null>,
-	stories: Story[],
-	storyElements: Record<Id, HTMLElement | null>,
-	currentVersion: Id | `__ALL_VERSIONS__`,
-): [number[] | null, FeatureDivider[] | null, Array<StoryDivider> | null] | null => {
-	if (
-		epicsByCurrentVersion(epics, stories, currentVersion).every((epic) => !!epicElements[epic.id]) &&
-		featuresByCurrentVersion(features, stories, currentVersion).every((feature) => !!featureElements[feature.id]) &&
-		storiesByCurrentVersion(stories, currentVersion).every((story) => !!storyElements[story.id])
-	) {
-		let epicDividers: number[] = []
-		epics.forEach((epic, i) => {
-			const element = epicElements[epic.id]!
-			const epicPos = element!.offsetLeft + element!.offsetWidth / 2
-			if (i > 0) epicDividers.push(avg(epicDividers.at(-1)!, epicPos))
-			epicDividers.push(epicPos)
-		})
-
-		let featureDividers: FeatureDivider[] = []
-		features.forEach((feature, i) => {
-			const element = featureElements[feature.id]!
-			const featurePos = element!.offsetLeft + element!.offsetWidth / 2
-			if (i === 0) {
-				featureDividers.push({pos: featurePos, border: false})
-			} else {
-				featureDividers.push({
-					pos: avg(featureDividers.at(-1)!.pos, featurePos),
-					border: feature.prev_feature === null,
-				})
-				featureDividers.push({pos: featurePos, border: false})
-			}
-		})
-
-		let storyDividers: StoryDivider[] = features.map((feature) => {
-			const element = featureElements[feature.id]!
-			return {
-				featureId: feature.id,
-				featureLeft: element!.offsetLeft,
-				featureRight: element!.offsetLeft + element!.offsetWidth,
-				dividers: (() => {
-					const featureStories = stories.filter((story) => story.feature === feature.id)
-					const dividers: number[] = []
-					featureStories.forEach((story, i) => {
-						const element = storyElements[story.id]!
-						const storyPos = element!.offsetTop + element!.offsetHeight / 2
-						if (i > 0) dividers.push(avg(dividers.at(-1)!, storyPos))
-						dividers.push(storyPos)
-					})
-					return dividers
-				})(),
-			}
-		})
-
-		return [epicDividers, featureDividers, storyDividers]
-	}
-	return null
+	}, [activeProduct, setEpics, setFeatures, setStories])
 }
 
 // A combination of epics containing stories with the current version and epics containing no stories
-const epicsByCurrentVersion = (
+export const epicsByCurrentVersion = (
 	allEpics: Epic[],
 	allStories: Story[],
 	currentVersion: Id | `__ALL_VERSIONS__`,
@@ -226,7 +151,7 @@ const epicsByCurrentVersion = (
 }
 
 // A combination of features containing stories with the current version and features containing no stories
-const featuresByCurrentVersion = (
+export const featuresByCurrentVersion = (
 	allFeatures: Feature[],
 	allStories: Story[],
 	currentVersion: Id | `__ALL_VERSIONS__`,
@@ -246,7 +171,7 @@ const featuresByCurrentVersion = (
 	return features
 }
 
-const storiesByCurrentVersion = (allStories: Story[], currentVersion: Id | `__ALL_VERSIONS__`): Story[] => {
+export const storiesByCurrentVersion = (allStories: Story[], currentVersion: Id | `__ALL_VERSIONS__`): Story[] => {
 	if (currentVersion === `__ALL_VERSIONS__`) return allStories
 	return allStories.filter((story) => story.version === currentVersion)
 }

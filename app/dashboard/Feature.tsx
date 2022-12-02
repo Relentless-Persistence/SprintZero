@@ -28,6 +28,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const [featureName, setFeatureName] = useState(feature.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
+	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
 
 	const stories = useStoryMapStore((state) => state.stories.filter((story) => story.feature === feature.id))
 	const points = useStoryMapStore((state) =>
@@ -58,9 +59,10 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
 			if (!node) return
-			registerElement(1, feature.id, node)
+			registerElement(feature.id, node)
+			reportPendingDomChange({type: `create`, id: feature.id})
 		},
-		[feature.id, registerElement],
+		[feature.id, registerElement, reportPendingDomChange],
 	)
 
 	return (
@@ -71,7 +73,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />
 						</button>
-						<Draggable.Input value={feature.name} onChange={(value) => void setFeatureName(value)} />
+						<Draggable.Input id={feature.id} value={feature.name} onChange={(value) => void setFeatureName(value)} />
 					</div>
 
 					<div
@@ -116,7 +118,11 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 					onDescriptionChange: (value) => void updateFeatureMutation.mutate({description: value}),
 					comments: feature.comments,
 					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
-					onDelete: () => void deleteFeatureMutation.mutate(),
+					onDelete: () => {
+						setIsDrawerOpen(false)
+						reportPendingDomChange({type: `delete`, id: feature.id})
+						deleteFeatureMutation.mutate()
+					},
 				}}
 				isOpen={isDrawerOpen}
 				onClose={() => void setIsDrawerOpen(false)}

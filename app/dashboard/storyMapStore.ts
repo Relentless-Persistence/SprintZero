@@ -1,33 +1,16 @@
 import create from "zustand"
 
-import type {FeatureDivider, StoryDivider} from "./utils"
-import type {Id} from "~/types"
-import type {Epic} from "~/types/db/Epics"
-import type {Feature} from "~/types/db/Features"
-import type {Story} from "~/types/db/Stories"
+import type {FeatureDivider, StoryDivider, StoryMapStore} from "./types"
 
-import {sortEpics, sortFeatures, sortStories, calculateDividers} from "./utils"
-
-type StoryMapStore = {
-	currentVersion: Id | `__ALL_VERSIONS__`
-	setCurrentVersion: (version: Id | `__ALL_VERSIONS__`) => void
-	newVersionInput: string | null
-	setNewVersionInput: (version: string | null) => void
-
-	epics: Epic[]
-	epicElements: Record<Id, HTMLElement | null>
-	setEpics: (epics: Epic[]) => void
-	features: Feature[]
-	featureElements: Record<Id, HTMLElement | null>
-	setFeatures: (feature: Feature[]) => void
-	stories: Story[]
-	storyElements: Record<Id, HTMLElement | null>
-	setStories: (story: Story[]) => void
-
-	dividers: [number[] | null, FeatureDivider[] | null, Array<StoryDivider> | null]
-	registerElement: (layer: number, id: Id, element: HTMLElement) => void
-	calculateDividers: () => void
-}
+import {
+	avg,
+	epicsByCurrentVersion,
+	featuresByCurrentVersion,
+	sortEpics,
+	sortFeatures,
+	sortStories,
+	storiesByCurrentVersion,
+} from "./utils"
 
 export const useStoryMapStore = create<StoryMapStore>((set, get) => ({
 	currentVersion: `__ALL_VERSIONS__`,
@@ -36,50 +19,77 @@ export const useStoryMapStore = create<StoryMapStore>((set, get) => ({
 	setNewVersionInput: (input) => void set(() => ({newVersionInput: input})),
 
 	epics: [],
-	epicElements: {},
 	setEpics: (epics) => void set(() => ({epics: sortEpics(epics)})),
 	features: [],
-	featureElements: {},
 	setFeatures: (features) => void set(() => ({features: sortFeatures(get().epics, features)})),
 	stories: [],
-	storyElements: {},
 	setStories: (stories) => void set(() => ({stories: sortStories(get().features, stories)})),
 
-	dividers: [null, null, null],
-	registerElement: (layer, id, element) =>
+	elements: {},
+	registerElement: (id, element) =>
 		void set((state) => {
-			switch (layer) {
-				case 0: {
-					const epicElements = {...state.epicElements}
-					epicElements[id] = element
-					return {epicElements}
-				}
-				case 1: {
-					const featureElements = {...state.featureElements}
-					featureElements[id] = element
-					return {featureElements}
-				}
-				case 2: {
-					const storyElements = {...state.storyElements}
-					storyElements[id] = element
-					return {storyElements}
-				}
-				default: {
-					throw new Error(`Invalid layer: ${layer}`)
+			const elements = {...state.elements}
+			elements[id] = element
+			return {elements}
+		}),
+	pendingDomChanges: [],
+	reportPendingDomChange: (update) => void set((state) => ({pendingDomChanges: [...state.pendingDomChanges, update]})),
+	dividers: [null, null, null],
+	calculateDividers: (reason) =>
+		void set(({epics, features, stories, elements, currentVersion, pendingDomChanges}) => {
+			if (
+				epicsByCurrentVersion(epics, stories, currentVersion).every((epic) => !!elements[epic.id]) &&
+				featuresByCurrentVersion(features, stories, currentVersion).every((feature) => !!elements[feature.id]) &&
+				storiesByCurrentVersion(stories, currentVersion).every((story) => !!elements[story.id])
+			) {
+				let epicDividers: number[] = []
+				epics.forEach((epic, i) => {
+					const element = elements[epic.id]!
+					const epicPos = element!.offsetLeft + element!.offsetWidth / 2
+					if (i > 0) epicDividers.push(avg(epicDividers.at(-1)!, epicPos))
+					epicDividers.push(epicPos)
+				})
+
+				let featureDividers: FeatureDivider[] = []
+				features.forEach((feature, i) => {
+					const element = elements[feature.id]!
+					const featurePos = element!.offsetLeft + element!.offsetWidth / 2
+					if (i === 0) {
+						featureDividers.push({pos: featurePos, border: false})
+					} else {
+						featureDividers.push({
+							pos: avg(featureDividers.at(-1)!.pos, featurePos),
+							border: feature.prev_feature === null,
+						})
+						featureDividers.push({pos: featurePos, border: false})
+					}
+				})
+
+				let storyDividers: StoryDivider[] = features.map((feature) => {
+					const element = elements[feature.id]!
+					return {
+						featureId: feature.id,
+						featureLeft: element!.offsetLeft,
+						featureRight: element!.offsetLeft + element!.offsetWidth,
+						dividers: (() => {
+							const featureStories = stories.filter((story) => story.feature === feature.id)
+							const dividers: number[] = []
+							featureStories.forEach((story, i) => {
+								const element = elements[story.id]!
+								const storyPos = element!.offsetTop + element!.offsetHeight / 2
+								if (i > 0) dividers.push(avg(dividers.at(-1)!, storyPos))
+								dividers.push(storyPos)
+							})
+							return dividers
+						})(),
+					}
+				})
+
+				return {
+					dividers: [epicDividers, featureDividers, storyDividers],
+					pendingDomChanges: pendingDomChanges.filter(({id}) => id !== reason),
 				}
 			}
+			return {}
 		}),
-	calculateDividers: () =>
-		void set((state) => ({
-			dividers:
-				calculateDividers(
-					state.epics,
-					state.epicElements,
-					state.features,
-					state.featureElements,
-					state.stories,
-					state.storyElements,
-					state.currentVersion,
-				) ?? state.dividers,
-		})),
 }))

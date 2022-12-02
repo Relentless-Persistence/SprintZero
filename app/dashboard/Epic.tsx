@@ -24,6 +24,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 	const [epicName, setEpicName] = useState(epic.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
+	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
 
 	const features = useStoryMapStore((state) => state.features.filter((feature) => feature.epic === epic.id))
 	const points = useStoryMapStore((state) =>
@@ -45,9 +46,10 @@ const Epic: FC<EpicProps> = ({epic}) => {
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
 			if (!node) return
-			registerElement(0, epic.id, node)
+			registerElement(epic.id, node)
+			reportPendingDomChange({type: `create`, id: epic.id})
 		},
-		[epic.id, registerElement],
+		[epic.id, registerElement, reportPendingDomChange],
 	)
 
 	return (
@@ -58,7 +60,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<ReadOutlined />
 						</button>
-						<Draggable.Input value={epicName} onChange={(value) => void setEpicName(value)} />
+						<Draggable.Input id={epic.id} value={epicName} onChange={(value) => void setEpicName(value)} />
 					</div>
 					<div className="flex items-center">
 						<div className="flex gap-1">
@@ -95,7 +97,11 @@ const Epic: FC<EpicProps> = ({epic}) => {
 					},
 					comments: epic.comments,
 					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
-					onDelete: () => void deleteEpicMutation.mutate(),
+					onDelete: () => {
+						setIsDrawerOpen(false)
+						reportPendingDomChange({type: `delete`, id: epic.id})
+						deleteEpicMutation.mutate()
+					},
 				}}
 				isOpen={isDrawerOpen}
 				onClose={() => void setIsDrawerOpen(false)}

@@ -3,6 +3,7 @@
 import {ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
+import {useAnimationFrame} from "framer-motion"
 
 import type {FC} from "react"
 
@@ -14,12 +15,33 @@ import {addEpic} from "~/utils/fetch"
 
 const StoryMap: FC = () => {
 	const activeProduct = useMainStore((state) => state.activeProduct)
+	const elements = useStoryMapStore((state) => state.elements)
+	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
+	const pendingDomChanges = useStoryMapStore((state) => state.pendingDomChanges)
+
+	useAnimationFrame(() => {
+		pendingDomChanges.forEach(({type, id}) => {
+			const element = elements[id]
+			if (type === `delete`) {
+				if (!element?.isConnected) {
+					calculateDividers(id)
+				}
+			} else {
+				if (element) {
+					calculateDividers(id)
+				}
+			}
+		})
+	})
 
 	useSubscribeToData()
 
 	const epics = useStoryMapStore((state) => state.epics)
 
-	const addEpicMutation = useMutation({mutationFn: activeProduct ? addEpic(activeProduct) : async () => {}})
+	const addEpicMutation = useMutation({
+		mutationKey: [`add-epic`, activeProduct],
+		mutationFn: activeProduct ? addEpic(activeProduct) : async () => {},
+	})
 
 	return (
 		<div className="flex w-max">

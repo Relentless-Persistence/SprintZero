@@ -1,7 +1,7 @@
 "use client"
 
 import {motion} from "framer-motion"
-import {forwardRef, useLayoutEffect} from "react"
+import {forwardRef} from "react"
 
 import type {ReactNode, FC, ForwardRefRenderFunction} from "react"
 import type {Id} from "~/types"
@@ -23,22 +23,23 @@ const Draggable: ForwardRefRenderFunction<HTMLDivElement, DraggableProps> = ({ch
 }
 
 export type InputProps = {
+	id: Id
 	value: string
 	onChange: (value: string) => void
 }
 
-const Input: FC<InputProps> = ({value, onChange}) => {
-	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
-	useLayoutEffect(() => {
-		calculateDividers()
-	}, [calculateDividers, value])
+const Input: FC<InputProps> = ({id, value, onChange}) => {
+	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
 
 	return (
 		<div className="w-max">
 			<input
 				data-nondraggable
 				value={value}
-				onChange={(e) => void onChange(e.target.value)}
+				onChange={(e) => {
+					onChange(e.target.value)
+					reportPendingDomChange({type: `update`, id})
+				}}
 				className="w-full grow bg-transparent text-center leading-none"
 				size={1}
 			/>

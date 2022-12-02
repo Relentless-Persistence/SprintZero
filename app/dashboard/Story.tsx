@@ -21,6 +21,7 @@ const Story: FC<Props> = ({story}) => {
 	const [storyName, setStoryName] = useState(story.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
+	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
 
 	const activeProduct = useMainStore((state) => state.activeProduct)
 	const version = useQueryClient()
@@ -41,9 +42,10 @@ const Story: FC<Props> = ({story}) => {
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
 			if (!node) return
-			registerElement(2, story.id, node)
+			registerElement(story.id, node)
+			reportPendingDomChange({type: `create`, id: story.id})
 		},
-		[story.id, registerElement],
+		[story.id, registerElement, reportPendingDomChange],
 	)
 
 	return (
@@ -60,7 +62,7 @@ const Story: FC<Props> = ({story}) => {
 							<p className="-rotate-90">{version?.name}</p>
 						</button>
 						<div className="mx-auto text-xs text-black">
-							<Draggable.Input value={story.name} onChange={(value) => void setStoryName(value)} />
+							<Draggable.Input id={story.id} value={story.name} onChange={(value) => void setStoryName(value)} />
 						</div>
 					</div>
 				</div>
@@ -80,7 +82,11 @@ const Story: FC<Props> = ({story}) => {
 					},
 					comments: story.comments,
 					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
-					onDelete: () => void deleteStoryMutation.mutate(),
+					onDelete: () => {
+						setIsDrawerOpen(false)
+						reportPendingDomChange({type: `delete`, id: story.id})
+						deleteStoryMutation.mutate()
+					},
 				}}
 				isOpen={isDrawerOpen}
 				onClose={() => void setIsDrawerOpen(false)}
