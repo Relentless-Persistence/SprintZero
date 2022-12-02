@@ -5,8 +5,7 @@ import clsx from "clsx"
 import type {FC} from "react"
 
 import {useStoryMapStore} from "./storyMapStore"
-
-const layerBoundaries = [62, 164]
+import {layerBoundaries} from "./utils"
 
 const VisualizeCellBoundaries: FC = () => {
 	const dividers = useStoryMapStore((state) => state.dividers)

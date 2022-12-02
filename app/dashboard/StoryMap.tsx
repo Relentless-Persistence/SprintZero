@@ -40,7 +40,7 @@ const StoryMap: FC = () => {
 	})
 
 	return (
-		<div className="flex w-max gap-8">
+		<div className="relative z-10 flex w-max gap-8">
 			{epics.map((epic) => (
 				<Epic key={epic.id} epic={epic} />
 			))}

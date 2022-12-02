@@ -15,6 +15,8 @@ import {FeatureCollectionSchema, Features} from "~/types/db/Features"
 import {Stories, StoryCollectionSchema} from "~/types/db/Stories"
 import {getAllEpics, getAllFeatures, getAllStories} from "~/utils/fetch"
 
+export const layerBoundaries = [54, 156] as [number, number]
+
 export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) / arr.length
 
 export const sortEpics = (epics: Epic[]): Epic[] => {

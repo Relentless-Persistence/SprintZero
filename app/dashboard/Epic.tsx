@@ -60,28 +60,30 @@ const Epic: FC<EpicProps> = ({epic}) => {
 					className="grid justify-items-center gap-4"
 					style={{gridTemplateColumns: `repeat(${features.length}, auto)`}}
 				>
-					<div className="flex flex-col items-center gap-4">
-						<div
-							className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8] transition-transform hover:scale-105"
-							ref={ref}
-						>
-							<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
-								<ReadOutlined />
-							</button>
-							<Draggable.Input id={epic.id} value={epicName} onChange={(value) => void setEpicName(value)} />
-						</div>
-
-						<button
-							className={clsx(
-								"grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white",
-								features.length === 0 && `invisible`,
-							)}
-						>
-							<PlusOutlined />
+					<div
+						className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8] transition-transform hover:scale-105"
+						ref={ref}
+					>
+						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
+							<ReadOutlined />
 						</button>
+						<Draggable.Input id={epic.id} value={epicName} onChange={(value) => void setEpicName(value)} />
 					</div>
 
+					{/* Pad out the remaining columns in row 1 */}
 					{Array(Math.max(features.length - 1, 0)).fill(<div />)}
+
+					{/* Pad out the beginning columns in row 2 */}
+					{Array(Math.max(features.length - 1, 0)).fill(<div />)}
+
+					<button
+						className={clsx(
+							"grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white",
+							features.length === 0 && `invisible`,
+						)}
+					>
+						<PlusOutlined />
+					</button>
 
 					{features.map((feature) => (
 						<Feature key={feature.id} epicId={epic.id} feature={feature} />

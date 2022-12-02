@@ -76,7 +76,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 						<button type="button" onClick={() => void setIsDrawerOpen(true)} data-nondraggable>
 							<CopyOutlined />
 						</button>
-						<Draggable.Input id={feature.id} value={feature.name} onChange={(value) => void setFeatureName(value)} />
+						<Draggable.Input id={feature.id} value={featureName} onChange={(value) => void setFeatureName(value)} />
 					</div>
 
 					{(stories.length > 0 || currentVersion !== `__ALL_VERSIONS__`) && (

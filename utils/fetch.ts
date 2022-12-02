@@ -1,5 +1,6 @@
 import {
 	addDoc,
+	arrayUnion,
 	collection,
 	doc,
 	getDoc,
@@ -28,6 +29,8 @@ import {FeatureSchema, Features, FeatureCollectionSchema} from "~/types/db/Featu
 import {ProductSchema, Products, ProductCollectionSchema} from "~/types/db/Products"
 import {StorySchema, Stories, StoryCollectionSchema} from "~/types/db/Stories"
 import {Versions, VersionCollectionSchema} from "~/types/db/Versions"
+
+arrayUnion
 
 // export const getUsersById = async (ids: Id[]): Promise<User[]> => {
 // 	const userDocs = await getDocs(query(collection(db, Users._), where(Users.id, `in`, ids)))
@@ -285,10 +288,14 @@ export const addStory =
 			version,
 		}
 		const newStoryDoc = await addDoc(collection(db, Stories._), data)
-		if (lastStoryData)
+		if (lastStoryData) {
 			updateDoc(doc(db, Stories._, lastStoryData.id), {
 				next_story: newStoryDoc.id as Id,
 			} satisfies Partial<Story>)
+			updateDoc(doc(db, Features._, featureId), {
+				stories: arrayUnion(newStoryDoc.id) as unknown as Id[],
+			} satisfies Partial<Feature>)
+		}
 	}
 
 const getStoriesByEpic = (epicId: Id) => async (): Promise<Story[]> => {

@@ -61,7 +61,7 @@ const Story: FC<Props> = ({story}) => {
 						<p className="-rotate-90">{version?.name}</p>
 					</button>
 					<div className="mx-auto text-xs text-black">
-						<Draggable.Input id={story.id} value={story.name} onChange={(value) => void setStoryName(value)} />
+						<Draggable.Input id={story.id} value={storyName} onChange={(value) => void setStoryName(value)} />
 					</div>
 				</div>
 			</Draggable>
