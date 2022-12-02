@@ -99,8 +99,8 @@ const SideBar = () => {
           </Link>
         </MenuItem>
 
-        <MenuItem key="5" $highlight={isActive(pathname, "/strategy/visions")}>
-          <Link href="/dashboard/strategy/visions">
+        <MenuItem key="5" $highlight={isActive(pathname, "/strategy/vision")}>
+          <Link href="/dashboard/strategy/vision">
             Vision
           </Link>
         </MenuItem>

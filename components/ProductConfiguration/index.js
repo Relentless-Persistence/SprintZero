@@ -61,7 +61,7 @@ const ProductConfiguration = () => {
           cadence,
           gate,
           currency,
-          cost,
+          cost: cost.length ?? null,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           owner: user.uid,
         })
