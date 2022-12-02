@@ -93,7 +93,7 @@ const AppHeader = () => {
                 active={activeProduct && activeProduct.name === product.name}
                 onClick={() => setActiveProduct(product)}
               >
-                {product.product}
+                {product.name}
               </HeaderMenu>
             ))}
         </div>
