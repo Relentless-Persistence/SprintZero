@@ -29,7 +29,7 @@ const securityHeaders = [
 	},
 ]
 
-const config = {
+module.exports = {
 	async headers() {
 		return [
 			{
