@@ -46,5 +46,3 @@ module.exports = {
 		styledComponents: true,
 	},
 }
-
-export default config
