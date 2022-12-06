@@ -42,9 +42,6 @@ const config = {
 	experimental: {
 		appDir: true,
 	},
-	compiler: {
-		styledComponents: true,
-	},
 }
 
 export default config
