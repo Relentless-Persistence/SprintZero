@@ -43,7 +43,7 @@ const SideMenu: FC = () => {
 					children: [
 						{key: `sidemenu-ethics`, label: <Link href="/dashboard/tactics/ethics">Ethics</Link>},
 						{key: `sidemenu-priorities`, label: <Link href="/dashboard/tactics/priorities">Priorities</Link>},
-						{key: `sidemenu-release`, label: <Link href="/dashboard/tactics/release">Release</Link>},
+						// {key: `sidemenu-release`, label: <Link href="/dashboard/tactics/release">Release</Link>},
 						{
 							key: `sidemenu-retrospective`,
 							label: <Link href="/dashboard/tactics/retrospective">Retrospective</Link>,

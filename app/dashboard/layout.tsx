@@ -44,7 +44,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 						items={products?.map((product) => ({
 							key: product.id,
 							label: (
-								<button type="button" onClick={() => void setActiveProduct(product.id)} className="relative">
+								<button type="button" onClick={() => void setActiveProduct(product.id)} className="relative capitalize">
 									{product.name}
 									{activeProduct === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
 								</button>
