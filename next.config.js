@@ -29,7 +29,7 @@ const securityHeaders = [
 	},
 ]
 
-const config = {
+module.exports = {
 	async headers() {
 		return [
 			{
@@ -43,5 +43,3 @@ const config = {
 		appDir: true,
 	},
 }
-
-export default config
