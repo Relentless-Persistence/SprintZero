@@ -6,7 +6,7 @@
 		"dev": "next dev",
 		"build": "next build",
 		"export": "next export",
-		"start": "next start",
+		"start": "next start -p $PORT",
 		"lint": "next lint"
 	},
 	"dependencies": {
@@ -47,7 +47,7 @@
 		"prettier-plugin-tailwindcss": "0.2.0",
 		"prop-types": "^15.6.2",
 		"react": "18.2.0",
-		"react-archer": "4.2.2sta",
+		"react-archer": "4.2.2",
 		"react-beautiful-dnd": "^13.1.0",
 		"react-dom": "18.2.0",
 		"react-draggable": "^4.4.4",
