@@ -44,8 +44,13 @@ const MenuItem = styled(Menu.Item)`
 const rootSubmenuKeys = ["strategy", "tactics", "operations", "userbase"];
 
 const SideBar = () => {
+  const router = useRouter();
   const { pathname } = useRouter();
   const [openKeys, setOpenKeys] = React.useState([pathname.split("/")[2]]);
+
+  const productSlug = router.query.productSlug
+
+  console.log("slug", productSlug)
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
@@ -64,11 +69,11 @@ const SideBar = () => {
       style={{ height: "100%", borderRight: 0, position: "relative" }}
     >
       <MenuItem
-        $highlight={pathname === "/dashboard"}
+        $highlight={pathname === `/${productSlug}/dashboard`}
         key="1"
         icon={<HomeOutlined color="" />}
       >
-        <Link href="/dashboard">
+        <Link href={`/${productSlug}/dashboard`}>
           Home
         </Link>
       </MenuItem>
@@ -77,30 +82,30 @@ const SideBar = () => {
         icon={<DeploymentUnitOutlined />}
         title="Strategy"
       >
-        <MenuItem $highlight={isActive(pathname, "/strategy/kickoff")} key="2">
-          <Link href="/dashboard/strategy/kickoff">
+        <MenuItem $highlight={isActive(pathname, `/${productSlug}/strategy/kickoff`)} key="2">
+          <Link href={`/${productSlug}/strategy/kickoff`}>
             Kickoff
           </Link>
         </MenuItem>
         <MenuItem
-          $highlight={isActive(pathname, "/strategy/accessibility")}
+          $highlight={isActive(pathname, `/${productSlug}/strategy/accessibility`)}
           key="3"
         >
-          <Link href="/dashboard/strategy/accessibility">
+          <Link href={`/${productSlug}/strategy/accessibility`}>
             Accessibility
           </Link>
         </MenuItem>
         <MenuItem
-          $highlight={isActive(pathname, "/strategy/objectives")}
+          $highlight={isActive(pathname, `/${productSlug}/strategy/objectives`)}
           key="4"
         >
-          <Link href="/dashboard/strategy/objectives">
+          <Link href={`/${productSlug}/strategy/objectives`}>
             Objectives
           </Link>
         </MenuItem>
 
-        <MenuItem key="5" $highlight={isActive(pathname, "/strategy/vision")}>
-          <Link href="/dashboard/strategy/vision">
+        <MenuItem key="5" $highlight={isActive(pathname, `/${productSlug}/strategy/vision`)}>
+          <Link href={`/${productSlug}/strategy/vision`}>
             Vision
           </Link>
         </MenuItem>
@@ -110,16 +115,16 @@ const SideBar = () => {
         icon={<PullRequestOutlined />}
         title="Tactics"
       >
-        <MenuItem $highlight={isActive(pathname, "/tactics/ethics")} key="6">
-          <Link href="/dashboard/tactics/ethics">
+        <MenuItem $highlight={isActive(pathname, `/${productSlug}/tactics/ethics`)} key="6">
+          <Link href={`/${productSlug}/tactics/ethics`}>
             Ethics
           </Link>
         </MenuItem>
         <MenuItem
           key="7"
-          $highlight={isActive(pathname, "/tactics/priorities")}
+          $highlight={isActive(pathname, `/${productSlug}/tactics/priorities`)}
         >
-          <Link href="/dashboard/tactics/priorities">
+          <Link href={`/${productSlug}/tactics/priorities`}>
             Priorities
           </Link>
         </MenuItem>
@@ -130,9 +135,9 @@ const SideBar = () => {
         </MenuItem> */}
         <MenuItem
           key="9"
-          $highlight={isActive(pathname, "/tactics/retrospective")}
+          $highlight={isActive(pathname, `/${productSlug}/tactics/retrospective`)}
         >
-          <Link href="/dashboard/tactics/retrospective">
+          <Link href={`/${productSlug}/tactics/retrospective`}>
             Retrospective
           </Link>
         </MenuItem>
@@ -150,9 +155,9 @@ const SideBar = () => {
           </MenuItem> */}
         <MenuItem
           key="12"
-          $highlight={isActive(pathname, "/operations/huddle")}
+          $highlight={isActive(pathname, `/${productSlug}/operations/huddle`)}
         >
-          <Link href="/dashboard/operations/huddle">
+          <Link href={`/${productSlug}/operations/huddle`}>
             Huddle
           </Link>
         </MenuItem>
@@ -166,14 +171,14 @@ const SideBar = () => {
           </MenuItem> */}
         <MenuItem
           key="14"
-          $highlight={isActive(pathname, "/operations/sprint")}
+          $highlight={isActive(pathname, `/${productSlug}/operations/sprint`)}
         >
-          <Link href="/dashboard/operations/sprint">
+          <Link href={`/${productSlug}/operations/sprint`}>
             Sprint
           </Link>
         </MenuItem>
-        <MenuItem key="15" $highlight={isActive(pathname, "/operations/tasks")}>
-          <Link href="/dashboard/operations/tasks">
+        <MenuItem key="15" $highlight={isActive(pathname, `/${productSlug}/operations/tasks`)}>
+          <Link href={`/${productSlug}/operations/tasks`}>
             Tasks
           </Link>
         </MenuItem>
@@ -181,34 +186,34 @@ const SideBar = () => {
       <StyledSubMenu key="userbase" icon={<UserOutlined />} title="Userbase">
         <MenuItem
           key="16"
-          $highlight={isActive(pathname, "/userbase/dialogue")}
+          $highlight={isActive(pathname, `/${productSlug}/userbase/dialogue`)}
         >
-          <Link href="/dashboard/userbase/dialogue">
+          <Link href={`/${productSlug}/userbase/dialogue`}>
             Dialogue
           </Link>
         </MenuItem>
         <MenuItem
           key="17"
-          $highlight={isActive(pathname, "/userbase/journeys")}
+          $highlight={isActive(pathname, `/${productSlug}/userbase/journeys`)}
         >
-          <Link href="/dashboard/userbase/journeys">
+          <Link href={`/${productSlug}/userbase/journeys`}>
             Journeys
           </Link>
         </MenuItem>
         <MenuItem
           key="18"
-          $highlight={isActive(pathname, "/userbase/learnings")}
+          $highlight={isActive(pathname, `/${productSlug}/userbase/learnings`)}
         >
-          <Link href="/dashboard/userbase/learnings">
+          <Link href={`/${productSlug}/userbase/learnings`}>
             Learnings
           </Link>
         </MenuItem>
 
         <MenuItem
           key="19"
-          $highlight={isActive(pathname, "/userbase/personas")}
+          $highlight={isActive(pathname, `/${productSlug}/userbase/personas`)}
         >
-          <Link href="/dashboard/userbase/personas">
+          <Link href={`/${productSlug}/userbase/personas`}>
             Personas
           </Link>
         </MenuItem>

@@ -26,6 +26,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import SwiperCore, { Pagination, Navigation } from "swiper";
+import generateString from "../../utils/generateRandomStrings";
 
 const { Title, Text } = Typography;
 // const db = firebaseConfig.firestore();
@@ -55,6 +56,7 @@ const ProductConfiguration = () => {
       db.collection("Products")
         .add({
           name: product.toLowerCase(),
+          slug: product.toLowerCase() + "-" + generateString(6),
           email1,
           email2,
           email3,
@@ -66,6 +68,7 @@ const ProductConfiguration = () => {
           owner: user.uid,
         })
         .then((res) => {
+          console.log("id", res.id)
           newVersion(res.id);
           addOwnerToTeam(res.id);
           createAccessibilities(res.id);
@@ -75,8 +78,12 @@ const ProductConfiguration = () => {
             content: "Product configuration saved successfully",
             className: "custom-message mt-12",
           });
+          db.collection("Products").doc(res.id).get()
+          .then((doc) => {
+            const product = doc.data();
+            router.push(`/${product.slug}/dashboard`)
+          })
         })
-        .then(() => router.push("/dashboard"));
     } else {
       message.warning({
         content: "Some field can't be empty",
@@ -165,50 +172,6 @@ const ProductConfiguration = () => {
       success_metrics: [""],
       priorities: [""],
     });
-  };
-
-  const PrevArrow = ({ index }) => {
-    const show = index === 0 ? true : false;
-    return (
-      <div>
-        <Button disabled={show} type="primary" ghost>
-          Prev
-        </Button>
-      </div>
-    );
-  };
-
-  const NextArrow = () => {
-    // const show = index === 4 ? true : false;
-
-    // const next = () => {
-    //   const activate = () => {
-    //     setError(false);
-    //   };
-
-    //   if (index === 0) {
-    //     if (product && email1) {
-    //       activate();
-    //     } else {
-    //       setError(true);
-    //     }
-    //   } else if (index === 1) {
-    //     cadence ? activate() : setError(true);
-    //   } else if (index === 2) {
-    //     gate ? activate() : setError(true);
-    //   } else if (index === 3) {
-    //     activate();
-    //   }
-    // };
-    // console.log(swiperRef.current);
-
-    return (
-      <div style={{ position: "absolute", bottom: 0, right: 0 }}>
-        <Button disabled={false} type="primary" ghost ref={nextRef}>
-          Next
-        </Button>
-      </div>
-    );
   };
 
   return (

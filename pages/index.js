@@ -33,7 +33,7 @@ const login = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Script
+      {/* <Script
         async
         type="text/javascript"
         src="https://cdn.weglot.com/weglot.min.js"
@@ -42,7 +42,7 @@ const login = () => {
             api_key: process.env.NEXT_PUBLIC_WEGLOT_API_KEY,
           });
         }}
-      />
+      /> */}
 
       <Layout>
         <Login />

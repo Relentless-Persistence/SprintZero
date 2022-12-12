@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, {useState} from 'react';
 import Head from "next/head";
-import AppLayout from "../../../components/Dashboard/AppLayout";
-import { splitRoutes } from "../../../utils";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
+import { splitRoutes } from "../../../../utils";
 import { useRouter } from "next/router";
-import Account from "../../../components/Settings/Account";
+import Account from "../../../../components/Settings/Account";
 import { findIndex } from "lodash";
 
 const account = () => {

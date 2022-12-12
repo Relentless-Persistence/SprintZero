@@ -6,11 +6,11 @@ import type {FC} from "react"
 
 import StoryMapHeader from "./StoryMapHeader"
 import {useStoryMapStore} from "./storyMapStore"
+import TreeLines from "./TreeLines"
 import {useGetInitialData} from "./utils"
 import VersionList from "./VersionList"
 import VisualizeCellBoundaries from "./VisualizeCellBoundaries"
-import StoryMap from "~/app/dashboard/StoryMap"
-import TreeLines from "./TreeLines"
+import StoryMap from "~/app/[productSlug]/dashboard/StoryMap"
 
 const Dashboard: FC = () => {
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)

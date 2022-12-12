@@ -8,8 +8,8 @@ import {useState} from "react"
 
 import type {ReactNode, FC} from "react"
 
-import SettingsMenu from "~/app/dashboard/SettingsMenu"
-import SideMenu from "~/app/dashboard/SideMenu"
+import SettingsMenu from "~/app/[productSlug]/dashboard/SettingsMenu"
+import SideMenu from "~/app/[productSlug]/dashboard/SideMenu"
 import useMainStore from "~/stores/mainStore"
 import {getAllProducts} from "~/utils/fetch"
 
