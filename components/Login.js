@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 // import Image from "next/image";
 import { Button, Typography, message, Image } from "antd";
@@ -22,12 +22,27 @@ const Login = () => {
   const { type, product } = router.query;
   const { executeRecaptcha } = useGoogleReCaptcha();
   // const paid = usePaymentConfirm();
+  const [activeProduct, setActiveProduct] = useState();
+
+  const fetchProducts = async() => {
+    if(user) {
+      const res = await db
+        .collection("Products")
+        .where("owner", "==", user.uid)
+        .get();
+      setActiveProduct(res.docs.map((doc) => ({ id: doc.id, ...doc.data() }))[0])
+    }
+  }
 
   useEffect(() => {
-    if (user) {
-      router.push("/dashboard");
-    }
+    fetchProducts();
   }, [user]);
+
+  useEffect(() => {
+    if (user && activeProduct) {
+      router.push(`/${activeProduct.slug}/dashboard`);
+    }
+  }, [activeProduct]);
 
   // const handleOnClick = (provider) => {
   //   try {
@@ -105,7 +120,7 @@ const Login = () => {
             content: "Successfully logged in",
             className: "custom-message",
           });
-          router.push("/dashboard");
+          router.push(`/${activeProduct.slug}/dashboard`);
         }
       });
     } catch (error) {
@@ -130,7 +145,7 @@ const Login = () => {
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center space-y-[24px] mt-10">
+      {activeProduct && <div className="flex flex-col items-center justify-center space-y-[24px] mt-10">
         <Button
           className="flex items-center justify-start space-x-4 w-[345px] h-[54px] border-black bg-white rounded-[10px] text-[20px] font-semibold"
           onClick={() => handleOnClick(appleProvider)}
@@ -165,7 +180,7 @@ const Login = () => {
           />
           <p>Sign in with Microsoft</p>
         </Button>
-      </div>
+      </div>}
       <div className="absolute bottom-20 lg:right-80">
         <Button onClick={() => router.push("/")}>Cancel</Button>
       </div>
