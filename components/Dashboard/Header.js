@@ -72,6 +72,12 @@ const AppHeader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  const handleProduct = (product) => {
+    console.log(product);
+    setActiveProduct(product);
+    router.push(`/${product.slug}/dashboard`)
+  }
+
   return (
     <CustomHeader
       className="header"
@@ -90,8 +96,8 @@ const AppHeader = () => {
               <HeaderMenu
                 key={i}
                 className="mr-10 capitalize"
-                active={activeProduct && activeProduct.name === product.name}
-                onClick={() => setActiveProduct(product)}
+                active={activeProduct && activeProduct.slug === product.slug}
+                onClick={() => handleProduct(product)}
               >
                 {product.name}
               </HeaderMenu>
