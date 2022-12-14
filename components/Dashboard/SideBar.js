@@ -12,7 +12,7 @@ import {
 } from "@ant-design/icons";
 import styled from "styled-components";
 import { activeProductState } from "../../atoms/productAtom";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 
 const { SubMenu } = Menu;
 

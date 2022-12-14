@@ -4,20 +4,27 @@ import {CloseOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Drawer, Layout, Menu} from "antd5"
 import Image from "next/image"
-import {useState} from "react"
+import {useState, useEffect} from "react"
+import {useRecoilState} from "recoil"
 
 import type {ReactNode, FC} from "react"
 
+import {useRouter} from "next/navigation"
+
+import {activeProductState} from "../../../atoms/productAtom"
 import SettingsMenu from "~/app/[productSlug]/dashboard/SettingsMenu"
 import SideMenu from "~/app/[productSlug]/dashboard/SideMenu"
 import useMainStore from "~/stores/mainStore"
 import {getAllProducts} from "~/utils/fetch"
+
+
 
 export type DashboardLayoutProps = {
 	children: ReactNode
 }
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
+	const router = useRouter()
 	const user = useMainStore((state) => state.user)
 	const {data: products} = useQuery({
 		queryKey: [`all-products`, user?.uid],
@@ -26,10 +33,28 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 		enabled: user?.uid !== undefined,
 	})
 
-	const setActiveProduct = useMainStore((state) => state.setActiveProduct)
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const setActiveProductId = useMainStore((state) => state.setActiveProduct)
+	const activeProductId = useMainStore((state) => state.activeProduct)
+	const [activeProduct, setActiveProduct] = useRecoilState(activeProductState)
 
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+
+	const handleProduct = (product: any) => {
+		setActiveProduct(product)
+		setActiveProductId(product.id)
+		router.push(`/${product.slug}/dashboard`)
+	}
+
+	useEffect(() => {
+		if(products) {
+			if (activeProduct === null) {
+				setActiveProduct(products[0])
+			} else {
+				setActiveProduct(activeProduct)
+			}
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [products]);
 
 	return (
 		<Layout className="h-full">
@@ -40,13 +65,13 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 					<Menu
 						theme="dark"
 						mode="horizontal"
-						selectedKeys={activeProduct ? [activeProduct] : []}
+						selectedKeys={activeProductId ? [activeProductId] : []}
 						items={products?.map((product) => ({
 							key: product.id,
 							label: (
-								<button type="button" onClick={() => void setActiveProduct(product.id)} className="relative capitalize">
+								<button type="button" onClick={() => void handleProduct(product)} className="relative capitalize">
 									{product.name}
-									{activeProduct === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
+									{activeProductId === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
 								</button>
 							),
 						}))}

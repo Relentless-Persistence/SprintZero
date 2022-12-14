@@ -5,7 +5,7 @@ import {genDbNames, idSchema} from "~/types"
 
 export const ProductSchema = z.object({
 	id: idSchema,
-
+	slug: z.string(),
 	cadence: z.string(),
 	cost: z.number().nullable(),
 	currency: z.string(),
