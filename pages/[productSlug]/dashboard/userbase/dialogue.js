@@ -8,24 +8,24 @@ import { Row, Col, Drawer, Select } from "antd";
 
 import { CloseOutlined } from "@ant-design/icons";
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
 
-import { splitRoutes } from "../../../utils";
+import { splitRoutes } from "../../../../utils";
 
-import fakeData from "../../../fakeData/dialogue.json";
-import products from "../../../fakeData/products.json";
+import fakeData from "../../../../fakeData/dialogue.json";
+import products from "../../../../fakeData/products.json";
 import {
   DialogueCard,
   AddNote,
   EditNote,
-} from "../../../components/Dashboard/Dialogue";
-import {CardHeaderLink} from "../../../components/Dashboard/CardHeaderButton";
-import { db } from "../../../config/firebase-config";
-import { activeProductState } from "../../../atoms/productAtom";
+} from "../../../../components/Dashboard/Dialogue";
+import {CardHeaderLink} from "../../../../components/Dashboard/CardHeaderButton";
+import { db } from "../../../../config/firebase-config";
+import { activeProductState } from "../../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
-import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
-import { useAuth } from "../../../contexts/AuthContext";
+import ResizeableDrawer from "../../../../components/Dashboard/ResizeableDrawer";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 const getRightNav = (data) => {
   return data.map((d) => d.title);

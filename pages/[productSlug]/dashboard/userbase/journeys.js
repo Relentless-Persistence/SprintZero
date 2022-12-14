@@ -17,19 +17,19 @@ import {
 } from "antd";
 import { useRouter } from "next/router";
 import { SettingOutlined } from "@ant-design/icons";
-import AppLayout from "../../../components/Dashboard/Journeys/AppLayout";
+import AppLayout from "../../../../components/Dashboard/Journeys/AppLayout";
 
-import { Chart } from "../../../components/Dashboard/Journeys";
+import { Chart } from "../../../../components/Dashboard/Journeys";
 
-import fakeData from "../../../fakeData/journeys.json";
-import products from "../../../fakeData/products.json";
-import { db } from "../../../config/firebase-config";
-import { activeProductState } from "../../../atoms/productAtom";
+import fakeData from "../../../../fakeData/journeys.json";
+import products from "../../../../fakeData/products.json";
+import { db } from "../../../../config/firebase-config";
+import { activeProductState } from "../../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
-import { splitRoutes } from "../../../utils";
-import AddEvent from "../../../components/Dashboard/Journeys/AddEvent";
-import { useAuth } from "../../../contexts/AuthContext";
+import { splitRoutes } from "../../../../utils";
+import AddEvent from "../../../../components/Dashboard/Journeys/AddEvent";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 const { Option } = Select;
 

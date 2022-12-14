@@ -36,8 +36,11 @@ const MenuItem = styled(Menu.Item)`
 `;
 
 const SettingsMenu = () => {
+  const router = useRouter();
   const { pathname } = useRouter();
   const [openKeys, setOpenKeys] = React.useState([pathname.split("/")[2]]);
+
+  const productSlug = router.query.productSlug
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
@@ -60,7 +63,7 @@ const SettingsMenu = () => {
           key="1"
           icon={<UserOutlined />}
         >
-          <Link href="/dashboard/settings/account">
+          <Link href="/settings/account">
             Account
           </Link>
         </MenuItem>
@@ -69,7 +72,7 @@ const SettingsMenu = () => {
           key="2"
           icon={<DollarOutlined />}
         >
-          <Link href="/dashboard/settings/billing">
+          <Link href="/settings/billing">
             Billing
           </Link>
         </MenuItem>
@@ -78,7 +81,7 @@ const SettingsMenu = () => {
           key="1"
           icon={<SettingOutlined />}
         >
-          <Link href="/dashboard/settings/config">
+          <Link href="/settings/config">
             Configuration
           </Link>
         </MenuItem>
@@ -96,7 +99,7 @@ const SettingsMenu = () => {
           key="1"
           icon={<TeamOutlined />}
         >
-          <Link href="/dashboard/settings/team">
+          <Link href="/settings/team">
             Team
           </Link>
         </MenuItem>

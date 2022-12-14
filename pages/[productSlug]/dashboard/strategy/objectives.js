@@ -5,17 +5,14 @@ import { useRouter } from "next/router";
 import { Input, message } from "antd";
 import { AimOutlined } from "@ant-design/icons";
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
-import {ObjectiveFormCard} from "../../../components/Dashboard/FormCard";
-import ItemCard, {ObjectiveItemCard} from "../../../components/Dashboard/ItemCard";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
+import {ObjectiveFormCard} from "../../../../components/Dashboard/FormCard";
+import ItemCard, {ObjectiveItemCard} from "../../../../components/Dashboard/ItemCard";
 
-import { splitRoutes } from "../../../utils";
-
-import fakeData from "../../../fakeData/productData.json";
-import products from "../../../fakeData/products.json";
-import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
-import { db } from "../../../config/firebase-config";
-import { activeProductState } from "../../../atoms/productAtom";
+import { splitRoutes } from "../../../../utils";
+import MasonryGrid from "../../../../components/Dashboard/MasonryGrid";
+import { db } from "../../../../config/firebase-config";
+import { activeProductState } from "../../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
 

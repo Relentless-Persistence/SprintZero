@@ -3,23 +3,20 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
-import StatementForm from "../../../components/Vision/StatementForm";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
+import StatementForm from "../../../../components/Vision/StatementForm";
 
 import {
   checkEmptyArray,
   checkEmptyObject,
   getTimeAgo,
   splitRoutes,
-} from "../../../utils";
-import products from "../../../fakeData/products.json";
-import { db } from "../../../config/firebase-config";
-import { activeProductState } from "../../../atoms/productAtom";
+} from "../../../../utils";
+import { db } from "../../../../config/firebase-config";
+import { activeProductState } from "../../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 
-
-import fakeData from "../../../fakeData/visionData.json";
-import Deck from "../../../components/Vision/Deck";
+import Deck from "../../../../components/Vision/Deck";
 
 const generateRightNav = (items) => {
   if (!items?.length) {

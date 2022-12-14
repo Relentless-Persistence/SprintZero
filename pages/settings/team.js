@@ -2,14 +2,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import TeamLayout from "../../../components/Dashboard/TeamLayout";
-import { splitRoutes } from "../../../utils";
+import TeamLayout from "../../components/Dashboard/TeamLayout";
+import { splitRoutes } from "../../utils";
 import { useRouter } from "next/router";
-import Account from "../../../components/Settings/Account";
 import { findIndex } from "lodash";
-import Team from "../../../components/Settings/Team";
-import { db } from "../../../config/firebase-config";
-import { activeProductState } from "../../../atoms/productAtom";
+import Team from "../../components/Settings/Team";
+import { db } from "../../config/firebase-config";
+import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 const share = () => {
@@ -51,7 +50,7 @@ const share = () => {
 
   const setActiveRightNav = (h) => {
     const menuTypeIndex = findIndex(menus, (o) => o === h);
-    router.push(`/dashboard/settings/${menus[menuTypeIndex].toLowerCase()}`);
+    router.push(`/settings/${menus[menuTypeIndex].toLowerCase()}`);
   };
 
 

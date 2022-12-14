@@ -2,9 +2,9 @@
 import React, {useState} from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { splitRoutes } from "../../../utils";
-import AppLayout from "../../../components/Dashboard/AppLayout";
-import Billings from "../../../components/Settings/Billings";
+import { splitRoutes } from "../../utils";
+import AppLayout from "../../components/Dashboard/AppLayout";
+import Billings from "../../components/Settings/Billings";
 import { findIndex } from "lodash";
 
 export default function billing() {
@@ -15,7 +15,7 @@ export default function billing() {
 
   const setActiveRightNav = (h) => {
     const menuTypeIndex = findIndex(menus, (o) => o === h);
-    router.push(`/dashboard/settings/${menus[menuTypeIndex].toLowerCase()}`);
+    router.push(`/settings/${menus[menuTypeIndex].toLowerCase()}`);
   };
   return (
     <div className="mb-8">

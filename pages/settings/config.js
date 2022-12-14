@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
-import AppLayout from "../../../components/Settings/Config/AppLayout";
-import { splitRoutes } from "../../../utils";
+import AppLayout from "../../components/Settings/Config/AppLayout";
+import { splitRoutes } from "../../utils";
 import { useRouter } from "next/router";
-import Config from "../../../components/Settings/Config";
+import Config from "../../components/Settings/Config";
 import { findIndex } from "lodash";
-import { activeProductState } from "../../../atoms/productAtom";
+import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
-import { db } from "../../../config/firebase-config";
+import { db } from "../../config/firebase-config";
 import { Button, Dropdown, message, Menu } from "antd";
 import { FireOutlined } from "@ant-design/icons";
-import deleteData from "../../../components/Settings/Config/deleteData";
-import { useAuth } from "../../../contexts/AuthContext";
+import deleteData from "../../components/Settings/Config/deleteData";
+import { useAuth } from "../../contexts/AuthContext";
 
 const items = [
   {
@@ -39,8 +39,6 @@ const config = () => {
   const [cost, setCost] = useState("");
   const [currency, setCurrency] = useState("");
 
-  console.log(user);
-
   useEffect(() => {
     if (activeProduct) {
       setCadence(activeProduct.cadence);
@@ -53,7 +51,7 @@ const config = () => {
 
   const setActiveRightNav = (h) => {
     const menuTypeIndex = findIndex(menus, (o) => o === h);
-    router.push(`/dashboard/settings/${menus[menuTypeIndex].toLowerCase()}`);
+    router.push(`/settings/${menus[menuTypeIndex].toLowerCase()}`);
   };
 
   const updateCadence = (cadence) => {

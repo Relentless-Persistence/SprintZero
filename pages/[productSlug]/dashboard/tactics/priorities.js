@@ -22,23 +22,23 @@ import {
   DislikeOutlined,
 } from "@ant-design/icons";
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
 
-import { CardTitle } from "../../../components/Dashboard/CardTitle";
-import MainSub from "../../../components/Dashboard/MainSub";
-import { scaleToVal, splitRoutes } from "../../../utils";
+import { CardTitle } from "../../../../components/Dashboard/CardTitle";
+import MainSub from "../../../../components/Dashboard/MainSub";
+import { scaleToVal, splitRoutes } from "../../../../utils";
 
-import fakeData from "../../../fakeData/priorities.json";
-import products from "../../../fakeData/products.json";
-import { db } from "../../../config/firebase-config";
+import fakeData from "../../../../fakeData/priorities.json";
+import products from "../../../../fakeData/products.json";
+import { db } from "../../../../config/firebase-config";
 import { findIndex } from "lodash"
 
 import {
   DraggableTab,
   DraggableContainer,
-} from "../../../components/Priorities";
-import DrawerSubTitle from "../../../components/Dashboard/DrawerSubTitle";
-import { activeProductState } from "../../../atoms/productAtom";
+} from "../../../../components/Priorities";
+import DrawerSubTitle from "../../../../components/Dashboard/DrawerSubTitle";
+import { activeProductState } from "../../../../atoms/productAtom";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 const { TextArea } = Input;
