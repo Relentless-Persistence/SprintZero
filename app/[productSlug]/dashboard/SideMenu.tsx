@@ -13,13 +13,13 @@ import {usePathname} from "next/navigation";
 import {useRecoilValue} from "recoil"
 
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
+// import type {Product} from "~/types/db/Products"
 
 import {activeProductState} from "../../../atoms/productAtom"
 
 const SideMenu: FC = () => {
 	const pathname = usePathname()
-	const activeProduct: Product | null = useRecoilValue(activeProductState)
+	const activeProduct: any = useRecoilValue(activeProductState)
 
 	return (
 		<>

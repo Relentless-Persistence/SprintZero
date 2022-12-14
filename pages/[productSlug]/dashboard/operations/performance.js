@@ -5,13 +5,13 @@ import { Area, DualAxes } from "@ant-design/plots";
 
 import { Select } from "antd";
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
-import { splitRoutes } from "../../../utils";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
+import { splitRoutes } from "../../../../utils";
 
-import fakeData from "../../../fakeData/performance.json";
-import products from "../../../fakeData/products.json";
+import fakeData from "../../../../fakeData/performance.json";
+import products from "../../../../fakeData/products.json";
 import { clamp } from "lodash";
-import { db } from "../../../config/firebase-config";
+import { db } from "../../../../config/firebase-config";
 
 const generateRightNav = (items) => {
   return items.map((it) => it.name);

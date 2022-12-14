@@ -4,15 +4,15 @@ import { useRouter } from "next/router";
 import { Button, Drawer, Row, Space } from "antd";
 import { findIndex } from "lodash";
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
-import Agenda from "../../../components/Calendar/Agenda";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
+import Agenda from "../../../../components/Calendar/Agenda";
 
-import { splitRoutes } from "../../../utils";
+import { splitRoutes } from "../../../../utils";
 
-import products from "../../../fakeData/products.json";
-import CreateEvent from "../../../components/Calendar/CreateEvent";
-import Month from "../../../components/Calendar/Month";
-import Year from "../../../components/Calendar/Year";
+import products from "../../../../fakeData/products.json";
+import CreateEvent from "../../../../components/Calendar/CreateEvent";
+import Month from "../../../../components/Calendar/Month";
+import Year from "../../../../components/Calendar/Year";
 
 const generateRightNav = (items) => {
   if (!items?.length) {

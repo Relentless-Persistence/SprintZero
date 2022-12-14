@@ -2,17 +2,17 @@
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import UserStoryLayout from "../../components/Dashboard/UserStoryLayout";
-import UserStory from "../../components/UserStory";
+import UserStoryLayout from "../../../components/Dashboard/UserStoryLayout";
+import UserStory from "../../../components/UserStory";
 import { findIndex, sortBy } from "lodash";
-import { splitRoutes } from "../../utils";
-import withAuth from "../../hoc/withAuth";
+import { splitRoutes } from "../../../utils";
+import withAuth from "../../../hoc/withAuth";
 import { Button, message } from "antd";
-import { db } from "../../config/firebase-config";
-import { activeProductState } from "../../atoms/productAtom";
-import { versionState } from "../../atoms/versionAtom";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
+import { versionState } from "../../../atoms/versionAtom";
 import { useRecoilValue, useRecoilState } from "recoil";
-import generateString from "../../utils/generateRandomStrings";
+import generateString from "../../../utils/generateRandomStrings";
 import Script from "next/script";
 
 function Home() {

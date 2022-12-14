@@ -4,12 +4,15 @@ import {CloseOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Drawer, Layout, Menu} from "antd5"
 import Image from "next/image"
+import {useRouter} from "next/navigation"
 import {useState, useEffect} from "react"
 import {useRecoilState} from "recoil"
 
-import type {ReactNode, FC} from "react"
 
-import {useRouter} from "next/navigation"
+import type {ReactNode, FC} from "react"
+// import type {Product} from "~/types/db/Products"
+
+
 
 import {activeProductState} from "../../../atoms/productAtom"
 import SettingsMenu from "~/app/[productSlug]/dashboard/SettingsMenu"
@@ -47,8 +50,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 
 	useEffect(() => {
 		if(products) {
+			let myProduct: any = products[0]
 			if (activeProduct === null) {
-				setActiveProduct(products[0])
+				setActiveProduct(myProduct)
 			} else {
 				setActiveProduct(activeProduct)
 			}

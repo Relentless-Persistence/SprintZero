@@ -4,18 +4,18 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { Button, Divider, message, Alert } from "antd";
 
-import AppLayout from "../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../../components/Dashboard/AppLayout";
 
-import Task from "../../../components/Release/Task";
+import Task from "../../../../components/Release/Task";
 
-import { splitRoutes } from "../../../utils";
+import { splitRoutes } from "../../../../utils";
 
-import fakeData from "../../../fakeData/release.json";
-import products from "../../../fakeData/products.json";
-import { db } from "../../../config/firebase-config";
-import { activeProductState } from "../../../atoms/productAtom";
+import fakeData from "../../../../fakeData/release.json";
+import products from "../../../../fakeData/products.json";
+import { db } from "../../../../config/firebase-config";
+import { activeProductState } from "../../../../atoms/productAtom";
 import { useRecoilValue, useRecoilState } from "recoil";
-import ActionButtons from "../../../components/Personas/ActionButtons";
+import ActionButtons from "../../../../components/Personas/ActionButtons";
 import { cloneDeep } from "lodash";
 
 const logOldData = (data, activeProduct, activeDataIndex) => {
