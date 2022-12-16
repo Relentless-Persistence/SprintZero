@@ -21,6 +21,8 @@ import ProductCost from "./ProductCost";
 import { db } from "../../config/firebase-config";
 import firebase from "firebase";
 import { useRouter } from "next/router";
+import {activeProductState} from "../../atoms/productAtom"
+import {useRecoilState} from "recoil"
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -35,6 +37,7 @@ SwiperCore.use([Pagination, Navigation]);
 const ProductConfiguration = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const [activeProduct, setActiveProduct] = useRecoilState(activeProductState)
   const [product, setProduct] = useState("");
   const [email1, setEmail1] = useState("");
   const [email2, setEmail2] = useState("");
@@ -81,6 +84,7 @@ const ProductConfiguration = () => {
           db.collection("Products").doc(res.id).get()
           .then((doc) => {
             const product = doc.data();
+            setActiveProduct(doc.data())
             router.push(`/${product.slug}/dashboard`)
           })
         })

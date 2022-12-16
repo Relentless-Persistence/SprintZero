@@ -38,7 +38,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "app/[productSlug]/dashboard/layout.tsxx"  ],
   "exclude": [
     "node_modules"
   ],

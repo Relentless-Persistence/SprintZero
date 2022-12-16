@@ -39,6 +39,9 @@ module.exports = {
 			},
 		]
 	},
+	images: {
+		domains: [`firebasestorage.googleapis.com`],
+	},
 	experimental: {
 		appDir: true,
 	},

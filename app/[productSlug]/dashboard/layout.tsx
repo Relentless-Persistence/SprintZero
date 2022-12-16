@@ -15,8 +15,8 @@ import type {ReactNode, FC} from "react"
 
 
 import {activeProductState} from "../../../atoms/productAtom"
-import SettingsMenu from "~/app/[productSlug]/dashboard/SettingsMenu"
-import SideMenu from "~/app/[productSlug]/dashboard/SideMenu"
+import SettingsMenu from "./SettingsMenu"
+import SideMenu from "./SideMenu"
 import useMainStore from "~/stores/mainStore"
 import {getAllProducts} from "~/utils/fetch"
 

@@ -28,23 +28,23 @@ const SettingsMenu: FC = () => {
 					{
 						key: `settings-account`,
 						icon: <UserOutlined />,
-						label: <Link href="/dashboard/settings/account">Account</Link>,
+						label: <Link href="/settings/account">Account</Link>,
 					},
 					{
 						key: `settings-billing`,
 						icon: <DollarOutlined />,
-						label: <Link href="/dashboard/settings/billing">Billing</Link>,
+						label: <Link href="/settings/billing">Billing</Link>,
 					},
 					{
 						key: `settings-config`,
 						icon: <SettingOutlined />,
-						label: <Link href="/dashboard/settings/config">Configuration</Link>,
+						label: <Link href="/settings/config">Configuration</Link>,
 					},
-					{key: `settings-team`, icon: <TeamOutlined />, label: <Link href="/dashboard/settings/team">Team</Link>},
+					{key: `settings-team`, icon: <TeamOutlined />, label: <Link href="/settings/team">Team</Link>},
 					{
 						key: `settings-integrations`,
 						icon: <ApiOutlined />,
-						label: <Link href="/dashboard/settings/integrations">Integrations</Link>,
+						label: <Link href="/settings/integrations">Integrations</Link>,
 					},
 				]}
 				style={{borderInlineEnd: `unset`}}
@@ -54,7 +54,7 @@ const SettingsMenu: FC = () => {
 					{
 						key: `settings-support`,
 						icon: <FormOutlined />,
-						label: <Link href="/dashboard/settings/support">Support</Link>,
+						label: <Link href="/settings/support">Support</Link>,
 					},
 					{
 						key: `settings-logout`,
