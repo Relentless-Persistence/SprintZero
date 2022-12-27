@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Button, message, Typography } from "antd";
 import { useRouter } from "next/router";
+import Loading from '../components/Loading'
 
 const { Title, Text } = Typography;
 
@@ -16,7 +17,11 @@ const LoginSuccess = () => {
   };
 
   if (!user) {
-    return "Loading...";
+    return (
+      <div className="relative">
+        <Loading />
+      </div>
+    )
   }
 
   return (
