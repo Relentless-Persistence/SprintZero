@@ -115,7 +115,7 @@ const Login = () => {
 								content: "Successfully logged in",
 								className: "custom-message",
 							})
-							router.push("/loginsuccess")
+							router.push("/tos")
 						}
 					} else {
 						message.success({
@@ -125,8 +125,6 @@ const Login = () => {
 						router.push(`/${product.slug}/dashboard`)
 					}
 				})
-
-				// Checking if user is new
 			})
 		} catch (error) {
 			console.log(error.message)
@@ -164,13 +162,13 @@ const Login = () => {
 					<p>Sign in with Google</p>
 				</Button>
 
-				<Button
+				{/* <Button
 					className="flex h-[54px] w-[345px] items-center justify-start space-x-4 rounded-[10px] border-black bg-white text-[20px] font-semibold"
 					onClick={() => handleOnClick(microsoftProvider)}
 				>
 					<Image src="/images/microsoftIcon.png" alt="microsoft" width={24} height={24} preview={false} />
 					<p>Sign in with Microsoft</p>
-				</Button>
+				</Button> */}
 			</div>
 			<div className="absolute bottom-20 lg:right-80">
 				<Button onClick={() => router.push("/")}>Cancel</Button>

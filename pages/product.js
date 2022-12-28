@@ -14,7 +14,7 @@ const product = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Script
+      {/* <Script
         async
         type="text/javascript"
         src="https://cdn.weglot.com/weglot.min.js"
@@ -23,7 +23,7 @@ const product = () => {
             api_key: process.env.NEXT_PUBLIC_WEGLOT_API_KEY,
           });
         }}
-      />
+      /> */}
 
       <ProductConfiguration />
     </div>

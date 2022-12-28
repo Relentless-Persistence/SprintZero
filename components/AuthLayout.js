@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Avatar, Image } from "antd";
+import { Typography, Avatar, Image, List } from "antd";
 const { Title, Text } = Typography;
 import { useAuth } from "../contexts/AuthContext";
 
@@ -7,25 +7,27 @@ const Layout = ({ children }) => {
   const { user } = useAuth();
 
   return (
-    <div className="mb-8" style={{ padding: "50px 153px" }}>
-      <Image
-        src="https://firebasestorage.googleapis.com/v0/b/sprintzero-657f3.appspot.com/o/Light.png?alt=media&token=ede37d0b-e499-4005-8bd7-7bca97b35235"
-        alt="Logo"
-        className="w-[178px] h-[42px]"
-        preview={false}
-      />
-      {user ? (
-        <div className="flex items-center justify-end -mt-10">
-          <Text className="mr-2 capitalize" style={{ fontSize: "16px" }}>
-            {user.displayName}
-          </Text>
-          <Avatar src={user.photoURL} />
-        </div>
-      ) : null}
+		<div className="mb-8" style={{padding: "50px 153px"}}>
+			<div className="flex items-center justify-between">
+				<Image src="/images/logo_beta_light.png" alt="Logo" className="h-[42px] w-[178px]" preview={false} />
+				{user ? (
+					<div className="">
+						<List className="w-[200px]">
+							<List.Item>
+								<List.Item.Meta
+									avatar={<Avatar size="large" src={user.photoURL} />}
+									title={user.displayName}
+									description={user.email}
+								/>
+							</List.Item>
+						</List>
+					</div>
+				) : null}
+			</div>
 
-      {children}
-    </div>
-  );
+			{children}
+		</div>
+	)
 };
 
 export default Layout;
