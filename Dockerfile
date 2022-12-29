@@ -1,5 +1,5 @@
 # Install packages
-FROM node:18-hydrogen-alpine3.17
+FROM node:hydrogen-alpine
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -9,7 +9,7 @@ RUN corepack enable
 RUN pnpm install --frozen-lockfile
 
 # Build
-FROM node:18-hydrogen-alpine3.17
+FROM node:hydrogen-alpine
 WORKDIR /app
 
 COPY --from=0 /app/node_modules ./node_modules
@@ -19,7 +19,7 @@ RUN corepack enable
 RUN pnpm build
 
 # Run
-FROM node:18-hydrogen-alpine3.17
+FROM node:hydrogen-alpine
 WORKDIR /app
 ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
