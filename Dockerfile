@@ -21,7 +21,6 @@ RUN pnpm build
 # Run
 FROM node:hydrogen-alpine
 WORKDIR /app
-RUN corepack enable
 
 ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
@@ -33,4 +32,4 @@ COPY --from=1 --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]
