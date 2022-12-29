@@ -1,14 +1,26 @@
-# base Image
-FROM node:18.12.1-alpine
+# Install packages
+FROM node:hydrogen-alpine3.15
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable
+RUN pnpm install
 
-# Create and change to the app directory
-WORKDIR /usr/app
-
+# Build
+FROM node:hydrogen-alpine3.15
+WORKDIR /app
+COPY --from=0 /app/node_modules ./node_modules
 COPY . .
+RUN corepack enable
+RUN pnpm build
 
-# Install production dependencies
-RUN npm ci --legacy-peer-deps
+# Run
+FROM node:hydrogen-alpine3.15
+WORKDIR /app
+ENV NODE_ENV production
+COPY --from=1 /app/.next ./.next
+COPY --from=1 /app/node_modules ./node_modules
+COPY --from=1 /app/package.json ./package.json
+RUN corepack enable
 
-RUN npm run build
-
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
