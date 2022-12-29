@@ -10,11 +10,11 @@ import type {FC} from "react"
 import Epic from "./Epic"
 import {useStoryMapStore} from "./storyMapStore"
 import {useSubscribeToData} from "./utils"
-import useMainStore from "~/stores/mainStore"
 import {addEpic} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 const StoryMap: FC = () => {
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 	const elements = useStoryMapStore((state) => state.elements)
 	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
 	const pendingDomChanges = useStoryMapStore((state) => state.pendingDomChanges)

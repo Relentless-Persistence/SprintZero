@@ -3,7 +3,6 @@
 import {CopyOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
-import clsx from "clsx"
 import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
@@ -14,8 +13,8 @@ import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
 import Story from "./Story"
 import {useStoryMapStore} from "./storyMapStore"
-import useMainStore from "~/stores/mainStore"
 import {addCommentToFeature, addStory, deleteFeature, updateFeature} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 export type FeatureProps = {
 	epicId: Id
@@ -23,7 +22,7 @@ export type FeatureProps = {
 }
 
 const Feature: FC<FeatureProps> = ({epicId, feature}) => {
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
 	const [featureName, setFeatureName] = useState(feature.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)

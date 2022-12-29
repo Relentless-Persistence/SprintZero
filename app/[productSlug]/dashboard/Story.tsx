@@ -10,8 +10,8 @@ import type {Version} from "~/types/db/Versions"
 import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
 import {useStoryMapStore} from "./storyMapStore"
-import useMainStore from "~/stores/mainStore"
 import {addCommentToStory, deleteStory, updateStory} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 type Props = {
 	story: StoryType
@@ -23,7 +23,7 @@ const Story: FC<Props> = ({story}) => {
 	const registerElement = useStoryMapStore((state) => state.registerElement)
 	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
 
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 	const version = useQueryClient()
 		.getQueryData<Version[]>([`all-versions`, activeProduct])
 		?.find((version) => version.id === story.version)

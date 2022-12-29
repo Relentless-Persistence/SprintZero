@@ -44,6 +44,13 @@ export const getProduct = (id: string) => async (): Promise<Product> => {
 	return product
 }
 
+export const getProductBySlug = (slug: string) => async (): Promise<Product> => {
+	const productDoc = (await getDocs(query(collection(db, Products._), where(Products.slug, `==`, slug)))).docs[0]
+	if (!productDoc) throw new Error(`Product not found.`)
+	const product = ProductSchema.parse({id: productDoc.id, ...productDoc.data()})
+	return product
+}
+
 export const getAllProducts = (userId: string) => async (): Promise<Product[]> => {
 	const _data = await getDocs(
 		query(collection(db, Products._), where(Products.owner, `==`, userId), orderBy(Products.name)),

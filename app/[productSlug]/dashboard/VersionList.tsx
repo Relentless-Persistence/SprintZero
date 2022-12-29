@@ -6,12 +6,12 @@ import {Button, Input, Menu} from "antd5"
 import type {FC} from "react"
 
 import {useStoryMapStore} from "./storyMapStore"
-import useMainStore from "~/stores/mainStore"
 import {addVersion, getAllVersions} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 const VersionList: FC = () => {
 	const queryClient = useQueryClient()
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 	const newVersionInput = useStoryMapStore((state) => state.newVersionInput)
 	const setNewVersionInput = useStoryMapStore((state) => state.setNewVersionInput)
 
