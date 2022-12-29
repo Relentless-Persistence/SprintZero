@@ -2,7 +2,6 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args:
       - build
-      - "--no-cache"
       - "-t"
       - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA"
       - .
@@ -14,7 +13,7 @@ steps:
       - push
       - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA"
     id: Push
-  - name: "gcr.io/cloud-builders/docker"
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
     args:
       - run
       - services
