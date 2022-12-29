@@ -1,26 +1,35 @@
 # Install packages
-FROM node:hydrogen-alpine3.15
+FROM node:18-hydrogen-alpine3.17
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
 COPY package.json pnpm-lock.yaml ./
+
 RUN corepack enable
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 # Build
-FROM node:hydrogen-alpine3.15
+FROM node:18-hydrogen-alpine3.17
 WORKDIR /app
+
 COPY --from=0 /app/node_modules ./node_modules
 COPY . .
+
 RUN corepack enable
 RUN pnpm build
 
 # Run
-FROM node:hydrogen-alpine3.15
+FROM node:18-hydrogen-alpine3.17
 WORKDIR /app
 ENV NODE_ENV production
-COPY --from=1 /app/.next ./.next
-COPY --from=1 /app/node_modules ./node_modules
-COPY --from=1 /app/package.json ./package.json
-RUN corepack enable
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
+COPY --from=1 /app/public ./public
+COPY --from=1 --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=1 --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+RUN corepack enable
 CMD ["pnpm", "start"]

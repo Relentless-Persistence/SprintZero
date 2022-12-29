@@ -1,18 +1,9 @@
 steps:
-  - name: "gcr.io/cloud-builders/docker"
+  - name: "gcr.io/kaniko-project/executor:latest"
     args:
-      - build
-      - "-t"
-      - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA"
-      - .
-      - "-f"
-      - Dockerfile
+      - --destination=gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA
+      - --cache=true
     id: Build
-  - name: "gcr.io/cloud-builders/docker"
-    args:
-      - push
-      - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA"
-    id: Push
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
     args:
       - run
