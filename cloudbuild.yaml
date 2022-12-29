@@ -18,8 +18,6 @@ steps:
       - "--quiet"
     id: Deploy
     entrypoint: gcloud
-images:
-  - "gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA"
 options:
   substitutionOption: ALLOW_LOOSE
 substitutions:
