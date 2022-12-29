@@ -57,6 +57,7 @@
 		"react-sdndk": "^1.0.2",
 		"react-use": "17.4.0",
 		"recoil": "0.7.6",
+		"sharp": "0.31.3",
 		"stripe": "^8.181.0",
 		"styled-components": "^5.3.6",
 		"swiper": "^7.4.1",
