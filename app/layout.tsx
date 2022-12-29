@@ -24,8 +24,6 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	const activeProduct = useMainStore((state) => state.activeProduct)
 	const setActiveProduct = useMainStore((state) => state.setActiveProduct)
 
-	
-
 	const {replace} = useRouter()
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -61,4 +59,4 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	)
 }
 
-export default RootLayout;
+export default RootLayout

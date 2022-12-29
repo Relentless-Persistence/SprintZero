@@ -4,30 +4,20 @@ import {CloseOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Drawer, Layout, Menu} from "antd5"
 import Image from "next/image"
-import {useRouter} from "next/navigation"
-import {useState, useEffect} from "react"
-import {useRecoilState} from "recoil"
-
+import {useState} from "react"
 
 import type {ReactNode, FC} from "react"
-// import type {Product} from "~/types/db/Products"
 
-
-
-import {activeProductState} from "../../../atoms/productAtom"
 import SettingsMenu from "./SettingsMenu"
 import SideMenu from "./SideMenu"
 import useMainStore from "~/stores/mainStore"
 import {getAllProducts} from "~/utils/fetch"
-
-
 
 export type DashboardLayoutProps = {
 	children: ReactNode
 }
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
-	const router = useRouter()
 	const user = useMainStore((state) => state.user)
 	const {data: products} = useQuery({
 		queryKey: [`all-products`, user?.uid],
@@ -38,27 +28,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 
 	const setActiveProductId = useMainStore((state) => state.setActiveProduct)
 	const activeProductId = useMainStore((state) => state.activeProduct)
-	const [activeProduct, setActiveProduct] = useRecoilState(activeProductState)
 
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-
-	const handleProduct = (product: any) => {
-		setActiveProduct(product)
-		setActiveProductId(product.id)
-		router.push(`/${product.slug}/dashboard`)
-	}
-
-	useEffect(() => {
-		if(products) {
-			let myProduct: any = products[0]
-			if (activeProduct === null) {
-				setActiveProduct(myProduct)
-			} else {
-				setActiveProduct(activeProduct)
-			}
-		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [products]);
 
 	return (
 		<Layout className="h-full">
@@ -73,7 +44,11 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 						items={products?.map((product) => ({
 							key: product.id,
 							label: (
-								<button type="button" onClick={() => void handleProduct(product)} className="relative capitalize">
+								<button
+									type="button"
+									onClick={() => void setActiveProductId(product.id)}
+									className="relative capitalize"
+								>
 									{product.name}
 									{activeProductId === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
 								</button>
