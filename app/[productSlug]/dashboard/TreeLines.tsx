@@ -24,12 +24,14 @@ const TreeLines: FC = () => {
 				?.filter((_, i) => i % 2 === 0)
 				.map((pos) => (
 					<div
+						key={`divider-0-${pos}`}
 						className="absolute top-[30px] h-[48px] border border-dashed border-[#4f2dc8]"
 						style={{left: `${pos}px`}}
 					/>
 				))}
 			{featureDividersByEpic.map((dividers) => (
 				<div
+					key={`divider-1-${dividers[0]}-${dividers.at(-1)!}`}
 					className="absolute top-[54px] border border-dashed border-[#4f2dc8]"
 					style={{
 						left: `${dividers[0]}px`,
