@@ -21,7 +21,6 @@ export type RootLayoutProps = {
 
 const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	const setUser = useMainStore((state) => state.setUser)
-	const activeProduct = useMainStore((state) => state.activeProduct)
 
 	const {replace} = useRouter()
 	useEffect(() => {
@@ -32,7 +31,6 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 				return
 			}
 
-			if (activeProduct) return
 			const firstProduct = (await getAllProducts(user.uid)())[0]
 			if (!firstProduct) {
 				replace(`/product`)
@@ -42,7 +40,7 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 		})
 
 		return unsubscribe
-	}, [setUser, activeProduct, replace])
+	}, [setUser, replace])
 
 	return (
 		<ConfigProvider theme={{token: {colorPrimary: `#73c92d`}}}>
