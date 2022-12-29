@@ -7,7 +7,7 @@ WORKDIR /usr/app
 COPY . .
 
 # Install production dependencies
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 RUN npm run build
 
