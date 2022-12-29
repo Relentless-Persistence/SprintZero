@@ -3,7 +3,6 @@ name: sprintzero
 on:
   push:
     branches:
-      - main
       - gcrun
 
 env:

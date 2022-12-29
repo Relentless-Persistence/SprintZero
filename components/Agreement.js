@@ -6,6 +6,7 @@ import {db} from "../config/firebase-config"
 import {useAuth} from "../contexts/AuthContext"
 import {useRouter} from "next/router"
 import {message} from "antd5"
+import {auth} from "../config/firebase-config"
 
 const Agreement = () => {
 	const router = useRouter()
@@ -31,6 +32,7 @@ const Agreement = () => {
 	}
 
 	const onCancel = (e) => {
+    auth.signOut();
 		router.push("/")
 	}
 
