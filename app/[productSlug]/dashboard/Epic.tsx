@@ -3,6 +3,7 @@
 import {CopyOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
+import clsx from "clsx"
 import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
@@ -12,16 +13,15 @@ import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
 import {useStoryMapStore} from "./storyMapStore"
 import Feature from "~/app/[productSlug]/dashboard/Feature"
-import useMainStore from "~/stores/mainStore"
 import {addCommentToEpic, addFeature, deleteEpic, updateEpic} from "~/utils/fetch"
-import clsx from "clsx"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 export type EpicProps = {
 	epic: EpicType
 }
 
 const Epic: FC<EpicProps> = ({epic}) => {
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 	const [epicName, setEpicName] = useState(epic.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const registerElement = useStoryMapStore((state) => state.registerElement)
@@ -80,7 +80,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 						type="button"
 						onClick={() => void addFeatureMutation.mutate(`Feature`)}
 						className={clsx(
-							"grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white",
+							`grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white`,
 							features.length === 0 && `invisible`,
 						)}
 					>

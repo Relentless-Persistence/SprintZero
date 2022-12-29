@@ -9,11 +9,11 @@ import type {Story} from "~/types/db/Stories"
 
 import {useStoryMapStore} from "./storyMapStore"
 import {db} from "~/config/firebase"
-import useMainStore from "~/stores/mainStore"
 import {EpicCollectionSchema, Epics} from "~/types/db/Epics"
 import {FeatureCollectionSchema, Features} from "~/types/db/Features"
 import {Stories, StoryCollectionSchema} from "~/types/db/Stories"
 import {getAllEpics, getAllFeatures, getAllStories} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 export const layerBoundaries = [54, 156] as [number, number]
 
@@ -57,7 +57,7 @@ export const sortStories = (sortedFeatures: Feature[], stories: Story[]): Story[
 
 // Once this hook has run, the story map will mount. That way, we can always rely on there being data available.
 export const useGetInitialData = (): boolean => {
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 
 	const setEpics = useStoryMapStore((state) => state.setEpics)
 	const setFeatures = useStoryMapStore((state) => state.setFeatures)
@@ -92,7 +92,7 @@ export const useGetInitialData = (): boolean => {
 }
 
 export const useSubscribeToData = (): void => {
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 
 	const setEpics = useStoryMapStore((state) => state.setEpics)
 	const setFeatures = useStoryMapStore((state) => state.setFeatures)

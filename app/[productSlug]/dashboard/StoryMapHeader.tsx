@@ -5,11 +5,11 @@ import {Breadcrumb, Button} from "antd5"
 import type {FC} from "react"
 
 import {useStoryMapStore} from "./storyMapStore"
-import useMainStore from "~/stores/mainStore"
 import {getAllVersions} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 const StoryMapHeader: FC = () => {
-	const activeProduct = useMainStore((state) => state.activeProduct)
+	const activeProduct = useActiveProductId()
 
 	const currentVersion = useStoryMapStore((state) => state.currentVersion)
 	const setCurrentVersion = useStoryMapStore((state) => state.setCurrentVersion)

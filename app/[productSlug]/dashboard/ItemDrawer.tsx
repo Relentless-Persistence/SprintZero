@@ -7,8 +7,8 @@ import {useState} from "react"
 import type {FC, ReactNode} from "react"
 import type {Id} from "~/types"
 
-import useMainStore from "~/stores/mainStore"
 import {getProduct} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 type Props = {
 	title: string
@@ -35,7 +35,7 @@ type Props = {
 const ItemDrawer: FC<Props> = ({title, itemType, extra, data, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
 
-	const activeProductId = useMainStore((state) => state.activeProduct)
+	const activeProductId = useActiveProductId()
 	const {data: activeProduct} = useQuery({
 		queryKey: [`product`, activeProductId],
 		queryFn: getProduct(activeProductId!),

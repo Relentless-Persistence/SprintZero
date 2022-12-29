@@ -4,6 +4,7 @@ import {CloseOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Drawer, Layout, Menu} from "antd5"
 import Image from "next/image"
+import {useRouter} from "next/navigation"
 import {useState} from "react"
 
 import type {ReactNode, FC} from "react"
@@ -12,6 +13,7 @@ import SettingsMenu from "./SettingsMenu"
 import SideMenu from "./SideMenu"
 import useMainStore from "~/stores/mainStore"
 import {getAllProducts} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductSlug"
 
 export type DashboardLayoutProps = {
 	children: ReactNode
@@ -26,8 +28,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 		enabled: user?.uid !== undefined,
 	})
 
-	const setActiveProductId = useMainStore((state) => state.setActiveProduct)
-	const activeProductId = useMainStore((state) => state.activeProduct)
+	const activeProductId = useActiveProductId()
+	const {replace} = useRouter()
 
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
@@ -44,11 +46,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 						items={products?.map((product) => ({
 							key: product.id,
 							label: (
-								<button
-									type="button"
-									onClick={() => void setActiveProductId(product.id)}
-									className="relative capitalize"
-								>
+								<button type="button" onClick={() => void replace(product.id)} className="relative capitalize">
 									{product.name}
 									{activeProductId === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
 								</button>
