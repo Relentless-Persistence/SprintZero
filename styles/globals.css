@@ -67,6 +67,7 @@ body {
 }
 
 .product-card {
+  position: relative;
   width: 440px;
   height: 440px;
   background: #f0f2f5;
@@ -352,4 +353,19 @@ body {
 /* AG: this needs to be fixed */
 #sprint0Dashboard .ant-tag {
   margin-right: 0px !important;
+}
+
+.product-slide {
+  width: 100vw;
+  height: 650px;
+  overflow: hidden;
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row {
+  position: relative;
 }
