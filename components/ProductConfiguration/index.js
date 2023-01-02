@@ -264,9 +264,7 @@ const ProductConfiguration = () => {
 								scale: index === position ? 1 : 0.8,
 							}}
 							transition={{
-								type: "spring",
-								stiffness: 260,
-								damping: 20,
+								ease: [0.17, 0.67, 0.83, 0.67],
 							}}
 						>
 							<Card className="product-card w-full">{slide.component}</Card>
@@ -284,7 +282,7 @@ const ProductConfiguration = () => {
 					Next
 				</Button>
 			</div>
-      <div className="h-4"></div>
+			<div className="h-4"></div>
 		</>
 	)
 };
