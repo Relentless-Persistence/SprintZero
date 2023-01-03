@@ -10,7 +10,6 @@ export const InviteTokenSchema = z.object({
 
 	product: idSchema,
 })
-export const InviteTokenCollectionSchema = z.array(InviteTokenSchema)
 
 export const InviteTokens = genDbNames(`InviteTokens`, InviteTokenSchema)
 export type InviteToken = z.infer<typeof InviteTokenSchema>

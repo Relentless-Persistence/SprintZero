@@ -5,3 +5,11 @@
 [data-nextjs-scroll-focus-boundary] {
 	display: contents;
 }
+
+button.ant-btn-default {
+	background-color: white;
+}
+
+button.ant-btn-primary {
+	background-color: #73c92d;
+}

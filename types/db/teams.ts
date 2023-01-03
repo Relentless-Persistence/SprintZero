@@ -16,7 +16,6 @@ export const TeamSchema = z.object({
 
 	product: idSchema,
 })
-export const TeamCollectionSchema = z.array(TeamSchema)
 
 export const Teams = genDbNames(`Teams`, TeamSchema)
 export type Team = z.infer<typeof TeamSchema>

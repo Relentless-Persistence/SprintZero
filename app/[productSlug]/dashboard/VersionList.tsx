@@ -2,21 +2,20 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import {Button, Input, Menu} from "antd5"
+import {useAtom} from "jotai"
 
 import type {FC} from "react"
 
-import {useStoryMapStore} from "./storyMapStore"
+import {currentVersionAtom, newVersionInputAtom} from "./atoms"
 import {addVersion, getAllVersions} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const VersionList: FC = () => {
 	const queryClient = useQueryClient()
 	const activeProduct = useActiveProductId()
-	const newVersionInput = useStoryMapStore((state) => state.newVersionInput)
-	const setNewVersionInput = useStoryMapStore((state) => state.setNewVersionInput)
+	const [newVersionInput, setNewVersionInput] = useAtom(newVersionInputAtom)
 
-	const currentVersion = useStoryMapStore((state) => state.currentVersion)
-	const setCurrentVersion = useStoryMapStore((state) => state.setCurrentVersion)
+	const [currentVersion, setCurrentVersion] = useAtom(currentVersionAtom)
 
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProduct],

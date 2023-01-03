@@ -1,16 +1,16 @@
 "use client"
 
-import clsx from "clsx"
+import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
 
-import {useStoryMapStore} from "./storyMapStore"
+import {currentVersionAtom, dividersAtom, featuresAtom} from "./atoms"
 import {avg, layerBoundaries} from "./utils"
 
 const TreeLines: FC = () => {
-	const currentVersion = useStoryMapStore((state) => state.currentVersion)
-	const features = useStoryMapStore((state) => state.features)
-	const dividers = useStoryMapStore((state) => state.dividers)
+	const currentVersion = useAtomValue(currentVersionAtom)
+	const features = useAtomValue(featuresAtom)
+	const dividers = useAtomValue(dividersAtom)
 
 	const featureDividersByEpic: number[][] = [[]]
 	dividers[1]?.forEach((divider, i) => {
@@ -53,7 +53,7 @@ const TreeLines: FC = () => {
 			</div>
 			<div className="absolute top-[108px] h-[48px] w-full">
 				{dividers[2]
-					?.filter((group, i) =>
+					?.filter((group) =>
 						currentVersion === `__ALL_VERSIONS__`
 							? features.find((feature) => feature.id === group.featureId)!.stories.length > 0
 							: true,

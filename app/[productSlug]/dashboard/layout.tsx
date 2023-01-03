@@ -3,6 +3,7 @@
 import {CloseOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Drawer, Layout, Menu} from "antd5"
+import {useAtomValue} from "jotai"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
@@ -11,25 +12,31 @@ import type {ReactNode, FC} from "react"
 
 import SettingsMenu from "./SettingsMenu"
 import SideMenu from "./SideMenu"
-import useMainStore from "~/stores/mainStore"
-import {getAllProducts} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {userIdAtom} from "~/utils/atoms"
+import {getAllProducts, getUser} from "~/utils/fetch"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type DashboardLayoutProps = {
 	children: ReactNode
 }
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
-	const user = useMainStore((state) => state.user)
+	const router = useRouter()
+
+	const userId = useAtomValue(userIdAtom)
+	const {data: user} = useQuery({
+		queryKey: [`user`, userId],
+		queryFn: getUser(userId!),
+		enabled: userId !== null,
+	})
 	const {data: products} = useQuery({
-		queryKey: [`all-products`, user?.uid],
+		queryKey: [`all-products`, user?.id],
 		// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-		queryFn: getAllProducts(user?.uid!),
-		enabled: user?.uid !== undefined,
+		queryFn: getAllProducts(user?.id!),
+		enabled: user?.id !== undefined,
 	})
 
 	const activeProductId = useActiveProductId()
-	const {replace} = useRouter()
 
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
@@ -46,7 +53,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 						items={products?.map((product) => ({
 							key: product.id,
 							label: (
-								<button type="button" onClick={() => void replace(product.id)} className="relative capitalize">
+								<button type="button" onClick={() => void router.replace(product.id)} className="relative capitalize">
 									{product.name}
 									{activeProductId === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
 								</button>
@@ -56,7 +63,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 					/>
 
 					<button type="button" onClick={() => void setIsSettingsOpen(true)}>
-						<Avatar src={user?.photoURL} className="border-2 border-green" />
+						<Avatar src={user?.avatar} className="border-2 border-green" />
 					</button>
 				</div>
 			</Layout.Header>

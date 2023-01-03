@@ -8,7 +8,7 @@ import type {FC, ReactNode} from "react"
 import type {Id} from "~/types"
 
 import {getProduct} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 type Props = {
 	title: string

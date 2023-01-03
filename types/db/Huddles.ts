@@ -14,7 +14,6 @@ export const HuddlesSchema = z.object({
 
 	createdAt: z.instanceof(Timestamp),
 })
-export const HuddlesCollectionSchema = z.array(HuddlesSchema)
 
 export const Huddles = genDbNames(`Huddles`, HuddlesSchema)
 export type Huddle = z.infer<typeof HuddlesSchema>

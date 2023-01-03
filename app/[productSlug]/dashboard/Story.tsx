@@ -1,17 +1,18 @@
 "use client"
 
 import {useMutation, useQueryClient} from "@tanstack/react-query"
+import {useSetAtom} from "jotai"
 import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
 import type {Story as StoryType} from "~/types/db/Stories"
 import type {Version} from "~/types/db/Versions"
 
+import {registerElementAtom, reportPendingDomChangeAtom} from "./atoms"
 import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
-import {useStoryMapStore} from "./storyMapStore"
 import {addCommentToStory, deleteStory, updateStory} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 type Props = {
 	story: StoryType
@@ -20,8 +21,8 @@ type Props = {
 const Story: FC<Props> = ({story}) => {
 	const [storyName, setStoryName] = useState(story.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const registerElement = useStoryMapStore((state) => state.registerElement)
-	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
+	const registerElement = useSetAtom(registerElementAtom)
+	const reportPendingDomChange = useSetAtom(reportPendingDomChangeAtom)
 
 	const activeProduct = useActiveProductId()
 	const version = useQueryClient()
@@ -42,7 +43,7 @@ const Story: FC<Props> = ({story}) => {
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
 			if (!node) return
-			registerElement(story.id, node)
+			registerElement({id: story.id, element: node})
 			reportPendingDomChange({type: `create`, id: story.id})
 		},
 		[story.id, registerElement, reportPendingDomChange],

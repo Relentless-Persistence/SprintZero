@@ -10,7 +10,6 @@ export const GoalSchema = z.object({
 
 	product: idSchema,
 })
-export const GoalCollectionSchema = z.array(GoalSchema)
 
 export const Goals = genDbNames(`Goals`, GoalSchema)
 export type Goal = z.infer<typeof GoalSchema>

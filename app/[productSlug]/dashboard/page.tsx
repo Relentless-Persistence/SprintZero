@@ -1,11 +1,12 @@
 "use client"
 
+import {useAtomValue, useSetAtom} from "jotai"
 import {useLayoutEffect} from "react"
 
 import type {FC} from "react"
 
+import {calculateDividersAtom, currentVersionAtom} from "./atoms"
 import StoryMapHeader from "./StoryMapHeader"
-import {useStoryMapStore} from "./storyMapStore"
 import TreeLines from "./TreeLines"
 import {useGetInitialData} from "./utils"
 import VersionList from "./VersionList"
@@ -13,11 +14,11 @@ import VersionList from "./VersionList"
 import StoryMap from "~/app/[productSlug]/dashboard/StoryMap"
 
 const Dashboard: FC = () => {
-	const currentVersion = useStoryMapStore((state) => state.currentVersion)
+	const currentVersion = useAtomValue(currentVersionAtom)
 
 	const finishedFetching = useGetInitialData()
 
-	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
+	const calculateDividers = useSetAtom(calculateDividersAtom)
 	useLayoutEffect(() => void calculateDividers(), [calculateDividers, currentVersion])
 
 	return (

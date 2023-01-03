@@ -4,17 +4,18 @@ import {CopyOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
 import clsx from "clsx"
+import {useAtomValue, useSetAtom} from "jotai"
 import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
 
+import {featuresAtom, registerElementAtom, reportPendingDomChangeAtom, storiesAtom} from "./atoms"
 import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
-import {useStoryMapStore} from "./storyMapStore"
 import Feature from "~/app/[productSlug]/dashboard/Feature"
 import {addCommentToEpic, addFeature, deleteEpic, updateEpic} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type EpicProps = {
 	epic: EpicType
@@ -24,13 +25,13 @@ const Epic: FC<EpicProps> = ({epic}) => {
 	const activeProduct = useActiveProductId()
 	const [epicName, setEpicName] = useState(epic.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const registerElement = useStoryMapStore((state) => state.registerElement)
-	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
+	const registerElement = useSetAtom(registerElementAtom)
+	const reportPendingDomChange = useSetAtom(reportPendingDomChangeAtom)
 
-	const features = useStoryMapStore((state) => state.features.filter((feature) => feature.epic === epic.id))
-	const points = useStoryMapStore((state) =>
-		state.stories.filter((story) => story.epic === epic.id).reduce((acc, story) => acc + story.points, 0),
-	)
+	const features = useAtomValue(featuresAtom).filter((feature) => feature.epic === epic.id)
+	const points = useAtomValue(storiesAtom)
+		.filter((story) => story.epic === epic.id)
+		.reduce((acc, story) => acc + story.points, 0)
 
 	const addFeatureMutation = useMutation({
 		mutationFn: addFeature(activeProduct!, epic.id),
@@ -47,7 +48,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
 			if (!node) return
-			registerElement(epic.id, node)
+			registerElement({id: epic.id, element: node})
 			reportPendingDomChange({type: `create`, id: epic.id})
 		},
 		[epic.id, registerElement, reportPendingDomChange],

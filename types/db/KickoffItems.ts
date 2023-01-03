@@ -11,7 +11,6 @@ export const KickoffItemSchema = z.object({
 
 	product: idSchema,
 })
-export const KickoffItemCollectionSchema = z.array(KickoffItemSchema)
 
 export const KickoffItems = genDbNames(`KickoffItems`, KickoffItemSchema)
 export type KickoffItem = z.infer<typeof KickoffItemSchema>

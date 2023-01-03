@@ -12,7 +12,6 @@ export const JourneySchema = z.object({
 
 	product: idSchema,
 })
-export const JourneyCollectionSchema = z.array(JourneySchema)
 
 export const Journeys = genDbNames(`Journeys`, JourneySchema)
 export type Journey = z.infer<typeof JourneySchema>

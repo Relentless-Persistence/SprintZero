@@ -4,20 +4,21 @@ import {ReadOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
 import {useAnimationFrame} from "framer-motion"
+import {useAtomValue, useSetAtom} from "jotai"
 
 import type {FC} from "react"
 
+import {calculateDividersAtom, elementsAtom, epicsAtom, pendingDomChangesAtom} from "./atoms"
 import Epic from "./Epic"
-import {useStoryMapStore} from "./storyMapStore"
 import {useSubscribeToData} from "./utils"
 import {addEpic} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMap: FC = () => {
 	const activeProduct = useActiveProductId()
-	const elements = useStoryMapStore((state) => state.elements)
-	const calculateDividers = useStoryMapStore((state) => state.calculateDividers)
-	const pendingDomChanges = useStoryMapStore((state) => state.pendingDomChanges)
+	const elements = useAtomValue(elementsAtom)
+	const calculateDividers = useSetAtom(calculateDividersAtom)
+	const pendingDomChanges = useAtomValue(pendingDomChangesAtom)
 
 	useAnimationFrame(() => {
 		pendingDomChanges.forEach(({type, id}) => {
@@ -32,7 +33,7 @@ const StoryMap: FC = () => {
 
 	useSubscribeToData()
 
-	const epics = useStoryMapStore((state) => state.epics)
+	const epics = useAtomValue(epicsAtom)
 
 	const addEpicMutation = useMutation({
 		mutationKey: [`add-epic`, activeProduct],

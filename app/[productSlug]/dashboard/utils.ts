@@ -1,5 +1,6 @@
 import {useQuery} from "@tanstack/react-query"
 import {collection, onSnapshot, query, where} from "firebase9/firestore"
+import {useSetAtom} from "jotai"
 import {useEffect} from "react"
 
 import type {Id} from "~/types"
@@ -7,13 +8,13 @@ import type {Epic} from "~/types/db/Epics"
 import type {Feature} from "~/types/db/Features"
 import type {Story} from "~/types/db/Stories"
 
-import {useStoryMapStore} from "./storyMapStore"
+import {epicsAtom, featuresAtom, storiesAtom} from "./atoms"
 import {db} from "~/config/firebase"
-import {EpicCollectionSchema, Epics} from "~/types/db/Epics"
-import {FeatureCollectionSchema, Features} from "~/types/db/Features"
-import {Stories, StoryCollectionSchema} from "~/types/db/Stories"
+import {EpicSchema, Epics} from "~/types/db/Epics"
+import {FeatureSchema, Features} from "~/types/db/Features"
+import {StorySchema, Stories} from "~/types/db/Stories"
 import {getAllEpics, getAllFeatures, getAllStories} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export const layerBoundaries = [54, 156] as [number, number]
 
@@ -59,9 +60,9 @@ export const sortStories = (sortedFeatures: Feature[], stories: Story[]): Story[
 export const useGetInitialData = (): boolean => {
 	const activeProduct = useActiveProductId()
 
-	const setEpics = useStoryMapStore((state) => state.setEpics)
-	const setFeatures = useStoryMapStore((state) => state.setFeatures)
-	const setStories = useStoryMapStore((state) => state.setStories)
+	const setEpics = useSetAtom(epicsAtom)
+	const setFeatures = useSetAtom(featuresAtom)
+	const setStories = useSetAtom(storiesAtom)
 
 	const {isSuccess: isSuccessEpics} = useQuery({
 		queryKey: [`all-epics`, activeProduct],
@@ -94,15 +95,15 @@ export const useGetInitialData = (): boolean => {
 export const useSubscribeToData = (): void => {
 	const activeProduct = useActiveProductId()
 
-	const setEpics = useStoryMapStore((state) => state.setEpics)
-	const setFeatures = useStoryMapStore((state) => state.setFeatures)
-	const setStories = useStoryMapStore((state) => state.setStories)
+	const setEpics = useSetAtom(epicsAtom)
+	const setFeatures = useSetAtom(featuresAtom)
+	const setStories = useSetAtom(storiesAtom)
 
 	useEffect(() => {
 		const unsubscribeEpics = onSnapshot(
 			query(collection(db, Epics._), where(Epics.product, `==`, activeProduct)),
 			(doc) => {
-				const data = EpicCollectionSchema.parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+				const data = EpicSchema.array().parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 				setEpics(data)
 			},
 		)
@@ -110,7 +111,7 @@ export const useSubscribeToData = (): void => {
 		const unsubscribeFeatures = onSnapshot(
 			query(collection(db, Features._), where(Features.product, `==`, activeProduct)),
 			(doc) => {
-				const data = FeatureCollectionSchema.parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+				const data = FeatureSchema.array().parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 				setFeatures(data)
 			},
 		)
@@ -118,7 +119,7 @@ export const useSubscribeToData = (): void => {
 		const unsubscribeStories = onSnapshot(
 			query(collection(db, Stories._), where(Stories.product, `==`, activeProduct)),
 			(doc) => {
-				const data = StoryCollectionSchema.parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+				const data = StorySchema.array().parse(doc.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 				setStories(data)
 			},
 		)

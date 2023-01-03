@@ -20,7 +20,6 @@ export const JourneyEventSchema = z.object({
 
 	journey: idSchema,
 })
-export const JourneyEventCollectionSchema = z.array(JourneyEventSchema)
 
 export const JourneyEvents = genDbNames(`JourneyEvents`, JourneyEventSchema)
 export type JourneyEvent = z.infer<typeof JourneyEventSchema>

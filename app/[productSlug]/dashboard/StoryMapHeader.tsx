@@ -1,19 +1,19 @@
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Breadcrumb, Button} from "antd5"
+import {useAtom, useSetAtom} from "jotai"
 
 import type {FC} from "react"
 
-import {useStoryMapStore} from "./storyMapStore"
+import {currentVersionAtom, newVersionInputAtom} from "./atoms"
 import {getAllVersions} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMapHeader: FC = () => {
 	const activeProduct = useActiveProductId()
 
-	const currentVersion = useStoryMapStore((state) => state.currentVersion)
-	const setCurrentVersion = useStoryMapStore((state) => state.setCurrentVersion)
-	const setNewVersionInput = useStoryMapStore((state) => state.setNewVersionInput)
+	const [currentVersion, setCurrentVersion] = useAtom(currentVersionAtom)
+	const setNewVersionInput = useSetAtom(newVersionInputAtom)
 
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProduct],

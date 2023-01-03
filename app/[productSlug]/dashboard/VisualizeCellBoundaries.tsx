@@ -1,14 +1,15 @@
 "use client"
 
 import clsx from "clsx"
+import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
 
-import {useStoryMapStore} from "./storyMapStore"
+import {dividersAtom} from "./atoms"
 import {layerBoundaries} from "./utils"
 
 const VisualizeCellBoundaries: FC = () => {
-	const dividers = useStoryMapStore((state) => state.dividers)
+	const dividers = useAtomValue(dividersAtom)
 
 	return (
 		<div className="pointer-events-none absolute inset-0 opacity-30">

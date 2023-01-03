@@ -1,12 +1,13 @@
 "use client"
 
 import {motion} from "framer-motion"
+import {useSetAtom} from "jotai"
 import {forwardRef} from "react"
 
 import type {ReactNode, FC, ForwardRefRenderFunction} from "react"
 import type {Id} from "~/types"
 
-import {useStoryMapStore} from "./storyMapStore"
+import {reportPendingDomChangeAtom} from "./atoms"
 
 export type DraggableProps = {
 	children: ReactNode
@@ -29,7 +30,7 @@ export type InputProps = {
 }
 
 const Input: FC<InputProps> = ({id, value, onChange}) => {
-	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
+	const reportPendingDomChange = useSetAtom(reportPendingDomChangeAtom)
 
 	return (
 		<div className="w-max">

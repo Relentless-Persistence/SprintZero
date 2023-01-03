@@ -20,50 +20,43 @@ import type {Epic} from "~/types/db/Epics"
 import type {Feature} from "~/types/db/Features"
 import type {Product} from "~/types/db/Products"
 import type {Story} from "~/types/db/Stories"
+import type {User} from "~/types/db/Users"
 import type {Version} from "~/types/db/Versions"
 
 import {db} from "~/config/firebase"
 import {Comments} from "~/types/db/Comments"
-import {EpicSchema, Epics, EpicCollectionSchema} from "~/types/db/Epics"
-import {FeatureSchema, Features, FeatureCollectionSchema} from "~/types/db/Features"
-import {ProductSchema, Products, ProductCollectionSchema} from "~/types/db/Products"
-import {StorySchema, Stories, StoryCollectionSchema} from "~/types/db/Stories"
-import {Versions, VersionCollectionSchema} from "~/types/db/Versions"
+import {EpicSchema, Epics} from "~/types/db/Epics"
+import {FeatureSchema, Features} from "~/types/db/Features"
+import {ProductSchema, Products} from "~/types/db/Products"
+import {StorySchema, Stories} from "~/types/db/Stories"
+import {Users, UserSchema} from "~/types/db/Users"
+import {VersionSchema, Versions} from "~/types/db/Versions"
 
-arrayUnion
+export const getUser = (id: Id) => async (): Promise<User> => {
+	const _data = await getDoc(doc(db, Users._, id))
+	const data = UserSchema.parse({id: _data.id, ..._data.data()})
+	return data
+}
 
-// export const getUsersById = async (ids: Id[]): Promise<User[]> => {
-// 	const userDocs = await getDocs(query(collection(db, Users._), where(Users.id, `in`, ids)))
-// 	const users = UserCollectionSchema.parse(userDocs.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-// 	return users
-// }
-
-export const getProduct = (id: string) => async (): Promise<Product> => {
+export const getProduct = (id: Id) => async (): Promise<Product> => {
 	const productDoc = await getDoc(doc(db, Products._, id))
 	const product = ProductSchema.parse({id: productDoc.id, ...productDoc.data()})
 	return product
 }
 
-export const getProductBySlug = (slug: string) => async (): Promise<Product> => {
-	const productDoc = (await getDocs(query(collection(db, Products._), where(Products.slug, `==`, slug)))).docs[0]
-	if (!productDoc) throw new Error(`Product not found.`)
-	const product = ProductSchema.parse({id: productDoc.id, ...productDoc.data()})
-	return product
-}
-
-export const getAllProducts = (userId: string) => async (): Promise<Product[]> => {
+export const getAllProducts = (userId: Id) => async (): Promise<Product[]> => {
 	const _data = await getDocs(
 		query(collection(db, Products._), where(Products.owner, `==`, userId), orderBy(Products.name)),
 	)
-	const data = ProductCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = ProductSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
-export const getAllVersions = (productId: string) => async (): Promise<Version[]> => {
+export const getAllVersions = (productId: Id) => async (): Promise<Version[]> => {
 	const _data = await getDocs(
 		query(collection(db, Versions._), where(Versions.product, `==`, productId), orderBy(Versions.name)),
 	)
-	const data = VersionCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = VersionSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
@@ -127,7 +120,7 @@ const getEpic = (epicId: Id) => async (): Promise<Epic> => {
 
 export const getAllEpics = (productId: Id) => async (): Promise<Epic[]> => {
 	const _data = await getDocs(query(collection(db, Epics._), where(Epics.product, `==`, productId)))
-	const data = EpicCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = EpicSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
@@ -208,13 +201,13 @@ const getFeature = (featureId: Id) => async (): Promise<Feature> => {
 
 const getFeaturesByEpic = (epicId: Id) => async (): Promise<Feature[]> => {
 	const _data = await getDocs(query(collection(db, Features._), where(Features.epic, `==`, epicId)))
-	const data = FeatureCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = FeatureSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
 export const getAllFeatures = (productId: Id) => async (): Promise<Feature[]> => {
 	const _data = await getDocs(query(collection(db, Features._), where(Features.product, `==`, productId)))
-	const data = FeatureCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = FeatureSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
@@ -311,19 +304,19 @@ export const addStory =
 
 const getStoriesByEpic = (epicId: Id) => async (): Promise<Story[]> => {
 	const _data = await getDocs(query(collection(db, Stories._), where(Stories.epic, `==`, epicId)))
-	const data = StoryCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = StorySchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
 const getStoriesByFeature = (featureId: Id) => async (): Promise<Story[]> => {
 	const _data = await getDocs(query(collection(db, Stories._), where(Stories.feature, `==`, featureId)))
-	const data = StoryCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = StorySchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
 export const getAllStories = (productId: Id) => async (): Promise<Story[]> => {
 	const _data = await getDocs(query(collection(db, Stories._), where(Stories.product, `==`, productId)))
-	const data = StoryCollectionSchema.parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = StorySchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 

@@ -17,7 +17,6 @@ export const FeatureSchema = z.object({
 	product: idSchema,
 	stories: z.array(idSchema),
 })
-export const FeatureCollectionSchema = z.array(FeatureSchema)
 
 export const Features = genDbNames(`Features`, FeatureSchema)
 export type Feature = z.infer<typeof FeatureSchema>

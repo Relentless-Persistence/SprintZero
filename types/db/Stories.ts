@@ -28,7 +28,6 @@ export const StorySchema = z.object({
 	product: idSchema,
 	version: idSchema,
 })
-export const StoryCollectionSchema = z.array(StorySchema)
 
 export const Stories = genDbNames(`Stories`, StorySchema)
 export type Story = z.infer<typeof StorySchema>

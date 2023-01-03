@@ -29,7 +29,6 @@ export const DialogueSchema = z.object({
 
 	updatedAt: z.instanceof(Timestamp),
 })
-export const DialogueCollectionSchema = z.array(DialogueSchema)
 
 export const Dialogues = genDbNames(`Dialogues`, DialogueSchema)
 export type Dialogue = z.infer<typeof DialogueSchema>

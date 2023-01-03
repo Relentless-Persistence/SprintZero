@@ -3,18 +3,19 @@
 import {CopyOutlined} from "@ant-design/icons"
 import {useMutation} from "@tanstack/react-query"
 import {Button} from "antd5"
+import {useAtomValue, useSetAtom} from "jotai"
 import {useCallback, useEffect, useState} from "react"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Feature as FeatureType} from "~/types/db/Features"
 
+import {currentVersionAtom, registerElementAtom, reportPendingDomChangeAtom, storiesAtom} from "./atoms"
 import Draggable from "./Draggable"
 import ItemDrawer from "./ItemDrawer"
 import Story from "./Story"
-import {useStoryMapStore} from "./storyMapStore"
 import {addCommentToFeature, addStory, deleteFeature, updateFeature} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type FeatureProps = {
 	epicId: Id
@@ -23,16 +24,14 @@ export type FeatureProps = {
 
 const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const activeProduct = useActiveProductId()
-	const currentVersion = useStoryMapStore((state) => state.currentVersion)
+	const currentVersion = useAtomValue(currentVersionAtom)
 	const [featureName, setFeatureName] = useState(feature.name)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const registerElement = useStoryMapStore((state) => state.registerElement)
-	const reportPendingDomChange = useStoryMapStore((state) => state.reportPendingDomChange)
+	const registerElement = useSetAtom(registerElementAtom)
+	const reportPendingDomChange = useSetAtom(reportPendingDomChangeAtom)
 
-	const stories = useStoryMapStore((state) => state.stories.filter((story) => story.feature === feature.id))
-	const points = useStoryMapStore((state) =>
-		state.stories.filter((story) => story.feature === feature.id).reduce((acc, story) => acc + story.points, 0),
-	)
+	const stories = useAtomValue(storiesAtom).filter((story) => story.feature === feature.id)
+	const points = stories.filter((story) => story.feature === feature.id).reduce((acc, story) => acc + story.points, 0)
 
 	const addStoryMutation = useMutation({
 		mutationFn: addStory(activeProduct!, epicId, feature.id),
@@ -58,7 +57,7 @@ const Feature: FC<FeatureProps> = ({epicId, feature}) => {
 	const ref = useCallback(
 		(node: HTMLDivElement | null) => {
 			if (!node) return
-			registerElement(feature.id, node)
+			registerElement({id: feature.id, element: node})
 			reportPendingDomChange({type: `create`, id: feature.id})
 		},
 		[feature.id, registerElement, reportPendingDomChange],

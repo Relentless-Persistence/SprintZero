@@ -17,7 +17,6 @@ export const EpicSchema = z.object({
 	prev_epic: idSchema.nullable(),
 	product: idSchema,
 })
-export const EpicCollectionSchema = z.array(EpicSchema)
 
 export const Epics = genDbNames(`Epics`, EpicSchema)
 export type Epic = z.infer<typeof EpicSchema>

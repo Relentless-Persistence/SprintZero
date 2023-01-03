@@ -5,10 +5,8 @@ import {genDbNames, idSchema} from "~/types"
 
 export const ProductSchema = z.object({
 	id: idSchema,
-	slug: z.string(),
 	cadence: z.string(),
 	cost: z.number().nullable(),
-	currency: z.string(),
 	email1: z.string(),
 	email2: z.string(),
 	email3: z.string(),
@@ -24,10 +22,10 @@ export const ProductSchema = z.object({
 	name: z.string(),
 
 	owner: idSchema,
+	members: z.array(idSchema).default([]),
 
 	updatedAt: z.instanceof(Timestamp),
 })
-export const ProductCollectionSchema = z.array(ProductSchema)
 
 export const Products = genDbNames(`Products`, ProductSchema)
 export type Product = z.infer<typeof ProductSchema>

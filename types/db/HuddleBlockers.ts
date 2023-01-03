@@ -19,7 +19,6 @@ export const HuddleBlockerSchema = z.object({
 
 	createdAt: z.instanceof(Timestamp),
 })
-export const HuddleBlockerCollectionSchema = z.array(HuddleBlockerSchema)
 
 export const HuddleBlockers = genDbNames(`HuddleBlockers`, HuddleBlockerSchema)
 export type HuddleBlocker = z.infer<typeof HuddleBlockerSchema>
