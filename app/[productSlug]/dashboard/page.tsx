@@ -5,13 +5,13 @@ import {useLayoutEffect} from "react"
 
 import type {FC} from "react"
 
-import {calculateDividersAtom, currentVersionAtom} from "./atoms"
-import StoryMapHeader from "./StoryMapHeader"
-import TreeLines from "./TreeLines"
-import {useGetInitialData} from "./utils"
+import {calculateDividersAtom, currentVersionAtom} from "./storyMap/atoms"
+import StoryMap from "./storyMap/StoryMap"
+import StoryMapHeader from "./storyMap/StoryMapHeader"
+import TreeLines from "./storyMap/TreeLines"
+import {useGetInitialData} from "./storyMap/utils"
 import VersionList from "./VersionList"
-// import VisualizeCellBoundaries from "./VisualizeCellBoundaries"
-import StoryMap from "~/app/[productSlug]/dashboard/StoryMap"
+// import VisualizeCellBoundaries from "./storyMap/VisualizeCellBoundaries"
 
 const Dashboard: FC = () => {
 	const currentVersion = useAtomValue(currentVersionAtom)

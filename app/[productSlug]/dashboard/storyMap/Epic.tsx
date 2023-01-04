@@ -12,8 +12,8 @@ import type {Epic as EpicType} from "~/types/db/Epics"
 
 import {featuresAtom, registerElementAtom, reportPendingDomChangeAtom, storiesAtom} from "./atoms"
 import Draggable from "./Draggable"
+import Feature from "./Feature"
 import ItemDrawer from "./ItemDrawer"
-import Feature from "~/app/[productSlug]/dashboard/Feature"
 import {addCommentToEpic, addFeature, deleteEpic, updateEpic} from "~/utils/fetch"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

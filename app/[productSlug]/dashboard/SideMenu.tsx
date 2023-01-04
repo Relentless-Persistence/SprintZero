@@ -10,6 +10,7 @@ import {
 import {Menu} from "antd5"
 import Link from "next/link"
 import {usePathname} from "next/navigation"
+import {useState} from "react"
 
 import type {FC} from "react"
 
@@ -18,12 +19,14 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const SideMenu: FC = () => {
 	const pathname = usePathname()
 	const activeProductId = useActiveProductId()
+	const [openKeys, setOpenKeys] = useState<string[]>([])
 
 	return (
 		<>
 			{activeProductId && (
 				<Menu
 					mode="inline"
+					openKeys={openKeys}
 					selectedKeys={[`sidemenu-${(pathname ?? ``).split(`/`).at(-1)}`]}
 					items={[
 						{
@@ -67,7 +70,6 @@ const SideMenu: FC = () => {
 									key: `sidemenu-priorities`,
 									label: <Link href={`/${activeProductId}/dashboard/tactics/priorities`}>Priorities</Link>,
 								},
-								// {key: `sidemenu-release`, label: <Link href="/dashboard/tactics/release">Release</Link>},
 								{
 									key: `sidemenu-retrospective`,
 									label: <Link href={`/${activeProductId}/dashboard/tactics/retrospective`}>Retrospective</Link>,
@@ -117,6 +119,9 @@ const SideMenu: FC = () => {
 							],
 						},
 					]}
+					onOpenChange={(keys) => {
+						setOpenKeys(keys.slice(-1))
+					}}
 					style={{borderInlineEnd: `unset`}}
 				/>
 			)}

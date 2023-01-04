@@ -1,15 +1,14 @@
-import {Timestamp} from "firebase9/firestore"
 import {z} from "zod"
 
 import {genDbNames, idSchema} from "~/types"
 
 export const ProductSchema = z.object({
 	id: idSchema,
-	cadence: z.string(),
-	cost: z.number().nullable(),
-	email1: z.string(),
-	email2: z.string(),
-	email3: z.string(),
+	cadence: z.number(),
+	effortCost: z.number().nullable(),
+	email1: z.string().nullable(),
+	email2: z.string().nullable(),
+	email3: z.string().nullable(),
 	gate: z.union([
 		z.literal(`Monday`),
 		z.literal(`Tuesday`),
@@ -23,8 +22,6 @@ export const ProductSchema = z.object({
 
 	owner: idSchema,
 	members: z.array(idSchema).default([]),
-
-	updatedAt: z.instanceof(Timestamp),
 })
 
 export const Products = genDbNames(`Products`, ProductSchema)

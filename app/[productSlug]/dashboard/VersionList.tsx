@@ -6,7 +6,7 @@ import {useAtom} from "jotai"
 
 import type {FC} from "react"
 
-import {currentVersionAtom, newVersionInputAtom} from "./atoms"
+import {currentVersionAtom, newVersionInputAtom} from "./storyMap/atoms"
 import {addVersion, getAllVersions} from "~/utils/fetch"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

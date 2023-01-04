@@ -11,5 +11,10 @@ button.ant-btn-default {
 }
 
 button.ant-btn-primary {
-	background-color: #73c92d;
+	background-color: #4a801e;
+}
+
+:is(.ant-menu-inline, .ant-menu-vertical) :is(li.ant-menu-item, div.ant-menu-submenu-title) {
+	margin: 0px;
+	width: 100%;
 }

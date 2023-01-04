@@ -5,7 +5,7 @@ import {useAtomValue} from "jotai"
 import type {FC} from "react"
 
 import {currentVersionAtom, dividersAtom, featuresAtom} from "./atoms"
-import {avg, layerBoundaries} from "./utils"
+import {avg} from "./utils"
 
 const TreeLines: FC = () => {
 	const currentVersion = useAtomValue(currentVersionAtom)

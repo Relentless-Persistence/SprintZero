@@ -36,7 +36,7 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	}, [setUserId, replace])
 
 	return (
-		<ConfigProvider theme={{token: {colorPrimary: `#73c92d`}}}>
+		<ConfigProvider theme={{token: {colorPrimary: `#4a801e`, borderRadius: 0}}}>
 			<QueryClientProvider client={queryClient}>
 				<html lang="en" className="h-full">
 					<head></head>
