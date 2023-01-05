@@ -39,5 +39,8 @@ module.exports = {
 			sky: `#00d4ff`,
 			blue: `#009cd5`,
 		},
+		fontFamily: {
+			courier: [`Courier Prime`, `monospace`],
+		},
 	},
 }
