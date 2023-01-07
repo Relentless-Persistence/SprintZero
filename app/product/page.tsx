@@ -2,7 +2,7 @@
 
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Button} from "antd5"
-import {addDoc, collection, doc, setDoc} from "firebase9/firestore"
+import {doc, setDoc, updateDoc} from "firebase9/firestore"
 import {motion} from "framer-motion"
 import {useAtomValue} from "jotai"
 import Image from "next/image"
@@ -11,6 +11,7 @@ import {useState} from "react"
 import {v4 as uuid} from "uuid"
 
 import type {FC} from "react"
+import type {Product} from "~/types/db/Products"
 
 import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
@@ -18,9 +19,9 @@ import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
-import {Version, Versions} from "~/types/db/Versions"
+import {Users} from "~/types/db/Users"
+import {getUser} from "~/utils/api/queries"
 import {userIdAtom} from "~/utils/atoms"
-import {getUser} from "~/utils/fetch"
 
 const numSlides = 4
 
@@ -49,12 +50,19 @@ const ProductConfiguration: FC = () => {
 
 	const router = useRouter()
 	const submitForm = async (data: FormInputs) => {
+		if (!userId || !user) return
+
 		setHasSubmitted(true)
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}`
-		const finalData = ProductSchema.omit({id: true, updatedAt: true}).parse({...data, owner: userId})
+		const finalData = ProductSchema.omit({id: true}).parse({
+			...data,
+			storyMapState: [],
+			members: [{user: userId, type: `editor`}],
+		} satisfies Omit<Product, `id`>)
 		await setDoc(doc(db, Products._, slug), finalData)
 
-		// await addDoc(collection(db, Versions._), {name} satisfies Version)
+		await updateDoc(doc(db, Users._, userId), {products: [...user.products, slug]})
+
 		router.push(`/${slug}/dashboard`)
 	}
 

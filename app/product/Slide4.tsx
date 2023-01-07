@@ -22,7 +22,7 @@ type FormInputs = z.infer<typeof schema>
 type Slide4Props = {
 	currentSlide: number
 	setCanProceed: (canProceed: boolean) => void
-	onComplete: (data: {effortCost?: number}) => void
+	onComplete: (data: {effortCost: number | null}) => void
 }
 
 const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
@@ -36,7 +36,7 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	})
 
 	const onSubmit = handleSubmit(
-		(data) => void onComplete({effortCost: data.effortCost ? parseFloat(data.effortCost.slice(1)) : undefined}),
+		(data) => void onComplete({effortCost: data.effortCost ? parseFloat(data.effortCost.slice(1)) : null}),
 	)
 
 	useEffect(() => void (isActive && setCanProceed(formState.isValid)), [isActive, formState.isValid, setCanProceed])

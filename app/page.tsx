@@ -6,8 +6,8 @@ import {useRouter} from "next/navigation"
 
 import type {FC} from "react"
 
+import {getProductsByUser} from "~/utils/api/queries"
 import {userIdAtom} from "~/utils/atoms"
-import {getAllProducts} from "~/utils/fetch"
 
 const HomePage: FC = () => {
 	const router = useRouter()
@@ -15,7 +15,7 @@ const HomePage: FC = () => {
 
 	useQuery({
 		queryKey: [`all-products`, userId],
-		queryFn: getAllProducts(userId!),
+		queryFn: getProductsByUser(userId!),
 		enabled: userId !== null,
 		onSuccess: (products) => {
 			const firstProduct = products[0]

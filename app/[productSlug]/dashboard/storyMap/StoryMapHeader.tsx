@@ -6,7 +6,7 @@ import {useAtom, useSetAtom} from "jotai"
 import type {FC} from "react"
 
 import {currentVersionAtom, newVersionInputAtom} from "./atoms"
-import {getAllVersions} from "~/utils/fetch"
+import {getVersionsByProduct} from "~/utils/api/queries"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMapHeader: FC = () => {
@@ -17,7 +17,7 @@ const StoryMapHeader: FC = () => {
 
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProduct],
-		queryFn: getAllVersions(activeProduct!),
+		queryFn: getVersionsByProduct(activeProduct!),
 		onSuccess: (versions) => {
 			if (currentVersion === `` && versions[0]) setCurrentVersion(versions[0].id)
 		},

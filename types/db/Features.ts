@@ -12,10 +12,7 @@ export const FeatureSchema = z.object({
 
 	comments: z.array(idSchema),
 	epic: idSchema,
-	next_feature: idSchema.nullable(),
-	prev_feature: idSchema.nullable(),
 	product: idSchema,
-	stories: z.array(idSchema),
 })
 
 export const Features = genDbNames(`Features`, FeatureSchema)

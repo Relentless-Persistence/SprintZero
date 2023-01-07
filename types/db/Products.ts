@@ -4,11 +4,9 @@ import {genDbNames, idSchema} from "~/types"
 
 export const ProductSchema = z.object({
 	id: idSchema,
+
 	cadence: z.number(),
 	effortCost: z.number().nullable(),
-	email1: z.string().nullable(),
-	email2: z.string().nullable(),
-	email3: z.string().nullable(),
 	gate: z.union([
 		z.literal(`Monday`),
 		z.literal(`Tuesday`),
@@ -18,10 +16,28 @@ export const ProductSchema = z.object({
 		z.literal(`Saturday`),
 		z.literal(`Sunday`),
 	]),
+	members: z.array(
+		z.object({
+			user: idSchema,
+			type: z.union([z.literal(`editor`), z.literal(`viewer`)]),
+		}),
+	),
 	name: z.string(),
-
-	owner: idSchema,
-	members: z.array(idSchema).default([]),
+	storyMapState: z.array(
+		z.object({
+			epic: idSchema,
+			featuresOrder: z.array(
+				z.object({
+					feature: idSchema,
+					storiesOrder: z.array(
+						z.object({
+							story: idSchema,
+						}),
+					),
+				}),
+			),
+		}),
+	),
 })
 
 export const Products = genDbNames(`Products`, ProductSchema)

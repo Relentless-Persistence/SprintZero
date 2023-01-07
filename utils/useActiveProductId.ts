@@ -5,7 +5,7 @@ import {usePathname, useRouter} from "next/navigation"
 import type {Id} from "~/types"
 
 import {userIdAtom} from "./atoms"
-import {getAllProducts} from "./fetch"
+import {getProductsByUser} from "~/utils/api/queries"
 
 export const useActiveProductId = (): Id | null => {
 	const pathname = usePathname()
@@ -16,7 +16,7 @@ export const useActiveProductId = (): Id | null => {
 	const userId = useAtomValue(userIdAtom)
 	useQuery({
 		queryKey: [`all-products`, userId],
-		queryFn: getAllProducts(userId!),
+		queryFn: getProductsByUser(userId!),
 		enabled: userId !== null,
 		onSuccess: (products) => {
 			if (products.find((product) => product.id === productId)) return

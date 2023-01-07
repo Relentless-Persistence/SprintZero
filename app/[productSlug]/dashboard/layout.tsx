@@ -12,8 +12,8 @@ import type {ReactNode, FC} from "react"
 
 import SettingsMenu from "./SettingsMenu"
 import SideMenu from "./SideMenu"
+import {getProductsByUser, getUser} from "~/utils/api/queries"
 import {userIdAtom} from "~/utils/atoms"
-import {getAllProducts, getUser} from "~/utils/fetch"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type DashboardLayoutProps = {
@@ -32,7 +32,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	const {data: products} = useQuery({
 		queryKey: [`all-products`, user?.id],
 		// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-		queryFn: getAllProducts(user?.id!),
+		queryFn: getProductsByUser(user?.id!),
 		enabled: user?.id !== undefined,
 	})
 

@@ -28,10 +28,12 @@ const Login = () => {
 
 	const fetchProducts = async (user) => {
 		if (user) {
-			const res = await db.collection("Products").where("owner", "==", user.uid).get()
-			setActiveProduct(res.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0])
-			const product = res.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0]
-			return product
+			const _userObj = await db.collection("Users").doc(user.uid).get()
+			const userObj = {id: _userObj.id, ..._userObj.data()}
+
+			const _products = userObj.products.map(productId => db.collection("Products").doc(productId).get())
+			const products = (await Promise.all(_products)).map(doc => ({id: doc.id, ...doc.data()}))
+			return products[0]
 		}
 	}
 
@@ -83,7 +85,7 @@ const Login = () => {
 							content: "Successfully logged in",
 							className: "custom-message",
 						})
-						router.push(`/${product.slug}/dashboard`)
+						router.push(product ? `/${product.id}/dashboard` : `/product`)
 					}
 				})
 			})

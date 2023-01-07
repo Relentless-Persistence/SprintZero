@@ -23,8 +23,6 @@ export const StorySchema = z.object({
 	comments: z.array(idSchema),
 	epic: idSchema,
 	feature: idSchema,
-	next_story: idSchema.nullable(),
-	prev_story: idSchema.nullable(),
 	product: idSchema,
 	version: idSchema,
 })
