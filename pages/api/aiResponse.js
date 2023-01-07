@@ -8,7 +8,6 @@ const openai = new OpenAIApi(configuration)
 
 export default async function handler (req, res) {
   const {prompt} = req.body;
-  console.log(prompt)
 
   try {
     const response = await openai.createCompletion({

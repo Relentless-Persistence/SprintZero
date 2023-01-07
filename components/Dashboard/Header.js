@@ -60,8 +60,6 @@ const AppHeader = () => {
         setProducts(products);
         if(activeProduct === null) {
           setActiveProduct(products[0]);
-        } else {
-          setActiveProduct(activeProduct)
         }
       }
     }

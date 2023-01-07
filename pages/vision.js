@@ -4,30 +4,17 @@ import Head from "next/head"
 import {useRouter} from "next/router"
 
 import AppLayout from "../components/Dashboard/AppLayout"
-import StatementForm from "../components/Vision/StatementForm"
 
-import {checkEmptyArray, checkEmptyObject, getTimeAgo, splitRoutes} from "../utils"
+import {splitRoutes} from "../utils"
 import {db} from "../config/firebase-config"
 import {activeProductState} from "../atoms/productAtom"
 import {useRecoilValue} from "recoil"
 
 import {Row, Col, Typography, Button, Card, Tag, Timeline} from "antd5"
-
-import Deck from "../components/Vision/Deck"
-import {Steps} from "antd5"
+import Stages from "../components/Vision/Stages"
 
 const {Title, Text} = Typography
 
-const generateRightNav = (items) => {
-	if (!items?.length) {
-		return ["Now"]
-	}
-
-	return items.map((it) => ({
-		render: () => getTimeAgo(it.createdAt),
-		value: it.createdAt,
-	}))
-}
 
 const CustomDot = () => (
 	<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,12 +30,20 @@ export default function Visions() {
 	const [events, setEvents] = useState(null)
 
 	const fetchVisions = () => {
-		db.collection('Visions')
-			.where("product_id", "==", activeProduct.id)
+		db.collection("Visions")
+			.where("product_id", "==", "J3e9gnYupcQDMxP9qeRt")
 			.onSnapshot((snapshot) => {
-				setVision(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0])
+				if(snapshot.empty === true) {
+					setEditMode(true)
+				} else {
+					setVision(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0])
+				}
 			})
 	}
+
+	useEffect(() => {
+		fetchVisions()
+	}, [])
 
 	const fetchVisionEvents = () => {
 		db.collection("VisionEvents")
@@ -57,9 +52,6 @@ export default function Visions() {
 				setEvents(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 			})
 	}
-
-	const data =
-		"\n\nOur project management app will provide users with an intuitive and comprehensive platform to manage their projects. It will enable users to easily create, assign, and track tasks, collaborate with team members, and monitor progress. The app will also provide users with powerful analytics tools to help them identify areas of improvement and optimize their workflow. \n\nAdditionally, the app will offer a variety of features such as notifications, reminders, and customizable dashboards to help users stay organized and on top of their projects. Our goal is to make project management easier and more efficient for everyone.".trimStart()
 
 	return (
 		<div className="mb-8">
@@ -81,7 +73,7 @@ export default function Visions() {
 						<div className="mb-5 flex items-start justify-between">
 							<Title>Product Vision</Title>
 
-							<Button className="bg-white hover:text-black " disabled={editMode} onClick={() => setEditMode(!editMode)}>
+							<Button className="bg-white hover:text-black " disabled={editMode} onClick={() => setEditMode(true)}>
 								Edit
 							</Button>
 						</div>
@@ -92,14 +84,19 @@ export default function Visions() {
 									className="border border-[#D9D9D9] p-[42px]"
 									style={{boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)"}}
 								>
-									<div
-										className="text-2xl"
-										style={{whiteSpace: "pre-line"}}
-										dangerouslySetInnerHTML={{__html: data}}
-									></div>
+									{vision &&
+										(
+											<div
+												className="text-2xl"
+												style={{whiteSpace: "pre-line"}}
+												dangerouslySetInnerHTML={{__html: vision.acceptedVision}}
+											></div>
+										)}
 								</Card>
+							) : vision ? (
+								<Stages vision={vision} setEditMode={setEditMode} />
 							) : (
-								"Editing"
+								<Stages setEditMode={setEditMode} />
 							)}
 						</div>
 					</Col>

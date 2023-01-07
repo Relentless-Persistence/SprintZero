@@ -371,3 +371,7 @@ body {
 .row {
   position: relative;
 }
+
+#stages .ant-steps-item-title {
+  width: 100% !important;
+}
