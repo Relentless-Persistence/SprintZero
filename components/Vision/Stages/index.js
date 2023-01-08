@@ -7,7 +7,7 @@ import axios from "axios"
 import {db} from "../../../config/firebase-config"
 import { useAuth } from "../../../contexts/AuthContext"
 
-const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse: ""}, activeProduct, setEditMode}) => {
+const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse: ""}, productId, setEditMode}) => {
   const {user} = useAuth();
 	const [current, setCurrent] = useState(0)
 	const [type, setType] = useState(vision.type)
@@ -25,7 +25,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 	const createVision = () => {
 		db.collection("Visions")
 			.add({
-				product_id: "J3e9gnYupcQDMxP9qeRt",
+				product_id: productId,
 				type,
 				value,
 				features,
