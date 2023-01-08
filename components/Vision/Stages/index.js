@@ -5,8 +5,10 @@ import Final from "./Final"
 import GptResponse from "./GptResponse"
 import axios from "axios"
 import {db} from "../../../config/firebase-config"
+import { useAuth } from "../../../contexts/AuthContext"
 
 const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse: ""}, activeProduct, setEditMode}) => {
+  const {user} = useAuth();
 	const [current, setCurrent] = useState(0)
 	const [type, setType] = useState(vision.type)
 	const [value, setValue] = useState(vision.value)
@@ -18,6 +20,8 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 	const [step2, setStep2] = useState(false)
 	const [step3, setStep3] = useState(false)
 
+  const prevValue = vision.value;
+
 	const createVision = () => {
 		db.collection("Visions")
 			.add({
@@ -27,7 +31,8 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 				features,
 				acceptedVision,
 			})
-			.then(() => {
+			.then((res) => {
+        createEvent(res.id);
 				setEditMode(false)
 			})
 	}
@@ -42,9 +47,23 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 				acceptedVision,
 			})
 			.then(() => {
+        createEvent(vision.id)
 				setEditMode(false)
 			})
 	}
+
+  const createEvent = (id) => {
+    db.collection("VisionEvents").add({
+      user: {
+        id: user.uid,
+        name: user.displayName,
+      },
+      prevValue,
+      newValue: value,
+      vision_id: id,
+      createdAt: new Date().toISOString(),
+    })
+  }
 
 	const gptQuestion = `Write a product vision for a ${type} app. It is ${value}. Which has the following features; ${features.map(
 		(feature) => `${feature} `,

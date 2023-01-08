@@ -13,8 +13,9 @@ import {useRecoilValue} from "recoil"
 import {Row, Col, Typography, Button, Card, Tag, Timeline} from "antd5"
 import Stages from "../components/Vision/Stages"
 
-const {Title, Text} = Typography
+import {formatDistance} from "date-fns"
 
+const {Title, Text} = Typography
 
 const CustomDot = () => (
 	<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,15 +26,15 @@ const CustomDot = () => (
 export default function Visions() {
 	const {pathname} = useRouter()
 	const activeProduct = useRecoilValue(activeProductState)
-	const [editMode, setEditMode] = useState(false);
-	const [vision, setVision] = useState(null);
+	const [editMode, setEditMode] = useState(false)
+	const [vision, setVision] = useState(null)
 	const [events, setEvents] = useState(null)
 
 	const fetchVisions = () => {
 		db.collection("Visions")
 			.where("product_id", "==", "J3e9gnYupcQDMxP9qeRt")
 			.onSnapshot((snapshot) => {
-				if(snapshot.empty === true) {
+				if (snapshot.empty === true) {
 					setEditMode(true)
 				} else {
 					setVision(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0])
@@ -46,11 +47,23 @@ export default function Visions() {
 	}, [])
 
 	const fetchVisionEvents = () => {
-		db.collection("VisionEvents")
-			.where("product_id", "==", activeProduct.id)
-			.onSnapshot((snapshot) => {
-				setEvents(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-			})
+		if (vision) {
+			db.collection("VisionEvents")
+				.where("vision_id", "==", "Ms89C843j6HBAV4PCZ6o")
+				.orderBy("createdAt", "desc")
+				.onSnapshot((snapshot) => {
+					setEvents(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+					console.log(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+				})
+		}
+	}
+
+	useEffect(() => {
+		fetchVisionEvents()
+	}, [vision])
+
+	const getLastUpdate = (date) => {
+		if (date) return formatDistance(new Date(date), new Date(), {includeSeconds: true}) + " ago"
 	}
 
 	return (
@@ -84,14 +97,13 @@ export default function Visions() {
 									className="border border-[#D9D9D9] p-[42px]"
 									style={{boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)"}}
 								>
-									{vision &&
-										(
-											<div
-												className="text-2xl"
-												style={{whiteSpace: "pre-line"}}
-												dangerouslySetInnerHTML={{__html: vision.acceptedVision}}
-											></div>
-										)}
+									{vision && (
+										<div
+											className="text-2xl"
+											style={{whiteSpace: "pre-line"}}
+											dangerouslySetInnerHTML={{__html: vision.acceptedVision}}
+										></div>
+									)}
 								</Card>
 							) : vision ? (
 								<Stages vision={vision} setEditMode={setEditMode} />
@@ -107,20 +119,22 @@ export default function Visions() {
 						</Tag>
 
 						<Timeline>
-							<Timeline.Item color="#54A31C" className="">
-								<p className="mb-[10px] font-courier text-xs">2 minutes ago</p>
-								<p className="text-xs">
-									<span className="text-[#1890FF]">@Matthew</span> modified <strong>“for all time”</strong> to{" "}
-									<strong>“in my time”</strong>
-								</p>
-							</Timeline.Item>
-							<Timeline.Item color="#54A31C" className="">
-								<p className="mb-[10px] font-courier text-xs">2 minutes ago</p>
-								<p className="text-xs">
-									<span className="text-[#1890FF]">@Matthew</span> modified <strong>“for all time”</strong> to{" "}
-									<strong>“in my time”</strong>
-								</p>
-							</Timeline.Item>
+							{events &&
+								events.map((event, i) => (
+									<Timeline.Item color="#54A31C" key={i}>
+										<p className="mb-[10px] font-courier text-xs">{getLastUpdate(event.createdAt)}</p>
+										{i === 0 ? (
+											<p className="text-xs">
+												<span className="text-[#1890FF]">@{event.user.name}</span> created Product Vision <strong>"{event.newValue}"</strong>
+											</p>
+										) : (
+											<p className="text-xs">
+												<span className="text-[#1890FF]">@{event.user.name}</span> modified{" "}
+												<strong>“{event.prevValue}”</strong> to <strong>“{event.newValue}”</strong>
+											</p>
+										)}
+									</Timeline.Item>
+								))}
 						</Timeline>
 					</Col>
 				</Row>
