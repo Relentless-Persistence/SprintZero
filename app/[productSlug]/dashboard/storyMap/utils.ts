@@ -35,7 +35,6 @@ declare global {
 		__storyBoundaries: Record<Id, {top: number; center: number; bottom: number}>
 		__pointerLocation: [number, number]
 		__pointerOffset: {current: [number, number] | null}
-		__targetPosition: TargetPosition
 	}
 }
 
@@ -58,12 +57,6 @@ if (typeof window !== `undefined`) {
 	window.__pointerLocation = window.__pointerLocation ?? [0, 0]
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	window.__pointerOffset = window.__pointerOffset ?? {current: null}
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	window.__targetPosition = window.__targetPosition ?? {
-		epic: null,
-		feature: null,
-		story: null,
-	}
 }
 
 export let storyMapScrollPosition = window.__storyMapScrollPosition
@@ -74,7 +67,6 @@ export let featureBoundaries = window.__featureBoundaries
 export let storyBoundaries = window.__storyBoundaries
 export let pointerLocation = window.__pointerLocation
 export let pointerOffset = window.__pointerOffset
-export let targetPosition = window.__targetPosition
 
 const getElementTranslation = (element: HTMLElement): [number, number] => {
 	const style = window.getComputedStyle(element)
@@ -284,41 +276,9 @@ export const getTargetPosition = (storyMapState: StoryMapState): TargetPosition 
 		targetStoryIndex = storiesOrder.findIndex(({story}) => story === storyId)
 	}
 
-	targetPosition = {
+	return {
 		epic: targetEpicIndex >= 0 ? targetEpicIndex : null,
 		feature: y > layerBoundaries[0] && targetFeatureIndex >= 0 ? targetFeatureIndex : null,
 		story: y > layerBoundaries[1] && targetStoryIndex >= 0 ? targetStoryIndex : null,
 	}
-
-	const indicator = document.getElementById(`indicator`)
-	if (indicator) {
-		const epicId = targetPosition.epic !== null ? storyMapState[targetEpicIndex]!.epic : null
-		const featureId =
-			targetPosition.feature !== null
-				? storyMapState[hoveringEpicIndex]!.featuresOrder[targetFeatureIndex]!.feature
-				: null
-		const storyId =
-			targetPosition.story !== null
-				? storyMapState[hoveringEpicIndex]!.featuresOrder[hoveringFeatureIndex]!.storiesOrder[targetStoryIndex]!.story
-				: null
-
-		if (storyId && featureId) {
-			indicator.style.top = `${storyBoundaries[storyId]!.top + storyMapTop}px`
-			indicator.style.left = `${featureBoundaries[featureId]!.left - storyMapScrollPosition.position}px`
-			indicator.style.width = `${featureBoundaries[featureId]!.right - featureBoundaries[featureId]!.left}px`
-			indicator.style.height = `${storyBoundaries[storyId]!.bottom - storyBoundaries[storyId]!.top}px`
-		} else if (featureId) {
-			indicator.style.top = `${layerBoundaries[0] + storyMapTop}px`
-			indicator.style.left = `${featureBoundaries[featureId]!.left - storyMapScrollPosition.position}px`
-			indicator.style.width = `${featureBoundaries[featureId]!.right - featureBoundaries[featureId]!.left}px`
-			indicator.style.height = `${layerBoundaries[1] - layerBoundaries[0]}px`
-		} else if (epicId) {
-			indicator.style.top = `${storyMapTop}px`
-			indicator.style.left = `${epicBoundaries[epicId]!.left - storyMapScrollPosition.position}px`
-			indicator.style.width = `${epicBoundaries[epicId]!.right - epicBoundaries[epicId]!.left}px`
-			indicator.style.height = `${layerBoundaries[0]}px`
-		}
-	}
-
-	return targetPosition
 }

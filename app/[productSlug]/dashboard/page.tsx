@@ -46,11 +46,6 @@ const Dashboard: FC = () => {
 			</div>
 
 			<VersionList />
-
-			<div
-				className="pointer-events-none fixed z-50 rounded border transition-[left,top,width,height,background,border-color]"
-				id="indicator"
-			/>
 		</div>
 	)
 }
