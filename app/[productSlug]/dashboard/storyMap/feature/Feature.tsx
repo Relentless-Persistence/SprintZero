@@ -3,13 +3,13 @@
 import clsx from "clsx"
 import {motion, useDragControls} from "framer-motion"
 import {useAtomValue} from "jotai"
-import {useEffect, useRef, useState} from "react"
+import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
 import type {Feature as FeatureType} from "~/types/db/Features"
 
 import {storyMapStateAtom} from "../atoms"
-import {elementRegistry, featureDividers} from "../utils"
+import {avg, elementRegistry, featureBoundaries, pointerOffset} from "../utils"
 import FeatureContent from "./FeatureContent"
 import StoryList from "./StoryList"
 
@@ -19,7 +19,6 @@ export type FeatureProps = {
 
 const Feature: FC<FeatureProps> = ({feature}) => {
 	const dragControls = useDragControls()
-	const [isBeingDragged, setIsBeingDragged] = useState(false)
 
 	const storyMapState = useAtomValue(storyMapStateAtom)
 	const featuresOrder = storyMapState.find(({epic}) => epic === feature.epic)!.featuresOrder
@@ -42,21 +41,21 @@ const Feature: FC<FeatureProps> = ({feature}) => {
 		}
 	}, [feature.id])
 
-	const startPos = useRef(0)
-
 	return (
 		<motion.div
 			layoutId={feature.id}
 			layout="position"
-			data-is-being-dragged={isBeingDragged}
 			drag
 			dragControls={dragControls}
 			whileDrag="grabbing"
 			dragListener={false}
 			dragSnapToOrigin
-			onPointerDown={() => void (startPos.current = featureDividers[feature.id]!.center)}
-			onDragStart={() => void setIsBeingDragged(true)}
-			onDragEnd={() => void setIsBeingDragged(false)}
+			onPointerDown={(e) => {
+				e.stopPropagation()
+				const contentRect = contentRef.current!.getBoundingClientRect()
+				pointerOffset.current = [e.clientX - avg(contentRect.left, contentRect.right), 0]
+			}}
+			onDragEnd={() => void (pointerOffset.current = null)}
 			// onDrag={(e, info) => {
 			// 	if (prevEpic !== null) {
 			// 		const prevEpicPosition = epicDividers[prevEpic]!
@@ -84,7 +83,7 @@ const Feature: FC<FeatureProps> = ({feature}) => {
 				}}
 				className="-m-4 cursor-grab touch-none p-4 transition-transform hover:scale-105"
 			>
-				<FeatureContent feature={feature} />
+				<FeatureContent feature={feature} ref={contentRef} />
 			</motion.div>
 
 			<StoryList feature={feature} />

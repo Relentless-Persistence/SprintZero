@@ -3,13 +3,13 @@
 import clsx from "clsx"
 import {motion, useDragControls} from "framer-motion"
 import {useAtomValue} from "jotai"
-import {useEffect, useRef, useState} from "react"
+import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
 
 import {storyMapStateAtom} from "../atoms"
-import {elementRegistry, epicDividers} from "../utils"
+import {avg, pointerLocation, elementRegistry, epicBoundaries, pointerOffset} from "../utils"
 import EpicContent from "./EpicContent"
 import FeatureList from "./FeatureList"
 import SmallAddFeatureButton from "./SmallAddFeatureButton"
@@ -22,7 +22,6 @@ export type EpicProps = {
 
 const Epic: FC<EpicProps> = ({epic}) => {
 	const dragControls = useDragControls()
-	const [isBeingDragged, setIsBeingDragged] = useState(false)
 
 	const activeProductId = useActiveProductId()
 	const storyMapState = useAtomValue(storyMapStateAtom)
@@ -48,33 +47,32 @@ const Epic: FC<EpicProps> = ({epic}) => {
 		}
 	}, [epic.id])
 
-	const startPos = useRef(0)
-
 	return (
 		<motion.div
 			layoutId={epic.id}
 			layout="position"
-			data-is-being-dragged={isBeingDragged}
 			drag
 			dragControls={dragControls}
 			whileDrag="grabbing"
 			dragListener={false}
 			dragSnapToOrigin
-			onPointerDown={() => void (startPos.current = epicDividers[epic.id]!.center)}
-			onDragStart={() => void setIsBeingDragged(true)}
-			onDragEnd={() => void setIsBeingDragged(false)}
-			onDrag={(e, info) => {
-				if (prevEpic !== null) {
-					const prevEpicPosition = epicDividers[prevEpic]!
-					if (info.offset.x < prevEpicPosition.center - startPos.current)
-						moveEpicTo({productId: activeProductId!, epicId: epic.id, position: epicIndex - 1})
-				}
-				if (nextEpic !== null) {
-					const nextEpicPosition = epicDividers[nextEpic]!
-					if (info.offset.x > nextEpicPosition.center - startPos.current)
-						moveEpicTo({productId: activeProductId!, epicId: epic.id, position: epicIndex + 1})
-				}
+			onPointerDown={(e) => {
+				const contentRect = contentRef.current!.getBoundingClientRect()
+				pointerOffset.current = [e.clientX - avg(contentRect.left, contentRect.right), 0]
 			}}
+			onDragEnd={() => void (pointerOffset.current = null)}
+			// onDrag={(e, info) => {
+			// 	if (prevEpic !== null) {
+			// 		const prevEpicPosition = epicDividers[prevEpic]!
+			// 		if (info.offset.x < prevEpicPosition.center - startPos.current)
+			// 			moveEpicTo({productId: activeProductId!, epicId: epic.id, position: epicIndex - 1})
+			// 	}
+			// 	if (nextEpic !== null) {
+			// 		const nextEpicPosition = epicDividers[nextEpic]!
+			// 		if (info.offset.x > nextEpicPosition.center - startPos.current)
+			// 			moveEpicTo({productId: activeProductId!, epicId: epic.id, position: epicIndex + 1})
+			// 	}
+			// }}
 			className={clsx(`grid justify-items-center gap-y-4`, featuresOrder.length === 0 && `px-4`)}
 			style={{gridTemplateColumns: `repeat(${featuresOrder.length}, auto)`}}
 			ref={containerRef}

@@ -1,5 +1,6 @@
 "use client"
 
+import {motion} from "framer-motion"
 import {useAtomValue} from "jotai"
 import {useEffect} from "react"
 
@@ -8,7 +9,7 @@ import type {FC} from "react"
 import {storyMapStateAtom} from "./storyMap/atoms"
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
-import {cursorLocationPixels, storyMapScrollPosition, updateCursorLocation} from "./storyMap/utils"
+import {pointerLocation, storyMapScrollPosition, getTargetPosition} from "./storyMap/utils"
 import VersionList from "./VersionList"
 
 const Dashboard: FC = () => {
@@ -16,9 +17,9 @@ const Dashboard: FC = () => {
 
 	useEffect(() => {
 		const handlePointerMove = (e: PointerEvent) => {
-			cursorLocationPixels[0] = e.clientX
-			cursorLocationPixels[1] = e.clientY
-			updateCursorLocation(storyMapState)
+			pointerLocation[0] = e.clientX
+			pointerLocation[1] = e.clientY
+			getTargetPosition(storyMapState)
 		}
 		window.addEventListener(`pointermove`, handlePointerMove)
 
@@ -31,22 +32,23 @@ const Dashboard: FC = () => {
 				<StoryMapHeader />
 
 				<div className="relative w-full grow">
-					<div
+					<motion.div
+						layoutScroll
 						className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2"
 						onScroll={(e) => {
 							storyMapScrollPosition.position = e.currentTarget.scrollLeft
-							updateCursorLocation(storyMapState)
+							getTargetPosition(storyMapState)
 						}}
 					>
 						<StoryMap />
-					</div>
+					</motion.div>
 				</div>
 			</div>
 
 			<VersionList />
 
 			<div
-				className="pointer-events-none fixed z-50 rounded border border-sky/40 bg-sky/20 transition-[left,top,width,height]"
+				className="pointer-events-none fixed z-50 rounded border transition-[left,top,width,height,background,border-color]"
 				id="indicator"
 			/>
 		</div>

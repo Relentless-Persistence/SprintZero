@@ -9,7 +9,7 @@ import type {Epic as EpicType} from "~/types/db/Epics"
 
 import {epicsAtom, storyMapStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
-import {calculateDividers, useSubscribeToData} from "./utils"
+import {calculateBoundaries, useSubscribeToData} from "./utils"
 import {addEpic} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -20,7 +20,7 @@ const StoryMap: FC = () => {
 
 	useSubscribeToData()
 
-	useInterval(() => calculateDividers(storyMapState), 100)
+	useInterval(() => calculateBoundaries(storyMapState), 100)
 
 	return (
 		<div className="relative z-10 flex w-max items-start">
