@@ -1,35 +1,17 @@
-import {
-	addDoc,
-	collection,
-	doc,
-	getDoc,
-	getDocs,
-	query,
-	serverTimestamp,
-	updateDoc,
-	where,
-	writeBatch,
-} from "firebase9/firestore"
+import {addDoc, collection, doc, getDocs, query, updateDoc, where} from "firebase9/firestore"
 import produce from "immer"
+import {nanoid} from "nanoid"
 
-import type {Timestamp} from "firebase9/firestore"
+import type {StoryMapState} from "~/app/[productSlug]/dashboard/storyMap/atoms"
 import type {Id} from "~/types"
-import type {Comment} from "~/types/db/Comments"
-import type {Epic} from "~/types/db/Epics"
-import type {Feature} from "~/types/db/Features"
 import type {InputState} from "~/types/db/InputStates"
-import type {Product} from "~/types/db/Products"
-import type {Story} from "~/types/db/Stories"
+import type {Epic, Feature, Story} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
-import {getEpic, getFeature, getFeaturesByEpic, getProduct, getStoriesByEpic, getStoriesByFeature} from "./queries"
+import {getProduct} from "./queries"
 import {db} from "~/config/firebase"
-import {Comments} from "~/types/db/Comments"
-import {EpicSchema, Epics} from "~/types/db/Epics"
-import {FeatureSchema, Features} from "~/types/db/Features"
 import {InputStates} from "~/types/db/InputStates"
 import {Products} from "~/types/db/Products"
-import {StorySchema, Stories} from "~/types/db/Stories"
 import {Versions} from "~/types/db/Versions"
 
 type AddVersionVars = {
@@ -58,270 +40,215 @@ export const addVersion = async ({productId, versionName}: AddVersionVars): Prom
 
 type AddEpicVars = {
 	productId: Id
-	name: string
-	description: string
+	data: Partial<Epic>
+	position?: number
 }
 
-export const addEpic = async ({productId, name, description}: AddEpicVars): Promise<void> => {
-	const inputState = await createInputState()
-
-	const data: Omit<Epic, `id` | `updatedAt`> = {
-		description,
-		name,
+export const addEpic = async ({productId, data: initialData, position}: AddEpicVars): Promise<void> => {
+	const id = nanoid() as Id
+	const data: Epic = {
+		id,
+		description: ``,
+		name: ``,
 		priority_level: 0,
 		visibility_level: 0,
 		comments: [],
 		keepers: [],
-		nameInputState: inputState,
-		product: productId,
+		nameInputStateId: await createInputState(),
+		features: [],
+		...initialData,
 	}
-	const newEpicDoc = await addDoc(collection(db, Epics._), data)
 
-	const product = await getProduct(productId)()
-	let storyMapState = product.storyMapState
-	storyMapState.push({epic: newEpicDoc.id as Id, featuresOrder: []})
-	updateDoc(doc(db, Products._, productId), {storyMapState})
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	storyMapState.splice(position ?? Infinity, 0, data)
+
+	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
 type UpdateEpicVars = {
-	epicId: Id
-	data: Partial<Pick<Epic, `description` | `name` | `keepers`>>
-}
-
-export const updateEpic = async ({epicId, data}: UpdateEpicVars): Promise<void> =>
-	await updateDoc(doc(db, Epics._, epicId), data)
-
-export const deleteEpic = (epicId: Id) => async (): Promise<void> => {
-	const epicDoc = await getDoc(doc(db, Epics._, epicId))
-	const epic = EpicSchema.parse({id: epicDoc.id, ...epicDoc.data()})
-
-	const [features, stories, product] = await Promise.all([
-		getFeaturesByEpic(epicId)(),
-		getStoriesByEpic(epicId)(),
-		getProduct(epic.product)(),
-	])
-
-	const batch = writeBatch(db)
-	batch.update(doc(db, Products._, product.id), {
-		storyMapState: product.storyMapState.filter((s) => s.epic !== epicId),
-	} satisfies Partial<Product>)
-	stories.forEach((story) => void batch.delete(doc(db, Stories._, story.id)))
-	features.forEach((feature) => void batch.delete(doc(db, Features._, feature.id)))
-	batch.delete(doc(db, Epics._, epicId))
-	await batch.commit()
-}
-
-type MoveEpicToVars = {
 	productId: Id
 	epicId: Id
-	position: number
+	data: Partial<Pick<Epic, `description` | `name` | `priority_level` | `visibility_level` | `comments` | `keepers`>>
 }
 
-export const moveEpicTo = async ({productId, epicId, position}: MoveEpicToVars): Promise<void> => {
-	const storyMapState = [...(await getProduct(productId)()).storyMapState]
-	const epicIndex = storyMapState.findIndex((s) => s.epic === epicId)
-	if (epicIndex === position) return
-
-	const epicState = storyMapState[epicIndex]!
-	storyMapState[epicIndex] = storyMapState[position]!
-	storyMapState[position] = epicState
-
-	await updateDoc(doc(db, Products._, productId), {storyMapState} satisfies Partial<Product>)
+export const updateEpic = async ({productId, epicId, data}: UpdateEpicVars): Promise<void> => {
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	produce(storyMapState, (state) => {
+		const epicIndex = state.findIndex(({id}) => id === epicId)
+		state[epicIndex] = {
+			...state[epicIndex]!,
+			...data,
+		}
+	})
+	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
-type AddCommentToEpicVars = {
+type DeleteEpicVars = {
+	productId: Id
 	epicId: Id
-	comment: Pick<Comment, `author` | `text` | `type`>
 }
 
-export const addCommentToEpic = async ({epicId, comment}: AddCommentToEpicVars): Promise<void> => {
-	const epicDoc = await getDoc(doc(db, Epics._, epicId))
-	const epic = EpicSchema.parse({id: epicDoc.id, ...epicDoc.data()})
+export const deleteEpic = async ({productId, epicId}: DeleteEpicVars): Promise<void> => {
+	const product = await getProduct(productId)()
 
-	const commentData: Omit<Comment, `id`> = {
-		...comment,
-		createdAt: serverTimestamp() as Timestamp,
-	}
-	const commentDoc = await addDoc(collection(db, Comments._), commentData)
-	await updateDoc(doc(db, Epics._, epicId), {
-		comments: [...epic.comments, commentDoc.id as Id],
-	} satisfies Partial<Epic>)
+	updateDoc(doc(db, Products._, product.id), {
+		storyMapState: product.storyMapState.filter(({id}) => id !== epicId),
+	})
 }
 
 type AddFeatureVars = {
+	productId: Id
 	epicId: Id
-	name: string
+	data: Partial<Feature>
+	position?: number
 }
 
-export const addFeature = async ({epicId, name}: AddFeatureVars): Promise<void> => {
-	const epic = await getEpic(epicId)()
-
-	const data: Omit<Feature, `id`> = {
+export const addFeature = async ({productId, epicId, data: initialData, position}: AddFeatureVars): Promise<void> => {
+	const id = nanoid() as Id
+	const data: Feature = {
+		id,
 		description: ``,
-		name,
+		name: ``,
 		priority_level: 0,
 		visibility_level: 0,
 		comments: [],
-		epic: epicId,
 		nameInputState: await createInputState(),
-		product: epic.product,
+		stories: [],
+		...initialData,
 	}
-	const newFeatureDoc = await addDoc(collection(db, Features._), data)
 
-	const product = await getProduct(epic.product)()
-	const storyMapState = produce(product.storyMapState, (draft) => {
-		draft
-			.find((feature) => feature.epic === epicId)!
-			.featuresOrder.push({feature: newFeatureDoc.id as Id, storiesOrder: []})
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	storyMapState = produce(storyMapState, (state) => {
+		const epicIndex = state.findIndex(({id}) => id === epicId)
+		state[epicIndex]!.features.splice(position ?? Infinity, 0, data)
 	})
-	updateDoc(doc(db, Products._, epic.product), {storyMapState})
+	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
 type DeleteFeatureVars = {
+	productId: Id
+	epicId: Id
 	featureId: Id
 }
 
-export const deleteFeature = async ({featureId}: DeleteFeatureVars): Promise<void> => {
-	const feature = await getFeature(featureId)()
-
-	const [epic, stories, product] = await Promise.all([
-		getEpic(feature.epic)(),
-		getStoriesByFeature(featureId)(),
-		getProduct(feature.product)(),
-	])
-
-	const batch = writeBatch(db)
-	const storyMapState = produce(product.storyMapState, (draft) => {
-		const feature = draft.find((feature) => feature.epic === epic.id)!
-		feature.featuresOrder = feature.featuresOrder.filter((feature) => feature.feature !== featureId)
+export const deleteFeature = async ({productId, epicId, featureId}: DeleteFeatureVars): Promise<void> => {
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	storyMapState = produce(storyMapState, (state) => {
+		const epicIndex = state.findIndex(({id}) => id === epicId)
+		state[epicIndex]!.features = state[epicIndex]!.features.filter(({id}) => id !== featureId)
 	})
-	batch.update(doc(db, Products._, product.id), {storyMapState})
-	stories.forEach((story) => void batch.delete(doc(db, Stories._, story.id)))
-	batch.delete(doc(db, Features._, featureId))
-	await batch.commit()
+	updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
 type UpdateFeatureVars = {
+	productId: Id
+	epicId: Id
 	featureId: Id
 	data: Partial<Pick<Feature, `description` | `name` | `comments`>>
 }
 
-export const updateFeature = async ({featureId, data}: UpdateFeatureVars): Promise<void> =>
-	await updateDoc(doc(db, Features._, featureId), data)
-
-type AddCommentToFeatureVars = {
-	featureId: Id
-	comment: Pick<Comment, `author` | `text` | `type`>
-}
-
-export const addCommentToFeature = async ({featureId, comment}: AddCommentToFeatureVars): Promise<void> => {
-	const featureDoc = await getDoc(doc(db, Features._, featureId))
-	const feature = FeatureSchema.parse({id: featureDoc.id, ...featureDoc.data()})
-	const commentData: Omit<Comment, `id`> = {
-		...comment,
-		createdAt: serverTimestamp() as Timestamp,
-	}
-	const commentDoc = await addDoc(collection(db, Comments._), commentData)
-	await updateDoc(doc(db, Features._, featureId), {
-		comments: [...feature.comments, commentDoc.id as Id],
-	} satisfies Partial<Feature>)
+export const updateFeature = async ({productId, epicId, featureId, data}: UpdateFeatureVars): Promise<void> => {
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	produce(storyMapState, (state) => {
+		const epicIndex = state.findIndex(({id}) => id === epicId)
+		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		state[epicIndex]!.features[featureIndex] = {
+			...state[epicIndex]!.features[featureIndex]!,
+			...data,
+		}
+	})
+	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
 type AddStoryVars = {
+	productId: Id
+	epicId: Id
 	featureId: Id
-	description: string
-	name: string
-	version: Id
+	data: Partial<Story> & {version: Id}
+	position?: number
 }
 
-export const addStory = async ({featureId, description, name, version}: AddStoryVars): Promise<void> => {
-	const feature = await getFeature(featureId)()
-
-	const data: Omit<Story, `id`> = {
+export const addStory = async ({
+	productId,
+	epicId,
+	featureId,
+	data: initialData,
+	position,
+}: AddStoryVars): Promise<void> => {
+	const id = nanoid() as Id
+	const data: Story = {
+		id,
 		acceptanceCriteria: [],
 		codeLink: null,
-		description,
+		description: ``,
 		designLink: null,
-		name,
+		name: ``,
 		points: 0,
 		priority_level: 0,
 		visibility_level: 0,
 		comments: [],
-		epic: feature.epic,
-		feature: featureId,
 		nameInputState: await createInputState(),
-		product: feature.product,
-		version,
+		...initialData,
 	}
-	const newStoryDoc = await addDoc(collection(db, Stories._), data)
 
-	const product = await getProduct(feature.product)()
-	const storyMapState = produce(product.storyMapState, (storyMapState) => {
-		storyMapState
-			.find((e) => e.epic === feature.epic)!
-			.featuresOrder.find((f) => f.feature === featureId)!
-			.storiesOrder.push({story: newStoryDoc.id as Id})
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	storyMapState = produce(storyMapState, (state) => {
+		const epicIndex = state.findIndex(({id}) => id === epicId)
+		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		state[epicIndex]!.features[featureIndex]!.stories.splice(position ?? Infinity, 0, data)
 	})
-	updateDoc(doc(db, Products._, feature.product), {storyMapState})
+	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
 type DeleteStoryVars = {
+	productId: Id
+	epicId: Id
+	featureId: Id
 	storyId: Id
 }
 
-export const deleteStory = async ({storyId}: DeleteStoryVars): Promise<void> => {
-	const storyDoc = await getDoc(doc(db, Stories._, storyId))
-	const story = StorySchema.parse({id: storyDoc.id, ...storyDoc.data()})
-
-	const product = await getProduct(story.product)()
-
-	const batch = writeBatch(db)
-	const storyMapState = produce(product.storyMapState, (draft) => {
-		const featuresOrder = draft.find((feature) => feature.epic === story.epic)!.featuresOrder
-		let storiesOrder = featuresOrder.find((feature) => feature.feature === story.feature)!.storiesOrder
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		storiesOrder = storiesOrder.filter((story) => story.story !== storyId)
+export const deleteStory = async ({productId, epicId, featureId, storyId}: DeleteStoryVars): Promise<void> => {
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	storyMapState = produce(storyMapState, (state) => {
+		const epicIndex = state.findIndex(({id}) => id === epicId)
+		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		state[epicIndex]!.features[featureIndex]!.stories = state[epicIndex]!.features[featureIndex]!.stories.filter(
+			({id}) => id !== storyId,
+		)
 	})
-	batch.update(doc(db, Products._, product.id), {storyMapState})
-	batch.delete(doc(db, Stories._, storyId))
-	await batch.commit()
+	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
 type UpdateStoryVars = {
+	productId: Id
+	epicId: Id
+	featureId: Id
 	storyId: Id
 	data: Partial<
 		Pick<Story, `acceptanceCriteria` | `codeLink` | `description` | `designLink` | `name` | `points` | `version`>
 	>
 }
 
-export const updateStory = async ({storyId, data}: UpdateStoryVars): Promise<void> =>
-	await updateDoc(doc(db, Stories._, storyId), data)
-
-type AddCommentToStoryVars = {
-	storyId: Id
-	comment: Pick<Comment, `author` | `text` | `type`>
+export const updateStory = async ({productId, epicId, featureId, storyId, data}: UpdateStoryVars): Promise<void> => {
+	let storyMapState = (await getProduct(productId)()).storyMapState
+	storyMapState = produce(storyMapState, (state) => {
+		const epicIndex = state.findIndex(({id}) => id === epicId)
+		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		const storyIndex = state[epicIndex]!.features[featureIndex]!.stories.findIndex(({id}) => id === storyId)
+		state[epicIndex]!.features[featureIndex]!.stories[storyIndex] = {
+			...state[epicIndex]!.features[featureIndex]!.stories[storyIndex]!,
+			...data,
+		}
+	})
+	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
 
-export const addCommentToStory = async ({storyId, comment}: AddCommentToStoryVars): Promise<void> => {
-	const storyDoc = await getDoc(doc(db, Stories._, storyId))
-	const story = StorySchema.parse({id: storyDoc.id, ...storyDoc.data()})
-	const commentData: Omit<Comment, `id`> = {
-		...comment,
-		createdAt: serverTimestamp() as Timestamp,
-	}
-	const commentDoc = await addDoc(collection(db, Comments._), commentData)
-	await updateDoc(doc(db, Stories._, storyId), {
-		comments: [...story.comments, commentDoc.id as Id],
-	} satisfies Partial<Story>)
-}
-
-export const createInputState = async (): Promise<Id> => {
-	return (
+export const createInputState = async (): Promise<Id> =>
+	(
 		await addDoc(collection(db, InputStates._), {
 			selections: {},
 		} satisfies Omit<InputState, `id`>)
 	).id as Id
-}
 
 type UpdateInputStateVars = {
 	id: Id
@@ -332,3 +259,11 @@ type UpdateInputStateVars = {
 export const updateInputState = async ({id, inputState, userId}: UpdateInputStateVars): Promise<void> => {
 	await updateDoc(doc(db, InputStates._, id), {[`${InputStates.selections}.${userId}`]: inputState})
 }
+
+type SetStoryMapStateVars = {
+	productId: Id
+	storyMapState: StoryMapState
+}
+
+export const setStoryMapState = async ({productId, storyMapState}: SetStoryMapStateVars): Promise<void> =>
+	await updateDoc(doc(db, Products._, productId), {storyMapState})

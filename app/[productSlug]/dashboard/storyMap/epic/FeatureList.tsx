@@ -1,36 +1,31 @@
 import {CopyOutlined} from "@ant-design/icons"
-import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
-import type {Epic as EpicType} from "~/types/db/Epics"
-import type {Feature as FeatureType} from "~/types/db/Features"
+import type {Id} from "~/types"
+import type {Epic as EpicType} from "~/types/db/Products"
 
-import {featuresAtom, storyMapStateAtom} from "../atoms"
+import {useGetEpic} from "../atoms"
 import Feature from "../feature/Feature"
 import {addFeature} from "~/utils/api/mutations"
 
 export type FeatureListProps = {
+	productId: Id
 	epic: EpicType
 }
 
-const FeatureList: FC<FeatureListProps> = ({epic}) => {
-	const features = useAtomValue(featuresAtom)
-	const storyMapState = useAtomValue(storyMapStateAtom)
-	const featuresOrder = storyMapState.find((e) => e.epic === epic.id)!.featuresOrder
+const FeatureList: FC<FeatureListProps> = ({productId, epic}) => {
+	const features = useGetEpic(epic.id).features
 
 	return (
 		<>
-			{featuresOrder
-				.map(({feature}) => features.find((f) => f.id === feature))
-				.filter((feature): feature is FeatureType => feature !== undefined)
-				.map((feature) => (
-					<Feature key={feature.id} feature={feature} />
-				))}
+			{features.map((feature) => (
+				<Feature key={feature.id} feature={feature} />
+			))}
 
 			{features.length === 0 && (
 				<button
 					type="button"
-					onClick={() => void addFeature({epicId: epic.id, name: `Feature`})}
+					onClick={() => void addFeature({productId, epicId: epic.id, data: {name: `Feature`}})}
 					className="mx-4 flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
 				>
 					<CopyOutlined />

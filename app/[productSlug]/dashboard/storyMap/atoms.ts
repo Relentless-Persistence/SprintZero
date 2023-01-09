@@ -1,16 +1,24 @@
-import {atom} from "jotai"
+import {atom, useAtomValue} from "jotai"
 
 import type {Id} from "~/types"
-import type {Epic} from "~/types/db/Epics"
-import type {Feature} from "~/types/db/Features"
-import type {Story} from "~/types/db/Stories"
+import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 
-export const currentVersionAtom = atom<Id | `__ALL_VERSIONS__`>(`__ALL_VERSIONS__`)
+export const currentVersionAtom = atom<{id: Id | `__ALL_VERSIONS__`; name: string}>({
+	id: `__ALL_VERSIONS__`,
+	name: `All`,
+})
 export const newVersionInputAtom = atom<string | null>(null)
 
-export type StoryMapState = Array<{epic: Id; featuresOrder: Array<{feature: Id; storiesOrder: Array<{story: Id}>}>}>
 export const storyMapStateAtom = atom<StoryMapState>([])
-
-export const epicsAtom = atom<Epic[]>([])
-export const featuresAtom = atom<Feature[]>([])
-export const storiesAtom = atom<Story[]>([])
+export const useGetEpic = (epicId: Id): Epic => {
+	const storyMapState = useAtomValue(storyMapStateAtom)
+	return storyMapState.find((epic) => epic.id === epicId)!
+}
+export const useGetFeature = (epicId: Id, featureId: Id): Feature => {
+	const epic = useGetEpic(epicId)
+	return epic.features.find((feature) => feature.id === featureId)!
+}
+export const useGetStory = (epicId: Id, featureId: Id, storyId: Id): Story => {
+	const feature = useGetFeature(epicId, featureId)
+	return feature.stories.find((story) => story.id === storyId)!
+}

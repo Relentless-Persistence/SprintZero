@@ -32,9 +32,11 @@ specifiers:
   firebase: ^8.10.1
   firebase9: npm:firebase@9.15.0
   framer-motion: 8.2.4
+  immer: 9.0.17
   immutability-helper: ^3.1.1
   jotai: 1.12.1
   lodash: 4.17.21
+  nanoid: 4.0.0
   next: 13.1.1
   openai: 3.1.0
   postcss: 8.4.21
@@ -94,9 +96,11 @@ dependencies:
   firebase: 8.10.1
   firebase9: /firebase/9.15.0
   framer-motion: 8.2.4_biqbaboplfbrettd7655fr4n2y
+  immer: 9.0.17
   immutability-helper: 3.1.1
   jotai: 1.12.1_react@18.2.0
   lodash: 4.17.21
+  nanoid: 4.0.0
   next: 13.1.1_biqbaboplfbrettd7655fr4n2y
   openai: 3.1.0
   postcss: 8.4.21
@@ -905,7 +909,7 @@ packages:
       '@antv/xflow-hook': 1.0.52
       antd: 4.24.4_biqbaboplfbrettd7655fr4n2y
       classnames: 2.3.2
-      immer: 9.0.16
+      immer: 9.0.17
       lodash: 4.17.21
       mana-common: 0.3.2
       mana-syringe: 0.2.2
@@ -4701,8 +4705,8 @@ packages:
     engines: {node: '>= 4'}
     dev: false
 
-  /immer/9.0.16:
-    resolution: {integrity: sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==}
+  /immer/9.0.17:
+    resolution: {integrity: sha512-+hBruaLSQvkPfxRiTLK/mi4vLH+/VQS6z2KJahdoxlleFOI8ARqzOF17uy12eFDlqWmPoygwc5evgwcp+dlHhg==}
     dev: false
 
   /immutability-helper/3.1.1:
@@ -5308,6 +5312,12 @@ packages:
   /nanoid/3.3.4:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+    dev: false
+
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
     hasBin: true
     dev: false
 

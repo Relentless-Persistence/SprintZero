@@ -1,41 +1,36 @@
 import {ReadOutlined} from "@ant-design/icons"
-import {useMutation} from "@tanstack/react-query"
-import {useAtomValue, useSetAtom} from "jotai"
+import produce from "immer"
+import {useSetAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Epic as EpicType} from "~/types/db/Epics"
+import type {Id} from "~/types"
+import type {Epic as EpicType} from "~/types/db/Products"
 
-import {epicsAtom, storiesAtom} from "../atoms"
+import {storyMapStateAtom, useGetEpic} from "../atoms"
 import AutoSizingInput from "../AutoSizingInput"
 import ItemDrawer from "../ItemDrawer"
-import {addCommentToEpic, deleteEpic, updateEpic} from "~/utils/api/mutations"
+import {deleteEpic, updateEpic} from "~/utils/api/mutations"
 
 export type EpicContentProps = {
+	productId: Id
 	epic: EpicType
 }
 
-const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = ({epic}, ref) => {
+const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = ({productId, epic}, ref) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const setEpics = useSetAtom(epicsAtom)
-	const points = useAtomValue(storiesAtom)
-		.filter((story) => story.epic === epic.id)
+	const points = useGetEpic(epic.id)
+		.features.flatMap((feature) => feature.stories)
 		.reduce((acc, story) => acc + story.points, 0)
 
-	const deleteEpicMutation = useMutation({mutationKey: [`delete-epic`, epic.id], mutationFn: deleteEpic(epic.id)})
-
+	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const updateLocalEpicName = (newName: string) => {
-		setEpics((oldEpics) => {
-			const index = oldEpics.findIndex((oldEpic) => oldEpic.id === epic.id)
-			return [
-				...oldEpics.slice(0, index),
-				{
-					...oldEpics[index]!,
-					name: newName,
-				},
-				...oldEpics.slice(index + 1),
-			]
-		})
+		setStoryMapState((state) =>
+			produce(state, (state) => {
+				const index = state.findIndex((oldEpic) => oldEpic.id === epic.id)
+				state[index]!.name = newName
+			}),
+		)
 	}
 
 	return (
@@ -55,9 +50,9 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 					value={epic.name}
 					onChange={(value) => {
 						updateLocalEpicName(value)
-						updateEpic({epicId: epic.id, data: {name: value}})
+						updateEpic({productId, epicId: epic.id, data: {name: value}})
 					}}
-					inputStateId={epic.nameInputState}
+					inputStateId={epic.nameInputStateId}
 					inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
 				/>
 			</div>
@@ -68,18 +63,17 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 				data={{
 					points,
 					description: epic.description,
-					onDescriptionChange: (value) => void updateEpic({epicId: epic.id, data: {description: value}}),
+					onDescriptionChange: (value) => void updateEpic({productId, epicId: epic.id, data: {description: value}}),
 					checklist: {
 						title: `Keepers`,
 						items: [],
 						onItemToggle: () => {},
 					},
 					comments: epic.comments,
-					onCommentAdd: (comment, author, type) =>
-						void addCommentToEpic({epicId: epic.id, comment: {text: comment, author, type}}),
+					onCommentAdd: () => {},
 					onDelete: () => {
 						setIsDrawerOpen(false)
-						deleteEpicMutation.mutate()
+						deleteEpic({productId, epicId: epic.id})
 					},
 				}}
 				isOpen={isDrawerOpen}

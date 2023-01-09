@@ -1,44 +1,49 @@
 "use client"
 
 import {useQueryClient} from "@tanstack/react-query"
+import produce from "immer"
 import {useSetAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Story as StoryType} from "~/types/db/Stories"
+import type {Id} from "~/types"
+import type {Story as StoryType} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
-import {storiesAtom} from "../atoms"
+import {storyMapStateAtom} from "../atoms"
 import AutoSizingInput from "../AutoSizingInput"
 import ItemDrawer from "../ItemDrawer"
-import {addCommentToStory, deleteStory, updateStory} from "~/utils/api/mutations"
+import {deleteStory, updateStory} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type StoryContentProps = {
+	productId: Id
+	epicId: Id
+	featureId: Id
 	story: StoryType
 }
 
-const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> = ({story}, ref) => {
+const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> = (
+	{productId, epicId, featureId, story},
+	ref,
+) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	const activeProduct = useActiveProductId()
 	const version = useQueryClient()
 		.getQueryData<Version[]>([`all-versions`, activeProduct])
 		?.find((version) => version.id === story.version)
-	const setStories = useSetAtom(storiesAtom)
 
+	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const updateLocalStoryName = (newName: string) => {
-		setStories((oldStories) => {
-			const index = oldStories.findIndex((oldStory) => oldStory.id === story.id)
-			return [
-				...oldStories.slice(0, index),
-				{
-					...oldStories[index]!,
-					name: newName,
-				},
-				...oldStories.slice(index + 1),
-			]
-		})
+		setStoryMapState((state) =>
+			produce(state, (state) => {
+				const epicIndex = state.findIndex((epic) => epic.id === epicId)
+				const featureIndex = state[epicIndex]!.features.findIndex((feature) => feature.id === featureId)
+				const storyIndex = state[epicIndex]!.features[featureIndex]!.stories.findIndex((s) => s.id === story.id)
+				state[epicIndex]!.features[featureIndex]!.stories[storyIndex]!.name = newName
+			}),
+		)
 	}
 
 	return (
@@ -60,7 +65,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 						value={story.name}
 						onChange={(value) => {
 							updateLocalStoryName(value)
-							updateStory({storyId: story.id, data: {name: value}})
+							updateStory({productId, epicId, featureId, storyId: story.id, data: {name: value}})
 						}}
 						inputStateId={story.nameInputState}
 						inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
@@ -74,18 +79,18 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 				data={{
 					points: story.points,
 					description: story.description,
-					onDescriptionChange: (value) => void updateStory({storyId: story.id, data: {description: value}}),
+					onDescriptionChange: (value) =>
+						void updateStory({productId, epicId, featureId, storyId: story.id, data: {description: value}}),
 					checklist: {
 						title: `Acceptance criteria`,
 						items: story.acceptanceCriteria.map((item) => ({id: item.id, label: item.name, checked: item.checked})),
 						onItemToggle: () => {},
 					},
 					comments: story.comments,
-					onCommentAdd: (comment, author, type) =>
-						void addCommentToStory({storyId: story.id, comment: {text: comment, author, type}}),
+					onCommentAdd: () => {},
 					onDelete: () => {
 						setIsDrawerOpen(false)
-						deleteStory({storyId: story.id})
+						deleteStory({productId, epicId, featureId, storyId: story.id})
 					},
 				}}
 				isOpen={isDrawerOpen}

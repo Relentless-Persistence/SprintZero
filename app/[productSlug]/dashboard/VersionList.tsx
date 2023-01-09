@@ -21,9 +21,6 @@ const VersionList: FC = () => {
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProductId],
 		queryFn: getVersionsByProduct(activeProductId!),
-		onSuccess: (versions) => {
-			if (currentVersion === `` && versions[0]) setCurrentVersion(versions[0].id)
-		},
 		enabled: activeProductId !== null,
 	})
 
@@ -38,14 +35,18 @@ const VersionList: FC = () => {
 	return (
 		<div>
 			<Menu
-				selectedKeys={[currentVersion]}
+				selectedKeys={[currentVersion.id]}
 				items={[
 					...(versions ?? []).map((version) => ({
 						key: version.id,
 						label: version.name,
-						onClick: () => void setCurrentVersion(version.id),
+						onClick: () => void setCurrentVersion({id: version.id, name: version.name}),
 					})),
-					{key: `__ALL_VERSIONS__`, label: `All`, onClick: () => void setCurrentVersion(`__ALL_VERSIONS__`)},
+					{
+						key: `__ALL_VERSIONS__`,
+						label: `All`,
+						onClick: () => void setCurrentVersion({id: `__ALL_VERSIONS__`, name: `All`}),
+					},
 				]}
 				className="bg-transparent"
 			/>

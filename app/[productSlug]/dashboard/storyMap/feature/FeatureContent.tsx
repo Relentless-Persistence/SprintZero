@@ -1,39 +1,42 @@
 "use client"
 
 import {CopyOutlined} from "@ant-design/icons"
-import {useAtomValue, useSetAtom} from "jotai"
+import produce from "immer"
+import {useSetAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Feature as FeatureType} from "~/types/db/Features"
+import type {Id} from "~/types"
+import type {Feature as FeatureType} from "~/types/db/Products"
 
-import {featuresAtom, storiesAtom} from "../atoms"
+import {storyMapStateAtom, useGetFeature} from "../atoms"
 import AutoSizingInput from "../AutoSizingInput"
 import ItemDrawer from "../ItemDrawer"
-import {addCommentToFeature, deleteFeature, updateFeature} from "~/utils/api/mutations"
+import {deleteFeature, updateFeature} from "~/utils/api/mutations"
 
 export type FeatureContentProps = {
+	productId: Id
+	epicId: Id
 	feature: FeatureType
 }
 
-const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentProps> = ({feature}, ref) => {
+const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentProps> = (
+	{productId, epicId, feature},
+	ref,
+) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const setFeatures = useSetAtom(featuresAtom)
-	const stories = useAtomValue(storiesAtom).filter((story) => story.feature === feature.id)
-	const points = stories.filter((story) => story.feature === feature.id).reduce((acc, story) => acc + story.points, 0)
+	const stories = useGetFeature(epicId, feature.id).stories
+	const points = stories.reduce((acc, story) => acc + story.points, 0)
 
+	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const updateLocalFeatureName = (newName: string) => {
-		setFeatures((oldFeatures) => {
-			const index = oldFeatures.findIndex((oldFeature) => oldFeature.id === feature.id)
-			return [
-				...oldFeatures.slice(0, index),
-				{
-					...oldFeatures[index]!,
-					name: newName,
-				},
-				...oldFeatures.slice(index + 1),
-			]
-		})
+		setStoryMapState((state) =>
+			produce(state, (state) => {
+				const epicIndex = state.findIndex((epic) => epic.id === epicId)
+				const featureIndex = state[epicIndex]!.features.findIndex((f) => f.id === feature.id)
+				state[epicIndex]!.features[featureIndex]!.name = newName
+			}),
+		)
 	}
 
 	return (
@@ -53,7 +56,7 @@ const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentPro
 					value={feature.name}
 					onChange={(value) => {
 						updateLocalFeatureName(value)
-						updateFeature({featureId: feature.id, data: {name: value}})
+						updateFeature({productId, epicId, featureId: feature.id, data: {name: value}})
 					}}
 					inputStateId={feature.nameInputState}
 					inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
@@ -66,13 +69,13 @@ const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentPro
 				data={{
 					points,
 					description: feature.description,
-					onDescriptionChange: (value) => void updateFeature({featureId: feature.id, data: {description: value}}),
+					onDescriptionChange: (value) =>
+						void updateFeature({productId, epicId, featureId: feature.id, data: {description: value}}),
 					comments: feature.comments,
-					onCommentAdd: (comment, author, type) =>
-						void addCommentToFeature({featureId: feature.id, comment: {text: comment, author, type}}),
+					onCommentAdd: () => {},
 					onDelete: () => {
 						setIsDrawerOpen(false)
-						deleteFeature({featureId: feature.id})
+						deleteFeature({productId, epicId, featureId: feature.id})
 					},
 				}}
 				isOpen={isDrawerOpen}
