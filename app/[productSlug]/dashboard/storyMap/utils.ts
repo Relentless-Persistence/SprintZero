@@ -70,9 +70,11 @@ export let storyDividers = window.__storyDividers
 export let cursorLocationPixels = window.__cursorLocationPixels
 export let cursorLocation = window.__cursorLocation
 
-export const calculateDividers = (): void => {
+export const calculateDividers = (storyMapState: StoryMapState): void => {
 	Object.entries(elementRegistry.epics).forEach(([id, element]) => {
+		// Initialize the divider if it doesn't exist
 		if (!epicDividers[id as Id]) epicDividers[id as Id] = {left: 0, center: 0, right: 0}
+
 		const divider = epicDividers[id as Id]!
 
 		if (element.content) {
@@ -81,9 +83,12 @@ export const calculateDividers = (): void => {
 		}
 
 		if (element.container) {
+			const isFirstEpic = id === storyMapState[0]!.epic
+			const isLastEpic = id === storyMapState[storyMapState.length - 1]!.epic
+
 			const boundingRect = element.container.getBoundingClientRect()
-			divider.left = boundingRect.left + storyMapScrollPosition.position
-			divider.right = boundingRect.right + storyMapScrollPosition.position
+			divider.left = isFirstEpic ? 0 : boundingRect.left + storyMapScrollPosition.position
+			divider.right = isLastEpic ? Infinity : boundingRect.right + storyMapScrollPosition.position
 		}
 	})
 
@@ -97,19 +102,48 @@ export const calculateDividers = (): void => {
 		}
 
 		if (element.container) {
+			const epicIndex = storyMapState.findIndex(({featuresOrder}) => featuresOrder.some(({feature}) => feature === id))
+			const isFirstEpic = epicIndex === 0
+			const isLastEpic = epicIndex === storyMapState.length - 1
+			const featuresOrder = storyMapState[epicIndex]!.featuresOrder
+			const isFirstFeatureInEpic = id === featuresOrder[0]!.feature
+			const isLastFeatureInEpic = id === featuresOrder.at(-1)!.feature
+
 			const boundingRect = element.container.getBoundingClientRect()
-			divider.left = boundingRect.left + storyMapScrollPosition.position
-			divider.right = boundingRect.right + storyMapScrollPosition.position
+			const left = boundingRect.left + storyMapScrollPosition.position
+			const right = boundingRect.right + storyMapScrollPosition.position
+			if (isFirstFeatureInEpic) {
+				if (isFirstEpic) divider.left = 0
+				else divider.left = epicDividers[storyMapState[epicIndex - 1]!.epic]!.right
+			} else {
+				divider.left = left
+			}
+			if (isLastFeatureInEpic) {
+				if (isLastEpic) divider.right = Infinity
+				else divider.right = epicDividers[storyMapState[epicIndex + 1]!.epic]!.left
+			} else {
+				divider.right = right
+			}
 		}
 	})
 
 	Object.entries(elementRegistry.stories).forEach(([id, element]: [id: Id, element: HTMLElement | null]) => {
+		const allFeatures = storyMapState.reduce((acc, {featuresOrder}) => [...acc, ...featuresOrder], [])
+
 		if (element) {
+			let isLastStory = false
+			for (const {storiesOrder} of allFeatures) {
+				if (id === storiesOrder.at(-1)?.story) {
+					isLastStory = true
+					break
+				}
+			}
+
 			const boundingRect = element.getBoundingClientRect()
 			storyDividers[id] = {
 				top: boundingRect.top - storyMapTop,
 				center: avg(boundingRect.top, boundingRect.bottom) - storyMapTop,
-				bottom: boundingRect.bottom - storyMapTop,
+				bottom: isLastStory ? Infinity : boundingRect.bottom - storyMapTop,
 			}
 		} else {
 			delete storyDividers[id]

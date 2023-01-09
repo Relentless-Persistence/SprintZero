@@ -9,7 +9,7 @@ import type {Epic as EpicType} from "~/types/db/Epics"
 
 import {epicsAtom, storyMapStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
-import {calculateDividers, useSubscribeToData, updateCursorLocation, cursorLocationPixels} from "./utils"
+import {calculateDividers, useSubscribeToData} from "./utils"
 import {addEpic} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -20,17 +20,10 @@ const StoryMap: FC = () => {
 
 	useSubscribeToData()
 
-	useInterval(calculateDividers, 100)
+	useInterval(() => calculateDividers(storyMapState), 100)
 
 	return (
-		<div
-			className="relative z-10 flex w-max items-start"
-			onPointerMove={(e) => {
-				cursorLocationPixels[0] = e.clientX
-				cursorLocationPixels[1] = e.clientY
-				updateCursorLocation(storyMapState)
-			}}
-		>
+		<div className="relative z-10 flex w-max items-start">
 			{storyMapState
 				.map(({epic}) => epics.find((e) => e.id === epic))
 				.filter((epic): epic is EpicType => epic !== undefined)
