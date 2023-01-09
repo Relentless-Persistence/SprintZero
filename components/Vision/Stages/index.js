@@ -143,7 +143,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 								disabled={step3}
 								createVision={createVision}
 								updateVision={updateVision}
-                id={vision.id ? vision.id : null}
+								id={vision.id ? vision.id : null}
 							/>
 						),
 					},
