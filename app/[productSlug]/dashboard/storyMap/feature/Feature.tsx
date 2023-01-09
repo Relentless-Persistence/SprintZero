@@ -3,7 +3,7 @@
 import clsx from "clsx"
 import {motion, useDragControls} from "framer-motion"
 import {useAtomValue} from "jotai"
-import {useEffect, useRef} from "react"
+import {useEffect, useRef, useState} from "react"
 
 import type {FC} from "react"
 import type {Feature as FeatureType} from "~/types/db/Features"
@@ -19,6 +19,7 @@ export type FeatureProps = {
 
 const Feature: FC<FeatureProps> = ({feature}) => {
 	const dragControls = useDragControls()
+	const [isBeingDragged, setIsBeingDragged] = useState(false)
 
 	const storyMapState = useAtomValue(storyMapStateAtom)
 	const featuresOrder = storyMapState.find(({epic}) => epic === feature.epic)!.featuresOrder
@@ -47,11 +48,15 @@ const Feature: FC<FeatureProps> = ({feature}) => {
 		<motion.div
 			layoutId={feature.id}
 			layout="position"
+			data-is-being-dragged={isBeingDragged}
 			drag
 			dragControls={dragControls}
+			whileDrag="grabbing"
 			dragListener={false}
 			dragSnapToOrigin
 			onPointerDown={() => void (startPos.current = featureDividers[feature.id]!.center)}
+			onDragStart={() => void setIsBeingDragged(true)}
+			onDragEnd={() => void setIsBeingDragged(false)}
 			// onDrag={(e, info) => {
 			// 	if (prevEpic !== null) {
 			// 		const prevEpicPosition = epicDividers[prevEpic]!
@@ -71,7 +76,8 @@ const Feature: FC<FeatureProps> = ({feature}) => {
 			)}
 			ref={containerRef}
 		>
-			<div
+			<motion.div
+				variants={{grabbing: {cursor: `grabbing`}}}
 				onPointerDown={(e) => {
 					e.preventDefault()
 					dragControls.start(e)
@@ -79,7 +85,7 @@ const Feature: FC<FeatureProps> = ({feature}) => {
 				className="-m-4 cursor-grab touch-none p-4 transition-transform hover:scale-105"
 			>
 				<FeatureContent feature={feature} />
-			</div>
+			</motion.div>
 
 			<StoryList feature={feature} />
 		</motion.div>

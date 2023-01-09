@@ -3,7 +3,7 @@
 import clsx from "clsx"
 import {motion, useDragControls} from "framer-motion"
 import {useAtomValue} from "jotai"
-import {useEffect, useRef} from "react"
+import {useEffect, useRef, useState} from "react"
 
 import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Epics"
@@ -22,6 +22,7 @@ export type EpicProps = {
 
 const Epic: FC<EpicProps> = ({epic}) => {
 	const dragControls = useDragControls()
+	const [isBeingDragged, setIsBeingDragged] = useState(false)
 
 	const activeProductId = useActiveProductId()
 	const storyMapState = useAtomValue(storyMapStateAtom)
@@ -53,11 +54,15 @@ const Epic: FC<EpicProps> = ({epic}) => {
 		<motion.div
 			layoutId={epic.id}
 			layout="position"
+			data-is-being-dragged={isBeingDragged}
 			drag
 			dragControls={dragControls}
+			whileDrag="grabbing"
 			dragListener={false}
 			dragSnapToOrigin
 			onPointerDown={() => void (startPos.current = epicDividers[epic.id]!.center)}
+			onDragStart={() => void setIsBeingDragged(true)}
+			onDragEnd={() => void setIsBeingDragged(false)}
 			onDrag={(e, info) => {
 				if (prevEpic !== null) {
 					const prevEpicPosition = epicDividers[prevEpic]!
@@ -74,7 +79,8 @@ const Epic: FC<EpicProps> = ({epic}) => {
 			style={{gridTemplateColumns: `repeat(${featuresOrder.length}, auto)`}}
 			ref={containerRef}
 		>
-			<div
+			<motion.div
+				variants={{grabbing: {cursor: `grabbing`}}}
 				onPointerDown={(e) => {
 					e.preventDefault()
 					dragControls.start(e)
@@ -82,7 +88,7 @@ const Epic: FC<EpicProps> = ({epic}) => {
 				className="-m-4 cursor-grab touch-none p-4 transition-transform hover:scale-105"
 			>
 				<EpicContent epic={epic} ref={contentRef} />
-			</div>
+			</motion.div>
 
 			{/* Pad out the remaining columns in row 1 */}
 			{Array(Math.max(featuresOrder.length - 1, 0))

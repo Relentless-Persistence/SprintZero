@@ -3,7 +3,7 @@
 import clsx from "clsx"
 import {motion} from "framer-motion"
 import {useAtomValue} from "jotai"
-import {useEffect, useRef} from "react"
+import {useEffect, useRef, useState} from "react"
 
 import type {FC} from "react"
 import type {Story as StoryType} from "~/types/db/Stories"
@@ -17,6 +17,7 @@ export type StoryProps = {
 }
 
 const Story: FC<StoryProps> = ({story}) => {
+	const [isDragging, setIsDragging] = useState(false)
 	const storyMapState = useAtomValue(storyMapStateAtom)
 	const storiesOrder = storyMapState
 		.find(({epic}) => epic === story.epic)!
@@ -36,6 +37,10 @@ const Story: FC<StoryProps> = ({story}) => {
 		<motion.div
 			drag
 			dragSnapToOrigin
+			whileDrag="grabbing"
+			onDragStart={() => setIsDragging(true)}
+			onDragEnd={() => setIsDragging(false)}
+			data-is-being-dragged={isDragging}
 			className={clsx(
 				`px-3`,
 				storyIndex === 0 ? `pt-3` : `pt-1.5`,
@@ -43,9 +48,12 @@ const Story: FC<StoryProps> = ({story}) => {
 			)}
 			ref={containerRef}
 		>
-			<div className="-m-1.5 cursor-grab touch-none p-1.5 transition-transform hover:scale-105">
+			<motion.div
+				variants={{grabbing: {cursor: `grabbing`}}}
+				className="-m-1.5 cursor-grab touch-none p-1.5 transition-transform hover:scale-105"
+			>
 				<StoryContent story={story} />
-			</div>
+			</motion.div>
 		</motion.div>
 	)
 }

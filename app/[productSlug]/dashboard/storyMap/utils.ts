@@ -77,12 +77,12 @@ export const calculateDividers = (storyMapState: StoryMapState): void => {
 
 		const divider = epicDividers[id as Id]!
 
-		if (element.content) {
+		if (element.content && element.container?.getAttribute(`data-is-being-dragged`) === `false`) {
 			const boundingRect = element.content.getBoundingClientRect()
 			divider.center = avg(boundingRect.left, boundingRect.right) + storyMapScrollPosition.position
 		}
 
-		if (element.container) {
+		if (element.container && element.container.getAttribute(`data-is-being-dragged`) === `false`) {
 			const isFirstEpic = id === storyMapState[0]!.epic
 			const isLastEpic = id === storyMapState[storyMapState.length - 1]!.epic
 
@@ -96,12 +96,12 @@ export const calculateDividers = (storyMapState: StoryMapState): void => {
 		if (!featureDividers[id as Id]) featureDividers[id as Id] = {left: 0, center: 0, right: 0}
 		const divider = featureDividers[id as Id]!
 
-		if (element.content) {
+		if (element.content && element.container?.getAttribute(`data-is-being-dragged`) === `false`) {
 			const boundingRect = element.content.getBoundingClientRect()
 			divider.center = avg(boundingRect.left, boundingRect.right) + storyMapScrollPosition.position
 		}
 
-		if (element.container) {
+		if (element.container && element.container.getAttribute(`data-is-being-dragged`) === `false`) {
 			const epicIndex = storyMapState.findIndex(({featuresOrder}) => featuresOrder.some(({feature}) => feature === id))
 			const isFirstEpic = epicIndex === 0
 			const isLastEpic = epicIndex === storyMapState.length - 1
@@ -130,7 +130,7 @@ export const calculateDividers = (storyMapState: StoryMapState): void => {
 	Object.entries(elementRegistry.stories).forEach(([id, element]: [id: Id, element: HTMLElement | null]) => {
 		const allFeatures = storyMapState.reduce((acc, {featuresOrder}) => [...acc, ...featuresOrder], [])
 
-		if (element) {
+		if (element && element.getAttribute(`data-is-being-dragged`) === `false`) {
 			let isLastStory = false
 			for (const {storiesOrder} of allFeatures) {
 				if (id === storiesOrder.at(-1)?.story) {

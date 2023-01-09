@@ -50,7 +50,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 				<button
 					type="button"
 					onClick={() => void setIsDrawerOpen(true)}
-					data-nondraggable
+					onPointerDownCapture={(e) => void e.stopPropagation()}
 					className="border-r-[1px] border-laurel bg-green-t1200 p-0.5 text-[0.6rem]"
 				>
 					<p className="-rotate-90">{version?.name}</p>
