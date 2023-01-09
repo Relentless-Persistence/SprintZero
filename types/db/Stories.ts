@@ -23,6 +23,7 @@ export const StorySchema = z.object({
 	comments: z.array(idSchema),
 	epic: idSchema,
 	feature: idSchema,
+	nameInputState: idSchema,
 	product: idSchema,
 	version: idSchema,
 })

@@ -1,5 +1,4 @@
 import {PlusOutlined} from "@ant-design/icons"
-import {useMutation} from "@tanstack/react-query"
 import clsx from "clsx"
 import {useAtomValue} from "jotai"
 
@@ -16,14 +15,10 @@ export type SmallAddFeatureButtonProps = {
 const SmallAddFeatureButton: FC<SmallAddFeatureButtonProps> = ({epic}) => {
 	const features = useAtomValue(featuresAtom).filter((feature) => feature.epic === epic.id)
 
-	const addFeatureMutation = useMutation({
-		mutationFn: addFeature(epic.id),
-	})
-
 	return (
 		<button
 			type="button"
-			onClick={() => void addFeatureMutation.mutate(`Feature`)}
+			onClick={() => void addFeature({epicId: epic.id, name: `Feature`})}
 			className={clsx(
 				`grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white`,
 				features.length === 0 && `invisible`,

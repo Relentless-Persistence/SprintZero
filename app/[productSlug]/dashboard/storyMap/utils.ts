@@ -1,32 +1,38 @@
-import {useQuery} from "@tanstack/react-query"
-import {collection, onSnapshot, query, where} from "firebase9/firestore"
+import {collection, doc, onSnapshot, query, where} from "firebase9/firestore"
 import {useSetAtom} from "jotai"
 import {useEffect} from "react"
 
+import type {StoryMapState} from "./atoms"
 import type {Id} from "~/types"
 
 import {epicsAtom, featuresAtom, storiesAtom, storyMapStateAtom} from "./atoms"
 import {db} from "~/config/firebase"
 import {EpicSchema, Epics} from "~/types/db/Epics"
 import {FeatureSchema, Features} from "~/types/db/Features"
+import {Products, ProductSchema} from "~/types/db/Products"
 import {StorySchema, Stories} from "~/types/db/Stories"
-import {getEpicsByProduct, getFeaturesByProduct, getStoriesByProduct, getProduct} from "~/utils/api/queries"
+import objectEntries from "~/utils/objectEntries"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+
+const storyMapTop = 216
 
 declare global {
 	interface Window {
+		__storyMapScrollPosition: {position: number}
 		__elementRegistry: {
-			epics: Record<Id, HTMLElement | null>
-			features: Record<Id, HTMLElement | null>
+			epics: Record<Id, {content: HTMLElement | null; container: HTMLElement | null}>
+			features: Record<Id, {content: HTMLElement | null; container: HTMLElement | null}>
 			stories: Record<Id, HTMLElement | null>
 		}
-		__epicDividers: Record<Id, {left: number; right: number}>
-		__featureDividers: Record<Id, {left: number; right: number}>
-		__storyDividers: Record<Id, {top: number; bottom: number}>
+		__epicDividers: Record<Id, {left: number; center: number; right: number}>
+		__featureDividers: Record<Id, {left: number; center: number; right: number}>
+		__storyDividers: Record<Id, {top: number; center: number; bottom: number}>
 	}
 }
 
 if (typeof window !== `undefined`) {
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	window.__storyMapScrollPosition = window.__storyMapScrollPosition ?? {position: 0}
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	window.__elementRegistry = window.__elementRegistry ?? {
 		epics: {},
@@ -41,6 +47,7 @@ if (typeof window !== `undefined`) {
 	window.__storyDividers = window.__storyDividers ?? {}
 }
 
+export let storyMapScrollPosition = window.__storyMapScrollPosition
 export let elementRegistry = window.__elementRegistry
 export const layerBoundaries: [number, number] = [54, 156]
 export let epicDividers = window.__epicDividers
@@ -48,91 +55,53 @@ export let featureDividers = window.__featureDividers
 export let storyDividers = window.__storyDividers
 
 export const calculateDividers = (): void => {
-	Object.entries(elementRegistry.epics).forEach(([id, element]: [id: Id, element: HTMLElement | null]) => {
-		if (element) {
-			epicDividers[id] = {
-				left: element.offsetLeft,
-				right: element.offsetLeft + element.offsetWidth,
-			}
-			// debugger
-		} else {
-			delete epicDividers[id]
+	Object.entries(elementRegistry.epics).forEach(([id, element]) => {
+		if (!epicDividers[id as Id]) epicDividers[id as Id] = {left: 0, center: 0, right: 0}
+		const divider = epicDividers[id as Id]!
+
+		if (element.content) {
+			const boundingRect = element.content.getBoundingClientRect()
+			divider.center = avg(boundingRect.left, boundingRect.right) + storyMapScrollPosition.position
+		}
+
+		if (element.container) {
+			const boundingRect = element.container.getBoundingClientRect()
+			divider.left = boundingRect.left + storyMapScrollPosition.position
+			divider.right = boundingRect.right + storyMapScrollPosition.position
 		}
 	})
 
-	Object.entries(elementRegistry.features).forEach(([id, element]: [id: Id, element: HTMLElement | null]) => {
-		if (element) {
-			featureDividers[id] = {
-				left: element.offsetLeft,
-				right: element.offsetLeft + element.offsetWidth,
-			}
-		} else {
-			delete featureDividers[id]
+	Object.entries(elementRegistry.features).forEach(([id, element]) => {
+		if (!featureDividers[id as Id]) featureDividers[id as Id] = {left: 0, center: 0, right: 0}
+		const divider = featureDividers[id as Id]!
+
+		if (element.content) {
+			const boundingRect = element.content.getBoundingClientRect()
+			divider.center = avg(boundingRect.left, boundingRect.right) + storyMapScrollPosition.position
+		}
+
+		if (element.container) {
+			const boundingRect = element.container.getBoundingClientRect()
+			divider.left = boundingRect.left + storyMapScrollPosition.position
+			divider.right = boundingRect.right + storyMapScrollPosition.position
 		}
 	})
 
 	Object.entries(elementRegistry.stories).forEach(([id, element]: [id: Id, element: HTMLElement | null]) => {
 		if (element) {
+			const boundingRect = element.getBoundingClientRect()
 			storyDividers[id] = {
-				top: element.offsetTop,
-				bottom: element.offsetTop + element.offsetHeight,
+				top: boundingRect.top - storyMapTop,
+				center: avg(boundingRect.top, boundingRect.bottom) - storyMapTop,
+				bottom: boundingRect.bottom - storyMapTop,
 			}
 		} else {
 			delete storyDividers[id]
 		}
 	})
-
-	// console.log(epicDividers)
 }
 
 export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) / arr.length
-
-// We need to fetch all data before the story map mounts. This ensures that all elements are in the DOM immediately,
-// which is important since we need to measure the element positions upon mount.
-export const useGetInitialData = (): boolean => {
-	const activeProduct = useActiveProductId()
-
-	const setStoryMapState = useSetAtom(storyMapStateAtom)
-	const setEpics = useSetAtom(epicsAtom)
-	const setFeatures = useSetAtom(featuresAtom)
-	const setStories = useSetAtom(storiesAtom)
-
-	const {isSuccess: isSuccessStoryMapState} = useQuery({
-		queryKey: [`product`, activeProduct],
-		queryFn: getProduct(activeProduct!),
-		enabled: activeProduct !== null,
-		select: (product) => product.storyMapState,
-		onSuccess: (storyMapState) => void setStoryMapState(storyMapState),
-		staleTime: Infinity,
-	})
-
-	const {isSuccess: isSuccessEpics} = useQuery({
-		queryKey: [`all-epics`, activeProduct],
-		queryFn: getEpicsByProduct(activeProduct!),
-		onSuccess: (epics) => void setEpics(epics),
-		enabled: activeProduct !== null,
-		staleTime: Infinity,
-	})
-
-	const {isSuccess: isSuccessFeatures} = useQuery({
-		queryKey: [`all-features`, activeProduct],
-		queryFn: getFeaturesByProduct(activeProduct!),
-		onSuccess: (features) => void setFeatures(features),
-		enabled: activeProduct !== null,
-		staleTime: Infinity,
-	})
-
-	const {isSuccess: isSuccessStories} = useQuery({
-		queryKey: [`all-stories`, activeProduct],
-		queryFn: getStoriesByProduct(activeProduct!),
-		onSuccess: (stories) => void setStories(stories),
-		enabled: activeProduct !== null,
-		staleTime: Infinity,
-	})
-
-	const finishedFetching = isSuccessStoryMapState && isSuccessEpics && isSuccessFeatures && isSuccessStories
-	return finishedFetching
-}
 
 export const useSubscribeToData = (): void => {
 	const activeProduct = useActiveProductId()
@@ -140,8 +109,11 @@ export const useSubscribeToData = (): void => {
 	const setEpics = useSetAtom(epicsAtom)
 	const setFeatures = useSetAtom(featuresAtom)
 	const setStories = useSetAtom(storiesAtom)
+	const setStoryMapState = useSetAtom(storyMapStateAtom)
 
 	useEffect(() => {
+		if (activeProduct === null) return
+
 		const unsubscribeEpics = onSnapshot(
 			query(collection(db, Epics._), where(Epics.product, `==`, activeProduct)),
 			(doc) => {
@@ -166,146 +138,61 @@ export const useSubscribeToData = (): void => {
 			},
 		)
 
+		const unsubscribeStoryMapState = onSnapshot(doc(db, Products._, activeProduct), (doc) => {
+			const data = ProductSchema.parse({id: doc.id, ...doc.data()})
+			setStoryMapState(data.storyMapState)
+		})
+
 		return () => {
 			unsubscribeEpics()
 			unsubscribeFeatures()
 			unsubscribeStories()
+			unsubscribeStoryMapState()
 		}
-	}, [activeProduct, setEpics, setFeatures, setStories])
+	}, [activeProduct, setEpics, setFeatures, setStories, setStoryMapState])
 }
 
-// export const useRegisterElement = (): ((update: {element: HTMLElement; id: Id}) => void) => {
-// 	const setElements = useSetAtom(elementsAtom)
+type WhereIsMyCursorReturn = {
+	epic: {index: number; id: Id | null} | null
+	feature: {index: number; id: Id | null} | null
+	story: {index: number; id: Id | null} | null
+}
 
-// 	return ({element, id}) => void setElements((prev) => ({...prev, [id]: element}))
-// }
+export const whereIsMyCusror = (x: number, y: number, storyMapState: StoryMapState): WhereIsMyCursorReturn => {
+	const xAdj = x + storyMapScrollPosition.position
+	const yAdj = y - storyMapTop
 
-// export const useReportPendingDomChanges = (): ((update: {type: `create` | `update` | `delete`; id: Id}) => void) => {
-// 	const setPendingDomChanges = useSetAtom(pendingDomChangesAtom)
+	const epicId =
+		objectEntries(epicDividers).find(([, divider]) => xAdj > divider.left && xAdj < divider.right)?.[0] ?? null
+	const featureId =
+		objectEntries(featureDividers).find(([, divider]) => xAdj > divider.left && xAdj < divider.right)?.[0] ?? null
 
-// 	return (update) => void setPendingDomChanges((prev) => [...prev, update])
-// }
+	const epicIndex = storyMapState.findIndex(({epic}) => epic === epicId)
+	const featureIndex =
+		epicIndex >= 0 ? storyMapState[epicIndex]!.featuresOrder.findIndex(({feature}) => feature === featureId) : -1
 
-// export const useCalculateDividers = (): ((reasons?: Id[]) => void) => {
-// 	const storyMapState = useAtomValue(storyMapStateAtom)
-// 	const epics = useAtomValue(epicsAtom)
-// 	const features = useAtomValue(featuresAtom)
-// 	const stories = useAtomValue(storiesAtom)
-// 	const elements = useAtomValue(elementsAtom)
-// 	const currentVersion = useAtomValue(currentVersionAtom)
-// 	const setDividers = useSetAtom(dividersAtom)
-// 	const setPendingDomChanges = useSetAtom(pendingDomChangesAtom)
+	const storiesOrder =
+		epicIndex >= 0 && featureIndex >= 0 ? storyMapState[epicIndex]!.featuresOrder[featureIndex]!.storiesOrder : []
+	const storyId =
+		storiesOrder
+			.map(({story}) => [story, storyDividers[story]] as const)
+			.filter(([, divider]) => !!divider)
+			.find(([, divider]) => yAdj > divider!.top && yAdj < divider!.bottom)?.[0] ?? null
+	const storyIndex = storiesOrder.findIndex(({story}) => story === storyId)
 
-// 	const allEpicsRegistered = epicsByCurrentVersion(epics, stories, currentVersion).every(
-// 		(epic) => elements[epic.id] !== undefined,
-// 	)
-// 	const allFeaturesRegistered = featuresByCurrentVersion(features, stories, currentVersion).every(
-// 		(feature) => elements[feature.id] !== undefined,
-// 	)
-// 	const allStoriesRegistered = storiesByCurrentVersion(stories, currentVersion).every(
-// 		(story) => elements[story.id] !== undefined,
-// 	)
+	const r = {
+		epic: epicId ? {index: epicIndex, id: epicId} : null,
+		feature: yAdj > layerBoundaries[0] ? {index: featureIndex, id: featureId} : null,
+		story: yAdj > layerBoundaries[1] ? {index: storyIndex, id: storyId} : null,
+	}
 
-// 	return (reasons) => {
-// 		if (!allEpicsRegistered || !allFeaturesRegistered || !allStoriesRegistered) return
+	if (r.story) {
+		console.log(`epic ${epicIndex}, feature ${featureIndex}, story ${storyIndex}`)
+	} else if (r.feature) {
+		console.log(`epic ${epicIndex}, feature ${featureIndex}`)
+	} else {
+		console.log(`epic ${epicIndex}`)
+	}
 
-// 		let epicDividers: number[] = []
-// 		storyMapState.forEach(({epic}, i) => {
-// 			const element = elements[epic]!
-// 			const epicPos = element!.offsetLeft + element!.offsetWidth / 2
-// 			if (i > 0) epicDividers.push(avg(epicDividers.at(-1)!, epicPos))
-// 			epicDividers.push(epicPos)
-// 		})
-
-// 		let featureDividers: FeatureDivider[] = []
-// 		storyMapState.forEach(({featuresOrder}) => {
-// 			featuresOrder.forEach(({feature}, i) => {
-// 				const element = elements[feature]!
-// 				const featurePos = element!.offsetLeft + element!.offsetWidth / 2
-// 				if (i === 0) {
-// 					featureDividers.push({pos: featurePos, border: false})
-// 				} else {
-// 					featureDividers.push({
-// 						pos: avg(featureDividers.at(-1)!.pos, featurePos),
-// 						border: i === 0,
-// 					})
-// 					featureDividers.push({pos: featurePos, border: false})
-// 				}
-// 			})
-// 		})
-
-// 		const aFeatures: Array<{feature: Id; storiesOrder: Array<{story: Id}>}> = []
-// 		storyMapState.forEach(({featuresOrder}) => {
-// 			aFeatures.push(...featuresOrder)
-// 		})
-
-// 		let storyDividers: StoryDivider[] = aFeatures.map(({feature, storiesOrder}) => {
-// 			const element = elements[feature]!
-// 			const dividers: number[] = []
-// 			storiesOrder.forEach(({story}, i) => {
-// 				const element = elements[story]!
-// 				const storyPos = element!.offsetTop + element!.offsetHeight / 2
-// 				if (i > 0) dividers.push(avg(dividers.at(-1)!, storyPos))
-// 				dividers.push(storyPos)
-// 			})
-
-// 			return {
-// 				featureId: feature,
-// 				featureLeft: element!.offsetLeft,
-// 				featureRight: element!.offsetLeft + element!.offsetWidth,
-// 				dividers,
-// 			}
-// 		})
-
-// 		setDividers([epicDividers, featureDividers, storyDividers])
-// 		console.log(`removing ${reasons}`)
-// 		setPendingDomChanges((prev) => prev.filter(({id}) => reasons?.includes(id)))
-// 	}
-// }
-
-// // A combination of epics containing stories with the current version and epics containing no stories
-// export const epicsByCurrentVersion = (
-// 	allEpics: Epic[],
-// 	allStories: Story[],
-// 	currentVersion: Id | `__ALL_VERSIONS__`,
-// ): Epic[] => {
-// 	if (currentVersion === `__ALL_VERSIONS__`) return allEpics
-
-// 	const storiesWithCurrentVersion = allStories.filter((story) => story.version === currentVersion)
-// 	const epicsWithCurrentVersion = storiesWithCurrentVersion.map((story) => story.epic)
-
-// 	const epicsWithStories = allStories.map((story) => story.epic)
-// 	const epicsWithoutStories = allEpics.filter((epic) => !epicsWithStories.includes(epic.id))
-
-// 	const epicsToShow = [...new Set([...epicsWithCurrentVersion, ...epicsWithoutStories])]
-
-// 	// To ensure that the epics are in the same order as in the state.epics array
-// 	const epics = allEpics.filter((epic) => epicsToShow.includes(epic.id))
-// 	return epics
-// }
-
-// // A combination of features containing stories with the current version and features containing no stories
-// export const featuresByCurrentVersion = (
-// 	allFeatures: Feature[],
-// 	allStories: Story[],
-// 	currentVersion: Id | `__ALL_VERSIONS__`,
-// ): Feature[] => {
-// 	if (currentVersion === `__ALL_VERSIONS__`) return allFeatures
-
-// 	const storiesWithCurrentVersion = allStories.filter((story) => story.version === currentVersion)
-// 	const featuresWithCurrentVersion = storiesWithCurrentVersion.map((story) => story.feature)
-
-// 	const featuresWithStories = allStories.map((story) => story.feature)
-// 	const featuresWithoutStories = allFeatures.filter((feature) => !featuresWithStories.includes(feature.id))
-
-// 	const featuresToShow = [...new Set([...featuresWithCurrentVersion, ...featuresWithoutStories])]
-
-// 	// To ensure that the features are in the same order as in the state.features array
-// 	const features = allFeatures.filter((feature) => featuresToShow.includes(feature.id))
-// 	return features
-// }
-
-// export const storiesByCurrentVersion = (allStories: Story[], currentVersion: Id | `__ALL_VERSIONS__`): Story[] => {
-// 	if (currentVersion === `__ALL_VERSIONS__`) return allStories
-// 	return allStories.filter((story) => story.version === currentVersion)
-// }
+	return r
+}

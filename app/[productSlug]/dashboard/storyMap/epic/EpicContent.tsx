@@ -17,20 +17,15 @@ export type EpicContentProps = {
 
 const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = ({epic}, ref) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const setEpic = useSetAtom(epicsAtom)
+	const setEpics = useSetAtom(epicsAtom)
 	const points = useAtomValue(storiesAtom)
 		.filter((story) => story.epic === epic.id)
 		.reduce((acc, story) => acc + story.points, 0)
 
-	const updateEpicMutation = useMutation({mutationKey: [`update-epic`, epic.id], mutationFn: updateEpic(epic.id)})
-	const addCommentMutation = useMutation({
-		mutationKey: [`add-comment`, epic.id],
-		mutationFn: addCommentToEpic(epic.id),
-	})
 	const deleteEpicMutation = useMutation({mutationKey: [`delete-epic`, epic.id], mutationFn: deleteEpic(epic.id)})
 
-	const updateLocalEpic = (newName: string) => {
-		setEpic((oldEpics) => {
+	const updateLocalEpicName = (newName: string) => {
+		setEpics((oldEpics) => {
 			const index = oldEpics.findIndex((oldEpic) => oldEpic.id === epic.id)
 			return [
 				...oldEpics.slice(0, index),
@@ -59,8 +54,8 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 				<AutoSizingInput
 					value={epic.name}
 					onChange={(value) => {
-						updateLocalEpic(value)
-						updateEpicMutation.mutate({name: value})
+						updateLocalEpicName(value)
+						updateEpic({epicId: epic.id, data: {name: value}})
 					}}
 					inputStateId={epic.nameInputState}
 					inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
@@ -73,14 +68,15 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 				data={{
 					points,
 					description: epic.description,
-					onDescriptionChange: (value) => void updateEpicMutation.mutate({description: value}),
+					onDescriptionChange: (value) => void updateEpic({epicId: epic.id, data: {description: value}}),
 					checklist: {
 						title: `Keepers`,
 						items: [],
 						onItemToggle: () => {},
 					},
 					comments: epic.comments,
-					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
+					onCommentAdd: (comment, author, type) =>
+						void addCommentToEpic({epicId: epic.id, comment: {text: comment, author, type}}),
 					onDelete: () => {
 						setIsDrawerOpen(false)
 						deleteEpicMutation.mutate()

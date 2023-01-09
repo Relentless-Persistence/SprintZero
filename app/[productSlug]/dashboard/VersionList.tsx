@@ -13,25 +13,25 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const VersionList: FC = () => {
 	const queryClient = useQueryClient()
-	const activeProduct = useActiveProductId()
+	const activeProductId = useActiveProductId()
 	const [newVersionInput, setNewVersionInput] = useAtom(newVersionInputAtom)
 
 	const [currentVersion, setCurrentVersion] = useAtom(currentVersionAtom)
 
 	const {data: versions} = useQuery({
-		queryKey: [`all-versions`, activeProduct],
-		queryFn: getVersionsByProduct(activeProduct!),
+		queryKey: [`all-versions`, activeProductId],
+		queryFn: getVersionsByProduct(activeProductId!),
 		onSuccess: (versions) => {
 			if (currentVersion === `` && versions[0]) setCurrentVersion(versions[0].id)
 		},
-		enabled: activeProduct !== null,
+		enabled: activeProductId !== null,
 	})
 
 	const addVersionMutation = useMutation({
-		mutationFn: activeProduct ? addVersion(activeProduct) : async () => {},
+		mutationFn: addVersion,
 		onSuccess: () => {
 			setNewVersionInput(null)
-			queryClient.invalidateQueries({queryKey: [`all-versions`, activeProduct], exact: true})
+			queryClient.invalidateQueries({queryKey: [`all-versions`, activeProductId], exact: true})
 		},
 	})
 
@@ -53,7 +53,7 @@ const VersionList: FC = () => {
 				<form
 					onSubmit={(evt) => {
 						evt.preventDefault()
-						addVersionMutation.mutate(newVersionInput)
+						addVersionMutation.mutate({productId: activeProductId!, versionName: newVersionInput})
 					}}
 					className="flex flex-col gap-2"
 				>

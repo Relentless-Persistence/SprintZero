@@ -8,7 +8,7 @@ import type {Story} from "~/types/db/Stories"
 export const currentVersionAtom = atom<Id | `__ALL_VERSIONS__`>(`__ALL_VERSIONS__`)
 export const newVersionInputAtom = atom<string | null>(null)
 
-type StoryMapState = Array<{epic: Id; featuresOrder: Array<{feature: Id; storiesOrder: Array<{story: Id}>}>}>
+export type StoryMapState = Array<{epic: Id; featuresOrder: Array<{feature: Id; storiesOrder: Array<{story: Id}>}>}>
 export const storyMapStateAtom = atom<StoryMapState>([])
 
 export const epicsAtom = atom<Epic[]>([])

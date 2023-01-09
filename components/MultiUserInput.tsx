@@ -36,7 +36,8 @@ const MultiUserInput: FC<MultiUserInputProps> = ({value, onChange, inputStateId,
 
 	const storeCursorPosition = () => {
 		if (userId) {
-			updateInputState(inputStateId)({
+			updateInputState({
+				id: inputStateId,
 				inputState: {
 					start: ref.current?.selectionStart ?? null,
 					end: ref.current?.selectionEnd ?? null,

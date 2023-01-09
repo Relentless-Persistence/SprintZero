@@ -1,92 +1,52 @@
 "use client"
 
-import {useMutation, useQueryClient} from "@tanstack/react-query"
-import {useCallback, useEffect, useState} from "react"
+import clsx from "clsx"
+import {motion} from "framer-motion"
+import {useAtomValue} from "jotai"
+import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
 import type {Story as StoryType} from "~/types/db/Stories"
-import type {Version} from "~/types/db/Versions"
 
-import AutoSizingInput from "../AutoSizingInput"
-import ItemDrawer from "../ItemDrawer"
-import {storyDividers} from "../utils"
-import {addCommentToStory, deleteStory, updateStory} from "~/utils/api/mutations"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {storyMapStateAtom} from "../atoms"
+import {elementRegistry} from "../utils"
+import StoryContent from "./StoryContent"
 
-type Props = {
+export type StoryProps = {
 	story: StoryType
 }
 
-const Story: FC<Props> = ({story}) => {
-	const [storyName, setStoryName] = useState(story.name)
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+const Story: FC<StoryProps> = ({story}) => {
+	const storyMapState = useAtomValue(storyMapStateAtom)
+	const storiesOrder = storyMapState
+		.find(({epic}) => epic === story.epic)!
+		.featuresOrder.find(({feature}) => feature === story.feature)!.storiesOrder
+	const storyIndex = storiesOrder.findIndex(({story: storyId}) => storyId === story.id)
 
-	const activeProduct = useActiveProductId()
-	const version = useQueryClient()
-		.getQueryData<Version[]>([`all-versions`, activeProduct])
-		?.find((version) => version.id === story.version)
-
-	const updateStoryMutation = useMutation({mutationKey: [`update-story`, story.id], mutationFn: updateStory(story.id)})
-	const deleteStoryMutation = useMutation({mutationKey: [`delete-story`, story.id], mutationFn: deleteStory(story.id)})
-	const addCommentMutation = useMutation({
-		mutationKey: [`add-comment`, story.id],
-		mutationFn: addCommentToStory(story.id),
-	})
-
+	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		updateStory(story.id)({name: storyName})
-	}, [story.id, storyName])
-
-	const ref = useCallback(
-		(node: HTMLDivElement | null) => {
-			if (!node) return
-			storyDividers[story.id] = {top: node.offsetTop, bottom: node.offsetTop + node.offsetHeight}
-		},
-		[story.id],
-	)
+		elementRegistry.stories[story.id] = containerRef.current
+		return () => {
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			elementRegistry.stories[story.id] = containerRef.current
+		}
+	}, [story.id])
 
 	return (
-		<>
-			<div
-				className="flex min-w-[4rem] items-center gap-1 overflow-hidden rounded border border-laurel bg-green-t1300 pr-1 text-laurel transition-transform hover:scale-105"
-				ref={ref}
-			>
-				<button
-					type="button"
-					onClick={() => void setIsDrawerOpen(true)}
-					data-nondraggable
-					className="border-r-[1px] border-laurel bg-green-t1200 p-0.5 text-[0.6rem]"
-				>
-					<p className="-rotate-90">{version?.name}</p>
-				</button>
-				<div className="mx-auto text-xs text-black">
-					<AutoSizingInput id={story.id} value={storyName} onChange={(value) => void setStoryName(value)} />
-				</div>
+		<motion.div
+			drag
+			dragSnapToOrigin
+			className={clsx(
+				`px-3`,
+				storyIndex === 0 ? `pt-3` : `pt-1.5`,
+				storyIndex === storiesOrder.length - 1 ? `pb-3` : `pb-1.5`,
+			)}
+			ref={containerRef}
+		>
+			<div className="-m-1.5 cursor-grab touch-none p-1.5 transition-transform hover:scale-105">
+				<StoryContent story={story} />
 			</div>
-
-			<ItemDrawer
-				title={story.name}
-				itemType="User story"
-				data={{
-					points: story.points,
-					description: story.description,
-					onDescriptionChange: (value) => void updateStoryMutation.mutate({description: value}),
-					checklist: {
-						title: `Acceptance criteria`,
-						items: story.acceptanceCriteria.map((item) => ({id: item.id, label: item.name, checked: item.checked})),
-						onItemToggle: () => {},
-					},
-					comments: story.comments,
-					onCommentAdd: (comment, author, type) => void addCommentMutation.mutate({text: comment, author, type}),
-					onDelete: () => {
-						setIsDrawerOpen(false)
-						deleteStoryMutation.mutate()
-					},
-				}}
-				isOpen={isDrawerOpen}
-				onClose={() => void setIsDrawerOpen(false)}
-			/>
-		</>
+		</motion.div>
 	)
 }
 

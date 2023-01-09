@@ -12,6 +12,7 @@ export const FeatureSchema = z.object({
 
 	comments: z.array(idSchema),
 	epic: idSchema,
+	nameInputState: idSchema,
 	product: idSchema,
 })
 
