@@ -4,7 +4,7 @@ import {useSetAtom} from "jotai"
 import {useEffect} from "react"
 
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/Products"
+import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 
 import {storyMapStateAtom} from "./atoms"
 import {db} from "~/config/firebase"
@@ -102,7 +102,7 @@ export const calculateBoundaries = (storyMapState: StoryMapState): void => {
 
 		if (element.container && element.content) {
 			const translation = getElementTranslation(element.container)
-			const epicIndex = storyMapState.findIndex((epic) => epic.id === id)
+			const epicIndex = storyMapState.findIndex((epic) => epic.features.some((feature) => feature.id === id))
 			const isFirstEpic = epicIndex === 0
 			const isLastEpic = epicIndex === storyMapState.length - 1
 			const features = storyMapState[epicIndex]!.features
@@ -181,14 +181,14 @@ export const getTargetLocation = (storyMapState: StoryMapState): TargetLocation 
 	const y = pointerLocation[1] - (pointerOffset.current?.[1] ?? 0) - storyMapTop
 
 	const leftEpicBoundaries = objectEntries(epicBoundaries).find(
-		([, boundaries]) => x > boundaries.center && x < boundaries.right,
+		([, boundaries]) => x >= boundaries.center && x < boundaries.right,
 	)
 	const rightEpicBoundaries = objectEntries(epicBoundaries).find(
 		([, boundaries]) => x >= boundaries.left && x < boundaries.center,
 	)
 
 	let hoveringEpicIndex = -1
-	let targetEpicIndex = -1
+	let targetEpicIndex = 0
 	if (leftEpicBoundaries) {
 		const epicId = leftEpicBoundaries[0]
 		hoveringEpicIndex = storyMapState.findIndex(({id}) => id === epicId)
@@ -199,14 +199,14 @@ export const getTargetLocation = (storyMapState: StoryMapState): TargetLocation 
 	}
 
 	const leftFeatureBoundaries = objectEntries(featureBoundaries).find(
-		([, boundaries]) => x > boundaries.center && x < boundaries.right,
+		([, boundaries]) => x >= boundaries.center && x < boundaries.right,
 	)
 	const rightFeatureBoundaries = objectEntries(featureBoundaries).find(
 		([, boundaries]) => x >= boundaries.left && x < boundaries.center,
 	)
 
 	let hoveringFeatureIndex = -1
-	let targetFeatureIndex = -1
+	let targetFeatureIndex = 0
 	if (leftFeatureBoundaries) {
 		const featureId = leftFeatureBoundaries[0]
 		hoveringFeatureIndex = storyMapState[hoveringEpicIndex]!.features.findIndex(({id}) => id === featureId)
@@ -225,11 +225,13 @@ export const getTargetLocation = (storyMapState: StoryMapState): TargetLocation 
 	const allStoryBoundaries = stories
 		.map(({id}) => [id, storyBoundaries[id]])
 		.filter(([, boundaries]) => !!boundaries) as Array<[Id, {top: number; center: number; bottom: number}]>
-	const topStoryBoundaries = allStoryBoundaries.find(([, boundaries]) => y > boundaries.center && y < boundaries.bottom)
+	const topStoryBoundaries = allStoryBoundaries.find(
+		([, boundaries]) => y >= boundaries.center && y < boundaries.bottom,
+	)
 	const bottomStoryBoundaries = allStoryBoundaries.find(
 		([, boundaries]) => y >= boundaries.top && y < boundaries.center,
 	)
-	let targetStoryIndex = -1
+	let targetStoryIndex = 0
 	if (topStoryBoundaries) {
 		const storyId = topStoryBoundaries[0]
 		targetStoryIndex = stories.findIndex(({id}) => id === storyId) + 1
@@ -239,38 +241,78 @@ export const getTargetLocation = (storyMapState: StoryMapState): TargetLocation 
 	}
 
 	return {
-		epic: targetEpicIndex >= 0 ? targetEpicIndex : null,
-		feature: y > layerBoundaries[0] && targetFeatureIndex >= 0 ? targetFeatureIndex : null,
-		story: y > layerBoundaries[1] && targetStoryIndex >= 0 ? targetStoryIndex : null,
+		epic: y < layerBoundaries[0] ? targetEpicIndex : hoveringEpicIndex,
+		feature: y > layerBoundaries[0] ? targetFeatureIndex : null,
+		story: y > layerBoundaries[1] ? targetStoryIndex : null,
 	}
 }
 
-export const moveEpic = (originalState: StoryMapState, epicId: Id, targetLocation: TargetLocation): StoryMapState =>
+export const convertEpicToFeature = (epic: Epic): Feature => ({
+	id: epic.id,
+	description: epic.description,
+	name: epic.name,
+	priority_level: 0,
+	visibility_level: 0,
+	comments: epic.comments,
+	nameInputStateId: epic.nameInputStateId,
+	stories: epic.features.flatMap(({stories}) => stories),
+})
+
+export const convertEpicToStory = (epic: Epic, versionId: Id): Story => ({
+	id: epic.id,
+	acceptance_criteria: [],
+	code_link: null,
+	description: epic.description,
+	design_link: null,
+	name: epic.name,
+	points: 0,
+	priority_level: 0,
+	visibility_level: 0,
+	comments: epic.comments,
+	nameInputStateId: epic.nameInputStateId,
+	versionId,
+})
+
+export const moveEpic = (
+	originalState: StoryMapState,
+	epicId: Id,
+	targetLocation: TargetLocation,
+	currentVersionId: Id | `__ALL_VERSIONS__`,
+): StoryMapState =>
 	produce(originalState, (state) => {
 		if (targetLocation.epic !== null && targetLocation.feature !== null && targetLocation.story !== null) {
-			// Epics should only be allowed to move to stories if they don't have any features
-			const epic = state.find(({id}) => id === epicId)!
-			if (epic.features.length > 0) return
+			const epicIndex = state.findIndex(({id}) => id === epicId)
+			const epic = state[epicIndex]!
+
+			if (
+				// Epics should only be allowed to move to stories if they don't have any features
+				epic.features.length > 0 ||
+				// Version must be selected to create a story
+				currentVersionId === `__ALL_VERSIONS__` ||
+				// Don't allow epic to be moved into itself
+				epicIndex === targetLocation.epic
+			)
+				return
 
 			// Insert the epic at story location
 			const storiesOrder = state[targetLocation.epic]!.features[targetLocation.feature]!.stories
-			storiesOrder.splice(targetLocation.story, 0, {story: epicId})
+			storiesOrder.splice(targetLocation.story, 0, convertEpicToStory(epic, currentVersionId))
 
 			// Remove the epic from its original location
 			state = state.filter(({id}) => id !== epicId)
 		} else if (targetLocation.epic !== null && targetLocation.feature !== null) {
+			const epicIndex = state.findIndex(({id}) => id === epicId)
+			const epic = state[epicIndex]!
 			const features = state[targetLocation.epic]!.features
-			const allStories = features.flatMap(({stories}) => stories)
-			const newFeaturesOrder = {
-				id: epicId,
-				stories: allStories,
-			}
+
+			// Don't allow epic to be moved into itself
+			if (epicIndex === targetLocation.epic) return
 
 			// Insert the new feature at feature location
-			features.splice(targetLocation.feature, 0, newFeaturesOrder)
+			features.splice(targetLocation.feature, 0, convertEpicToFeature(epic))
 
 			// Remove the epic from its original location
-			state = state.filter(({id}) => id !== epicId)
+			state.splice(epicIndex, 1)
 		} else if (targetLocation.epic !== null) {
 			const epicIndex = state.findIndex(({id}) => id === epicId)
 			const epic = state[epicIndex]!

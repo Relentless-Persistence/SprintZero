@@ -27,7 +27,7 @@ const AddStoryButton: FC<AddStoryButtonProps> = ({productId, epicId, feature}) =
 						productId,
 						epicId,
 						featureId: feature.id,
-						data: {name: `story`, description: `description`, version: currentVersion.id},
+						data: {name: `story`, description: `description`, versionId: currentVersion.id},
 					})
 			}}
 			className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"

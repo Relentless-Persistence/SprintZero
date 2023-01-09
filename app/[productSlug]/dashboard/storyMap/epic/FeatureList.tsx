@@ -19,7 +19,7 @@ const FeatureList: FC<FeatureListProps> = ({productId, epic}) => {
 	return (
 		<>
 			{features.map((feature) => (
-				<Feature key={feature.id} feature={feature} />
+				<Feature key={feature.id} productId={productId} epicId={epic.id} feature={feature} />
 			))}
 
 			{features.length === 0 && (

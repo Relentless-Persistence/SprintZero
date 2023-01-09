@@ -9,7 +9,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Epic as EpicType} from "~/types/db/Products"
 
-import {storyMapStateAtom, useGetEpic} from "../atoms"
+import {currentVersionAtom, storyMapStateAtom, useGetEpic} from "../atoms"
 import {avg, elementRegistry, pointerOffset, moveEpic, getTargetLocation} from "../utils"
 import EpicContent from "./EpicContent"
 import FeatureList from "./FeatureList"
@@ -25,6 +25,7 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 	const dragControls = useDragControls()
 
 	const features = useGetEpic(epic.id).features
+	const currentVersion = useAtomValue(currentVersionAtom)
 
 	const contentRef = useRef<HTMLDivElement>(null)
 	const containerRef = useRef<HTMLDivElement>(null)
@@ -63,7 +64,12 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 			onDragStart={() => void (originalStoryMapState.current = storyMapState)}
 			onDragEnd={() => void (pointerOffset.current = null)}
 			onDrag={() => {
-				const newState = moveEpic(originalStoryMapState.current, epic.id, getTargetLocation(storyMapState))
+				const newState = moveEpic(
+					originalStoryMapState.current,
+					epic.id,
+					getTargetLocation(storyMapState),
+					currentVersion.id,
+				)
 				if (JSON.stringify(newState) !== JSON.stringify(storyMapState)) {
 					if (!isUpdating.current) {
 						setStoryMapState({productId, storyMapState: newState})

@@ -46,30 +46,30 @@ export const ProductSchema = z.object({
 					visibility_level: z.number(),
 
 					comments: z.array(idSchema),
-					nameInputState: idSchema,
+					nameInputStateId: idSchema,
 
 					stories: z.array(
 						z.object({
 							id: idSchema,
 
-							acceptanceCriteria: z.array(
+							acceptance_criteria: z.array(
 								z.object({
 									id: z.string(),
 									name: z.string(),
 									checked: z.boolean(),
 								}),
 							),
-							codeLink: z.string().url().nullable(),
+							code_link: z.string().url().nullable(),
 							description: z.string(),
-							designLink: z.string().url().nullable(),
+							design_link: z.string().url().nullable(),
 							name: z.string(),
 							points: z.number(),
 							priority_level: z.number(),
 							visibility_level: z.number(),
 
 							comments: z.array(idSchema),
-							nameInputState: idSchema,
-							version: idSchema,
+							nameInputStateId: idSchema,
+							versionId: idSchema,
 						}),
 					),
 				}),

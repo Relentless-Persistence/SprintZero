@@ -58,7 +58,7 @@ const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentPro
 						updateLocalFeatureName(value)
 						updateFeature({productId, epicId, featureId: feature.id, data: {name: value}})
 					}}
-					inputStateId={feature.nameInputState}
+					inputStateId={feature.nameInputStateId}
 					inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
 				/>
 			</div>

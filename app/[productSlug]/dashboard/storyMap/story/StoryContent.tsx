@@ -32,7 +32,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 	const activeProduct = useActiveProductId()
 	const version = useQueryClient()
 		.getQueryData<Version[]>([`all-versions`, activeProduct])
-		?.find((version) => version.id === story.version)
+		?.find((version) => version.id === story.versionId)
 
 	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const updateLocalStoryName = (newName: string) => {
@@ -67,7 +67,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 							updateLocalStoryName(value)
 							updateStory({productId, epicId, featureId, storyId: story.id, data: {name: value}})
 						}}
-						inputStateId={story.nameInputState}
+						inputStateId={story.nameInputStateId}
 						inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
 					/>
 				</div>
@@ -83,7 +83,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 						void updateStory({productId, epicId, featureId, storyId: story.id, data: {description: value}}),
 					checklist: {
 						title: `Acceptance criteria`,
-						items: story.acceptanceCriteria.map((item) => ({id: item.id, label: item.name, checked: item.checked})),
+						items: story.acceptance_criteria.map((item) => ({id: item.id, label: item.name, checked: item.checked})),
 						onItemToggle: () => {},
 					},
 					comments: story.comments,

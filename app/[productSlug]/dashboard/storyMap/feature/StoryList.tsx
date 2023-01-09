@@ -23,7 +23,7 @@ const StoryList: FC<StoryListProps> = ({productId, epicId, feature}) => {
 	return (
 		<div className="flex flex-col items-start rounded-md border border-[#006378] bg-white">
 			{stories.map((story) => (
-				<Story key={story.id} story={story} />
+				<Story key={story.id} productId={productId} epicId={epicId} featureId={feature.id} story={story} />
 			))}
 
 			{currentVersion.id !== `__ALL_VERSIONS__` && (

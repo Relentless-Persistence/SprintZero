@@ -1,7 +1,7 @@
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Breadcrumb, Button} from "antd5"
-import {useAtom, useSetAtom} from "jotai"
+import {useAtomValue, useSetAtom} from "jotai"
 
 import type {FC} from "react"
 
@@ -12,15 +12,12 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const StoryMapHeader: FC = () => {
 	const activeProduct = useActiveProductId()
 
-	const [currentVersion, setCurrentVersion] = useAtom(currentVersionAtom)
+	const currentVersion = useAtomValue(currentVersionAtom)
 	const setNewVersionInput = useSetAtom(newVersionInputAtom)
 
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProduct],
 		queryFn: getVersionsByProduct(activeProduct!),
-		onSuccess: (versions) => {
-			if (currentVersion === `` && versions[0]) setCurrentVersion(versions[0].id)
-		},
 		enabled: activeProduct !== null,
 	})
 
@@ -29,7 +26,7 @@ const StoryMapHeader: FC = () => {
 			<div className="flex justify-between px-12 pt-8">
 				<Breadcrumb>
 					<Breadcrumb.Item>Story Map</Breadcrumb.Item>
-					<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersion)?.name}</Breadcrumb.Item>
+					<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersion.id)?.name}</Breadcrumb.Item>
 				</Breadcrumb>
 
 				<Button onClick={() => void setNewVersionInput(``)} className="bg-white">

@@ -57,18 +57,6 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 				pointerOffset.current = [e.clientX - avg(contentRect.left, contentRect.right), 0]
 			}}
 			onDragEnd={() => void (pointerOffset.current = null)}
-			// onDrag={(e, info) => {
-			// 	if (prevEpic !== null) {
-			// 		const prevEpicPosition = epicDividers[prevEpic]!
-			// 		if (info.offset.x < prevEpicPosition - startPos.current)
-			// 			moveEpicTo({productId: activeProductId!, epicId: epic.id, position: epicIndex - 1})
-			// 	}
-			// 	if (nextEpic !== null) {
-			// 		const nextEpicPosition = epicDividers[nextEpic]!
-			// 		if (info.offset.x > nextEpicPosition - startPos.current)
-			// 			moveEpicTo({productId: activeProductId!, epicId: epic.id, position: epicIndex + 1})
-			// 	}
-			// }}
 			className={clsx(
 				`flex flex-col items-center gap-12`,
 				featureIndex === 0 ? `pl-4` : `pl-2`,

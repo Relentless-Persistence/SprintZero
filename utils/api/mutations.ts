@@ -2,10 +2,9 @@ import {addDoc, collection, doc, getDocs, query, updateDoc, where} from "firebas
 import produce from "immer"
 import {nanoid} from "nanoid"
 
-import type {StoryMapState} from "~/app/[productSlug]/dashboard/storyMap/atoms"
 import type {Id} from "~/types"
 import type {InputState} from "~/types/db/InputStates"
-import type {Epic, Feature, Story} from "~/types/db/Products"
+import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
 import {getProduct} from "./queries"
@@ -112,7 +111,7 @@ export const addFeature = async ({productId, epicId, data: initialData, position
 		priority_level: 0,
 		visibility_level: 0,
 		comments: [],
-		nameInputState: await createInputState(),
+		nameInputStateId: await createInputState(),
 		stories: [],
 		...initialData,
 	}
@@ -164,7 +163,7 @@ type AddStoryVars = {
 	productId: Id
 	epicId: Id
 	featureId: Id
-	data: Partial<Story> & {version: Id}
+	data: Partial<Story> & {versionId: Id}
 	position?: number
 }
 
@@ -178,16 +177,16 @@ export const addStory = async ({
 	const id = nanoid() as Id
 	const data: Story = {
 		id,
-		acceptanceCriteria: [],
-		codeLink: null,
+		acceptance_criteria: [],
+		code_link: null,
 		description: ``,
-		designLink: null,
+		design_link: null,
 		name: ``,
 		points: 0,
 		priority_level: 0,
 		visibility_level: 0,
 		comments: [],
-		nameInputState: await createInputState(),
+		nameInputStateId: await createInputState(),
 		...initialData,
 	}
 
@@ -225,7 +224,7 @@ type UpdateStoryVars = {
 	featureId: Id
 	storyId: Id
 	data: Partial<
-		Pick<Story, `acceptanceCriteria` | `codeLink` | `description` | `designLink` | `name` | `points` | `version`>
+		Pick<Story, `acceptance_criteria` | `code_link` | `description` | `design_link` | `name` | `points` | `versionId`>
 	>
 }
 
