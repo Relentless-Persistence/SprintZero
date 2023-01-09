@@ -27,6 +27,12 @@ declare global {
 		__epicDividers: Record<Id, {left: number; center: number; right: number}>
 		__featureDividers: Record<Id, {left: number; center: number; right: number}>
 		__storyDividers: Record<Id, {top: number; center: number; bottom: number}>
+		__cursorLocationPixels: [number, number]
+		__cursorLocation: {
+			epic: {index: number; id: Id | null} | null
+			feature: {index: number; id: Id | null} | null
+			story: {index: number; id: Id | null} | null
+		}
 	}
 }
 
@@ -45,14 +51,24 @@ if (typeof window !== `undefined`) {
 	window.__featureDividers = window.__featureDividers ?? {}
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	window.__storyDividers = window.__storyDividers ?? {}
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	window.__cursorLocationPixels = window.__cursorLocationPixels ?? [0, 0]
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	window.__cursorLocation = window.__cursorLocation ?? {
+		epic: null,
+		feature: null,
+		story: null,
+	}
 }
 
 export let storyMapScrollPosition = window.__storyMapScrollPosition
 export let elementRegistry = window.__elementRegistry
-export const layerBoundaries: [number, number] = [54, 156]
+export const layerBoundaries: [number, number] = [62, 164]
 export let epicDividers = window.__epicDividers
 export let featureDividers = window.__featureDividers
 export let storyDividers = window.__storyDividers
+export let cursorLocationPixels = window.__cursorLocationPixels
+export let cursorLocation = window.__cursorLocation
 
 export const calculateDividers = (): void => {
 	Object.entries(elementRegistry.epics).forEach(([id, element]) => {
@@ -152,20 +168,13 @@ export const useSubscribeToData = (): void => {
 	}, [activeProduct, setEpics, setFeatures, setStories, setStoryMapState])
 }
 
-type WhereIsMyCursorReturn = {
-	epic: {index: number; id: Id | null} | null
-	feature: {index: number; id: Id | null} | null
-	story: {index: number; id: Id | null} | null
-}
+export const updateCursorLocation = (storyMapState: StoryMapState): void => {
+	const x = cursorLocationPixels[0] + storyMapScrollPosition.position
+	const y = cursorLocationPixels[1] - storyMapTop
 
-export const whereIsMyCusror = (x: number, y: number, storyMapState: StoryMapState): WhereIsMyCursorReturn => {
-	const xAdj = x + storyMapScrollPosition.position
-	const yAdj = y - storyMapTop
-
-	const epicId =
-		objectEntries(epicDividers).find(([, divider]) => xAdj > divider.left && xAdj < divider.right)?.[0] ?? null
+	const epicId = objectEntries(epicDividers).find(([, divider]) => x > divider.left && x < divider.right)?.[0] ?? null
 	const featureId =
-		objectEntries(featureDividers).find(([, divider]) => xAdj > divider.left && xAdj < divider.right)?.[0] ?? null
+		objectEntries(featureDividers).find(([, divider]) => x > divider.left && x < divider.right)?.[0] ?? null
 
 	const epicIndex = storyMapState.findIndex(({epic}) => epic === epicId)
 	const featureIndex =
@@ -177,22 +186,36 @@ export const whereIsMyCusror = (x: number, y: number, storyMapState: StoryMapSta
 		storiesOrder
 			.map(({story}) => [story, storyDividers[story]] as const)
 			.filter(([, divider]) => !!divider)
-			.find(([, divider]) => yAdj > divider!.top && yAdj < divider!.bottom)?.[0] ?? null
+			.find(([, divider]) => y > divider!.top && y < divider!.bottom)?.[0] ?? null
 	const storyIndex = storiesOrder.findIndex(({story}) => story === storyId)
 
-	const r = {
+	cursorLocation = {
 		epic: epicId ? {index: epicIndex, id: epicId} : null,
-		feature: yAdj > layerBoundaries[0] ? {index: featureIndex, id: featureId} : null,
-		story: yAdj > layerBoundaries[1] ? {index: storyIndex, id: storyId} : null,
+		feature: y > layerBoundaries[0] ? {index: featureIndex, id: featureId} : null,
+		story: y > layerBoundaries[1] ? {index: storyIndex, id: storyId} : null,
 	}
 
-	if (r.story) {
-		console.log(`epic ${epicIndex}, feature ${featureIndex}, story ${storyIndex}`)
-	} else if (r.feature) {
-		console.log(`epic ${epicIndex}, feature ${featureIndex}`)
-	} else {
-		console.log(`epic ${epicIndex}`)
-	}
+	const indicator = document.getElementById(`indicator`)
+	if (indicator) {
+		const epicId = cursorLocation.epic?.id
+		const featureId = cursorLocation.feature?.id
+		const storyId = cursorLocation.story?.id
 
-	return r
+		if (storyId && featureId) {
+			indicator.style.top = `${storyDividers[storyId]!.top + storyMapTop}px`
+			indicator.style.left = `${featureDividers[featureId]!.left - storyMapScrollPosition.position}px`
+			indicator.style.width = `${featureDividers[featureId]!.right - featureDividers[featureId]!.left}px`
+			indicator.style.height = `${storyDividers[storyId]!.bottom - storyDividers[storyId]!.top}px`
+		} else if (featureId) {
+			indicator.style.top = `${layerBoundaries[0] + storyMapTop}px`
+			indicator.style.left = `${featureDividers[featureId]!.left - storyMapScrollPosition.position}px`
+			indicator.style.width = `${featureDividers[featureId]!.right - featureDividers[featureId]!.left}px`
+			indicator.style.height = `${layerBoundaries[1] - layerBoundaries[0]}px`
+		} else if (epicId) {
+			indicator.style.top = `${storyMapTop}px`
+			indicator.style.left = `${epicDividers[epicId]!.left - storyMapScrollPosition.position}px`
+			indicator.style.width = `${epicDividers[epicId]!.right - epicDividers[epicId]!.left}px`
+			indicator.style.height = `${layerBoundaries[0]}px`
+		}
+	}
 }

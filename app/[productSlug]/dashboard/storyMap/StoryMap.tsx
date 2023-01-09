@@ -9,7 +9,7 @@ import type {Epic as EpicType} from "~/types/db/Epics"
 
 import {epicsAtom, storyMapStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
-import {calculateDividers, useSubscribeToData, whereIsMyCusror} from "./utils"
+import {calculateDividers, useSubscribeToData, updateCursorLocation, cursorLocationPixels} from "./utils"
 import {addEpic} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -25,7 +25,11 @@ const StoryMap: FC = () => {
 	return (
 		<div
 			className="relative z-10 flex w-max items-start"
-			onPointerMove={(e) => void whereIsMyCusror(e.clientX, e.clientY, storyMapState)}
+			onPointerMove={(e) => {
+				cursorLocationPixels[0] = e.clientX
+				cursorLocationPixels[1] = e.clientY
+				updateCursorLocation(storyMapState)
+			}}
 		>
 			{storyMapState
 				.map(({epic}) => epics.find((e) => e.id === epic))
