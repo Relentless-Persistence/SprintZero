@@ -378,7 +378,6 @@ export const moveFeature = (
 			targetLocation.feature >= 0 &&
 			targetLocation.story >= 0
 		) {
-			console.log(targetLocation.epic, targetLocation.feature, targetLocation.story)
 			const stories = state[targetLocation.epic]!.features[targetLocation.feature]!.stories
 
 			if (

@@ -72,32 +72,43 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 				))}
 
 			{/* Pad out the beginning columns in row 2 */}
-			{Array(Math.max(features.length - 1, 1))
-				.fill(null)
-				.map((_, i) => (
-					<div key={`row2-${i}`} className="relative h-10 w-full">
-						{i === 0 && (
-							<div className="absolute left-1/2 h-full w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
-						)}
-						{i > 0 && (
-							<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
-						)}
-						{i === 0 && features.length > 0 && (
-							<div className="absolute top-1/2 left-1/2 h-px w-1/2 border border-dashed border-[#4f2dc8]" />
-						)}
-						{i > 0 && <div className="absolute top-1/2 left-0 h-px w-full border border-dashed border-[#4f2dc8]" />}
-					</div>
-				))}
+			{features.length > 1 &&
+				Array(Math.max(features.length - 1, 0))
+					.fill(null)
+					.map((_, i) => (
+						<div key={`row2-${i}`} className="relative h-10 w-full">
+							{i === 0 && (
+								<div className="absolute left-1/2 h-full w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
+							)}
+							{i > 0 && (
+								<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
+							)}
+							{i === 0 && features.length > 0 && (
+								<div className="absolute top-1/2 left-1/2 h-px w-1/2 border border-dashed border-[#4f2dc8]" />
+							)}
+							{i > 0 && <div className="absolute top-1/2 left-0 h-px w-full border border-dashed border-[#4f2dc8]" />}
+						</div>
+					))}
 
 			{features.length > 0 && (
 				<div className="relative grid h-10 w-full place-items-center">
-					<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
-					<div className="absolute top-1/2 left-0 h-px w-1/2 border border-dashed border-[#4f2dc8]" />
+					{features.length > 1 ? (
+						<>
+							<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
+							<div className="absolute top-1/2 left-0 h-px w-1/2 border border-dashed border-[#4f2dc8]" />
+						</>
+					) : (
+						<div className="absolute left-1/2 h-full w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
+					)}
 
 					<div className="relative z-10">
 						<SmallAddFeatureButton productId={productId} epic={epic} />
 					</div>
 				</div>
+			)}
+
+			{features.length === 0 && (
+				<div className="left-1/2 h-10 w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
 			)}
 
 			<FeatureList productId={productId} epic={epic} />
