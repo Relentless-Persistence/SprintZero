@@ -73,7 +73,7 @@ const AppHeader = () => {
   const handleProduct = (product) => {
     console.log(product);
     setActiveProduct(product);
-    router.push(`/${product.slug}/dashboard`)
+    router.push(`/${product.id}/dashboard`)
   }
 
   return (
@@ -94,7 +94,7 @@ const AppHeader = () => {
               <HeaderMenu
                 key={i}
                 className="mr-10 capitalize"
-                active={activeProduct && activeProduct.slug === product.slug}
+                active={activeProduct && activeProduct.id === product.id}
                 onClick={() => handleProduct(product)}
               >
                 {product.name}
