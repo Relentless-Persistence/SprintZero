@@ -2,13 +2,12 @@
 
 import {ReadOutlined} from "@ant-design/icons"
 import {useAtomValue} from "jotai"
-import {useInterval} from "react-use"
 
 import type {FC} from "react"
 
 import {storyMapStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
-import {calculateBoundaries, useSubscribeToData} from "./utils"
+import {useSubscribeToData} from "./utils"
 import {addEpic} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -17,8 +16,6 @@ const StoryMap: FC = () => {
 	const storyMapState = useAtomValue(storyMapStateAtom)
 
 	useSubscribeToData()
-
-	useInterval(() => calculateBoundaries(storyMapState), 100)
 
 	return (
 		<div className="relative z-10 flex w-max items-start">

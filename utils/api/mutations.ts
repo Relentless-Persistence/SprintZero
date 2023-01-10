@@ -72,7 +72,7 @@ type UpdateEpicVars = {
 
 export const updateEpic = async ({productId, epicId, data}: UpdateEpicVars): Promise<void> => {
 	let storyMapState = (await getProduct(productId)()).storyMapState
-	produce(storyMapState, (state) => {
+	storyMapState = produce(storyMapState, (state) => {
 		const epicIndex = state.findIndex(({id}) => id === epicId)
 		state[epicIndex] = {
 			...state[epicIndex]!,
@@ -148,7 +148,7 @@ type UpdateFeatureVars = {
 
 export const updateFeature = async ({productId, epicId, featureId, data}: UpdateFeatureVars): Promise<void> => {
 	let storyMapState = (await getProduct(productId)()).storyMapState
-	produce(storyMapState, (state) => {
+	storyMapState = produce(storyMapState, (state) => {
 		const epicIndex = state.findIndex(({id}) => id === epicId)
 		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
 		state[epicIndex]!.features[featureIndex] = {

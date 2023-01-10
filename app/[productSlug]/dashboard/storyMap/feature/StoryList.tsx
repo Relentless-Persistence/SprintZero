@@ -15,11 +15,12 @@ export type StoryListProps = {
 }
 
 const StoryList: FC<StoryListProps> = ({productId, epicId, feature}) => {
-	const stories = useGetFeature(epicId, feature.id).stories
 	const currentVersion = useAtomValue(currentVersionAtom)
+	const stories = useGetFeature(epicId, feature.id).stories.filter(
+		(story) => currentVersion.id === `__ALL_VERSIONS__` || story.versionId === currentVersion.id,
+	)
 
-	if (stories.length === 0 || currentVersion.id === `__ALL_VERSIONS__`)
-		return <AddStoryButton productId={productId} epicId={epicId} feature={feature} />
+	if (stories.length === 0) return <AddStoryButton productId={productId} epicId={epicId} feature={feature} />
 	return (
 		<div className="flex flex-col items-start rounded-md border border-[#006378] bg-white">
 			{stories.map((story) => (

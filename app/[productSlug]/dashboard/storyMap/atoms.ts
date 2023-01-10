@@ -1,5 +1,6 @@
 import {atom, useAtomValue} from "jotai"
 
+import type {MotionValue} from "framer-motion"
 import type {Id} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 
@@ -22,3 +23,13 @@ export const useGetStory = (epicId: Id, featureId: Id, storyId: Id): Story => {
 	const feature = useGetFeature(epicId, featureId)
 	return feature.stories.find((story) => story.id === storyId)!
 }
+
+export const dragStateAtom = atom<{
+	id: Id | null
+	type: `epic` | `feature` | `story` | null
+	pos: [MotionValue<number> | null, MotionValue<number> | null]
+}>({
+	id: null,
+	type: null,
+	pos: [null, null],
+})
