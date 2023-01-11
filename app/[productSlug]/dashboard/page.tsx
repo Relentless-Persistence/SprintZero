@@ -48,6 +48,7 @@ const Dashboard: FC = () => {
 	const originalStoryMapState = useRef(storyMapState)
 	const isUpdating = useRef(false)
 	const handlePan = () => {
+		// If there is no item being dragged, early return
 		if (!activeProductId || !dragState.id) return
 
 		let newState = originalStoryMapState.current

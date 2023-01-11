@@ -22,13 +22,13 @@ const StoryList: FC<StoryListProps> = ({productId, epicId, feature}) => {
 
 	if (stories.length === 0) return <AddStoryButton productId={productId} epicId={epicId} feature={feature} />
 	return (
-		<div className="flex flex-col items-start rounded-md border border-[#006378] bg-white">
+		<div className="flex flex-col items-start rounded-md border border-[#006378] bg-white p-1.5">
 			{stories.map((story) => (
 				<Story key={story.id} productId={productId} epicId={epicId} featureId={feature.id} story={story} />
 			))}
 
 			{currentVersion.id !== `__ALL_VERSIONS__` && (
-				<div className="m-3 mt-0">
+				<div className="m-1.5">
 					<AddStoryButton productId={productId} epicId={epicId} feature={feature} />
 				</div>
 			)}

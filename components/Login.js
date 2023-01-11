@@ -60,6 +60,7 @@ const Login = () => {
 						avatar: user.photoURL,
 						email: user.email,
 						name: user.displayName,
+						products: [],
 					})
 				}
 

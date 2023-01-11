@@ -6,6 +6,7 @@ import {useAtomValue} from "jotai"
 import type {FC} from "react"
 
 import {storyMapStateAtom} from "./atoms"
+import DebugVisualizer from "./DebugVisualizer"
 import Epic from "./epic/Epic"
 import {useSubscribeToData} from "./utils"
 import {addEpic} from "~/utils/api/mutations"
@@ -18,7 +19,7 @@ const StoryMap: FC = () => {
 	useSubscribeToData()
 
 	return (
-		<div className="relative z-10 flex w-max items-start">
+		<div className="relative z-10 flex w-max items-start gap-8">
 			{activeProductId && storyMapState.map((epic) => <Epic key={epic.id} productId={activeProductId} epic={epic} />)}
 
 			<button
@@ -29,6 +30,8 @@ const StoryMap: FC = () => {
 				<ReadOutlined />
 				<span>Add epic</span>
 			</button>
+
+			<DebugVisualizer />
 		</div>
 	)
 }

@@ -9,9 +9,10 @@ import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 import {storyMapStateAtom} from "./atoms"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
+import objectEntries from "~/utils/objectEntries"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const storyMapTop = 216
+const storyMapTop = 208
 
 type TargetLocation = {
 	epic: number | null
@@ -23,13 +24,13 @@ declare global {
 	interface Window {
 		__storyMapScrollPosition: {position: number}
 		__elementRegistry: {
-			epics: Record<Id, {content: HTMLElement | null; container: HTMLElement | null}>
-			features: Record<Id, {content: HTMLElement | null; container: HTMLElement | null}>
+			epics: Record<Id, HTMLElement | null>
+			features: Record<Id, HTMLElement | null>
 			stories: Record<Id, HTMLElement | null>
 		}
-		__epicBoundaries: Record<Id, {left: number; center: number; right: number}>
-		__featureBoundaries: Record<Id, {left: number; center: number; right: number}>
-		__storyBoundaries: Record<Id, {top: number; center: number; bottom: number}>
+		__epicBoundaries: Record<Id, {left: number; right: number}>
+		__featureBoundaries: Record<Id, {left: number; right: number}>
+		__storyBoundaries: Record<Id, {top: number; bottom: number}>
 		__pointerLocation: [number, number]
 		__pointerOffset: {current: [number, number] | null}
 	}
@@ -58,7 +59,7 @@ if (typeof window !== `undefined`) {
 
 export let storyMapScrollPosition = window.__storyMapScrollPosition
 export let elementRegistry = window.__elementRegistry
-export const layerBoundaries: [number, number] = [62, 164]
+export const layerBoundaries: [number, number] = [62, 140]
 export let epicBoundaries = window.__epicBoundaries
 export let featureBoundaries = window.__featureBoundaries
 export let storyBoundaries = window.__storyBoundaries
@@ -72,85 +73,36 @@ const getElementTranslation = (element: HTMLElement): [number, number] => {
 }
 
 export const calculateBoundaries = (storyMapState: StoryMapState): void => {
-	Object.entries(elementRegistry.epics).forEach(([id, element]) => {
-		// Initialize the boundaries if they don't exist
-		if (!epicBoundaries[id as Id]) epicBoundaries[id as Id] = {left: 0, center: 0, right: 0}
-
-		const boundaries = epicBoundaries[id as Id]!
-
-		if (element.container && element.content) {
-			const translation = getElementTranslation(element.container)
-			const isFirstEpic = id === storyMapState[0]!.id
-			const isLastEpic = id === storyMapState[storyMapState.length - 1]!.id
-
-			const containerBoundingRect = element.container.getBoundingClientRect()
-			boundaries.left = isFirstEpic ? 0 : containerBoundingRect.left + storyMapScrollPosition.position - translation[0]
-			boundaries.right = isLastEpic
-				? Infinity
-				: containerBoundingRect.right + storyMapScrollPosition.position - translation[0]
-
-			const contentBoundingRect = element.content.getBoundingClientRect()
-			boundaries.center =
-				avg(contentBoundingRect.left, contentBoundingRect.right) - translation[0] + storyMapScrollPosition.position
-		}
-	})
-
-	Object.entries(elementRegistry.features).forEach(([id, element]) => {
-		if (!featureBoundaries[id as Id]) featureBoundaries[id as Id] = {left: 0, center: 0, right: 0}
-		const boundaries = featureBoundaries[id as Id]!
-
-		if (element.container && element.content) {
-			const translation = getElementTranslation(element.container)
-			const epicIndex = storyMapState.findIndex((epic) => epic.features.some((feature) => feature.id === id))
-			const isFirstEpic = epicIndex === 0
-			const isLastEpic = epicIndex === storyMapState.length - 1
-			const features = storyMapState[epicIndex]!.features
-			const isFirstFeatureInEpic = id === features[0]!.id
-			const isLastFeatureInEpic = id === features.at(-1)!.id
-
-			const containerBoundingRect = element.container.getBoundingClientRect()
-
-			// Set left boundary
-			if (isFirstFeatureInEpic) {
-				if (isFirstEpic) boundaries.left = 0
-				else boundaries.left = epicBoundaries[storyMapState[epicIndex - 1]!.id]!.right
-			} else {
-				boundaries.left = containerBoundingRect.left - translation[0] + storyMapScrollPosition.position
-			}
-
-			// Set right boundary
-			if (isLastFeatureInEpic) {
-				if (isLastEpic) boundaries.right = Infinity
-				else boundaries.right = epicBoundaries[storyMapState[epicIndex + 1]!.id]!.left
-			} else {
-				boundaries.right = containerBoundingRect.right - translation[0] + storyMapScrollPosition.position
-			}
-
-			// Set center boundary
-			const contentBoundingRect = element.content.getBoundingClientRect()
-			boundaries.center =
-				avg(contentBoundingRect.left, contentBoundingRect.right) - translation[0] + storyMapScrollPosition.position
-		}
-	})
-
-	Object.entries(elementRegistry.stories).forEach(([id, element]: [id: Id, element: HTMLElement | null]) => {
+	objectEntries(elementRegistry.epics).forEach(([id, element]) => {
 		if (!element) return
 
-		const allFeatures = storyMapState.reduce((acc, {features}) => [...acc, ...features], [])
+		const boundingRect = element.getBoundingClientRect()
 		const translation = getElementTranslation(element)
-		let isLastStory = false
-		for (const {stories} of allFeatures) {
-			if (id === stories.at(-1)?.id) {
-				isLastStory = true
-				break
-			}
+		epicBoundaries[id] = {
+			left: boundingRect.left + storyMapScrollPosition.position - translation[0],
+			right: boundingRect.right + storyMapScrollPosition.position - translation[0],
 		}
+	})
+
+	objectEntries(elementRegistry.features).forEach(([id, element]) => {
+		if (!element) return
 
 		const boundingRect = element.getBoundingClientRect()
+		const translation = getElementTranslation(element)
+		featureBoundaries[id] = {
+			left: boundingRect.left - translation[0] + storyMapScrollPosition.position,
+			right: boundingRect.right - translation[0] + storyMapScrollPosition.position,
+		}
+	})
+
+	objectEntries(elementRegistry.stories).forEach(([id, element]) => {
+		if (!element) return
+
+		const boundingRect = element.getBoundingClientRect()
+		const translation = getElementTranslation(element)
 		storyBoundaries[id] = {
-			top: boundingRect.top - translation[1] - storyMapTop,
-			center: avg(boundingRect.top, boundingRect.bottom) - translation[1] - storyMapTop,
-			bottom: isLastStory ? Infinity : boundingRect.bottom - translation[1] - storyMapTop,
+			top: boundingRect.top - translation[1],
+			bottom: boundingRect.bottom - translation[1],
 		}
 	})
 }

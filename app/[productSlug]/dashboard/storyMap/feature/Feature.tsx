@@ -1,6 +1,5 @@
 "use client"
 
-import clsx from "clsx"
 import {motion} from "framer-motion"
 import {useAtom, useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
@@ -9,7 +8,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Feature as FeatureType} from "~/types/db/Products"
 
-import {currentVersionAtom, dragStateAtom, useGetEpic} from "../atoms"
+import {currentVersionAtom, dragStateAtom} from "../atoms"
 import {elementRegistry} from "../utils"
 import FeatureContent from "./FeatureContent"
 import StoryList from "./StoryList"
@@ -22,24 +21,14 @@ export type FeatureProps = {
 
 const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 	const [dragState, setDragState] = useAtom(dragStateAtom)
-	const features = useGetEpic(epicId).features
-	const featureIndex = features.findIndex(({id}) => id === feature.id)
 	const currentVersion = useAtomValue(currentVersionAtom)
 
-	const contentRef = useRef<HTMLDivElement>(null)
 	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		elementRegistry.features[feature.id] = {
-			content: contentRef.current,
-			container: containerRef.current,
-		}
+		elementRegistry.features[feature.id] = containerRef.current
 		return () => {
-			elementRegistry.features[feature.id] = {
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				content: contentRef.current,
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				container: containerRef.current,
-			}
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			elementRegistry.features[feature.id] = containerRef.current
 		}
 	}, [feature.id])
 
@@ -47,11 +36,7 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 		<motion.div
 			layoutId={feature.id}
 			layout="position"
-			className={clsx(
-				`flex flex-col items-center`,
-				featureIndex === 0 ? `pl-4` : `pl-2`,
-				featureIndex === features.length - 1 ? `pr-4` : `pr-2`,
-			)}
+			className="flex flex-col items-center"
 			style={{
 				x: dragState.id === feature.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
 				y: dragState.id === feature.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
@@ -65,7 +50,7 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 				}}
 				className="-m-4 cursor-grab touch-none p-4 transition-transform hover:scale-105"
 			>
-				<FeatureContent productId={productId} epicId={epicId} feature={feature} ref={contentRef} />
+				<FeatureContent productId={productId} epicId={epicId} feature={feature} />
 			</motion.div>
 
 			{(currentVersion.id !== `__ALL_VERSIONS__` || feature.stories.length > 0) && (
