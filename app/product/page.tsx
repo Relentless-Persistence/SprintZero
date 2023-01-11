@@ -58,6 +58,7 @@ const ProductConfiguration: FC = () => {
 			...data,
 			storyMapState: [],
 			members: [{user: userId, type: `editor`}],
+			owner: userId,
 		} satisfies Omit<Product, `id`>)
 		await setDoc(doc(db, Products._, slug), finalData)
 

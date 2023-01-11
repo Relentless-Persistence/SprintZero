@@ -22,6 +22,7 @@ export const ProductSchema = z.object({
 			type: z.union([z.literal(`editor`), z.literal(`viewer`)]),
 		}),
 	),
+	owner: idSchema,
 	name: z.string(),
 	storyMapState: z.array(
 		z.object({
