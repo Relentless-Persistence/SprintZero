@@ -11,7 +11,6 @@ export const ChallengeSchema = z.object({
 
 	product: idSchema,
 })
-export const ChallengeCollectionSchema = z.array(ChallengeSchema)
 
 export const Challenges = genDbNames(`Challenges`, ChallengeSchema)
 export type Challenge = z.infer<typeof ChallengeSchema>

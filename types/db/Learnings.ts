@@ -11,7 +11,6 @@ export const LearningSchema = z.object({
 
 	product: idSchema,
 })
-export const LearningCollectionSchema = z.array(LearningSchema)
 
 export const Learnings = genDbNames(`Learnings`, LearningSchema)
 export type Learning = z.infer<typeof LearningSchema>

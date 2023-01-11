@@ -15,7 +15,6 @@ export const VisionSchema = z.object({
 
 	createdAt: z.date(),
 })
-export const VisionCollectionSchema = z.array(VisionSchema)
 
 export const Visions = genDbNames(`Visions`, VisionSchema)
 export type Vision = z.infer<typeof VisionSchema>

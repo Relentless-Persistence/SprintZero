@@ -5,3 +5,16 @@
 [data-nextjs-scroll-focus-boundary] {
 	display: contents;
 }
+
+button.ant-btn-default {
+	background-color: white;
+}
+
+button.ant-btn-primary {
+	background-color: #4a801e;
+}
+
+:is(.ant-menu-inline, .ant-menu-vertical) :is(li.ant-menu-item, div.ant-menu-submenu-title) {
+	margin: 0px;
+	width: 100%;
+}

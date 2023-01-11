@@ -9,7 +9,6 @@ export const VersionSchema = z.object({
 
 	product: idSchema,
 })
-export const VersionCollectionSchema = z.array(VersionSchema)
 
 export const Versions = genDbNames(`Versions`, VersionSchema)
 export type Version = z.infer<typeof VersionSchema>

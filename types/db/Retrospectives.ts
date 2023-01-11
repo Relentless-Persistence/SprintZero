@@ -16,7 +16,6 @@ export const RetrospectiveSchema = z.object({
 
 	product: idSchema,
 })
-export const RetrospectiveCollectionSchema = z.array(RetrospectiveSchema)
 
 export const Retrospectives = genDbNames(`Retrospectives`, RetrospectiveSchema)
 export type Retrospective = z.infer<typeof RetrospectiveSchema>

@@ -28,16 +28,18 @@ const Login = () => {
 
 	const fetchProducts = async (user) => {
 		if (user) {
-			const res = await db.collection("Products").where("owner", "==", user.uid).get()
-			setActiveProduct(res.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0])
-      const product = res.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0]
-      return product;
+			const _userObj = await db.collection("Users").doc(user.uid).get()
+			const userObj = {id: _userObj.id, ..._userObj.data()}
+
+			const _products = userObj.products.map(productId => db.collection("Products").doc(productId).get())
+			const products = (await Promise.all(_products)).map(doc => ({id: doc.id, ...doc.data()}))
+			return products[0]
 		}
 	}
 
-  useEffect(() => {
-    fetchProducts(user);
-  }, [user])
+	useEffect(() => {
+		fetchProducts(user)
+	}, [user])
 
 	useEffect(() => {
 		if (user && activeProduct) {
@@ -45,62 +47,23 @@ const Login = () => {
 		}
 	}, [activeProduct])
 
-	// const handleOnClick = (provider) => {
-	//   try {
-	//     auth.signInWithPopup(provider).then(async (res) => {
-	//       var user = res.user;
-	//       console.log(res);
-	//       // Adding user to a product team
-	//       if (type && product) {
-	//         await db.collection("teams").add({
-	//           user: {
-	//             uid: user.uid,
-	//             email: user.email,
-	//             name: user.displayName,
-	//             avatar: user.photoURL,
-	//           },
-	//           expiry: "unlimited",
-	//           type: type,
-	//           product_id: product,
-	//         });
-	//       }
-
-	//       // Checking if user is new
-	//       if (res.additionalUserInfo.isNewUser) {
-	//         // if user has a company custom email
-	//         if (!/@gmail.com\s*$/.test(user.email)) {
-	//           router.push("/enterprise-contact");
-	//         } else {
-	//           message.success({
-	//             content: "Successfully logged in",
-	//             className: "custom-message",
-	//           });
-	//           router.push("/loginsuccess");
-	//         }
-	//       } else {
-	//         message.success({
-	//           content: "Successfully logged in",
-	//           className: "custom-message",
-	//         });
-	//         router.push("/dashboard");
-	//       }
-	//     });
-	//   } catch (error) {
-	//     console.log(error.message);
-	//     message.error({
-	//       content: "An error occurred while trying to log you in",
-	//       className: "custom-message",
-	//     });
-	//   }
-	// };
-
 	const handleOnClick = async (provider) => {
 		try {
 			auth.signInWithPopup(provider).then(async (res) => {
 				var user = res.user
 
+				// check if user is in db, if not, add them
+				const userRef = db.collection("Users").doc(user.uid)
+				const doc = await userRef.get()
+				if (!doc.exists) {
+					userRef.set({
+						avatar: user.photoURL,
+						email: user.email,
+						name: user.displayName,
+					})
+				}
+
 				await fetchProducts(user).then(async (product) => {
-          console.log(product)
 					if (res.additionalUserInfo.isNewUser) {
 						// if user has a company custom email
 						if (!/@relentlesspersistenceinc.com\s*$/.test(user.email)) {
@@ -122,7 +85,7 @@ const Login = () => {
 							content: "Successfully logged in",
 							className: "custom-message",
 						})
-						router.push(`/${product.slug}/dashboard`)
+						router.push(product ? `/${product.id}/dashboard` : `/product`)
 					}
 				})
 			})

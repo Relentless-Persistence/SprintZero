@@ -7,8 +7,8 @@ import {useState} from "react"
 import type {FC, ReactNode} from "react"
 import type {Id} from "~/types"
 
-import {getProduct} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {getProduct} from "~/utils/api/queries"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 type Props = {
 	title: string
@@ -53,7 +53,7 @@ const ItemDrawer: FC<Props> = ({title, itemType, extra, data, isOpen, onClose}) 
 						<Tag color="#91d5ff">
 							{data.points} point{data.points === 1 ? `` : `s`}
 						</Tag>
-						{activeProduct?.cost && <Tag color="#a4df74">${activeProduct.cost * data.points}</Tag>}
+						{activeProduct?.effortCost && <Tag color="#a4df74">${activeProduct.effortCost * data.points}</Tag>}
 						{extra}
 						{!editMode && (
 							<button type="button" onClick={() => void setEditMode(true)} className="text-sm text-[#396417]">

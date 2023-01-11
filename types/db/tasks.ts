@@ -16,7 +16,6 @@ export const TaskSchema = z.object({
 
 	product: idSchema,
 })
-export const TaskCollectionSchema = z.array(TaskSchema)
 
 export const Tasks = genDbNames(`Tasks`, TaskSchema)
 export type Task = z.infer<typeof TaskSchema>

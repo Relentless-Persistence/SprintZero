@@ -17,7 +17,6 @@ export const PersonaSchema = z.object({
 
 	product: idSchema,
 })
-export const PersonaCollectionSchema = z.array(PersonaSchema)
 
 export const Personas = genDbNames(`Personas`, PersonaSchema)
 export type Persona = z.infer<typeof PersonaSchema>

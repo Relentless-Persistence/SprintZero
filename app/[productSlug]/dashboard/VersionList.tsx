@@ -2,50 +2,51 @@
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import {Button, Input, Menu} from "antd5"
+import {useAtom} from "jotai"
 
 import type {FC} from "react"
 
-import {useStoryMapStore} from "./storyMapStore"
-import {addVersion, getAllVersions} from "~/utils/fetch"
-import {useActiveProductId} from "~/utils/useActiveProductSlug"
+import {currentVersionAtom, newVersionInputAtom} from "./storyMap/atoms"
+import {addVersion} from "~/utils/api/mutations"
+import {getVersionsByProduct} from "~/utils/api/queries"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const VersionList: FC = () => {
 	const queryClient = useQueryClient()
-	const activeProduct = useActiveProductId()
-	const newVersionInput = useStoryMapStore((state) => state.newVersionInput)
-	const setNewVersionInput = useStoryMapStore((state) => state.setNewVersionInput)
+	const activeProductId = useActiveProductId()
+	const [newVersionInput, setNewVersionInput] = useAtom(newVersionInputAtom)
 
-	const currentVersion = useStoryMapStore((state) => state.currentVersion)
-	const setCurrentVersion = useStoryMapStore((state) => state.setCurrentVersion)
+	const [currentVersion, setCurrentVersion] = useAtom(currentVersionAtom)
 
 	const {data: versions} = useQuery({
-		queryKey: [`all-versions`, activeProduct],
-		queryFn: getAllVersions(activeProduct!),
-		onSuccess: (versions) => {
-			if (currentVersion === `` && versions[0]) setCurrentVersion(versions[0].id)
-		},
-		enabled: activeProduct !== null,
+		queryKey: [`all-versions`, activeProductId],
+		queryFn: getVersionsByProduct(activeProductId!),
+		enabled: activeProductId !== null,
 	})
 
 	const addVersionMutation = useMutation({
-		mutationFn: activeProduct ? addVersion(activeProduct) : async () => {},
+		mutationFn: addVersion,
 		onSuccess: () => {
 			setNewVersionInput(null)
-			queryClient.invalidateQueries({queryKey: [`all-versions`, activeProduct], exact: true})
+			queryClient.invalidateQueries({queryKey: [`all-versions`, activeProductId], exact: true})
 		},
 	})
 
 	return (
 		<div>
 			<Menu
-				selectedKeys={[currentVersion]}
+				selectedKeys={[currentVersion.id]}
 				items={[
 					...(versions ?? []).map((version) => ({
 						key: version.id,
 						label: version.name,
-						onClick: () => void setCurrentVersion(version.id),
+						onClick: () => void setCurrentVersion({id: version.id, name: version.name}),
 					})),
-					{key: `__ALL_VERSIONS__`, label: `All`, onClick: () => void setCurrentVersion(`__ALL_VERSIONS__`)},
+					{
+						key: `__ALL_VERSIONS__`,
+						label: `All`,
+						onClick: () => void setCurrentVersion({id: `__ALL_VERSIONS__`, name: `All`}),
+					},
 				]}
 				className="bg-transparent"
 			/>
@@ -53,7 +54,7 @@ const VersionList: FC = () => {
 				<form
 					onSubmit={(evt) => {
 						evt.preventDefault()
-						addVersionMutation.mutate(newVersionInput)
+						addVersionMutation.mutate({productId: activeProductId!, versionName: newVersionInput})
 					}}
 					className="flex flex-col gap-2"
 				>

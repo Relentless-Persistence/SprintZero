@@ -9,7 +9,6 @@ export const EthicsItemSchema = z.object({
 
 	story: idSchema,
 })
-export const EthicsItemCollectionSchema = z.array(EthicsItemSchema)
 
 export const EthicsItems = genDbNames(`EthicsItems`, EthicsItemSchema)
 export type EthicsItem = z.infer<typeof EthicsItemSchema>

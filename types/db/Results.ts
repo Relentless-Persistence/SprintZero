@@ -9,7 +9,6 @@ export const ResultSchema = z.object({
 
 	goal: idSchema,
 })
-export const ResultCollectionSchema = z.array(ResultSchema)
 
 export const Results = genDbNames(`Results`, ResultSchema)
 export type Result = z.infer<typeof ResultSchema>

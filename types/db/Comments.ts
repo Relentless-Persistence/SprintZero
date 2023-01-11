@@ -12,7 +12,6 @@ export const CommentSchema = z.object({
 
 	createdAt: z.instanceof(Timestamp),
 })
-export const CommentCollectionSchema = z.array(CommentSchema)
 
 export const Comments = genDbNames(`Comments`, CommentSchema)
 export type Comment = z.infer<typeof CommentSchema>

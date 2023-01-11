@@ -9,7 +9,6 @@ export const AccessibilityItemSchema = z.object({
 
 	product: idSchema,
 })
-export const AccessibilityItemCollectionSchema = z.array(AccessibilityItemSchema)
 
 export const AccessibilityItems = genDbNames(`AccessibilityItems`, AccessibilityItemSchema)
 export type AccessibilityItem = z.infer<typeof AccessibilityItemSchema>

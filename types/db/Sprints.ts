@@ -11,7 +11,6 @@ export const SprintSchema = z.object({
 
 	product: idSchema,
 })
-export const SprintCollectionSchema = z.array(SprintSchema)
 
 export const Sprints = genDbNames(`Sprints`, SprintSchema)
 export type Sprint = z.infer<typeof SprintSchema>
