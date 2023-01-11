@@ -27,7 +27,9 @@ const HomePage: FC = () => {
 		},
 	})
 
-	return null
+	return (
+		<div>{`I'm just an empty page for now`}</div>
+	)
 }
 
 export default HomePage

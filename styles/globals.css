@@ -376,7 +376,7 @@ body {
   width: 100% !important;
 }
 
-#stages .ant-steps-item-active > .ant-steps-item-container > .ant-steps-item-icon {
+/* #stages .ant-steps-item-active > .ant-steps-item-container > .ant-steps-item-icon {
   background: #73C92D;
   border: none;
   color: #fff;
@@ -392,4 +392,4 @@ body {
 
 #stages .ant-steps-item-tail {
   background: #73C92D;
-}
+} */

@@ -39,7 +39,7 @@ const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVi
 				<TextArea
 					disabled={disabled}
 					value={acceptedVision}
-					rows={6}
+					rows={12}
 					onChange={(e) => setAcceptedVision(e.target.value)}
 				/>
 			</Card>

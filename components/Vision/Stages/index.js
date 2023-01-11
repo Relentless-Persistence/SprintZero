@@ -7,15 +7,15 @@ import axios from "axios"
 import {db} from "../../../config/firebase-config"
 import { useAuth } from "../../../contexts/AuthContext"
 
-const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse: ""}, productId, setEditMode}) => {
+const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "", acceptedResponse: ""}, productId, setEditMode}) => {
   const {user} = useAuth();
 	const [current, setCurrent] = useState(0)
 	const [type, setType] = useState(vision.type)
 	const [value, setValue] = useState(vision.value)
 	const [features, setFeatures] = useState(vision.features)
-	const [gptResponse, setGptResponse] = useState("")
+	const [gptResponse, setGptResponse] = useState(vision.gptResponse)
 	const [final, setFinal] = useState("")
-	const [acceptedVision, setAcceptedVision] = useState(vision.acceptedResponse)
+	const [acceptedVision, setAcceptedVision] = useState(vision.acceptedVision)
 	const [step1, setStep1] = useState(true)
 	const [step2, setStep2] = useState(false)
 	const [step3, setStep3] = useState(false)
@@ -29,6 +29,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 				type,
 				value,
 				features,
+				gptResponse,
 				acceptedVision,
 			})
 			.then((res) => {
@@ -45,6 +46,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 				value,
 				features,
 				acceptedVision,
+				gptResponse
 			})
 			.then(() => {
         createEvent(vision.id)
@@ -98,9 +100,18 @@ const Stages = ({vision = {type: "", value: "", features: [""], acceptedResponse
 		}
 	}, [current])
 
+	useEffect(() => {
+		if(vision.id) {
+			setCurrent(2)
+		}
+	}, [])
+
 	return (
 		<div id="stages">
 			<Steps
+			onChange={(value) => {
+				setCurrent(value)
+			}}
 				direction="vertical"
 				current={current}
 				items={[
