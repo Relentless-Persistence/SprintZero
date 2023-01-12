@@ -7,7 +7,7 @@ import type {Id} from "~/types"
 import {userIdAtom} from "./atoms"
 import {getProductsByUser} from "~/utils/api/queries"
 
-export const useActiveProductId = (): Id | null => {
+export const useActiveProductId = (): Id | undefined => {
 	const pathname = usePathname()
 	const slugs = pathname?.split(`/`)
 	const productId = slugs?.[1] as Id | undefined
@@ -17,7 +17,7 @@ export const useActiveProductId = (): Id | null => {
 	useQuery({
 		queryKey: [`all-products`, userId],
 		queryFn: getProductsByUser(userId!),
-		enabled: userId !== null,
+		enabled: userId !== undefined,
 		onSuccess: (products) => {
 			if (products.find((product) => product.id === productId)) return
 			if (products[0]) {
@@ -28,5 +28,5 @@ export const useActiveProductId = (): Id | null => {
 		},
 	})
 
-	return productId ?? null
+	return productId
 }

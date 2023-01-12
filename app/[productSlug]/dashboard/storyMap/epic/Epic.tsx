@@ -26,10 +26,10 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		elementRegistry.epics[epic.id] = containerRef.current
+		elementRegistry.epics[epic.id] = containerRef.current ?? undefined
 		return () => {
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-			elementRegistry.epics[epic.id] = containerRef.current
+			elementRegistry.epics[epic.id] = containerRef.current ?? undefined
 		}
 	}, [epic.id])
 
@@ -57,14 +57,14 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 
 			{/* Pad out the remaining columns in row 1 */}
 			{Array(Math.max(features.length - 1, 0))
-				.fill(null)
+				.fill(undefined)
 				.map((_, i) => (
 					<div key={`row1-${i}`} />
 				))}
 
 			{/* Pad out the beginning columns in row 2 */}
-			{Array(features.length)
-				.fill(null)
+			{Array(Math.max(features.length, 1))
+				.fill(undefined)
 				.map((_, i) => (
 					<div key={`row2-${i}`} className="relative h-10 w-[calc(100%+1rem-2px)]">
 						{/* Top */}
@@ -82,7 +82,7 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 							<div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-dashed border-[#4f2dc8]" />
 						)}
 
-						{i === features.length - 1 && i !== 0 && (
+						{i === features.length - 1 && features.length > 0 && (
 							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 								<SmallAddFeatureButton productId={productId} epic={epic} />
 							</div>

@@ -24,10 +24,10 @@ const Story: FC<StoryProps> = ({productId, epicId, featureId, story}) => {
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		elementRegistry.stories[story.id] = containerRef.current
+		elementRegistry.stories[story.id] = containerRef.current ?? undefined
 		return () => {
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-			elementRegistry.stories[story.id] = containerRef.current
+			elementRegistry.stories[story.id] = containerRef.current ?? undefined
 		}
 	}, [story.id])
 

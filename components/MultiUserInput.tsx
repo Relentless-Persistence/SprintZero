@@ -21,7 +21,7 @@ export type MultiUserInputProps = {
 
 const MultiUserInput: FC<MultiUserInputProps> = ({value, onChange, inputStateId, inputProps}) => {
 	const userId = useAtomValue(userIdAtom)
-	const ref = useRef<HTMLInputElement | null>(null)
+	const ref = useRef<HTMLInputElement | undefined>(undefined)
 
 	useEffect(() => {
 		const unsubscribe = onSnapshot(doc(db, InputStates._, inputStateId), (doc) => {
@@ -39,9 +39,9 @@ const MultiUserInput: FC<MultiUserInputProps> = ({value, onChange, inputStateId,
 			updateInputState({
 				id: inputStateId,
 				inputState: {
-					start: ref.current?.selectionStart ?? null,
-					end: ref.current?.selectionEnd ?? null,
-					direction: ref.current?.selectionDirection ?? null,
+					start: ref.current?.selectionStart ?? undefined,
+					end: ref.current?.selectionEnd ?? undefined,
+					direction: ref.current?.selectionDirection ?? undefined,
 				},
 				userId,
 			})

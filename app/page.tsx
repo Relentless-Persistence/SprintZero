@@ -16,7 +16,7 @@ const HomePage: FC = () => {
 	useQuery({
 		queryKey: [`all-products`, userId],
 		queryFn: getProductsByUser(userId!),
-		enabled: userId !== null,
+		enabled: userId !== undefined,
 		onSuccess: (products) => {
 			const firstProduct = products[0]
 			if (!firstProduct) {

@@ -8,12 +8,12 @@ export const currentVersionAtom = atom<{id: Id | `__ALL_VERSIONS__`; name: strin
 	id: `__ALL_VERSIONS__`,
 	name: `All`,
 })
-export const newVersionInputAtom = atom<string | null>(null)
+export const newVersionInputAtom = atom<string | undefined>(undefined)
 
-export const storyMapStateAtom = atom<StoryMapState>([])
+export const storyMapStateAtom = atom<StoryMapState>({epics: []})
 export const useGetEpic = (epicId: Id): Epic => {
 	const storyMapState = useAtomValue(storyMapStateAtom)
-	return storyMapState.find((epic) => epic.id === epicId)!
+	return storyMapState.epics.find((epic) => epic.id === epicId)!
 }
 export const useGetFeature = (epicId: Id, featureId: Id): Feature => {
 	const epic = useGetEpic(epicId)
@@ -25,11 +25,11 @@ export const useGetStory = (epicId: Id, featureId: Id, storyId: Id): Story => {
 }
 
 export const dragStateAtom = atom<{
-	id: Id | null
-	type: `epic` | `feature` | `story` | null
-	pos: [MotionValue<number> | null, MotionValue<number> | null]
+	id: Id | undefined
+	type: `epic` | `feature` | `story` | undefined
+	pos: [MotionValue<number> | undefined, MotionValue<number> | undefined]
 }>({
-	id: null,
-	type: null,
-	pos: [null, null],
+	id: undefined,
+	type: undefined,
+	pos: [undefined, undefined],
 })

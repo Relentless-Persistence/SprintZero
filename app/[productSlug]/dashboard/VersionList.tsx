@@ -21,13 +21,13 @@ const VersionList: FC = () => {
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProductId],
 		queryFn: getVersionsByProduct(activeProductId!),
-		enabled: activeProductId !== null,
+		enabled: activeProductId !== undefined,
 	})
 
 	const addVersionMutation = useMutation({
 		mutationFn: addVersion,
 		onSuccess: () => {
-			setNewVersionInput(null)
+			setNewVersionInput(undefined)
 			queryClient.invalidateQueries({queryKey: [`all-versions`, activeProductId], exact: true})
 		},
 	})
@@ -50,7 +50,7 @@ const VersionList: FC = () => {
 				]}
 				className="bg-transparent"
 			/>
-			{newVersionInput !== null && (
+			{newVersionInput !== undefined && (
 				<form
 					onSubmit={(evt) => {
 						evt.preventDefault()

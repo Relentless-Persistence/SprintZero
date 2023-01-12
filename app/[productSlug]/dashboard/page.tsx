@@ -35,8 +35,7 @@ const Dashboard: FC = () => {
 
 	useEffect(() => {
 		const handlePointerMove = (e: PointerEvent) => {
-			pointerLocation[0] = e.clientX
-			pointerLocation[1] = e.clientY
+			pointerLocation.current = [e.clientX, e.clientY]
 		}
 		window.addEventListener(`pointermove`, handlePointerMove)
 
@@ -91,7 +90,7 @@ const Dashboard: FC = () => {
 				originalStoryMapState.current = storyMapState
 			}}
 			onPanEnd={() => {
-				setDragState((prev) => ({...prev, id: null, type: null}))
+				setDragState((prev) => ({...prev, id: undefined, type: undefined}))
 				x.set(0)
 				y.set(0)
 			}}

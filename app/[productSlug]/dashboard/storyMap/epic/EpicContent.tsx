@@ -27,8 +27,8 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 	const updateLocalEpicName = (newName: string) => {
 		setStoryMapState((state) =>
 			produce(state, (state) => {
-				const index = state.findIndex((oldEpic) => oldEpic.id === epic.id)
-				state[index]!.name = newName
+				const index = state.epics.findIndex((oldEpic) => oldEpic.id === epic.id)
+				state.epics[index]!.name = newName
 			}),
 		)
 	}

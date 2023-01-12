@@ -11,7 +11,7 @@ import Input from "~/components/Input"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 
 const schema = z.object({
-	effortCost: z
+	effort_cost: z
 		.string()
 		.regex(/(\.[0-9]{2})?/, {message: `Must have two decimal places.`})
 		.regex(/^\$[0-9]+(\.[0-9]{2})?$/, `Invalid format.`)
@@ -22,7 +22,7 @@ type FormInputs = z.infer<typeof schema>
 type Slide4Props = {
 	currentSlide: number
 	setCanProceed: (canProceed: boolean) => void
-	onComplete: (data: {effortCost: number | null}) => void
+	onComplete: (data: {effort_cost: number | null}) => void
 }
 
 const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
@@ -31,12 +31,12 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 		mode: `onChange`,
 		resolver: zodResolver(schema),
 		defaultValues: {
-			effortCost: null,
+			effort_cost: null,
 		},
 	})
 
 	const onSubmit = handleSubmit(
-		(data) => void onComplete({effortCost: data.effortCost ? parseFloat(data.effortCost.slice(1)) : null}),
+		(data) => void onComplete({effort_cost: data.effort_cost ? parseFloat(data.effort_cost.slice(1)) : null}),
 	)
 
 	useEffect(() => void (isActive && setCanProceed(formState.isValid)), [isActive, formState.isValid, setCanProceed])
@@ -54,10 +54,10 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						extra="Optional"
 						required
 						hasFeedback
-						validateStatus={formValidateStatus(getFieldState(`effortCost`, formState))}
-						help={formState.errors.effortCost?.message}
+						validateStatus={formValidateStatus(getFieldState(`effort_cost`, formState))}
+						help={formState.errors.effort_cost?.message}
 					>
-						<Input currencyFormat placeholder="$0.00" htmlSize={20} control={control} name="effortCost" />
+						<Input currencyFormat placeholder="$0.00" htmlSize={20} control={control} name="effort_cost" />
 					</Form.Item>
 
 					<input type="submit" hidden />

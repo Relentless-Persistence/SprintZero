@@ -20,7 +20,8 @@ const StoryMap: FC = () => {
 
 	return (
 		<div className="relative z-10 flex w-max items-start gap-8">
-			{activeProductId && storyMapState.map((epic) => <Epic key={epic.id} productId={activeProductId} epic={epic} />)}
+			{activeProductId &&
+				storyMapState.epics.map((epic) => <Epic key={epic.id} productId={activeProductId} epic={epic} />)}
 
 			<button
 				type="button"

@@ -38,10 +38,10 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 	const updateLocalStoryName = (newName: string) => {
 		setStoryMapState((state) =>
 			produce(state, (state) => {
-				const epicIndex = state.findIndex((epic) => epic.id === epicId)
-				const featureIndex = state[epicIndex]!.features.findIndex((feature) => feature.id === featureId)
-				const storyIndex = state[epicIndex]!.features[featureIndex]!.stories.findIndex((s) => s.id === story.id)
-				state[epicIndex]!.features[featureIndex]!.stories[storyIndex]!.name = newName
+				const epicIndex = state.epics.findIndex((epic) => epic.id === epicId)
+				const featureIndex = state.epics[epicIndex]!.features.findIndex((feature) => feature.id === featureId)
+				const storyIndex = state.epics[epicIndex]!.features[featureIndex]!.stories.findIndex((s) => s.id === story.id)
+				state.epics[epicIndex]!.features[featureIndex]!.stories[storyIndex]!.name = newName
 			}),
 		)
 	}

@@ -27,7 +27,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	const {data: user} = useQuery({
 		queryKey: [`user`, userId],
 		queryFn: getUser(userId!),
-		enabled: userId !== null,
+		enabled: userId !== undefined,
 	})
 	const {data: products} = useQuery({
 		queryKey: [`all-products`, user?.id],

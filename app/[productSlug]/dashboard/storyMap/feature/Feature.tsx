@@ -25,10 +25,10 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		elementRegistry.features[feature.id] = containerRef.current
+		elementRegistry.features[feature.id] = containerRef.current ?? undefined
 		return () => {
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-			elementRegistry.features[feature.id] = containerRef.current
+			elementRegistry.features[feature.id] = containerRef.current ?? undefined
 		}
 	}, [feature.id])
 

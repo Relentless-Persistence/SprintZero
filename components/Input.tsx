@@ -32,7 +32,7 @@ const Input = <TFieldValues extends FieldValues = FieldValues>({
 	const {field} = useController({control, name})
 
 	const format = (str: string) => {
-		if (str.length === 0) return null
+		if (str.length === 0) return undefined
 		if (currencyFormat) return formatAsCurrency(str)
 		return str
 	}

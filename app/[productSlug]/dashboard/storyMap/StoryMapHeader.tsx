@@ -18,7 +18,7 @@ const StoryMapHeader: FC = () => {
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProduct],
 		queryFn: getVersionsByProduct(activeProduct!),
-		enabled: activeProduct !== null,
+		enabled: activeProduct !== undefined,
 	})
 
 	return (

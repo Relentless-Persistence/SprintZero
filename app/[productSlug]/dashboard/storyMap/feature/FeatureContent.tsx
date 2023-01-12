@@ -32,9 +32,9 @@ const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentPro
 	const updateLocalFeatureName = (newName: string) => {
 		setStoryMapState((state) =>
 			produce(state, (state) => {
-				const epicIndex = state.findIndex((epic) => epic.id === epicId)
-				const featureIndex = state[epicIndex]!.features.findIndex((f) => f.id === feature.id)
-				state[epicIndex]!.features[featureIndex]!.name = newName
+				const epicIndex = state.epics.findIndex((epic) => epic.id === epicId)
+				const featureIndex = state.epics[epicIndex]!.features.findIndex((f) => f.id === feature.id)
+				state.epics[epicIndex]!.features[featureIndex]!.name = newName
 			}),
 		)
 	}

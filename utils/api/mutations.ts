@@ -59,7 +59,7 @@ export const addEpic = async ({productId, data: initialData, position}: AddEpicV
 	}
 
 	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState.splice(position ?? Infinity, 0, data)
+	storyMapState.epics.splice(position ?? Infinity, 0, data)
 
 	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
@@ -73,9 +73,9 @@ type UpdateEpicVars = {
 export const updateEpic = async ({productId, epicId, data}: UpdateEpicVars): Promise<void> => {
 	let storyMapState = (await getProduct(productId)()).storyMapState
 	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.findIndex(({id}) => id === epicId)
-		state[epicIndex] = {
-			...state[epicIndex]!,
+		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
+		state.epics[epicIndex] = {
+			...state.epics[epicIndex]!,
 			...data,
 		}
 	})
@@ -91,7 +91,7 @@ export const deleteEpic = async ({productId, epicId}: DeleteEpicVars): Promise<v
 	const product = await getProduct(productId)()
 
 	updateDoc(doc(db, Products._, product.id), {
-		storyMapState: product.storyMapState.filter(({id}) => id !== epicId),
+		storyMapState: product.storyMapState.epics.filter(({id}) => id !== epicId),
 	})
 }
 
@@ -118,8 +118,8 @@ export const addFeature = async ({productId, epicId, data: initialData, position
 
 	let storyMapState = (await getProduct(productId)()).storyMapState
 	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.findIndex(({id}) => id === epicId)
-		state[epicIndex]!.features.splice(position ?? Infinity, 0, data)
+		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
+		state.epics[epicIndex]!.features.splice(position ?? Infinity, 0, data)
 	})
 	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
@@ -133,8 +133,8 @@ type DeleteFeatureVars = {
 export const deleteFeature = async ({productId, epicId, featureId}: DeleteFeatureVars): Promise<void> => {
 	let storyMapState = (await getProduct(productId)()).storyMapState
 	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.findIndex(({id}) => id === epicId)
-		state[epicIndex]!.features = state[epicIndex]!.features.filter(({id}) => id !== featureId)
+		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
+		state.epics[epicIndex]!.features = state.epics[epicIndex]!.features.filter(({id}) => id !== featureId)
 	})
 	updateDoc(doc(db, Products._, productId), {storyMapState})
 }
@@ -149,10 +149,10 @@ type UpdateFeatureVars = {
 export const updateFeature = async ({productId, epicId, featureId, data}: UpdateFeatureVars): Promise<void> => {
 	let storyMapState = (await getProduct(productId)()).storyMapState
 	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.findIndex(({id}) => id === epicId)
-		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		state[epicIndex]!.features[featureIndex] = {
-			...state[epicIndex]!.features[featureIndex]!,
+		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
+		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		state.epics[epicIndex]!.features[featureIndex] = {
+			...state.epics[epicIndex]!.features[featureIndex]!,
 			...data,
 		}
 	})
@@ -178,9 +178,7 @@ export const addStory = async ({
 	const data: Story = {
 		id,
 		acceptance_criteria: [],
-		code_link: null,
 		description: ``,
-		design_link: null,
 		name: ``,
 		points: 0,
 		priority_level: 0,
@@ -192,9 +190,9 @@ export const addStory = async ({
 
 	let storyMapState = (await getProduct(productId)()).storyMapState
 	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.findIndex(({id}) => id === epicId)
-		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		state[epicIndex]!.features[featureIndex]!.stories.splice(position ?? Infinity, 0, data)
+		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
+		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		state.epics[epicIndex]!.features[featureIndex]!.stories.splice(position ?? Infinity, 0, data)
 	})
 	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
@@ -209,11 +207,11 @@ type DeleteStoryVars = {
 export const deleteStory = async ({productId, epicId, featureId, storyId}: DeleteStoryVars): Promise<void> => {
 	let storyMapState = (await getProduct(productId)()).storyMapState
 	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.findIndex(({id}) => id === epicId)
-		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		state[epicIndex]!.features[featureIndex]!.stories = state[epicIndex]!.features[featureIndex]!.stories.filter(
-			({id}) => id !== storyId,
-		)
+		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
+		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		state.epics[epicIndex]!.features[featureIndex]!.stories = state.epics[epicIndex]!.features[
+			featureIndex
+		]!.stories.filter(({id}) => id !== storyId)
 	})
 	await updateDoc(doc(db, Products._, productId), {storyMapState})
 }
@@ -231,11 +229,11 @@ type UpdateStoryVars = {
 export const updateStory = async ({productId, epicId, featureId, storyId, data}: UpdateStoryVars): Promise<void> => {
 	let storyMapState = (await getProduct(productId)()).storyMapState
 	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.findIndex(({id}) => id === epicId)
-		const featureIndex = state[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		const storyIndex = state[epicIndex]!.features[featureIndex]!.stories.findIndex(({id}) => id === storyId)
-		state[epicIndex]!.features[featureIndex]!.stories[storyIndex] = {
-			...state[epicIndex]!.features[featureIndex]!.stories[storyIndex]!,
+		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
+		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
+		const storyIndex = state.epics[epicIndex]!.features[featureIndex]!.stories.findIndex(({id}) => id === storyId)
+		state.epics[epicIndex]!.features[featureIndex]!.stories[storyIndex] = {
+			...state.epics[epicIndex]!.features[featureIndex]!.stories[storyIndex]!,
 			...data,
 		}
 	})

@@ -39,7 +39,7 @@ const ItemDrawer: FC<Props> = ({title, itemType, extra, data, isOpen, onClose}) 
 	const {data: activeProduct} = useQuery({
 		queryKey: [`product`, activeProductId],
 		queryFn: getProduct(activeProductId!),
-		enabled: activeProductId !== null,
+		enabled: activeProductId !== undefined,
 	})
 
 	return (

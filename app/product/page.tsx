@@ -27,7 +27,7 @@ const numSlides = 4
 
 type FormInputs = {
 	cadence: number
-	effortCost: number | null
+	effort_cost: number | null
 	email1: string | null
 	email2: string | null
 	email3: string | null
@@ -45,7 +45,7 @@ const ProductConfiguration: FC = () => {
 	const {data: user} = useQuery({
 		queryKey: [`user`, userId],
 		queryFn: getUser(userId!),
-		enabled: userId !== null,
+		enabled: userId !== undefined,
 	})
 
 	const router = useRouter()
@@ -56,7 +56,7 @@ const ProductConfiguration: FC = () => {
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}`
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
-			storyMapState: [],
+			storyMapState: {epics: []},
 			members: [{user: userId, type: `editor`}],
 			owner: userId,
 		} satisfies Omit<Product, `id`>)
