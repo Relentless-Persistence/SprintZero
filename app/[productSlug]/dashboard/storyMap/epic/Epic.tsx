@@ -66,7 +66,7 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 			{Array(Math.max(features.length, 1))
 				.fill(undefined)
 				.map((_, i) => (
-					<div key={`row2-${i}`} className="relative h-10 w-[calc(100%+1rem-2px)]">
+					<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1rem-2px)]">
 						{/* Top */}
 						{i === 0 && (
 							<div className="absolute left-1/2 top-0 h-[calc(50%-2px)] w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />

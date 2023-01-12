@@ -39,9 +39,9 @@ const MultiUserInput: FC<MultiUserInputProps> = ({value, onChange, inputStateId,
 			updateInputState({
 				id: inputStateId,
 				inputState: {
-					start: ref.current?.selectionStart ?? undefined,
-					end: ref.current?.selectionEnd ?? undefined,
-					direction: ref.current?.selectionDirection ?? undefined,
+					start: ref.current?.selectionStart ?? null,
+					end: ref.current?.selectionEnd ?? null,
+					direction: ref.current?.selectionDirection ?? null,
 				},
 				userId,
 			})

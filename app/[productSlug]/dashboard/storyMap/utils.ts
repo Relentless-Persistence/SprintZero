@@ -11,8 +11,6 @@ import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const storyMapTop = 224
-
 declare global {
 	interface Window {
 		__storyMapScrollPosition: {position: number}
@@ -25,12 +23,18 @@ declare global {
 			epicBoundaries: Array<{
 				id: Id
 				left: number
+				center: number
 				right: number
+				centerWithLeft?: number
+				centerWithRight?: number
 				featureBoundaries: Array<{
 					id: Id
 					left: number
+					center: number
 					right: number
-					storyBoundaries: Array<{id: Id; top: number; bottom: number}>
+					centerWithLeft?: number
+					centerWithRight?: number
+					storyBoundaries: Array<{id: Id; top: number; center: number; bottom: number}>
 				}>
 			}>
 		}
@@ -56,9 +60,10 @@ if (typeof window !== `undefined`) {
 	window.__pointerOffset = window.__pointerOffset ?? {current: undefined}
 }
 
+export const storyMapTop = 224
+export const layerBoundaries: [number, number] = [62 + storyMapTop, 156 + storyMapTop]
 export let storyMapScrollPosition = window.__storyMapScrollPosition
 export let elementRegistry = window.__elementRegistry
-export const layerBoundaries: [number, number] = [62, 140]
 export let boundaries = window.__boundaries
 export let pointerLocation = window.__pointerLocation
 export let pointerOffset = window.__pointerOffset
@@ -97,39 +102,34 @@ export const calculateBoundaries = (storyMapState: StoryMapState): void => {
 		.every((story) => elementRegistry.stories[story.id])
 	if (!allEpicsRegistered || !allFeaturesRegistered || !allStoriesRegistered) return
 
-	boundaries.epicBoundaries = storyMapState.epics.map((epic, epicIndex) => {
+	// Calculate initial boundaries
+	boundaries.epicBoundaries = storyMapState.epics.map((epic) => {
 		const element = elementRegistry.epics[epic.id]!
 		const boundingRect = element.getBoundingClientRect()
 		const translation = getElementTranslation(element)
 
 		let epicLeft = boundingRect.left + storyMapScrollPosition.position - translation[0]
-		if (epicIndex === 0) epicLeft = 0
 		let epicRight = boundingRect.right + storyMapScrollPosition.position - translation[0]
-		if (epicIndex === storyMapState.epics.length - 1) epicRight = window.innerWidth
+		let epicCenter = avg(epicLeft, epicRight)
 
 		return {
 			id: epic.id,
 			left: epicLeft,
+			center: epicCenter,
 			right: epicRight,
-			featureBoundaries: epic.features.map((feature, featureIndex) => {
+			featureBoundaries: epic.features.map((feature) => {
 				const element = elementRegistry.features[feature.id]!
 				const boundingRect = element.getBoundingClientRect()
 				const translation = getElementTranslation(element)
 
 				let featureLeft = boundingRect.left + storyMapScrollPosition.position - translation[0]
-				if (featureIndex === 0) {
-					if (epicIndex === 0) featureLeft = 0
-					else featureLeft = epicLeft
-				}
 				let featureRight = boundingRect.right + storyMapScrollPosition.position - translation[0]
-				if (featureIndex === epic.features.length - 1) {
-					if (epicIndex === storyMapState.epics.length - 1) featureRight = window.innerWidth
-					else featureRight = epicRight
-				}
+				let featureCenter = avg(featureLeft, featureRight)
 
 				return {
 					id: feature.id,
 					left: featureLeft,
+					center: featureCenter,
 					right: featureRight,
 					storyBoundaries: feature.stories.map((story, storyIndex) => {
 						const element = elementRegistry.stories[story.id]!
@@ -137,12 +137,35 @@ export const calculateBoundaries = (storyMapState: StoryMapState): void => {
 						const translation = getElementTranslation(element)
 
 						let top = boundingRect.top - translation[1]
-						if (storyIndex === 0) top = layerBoundaries[1] + storyMapTop
 						let bottom = boundingRect.bottom - translation[1]
-						if (storyIndex === feature.stories.length - 1) bottom = window.innerHeight
+						const center = avg(top, bottom)
+						if (storyIndex === 0) top = layerBoundaries[1]
+						if (storyIndex === feature.stories.length - 1) bottom = Infinity
 
-						return {id: story.id, top, bottom}
+						return {id: story.id, top, center, bottom}
 					}),
+				}
+			}),
+		}
+	})
+
+	// Calculate center positions
+	boundaries.epicBoundaries = boundaries.epicBoundaries.map((epicBoundaries, epicIndex) => {
+		const prevEpicBoundaries = boundaries.epicBoundaries[epicIndex - 1]
+		const nextEpicBoundaries = boundaries.epicBoundaries[epicIndex + 1]
+
+		return {
+			...epicBoundaries,
+			centerWithLeft: prevEpicBoundaries && avg(prevEpicBoundaries.left, epicBoundaries.right),
+			centerWithRight: nextEpicBoundaries && avg(nextEpicBoundaries.right, epicBoundaries.left),
+			featureBoundaries: epicBoundaries.featureBoundaries.map((featureBoundaries, featureIndex) => {
+				const prevFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex - 1]
+				const nextFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex + 1]
+
+				return {
+					...featureBoundaries,
+					centerWithLeft: prevFeatureBoundaries && avg(prevFeatureBoundaries.left, featureBoundaries.right),
+					centerWithRight: nextFeatureBoundaries && avg(nextFeatureBoundaries.right, featureBoundaries.left),
 				}
 			}),
 		}
@@ -153,8 +176,10 @@ export const calculateBoundaries = (storyMapState: StoryMapState): void => {
 		const prevEpicBoundaries = boundaries.epicBoundaries[epicIndex - 1]
 		const nextEpicBoundaries = boundaries.epicBoundaries[epicIndex + 1]
 
-		const epicLeft = prevEpicBoundaries?.right ?? epicBoundaries.left
-		const epicRight = nextEpicBoundaries ? avg(nextEpicBoundaries.left, epicBoundaries.right) : epicBoundaries.right
+		let epicLeft = prevEpicBoundaries?.right ?? epicBoundaries.left
+		let epicRight = nextEpicBoundaries ? avg(nextEpicBoundaries.left, epicBoundaries.right) : epicBoundaries.right
+		if (epicIndex === 0) epicLeft = -Infinity
+		if (epicIndex === storyMapState.epics.length - 1) epicRight = Infinity
 
 		boundaries.epicBoundaries[epicIndex] = {
 			...epicBoundaries,
@@ -166,14 +191,20 @@ export const calculateBoundaries = (storyMapState: StoryMapState): void => {
 					const prevFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex - 1]
 					const nextFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex + 1]
 
-					let left = prevFeatureBoundaries?.right ?? featureBoundaries.left
-					if (featureIndex === 0) left = epicLeft
-					let right = nextFeatureBoundaries
+					let featureLeft = prevFeatureBoundaries?.right ?? featureBoundaries.left
+					let featureRight = nextFeatureBoundaries
 						? avg(nextFeatureBoundaries.left, featureBoundaries.right)
 						: featureBoundaries.right
-					if (featureIndex === allFeatureBoundaries.length - 1) right = epicRight
+					if (featureIndex === 0) {
+						if (epicIndex === 0) featureLeft = -Infinity
+						else featureLeft = epicLeft
+					}
+					if (featureIndex === allFeatureBoundaries.length - 1) {
+						if (epicIndex === storyMapState.epics.length - 1) featureRight = Infinity
+						else featureRight = epicRight
+					}
 
-					allFeatureBoundaries[featureIndex] = {...featureBoundaries, left, right}
+					allFeatureBoundaries[featureIndex] = {...featureBoundaries, left: featureLeft, right: featureRight}
 				}
 				return allFeatureBoundaries
 			})(),
@@ -181,16 +212,16 @@ export const calculateBoundaries = (storyMapState: StoryMapState): void => {
 	}
 }
 
-export type TargetLocation = {
-	epic: number | undefined
-	feature: number | undefined
-	story: number | undefined
+export type StoryMapLocation = {
+	epic?: number
+	feature?: number
+	story?: number
 }
 
-export const getTargetLocation = (storyMapState: StoryMapState): TargetLocation => {
+export const getTargetLocation = (storyMapState: StoryMapState, startLocation: StoryMapLocation): StoryMapLocation => {
 	calculateBoundaries(storyMapState)
 
-	const x = pointerLocation.current[0]
+	const x = pointerLocation.current[0] + storyMapScrollPosition.position
 	const y = pointerLocation.current[1]
 
 	let hoveringEpicIndex = -1
@@ -198,71 +229,104 @@ export const getTargetLocation = (storyMapState: StoryMapState): TargetLocation 
 	let hoveringFeatureIndex = -1
 	let targetFeatureIndex = -1
 	let targetStoryIndex = -1
-	for (const [index, epicBoundaries] of boundaries.epicBoundaries.entries()) {
-		if (x >= epicBoundaries.left && x < epicBoundaries.right) hoveringEpicIndex = index
+	for (const [
+		epicIndex,
+		{
+			left: epicLeft,
+			center: epicCenter,
+			right: epicRight,
+			centerWithLeft,
+			centerWithRight,
+			featureBoundaries: allFeatureBoundaries,
+		},
+	] of boundaries.epicBoundaries.entries()) {
+		if (x >= epicLeft && x < epicRight) hoveringEpicIndex = epicIndex
 
-		const prevEpicBoundaries = boundaries.epicBoundaries[index - 1]
-		const nextEpicBoundaries = boundaries.epicBoundaries[index + 1]
-		const centerWithLeft = prevEpicBoundaries && avg(prevEpicBoundaries.left, epicBoundaries.right)
-		const centerWithRight = nextEpicBoundaries && avg(epicBoundaries.left, nextEpicBoundaries.right)
+		const isForeign = startLocation.feature !== undefined
+		if (isForeign) {
+			if (x >= epicLeft && x < epicCenter) targetEpicIndex = epicIndex
+			else if (x >= epicCenter && x < epicRight) targetEpicIndex = epicIndex + 1
+		} else {
+			if (centerWithLeft && x >= epicLeft && x < centerWithLeft) targetEpicIndex = epicIndex - 1
+			else if (centerWithRight && x >= centerWithRight && x < epicRight) targetEpicIndex = epicIndex + 1
+			else targetEpicIndex = epicIndex
+		}
 
-		if (centerWithLeft && x >= epicBoundaries.left && x < centerWithLeft) targetEpicIndex = index - 1
-		else if (centerWithRight && x >= centerWithRight && x < epicBoundaries.right) targetEpicIndex = index + 1
-		else targetEpicIndex = index
+		if (hoveringEpicIndex !== -1) {
+			for (const [
+				featureIndex,
+				{
+					left: featureLeft,
+					center: featureCenter,
+					right: featureRight,
+					centerWithLeft,
+					centerWithRight,
+					storyBoundaries: allStoryBoundaries,
+				},
+			] of allFeatureBoundaries.entries()) {
+				if (x >= featureLeft && x < featureRight) hoveringFeatureIndex = featureIndex
 
-		if (hoveringEpicIndex >= 0) {
-			const featureBoundaries = epicBoundaries.featureBoundaries
-			for (const [index, boundaries] of featureBoundaries.entries()) {
-				if (x >= boundaries.left && x < boundaries.right) hoveringFeatureIndex = index
+				const isForeign =
+					startLocation.feature === undefined || // Was originally an epic
+					(startLocation.story === undefined && startLocation.epic !== epicIndex) || // Was originally a feature, but from a different epic
+					startLocation.story !== undefined // Was originally a story
+				if (isForeign) {
+					if (x >= featureLeft && x < featureCenter) targetFeatureIndex = featureIndex
+					else if (x >= featureCenter && x < featureRight) targetFeatureIndex = featureIndex + 1
+				} else {
+					if (centerWithLeft && x >= featureLeft && x < centerWithLeft) targetFeatureIndex = featureIndex - 1
+					else if (centerWithRight && x >= centerWithRight && x < featureRight) targetFeatureIndex = featureIndex + 1
+					else targetFeatureIndex = featureIndex
+				}
 
-				const prevFeatureBoundaries = featureBoundaries[index - 1]
-				const nextFeatureBoundaries = featureBoundaries[index + 1]
-				const centerWithLeft = prevFeatureBoundaries && avg(prevFeatureBoundaries.left, boundaries.right)
-				const centerWithRight = nextFeatureBoundaries && avg(boundaries.left, nextFeatureBoundaries.right)
+				if (hoveringFeatureIndex !== -1) {
+					for (const [
+						storyIndex,
+						{top: storyTop, center: storyCenter, bottom: storyBottom},
+					] of allStoryBoundaries.entries()) {
+						const isForeign = startLocation.story === undefined || startLocation.feature !== featureIndex
+						if (isForeign) {
+							if (y >= storyTop && y < storyCenter) targetStoryIndex = storyIndex
+							else if (y >= storyCenter && y < storyBottom) targetStoryIndex = storyIndex + 1
+						} else {
+							if (y >= storyTop && y < storyBottom) targetStoryIndex = storyIndex
+						}
 
-				if (centerWithLeft && x >= boundaries.left && x < centerWithLeft) targetFeatureIndex = index - 1
-				else if (centerWithRight && x >= centerWithRight && x < boundaries.right) targetFeatureIndex = index + 1
-				else targetFeatureIndex = index
-
-				if (hoveringFeatureIndex >= 0) {
-					for (const [index, storyBoundaries] of boundaries.storyBoundaries.entries()) {
-						if (y >= storyBoundaries.top && y < storyBoundaries.bottom) targetStoryIndex = index
-
-						if (targetStoryIndex >= 0) break
-						targetStoryIndex = index + 1
+						if (targetStoryIndex !== -1) break
 					}
+					if (targetStoryIndex === -1) targetStoryIndex = allStoryBoundaries.length
 
 					break
-					targetFeatureIndex = index + 1
 				}
 			}
+			if (targetFeatureIndex === -1) targetFeatureIndex = allFeatureBoundaries.length
 
 			break
-			targetEpicIndex = index + 1
 		}
 	}
+	if (targetEpicIndex === -1) targetEpicIndex = boundaries.epicBoundaries.length
 
-	console.log({
-		epic: y - storyMapTop < layerBoundaries[0] ? targetEpicIndex : hoveringEpicIndex,
-		feature:
-			y - storyMapTop > layerBoundaries[0]
-				? y < layerBoundaries[1]
-					? targetFeatureIndex
-					: hoveringFeatureIndex
-				: undefined,
-		story: y - storyMapTop > layerBoundaries[1] ? targetStoryIndex : undefined,
-	})
-
-	return {
-		epic: y - storyMapTop < layerBoundaries[0] ? targetEpicIndex : hoveringEpicIndex,
-		feature:
-			y - storyMapTop > layerBoundaries[0]
-				? y < layerBoundaries[1]
-					? targetFeatureIndex
-					: hoveringFeatureIndex
-				: undefined,
-		story: y - storyMapTop > layerBoundaries[1] ? targetStoryIndex : undefined,
+	const targetLocation = {
+		epic: y < layerBoundaries[0] ? targetEpicIndex : hoveringEpicIndex,
+		feature: y > layerBoundaries[0] ? (y < layerBoundaries[1] ? targetFeatureIndex : hoveringFeatureIndex) : undefined,
+		story: y > layerBoundaries[1] ? targetStoryIndex : undefined,
 	}
+
+	// Don't allow epic to move into itself
+	if (
+		startLocation.epic === targetLocation.epic &&
+		startLocation.feature === undefined &&
+		targetLocation.feature !== undefined
+	)
+		return startLocation
+	// Don't allow feature to move into itself
+	if (
+		startLocation.feature === targetLocation.feature &&
+		startLocation.story === undefined &&
+		targetLocation.story !== undefined
+	)
+		return startLocation
+	return targetLocation
 }
 
 export const convertEpicToFeature = (epic: Epic): Feature => ({
@@ -344,7 +408,7 @@ export const convertStoryToFeature = (story: Story): Feature => ({
 export const moveEpic = (
 	originalState: StoryMapState,
 	epicId: Id,
-	targetLocation: TargetLocation,
+	targetLocation: StoryMapLocation,
 	currentVersionId: Id | `__ALL_VERSIONS__`,
 ): StoryMapState =>
 	produce(originalState, (state) => {
@@ -405,7 +469,7 @@ export const moveEpic = (
 export const moveFeature = (
 	originalState: StoryMapState,
 	featureId: Id,
-	targetLocation: TargetLocation,
+	targetLocation: StoryMapLocation,
 	currentVersionId: Id | `__ALL_VERSIONS__`,
 ): StoryMapState =>
 	produce(originalState, (state) => {
@@ -469,7 +533,7 @@ export const moveFeature = (
 		}
 	})
 
-export const moveStory = (originalState: StoryMapState, storyId: Id, targetLocation: TargetLocation): StoryMapState =>
+export const moveStory = (originalState: StoryMapState, storyId: Id, targetLocation: StoryMapLocation): StoryMapState =>
 	produce(originalState, (state) => {
 		let epicIndex = -1
 		let featureIndex = -1

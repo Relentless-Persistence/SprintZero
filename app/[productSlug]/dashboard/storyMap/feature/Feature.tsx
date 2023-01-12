@@ -54,7 +54,7 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 			</motion.div>
 
 			{(currentVersion.id !== `__ALL_VERSIONS__` || feature.stories.length > 0) && (
-				<div className="h-10 w-px border border-dashed border-[#006378]" />
+				<div className="h-8 w-px border border-dashed border-[#006378]" />
 			)}
 
 			<StoryList productId={productId} epicId={epicId} feature={feature} />

@@ -4,7 +4,7 @@ import {nanoid} from "nanoid"
 
 import type {Id} from "~/types"
 import type {InputState} from "~/types/db/InputStates"
-import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
+import type {Epic, Feature, Product, Story, StoryMapState} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
 import {getProduct} from "./queries"
@@ -91,8 +91,8 @@ export const deleteEpic = async ({productId, epicId}: DeleteEpicVars): Promise<v
 	const product = await getProduct(productId)()
 
 	updateDoc(doc(db, Products._, product.id), {
-		storyMapState: product.storyMapState.epics.filter(({id}) => id !== epicId),
-	})
+		storyMapState: {epics: product.storyMapState.epics.filter(({id}) => id !== epicId)},
+	} satisfies Partial<Product>)
 }
 
 type AddFeatureVars = {
@@ -178,7 +178,9 @@ export const addStory = async ({
 	const data: Story = {
 		id,
 		acceptance_criteria: [],
+		code_link: null,
 		description: ``,
+		design_link: null,
 		name: ``,
 		points: 0,
 		priority_level: 0,
