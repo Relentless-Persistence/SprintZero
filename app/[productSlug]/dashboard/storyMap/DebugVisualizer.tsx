@@ -2,18 +2,13 @@ import {useAnimationFrame} from "framer-motion"
 import {useAtomValue} from "jotai"
 import {Fragment, useEffect, useState} from "react"
 
-import type {StoryMapLocation} from "./utils"
+import type {StoryMapLocation} from "./utils/types"
 import type {FC} from "react"
 
 import {storyMapStateAtom} from "./atoms"
-import {
-	pointerLocation,
-	storyMapTop,
-	calculateBoundaries,
-	boundaries,
-	getTargetLocation,
-	layerBoundaries,
-} from "./utils"
+import {calculateBoundaries} from "./utils"
+import {boundaries, layerBoundaries, pointerLocation, storyMapTop} from "./utils/globals"
+import {getTargetLocation} from "./utils/targeting"
 
 const storyMapLeft = 248
 

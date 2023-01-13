@@ -4,24 +4,16 @@ import {motion, useMotionValue} from "framer-motion"
 import {useAtom, useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
-import type {StoryMapLocation} from "./storyMap/utils"
+import type {StoryMapLocation} from "./storyMap/utils/types"
 import type {FC} from "react"
 import type {StoryMapState} from "~/types/db/Products"
 
 import {currentVersionAtom, dragStateAtom, storyMapStateAtom} from "./storyMap/atoms"
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
-import {
-	getFeatureLocation,
-	getStoryLocation,
-	getEpicLocation,
-	getTargetLocation,
-	moveEpic,
-	moveFeature,
-	moveStory,
-	pointerLocation,
-	storyMapScrollPosition,
-} from "./storyMap/utils"
+import {pointerLocation, storyMapScrollPosition} from "./storyMap/utils/globals"
+import {moveEpic, moveFeature, moveStory} from "./storyMap/utils/moving"
+import {getEpicLocation, getFeatureLocation, getStoryLocation, getTargetLocation} from "./storyMap/utils/targeting"
 import VersionList from "./VersionList"
 import {setStoryMapState} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -125,7 +117,7 @@ const Dashboard: FC = () => {
 						layoutScroll
 						className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2"
 						onScroll={(e) => {
-							storyMapScrollPosition.position = e.currentTarget.scrollLeft
+							storyMapScrollPosition.current = e.currentTarget.scrollLeft
 						}}
 					>
 						<StoryMap />
