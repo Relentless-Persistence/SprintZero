@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { Row, Col, Card } from "antd";
 
 import AppLayout from "../../../components/Dashboard/AppLayout";
-import { splitRoutes, getTimeAgo } from "../../../../utils";
+import { splitRoutes, getTimeAgo } from "../../../utils";
 
 import fakeData from "../../../fakeData/huddleData.json";
 import products from "../../../fakeData/products.json";
