@@ -28,26 +28,22 @@ import {
   FlagOutlined,
 } from "@ant-design/icons";
 
-import AppLayout from "../../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../components/Dashboard/AppLayout";
 
-import { Board } from "../../../../components/Dashboard/Sprint/Board";
+import { Board } from "../../../components/Dashboard/Sprint/Board";
 
-import { splitRoutes } from "../../../../utils";
+import { splitRoutes } from "../../../utils";
 
-import fakeData from "../../../../fakeData/sprint.json";
-import products from "../../../../fakeData/products.json";
-import { Title } from "../../../../components/Dashboard/SectionTitle";
-import CustomTag from "../../../../components/Sprint/CustomTag";
-import AppCheckbox from "../../../../components/AppCheckbox";
-import ResizeableDrawer from "../../../../components/Dashboard/ResizeableDrawer";
-import RadioButton from "../../../../components/AppRadioBtn";
-import { db } from "../../../../config/firebase-config";
-import { activeProductState } from "../../../../atoms/productAtom";
+import CustomTag from "../../../components/Sprint/CustomTag";
+import AppCheckbox from "../../../components/AppCheckbox";
+import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
+import RadioButton from "../../../components/AppRadioBtn";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { findIndex, set } from "lodash";
-import { versionState } from "../../../../atoms/versionAtom";
-import update from "immutability-helper";
-import StoryDetails from "../../../../components/Sprint/StoryDetails";
+import { versionState } from "../../../atoms/versionAtom";
+import StoryDetails from "../../../components/Sprint/StoryDetails";
 
 const { TextArea } = Input;
 

@@ -105,7 +105,7 @@ const Login = () => {
 					<Title level={1} style={{fontWeight: "normal"}}>
 						Authenticate Yourself Before You Wreck Yourself
 					</Title>
-					<Text className="text-left text-xl">Select a provider to create your account</Text>
+					<Text className="text-left text-xl">Select a provider to login</Text>
 				</div>
 			</div>
 

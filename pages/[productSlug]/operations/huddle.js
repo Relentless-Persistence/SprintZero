@@ -4,17 +4,17 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { Row, Col, Card } from "antd";
 
-import AppLayout from "../../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../components/Dashboard/AppLayout";
 import { splitRoutes, getTimeAgo } from "../../../../utils";
 
-import fakeData from "../../../../fakeData/huddleData.json";
-import products from "../../../../fakeData/products.json";
-import HuddleCard from "../../../../components/Huddle";
-import { db } from "../../../../config/firebase-config";
-import { activeProductState } from "../../../../atoms/productAtom";
+import fakeData from "../../../fakeData/huddleData.json";
+import products from "../../../fakeData/products.json";
+import HuddleCard from "../../../components/Huddle";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
-import { useAuth } from "../../../../contexts/AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
 import { isToday, isYesterday } from "date-fns";
 
 function subtractDays(numOfDays, date_today) {

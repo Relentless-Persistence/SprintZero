@@ -28,20 +28,20 @@ import {
   SendOutlined,
 } from "@ant-design/icons";
 
-import AppLayout from "../../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../components/Dashboard/AppLayout";
 
-import { Board } from "../../../../components/Dashboard/Sprint/Board";
+import { Board } from "../../../components/Dashboard/Sprint/Board";
 // import { Index } from "../../../components/Boards/NumberIndex";
 
-import { splitRoutes } from "../../../../utils";
+import { splitRoutes } from "../../../utils";
 
-import { Title } from "../../../../components/Dashboard/SectionTitle";
-import CustomTag from "../../../../components/Sprint/CustomTag";
-import AppCheckbox from "../../../../components/AppCheckbox";
-import { db } from "../../../../config/firebase-config";
-import { activeProductState } from "../../../../atoms/productAtom";
+import { Title } from "../../../components/Dashboard/SectionTitle";
+import CustomTag from "../../../components/Sprint/CustomTag";
+import AppCheckbox from "../../../components/AppCheckbox";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
-import StoryDetails from "../../../../components/Ethics/StoryDetails";
+import StoryDetails from "../../../components/Ethics/StoryDetails";
 
 const { TextArea } = Input;
 

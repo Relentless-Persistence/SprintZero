@@ -3,15 +3,15 @@ import React, {useState, useEffect} from "react"
 import Head from "next/head"
 import {useRouter} from "next/router"
 
-import AppLayout from "../../../../components/Dashboard/AppLayout"
+import AppLayout from "../../components/Dashboard/AppLayout"
 
-import {splitRoutes} from "../../../../utils"
-import {db} from "../../../../config/firebase-config"
-import {activeProductState} from "../../../../atoms/productAtom"
+import {splitRoutes} from "../../utils"
+import {db} from "../../config/firebase-config"
+import {activeProductState} from "../../atoms/productAtom"
 import {useRecoilValue} from "recoil"
 
 import {Row, Col, Typography, Button, Card, Tag, Timeline} from "antd5"
-import Stages from "../../../../components/Vision/Stages"
+import Stages from "../../components/Vision/Stages"
 
 import {formatDistance} from "date-fns"
 

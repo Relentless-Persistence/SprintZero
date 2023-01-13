@@ -5,17 +5,15 @@ import { useRouter } from "next/router";
 import { Row, Col, message, Button, Empty } from "antd";
 import { findIndex } from "lodash";
 
-import AppLayout from "../../../../components/Dashboard/AppLayout";
-import FormCard from "../../../../components/Dashboard/FormCard";
-import ItemCard from "../../../../components/Dashboard/ItemCard";
-import MainSub from "../../../../components/Dashboard/MainSub";
-import { splitRoutes } from "../../../../utils";
-import MasonryGrid from "../../../../components/Dashboard/MasonryGrid";
+import AppLayout from "../../../components/Dashboard/AppLayout";
+import FormCard from "../../../components/Dashboard/FormCard";
+import ItemCard from "../../../components/Dashboard/ItemCard";
+import MainSub from "../../../components/Dashboard/MainSub";
+import { splitRoutes } from "../../../utils";
+import MasonryGrid from "../../../components/Dashboard/MasonryGrid";
 
-import fakeData from "../../../../fakeData/accessiblity.json";
-import products from "../../../../fakeData/products.json";
-import { db } from "../../../../config/firebase-config";
-import { activeProductState } from "../../../../atoms/productAtom";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import Link from "next/link";
 
@@ -33,7 +31,6 @@ export default function Accessiblity() {
 
   const fetchAccessibility = async () => {
     if (activeProduct) {
-      console.log(activeChallenge);
       db.collection("Accessibility")
         .where("product_id", "==", activeProduct.id)
         .where("type", "==", activeChallenge)
@@ -76,13 +73,6 @@ export default function Accessiblity() {
     setActiveChallenge(challenges[activeChallengeIndex]);
   };
 
-  // const setProduct = (product) => {
-  //   setActiveProduct(product);
-  //   const challengeName = data[product][0].name;
-  //   setChallenge(challengeName, product);
-  //   setShowAdd(false);
-  // };
-
   const addItem = () => {
     const top =
       ref?.current?.getBoundingClientRect()?.top ||
@@ -101,9 +91,11 @@ export default function Accessiblity() {
       ...item,
       product_id: activeProduct.id,
     };
+    console.log(data);
     db.collection("Challenges")
       .add(data)
       .then((docRef) => {
+        console.log("docRef", docRef)
         message.success("New item added successfully");
       })
       .catch((error) => {
@@ -141,7 +133,7 @@ export default function Accessiblity() {
   return (
     <div className="mb-8">
       <Head>
-        <title>Dashboard | Sprint Zero</title>
+        <title>Accessibility | Sprint Zero</title>
         <meta name="description" content="Sprint Zero strategy accessiblity" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

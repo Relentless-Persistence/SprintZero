@@ -4,16 +4,16 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { Row, Col, Input, Space, Button } from "antd";
 
-import AppLayout from "../../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../components/Dashboard/AppLayout";
 import {
   ListCard,
   DescriptionCard,
   TimeLineCard,
   PersonasListCard,
-} from "../../../../components/Personas";
-import { splitRoutes } from "../../../../utils";
-import { db } from "../../../../config/firebase-config";
-import { activeProductState } from "../../../../atoms/productAtom";
+} from "../../../components/Personas";
+import { splitRoutes } from "../../../utils";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex } from "lodash";
 

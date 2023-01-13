@@ -4,20 +4,20 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { Row, Col, Input, Space, Button } from "antd";
 
-import AppLayout from "../../../../components/Dashboard/AppLayout";
+import AppLayout from "../../../components/Dashboard/AppLayout";
 import {
   ListCard,
   DescriptionCard,
   TimeLineCard,
-} from "../../../../components/Personas";
-import { splitRoutes } from "../../../../utils";
-import { db } from "../../../../config/firebase-config";
-import { activeProductState } from "../../../../atoms/productAtom";
+} from "../../../components/Personas";
+import { splitRoutes } from "../../../utils";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { capitalize, findIndex } from "lodash";
 
-import fakeData from "../../../../fakeData/personas.json";
-import products from "../../../../fakeData/products.json";
+import fakeData from "../../../fakeData/personas.json";
+import products from "../../../fakeData/products.json";
 
 // const getCardData = (name, data) => {
 //   return [...data?.find((d) => d.name === name)?.list];

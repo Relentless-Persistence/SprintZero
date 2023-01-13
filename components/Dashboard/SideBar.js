@@ -82,30 +82,30 @@ const SideBar = () => {
         icon={<DeploymentUnitOutlined />}
         title="Strategy"
       >
-        <MenuItem $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/strategy/kickoff`)} key="2">
-          <Link href={`/${activeProduct.id}/dashboard/strategy/kickoff`}>
+        <MenuItem $highlight={isActive(asPath, `/${activeProduct.id}/strategy/kickoff`)} key="2">
+          <Link href={`/${activeProduct.id}/strategy/kickoff`}>
             Kickoff
           </Link>
         </MenuItem>
         <MenuItem
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/strategy/accessibility`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/strategy/accessibility`)}
           key="3"
         >
-          <Link href={`/${activeProduct.id}/dashboard/strategy/accessibility`}>
+          <Link href={`/${activeProduct.id}/strategy/accessibility`}>
             Accessibility
           </Link>
         </MenuItem>
         <MenuItem
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/strategy/objectives`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/strategy/objectives`)}
           key="4"
         >
-          <Link href={`/${activeProduct.id}/dashboard/strategy/objectives`}>
+          <Link href={`/${activeProduct.id}/strategy/objectives`}>
             Objectives
           </Link>
         </MenuItem>
 
-        <MenuItem key="5" $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/strategy/vision`)}>
-          <Link href={`/${activeProduct.id}/dashboard/strategy/vision`}>
+        <MenuItem key="5" $highlight={isActive(asPath, `/${activeProduct.id}/strategy/vision`)}>
+          <Link href={`/${activeProduct.id}/strategy/vision`}>
             Vision
           </Link>
         </MenuItem>
@@ -115,16 +115,16 @@ const SideBar = () => {
         icon={<PullRequestOutlined />}
         title="Tactics"
       >
-        <MenuItem $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/tactics/ethics`)} key="6">
-          <Link href={`/${activeProduct.id}/dashboard/tactics/ethics`}>
+        <MenuItem $highlight={isActive(asPath, `/${activeProduct.id}/tactics/ethics`)} key="6">
+          <Link href={`/${activeProduct.id}/tactics/ethics`}>
             Ethics
           </Link>
         </MenuItem>
         <MenuItem
           key="7"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/tactics/priorities`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/tactics/priorities`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/tactics/priorities`}>
+          <Link href={`/${activeProduct.id}/tactics/priorities`}>
             Priorities
           </Link>
         </MenuItem>
@@ -135,9 +135,9 @@ const SideBar = () => {
         </MenuItem> */}
         <MenuItem
           key="9"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/tactics/retrospective`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/tactics/retrospective`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/tactics/retrospective`}>
+          <Link href={`/${activeProduct.id}/tactics/retrospective`}>
             Retrospective
           </Link>
         </MenuItem>
@@ -155,9 +155,9 @@ const SideBar = () => {
           </MenuItem> */}
         <MenuItem
           key="12"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/operations/huddle`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/operations/huddle`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/operations/huddle`}>
+          <Link href={`/${activeProduct.id}/operations/huddle`}>
             Huddle
           </Link>
         </MenuItem>
@@ -171,14 +171,14 @@ const SideBar = () => {
           </MenuItem> */}
         <MenuItem
           key="14"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/operations/sprint`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/operations/sprint`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/operations/sprint`}>
+          <Link href={`/${activeProduct.id}/operations/sprint`}>
             Sprint
           </Link>
         </MenuItem>
-        <MenuItem key="15" $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/operations/tasks`)}>
-          <Link href={`/${activeProduct.id}/dashboard/operations/tasks`}>
+        <MenuItem key="15" $highlight={isActive(asPath, `/${activeProduct.id}/operations/tasks`)}>
+          <Link href={`/${activeProduct.id}/operations/tasks`}>
             Tasks
           </Link>
         </MenuItem>
@@ -186,34 +186,34 @@ const SideBar = () => {
       <StyledSubMenu key="userbase" icon={<UserOutlined />} title="Userbase">
         <MenuItem
           key="16"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/userbase/dialogue`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/userbase/dialogue`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/userbase/dialogue`}>
+          <Link href={`/${activeProduct.id}/userbase/dialogue`}>
             Dialogue
           </Link>
         </MenuItem>
         <MenuItem
           key="17"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/userbase/journeys`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/userbase/journeys`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/userbase/journeys`}>
+          <Link href={`/${activeProduct.id}/userbase/journeys`}>
             Journeys
           </Link>
         </MenuItem>
         <MenuItem
           key="18"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/userbase/learnings`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/userbase/learnings`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/userbase/learnings`}>
+          <Link href={`/${activeProduct.id}/userbase/learnings`}>
             Learnings
           </Link>
         </MenuItem>
 
         <MenuItem
           key="19"
-          $highlight={isActive(asPath, `/${activeProduct.id}/dashboard/userbase/personas`)}
+          $highlight={isActive(asPath, `/${activeProduct.id}/userbase/personas`)}
         >
-          <Link href={`/${activeProduct.id}/dashboard/userbase/personas`}>
+          <Link href={`/${activeProduct.id}/userbase/personas`}>
             Personas
           </Link>
         </MenuItem>

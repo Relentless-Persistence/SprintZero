@@ -22,25 +22,25 @@ import {
 } from "antd";
 import { SendOutlined, FlagOutlined, UserOutlined } from "@ant-design/icons";
 
-import AppLayout from "../../../../components/Dashboard/AppLayout";
-import DrawerSubTitle from "../../../../components/Dashboard/DrawerSubTitle";
-import { CardTitle } from "../../../../components/Dashboard/CardTitle";
+import AppLayout from "../../../components/Dashboard/AppLayout";
+import DrawerSubTitle from "../../../components/Dashboard/DrawerSubTitle";
+import { CardTitle } from "../../../components/Dashboard/CardTitle";
 
-import { Board } from "../../../../components/Tasks/Boards";
-import { Index } from "../../../../components/Boards/NumberIndex";
+import { Board } from "../../../components/Tasks/Boards";
+import { Index } from "../../../components/Boards/NumberIndex";
 
-import { splitRoutes } from "../../../../utils";
+import { splitRoutes } from "../../../utils";
 
-import CustomTag from "../../../../components/Tasks/CustomTag";
-import ActionButtons from "../../../../components/Personas/ActionButtons";
-import ResizeableDrawer from "../../../../components/Dashboard/ResizeableDrawer";
-import { db } from "../../../../config/firebase-config";
-import { activeProductState } from "../../../../atoms/productAtom";
+import CustomTag from "../../../components/Tasks/CustomTag";
+import ActionButtons from "../../../components/Personas/ActionButtons";
+import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
+import { db } from "../../../config/firebase-config";
+import { activeProductState } from "../../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { findIndex, set } from "lodash";
-import EditTask from "../../../../components/Tasks/EditTask";
-import AddTask from "../../../../components/Tasks/AddTask";
-import { useAuth } from "../../../../contexts/AuthContext"
+import EditTask from "../../../components/Tasks/EditTask";
+import AddTask from "../../../components/Tasks/AddTask";
+import { useAuth } from "../../../contexts/AuthContext"
 
 const boards = ["Board 0", "Board 1", "Board 2", "Board 3", "Board 4"];
 

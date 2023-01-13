@@ -1,4 +1,4 @@
-const splitRoutes = ( path, begin = "/[productSlug]/dashboard/" ) =>
+const splitRoutes = ( path, begin = "/[productSlug]/" ) =>
 {
     return path.replace( begin, "" )
         .split( "/" );

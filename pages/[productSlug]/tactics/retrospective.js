@@ -7,23 +7,23 @@ import {Dropdown, Card, Avatar, Divider, message, Empty} from "antd"
 
 import {SortAscendingOutlined} from "@ant-design/icons"
 
-import CardHeaderButton, {CardHeaderLink} from "../../../../components/Dashboard/CardHeaderButton"
+import CardHeaderButton, {CardHeaderLink} from "../../../components/Dashboard/CardHeaderButton"
 
-import AppLayout from "../../../../components/Dashboard/AppLayout"
-import {splitRoutes} from "../../../../utils"
+import AppLayout from "../../../components/Dashboard/AppLayout"
+import {splitRoutes} from "../../../utils"
 
-import MasonryGrid from "../../../../components/Dashboard/MasonryGrid"
+import MasonryGrid from "../../../components/Dashboard/MasonryGrid"
 
-import fakeData from "../../../../fakeData/retrospective.json"
-import products from "../../../../fakeData/products.json"
-import {ActionFormCard} from "../../../../components/Dashboard/FormCard"
-import AddItem from "../../../../components/Retrospective/AddItem"
-import {db} from "../../../../config/firebase-config"
-import {activeProductState} from "../../../../atoms/productAtom"
+import fakeData from "../../../fakeData/retrospective.json"
+import products from "../../../fakeData/products.json"
+import {ActionFormCard} from "../../../components/Dashboard/FormCard"
+import AddItem from "../../../components/Retrospective/AddItem"
+import {db} from "../../../config/firebase-config"
+import {activeProductState} from "../../../atoms/productAtom"
 import {useRecoilValue} from "recoil"
-import {useAuth} from "../../../../contexts/AuthContext"
+import {useAuth} from "../../../contexts/AuthContext"
 import {findIndex} from "lodash"
-import AppCheckbox from "../../../../components/AppCheckbox"
+import AppCheckbox from "../../../components/AppCheckbox"
 
 const {Meta} = Card
 const types = ["Enjoyable", "Puzzling", "Frustrating"]
