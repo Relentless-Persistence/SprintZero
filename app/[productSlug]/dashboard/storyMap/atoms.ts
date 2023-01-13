@@ -28,8 +28,10 @@ export const dragStateAtom = atom<{
 	id: Id | undefined
 	type: `epic` | `feature` | `story` | undefined
 	pos: [MotionValue<number> | undefined, MotionValue<number> | undefined]
+	yOffset: number | undefined
 }>({
 	id: undefined,
 	type: undefined,
 	pos: [undefined, undefined],
+	yOffset: undefined,
 })

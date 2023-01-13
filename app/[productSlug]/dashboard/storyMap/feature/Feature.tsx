@@ -1,5 +1,6 @@
 "use client"
 
+import clsx from "clsx"
 import {motion} from "framer-motion"
 import {useAtom, useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
@@ -9,7 +10,7 @@ import type {Id} from "~/types"
 import type {Feature as FeatureType} from "~/types/db/Products"
 
 import {currentVersionAtom, dragStateAtom} from "../atoms"
-import {elementRegistry} from "../utils/globals"
+import {elementRegistry, layerBoundaries} from "../utils/globals"
 import FeatureContent from "./FeatureContent"
 import StoryList from "./StoryList"
 
@@ -17,37 +18,39 @@ export type FeatureProps = {
 	productId: Id
 	epicId: Id
 	feature: FeatureType
+	inert?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
+const Feature: FC<FeatureProps> = ({productId, epicId, feature, inert = false}) => {
 	const [dragState, setDragState] = useAtom(dragStateAtom)
 	const currentVersion = useAtomValue(currentVersionAtom)
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
+		if (inert) return
 		elementRegistry.features[feature.id] = containerRef.current ?? undefined
 		return () => {
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 			elementRegistry.features[feature.id] = containerRef.current ?? undefined
 		}
-	}, [feature.id])
+	}, [feature.id, inert])
 
 	return (
 		<motion.div
-			className="flex flex-col items-center"
-			style={
-				{
-					// x: dragState.id === feature.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
-					// y: dragState.id === feature.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
-				}
-			}
+			layoutId={dragState.id === epicId || dragState.id === feature.id ? undefined : `feature-${feature.id}`}
+			className={clsx(`flex flex-col items-center`, dragState.id === feature.id && !inert && `invisible`)}
 			ref={containerRef}
 		>
 			<motion.div
-				onPointerDown={(e) => {
-					e.preventDefault()
-					setDragState((prev) => ({...prev, id: feature.id, type: `feature`}))
-				}}
+				onPointerDown={(e) => void e.preventDefault()}
+				onPanStart={(e, info) =>
+					void setDragState((prev) => ({
+						...prev,
+						id: feature.id,
+						type: `feature`,
+						yOffset: info.point.y - layerBoundaries[0],
+					}))
+				}
 				className="-m-4 cursor-grab touch-none p-4 transition-transform hover:scale-105"
 			>
 				<FeatureContent productId={productId} epicId={epicId} feature={feature} />
@@ -57,7 +60,7 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 				<div className="h-8 w-px border border-dashed border-[#006378]" />
 			)}
 
-			<StoryList productId={productId} epicId={epicId} feature={feature} />
+			<StoryList productId={productId} epicId={epicId} feature={feature} inert={inert} />
 		</motion.div>
 	)
 }

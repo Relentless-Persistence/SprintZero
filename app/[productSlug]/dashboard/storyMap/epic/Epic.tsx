@@ -1,5 +1,6 @@
 "use client"
 
+import clsx from "clsx"
 import {motion} from "framer-motion"
 import {useAtom} from "jotai"
 import {useEffect, useRef} from "react"
@@ -9,7 +10,7 @@ import type {Id} from "~/types"
 import type {Epic as EpicType} from "~/types/db/Products"
 
 import {dragStateAtom, useGetEpic} from "../atoms"
-import {elementRegistry} from "../utils/globals"
+import {elementRegistry, storyMapTop} from "../utils/globals"
 import EpicContent from "./EpicContent"
 import FeatureList from "./FeatureList"
 import SmallAddFeatureButton from "./SmallAddFeatureButton"
@@ -17,37 +18,36 @@ import SmallAddFeatureButton from "./SmallAddFeatureButton"
 export type EpicProps = {
 	productId: Id
 	epic: EpicType
+	inert?: boolean
 }
 
-const Epic: FC<EpicProps> = ({productId, epic}) => {
+const Epic: FC<EpicProps> = ({productId, epic, inert = false}) => {
 	const [dragState, setDragState] = useAtom(dragStateAtom)
 
 	const features = useGetEpic(epic.id).features
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
+		if (inert) return
 		elementRegistry.epics[epic.id] = containerRef.current ?? undefined
 		return () => {
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 			elementRegistry.epics[epic.id] = containerRef.current ?? undefined
 		}
-	}, [epic.id])
+	}, [epic.id, inert])
 
 	return (
 		<motion.div
-			className="grid justify-items-center gap-x-4"
-			style={{
-				gridTemplateColumns: `repeat(${features.length}, auto)`,
-				// x: dragState.id === epic.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
-				// y: dragState.id === epic.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
-			}}
+			layoutId={dragState.id === epic.id ? undefined : `epic-${epic.id}`}
+			className={clsx(`grid justify-items-center gap-x-4`, dragState.id === epic.id && !inert && `invisible`)}
+			style={{gridTemplateColumns: `repeat(${features.length}, auto)`}}
 			ref={containerRef}
 		>
 			<motion.div
-				onPointerDown={(e) => {
-					e.preventDefault()
-					setDragState((prev) => ({...prev, id: epic.id, type: `epic`}))
-				}}
+				onPointerDown={(e) => void e.preventDefault()}
+				onPanStart={(e, info) =>
+					void setDragState((prev) => ({...prev, id: epic.id, type: `epic`, yOffset: info.point.y - storyMapTop}))
+				}
 				className="-m-4 cursor-grab touch-none p-4 transition-transform hover:scale-105"
 			>
 				<EpicContent productId={productId} epic={epic} />
@@ -88,7 +88,7 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 					</div>
 				))}
 
-			<FeatureList productId={productId} epic={epic} />
+			<FeatureList productId={productId} epic={epic} inert={inert} />
 		</motion.div>
 	)
 }

@@ -12,9 +12,10 @@ export type StoryListProps = {
 	productId: Id
 	epicId: Id
 	feature: FeatureType
+	inert?: boolean
 }
 
-const StoryList: FC<StoryListProps> = ({productId, epicId, feature}) => {
+const StoryList: FC<StoryListProps> = ({productId, epicId, feature, inert = false}) => {
 	const currentVersion = useAtomValue(currentVersionAtom)
 	const stories = useGetFeature(epicId, feature.id).stories.filter(
 		(story) => currentVersion.id === `__ALL_VERSIONS__` || story.versionId === currentVersion.id,
@@ -24,7 +25,14 @@ const StoryList: FC<StoryListProps> = ({productId, epicId, feature}) => {
 	return (
 		<div className="flex flex-col items-start rounded-md border border-[#006378] bg-white p-1.5">
 			{stories.map((story) => (
-				<Story key={story.id} productId={productId} epicId={epicId} featureId={feature.id} story={story} />
+				<Story
+					key={story.id}
+					productId={productId}
+					epicId={epicId}
+					featureId={feature.id}
+					story={story}
+					inert={inert}
+				/>
 			))}
 
 			{currentVersion.id !== `__ALL_VERSIONS__` && (

@@ -32,7 +32,7 @@ const StoryMap: FC = () => {
 				<span>Add epic</span>
 			</button>
 
-			<DebugVisualizer showBoundaryLines logTargetLocation={false} />
+			<DebugVisualizer showBoundaryLines={false} logTargetLocation={false} />
 		</div>
 	)
 }

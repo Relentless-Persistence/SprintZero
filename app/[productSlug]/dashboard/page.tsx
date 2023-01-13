@@ -1,6 +1,6 @@
 "use client"
 
-import {motion, useMotionValue} from "framer-motion"
+import {motion, useMotionTemplate, useMotionValue, useTransform} from "framer-motion"
 import {useAtom, useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
@@ -9,6 +9,9 @@ import type {FC} from "react"
 import type {StoryMapState} from "~/types/db/Products"
 
 import {currentVersionAtom, dragStateAtom, storyMapStateAtom} from "./storyMap/atoms"
+import Epic from "./storyMap/epic/Epic"
+import Feature from "./storyMap/feature/Feature"
+import Story from "./storyMap/story/Story"
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import {pointerLocation, storyMapScrollPosition} from "./storyMap/utils/globals"
@@ -81,8 +84,8 @@ const Dashboard: FC = () => {
 	return (
 		<motion.div
 			onPan={(e, info) => {
-				x.set(info.offset.x)
-				y.set(info.offset.y)
+				x.set(info.point.x)
+				y.set(info.point.y)
 				handlePan()
 			}}
 			onPanStart={() => {
@@ -115,6 +118,32 @@ const Dashboard: FC = () => {
 			</div>
 
 			<VersionList />
+
+			<motion.div
+				id="drag-host"
+				className="fixed top-0 left-0 z-20"
+				style={{x: useMotionTemplate`calc(${x}px - 50%)`, y: useTransform(y, (y) => y - (dragState.yOffset ?? 0))}}
+			>
+				{dragState.id &&
+					activeProductId &&
+					(() => {
+						for (const epic of storyMapState.epics) {
+							if (epic.id === dragState.id) return <Epic productId={activeProductId} epic={epic} inert />
+
+							for (const feature of epic.features) {
+								if (feature.id === dragState.id)
+									return <Feature productId={activeProductId} epicId={epic.id} feature={feature} inert />
+
+								for (const story of feature.stories) {
+									if (story.id === dragState.id)
+										return (
+											<Story productId={activeProductId} epicId={epic.id} featureId={feature.id} story={story} inert />
+										)
+								}
+							}
+						}
+					})()}
+			</motion.div>
 		</motion.div>
 	)
 }

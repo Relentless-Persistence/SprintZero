@@ -11,15 +11,16 @@ import {addFeature} from "~/utils/api/mutations"
 export type FeatureListProps = {
 	productId: Id
 	epic: EpicType
+	inert?: boolean
 }
 
-const FeatureList: FC<FeatureListProps> = ({productId, epic}) => {
+const FeatureList: FC<FeatureListProps> = ({productId, epic, inert = false}) => {
 	const features = useGetEpic(epic.id).features
 
 	return (
 		<>
 			{features.map((feature) => (
-				<Feature key={feature.id} productId={productId} epicId={epic.id} feature={feature} />
+				<Feature key={feature.id} productId={productId} epicId={epic.id} feature={feature} inert={inert} />
 			))}
 
 			{features.length === 0 && (
