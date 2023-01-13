@@ -69,7 +69,7 @@ const ProductConfiguration: FC = () => {
 
 	return (
 		<div className="h-full w-full overflow-hidden">
-			<div className="mx-auto flex h-full max-w-5xl flex-col gap-8 p-12">
+			<div className="mx-auto flex h-full max-w-5xl flex-col gap-8 p-8">
 				<div className="flex justify-between">
 					<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={178} height={42} priority />
 					<div className="flex items-center gap-2">
@@ -81,8 +81,8 @@ const ProductConfiguration: FC = () => {
 					</div>
 				</div>
 				<div className="flex flex-col gap-2">
-					<h1 className="text-4xl">Product Configuration</h1>
-					<h2 className="text-2xl text-[#595959]">
+					<h1 className="text-3xl">Product Configuration</h1>
+					<h2 className="text-xl text-[#595959]">
 						Almost time to start building! We just require a few data points before we can begin
 					</h2>
 				</div>

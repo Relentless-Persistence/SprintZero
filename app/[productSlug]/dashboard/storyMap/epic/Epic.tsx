@@ -39,6 +39,7 @@ const Epic: FC<EpicProps> = ({productId, epic, inert = false}) => {
 	return (
 		<motion.div
 			layoutId={dragState.id === epic.id ? undefined : `epic-${epic.id}`}
+			layout="position"
 			className={clsx(`grid justify-items-center gap-x-4`, dragState.id === epic.id && !inert && `invisible`)}
 			style={{gridTemplateColumns: `repeat(${features.length}, auto)`}}
 			ref={containerRef}

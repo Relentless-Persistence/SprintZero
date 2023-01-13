@@ -38,6 +38,7 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature, inert = false}) 
 	return (
 		<motion.div
 			layoutId={dragState.id === epicId || dragState.id === feature.id ? undefined : `feature-${feature.id}`}
+			layout="position"
 			className={clsx(`flex flex-col items-center`, dragState.id === feature.id && !inert && `invisible`)}
 			ref={containerRef}
 		>
