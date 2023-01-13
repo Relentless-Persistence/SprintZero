@@ -4,12 +4,17 @@ import {motion, useMotionValue} from "framer-motion"
 import {useAtom, useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
+import type {StoryMapLocation} from "./storyMap/utils"
 import type {FC} from "react"
+import type {StoryMapState} from "~/types/db/Products"
 
 import {currentVersionAtom, dragStateAtom, storyMapStateAtom} from "./storyMap/atoms"
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import {
+	getFeatureLocation,
+	getStoryLocation,
+	getEpicLocation,
 	getTargetLocation,
 	moveEpic,
 	moveFeature,
@@ -44,39 +49,53 @@ const Dashboard: FC = () => {
 		}
 	}, [])
 
-	const originalStoryMapState = useRef(storyMapState)
-	const isUpdating = useRef(false)
+	const originalStoryMapState = useRef<StoryMapState | undefined>(undefined)
+	const oldTarget = useRef<StoryMapLocation | undefined>(undefined)
+	const expectedStoryMapState = useRef<StoryMapState | undefined>(undefined)
 	const handlePan = () => {
 		// If there is no item being dragged, early return
-		if (!activeProductId || !dragState.id) return
+		if (!activeProductId || !dragState.id || !originalStoryMapState.current) return
 
+		if (expectedStoryMapState.current) {
+			// If storyMapState hasn't changed yet, return
+			if (JSON.stringify(expectedStoryMapState.current) !== JSON.stringify(storyMapState)) return
+			// If it has, reset expectedStoryMapState and continue
+			expectedStoryMapState.current = undefined
+			oldTarget.current = undefined
+		}
+
+		// If target hasn't changed since last drag, return
+		const newTarget = getTargetLocation(storyMapState)
+		if (!oldTarget.current || JSON.stringify(newTarget) === JSON.stringify(oldTarget.current)) {
+			oldTarget.current = newTarget
+			return
+		}
+
+		// At this point, we're sure the target has changed
 		let newState = originalStoryMapState.current
 		if (dragState.type === `epic`) {
 			newState = moveEpic(
 				originalStoryMapState.current,
 				dragState.id,
-				getTargetLocation(storyMapState),
+				getTargetLocation(storyMapState, getEpicLocation(storyMapState, dragState.id)),
 				currentVersion.id,
 			)
 		} else if (dragState.type === `feature`) {
 			newState = moveFeature(
 				originalStoryMapState.current,
 				dragState.id,
-				getTargetLocation(storyMapState),
+				getTargetLocation(storyMapState, getFeatureLocation(storyMapState, dragState.id)),
 				currentVersion.id,
 			)
 		} else if (dragState.type === `story`) {
-			newState = moveStory(originalStoryMapState.current, dragState.id, getTargetLocation(storyMapState))
+			newState = moveStory(
+				originalStoryMapState.current,
+				dragState.id,
+				getTargetLocation(storyMapState, getStoryLocation(storyMapState, dragState.id)),
+			)
 		}
-
-		if (JSON.stringify(newState) !== JSON.stringify(storyMapState)) {
-			if (!isUpdating.current) {
-				setStoryMapState({productId: activeProductId, storyMapState: newState})
-				isUpdating.current = true
-			}
-		} else {
-			isUpdating.current = false
-		}
+		expectedStoryMapState.current = newState
+		setStoryMapState({productId: activeProductId, storyMapState: newState})
 	}
 
 	return (
@@ -93,6 +112,8 @@ const Dashboard: FC = () => {
 				setDragState((prev) => ({...prev, id: undefined, type: undefined}))
 				x.set(0)
 				y.set(0)
+				oldTarget.current = undefined
+				originalStoryMapState.current = undefined
 			}}
 			className="grid h-full grid-cols-[1fr_minmax(6rem,max-content)]"
 		>

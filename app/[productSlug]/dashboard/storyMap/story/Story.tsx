@@ -33,13 +33,13 @@ const Story: FC<StoryProps> = ({productId, epicId, featureId, story}) => {
 
 	return (
 		<motion.div
-			layoutId={story.id}
-			layout="position"
 			className="p-1.5"
-			style={{
-				x: dragState.id === story.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
-				y: dragState.id === story.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
-			}}
+			style={
+				{
+					// x: dragState.id === story.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
+					// y: dragState.id === story.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
+				}
+			}
 			ref={containerRef}
 		>
 			<motion.div

@@ -34,13 +34,13 @@ const Feature: FC<FeatureProps> = ({productId, epicId, feature}) => {
 
 	return (
 		<motion.div
-			layoutId={feature.id}
-			layout="position"
 			className="flex flex-col items-center"
-			style={{
-				x: dragState.id === feature.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
-				y: dragState.id === feature.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
-			}}
+			style={
+				{
+					// x: dragState.id === feature.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
+					// y: dragState.id === feature.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
+				}
+			}
 			ref={containerRef}
 		>
 			<motion.div

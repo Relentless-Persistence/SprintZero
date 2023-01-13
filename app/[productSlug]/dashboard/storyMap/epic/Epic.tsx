@@ -35,13 +35,11 @@ const Epic: FC<EpicProps> = ({productId, epic}) => {
 
 	return (
 		<motion.div
-			layoutId={epic.id}
-			layout="position"
 			className="grid justify-items-center gap-x-4"
 			style={{
 				gridTemplateColumns: `repeat(${features.length}, auto)`,
-				x: dragState.id === epic.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
-				y: dragState.id === epic.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
+				// x: dragState.id === epic.id && dragState.pos[0] ? dragState.pos[0] : `0px`,
+				// y: dragState.id === epic.id && dragState.pos[1] ? dragState.pos[1] : `0px`,
 			}}
 			ref={containerRef}
 		>
