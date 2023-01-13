@@ -1,3 +1,4 @@
+import type {EpicBoundaries} from "./types"
 import type {Id} from "~/types"
 
 declare global {
@@ -8,25 +9,7 @@ declare global {
 			features: Record<Id, HTMLElement | undefined>
 			stories: Record<Id, HTMLElement | undefined>
 		}
-		__boundaries: {
-			epicBoundaries: Array<{
-				id: Id
-				left: number
-				center: number
-				right: number
-				centerWithLeft?: number
-				centerWithRight?: number
-				featureBoundaries: Array<{
-					id: Id
-					left: number
-					center: number
-					right: number
-					centerWithLeft?: number
-					centerWithRight?: number
-					storyBoundaries: Array<{id: Id; top: number; center: number; bottom: number}>
-				}>
-			}>
-		}
+		__boundaries: {epicBoundaries: EpicBoundaries[]}
 		__pointerLocation: {current: [number, number]}
 	}
 }

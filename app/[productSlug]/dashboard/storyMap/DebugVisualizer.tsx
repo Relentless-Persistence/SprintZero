@@ -8,7 +8,7 @@ import type {FC} from "react"
 import {storyMapStateAtom} from "./atoms"
 import {calculateBoundaries} from "./utils"
 import {boundaries, layerBoundaries, pointerLocation, storyMapTop} from "./utils/globals"
-import {getTargetLocation} from "./utils/targeting"
+import {getHoveringLocation, getTargetLocation} from "./utils/targeting"
 
 const storyMapLeft = 248
 
@@ -30,10 +30,8 @@ const DebugVisualizer: FC<DebugVisualizerProps> = ({showBoundaryLines, logTarget
 		const onPointerMove = () => {
 			if (!logTargetLocation) return
 
-			const targetLocation = getTargetLocation(
-				storyMapState,
-				logTargetLocation === true ? undefined : logTargetLocation,
-			)
+			const targetLocation =
+				logTargetLocation === true ? getHoveringLocation() : getTargetLocation(storyMapState, logTargetLocation)
 			console.info(targetLocation)
 		}
 
@@ -56,7 +54,7 @@ const DebugVisualizer: FC<DebugVisualizerProps> = ({showBoundaryLines, logTarget
 							<Fragment key={boundaries.id}>
 								<div
 									className="absolute h-full w-0.5 bg-[#9adbdf]"
-									style={{left: `${boundaries.left - storyMapLeft}px`}}
+									style={{left: `${Math.max(boundaries.left - storyMapLeft, -10000)}px`}}
 								/>
 								{boundaries.centerWithLeft && (
 									<div
@@ -92,7 +90,7 @@ const DebugVisualizer: FC<DebugVisualizerProps> = ({showBoundaryLines, logTarget
 								<Fragment key={boundaries.id}>
 									<div
 										className="absolute h-full w-0.5 bg-[#9adbdf]"
-										style={{left: `${boundaries.left - storyMapLeft}px`}}
+										style={{left: `${Math.max(boundaries.left - storyMapLeft, -10000)}px`}}
 									/>
 									{boundaries.centerWithLeft && (
 										<div
@@ -111,7 +109,7 @@ const DebugVisualizer: FC<DebugVisualizerProps> = ({showBoundaryLines, logTarget
 										/>
 									)}
 									<div
-										className="bg-bg-[#9adbdf] absolute h-full w-0.5"
+										className="absolute h-full w-0.5 bg-[#9adbdf]"
 										style={{left: `${boundaries.right - storyMapLeft}px`}}
 									/>
 								</Fragment>

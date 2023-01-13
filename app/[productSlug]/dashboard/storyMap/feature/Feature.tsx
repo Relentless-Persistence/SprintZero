@@ -9,7 +9,7 @@ import type {Id} from "~/types"
 import type {Feature as FeatureType} from "~/types/db/Products"
 
 import {currentVersionAtom, dragStateAtom} from "../atoms"
-import {elementRegistry} from "../utils"
+import {elementRegistry} from "../utils/globals"
 import FeatureContent from "./FeatureContent"
 import StoryList from "./StoryList"
 

@@ -25,6 +25,8 @@ export const moveEpic = (
 			targetLocation.feature !== undefined &&
 			targetLocation.story !== undefined
 		) {
+			// Epic to story
+
 			const epicIndex = state.epics.findIndex(({id}) => id === epicId)
 			const epic = state.epics[epicIndex]!
 
@@ -45,6 +47,8 @@ export const moveEpic = (
 			// Remove the epic from its original location
 			state.epics.splice(epicIndex, 1)
 		} else if (targetLocation.epic !== undefined && targetLocation.feature !== undefined) {
+			// Epic to feature
+
 			const epicIndex = state.epics.findIndex(({id}) => id === epicId)
 			const epic = state.epics[epicIndex]!
 			const features = state.epics[targetLocation.epic]!.features
@@ -58,6 +62,8 @@ export const moveEpic = (
 			// Remove the epic from its original location
 			state.epics.splice(epicIndex, 1)
 		} else if (targetLocation.epic !== undefined) {
+			// Epic to epic (reordering)
+
 			const epicIndex = state.epics.findIndex(({id}) => id === epicId)
 			const epic = state.epics[epicIndex]!
 
@@ -94,6 +100,8 @@ export const moveFeature = (
 			targetLocation.feature !== undefined &&
 			targetLocation.story !== undefined
 		) {
+			// Feature to story
+
 			const stories = state.epics[targetLocation.epic]!.features[targetLocation.feature]!.stories
 
 			if (
@@ -110,6 +118,8 @@ export const moveFeature = (
 			// Remove the feature from its original location
 			state.epics[epicIndex]!.features.splice(featureIndex, 1)
 		} else if (targetLocation.epic !== undefined && targetLocation.feature !== undefined) {
+			// Feature to feature (reordering)
+
 			if (targetLocation.epic === epicIndex) {
 				// Insert the new feature at feature location
 				state.epics[targetLocation.epic]!.features.splice(
@@ -127,6 +137,8 @@ export const moveFeature = (
 				state.epics[epicIndex]!.features.splice(featureIndex, 1)
 			}
 		} else if (targetLocation.epic !== undefined) {
+			// Feature to epic
+
 			// Insert the feature at new location
 			state.epics.splice(targetLocation.epic, 0, convertFeatureToEpic(feature))
 
@@ -157,11 +169,10 @@ export const moveStory = (originalState: StoryMapState, storyId: Id, targetLocat
 		if (
 			targetLocation.epic !== undefined &&
 			targetLocation.feature !== undefined &&
-			targetLocation.story !== undefined &&
-			targetLocation.epic >= 0 &&
-			targetLocation.feature >= 0 &&
-			targetLocation.story >= 0
+			targetLocation.story !== undefined
 		) {
+			// Story to story (reordering)
+
 			const stories = state.epics[targetLocation.epic]!.features[targetLocation.feature]!.stories
 
 			// Insert the story at story location
@@ -173,18 +184,17 @@ export const moveStory = (originalState: StoryMapState, storyId: Id, targetLocat
 			} else {
 				stories.splice(storyIndex, 1)
 			}
-		} else if (
-			targetLocation.epic !== undefined &&
-			targetLocation.feature !== undefined &&
-			targetLocation.epic >= 0 &&
-			targetLocation.feature >= 0
-		) {
+		} else if (targetLocation.epic !== undefined && targetLocation.feature !== undefined) {
+			// Story to feature
+
 			// Insert the new story at feature location
 			state.epics[targetLocation.epic]!.features.splice(targetLocation.feature, 0, convertStoryToFeature(story))
 
 			// Remove the story from its original location
 			state.epics[epicIndex]!.features[featureIndex]!.stories.splice(storyIndex, 1)
-		} else if (targetLocation.epic !== undefined && targetLocation.epic >= 0) {
+		} else if (targetLocation.epic !== undefined) {
+			// Story to epic
+
 			// Insert the story at new location
 			state.epics.splice(targetLocation.epic, 0, convertStoryToEpic(story))
 

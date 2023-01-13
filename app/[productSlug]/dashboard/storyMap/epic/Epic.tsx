@@ -9,7 +9,7 @@ import type {Id} from "~/types"
 import type {Epic as EpicType} from "~/types/db/Products"
 
 import {dragStateAtom, useGetEpic} from "../atoms"
-import {elementRegistry} from "../utils"
+import {elementRegistry} from "../utils/globals"
 import EpicContent from "./EpicContent"
 import FeatureList from "./FeatureList"
 import SmallAddFeatureButton from "./SmallAddFeatureButton"

@@ -9,7 +9,7 @@ import type {Id} from "~/types"
 import type {Story as StoryType} from "~/types/db/Products"
 
 import {dragStateAtom} from "../atoms"
-import {elementRegistry} from "../utils"
+import {elementRegistry} from "../utils/globals"
 import StoryContent from "./StoryContent"
 
 export type StoryProps = {

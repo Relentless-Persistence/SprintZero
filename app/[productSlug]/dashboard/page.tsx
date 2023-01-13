@@ -13,7 +13,7 @@ import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import {pointerLocation, storyMapScrollPosition} from "./storyMap/utils/globals"
 import {moveEpic, moveFeature, moveStory} from "./storyMap/utils/moving"
-import {getEpicLocation, getFeatureLocation, getStoryLocation, getTargetLocation} from "./storyMap/utils/targeting"
+import {getHoveringLocation, getTargetLocation} from "./storyMap/utils/targeting"
 import VersionList from "./VersionList"
 import {setStoryMapState} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -42,49 +42,37 @@ const Dashboard: FC = () => {
 	}, [])
 
 	const originalStoryMapState = useRef<StoryMapState | undefined>(undefined)
+	const startLocation = useRef<StoryMapLocation | undefined>(undefined)
 	const oldTarget = useRef<StoryMapLocation | undefined>(undefined)
 	const expectedStoryMapState = useRef<StoryMapState | undefined>(undefined)
 	const handlePan = () => {
-		// If there is no item being dragged, early return
-		if (!activeProductId || !dragState.id || !originalStoryMapState.current) return
+		// If there is no item being dragged, return
+		if (!activeProductId || !dragState.id || !originalStoryMapState.current || !startLocation.current) return
 
 		if (expectedStoryMapState.current) {
 			// If storyMapState hasn't changed yet, return
 			if (JSON.stringify(expectedStoryMapState.current) !== JSON.stringify(storyMapState)) return
-			// If it has, reset expectedStoryMapState and continue
+			// If it has, reset some refs and continue
 			expectedStoryMapState.current = undefined
 			oldTarget.current = undefined
+			startLocation.current = getHoveringLocation()
 		}
 
-		// If target hasn't changed since last drag, return
-		const newTarget = getTargetLocation(storyMapState)
+		// If target item hasn't changed since last drag, return
+		const newTarget = getTargetLocation(storyMapState, startLocation.current)
 		if (!oldTarget.current || JSON.stringify(newTarget) === JSON.stringify(oldTarget.current)) {
 			oldTarget.current = newTarget
 			return
 		}
 
 		// At this point, we're sure the target has changed
-		let newState = originalStoryMapState.current
+		let newState: StoryMapState
 		if (dragState.type === `epic`) {
-			newState = moveEpic(
-				originalStoryMapState.current,
-				dragState.id,
-				getTargetLocation(storyMapState, getEpicLocation(storyMapState, dragState.id)),
-				currentVersion.id,
-			)
+			newState = moveEpic(originalStoryMapState.current, dragState.id, newTarget, currentVersion.id)
 		} else if (dragState.type === `feature`) {
-			newState = moveFeature(
-				originalStoryMapState.current,
-				dragState.id,
-				getTargetLocation(storyMapState, getFeatureLocation(storyMapState, dragState.id)),
-				currentVersion.id,
-			)
-		} else if (dragState.type === `story`) {
-			newState = moveStory(
-				originalStoryMapState.current,
-				dragState.id,
-				getTargetLocation(storyMapState, getStoryLocation(storyMapState, dragState.id)),
-			)
+			newState = moveFeature(originalStoryMapState.current, dragState.id, newTarget, currentVersion.id)
+		} else {
+			newState = moveStory(originalStoryMapState.current, dragState.id, newTarget)
 		}
 		expectedStoryMapState.current = newState
 		setStoryMapState({productId: activeProductId, storyMapState: newState})
@@ -99,6 +87,7 @@ const Dashboard: FC = () => {
 			}}
 			onPanStart={() => {
 				originalStoryMapState.current = storyMapState
+				startLocation.current = getHoveringLocation()
 			}}
 			onPanEnd={() => {
 				setDragState((prev) => ({...prev, id: undefined, type: undefined}))
