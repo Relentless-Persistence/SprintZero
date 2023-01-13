@@ -71,11 +71,11 @@ const Dashboard: FC = () => {
 		// At this point, we're sure the target has changed
 		let newState: StoryMapState
 		if (dragState.type === `epic`) {
-			newState = moveEpic(originalStoryMapState.current, dragState.id, newTarget, currentVersion.id)
+			newState = moveEpic(storyMapState, dragState.id, newTarget, currentVersion.id)
 		} else if (dragState.type === `feature`) {
-			newState = moveFeature(originalStoryMapState.current, dragState.id, newTarget, currentVersion.id)
+			newState = moveFeature(storyMapState, dragState.id, newTarget, currentVersion.id)
 		} else {
-			newState = moveStory(originalStoryMapState.current, dragState.id, newTarget)
+			newState = moveStory(storyMapState, dragState.id, newTarget)
 		}
 		expectedStoryMapState.current = newState
 		setStoryMapState({productId: activeProductId, storyMapState: newState})

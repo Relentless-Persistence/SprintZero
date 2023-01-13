@@ -41,6 +41,7 @@ const Story: FC<StoryProps> = ({productId, epicId, featureId, story, inert = fal
 					? undefined
 					: `story-${story.id}`
 			}
+			layout="position"
 			className={clsx(`p-1.5`, dragState.id === story.id && !inert && `invisible`)}
 			ref={containerRef}
 		>
