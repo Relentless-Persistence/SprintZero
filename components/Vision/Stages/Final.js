@@ -5,7 +5,7 @@ import {Card, Input, Space, Typography, message, Skeleton} from "antd5"
 const {TextArea} = Input;
 const {Text} = Typography;
 
-const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVision, createVision, updateVision, id}) => {
+const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVision, createVision, updateVision, id, setEditMode}) => {
 
   const onSave = () => {
     if(id) {
@@ -16,8 +16,7 @@ const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVi
   }
 
   const onCancel = () => {
-    setAcceptedVision("")
-    setCurrent(1)
+		setEditMode(false)
   }
 
 	return (
@@ -37,17 +36,16 @@ const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVi
 				className="mt-3"
 			>
 				<TextArea
-					disabled={disabled}
 					value={acceptedVision}
 					rows={12}
 					onChange={(e) => setAcceptedVision(e.target.value)}
 				/>
 			</Card>
 			<Space className="mt-6 flex justify-end">
-				<Button disabled={disabled} onClick={onCancel}>
+				<Button  onClick={onCancel}>
 					Cancel
 				</Button>
-				<Button disabled={disabled} onClick={onSave} className="bg-green-s500 text-white">
+				<Button  onClick={onSave} className="bg-green-s500 text-white">
 					Save
 				</Button>
 			</Space>

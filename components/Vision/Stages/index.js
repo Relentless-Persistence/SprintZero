@@ -130,6 +130,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 								gptRequest={gptRequest}
 								id={vision.id}
 								disabled={step1}
+								setGptResponse={setGptResponse}
 							/>
 						),
 					},
@@ -155,6 +156,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 								createVision={createVision}
 								updateVision={updateVision}
 								id={vision.id ? vision.id : null}
+								setEditMode={setEditMode}
 							/>
 						),
 					},

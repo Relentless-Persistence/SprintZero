@@ -35,11 +35,10 @@ const GptResponse = ({gptRequest, gptResponse, setCurrent, disabled, setGptRespo
 				{gptResponse ? gptResponse : <Skeleton active />}
 			</Card>
 			<Space className="mt-6 flex justify-end">
-				<Button className="bg-white" disabled={disabled} onClick={redo}>
+				<Button className="bg-white"  onClick={redo}>
 					Redo
 				</Button>
 				<Button
-					disabled={disabled}
 					onClick={accept}
 					className="border-none bg-green-s500 text-white outline-none hover:border-none hover:bg-green-s400 hover:outline-none focus:outline-none"
 				>

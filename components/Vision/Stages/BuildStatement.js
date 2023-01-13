@@ -14,6 +14,7 @@ const BuildStatement = ({
 	setFeatures,
 	setCurrent,
 	gptRequest,
+	setGptResponse,
 	disabled,
 }) => {
 	const addFeature = () => {
@@ -34,12 +35,20 @@ const BuildStatement = ({
 	}
 
 	const onSubmit = async () => {
+		setGptResponse("")
 		if (type !== "" && value !== "" && features[0] !== "") {
 			gptRequest()
 			setCurrent(1)
 		} else {
 			message.error("Some fields are missing!")
 		}
+	}
+
+	const onReset = () => {
+		setType("");
+		setValue("");
+		setFeatures([""])
+		setGptResponse("")
 	}
 
 	return (
@@ -61,7 +70,7 @@ const BuildStatement = ({
 				<Form layout="vertical">
 					<Form.Item label={<span className="font-semibold">Type</span>} className="font-semibold">
 						<Segmented
-							disabled={disabled}
+							
 							value={type}
 							options={["Mobile", "Tablet", "Desktop", "Watch", "Web"]}
 							onChange={(value) => setType(value)}
@@ -73,7 +82,7 @@ const BuildStatement = ({
 							value={value}
 							onChange={(e) => setValue(e.target.value)}
 							placeholder="eg. Making it easy to to create albums of photos/videos"
-							disabled={disabled}
+							
 						/>
 					</Form.Item>
 
@@ -85,7 +94,7 @@ const BuildStatement = ({
 								prefix={
 									<div className="flex items-center justify-between">
 										{i !== 0 ? (
-											<button className="mr-[5px] flex items-center" onClick={() => removeFeature(i)}>
+											<button  className="mr-[5px] flex items-center" onClick={() => removeFeature(i)}>
 												<MinusCircleOutlined
 													style={{
 														color: "#C82D73",
@@ -99,7 +108,7 @@ const BuildStatement = ({
 								onChange={(e) => onChangeFeature(e.target.value, i)}
 								suffix={
 									<div className="flex items-center justify-between">
-										<button className="ml-[5px] flex items-center" onClick={addFeature}>
+										<button  className="ml-[5px] flex items-center" onClick={addFeature}>
 											<PlusCircleOutlined
 												style={{
 													color: "#009C7E",
@@ -108,16 +117,15 @@ const BuildStatement = ({
 										</button>
 									</div>
 								}
-								disabled={disabled}
+								
 							/>
 						))}
 					</Form.Item>
 				</Form>
 			</Card>
 			<Space className="mt-6 flex justify-end">
-				<Button disabled={disabled}>Reset</Button>
+				<Button  onClick={onReset}>Reset</Button>
 				<Button
-					disabled={disabled}
 					className="border-none bg-green-s500 text-white hover:text-white outline-none hover:border-none hover:bg-green-s400 hover:outline-none focus:outline-none"
 					onClick={onSubmit}
 				>

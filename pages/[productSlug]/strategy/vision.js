@@ -95,7 +95,7 @@ export default function Visions() {
 								>
 									{vision && (
 										<div
-											className="text-2xl"
+											className="text-[16px]"
 											style={{whiteSpace: "pre-line"}}
 											dangerouslySetInnerHTML={{__html: vision.acceptedVision}}
 										></div>
