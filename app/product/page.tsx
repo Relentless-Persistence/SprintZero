@@ -68,7 +68,7 @@ const ProductConfiguration: FC = () => {
 	}
 
 	return (
-		<div className="h-full w-full overflow-hidden">
+		<div className="h-full w-full overflow-x-hidden">
 			<div className="mx-auto flex h-full max-w-5xl flex-col gap-8 p-8">
 				<div className="flex justify-between">
 					<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={178} height={42} priority />
@@ -89,7 +89,7 @@ const ProductConfiguration: FC = () => {
 				<div className="flex w-full grow items-center">
 					<div className="shrink-0 basis-[calc(50%-12rem)]" />
 					<motion.div
-						className="flex h-full max-h-[34rem] w-max gap-24"
+						className="flex h-full max-h-[30rem] w-max gap-24"
 						animate={{x: `calc(-${currentSlide} * 30rem)`}}
 						transition={{duration: 0.3, ease: [0.65, 0, 0.35, 1]}}
 					>
