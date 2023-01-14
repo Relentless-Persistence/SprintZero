@@ -53,7 +53,8 @@ const ItemDrawer: FC<Props> = ({title, itemType, extra, data, isOpen, onClose}) 
 						<Tag color="#91d5ff">
 							{data.points} point{data.points === 1 ? `` : `s`}
 						</Tag>
-						{activeProduct?.effortCost && <Tag color="#a4df74">${activeProduct.effortCost * data.points}</Tag>}
+						{activeProduct?.effort_cost && <Tag color="#a4df74">${activeProduct.effort_cost * data.points}</Tag>}
+						{/* {activeProduct?.effortCost && <Tag color="#a4df74">${activeProduct.effortCost * data.points}</Tag>} */}
 						{extra}
 						{!editMode && (
 							<button type="button" onClick={() => void setEditMode(true)} className="text-sm text-[#396417]">
