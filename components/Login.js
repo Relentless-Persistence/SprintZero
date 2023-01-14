@@ -107,7 +107,7 @@ const Login = () => {
 					<Title level={1} style={{ fontWeight: "normal" }}>
 						Authenticate Yourself Before You Wreck Yourself
 					</Title>
-					<Text className="text-left text-xl">Select a provider to login</Text>
+					<Text className="text-left text-xl">Select a provider below to sign in with</Text>
 				</div>
 			</div>
 
@@ -135,9 +135,9 @@ const Login = () => {
 					<p>Sign in with Microsoft</p>
 				</Button> */}
 			</div>
-			<div className="absolute bottom-20 lg:right-80">
+			{/* <div className="absolute bottom-20 lg:right-80">
 				<Button onClick={() => router.push("/")}>Cancel</Button>
-			</div>
+			</div> */}
 		</>
 	)
 }
