@@ -41,19 +41,19 @@ const SideMenu: FC = () => {
 							children: [
 								{
 									key: `sidemenu-kickoff`,
-									label: <Link href={`/${activeProductId}/dashboard/strategy/kickoff`}>Kickoff</Link>,
+									label: <Link href={`/${activeProductId}/strategy/kickoff`}>Kickoff</Link>,
 								},
 								{
 									key: `sidemenu-accessibility`,
-									label: <Link href={`/${activeProductId}/dashboard/strategy/accessibility`}>Accessibility</Link>,
+									label: <Link href={`/${activeProductId}/strategy/accessibility`}>Accessibility</Link>,
 								},
 								{
 									key: `sidemenu-objectives`,
-									label: <Link href={`/${activeProductId}/dashboard/strategy/objectives`}>Objectives</Link>,
+									label: <Link href={`/${activeProductId}/strategy/objectives`}>Objectives</Link>,
 								},
 								{
 									key: `sidemenu-vision`,
-									label: <Link href={`/${activeProductId}/dashboard/strategy/vision`}>Vision</Link>,
+									label: <Link href={`/${activeProductId}/strategy/vision`}>Vision</Link>,
 								},
 							],
 						},
@@ -64,15 +64,15 @@ const SideMenu: FC = () => {
 							children: [
 								{
 									key: `sidemenu-ethics`,
-									label: <Link href={`/${activeProductId}/dashboard/tactics/ethics`}>Ethics</Link>,
+									label: <Link href={`/${activeProductId}/tactics/ethics`}>Ethics</Link>,
 								},
 								{
 									key: `sidemenu-priorities`,
-									label: <Link href={`/${activeProductId}/dashboard/tactics/priorities`}>Priorities</Link>,
+									label: <Link href={`/${activeProductId}/tactics/priorities`}>Priorities</Link>,
 								},
 								{
 									key: `sidemenu-retrospective`,
-									label: <Link href={`/${activeProductId}/dashboard/tactics/retrospective`}>Retrospective</Link>,
+									label: <Link href={`/${activeProductId}/tactics/retrospective`}>Retrospective</Link>,
 								},
 							],
 						},
@@ -83,15 +83,15 @@ const SideMenu: FC = () => {
 							children: [
 								{
 									key: `sidemenu-huddle`,
-									label: <Link href={`/${activeProductId}/dashboard/operations/huddle`}>Huddle</Link>,
+									label: <Link href={`/${activeProductId}/operations/huddle`}>Huddle</Link>,
 								},
 								{
 									key: `sidemenu-sprint`,
-									label: <Link href={`/${activeProductId}/dashboard/operations/sprint`}>Sprint</Link>,
+									label: <Link href={`/${activeProductId}/operations/sprint`}>Sprint</Link>,
 								},
 								{
 									key: `sidemenu-tasks`,
-									label: <Link href={`/${activeProductId}/dashboard/operations/tasks`}>Tasks</Link>,
+									label: <Link href={`/${activeProductId}/operations/tasks`}>Tasks</Link>,
 								},
 							],
 						},
@@ -102,19 +102,19 @@ const SideMenu: FC = () => {
 							children: [
 								{
 									key: `sidemenu-dialogue`,
-									label: <Link href={`/${activeProductId}/dashboard/userbase/dialogue`}>Dialogue</Link>,
+									label: <Link href={`/${activeProductId}/userbase/dialogue`}>Dialogue</Link>,
 								},
 								{
 									key: `sidemenu-journeys`,
-									label: <Link href={`/${activeProductId}/dashboard/userbase/journeys`}>Journeys</Link>,
+									label: <Link href={`/${activeProductId}/userbase/journeys`}>Journeys</Link>,
 								},
 								{
 									key: `sidemenu-learnings`,
-									label: <Link href={`/${activeProductId}/dashboard/userbase/learnings`}>Learnings</Link>,
+									label: <Link href={`/${activeProductId}/userbase/learnings`}>Learnings</Link>,
 								},
 								{
 									key: `sidemenu-personas`,
-									label: <Link href={`/${activeProductId}/dashboard/userbase/personas`}>Personas</Link>,
+									label: <Link href={`/${activeProductId}/userbase/personas`}>Personas</Link>,
 								},
 							],
 						},
