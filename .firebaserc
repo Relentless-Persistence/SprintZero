@@ -1,5 +1,8 @@
 {
-  "projects": {
-    "default": "sprintzero-657f3"
-  }
+	"projects": {
+		"staging": "sprintzero-657f3",
+		"production": "sprintzero-prod"
+	},
+	"targets": {},
+	"etags": {}
 }
