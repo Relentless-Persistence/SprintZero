@@ -1,190 +1,128 @@
-import type {EpicBoundaries, FeatureBoundaries, StoryBoundaries, StoryMapLocation} from "./types"
+import type {StoryMapTarget} from "./types"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/Products"
 
-import {calculateBoundaries} from "."
-import {boundaries, layerBoundaries, pointerLocation, storyMapScrollPosition} from "./globals"
+import {meta} from "."
+import {boundaries, dragState, layerBoundaries, pointerLocation, storyMapMeta, storyMapScrollPosition} from "./globals"
 
-export const getEpicLocation = (storyMapState: StoryMapState, epicId: Id): StoryMapLocation => {
-	const epicIndex = storyMapState.epics.findIndex((epic) => epic.id === epicId)
-	if (epicIndex === -1) return {}
-	return {epic: epicIndex}
-}
+export const getTargetItem = (): StoryMapTarget => {
+	if (!dragState.current) return `stay`
 
-export const getFeatureLocation = (storyMapState: StoryMapState, featureId: Id): StoryMapLocation => {
-	for (const [epicIndex, epic] of storyMapState.epics.entries()) {
-		const featureIndex = epic.features.findIndex((feature) => feature.id === featureId)
-		if (featureIndex !== -1) return {epic: epicIndex, feature: featureIndex}
-	}
-	return {}
-}
+	const x = pointerLocation.current[0] - dragState.current.xOffsetFromCenter + storyMapScrollPosition.current
+	const y = pointerLocation.current[1]
 
-export const getStoryLocation = (storyMapState: StoryMapState, storyId: Id): StoryMapLocation => {
-	for (const [epicIndex, epic] of storyMapState.epics.entries()) {
-		for (const [featureIndex, feature] of epic.features.entries()) {
-			const storyIndex = feature.stories.findIndex((story) => story.id === storyId)
-			if (storyIndex !== -1) return {epic: epicIndex, feature: featureIndex, story: storyIndex}
+	const hoveringItems = getHoveringItems()
+	const hoveringItem = hoveringItems.story ?? hoveringItems.feature ?? hoveringItems.epic
+
+	if (y < layerBoundaries[0]) {
+		// Hovering over epics
+
+		if (dragState.current.type === `story`) return `stay`
+
+		const isForeign = dragState.current.type !== `epic`
+		if (isForeign) {
+			const hoveringItemBoundaries = boundaries.epic[hoveringItem!]!
+
+			return [x < hoveringItemBoundaries.center ? `before` : `after`, {type: `epic`, id: hoveringItem!}]
+		} else {
+			const startItemBoundaries = boundaries.epic[dragState.current.id]
+			const prevItem = meta<`epic`>(dragState.current.id).prevItem
+			const nextItem = meta<`epic`>(dragState.current.id).nextItem
+			if (!startItemBoundaries) return `stay`
+
+			if (startItemBoundaries.centerWithLeft !== undefined && x < startItemBoundaries.centerWithLeft && prevItem)
+				return [`before`, {type: `epic`, id: prevItem}]
+			else if (
+				startItemBoundaries.centerWithRight !== undefined &&
+				x >= startItemBoundaries.centerWithRight &&
+				nextItem
+			)
+				return [`after`, {type: `epic`, id: nextItem}]
+			else return `stay`
 		}
-	}
-	return {}
-}
+	} else if (y < layerBoundaries[1]) {
+		// Hovering over features
 
-const getTargetEpic = (
-	epicBoundariesList: EpicBoundaries[],
-	x: number,
-	y: number,
-	startLocation: StoryMapLocation,
-	hoveringLocation: StoryMapLocation,
-): number | undefined => {
-	if (hoveringLocation.epic === undefined) return 0
+		if ((dragState.current.type === `epic` && hoveringItems.epic === dragState.current.id) || !hoveringItem)
+			return `stay`
 
-	const isForeign = startLocation.feature !== undefined
-	if (isForeign) {
-		const boundaries = epicBoundariesList[hoveringLocation.epic]
-		if (!boundaries) return undefined
+		if (hoveringItems.feature === undefined) return [`beneath`, {type: `epic`, id: hoveringItems.epic!}]
 
-		if (x >= boundaries.left && x < boundaries.center) return hoveringLocation.epic
-		else if (x >= boundaries.center && x < boundaries.right) return hoveringLocation.epic + 1
-	} else if (startLocation.epic !== undefined) {
-		const boundaries = epicBoundariesList[startLocation.epic]
-		if (!boundaries) return undefined
+		const isForeign =
+			dragState.current.type !== `feature` || meta(dragState.current.id).parent !== meta(hoveringItem).parent
+		if (isForeign) {
+			const hoveringItemBoundaries = boundaries.feature[hoveringItem]
+			if (!hoveringItemBoundaries) return `stay`
 
-		if (boundaries.centerWithLeft && x < boundaries.centerWithLeft) return startLocation.epic - 1
-		else if (boundaries.centerWithRight && x >= boundaries.centerWithRight) return startLocation.epic + 1
-		else return startLocation.epic
-	}
-}
+			return [x < hoveringItemBoundaries.center ? `before` : `after`, {type: `feature`, id: hoveringItem}]
+		} else {
+			const startItemBoundaries = boundaries.feature[dragState.current.id]
+			const prevItem = meta<`feature`>(dragState.current.id).prevItem
+			const nextItem = meta<`feature`>(dragState.current.id).nextItem
+			if (!startItemBoundaries) return `stay`
 
-const getTargetFeature = (
-	featureBoundariesList: FeatureBoundaries[],
-	x: number,
-	startLocation: StoryMapLocation,
-	hoveringLocation: StoryMapLocation,
-): number | undefined => {
-	if (hoveringLocation.feature === undefined) return 0
+			if (startItemBoundaries.centerWithLeft !== undefined && x < startItemBoundaries.centerWithLeft && prevItem)
+				return [`before`, {type: `feature`, id: prevItem}]
+			else if (
+				startItemBoundaries.centerWithRight !== undefined &&
+				x >= startItemBoundaries.centerWithRight &&
+				nextItem
+			)
+				return [`after`, {type: `feature`, id: nextItem}]
+			else return `stay`
+		}
+	} else {
+		// Hovering over stories
 
-	const isForeign =
-		startLocation.feature === undefined || // Was originally an epic
-		startLocation.epic !== hoveringLocation.epic || // Was originally a feature, but from a different epic
-		startLocation.story !== undefined // Was originally a story
-	if (isForeign) {
-		const boundaries = featureBoundariesList[hoveringLocation.feature]
-		if (!boundaries) return undefined
+		if (
+			dragState.current.type === `epic` ||
+			(dragState.current.type === `feature` && hoveringItems.feature === dragState.current.id)
+		)
+			return `stay`
 
-		if (x >= boundaries.left && x < boundaries.center) return hoveringLocation.feature
-		else if (x >= boundaries.center && x < boundaries.right) return hoveringLocation.feature + 1
-	} else if (startLocation.feature !== undefined) {
-		const boundaries = featureBoundariesList[startLocation.feature]
-		if (!boundaries) return undefined
+		if (hoveringItem === undefined) {
+			if (hoveringItems.feature === undefined) return [`beneath`, {type: `feature`, id: hoveringItems.epic!}]
+			else return [`beneath`, {type: `feature`, id: hoveringItems.feature}]
+		}
 
-		if (boundaries.centerWithLeft && x < boundaries.centerWithLeft) return startLocation.feature - 1
-		else if (boundaries.centerWithRight && x >= boundaries.centerWithRight) return startLocation.feature + 1
-		else return startLocation.feature
+		const hoveringItemBoundaries = boundaries.story[hoveringItem]
+		if (!hoveringItemBoundaries) return `stay`
+		return [y < hoveringItemBoundaries.center ? `before` : `after`, {type: `story`, id: hoveringItem}]
 	}
 }
 
-const getTargetStory = (
-	storyBoundariesList: StoryBoundaries[],
-	x: number,
-	y: number,
-	startLocation: StoryMapLocation,
-	hoveringLocation: StoryMapLocation,
-): number | undefined => {
-	if (hoveringLocation.story === undefined) return 0
-
-	const boundaries = storyBoundariesList[hoveringLocation.story]
-	if (!boundaries) return undefined
-	if (y >= boundaries.top && y < boundaries.center) return hoveringLocation.story
-	else if (y >= boundaries.center && y < boundaries.bottom) return hoveringLocation.story + 1
-}
-
-export const getTargetLocation = (storyMapState: StoryMapState, startLocation: StoryMapLocation): StoryMapLocation => {
-	calculateBoundaries(storyMapState)
-
+export const getHoveringItems = (): {epic?: Id; feature?: Id; story?: Id} => {
 	const x = pointerLocation.current[0] + storyMapScrollPosition.current
 	const y = pointerLocation.current[1]
 
-	const hoveringLocation = getHoveringLocation()
-	const featureBoundariesList =
-		hoveringLocation.epic !== undefined
-			? boundaries.epicBoundaries[hoveringLocation.epic]?.featureBoundaries
-			: undefined
-	const storyBoundaries =
-		hoveringLocation.epic !== undefined && hoveringLocation.feature !== undefined
-			? boundaries.epicBoundaries[hoveringLocation.epic]?.featureBoundaries[hoveringLocation.feature]?.storyBoundaries
-			: undefined
-
-	let targetEpicIndex = getTargetEpic(boundaries.epicBoundaries, x, y, startLocation, hoveringLocation)
-	if (y >= layerBoundaries[0]) targetEpicIndex = hoveringLocation.epic
-
-	let targetFeatureIndex = featureBoundariesList
-		? getTargetFeature(featureBoundariesList, x, startLocation, hoveringLocation)
-		: undefined
-	if (y < layerBoundaries[0]) targetFeatureIndex = undefined
-	if (y >= layerBoundaries[1]) {
-		if (hoveringLocation.epic && storyMapState.epics[hoveringLocation.epic]!.features.length === 0)
-			targetFeatureIndex = 0
-		else targetFeatureIndex = hoveringLocation.feature
+	// Find hovering epic
+	let hoveringEpic: Id | undefined
+	for (const id in boundaries.epic) {
+		const epic = boundaries.epic[id as Id]!
+		if (x >= epic.left && x < epic.right) hoveringEpic = id as Id
 	}
 
-	let targetStoryIndex = storyBoundaries
-		? getTargetStory(storyBoundaries, x, y, startLocation, hoveringLocation)
-		: undefined
-	if (y < layerBoundaries[1]) targetStoryIndex = undefined
-
-	const targetLocation = {
-		epic: targetEpicIndex,
-		feature: targetFeatureIndex,
-		story: targetStoryIndex,
+	// Find hovering feature
+	let hoveringFeature: Id | undefined
+	for (const id in boundaries.feature) {
+		const feature = boundaries.feature[id as Id]!
+		if (x >= feature.left && x < feature.right && y >= layerBoundaries[0]) hoveringFeature = id as Id
 	}
 
-	// Don't allow epic to move into itself
-	if (
-		startLocation.epic === targetLocation.epic &&
-		startLocation.feature === undefined &&
-		targetLocation.feature !== undefined
-	)
-		return startLocation
+	// Find hovering story
+	let hoveringStory: Id | undefined
+	for (const id in boundaries.story) {
+		const story = boundaries.story[id as Id]!
+		const storyMeta = storyMapMeta.current[id as Id]
+		if (!storyMeta) continue
 
-	// Don't allow feature to move into itself
-	if (
-		startLocation.feature === targetLocation.feature &&
-		startLocation.story === undefined &&
-		targetLocation.story !== undefined
-	)
-		return startLocation
-
-	return targetLocation
-}
-
-export const getHoveringLocation = (): StoryMapLocation => {
-	const x = pointerLocation.current[0] + storyMapScrollPosition.current
-	const y = pointerLocation.current[1]
-
-	let hoveringEpicIndex: number | undefined = boundaries.epicBoundaries.findIndex(
-		({left, right}) => x >= left && x < right,
-	)
-	if (hoveringEpicIndex === -1) hoveringEpicIndex = undefined
-
-	let hoveringFeatureIndex =
-		hoveringEpicIndex === undefined
-			? undefined
-			: boundaries.epicBoundaries[hoveringEpicIndex]?.featureBoundaries.findIndex(
-					({left, right}) => x >= left && x < right,
-			  )
-	if (hoveringFeatureIndex === -1) hoveringFeatureIndex = undefined
-
-	let hoveringStoryIndex =
-		hoveringEpicIndex === undefined || hoveringFeatureIndex === undefined
-			? undefined
-			: boundaries.epicBoundaries[hoveringEpicIndex]?.featureBoundaries[
-					hoveringFeatureIndex
-			  ]?.storyBoundaries.findIndex(({top, bottom}) => y >= top && y < bottom)
-	if (hoveringStoryIndex === -1) hoveringStoryIndex = undefined
+		const parentBoundaries = boundaries.feature[storyMeta.parent!]!
+		if (y >= story.top && y < story.bottom && x >= parentBoundaries.left && x < parentBoundaries.right)
+			hoveringStory = id as Id
+	}
 
 	return {
-		epic: hoveringEpicIndex,
-		feature: y > layerBoundaries[0] ? hoveringFeatureIndex : undefined,
-		story: hoveringStoryIndex,
+		epic: hoveringEpic,
+		feature: hoveringFeature,
+		story: hoveringStory,
 	}
 }

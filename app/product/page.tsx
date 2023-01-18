@@ -5,12 +5,14 @@ import {Avatar, Button} from "antd5"
 import {doc, setDoc, updateDoc} from "firebase9/firestore"
 import {motion} from "framer-motion"
 import {useAtomValue} from "jotai"
+import {nanoid} from "nanoid"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
 import {v4 as uuid} from "uuid"
 
 import type {FC} from "react"
+import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 
 import Slide1 from "./Slide1"
@@ -27,7 +29,7 @@ const numSlides = 4
 
 type FormInputs = {
 	cadence: number
-	effort_cost: number | null
+	effortCost: number | null
 	email1: string | null
 	email2: string | null
 	email3: string | null
@@ -56,7 +58,7 @@ const ProductConfiguration: FC = () => {
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}`
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
-			storyMapState: {epics: []},
+			storyMapState: {productId: slug as Id, epics: [], features: [], stories: []},
 			members: [{user: userId, type: `editor`}],
 			owner: userId,
 		} satisfies Omit<Product, `id`>)

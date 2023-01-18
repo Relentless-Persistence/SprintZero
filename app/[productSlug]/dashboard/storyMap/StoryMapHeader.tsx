@@ -40,8 +40,8 @@ const StoryMapHeader: FC = () => {
 					<RightOutlined className="absolute right-[-6px] -translate-y-1/2" />
 				</div>
 				<div className="mt-2 flex justify-between text-xs">
-					<p>Low value</p>
 					<p>High value</p>
+					<p>Low value</p>
 				</div>
 			</div>
 		</div>

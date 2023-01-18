@@ -19,17 +19,15 @@ const HomePage: FC = () => {
 		enabled: userId !== undefined,
 		onSuccess: (products) => {
 			const firstProduct = products[0]
-			if (!firstProduct) {
-				router.replace(`/product`)
-			} else {
+			if (firstProduct) {
 				router.replace(`/${firstProduct.id}/dashboard`)
+			} else {
+				router.replace(`/product`)
 			}
 		},
 	})
 
-	return (
-		<div>{`I'm just an empty page for now`}</div>
-	)
+	return <div>{`I'm just an empty page for now`}</div>
 }
 
 export default HomePage

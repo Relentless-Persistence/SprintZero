@@ -2,12 +2,13 @@ import {addDoc, collection, doc, getDocs, query, updateDoc, where} from "firebas
 import produce from "immer"
 import {nanoid} from "nanoid"
 
+import type {SetRequired} from "type-fest"
 import type {Id} from "~/types"
 import type {InputState} from "~/types/db/InputStates"
 import type {Epic, Feature, Product, Story, StoryMapState} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
-import {getProduct} from "./queries"
+import {storyMapMeta} from "~/app/[productSlug]/dashboard/storyMap/utils/globals"
 import {db} from "~/config/firebase"
 import {InputStates} from "~/types/db/InputStates"
 import {Products} from "~/types/db/Products"
@@ -38,138 +39,146 @@ export const addVersion = async ({productId, versionName}: AddVersionVars): Prom
 }
 
 type AddEpicVars = {
-	productId: Id
+	storyMapState: StoryMapState
 	data: Partial<Epic>
 	position?: number
 }
 
-export const addEpic = async ({productId, data: initialData, position}: AddEpicVars): Promise<void> => {
+export const addEpic = async ({storyMapState, data: initialData, position}: AddEpicVars): Promise<void> => {
 	const id = nanoid() as Id
 	const data: Epic = {
 		id,
 		description: ``,
 		name: ``,
-		priority_level: 0,
-		visibility_level: 0,
-		comments: [],
-		keepers: [],
+		priorityLevel: 0,
+		visibilityLevel: 0,
+		commentIds: [],
+		featureIds: [],
+		keeperIds: [],
 		nameInputStateId: await createInputState(),
-		features: [],
 		...initialData,
 	}
 
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState.epics.splice(position ?? Infinity, 0, data)
+	const newStoryMapState = produce(storyMapState, (state) => {
+		state.epics.splice(position ?? Infinity, 0, data)
+	})
 
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
+	await updateDoc(doc(db, Products._, storyMapState.productId), {
+		storyMapState: newStoryMapState,
+	} satisfies Partial<Product>)
 }
 
 type UpdateEpicVars = {
-	productId: Id
+	storyMapState: StoryMapState
 	epicId: Id
-	data: Partial<Pick<Epic, `description` | `name` | `priority_level` | `visibility_level` | `comments` | `keepers`>>
+	data: Partial<Pick<Epic, `description` | `name` | `priorityLevel` | `visibilityLevel` | `commentIds` | `keeperIds`>>
 }
 
-export const updateEpic = async ({productId, epicId, data}: UpdateEpicVars): Promise<void> => {
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState = produce(storyMapState, (state) => {
+export const updateEpic = async ({storyMapState, epicId, data}: UpdateEpicVars): Promise<void> => {
+	const newStoryMapState = produce(storyMapState, (state) => {
 		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
 		state.epics[epicIndex] = {
 			...state.epics[epicIndex]!,
 			...data,
 		}
 	})
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
-}
-
-type DeleteEpicVars = {
-	productId: Id
-	epicId: Id
-}
-
-export const deleteEpic = async ({productId, epicId}: DeleteEpicVars): Promise<void> => {
-	const product = await getProduct(productId)()
-
-	updateDoc(doc(db, Products._, product.id), {
-		storyMapState: {epics: product.storyMapState.epics.filter(({id}) => id !== epicId)},
+	await updateDoc(doc(db, Products._, storyMapState.productId), {
+		storyMapState: newStoryMapState,
 	} satisfies Partial<Product>)
 }
 
+type DeleteEpicVars = {
+	storyMapState: StoryMapState
+	epicId: Id
+}
+
+export const deleteEpic = async ({storyMapState, epicId}: DeleteEpicVars): Promise<void> => {
+	const newStoryMapState = produce(storyMapState, (state) => {
+		state.epics = state.epics.filter(({id}) => id !== epicId)
+	})
+
+	updateDoc(doc(db, Products._, storyMapState.productId), {storyMapState: newStoryMapState} satisfies Partial<Product>)
+}
+
 type AddFeatureVars = {
-	productId: Id
+	storyMapState: StoryMapState
 	epicId: Id
 	data: Partial<Feature>
 	position?: number
 }
 
-export const addFeature = async ({productId, epicId, data: initialData, position}: AddFeatureVars): Promise<void> => {
+export const addFeature = async ({
+	storyMapState,
+	epicId,
+	data: initialData,
+	position,
+}: AddFeatureVars): Promise<void> => {
 	const id = nanoid() as Id
 	const data: Feature = {
 		id,
 		description: ``,
 		name: ``,
-		priority_level: 0,
-		visibility_level: 0,
-		comments: [],
+		priorityLevel: 0,
+		visibilityLevel: 0,
+		commentIds: [],
 		nameInputStateId: await createInputState(),
-		stories: [],
+		storyIds: [],
 		...initialData,
 	}
 
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-		state.epics[epicIndex]!.features.splice(position ?? Infinity, 0, data)
+	const newStoryMapState = produce(storyMapState, (state) => {
+		state.features.push(data)
+		const epic = state.epics.find(({id}) => id === epicId)!
+		epic.featureIds.splice(position ?? Infinity, 0, id)
 	})
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
+	await updateDoc(doc(db, Products._, storyMapState.productId), {
+		storyMapState: newStoryMapState,
+	} satisfies Partial<Product>)
 }
 
 type DeleteFeatureVars = {
-	productId: Id
-	epicId: Id
+	storyMapState: StoryMapState
 	featureId: Id
 }
 
-export const deleteFeature = async ({productId, epicId, featureId}: DeleteFeatureVars): Promise<void> => {
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-		state.epics[epicIndex]!.features = state.epics[epicIndex]!.features.filter(({id}) => id !== featureId)
+export const deleteFeature = async ({storyMapState, featureId}: DeleteFeatureVars): Promise<void> => {
+	const featureMeta = storyMapMeta.current[featureId]!
+	const newStoryMapState = produce(storyMapState, (state) => {
+		const epic = state.epics.find(({id}) => id === featureMeta.parent)!
+		epic.featureIds = epic.featureIds.filter((id) => id !== featureId)
+		state.features.filter(({id}) => id !== featureId)
 	})
-	updateDoc(doc(db, Products._, productId), {storyMapState})
+	updateDoc(doc(db, Products._, storyMapState.productId), {storyMapState: newStoryMapState} satisfies Partial<Product>)
 }
 
 type UpdateFeatureVars = {
-	productId: Id
-	epicId: Id
+	storyMapState: StoryMapState
 	featureId: Id
-	data: Partial<Pick<Feature, `description` | `name` | `comments`>>
+	data: Partial<Pick<Feature, `description` | `name` | `commentIds`>>
 }
 
-export const updateFeature = async ({productId, epicId, featureId, data}: UpdateFeatureVars): Promise<void> => {
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		state.epics[epicIndex]!.features[featureIndex] = {
-			...state.epics[epicIndex]!.features[featureIndex]!,
+export const updateFeature = async ({storyMapState, featureId, data}: UpdateFeatureVars): Promise<void> => {
+	const newStoryMapState = produce(storyMapState, (state) => {
+		const featureIndex = state.features.findIndex(({id}) => id === featureId)
+		state.features[featureIndex] = {
+			...state.features[featureIndex]!,
 			...data,
 		}
 	})
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
+	await updateDoc(doc(db, Products._, storyMapState.productId), {
+		storyMapState: newStoryMapState,
+	} satisfies Partial<Product>)
 }
 
 type AddStoryVars = {
-	productId: Id
-	epicId: Id
+	storyMapState: StoryMapState
 	featureId: Id
-	data: Partial<Story> & {versionId: Id}
+	data: SetRequired<Partial<Story>, `versionId`>
 	position?: number
 }
 
 export const addStory = async ({
-	productId,
-	epicId,
+	storyMapState,
 	featureId,
 	data: initialData,
 	position,
@@ -177,69 +186,63 @@ export const addStory = async ({
 	const id = nanoid() as Id
 	const data: Story = {
 		id,
-		acceptance_criteria: [],
-		code_link: null,
+		acceptanceCriteria: [],
+		codeLink: null,
 		description: ``,
-		design_link: null,
+		designLink: null,
 		name: ``,
 		points: 0,
-		priority_level: 0,
-		visibility_level: 0,
-		comments: [],
+		priorityLevel: 0,
+		visibilityLevel: 0,
+		commentIds: [],
 		nameInputStateId: await createInputState(),
 		...initialData,
 	}
 
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		state.epics[epicIndex]!.features[featureIndex]!.stories.splice(position ?? Infinity, 0, data)
+	const newStoryMapState = produce(storyMapState, (state) => {
+		state.stories.push(data)
+		const feature = state.features.find(({id}) => id === featureId)!
+		feature.storyIds.splice(position ?? Infinity, 0, id)
 	})
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
+	await updateDoc(doc(db, Products._, storyMapState.productId), {
+		storyMapState: newStoryMapState,
+	} satisfies Partial<Product>)
 }
 
 type DeleteStoryVars = {
-	productId: Id
-	epicId: Id
-	featureId: Id
+	storyMapState: StoryMapState
 	storyId: Id
 }
 
-export const deleteStory = async ({productId, epicId, featureId, storyId}: DeleteStoryVars): Promise<void> => {
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		state.epics[epicIndex]!.features[featureIndex]!.stories = state.epics[epicIndex]!.features[
-			featureIndex
-		]!.stories.filter(({id}) => id !== storyId)
+export const deleteStory = async ({storyMapState, storyId}: DeleteStoryVars): Promise<void> => {
+	const storyMeta = storyMapMeta.current[storyId]!
+	const newStoryMapState = produce(storyMapState, (state) => {
+		const feature = state.features.find(({id}) => id === storyMeta.parent)!
+		feature.storyIds = feature.storyIds.filter((id) => id !== storyId)
+		state.stories = state.stories.filter(({id}) => id !== storyId)
 	})
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
+	await updateDoc(doc(db, Products._, storyMapState.productId), {
+		storyMapState: newStoryMapState,
+	} satisfies Partial<Product>)
 }
 
 type UpdateStoryVars = {
-	productId: Id
-	epicId: Id
-	featureId: Id
+	storyMapState: StoryMapState
 	storyId: Id
-	data: Partial<
-		Pick<Story, `acceptance_criteria` | `code_link` | `description` | `design_link` | `name` | `points` | `versionId`>
-	>
+	data: Partial<Story>
 }
 
-export const updateStory = async ({productId, epicId, featureId, storyId, data}: UpdateStoryVars): Promise<void> => {
-	let storyMapState = (await getProduct(productId)()).storyMapState
-	storyMapState = produce(storyMapState, (state) => {
-		const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-		const featureIndex = state.epics[epicIndex]!.features.findIndex(({id}) => id === featureId)
-		const storyIndex = state.epics[epicIndex]!.features[featureIndex]!.stories.findIndex(({id}) => id === storyId)
-		state.epics[epicIndex]!.features[featureIndex]!.stories[storyIndex] = {
-			...state.epics[epicIndex]!.features[featureIndex]!.stories[storyIndex]!,
+export const updateStory = async ({storyMapState, storyId, data}: UpdateStoryVars): Promise<void> => {
+	const newStoryMapState = produce(storyMapState, (state) => {
+		const storyIndex = state.stories.findIndex(({id}) => id === storyId)
+		state.stories[storyIndex] = {
+			...state.stories[storyIndex]!,
 			...data,
 		}
 	})
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
+	await updateDoc(doc(db, Products._, storyMapState.productId), {
+		storyMapState: newStoryMapState,
+	} satisfies Partial<Product>)
 }
 
 export const createInputState = async (): Promise<Id> =>

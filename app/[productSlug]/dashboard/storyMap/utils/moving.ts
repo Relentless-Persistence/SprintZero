@@ -1,204 +1,326 @@
 import produce from "immer"
 
-import type {StoryMapLocation} from "./types"
+import type {StoryMapItem, StoryMapTarget} from "./types"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/Products"
+import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 
-import {
-	convertEpicToFeature,
-	convertEpicToStory,
-	convertFeatureToEpic,
-	convertFeatureToStory,
-	convertStoryToEpic,
-	convertStoryToFeature,
-} from "."
+import {meta} from "."
 
-export const moveEpic = (
+export const moveItem = (
+	currentState: StoryMapState,
 	originalState: StoryMapState,
-	epicId: Id,
-	targetLocation: StoryMapLocation,
-	currentVersionId: Id | `__ALL_VERSIONS__`,
+	startItem: StoryMapItem,
+	targetLocation: StoryMapTarget,
+	currentVersionId: Id | undefined,
 ): StoryMapState =>
-	produce(originalState, (state) => {
-		if (
-			targetLocation.epic !== undefined &&
-			targetLocation.feature !== undefined &&
-			targetLocation.story !== undefined
-		) {
-			// Epic to story
+	produce(currentState, (state) => {
+		if (targetLocation === `stay`) return
+		if (targetLocation[0] === `before` || targetLocation[0] === `after`) {
+			let targetPosition = meta(targetLocation[1].id).position
+			targetPosition = targetLocation[0] === `before` ? targetPosition : targetPosition + 1
 
-			const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-			const epic = state.epics[epicIndex]!
+			if (startItem.type === `epic`) {
+				if (targetLocation[1].type === `epic`) {
+					// Epic to epic (reordering)
 
-			if (
-				// Epics should only be allowed to move to stories if they don't have any features
-				epic.features.length > 0 ||
-				// Version must be selected to create a story
-				currentVersionId === `__ALL_VERSIONS__` ||
-				// Don't allow epic to be moved into itself
-				epicIndex === targetLocation.epic
-			)
-				return
+					const epicIndex = state.epics.findIndex((epic) => epic.id === startItem.id)
+					const epic = state.epics[epicIndex]!
 
-			// Insert the epic at story location
-			const storiesOrder = state.epics[targetLocation.epic]!.features[targetLocation.feature]!.stories
-			storiesOrder.splice(targetLocation.story, 0, convertEpicToStory(epic, currentVersionId))
+					// Insert the epic at the new location
+					state.epics.splice(targetPosition, 0, epic)
 
-			// Remove the epic from its original location
-			state.epics.splice(epicIndex, 1)
-		} else if (targetLocation.epic !== undefined && targetLocation.feature !== undefined) {
-			// Epic to feature
+					// Remove the epic from its original location
+					state.epics.splice(epicIndex < targetPosition ? epicIndex : epicIndex + 1, 1)
+				} else if (targetLocation[1].type === `feature`) {
+					// Epic to feature
 
-			const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-			const epic = state.epics[epicIndex]!
-			const features = state.epics[targetLocation.epic]!.features
+					if (!currentVersionId) return
 
-			// Don't allow epic to be moved into itself
-			if (epicIndex === targetLocation.epic) return
+					const existingEpic = state.epics.find((epic) => epic.id === startItem.id)!
+					const newFeature: Feature = {
+						id: existingEpic.id,
+						description: existingEpic.description,
+						name: existingEpic.name,
+						priorityLevel: existingEpic.priorityLevel,
+						visibilityLevel: existingEpic.visibilityLevel,
+						commentIds: existingEpic.commentIds,
+						nameInputStateId: existingEpic.nameInputStateId,
+						storyIds: existingEpic.featureIds,
+					}
 
-			// Insert the new feature at feature location
-			features.splice(targetLocation.feature, 0, convertEpicToFeature(epic))
+					// Insert the epic as a feature at the new location
+					state.features.push(newFeature)
+					const host = state.epics.find((epic) => epic.id === meta(targetLocation[1].id).parent)!
+					host.featureIds.splice(targetPosition, 0, newFeature.id)
 
-			// Remove the epic from its original location
-			state.epics.splice(epicIndex, 1)
-		} else if (targetLocation.epic !== undefined) {
-			// Epic to epic (reordering)
+					// Remove the epic from its current location
+					state.epics = state.epics.filter((epic) => epic.id !== existingEpic.id)
 
-			const epicIndex = state.epics.findIndex(({id}) => id === epicId)
-			const epic = state.epics[epicIndex]!
-
-			// Insert the epic at new location
-			state.epics.splice(targetLocation.epic + (targetLocation.epic > epicIndex ? 1 : 0), 0, epic)
-
-			// Remove the epic from its original location
-			state.epics.splice(epicIndex + (epicIndex > targetLocation.epic ? 1 : 0), 1)
-		}
-	})
-
-export const moveFeature = (
-	originalState: StoryMapState,
-	featureId: Id,
-	targetLocation: StoryMapLocation,
-	currentVersionId: Id | `__ALL_VERSIONS__`,
-): StoryMapState =>
-	produce(originalState, (state) => {
-		let epicIndex = -1
-		let featureIndex = -1
-		epicLoop: for (const [i, epic] of state.epics.entries()) {
-			for (const [j, feature] of epic.features.entries()) {
-				if (feature.id === featureId) {
-					epicIndex = i
-					featureIndex = j
-					break epicLoop
+					// Move child features to stories of the new feature
+					const existingFeatures = state.features.filter((feature) => existingEpic.featureIds.includes(feature.id))
+					for (const feature of existingFeatures) {
+						const story: Story = {
+							id: feature.id,
+							acceptanceCriteria: [],
+							codeLink: null,
+							description: feature.description,
+							designLink: null,
+							name: feature.name,
+							points: 0,
+							priorityLevel: feature.priorityLevel,
+							visibilityLevel: feature.visibilityLevel,
+							commentIds: feature.commentIds,
+							nameInputStateId: feature.nameInputStateId,
+							versionId: currentVersionId,
+						}
+						state.stories.push(story)
+					}
+					state.features = state.features.filter((feature) => !existingEpic.featureIds.includes(feature.id))
+				} else {
+					// Epic to story is not allowed
+					return
 				}
-			}
-		}
-		const feature = state.epics[epicIndex]!.features[featureIndex]!
+			} else if (startItem.type === `feature`) {
+				if (targetLocation[1].type === `epic`) {
+					// Feature to epic
 
-		if (
-			targetLocation.epic !== undefined &&
-			targetLocation.feature !== undefined &&
-			targetLocation.story !== undefined
-		) {
-			// Feature to story
+					const existingFeature = state.features.find((feature) => feature.id === startItem.id)!
+					const newEpic: Epic = {
+						id: existingFeature.id,
+						description: existingFeature.description,
+						name: existingFeature.name,
+						priorityLevel: existingFeature.priorityLevel,
+						visibilityLevel: existingFeature.visibilityLevel,
+						commentIds: existingFeature.commentIds,
+						featureIds: existingFeature.storyIds,
+						keeperIds: [],
+						nameInputStateId: existingFeature.nameInputStateId,
+					}
 
-			const stories = state.epics[targetLocation.epic]!.features[targetLocation.feature]!.stories
+					// Insert the feature as an epic at the new location
+					state.epics.splice(targetPosition, 0, newEpic)
 
-			if (
-				// Version must be selected to create a story
-				currentVersionId === `__ALL_VERSIONS__` ||
-				// Don't allow feature to be moved into itself
-				featureIndex === targetLocation.feature
-			)
-				return
+					// Remove the feature from its current location
+					state.features = state.features.filter((feature) => feature.id !== existingFeature.id)
+					const host = state.epics.find((epic) => epic.id === targetLocation[1].id)!
+					host.featureIds = host.featureIds.filter((featureId) => featureId !== existingFeature.id)
 
-			// Insert the feature at story location
-			stories.splice(targetLocation.story, 0, convertFeatureToStory(feature, currentVersionId))
+					// Move child stories to features of the new epic
+					const existingStories = state.stories.filter((story) => existingFeature.storyIds.includes(story.id))
+					for (const story of existingStories) {
+						const feature: Feature = {
+							id: story.id,
+							description: story.description,
+							name: story.name,
+							priorityLevel: story.priorityLevel,
+							visibilityLevel: story.visibilityLevel,
+							commentIds: story.commentIds,
+							nameInputStateId: story.nameInputStateId,
+							storyIds: [],
+						}
+						state.features.push(feature)
+					}
+					state.stories = state.stories.filter((story) => !existingFeature.storyIds.includes(story.id))
+				} else if (targetLocation[1].type === `feature`) {
+					const isForeign = meta(startItem.id).parent !== meta(targetLocation[1].id).parent
+					if (isForeign) {
+						// Feature to feature (reparenting)
 
-			// Remove the feature from its original location
-			state.epics[epicIndex]!.features.splice(featureIndex, 1)
-		} else if (targetLocation.epic !== undefined && targetLocation.feature !== undefined) {
-			// Feature to feature (reordering)
+						// Insert the feature as a feature at the new location
+						const newHost = state.epics.find((epic) => epic.id === meta(targetLocation[1].id).parent)!
+						newHost.featureIds.splice(targetPosition, 0, startItem.id)
 
-			if (targetLocation.epic === epicIndex) {
-				// Insert the new feature at feature location
-				state.epics[targetLocation.epic]!.features.splice(
-					targetLocation.feature + (targetLocation.feature > featureIndex ? 1 : 0),
-					0,
-					feature,
-				)
+						// Remove the feature from its current location
+						const currentHost = state.epics.find((epic) => epic.id === meta(startItem.id).parent)!
+						currentHost.featureIds = currentHost.featureIds.filter((featureId) => featureId !== startItem.id)
+					} else {
+						// Feature to feature (reordering)
 
-				// Remove the feature from its original location
-				state.epics[epicIndex]!.features.splice(featureIndex + (featureIndex > targetLocation.feature ? 1 : 0), 1)
+						const startPosition = meta(startItem.id).position
+						const host = state.epics.find((epic) => epic.id === meta(startItem.id).parent)!
+
+						// Insert the feature as a feature at the new location
+						host.featureIds.splice(targetPosition, 0, startItem.id)
+
+						// Remove the feature from its current location
+						host.featureIds.splice(startPosition < targetPosition ? startPosition : startPosition + 1, 1)
+					}
+				} else {
+					// Feature to story
+
+					if (!currentVersionId) return
+
+					const existingFeature = state.features.find((feature) => feature.id === startItem.id)!
+					const newStory: Story = {
+						id: existingFeature.id,
+						acceptanceCriteria: [],
+						codeLink: null,
+						description: existingFeature.description,
+						designLink: null,
+						name: existingFeature.name,
+						points: 0,
+						priorityLevel: existingFeature.priorityLevel,
+						visibilityLevel: existingFeature.visibilityLevel,
+						commentIds: existingFeature.commentIds,
+						nameInputStateId: existingFeature.nameInputStateId,
+						versionId: currentVersionId,
+					}
+
+					// Insert the feature as a story at the new location
+					state.stories.push(newStory)
+					const newHost = state.features.find((feature) => feature.id === meta(targetLocation[1].id).parent)!
+					newHost.storyIds.splice(targetPosition, 0, startItem.id)
+
+					// Remove the feature from its current location
+					const currentHost = state.epics.find((epic) => epic.id === meta(startItem.id).parent)!
+					currentHost.featureIds = currentHost.featureIds.filter((featureId) => featureId !== startItem.id)
+					state.features = state.features.filter((feature) => feature.id !== existingFeature.id)
+
+					// Delete the original feature's stories
+					state.stories = state.stories.filter((story) => !existingFeature.storyIds.includes(story.id))
+				}
 			} else {
-				// Insert the new feature at feature location
-				state.epics[targetLocation.epic]!.features.splice(targetLocation.feature, 0, feature)
-				// Remove the feature from its original location
-				state.epics[epicIndex]!.features.splice(featureIndex, 1)
-			}
-		} else if (targetLocation.epic !== undefined) {
-			// Feature to epic
+				if (targetLocation[1].type === `epic`) {
+					// Story to epic is not allowed
+					return
+				} else if (targetLocation[1].type === `feature`) {
+					// Story to feature
 
-			// Insert the feature at new location
-			state.epics.splice(targetLocation.epic, 0, convertFeatureToEpic(feature))
+					const existingStory = state.stories.find((story) => story.id === startItem.id)!
+					const newFeature: Feature = {
+						id: existingStory.id,
+						description: existingStory.description,
+						name: existingStory.name,
+						priorityLevel: existingStory.priorityLevel,
+						visibilityLevel: existingStory.visibilityLevel,
+						commentIds: existingStory.commentIds,
+						nameInputStateId: existingStory.nameInputStateId,
+						storyIds: [],
+					}
 
-			// Remove the feature from its original location
-			state.epics[epicIndex]!.features.splice(featureIndex, 1)
-		}
-	})
+					// Insert the story as a feature at the new location
+					state.features.push(newFeature)
+					const newHost = state.epics.find((epic) => epic.id === meta(targetLocation[1].id).parent)!
+					newHost.featureIds.splice(targetPosition, 0, startItem.id)
 
-export const moveStory = (originalState: StoryMapState, storyId: Id, targetLocation: StoryMapLocation): StoryMapState =>
-	produce(originalState, (state) => {
-		let epicIndex = -1
-		let featureIndex = -1
-		let storyIndex = -1
-		epicLoop: for (const [i, epic] of state.epics.entries()) {
-			for (const [j, feature] of epic.features.entries()) {
-				for (const [k, story] of feature.stories.entries()) {
-					if (story.id === storyId) {
-						epicIndex = i
-						featureIndex = j
-						storyIndex = k
-						break epicLoop
+					// Remove the story from its current location
+					const currentHost = state.features.find((feature) => feature.id === meta(startItem.id).parent)!
+					currentHost.storyIds = currentHost.storyIds.filter((storyId) => storyId !== startItem.id)
+					state.stories = state.stories.filter((story) => story.id !== startItem.id)
+				} else {
+					const isForeign = meta(startItem.id).parent !== meta(targetLocation[1].id).parent
+					if (isForeign) {
+						// Story to story (reparenting)
+
+						// Insert the story at the new location
+						const host = state.features.find((feature) => feature.id === meta(targetLocation[1].id).parent)!
+						host.storyIds.splice(targetPosition, 0, startItem.id)
+
+						// Remove the story from its current location
+						const currentHost = state.features.find((feature) => feature.id === meta(startItem.id).parent)!
+						currentHost.storyIds = currentHost.storyIds.filter((storyId) => storyId !== startItem.id)
+					} else {
+						// Story to story (reordering)
+
+						const startPosition = meta(startItem.id).position
+						const host = state.features.find((feature) => feature.id === meta(startItem.id).parent)!
+
+						// Insert the story at the new location
+						host.storyIds.splice(targetPosition, 0, startItem.id)
+
+						// Remove the story from its current location
+						host.storyIds.splice(startPosition < targetPosition ? startPosition : startPosition + 1, 1)
 					}
 				}
 			}
-		}
-		const story = state.epics[epicIndex]!.features[featureIndex]!.stories[storyIndex]!
+		} else {
+			if (startItem.type === `epic`) {
+				if (targetLocation[1].type === `epic`) {
+					// Epic to first feature in epic
 
-		if (
-			targetLocation.epic !== undefined &&
-			targetLocation.feature !== undefined &&
-			targetLocation.story !== undefined
-		) {
-			// Story to story (reordering)
+					const existingEpic = state.epics.find((epic) => epic.id === startItem.id)!
+					const newFeature: Feature = {
+						id: existingEpic.id,
+						description: existingEpic.description,
+						name: existingEpic.name,
+						priorityLevel: existingEpic.priorityLevel,
+						visibilityLevel: existingEpic.visibilityLevel,
+						commentIds: existingEpic.commentIds,
+						nameInputStateId: existingEpic.nameInputStateId,
+						storyIds: existingEpic.featureIds,
+					}
 
-			const stories = state.epics[targetLocation.epic]!.features[targetLocation.feature]!.stories
+					// Insert the epic as a feature at the new location
+					state.features.push(newFeature)
+					const host = state.epics.find((epic) => epic.id === targetLocation[1].id)!
+					host.featureIds.splice(0, 0, startItem.id)
 
-			// Insert the story at story location
-			stories.splice(targetLocation.story, 0, story)
+					// Remove the epic from its current location
+					state.epics = state.epics.filter((epic) => epic.id !== startItem.id)
+				} else {
+					// Epic to story is not allowed
+					return
+				}
+			} else if (startItem.type === `feature`) {
+				if (targetLocation[1].type === `epic`) {
+					// Feature to another epic as first feature
 
-			// Remove the story from its original location
-			if (targetLocation.epic === epicIndex && targetLocation.feature === featureIndex) {
-				stories.splice(storyIndex + (storyIndex > targetLocation.story ? 1 : 0), 1)
+					// Insert the feature at the new location
+					const newHost = state.epics.find((epic) => epic.id === targetLocation[1].id)!
+					newHost.featureIds.splice(0, 0, startItem.id)
+
+					// Remove the feature from its current location
+					const currentHost = state.epics.find((epic) => epic.id === meta(startItem.id).parent)!
+					currentHost.featureIds = currentHost.featureIds.filter((featureId) => featureId !== startItem.id)
+				} else if (targetLocation[1].type === `feature`) {
+					// Feature to first story of another feature
+
+					if (!currentVersionId) return
+
+					const existingFeature = state.features.find((feature) => feature.id === startItem.id)!
+					const newStory: Story = {
+						id: existingFeature.id,
+						acceptanceCriteria: [],
+						codeLink: null,
+						description: existingFeature.description,
+						designLink: null,
+						name: existingFeature.name,
+						points: 0,
+						priorityLevel: existingFeature.priorityLevel,
+						visibilityLevel: existingFeature.visibilityLevel,
+						commentIds: existingFeature.commentIds,
+						nameInputStateId: existingFeature.nameInputStateId,
+						versionId: currentVersionId,
+					}
+
+					// Insert the feature as a story at the new location
+					state.stories.push(newStory)
+					const newHost = state.features.find((feature) => feature.id === targetLocation[1].id)!
+					newHost.storyIds.splice(0, 0, startItem.id)
+
+					// Remove the feature from its current location
+					const currentHost = state.features.find((feature) => feature.id === meta(startItem.id).parent)!
+					currentHost.storyIds = currentHost.storyIds.filter((storyId) => storyId !== startItem.id)
+					state.features = state.features.filter((feature) => feature.id !== startItem.id)
+
+					// Delete the original feature's stories
+					state.stories = state.stories.filter((story) => !existingFeature.storyIds.includes(story.id))
+				}
 			} else {
-				stories.splice(storyIndex, 1)
+				if (targetLocation[1].type === `epic`) {
+					// Story to epic is not allowed
+					return
+				} else if (targetLocation[1].type === `feature`) {
+					// Story to first story of another feature
+
+					// Insert the story at the new location
+					const newHost = state.features.find((feature) => feature.id === targetLocation[1].id)!
+					newHost.storyIds.splice(0, 0, startItem.id)
+
+					// Remove the story from its current location
+					const currentHost = state.features.find((feature) => feature.id === meta(startItem.id).parent)!
+					currentHost.storyIds = currentHost.storyIds.filter((storyId) => storyId !== startItem.id)
+				}
 			}
-		} else if (targetLocation.epic !== undefined && targetLocation.feature !== undefined) {
-			// Story to feature
-
-			// Insert the new story at feature location
-			state.epics[targetLocation.epic]!.features.splice(targetLocation.feature, 0, convertStoryToFeature(story))
-
-			// Remove the story from its original location
-			state.epics[epicIndex]!.features[featureIndex]!.stories.splice(storyIndex, 1)
-		} else if (targetLocation.epic !== undefined) {
-			// Story to epic
-
-			// Insert the story at new location
-			state.epics.splice(targetLocation.epic, 0, convertStoryToEpic(story))
-
-			// Remove the story from its original location
-			state.epics[epicIndex]!.features[featureIndex]!.stories.splice(storyIndex, 1)
 		}
 	})

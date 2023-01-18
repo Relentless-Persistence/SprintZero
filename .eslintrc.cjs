@@ -11,6 +11,7 @@ module.exports = {
 		},
 	},
 	rules: {
+		eqeqeq: `warn`,
 		"import/named": `off`,
 		"import/no-duplicates": `error`,
 		"import/no-named-as-default": `off`,
@@ -37,8 +38,12 @@ module.exports = {
 		"no-control-regex": `off`,
 		"no-empty": [`warn`, {allowEmptyCatch: true}],
 		"no-mixed-spaces-and-tabs": [`warn`, `smart-tabs`],
+		"no-negated-condition": `warn`,
+		"no-param-reassign": `error`,
 		"no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
+		"object-shorthand": `warn`,
 		quotes: [`warn`, `backtick`],
+		yoda: `warn`,
 	},
 	overrides: [
 		{

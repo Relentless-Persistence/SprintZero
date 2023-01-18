@@ -2,63 +2,68 @@
 
 import clsx from "clsx"
 import {motion} from "framer-motion"
-import {useAtom} from "jotai"
+import {useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {Story as StoryType} from "~/types/db/Products"
 
-import {dragStateAtom} from "../atoms"
-import {elementRegistry, layerBoundaries} from "../utils/globals"
+import {storyMapStateAtom} from "../atoms"
+import {dragState, elementRegistry, storyMapMeta} from "../utils/globals"
 import StoryContent from "./StoryContent"
 
 export type StoryProps = {
-	productId: Id
-	epicId: Id
-	featureId: Id
 	story: StoryType
 	inert?: boolean
 }
 
-const Story: FC<StoryProps> = ({productId, epicId, featureId, story, inert = false}) => {
-	const [dragState, setDragState] = useAtom(dragStateAtom)
+const Story: FC<StoryProps> = ({story, inert = false}) => {
+	const storyMapState = useAtomValue(storyMapStateAtom)
+	const storyMeta = storyMapMeta.current[story.id]
+	const parentFeature = storyMapState.features.find((feature) => feature.id === storyMeta?.parent)
+	const parentEpicId = parentFeature && storyMapMeta.current[parentFeature.id]?.parent
 
 	const containerRef = useRef<HTMLDivElement>(null)
+	const contentRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		if (inert) return
-		elementRegistry.stories[story.id] = containerRef.current ?? undefined
-		return () => {
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-			elementRegistry.stories[story.id] = containerRef.current ?? undefined
+		if (inert || !containerRef.current || !contentRef.current) return
+		elementRegistry[story.id] = {
+			container: containerRef.current,
+			content: contentRef.current,
 		}
-	}, [inert, story.id])
+		return () => {
+			if (!containerRef.current || !contentRef.current) return
+			elementRegistry[story.id] = {
+				// eslint-disable-next-line react-hooks/exhaustive-deps
+				container: containerRef.current,
+				// eslint-disable-next-line react-hooks/exhaustive-deps
+				content: contentRef.current,
+			}
+		}
+	}, [story.id, inert])
 
 	return (
 		<motion.div
 			layoutId={
-				dragState.id === epicId || dragState.id === featureId || dragState.id === story.id
+				dragState.current?.id === parentEpicId ||
+				dragState.current?.id === storyMeta?.parent ||
+				dragState.current?.id === story.id
 					? undefined
 					: `story-${story.id}`
 			}
-			layout="position"
-			className={clsx(`p-1.5`, dragState.id === story.id && !inert && `invisible`)}
+			layout={
+				dragState.current?.id === parentEpicId ||
+				dragState.current?.id === storyMeta?.parent ||
+				dragState.current?.id === story.id
+					? undefined
+					: `position`
+			}
+			className={clsx(`p-1.5`, dragState.current?.id === story.id && !inert && `invisible`)}
 			ref={containerRef}
 		>
-			<motion.div
-				onPointerDown={(e) => void e.preventDefault()}
-				onPanStart={(e, info) =>
-					void setDragState((prev) => ({
-						...prev,
-						id: story.id,
-						type: `story`,
-						yOffset: info.point.y - layerBoundaries[1],
-					}))
-				}
-				className="-m-1.5 cursor-grab touch-none p-1.5 transition-transform hover:scale-105"
-			>
-				<StoryContent productId={productId} epicId={epicId} featureId={featureId} story={story} />
-			</motion.div>
+			<div className="cursor-grab touch-none select-none transition-transform hover:scale-105" ref={contentRef}>
+				<StoryContent story={story} />
+			</div>
 		</motion.div>
 	)
 }

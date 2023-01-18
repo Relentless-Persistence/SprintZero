@@ -1,27 +1,31 @@
 import {ReadOutlined} from "@ant-design/icons"
 import produce from "immer"
-import {useSetAtom} from "jotai"
+import {useAtomValue, useSetAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Id} from "~/types"
 import type {Epic as EpicType} from "~/types/db/Products"
 
-import {storyMapStateAtom, useGetEpic} from "../atoms"
+import {storyMapStateAtom} from "../atoms"
 import AutoSizingInput from "../AutoSizingInput"
 import ItemDrawer from "../ItemDrawer"
 import {deleteEpic, updateEpic} from "~/utils/api/mutations"
 
 export type EpicContentProps = {
-	productId: Id
 	epic: EpicType
 }
 
-const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = ({productId, epic}, ref) => {
+const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = ({epic}, ref) => {
+	const storyMapState = useAtomValue(storyMapStateAtom)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const points = useGetEpic(epic.id)
-		.features.flatMap((feature) => feature.stories)
-		.reduce((acc, story) => acc + story.points, 0)
+
+	const features = epic.featureIds.map((featureId) =>
+		storyMapState.features.find((feature) => feature.id === featureId),
+	)
+	const stories = features
+		.flatMap((feature) => feature?.storyIds)
+		.map((storyId) => storyMapState.stories.find((story) => story.id === storyId))
+	const points = stories.reduce((acc, story) => acc + (story?.points ?? 0), 0)
 
 	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const updateLocalEpicName = (newName: string) => {
@@ -50,7 +54,7 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 					value={epic.name}
 					onChange={(value) => {
 						updateLocalEpicName(value)
-						updateEpic({productId, epicId: epic.id, data: {name: value}})
+						updateEpic({storyMapState, epicId: epic.id, data: {name: value}})
 					}}
 					inputStateId={epic.nameInputStateId}
 					inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
@@ -63,17 +67,17 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 				data={{
 					points,
 					description: epic.description,
-					onDescriptionChange: (value) => void updateEpic({productId, epicId: epic.id, data: {description: value}}),
+					onDescriptionChange: (value) => void updateEpic({storyMapState, epicId: epic.id, data: {description: value}}),
 					checklist: {
 						title: `Keepers`,
 						items: [],
 						onItemToggle: () => {},
 					},
-					comments: epic.comments,
+					commentIds: epic.commentIds,
 					onCommentAdd: () => {},
 					onDelete: () => {
 						setIsDrawerOpen(false)
-						deleteEpic({productId, epicId: epic.id})
+						deleteEpic({storyMapState, epicId: epic.id})
 					},
 				}}
 				isOpen={isDrawerOpen}

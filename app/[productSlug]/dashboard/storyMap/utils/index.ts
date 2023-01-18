@@ -1,12 +1,13 @@
 import {doc, onSnapshot} from "firebase9/firestore"
-import {useSetAtom} from "jotai"
+import {useAtomValue, useSetAtom} from "jotai"
 import {useEffect} from "react"
 
+import type {CurrentVersionId, EpicMeta, FeatureMeta, StoryMapMeta, StoryMeta} from "./types"
 import type {Id} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 
-import {storyMapStateAtom} from "../atoms"
-import {boundaries, elementRegistry, layerBoundaries, storyMapScrollPosition} from "./globals"
+import {currentVersionAtom, storyMapStateAtom} from "../atoms"
+import {boundaries, elementRegistry, layerBoundaries, storyMapMeta, storyMapScrollPosition} from "./globals"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -16,6 +17,7 @@ export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) 
 export const useSubscribeToData = (): void => {
 	const activeProduct = useActiveProductId()
 	const setStoryMapState = useSetAtom(storyMapStateAtom)
+	const currentVersion = useAtomValue(currentVersionAtom)
 
 	useEffect(() => {
 		if (activeProduct === undefined) return
@@ -23,9 +25,65 @@ export const useSubscribeToData = (): void => {
 		return onSnapshot(doc(db, Products._, activeProduct), (doc) => {
 			const data = ProductSchema.parse({id: doc.id, ...doc.data()})
 			setStoryMapState(data.storyMapState)
+			genStoryMapMeta(data.storyMapState, currentVersion.id)
 		})
-	}, [activeProduct, setStoryMapState])
+	}, [activeProduct, currentVersion.id, setStoryMapState])
 }
+
+const genStoryMapMeta = (storyMapState: StoryMapState, currentVersionId: CurrentVersionId): void => {
+	const meta: StoryMapMeta = {}
+	storyMapState.epics.forEach((epic, i) => {
+		meta[epic.id] = {
+			type: `epic`,
+			parent: undefined,
+			children: epic.featureIds,
+			position: i,
+			prevItem: i === 0 ? undefined : storyMapState.epics[i - 1]!.id,
+			nextItem: i === storyMapState.epics.length - 1 ? undefined : storyMapState.epics[i + 1]!.id,
+		}
+
+		epic.featureIds.forEach((featureId, j) => {
+			meta[featureId] = {
+				...(meta[featureId] as FeatureMeta),
+				parent: epic.id,
+				position: j,
+				prevItem: j === 0 ? undefined : epic.featureIds[j - 1],
+				nextItem: j === epic.featureIds.length - 1 ? undefined : epic.featureIds[j + 1],
+			}
+		})
+	})
+
+	storyMapState.features.forEach((feature: Feature) => {
+		meta[feature.id] = {
+			...(meta[feature.id] as any),
+			type: `feature`,
+			children: feature.storyIds,
+		}
+
+		const currentVersionStories = feature.storyIds.filter(
+			(storyId) =>
+				currentVersionId === `__ALL_VERSIONS__` ||
+				storyMapState.stories.find((story) => story.id === storyId)!.versionId === currentVersionId,
+		)
+		currentVersionStories.forEach((storyId, j) => {
+			meta[storyId] = {
+				type: `story`,
+				parent: feature.id,
+				children: undefined,
+				position: j,
+				prevItem: j === 0 ? undefined : currentVersionStories[j - 1],
+				nextItem: j === currentVersionStories.length - 1 ? undefined : currentVersionStories[j + 1],
+			}
+		})
+	})
+
+	storyMapMeta.current = meta
+}
+
+export const meta = <T extends `epic` | `feature` | `story` | `unknown` = `unknown`>(
+	id: Id,
+): T extends `epic` ? EpicMeta : T extends `feature` ? FeatureMeta : T extends `story` ? StoryMeta : StoryMapMeta[Id] =>
+	storyMapMeta.current[id] as any
 
 const getElementTranslation = (element: HTMLElement): [number, number] => {
 	const style = window.getComputedStyle(element)
@@ -33,200 +91,147 @@ const getElementTranslation = (element: HTMLElement): [number, number] => {
 	return [matrix.m41, matrix.m42]
 }
 
-export const calculateBoundaries = (storyMapState: StoryMapState): void => {
+export const calculateBoundaries = (storyMapState: StoryMapState, currentVersionId: CurrentVersionId): void => {
 	// Make sure all story map items have registered their DOM elements in elementRegistry
-	const allEpicsRegistered = storyMapState.epics.every((epic) => elementRegistry.epics[epic.id])
-	const allFeaturesRegistered = storyMapState.epics
-		.flatMap((epic) => epic.features)
-		.every((feature) => elementRegistry.features[feature.id])
-	const allStoriesRegistered = storyMapState.epics
-		.flatMap((epic) => epic.features)
-		.flatMap((feature) => feature.stories)
-		.every((story) => elementRegistry.stories[story.id])
-	if (!allEpicsRegistered || !allFeaturesRegistered || !allStoriesRegistered) return
+	const allElementsRegistered = [
+		...storyMapState.epics,
+		...storyMapState.features,
+		...storyMapState.stories.filter(
+			(story) => currentVersionId === `__ALL_VERSIONS__` || story.versionId === currentVersionId,
+		),
+	].every(({id}) => elementRegistry[id])
+	if (!allElementsRegistered) return
 
-	// Calculate initial boundaries
-	boundaries.epicBoundaries = storyMapState.epics.map((epic) => {
-		const element = elementRegistry.epics[epic.id]!
+	//#region Calculate initial boundaries
+	storyMapState.epics.forEach((epic) => {
+		const element = elementRegistry[epic.id]!.container
 		const boundingRect = element.getBoundingClientRect()
 		const translation = getElementTranslation(element)
 
-		let epicLeft = boundingRect.left + storyMapScrollPosition.current - translation[0]
-		let epicRight = boundingRect.right + storyMapScrollPosition.current - translation[0]
-		let epicCenter = avg(epicLeft, epicRight)
+		let left = boundingRect.left + storyMapScrollPosition.current - translation[0]
+		let right = boundingRect.right + storyMapScrollPosition.current - translation[0]
+		let center = avg(left, right)
 
-		return {
-			id: epic.id,
-			left: epicLeft,
-			center: epicCenter,
-			right: epicRight,
-			featureBoundaries: epic.features.map((feature) => {
-				const element = elementRegistry.features[feature.id]!
-				const boundingRect = element.getBoundingClientRect()
-				const translation = getElementTranslation(element)
-
-				let featureLeft = boundingRect.left + storyMapScrollPosition.current - translation[0]
-				let featureRight = boundingRect.right + storyMapScrollPosition.current - translation[0]
-				let featureCenter = avg(featureLeft, featureRight)
-
-				return {
-					id: feature.id,
-					left: featureLeft,
-					center: featureCenter,
-					right: featureRight,
-					storyBoundaries: feature.stories.map((story, storyIndex) => {
-						const element = elementRegistry.stories[story.id]!
-						const boundingRect = element.getBoundingClientRect()
-						const translation = getElementTranslation(element)
-
-						let top = boundingRect.top - translation[1]
-						let bottom = boundingRect.bottom - translation[1]
-						const center = avg(top, bottom)
-						if (storyIndex === 0) top = layerBoundaries[1]
-						if (storyIndex === feature.stories.length - 1) bottom = Infinity
-
-						return {id: story.id, top, center, bottom}
-					}),
-				}
-			}),
-		}
+		boundaries.epic[epic.id] = {left, center, right}
 	})
 
-	// Calculate center positions
-	boundaries.epicBoundaries = boundaries.epicBoundaries.map((epicBoundaries, epicIndex) => {
-		const prevEpicBoundaries = boundaries.epicBoundaries[epicIndex - 1]
-		const nextEpicBoundaries = boundaries.epicBoundaries[epicIndex + 1]
+	storyMapState.features.forEach((feature) => {
+		const element = elementRegistry[feature.id]!.container
+		const boundingRect = element.getBoundingClientRect()
+		const translation = getElementTranslation(element)
 
-		return {
-			...epicBoundaries,
-			centerWithLeft: prevEpicBoundaries && avg(prevEpicBoundaries.left, epicBoundaries.right),
-			centerWithRight: nextEpicBoundaries && avg(nextEpicBoundaries.right, epicBoundaries.left),
-			featureBoundaries: epicBoundaries.featureBoundaries.map((featureBoundaries, featureIndex) => {
-				const prevFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex - 1]
-				const nextFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex + 1]
+		let left = boundingRect.left + storyMapScrollPosition.current - translation[0]
+		let right = boundingRect.right + storyMapScrollPosition.current - translation[0]
+		let center = avg(left, right)
 
-				return {
-					...featureBoundaries,
-					centerWithLeft: prevFeatureBoundaries && avg(prevFeatureBoundaries.left, featureBoundaries.right),
-					centerWithRight: nextFeatureBoundaries && avg(nextFeatureBoundaries.right, featureBoundaries.left),
-				}
-			}),
-		}
+		boundaries.feature[feature.id] = {left, center, right}
 	})
 
-	// Collapse gaps between boundaries
-	for (const [epicIndex, epicBoundaries] of boundaries.epicBoundaries.entries()) {
-		const prevEpicBoundaries = boundaries.epicBoundaries[epicIndex - 1]
-		const nextEpicBoundaries = boundaries.epicBoundaries[epicIndex + 1]
+	storyMapState.stories.forEach((story) => {
+		const element = elementRegistry[story.id]!.container
+		const boundingRect = element.getBoundingClientRect()
+		const translation = getElementTranslation(element)
 
-		let epicLeft = prevEpicBoundaries?.right ?? epicBoundaries.left
-		let epicRight = nextEpicBoundaries ? avg(nextEpicBoundaries.left, epicBoundaries.right) : epicBoundaries.right
-		if (epicIndex === 0) epicLeft = -Infinity
-		if (epicIndex === storyMapState.epics.length - 1) epicRight = Infinity
+		let top = boundingRect.top - translation[1]
+		let bottom = boundingRect.bottom - translation[1]
+		let center = avg(top, bottom)
 
-		boundaries.epicBoundaries[epicIndex] = {
-			...epicBoundaries,
-			left: epicLeft,
-			right: epicRight,
-			featureBoundaries: (() => {
-				const allFeatureBoundaries = epicBoundaries.featureBoundaries
-				for (const [featureIndex, featureBoundaries] of allFeatureBoundaries.entries()) {
-					const prevFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex - 1]
-					const nextFeatureBoundaries = epicBoundaries.featureBoundaries[featureIndex + 1]
+		boundaries.story[story.id] = {top, center, bottom}
+	})
+	//#endregion
 
-					let featureLeft = prevFeatureBoundaries?.right ?? featureBoundaries.left
-					let featureRight = nextFeatureBoundaries
-						? avg(nextFeatureBoundaries.left, featureBoundaries.right)
-						: featureBoundaries.right
-					if (featureIndex === 0) {
-						if (epicIndex === 0) featureLeft = -Infinity
-						else featureLeft = epicLeft
-					}
-					if (featureIndex === allFeatureBoundaries.length - 1) {
-						if (epicIndex === storyMapState.epics.length - 1) featureRight = Infinity
-						else featureRight = epicRight
-					}
+	//#region Calculate center positions
+	for (const id in boundaries.epic) {
+		const epicBoundaries = boundaries.epic[id as Id]!
+		const epicMeta = storyMapMeta.current[id as Id]
+		if (!epicMeta) continue
 
-					allFeatureBoundaries[featureIndex] = {...featureBoundaries, left: featureLeft, right: featureRight}
-				}
-				return allFeatureBoundaries
-			})(),
-		}
+		const prevEpicBoundaries = epicMeta.prevItem && boundaries.epic[epicMeta.prevItem]
+		const nextEpicBoundaries = epicMeta.nextItem && boundaries.epic[epicMeta.nextItem]
+
+		epicBoundaries.centerWithLeft = prevEpicBoundaries && avg(prevEpicBoundaries.left, epicBoundaries.right)
+		epicBoundaries.centerWithRight = nextEpicBoundaries && avg(nextEpicBoundaries.right, epicBoundaries.left)
 	}
+
+	for (const id in boundaries.feature) {
+		const featureBoundaries = boundaries.feature[id as Id]!
+		const featureMeta = storyMapMeta.current[id as Id]
+		if (!featureMeta) continue
+
+		const prevFeatureBoundaries = featureMeta.prevItem && boundaries.feature[featureMeta.prevItem]
+		const nextFeatureBoundaries = featureMeta.nextItem && boundaries.feature[featureMeta.nextItem]
+
+		featureBoundaries.centerWithLeft = prevFeatureBoundaries && avg(prevFeatureBoundaries.left, featureBoundaries.right)
+		featureBoundaries.centerWithRight =
+			nextFeatureBoundaries && avg(nextFeatureBoundaries.right, featureBoundaries.left)
+	}
+	//#endregion
+
+	//#region Collapse gaps between boundaries
+	for (const id in boundaries.epic) {
+		const epicBoundaries = boundaries.epic[id as Id]!
+		const epicMeta = storyMapMeta.current[id as Id]
+		if (!epicMeta) continue
+
+		const prevEpicBoundaries = epicMeta.prevItem && boundaries.epic[epicMeta.prevItem]
+		const nextEpicBoundaries = epicMeta.nextItem && boundaries.epic[epicMeta.nextItem]
+
+		epicBoundaries.left = prevEpicBoundaries ? prevEpicBoundaries.right : -Infinity
+		epicBoundaries.right = nextEpicBoundaries ? avg(epicBoundaries.right, nextEpicBoundaries.left) : Infinity
+	}
+
+	for (const id in boundaries.feature) {
+		const featureBoundaries = boundaries.feature[id as Id]!
+		const featureMeta = storyMapMeta.current[id as Id]
+		if (!featureMeta) continue
+
+		const prevFeatureBoundaries = featureMeta.prevItem && boundaries.feature[featureMeta.prevItem]
+		const nextFeatureBoundaries = featureMeta.nextItem && boundaries.feature[featureMeta.nextItem]
+		const parentEpicBoundaries = boundaries.epic[featureMeta.parent!]
+		if (!parentEpicBoundaries) continue
+
+		featureBoundaries.left = prevFeatureBoundaries ? prevFeatureBoundaries.right : parentEpicBoundaries.left
+		featureBoundaries.right = nextFeatureBoundaries
+			? avg(featureBoundaries.right, nextFeatureBoundaries.left)
+			: parentEpicBoundaries.right
+	}
+
+	for (const id in boundaries.story) {
+		const storyBoundaries = boundaries.story[id as Id]!
+		const storyMeta = storyMapMeta.current[id as Id]
+		if (!storyMeta) continue
+
+		if (storyMeta.position === 0) storyBoundaries.top = layerBoundaries[1]
+
+		const feature = storyMapState.features.find((feature) => feature.id === storyMeta.parent!)
+		if (!feature) continue
+		if (storyMeta.position === feature.storyIds.length - 1) storyBoundaries.bottom = Infinity
+	}
+	//#endregion
 }
 
 export const convertEpicToFeature = (epic: Epic): Feature => ({
 	id: epic.id,
 	description: epic.description,
 	name: epic.name,
-	priority_level: 0,
-	visibility_level: 0,
-	comments: epic.comments,
+	priorityLevel: 0,
+	visibilityLevel: 0,
+	commentIds: epic.commentIds,
 	nameInputStateId: epic.nameInputStateId,
-	stories: epic.features.flatMap(({stories}) => stories),
-})
-
-export const convertEpicToStory = (epic: Epic, versionId: Id): Story => ({
-	id: epic.id,
-	acceptance_criteria: [],
-	code_link: null,
-	description: epic.description,
-	design_link: null,
-	name: epic.name,
-	points: 0,
-	priority_level: 0,
-	visibility_level: 0,
-	comments: epic.comments,
-	nameInputStateId: epic.nameInputStateId,
-	versionId,
-})
-
-export const convertFeatureToEpic = (feature: Feature): Epic => ({
-	id: feature.id,
-	description: feature.description,
-	name: feature.name,
-	priority_level: feature.priority_level,
-	visibility_level: feature.visibility_level,
-	comments: feature.comments,
-	keepers: [],
-	nameInputStateId: feature.nameInputStateId,
-	features: feature.stories.map(convertStoryToFeature),
+	storyIds: [],
 })
 
 export const convertFeatureToStory = (feature: Feature, versionId: Id): Story => ({
 	id: feature.id,
-	acceptance_criteria: [],
-	code_link: null,
+	acceptanceCriteria: [],
+	codeLink: null,
 	description: feature.description,
-	design_link: null,
+	designLink: null,
 	name: feature.name,
 	points: 0,
-	priority_level: feature.priority_level,
-	visibility_level: feature.visibility_level,
-	comments: feature.comments,
+	priorityLevel: feature.priorityLevel,
+	visibilityLevel: feature.visibilityLevel,
+	commentIds: feature.commentIds,
 	nameInputStateId: feature.nameInputStateId,
 	versionId,
-})
-
-export const convertStoryToEpic = (story: Story): Epic => ({
-	id: story.id,
-	description: story.description,
-	name: story.name,
-	priority_level: story.priority_level,
-	visibility_level: story.visibility_level,
-	comments: story.comments,
-	keepers: [],
-	nameInputStateId: story.nameInputStateId,
-	features: [],
-})
-
-export const convertStoryToFeature = (story: Story): Feature => ({
-	id: story.id,
-	description: story.description,
-	name: story.name,
-	priority_level: story.priority_level,
-	visibility_level: story.visibility_level,
-	comments: story.comments,
-	nameInputStateId: story.nameInputStateId,
-	stories: [],
 })
