@@ -1,6 +1,7 @@
 "use client"
 
 import {QueryClientProvider} from "@tanstack/react-query"
+import "antd/dist/antd.css"
 import {ConfigProvider} from "antd5"
 import {onAuthStateChanged} from "firebase9/auth"
 import {useSetAtom} from "jotai"

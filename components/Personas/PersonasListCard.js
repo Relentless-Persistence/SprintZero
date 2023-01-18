@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 
-import { Card, Input, Form, Button } from "antd";
+import { Card, Form, Button } from "antd";
+import { Input } from "antd5"
 
 import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 
@@ -51,15 +52,37 @@ const PersonasListCard = ({
   id,
   product
 }) => {
-  const { userRole } = useAuth();
+  const userRole = "member";
   const [isEdit, setIsEdit] = useState(false);
   const [newPersona, setNewPersona] = useState();
+	const [list, setList] = useState(cardData);
 
   const toggleEdit = () => setIsEdit((s) => !s);
 
   const onFinish = () => {
     // const values = list.filter((it) => it.trim().length > 0);
     // handleEdit(values);
+		
+
+		list.map(async (persona) => {
+
+			if (!persona.id && persona.role !== "") {
+				db.collection("Personas").add({
+					role: persona.role,
+					product_id: product,
+					goals: [""],
+					interactions: [""],
+					dailyLife: [""],
+					tasks: [""],
+					responsibilities: [""],
+					priorities: [""],
+					frustrations: [""],
+					changes: [""],
+					description: "",
+				})
+			}
+		})
+
     setIsEdit(false);
   };
 
@@ -68,11 +91,9 @@ const PersonasListCard = ({
   };
 
   const add = () => {
-    // const newList = [...list, ""];
-    // setList(newList);
-    db.collection("Personas").add({
+    const newList = [...list, {
       role: "",
-      product_id: product.id,
+      product_id: product,
       goals: [""],
       interactions: [""],
       dailyLife: [""],
@@ -82,13 +103,15 @@ const PersonasListCard = ({
       frustrations: [""],
       changes: [""],
       description: "",
-    });
+    }];
+    setList(newList);
+    
   };
 
   const addPersona = () => {
 		db.collection("Personas").add({
 			role: newPersona,
-			product_id: product.id,
+			product_id: product,
 			goals: [""],
 			interactions: [""],
 			dailyLife: [""],
@@ -103,9 +126,9 @@ const PersonasListCard = ({
     })
 	}
 
-  const remove = (id) => {
-    // const newList = list.filter((_, i) => i !== index);
-    // setList(newList);
+  const remove = (index, id) => {
+    const newList = list.filter((_, i) => i !== index);
+    setList(newList);
     db.collection("Personas").doc(id).delete();
   };
 
@@ -114,21 +137,20 @@ const PersonasListCard = ({
   }
 
   // This function is expensive but debounce doesn't work
-  const onChange = (value, id) => {
-    // const newList = [...list];
-    // newList[i] = e.target.value;
+  const onChange = (value, i) => {
+    const newList = [...list];
+    newList[i].role = value;
 
-    // setList(newList);
-    // console.log(e.target.value, id)
+    setList(newList);
     
     // debounce(() => updatePersona(e.target.value, id),
     //   2000
     // );
-    db.collection("Personas").doc(id).update({ role: value });
+    // db.collection("Personas").doc(id).update({ role: value });
   };
 
   return isEdit ? (
-		<MyCard
+		<Card
 			className="border-2 border-[#D9D9D9]"
 			extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
 			title={<strong>{title}</strong>}
@@ -136,16 +158,16 @@ const PersonasListCard = ({
 				background: "#F5F5F5",
 			}}
 		>
-			{cardData.length >= 1 ? (
-				cardData.map((it, i) => (
-					<MyInput
-						key={it.id}
+			{list.length >= 1 ? (
+				list.map((it, i) => (
+					<Input
+						key={i}
 						value={it.role}
 						className="mb-[12px]"
-						onChange={(e) => onChange(e.target.value, it.id)}
-						addonBefore={
+						onChange={(e) => onChange(e.target.value, i)}
+						prefix={
 							<div className="flex items-center justify-between">
-								<button onClick={() => remove(it.id)} className="mr-[5px] flex items-center">
+								<button onClick={() => remove(i, it.id)} className="mr-[5px] flex items-center">
 									<MinusCircleOutlined
 										style={{
 											color: "#C82D73",
@@ -155,17 +177,15 @@ const PersonasListCard = ({
 								{`${i + 1}.`}
 							</div>
 						}
-						autoFocus
-						$removeRightBorder={i === cardData.length - 1}
-						addonAfter={
-							i === cardData.length - 1 ? (
-								<Add onClick={add}>
+						suffix={
+							i === list.length - 1 ? (
+								<button className="ml-[5px] flex items-center" onClick={add}>
 									<PlusCircleOutlined
 										style={{
 											color: "#009C7E",
 										}}
 									/>
-								</Add>
+								</button>
 							) : null
 						}
 					/>
@@ -178,17 +198,17 @@ const PersonasListCard = ({
 					autoFocus
 					addonAfter={
 						
-							<Add onClick={addPersona}>
+							<button onClick={addPersona}>
 								<PlusCircleOutlined
 									style={{
 										color: "#009C7E",
 									}}
 								/>
-							</Add>
+							</button>
 					}
 				/>
 			)}
-		</MyCard>
+		</Card>
 	) : (
 		<>
 			{userRole && (

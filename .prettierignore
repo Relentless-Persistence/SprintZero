@@ -1,4 +1,4 @@
 **/*.js
 !tailwind.config.js
 !next.config.js
-**/*.jsx
+# **/*.jsx

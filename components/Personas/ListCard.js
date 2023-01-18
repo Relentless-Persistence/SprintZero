@@ -43,7 +43,7 @@ const MyCard = styled(Card)`
 `;
 
 const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
-  const { userRole } = useAuth();
+  const userRole = "member";
   const [list, setList] = useState(cardData);
 
   const [isEdit, setIsEdit] = useState(false);

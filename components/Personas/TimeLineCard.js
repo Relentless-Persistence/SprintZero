@@ -49,7 +49,7 @@ const Remove = styled(Button)`
 `;
 
 const TimeLineCard = ({ handleEdit, title = "Goals", cardData = [] }) => {
-  const { userRole } = useAuth();
+  const userRole = "member";
   const [list, setList] = useState([...cardData]);
 
   const [isEdit, setIsEdit] = useState(false);
