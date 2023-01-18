@@ -135,7 +135,7 @@ export default function Kickoff() {
           <Row gutter={[16, 16]}>
             <Col xs={{ span: 24 }} sm={{ span: 12 }}>
               <DescriptionCard
-                handleEdit={(value) => handleProblem(value, id)}
+                handleEdit={(value) => handleProblem(value, kick[0].id)}
                 title="Problem Statement"
                 name={kick[0].id}
                 cardData={kick[0].problem_statement}

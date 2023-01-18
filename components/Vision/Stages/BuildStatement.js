@@ -108,7 +108,7 @@ const BuildStatement = ({
 								onChange={(e) => onChangeFeature(e.target.value, i)}
 								suffix={
 									<div className="flex items-center justify-between">
-										<button  className="ml-[5px] flex items-center" onClick={addFeature}>
+										<button className="ml-[5px] flex items-center" onClick={addFeature}>
 											<PlusCircleOutlined
 												style={{
 													color: "#009C7E",

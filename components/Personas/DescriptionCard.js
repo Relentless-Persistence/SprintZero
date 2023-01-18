@@ -22,7 +22,7 @@ const DescriptionCard = ({
   name = "",
   cardData = [],
 }) => {
-  const { userRole } = useAuth();
+  const userRole = "member";
   const [isEdit, setIsEdit] = useState(false);
   const [state, setState] = useState(cardData);
 
