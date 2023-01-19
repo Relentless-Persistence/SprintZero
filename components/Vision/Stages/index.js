@@ -1,14 +1,20 @@
 import {Steps, message} from "antd5"
+import {useAtomValue} from "jotai"
+import {useQuery} from "@tanstack/react-query"
 import React, {useState, useEffect} from "react"
+import {getUser} from "~/utils/api/queries"
 import BuildStatement from "./BuildStatement"
 import Final from "./Final"
 import GptResponse from "./GptResponse"
 import axios from "axios"
 import {db} from "../../../config/firebase-config"
 import { useAuth } from "../../../contexts/AuthContext"
+import {userIdAtom} from "~/utils/atoms"
 
 const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "", acceptedResponse: ""}, productId, setEditMode}) => {
-  const {user} = useAuth();
+  // const {user} = useAuth();
+	const userId = useAtomValue(userIdAtom)
+
 	const [current, setCurrent] = useState(0)
 	const [type, setType] = useState(vision.type)
 	const [value, setValue] = useState(vision.value)
@@ -20,7 +26,13 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 	const [step2, setStep2] = useState(false)
 	const [step3, setStep3] = useState(false)
 
-  const prevValue = vision.value;
+  // const prevValue = vision.value;
+
+	const {data: user} = useQuery({
+		queryKey: [`user`, userId],
+		queryFn: getUser(userId),
+		enabled: userId !== undefined,
+	})
 
 	const createVision = () => {
 		db.collection("Visions")
@@ -57,11 +69,11 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
   const createEvent = (id) => {
     db.collection("VisionEvents").add({
       user: {
-        id: user.uid,
-        name: user.displayName,
+        id: userId,
+        name: user.name,
       },
-      prevValue,
-      newValue: value,
+      // prevValue,
+      // newValue: value,
       vision_id: id,
       createdAt: new Date().toISOString(),
     })
@@ -107,7 +119,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 	}, [])
 
 	return (
-		<div id="stages">
+		<div id="stages" className="w-full">
 			<Steps
 			onChange={(value) => {
 				setCurrent(value)

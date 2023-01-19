@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-import {Card, Form, Typography, Input, Segmented, Space, message} from "antd5"
+import {Card, Form, Typography, Input, Segmented, Space, message, notification} from "antd5"
 import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
 import {Button} from "antd"
 
@@ -40,7 +40,10 @@ const BuildStatement = ({
 			gptRequest()
 			setCurrent(1)
 		} else {
-			message.error("Some fields are missing!")
+			notification.error({
+				message: "Some fields are missing!",
+				placement: "bottomRight"
+			})
 		}
 	}
 
@@ -52,7 +55,7 @@ const BuildStatement = ({
 	}
 
 	return (
-		<div style={{width: "100%"}} className="mb-7">
+		<div className="mb-7">
 			<div>
 				<Text className="text-[16px]">Build Statement</Text>
 			</div>
@@ -65,7 +68,7 @@ const BuildStatement = ({
 					boxShadow:
 						"0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)",
 				}}
-				className="mt-3"
+				className="w-full mt-3"
 			>
 				<Form layout="vertical">
 					<Form.Item label={<span className="font-semibold">Type</span>} className="font-semibold">
