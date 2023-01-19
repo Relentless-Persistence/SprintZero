@@ -16,7 +16,7 @@ const SmallAddFeatureButton: FC<SmallAddFeatureButtonProps> = ({epic}) => {
 	return (
 		<button
 			type="button"
-			onClick={() => void addFeature({storyMapState, epicId: epic.id, data: {name: `Feature`}})}
+			onClick={() => void addFeature({storyMapState, epicId: epic.id, data: {}})}
 			className="grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white"
 		>
 			<PlusOutlined />

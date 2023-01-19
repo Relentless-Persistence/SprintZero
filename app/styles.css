@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-[data-nextjs-scroll-focus-boundary] {
-	display: contents;
-}
-
 #dashboard button.ant-btn-default {
 	background-color: white;
 }
@@ -29,4 +25,20 @@
 
 #stages .ant-steps-item-title {
 	width: 100% !important;
+}
+
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-item-selected {
+	background-color: transparent;
+}
+
+.ant-menu-light .ant-menu-item-selected {
+	background-color: #e1f4d1;
+}
+
+.ant-tabs-content.ant-tabs-content-right {
+	height: 100%;
+}
+
+.ant-tabs-tabpane.ant-tabs-tabpane-active {
+	height: 100%;
 }

@@ -59,7 +59,8 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 								</button>
 							),
 						}))}
-						className="grow bg-transparent"
+						className="grow"
+						style={{background: `transparent`}}
 					/>
 
 					<button type="button" onClick={() => void setIsSettingsOpen(true)}>

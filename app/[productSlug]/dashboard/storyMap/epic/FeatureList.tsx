@@ -26,7 +26,7 @@ const FeatureList: FC<FeatureListProps> = ({epic, inert = false}) => {
 			{features.length === 0 && (
 				<button
 					type="button"
-					onClick={() => void addFeature({storyMapState, epicId: epic.id, data: {name: `Feature`}})}
+					onClick={() => void addFeature({storyMapState, epicId: epic.id, data: {}})}
 					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
 				>
 					<CopyOutlined />
