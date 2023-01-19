@@ -24,8 +24,8 @@ substitutions:
   _GCR_HOSTNAME: us.gcr.io
   _PLATFORM: managed
   _DEPLOY_REGION: us-central1
-  _LABELS: gcb-trigger-id=fa0e2d45-ba53-41cc-8723-401efd67db0e
-  _TRIGGER_ID: fa0e2d45-ba53-41cc-8723-401efd67db0e
+  _LABELS: gcb-trigger-id=da8dd881-4f33-4bbf-a73c-8b7b4a9ba0b7
+  _TRIGGER_ID: da8dd881-4f33-4bbf-a73c-8b7b4a9ba0b7
   _SERVICE_NAME: sprintzero
 tags:
   - gcp-cloud-build-deploy-cloud-run
