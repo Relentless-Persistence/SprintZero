@@ -41,7 +41,7 @@ const ItemCard = ({
   index,
   onDelete
 }) => {
-  const { userRole } = useAuth();
+  const userRole = "member"
   const [isEdit, setIsEdit] = useState(false);
 
   const toggleEdit = () => setIsEdit((s) => !s);
@@ -112,8 +112,7 @@ export const ObjectiveItemCard = ({
   index,
   onDelete,
 }) => {
-  const { userRole } = useAuth();
-  console.log(userRole);
+  const userRole = "member";
   const [isEdit, setIsEdit] = useState(false);
 
   const toggleEdit = () => setIsEdit((s) => !s);

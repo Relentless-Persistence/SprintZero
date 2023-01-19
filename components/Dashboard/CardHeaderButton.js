@@ -21,7 +21,7 @@ background: transparent !important;
 
 const CardHeaderLink = ( { children, ...props } ) =>
 {
-  return <Link size="small" { ...props } >{ children }</Link>;
+  return <Link type="link" size="small" { ...props } >{ children }</Link>;
 };
 
 

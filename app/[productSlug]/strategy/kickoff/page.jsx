@@ -107,7 +107,7 @@ const Kickoff = () => {
 						<br />
 
 						<ListCard
-							handleEdit={(list) => handleEdit(kick[0].success_metrics, "success_metrics", list, kick[0].id)}
+							handleEdit={(list) => handleEdit(kick[0].success_metrics, `success_metrics`, list, kick[0].id)}
 							title="Success Metrics"
 							cardData={kick[0].success_metrics}
 						/>

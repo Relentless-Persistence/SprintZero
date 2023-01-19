@@ -6,11 +6,11 @@
 	display: contents;
 }
 
-button.ant-btn-default {
+#dashboard button.ant-btn-default {
 	background-color: white;
 }
 
-button.ant-btn-primary {
+#dashboard button.ant-btn-primary {
 	background-color: #4a801e;
 }
 

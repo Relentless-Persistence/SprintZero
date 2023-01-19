@@ -69,7 +69,7 @@ export const LightActionButtons = ( {
     return (
       <div className="flex items-center space-x-2 ml-4">
         <Button
-          className="text-[#4A801D] text-[14px] border border-[#4A801D] cursor-pointer"
+          className="text-[#4A801D] text-[14px] border border-[#4A801D] cursor-pointer hover:text-[#5A9D24] hover:border-[#5A9D24]"
           size="small"
           onClick={onCancel}
         >

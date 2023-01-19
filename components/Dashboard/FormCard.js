@@ -34,6 +34,8 @@ export default function FormCard({
   className,
   headerSmall = false,
   onCancel,
+  titlePlaceholder,
+  descriptionPlaceholder
 }) {
   const [item, setItem] = useState(
     isEdit
@@ -86,7 +88,7 @@ export default function FormCard({
         <Input
           value={item.name}
           onChange={(e) => handleChange(e, "name")}
-          placeholder="Result name..."
+          placeholder={titlePlaceholder}
         />
       }
       headStyle={{
@@ -97,7 +99,7 @@ export default function FormCard({
         autoSize={{ minRows: 6 }}
         value={item.description}
         onChange={(e) => handleChange(e, "description")}
-        placeholder="Result description..."
+        placeholder={descriptionPlaceholder}
       />
 
       {extraItems}
@@ -128,7 +130,7 @@ export default function FormCard({
         <Input
           value={item.name}
           onChange={(e) => handleChange(e, "name")}
-          placeholder="Result name..."
+          placeholder={titlePlaceholder}
         />
       }
       headStyle={{
@@ -139,7 +141,7 @@ export default function FormCard({
         autoSize={{ minRows: 6 }}
         value={item.description}
         onChange={(e) => handleChange(e, "description")}
-        placeholder="Result description..."
+        placeholder={descriptionPlaceholder}
       />
       {extraItems}
       <Button disabled block className="bg-[#FF4D4F] text-white mt-2">
