@@ -36,15 +36,17 @@ const StoryMap: FC = () => {
 	}, [setDragPos, x, y])
 
 	useEffect(() => {
-		const handlePointerMove = (e: PointerEvent) => {
-			pointerLocation.current = [e.clientX, e.clientY]
-			x.set(e.clientX)
-			y.set(e.clientY)
-		}
-		window.addEventListener(`pointermove`, handlePointerMove)
+		if(typeof window !== `undefined`) {
+			const handlePointerMove = (e: PointerEvent) => {
+				pointerLocation.current = [e.clientX, e.clientY]
+				x.set(e.clientX)
+				y.set(e.clientY)
+			}
+			window.addEventListener(`pointermove`, handlePointerMove)
 
-		return () => {
-			window.removeEventListener(`pointermove`, handlePointerMove)
+			return () => {
+				window.removeEventListener(`pointermove`, handlePointerMove)
+			}
 		}
 	}, [x, y])
 

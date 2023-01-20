@@ -5,9 +5,9 @@ import {useEffect, useRef, useState} from "react"
 import type {FC} from "react"
 import type {StoryMapState} from "~/types/db/Products"
 
-import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
+import Epic from "./Epic"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -23,17 +23,19 @@ const EpicsTab: FC = () => {
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
-		if (!matrixRef.current) return
+		if (typeof window !== `undefined`) {
+			if (!matrixRef.current) return
 
-		matrixRect.current = matrixRef.current.getBoundingClientRect()
-		const onResize = () => {
-			matrixRect.current = matrixRef.current!.getBoundingClientRect()
-		}
+			matrixRect.current = matrixRef.current.getBoundingClientRect()
+			const onResize = () => {
+				matrixRect.current = matrixRef.current!.getBoundingClientRect()
+			}
 
-		window.addEventListener(`resize`, onResize)
+			window.addEventListener(`resize`, onResize)
 
-		return () => {
-			window.removeEventListener(`resize`, onResize)
+			return () => {
+				window.removeEventListener(`resize`, onResize)
+			}
 		}
 	}, [])
 
@@ -47,14 +49,16 @@ const EpicsTab: FC = () => {
 	}, [activeProductId])
 
 	useEffect(() => {
-		const onPointerMove = (e: PointerEvent) => {
-			pointerLocation.current = [e.clientX, e.clientY]
-		}
+		if (typeof window !== `undefined`) {
+			const onPointerMove = (e: PointerEvent) => {
+				pointerLocation.current = [e.clientX, e.clientY]
+			}
 
-		window.addEventListener(`pointermove`, onPointerMove)
+			window.addEventListener(`pointermove`, onPointerMove)
 
-		return () => {
-			window.removeEventListener(`pointermove`, onPointerMove)
+			return () => {
+				window.removeEventListener(`pointermove`, onPointerMove)
+			}
 		}
 	}, [])
 
