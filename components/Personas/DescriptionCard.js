@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import { Card, Input, Form, Button } from "antd";
+import { Card, Input, Form, Button } from "antd5";
 
 import { CardHeaderLink } from "../Dashboard/CardHeaderButton";
 import ActionButtons from "./ActionButtons";
@@ -11,7 +11,6 @@ const { TextArea } = Input;
 
 const MyCard = styled(Card)`
   .ant-card-head {
-    min-height: unset;
     border-bottom: 2px solid #d9d9d9;
   }
 `;
@@ -48,7 +47,7 @@ const DescriptionCard = ({
       <MyCard
         className="border-2 border-[#D9D9D9]"
         extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
-        title={<strong>{title}</strong>}
+        title={<p>{title}</p>}
         headStyle={{
           background: "#F5F5F5",
         }}
@@ -77,7 +76,7 @@ const DescriptionCard = ({
               </CardHeaderLink>
             ) : null
           }
-          title={<strong>{title}</strong>}
+          title={<p>{title}</p>}
           headStyle={{
             background: "#F5F5F5",
           }}

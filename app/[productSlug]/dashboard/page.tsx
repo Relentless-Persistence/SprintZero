@@ -14,7 +14,7 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const Dashboard: FC = () => {
 	const activeProductId = useActiveProductId()
 	return (
-		<div className="grid h-full grid-cols-[1fr_minmax(6rem,max-content)]">
+		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="flex flex-col gap-8">
 				<StoryMapHeader />
 
@@ -35,15 +35,12 @@ const Dashboard: FC = () => {
 
 			<button
 				type="button"
-				className="fixed bottom-8 right-8 rounded-md border-2 border-[red] bg-black px-2 py-1 text-white"
+				className="fixed bottom-8 right-8 rounded-md border border-laurel px-2 py-1 text-laurel transition-colors hover:border-black hover:text-black"
 				onClick={() =>
-					void setStoryMapState({
-						productId: activeProductId!,
-						storyMapState: {productId: activeProductId!, epics: [], features: [], stories: []},
-					})
+					void setStoryMapState({storyMapState: {productId: activeProductId!, epics: [], features: [], stories: []}})
 				}
 			>
-				nuke story map state
+				Reset story map
 			</button>
 		</div>
 	)

@@ -27,7 +27,7 @@
 	width: 100% !important;
 }
 
-.ant-menu-dark.ant-menu-horizontal > .ant-menu-item-selected {
+ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 	background-color: transparent;
 }
 

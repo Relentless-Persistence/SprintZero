@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 
-import { Card, Form, Button } from "antd";
+import { Card, Form, Button } from "antd5";
 import { Input } from "antd5"
 
 import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
@@ -40,7 +40,6 @@ const Add = styled(Button)`
 
 const MyCard = styled(Card)`
   .ant-card-head {
-    min-height: unset;
     border-bottom: 2px solid #d9d9d9;
   }
 `;
@@ -62,7 +61,7 @@ const PersonasListCard = ({
   const onFinish = () => {
     // const values = list.filter((it) => it.trim().length > 0);
     // handleEdit(values);
-		
+
 
 		list.map(async (persona) => {
 
@@ -105,7 +104,7 @@ const PersonasListCard = ({
       description: "",
     }];
     setList(newList);
-    
+
   };
 
   const addPersona = () => {
@@ -121,7 +120,7 @@ const PersonasListCard = ({
 			frustrations: [""],
 			changes: [""],
 			description: "",
-		}).then(() => { 
+		}).then(() => {
       setNewPersona();
     })
 	}
@@ -142,7 +141,7 @@ const PersonasListCard = ({
     newList[i].role = value;
 
     setList(newList);
-    
+
     // debounce(() => updatePersona(e.target.value, id),
     //   2000
     // );
@@ -153,13 +152,13 @@ const PersonasListCard = ({
 		<Card
 			className="border-2 border-[#D9D9D9]"
 			extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
-			title={<strong>{title}</strong>}
+			title={<p>{title}</p>}
 			headStyle={{
 				background: "#F5F5F5",
 			}}
 		>
-			{list.length >= 1 ? (
-				list.map((it, i) => (
+			{cardData.length >= 1 ? (
+				cardData.map((it, i) => (
 					<Input
 						key={i}
 						value={it.role}
@@ -178,7 +177,7 @@ const PersonasListCard = ({
 							</div>
 						}
 						suffix={
-							i === list.length - 1 ? (
+							i === cardData.length - 1 ? (
 								<button className="ml-[5px] flex items-center" onClick={add}>
 									<PlusCircleOutlined
 										style={{
@@ -197,7 +196,7 @@ const PersonasListCard = ({
 					onChange={(e) => setNewPersona(e.target.value)}
 					autoFocus
 					addonAfter={
-						
+
 							<button onClick={addPersona}>
 								<PlusCircleOutlined
 									style={{
@@ -221,7 +220,7 @@ const PersonasListCard = ({
 							</CardHeaderLink>
 						) : null
 					}
-					title={<strong>{title}</strong>}
+					title={<p>{title}</p>}
 					headStyle={{
 						background: "#F5F5F5",
 					}}
