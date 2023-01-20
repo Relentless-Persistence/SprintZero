@@ -1,3 +1,5 @@
+"use client"
+
 import {CopyOutlined} from "@ant-design/icons"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import produce from "immer"

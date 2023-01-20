@@ -1,3 +1,5 @@
+"use client"
+
 import {Breadcrumb} from "antd5"
 import {doc, onSnapshot} from "firebase9/firestore"
 import {useEffect, useRef, useState} from "react"
@@ -5,9 +7,9 @@ import {useEffect, useRef, useState} from "react"
 import type {FC} from "react"
 import type {StoryMapState} from "~/types/db/Products"
 
+import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
-import Epic from "./Epic"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {useActiveProductId} from "~/utils/useActiveProductId"

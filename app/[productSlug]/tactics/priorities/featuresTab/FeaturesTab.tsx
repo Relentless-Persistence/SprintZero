@@ -1,3 +1,5 @@
+"use client"
+
 import {Breadcrumb, Select} from "antd5"
 import {doc, onSnapshot} from "firebase9/firestore"
 import {useEffect, useRef, useState} from "react"
@@ -6,9 +8,9 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/Products"
 
+import Feature from "./Feature"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
-import Feature from "./Feature"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -39,7 +41,6 @@ const FeaturesTab: FC = () => {
 				window.removeEventListener(`resize`, onResize)
 			}
 		}
-		
 	}, [])
 
 	useEffect(() => {
@@ -63,7 +64,6 @@ const FeaturesTab: FC = () => {
 				window.removeEventListener(`pointermove`, onPointerMove)
 			}
 		}
-		
 	}, [])
 
 	return (
