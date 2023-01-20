@@ -143,6 +143,10 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 	}
 
 	const remove = (index, id) => {
+		if(index === 0) {
+			db.collection("Personas").doc(id).delete()
+			.then(() => setIsEdit(false))
+		}
 		const newList = list.filter((_, i) => i !== index)
 		setList(newList)
 		db.collection("Personas").doc(id).delete()
@@ -182,18 +186,16 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 						className="mb-[12px]"
 						onChange={(e) => onChange(e.target.value, i)}
 						prefix={
-							i === 0 ? null : (
-								<div className="flex items-center justify-between">
-									<button onClick={() => remove(i, it.id)} className="mr-[5px] flex items-center">
-										<MinusCircleOutlined
-											style={{
-												color: "#C82D73",
-											}}
-										/>
-									</button>
-									{`${i + 1}.`}
-								</div>
-							)
+							<div className="flex items-center justify-between">
+								<button onClick={() => remove(i, it.id)} className="mr-[5px] flex items-center">
+									<MinusCircleOutlined
+										style={{
+											color: "#C82D73",
+										}}
+									/>
+								</button>
+								{`${i + 1}.`}
+							</div>
 						}
 						suffix={
 							i === list.length - 1 ? (
