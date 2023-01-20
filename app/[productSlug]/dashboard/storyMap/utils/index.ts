@@ -7,8 +7,8 @@ import type {CurrentVersionId, EpicMeta, FeatureMeta, StoryMapMeta, StoryMeta} f
 import type {Id} from "~/types"
 import type {Epic, Feature, StoryMapState} from "~/types/db/Products"
 
-import {boundaries, elementRegistry, layerBoundaries, storyMapMeta, storyMapScrollPosition} from "./globals"
 import {currentVersionAtom, storyMapStateAtom} from "../atoms"
+import {boundaries, elementRegistry, layerBoundaries, storyMapMeta, storyMapScrollPosition} from "./globals"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {useActiveProductId} from "~/utils/useActiveProductId"

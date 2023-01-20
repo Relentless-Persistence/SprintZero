@@ -6,9 +6,9 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/Products"
 
-import Feature from "./Feature"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
+import Feature from "./Feature"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -25,18 +25,21 @@ const FeaturesTab: FC = () => {
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
-		if (!matrixRef.current) return
+		if (typeof window !== `undefined`) {
+			if (!matrixRef.current) return
 
-		matrixRect.current = matrixRef.current.getBoundingClientRect()
-		const onResize = () => {
-			matrixRect.current = matrixRef.current!.getBoundingClientRect()
+			matrixRect.current = matrixRef.current.getBoundingClientRect()
+			const onResize = () => {
+				matrixRect.current = matrixRef.current!.getBoundingClientRect()
+			}
+
+			window.addEventListener(`resize`, onResize)
+
+			return () => {
+				window.removeEventListener(`resize`, onResize)
+			}
 		}
-
-		window.addEventListener(`resize`, onResize)
-
-		return () => {
-			window.removeEventListener(`resize`, onResize)
-		}
+		
 	}, [])
 
 	useEffect(() => {
@@ -49,15 +52,18 @@ const FeaturesTab: FC = () => {
 	}, [activeProductId])
 
 	useEffect(() => {
-		const onPointerMove = (e: PointerEvent) => {
-			pointerLocation.current = [e.clientX, e.clientY]
-		}
+		if (typeof window !== `undefined`) {
+			const onPointerMove = (e: PointerEvent) => {
+				pointerLocation.current = [e.clientX, e.clientY]
+			}
 
-		window.addEventListener(`pointermove`, onPointerMove)
+			window.addEventListener(`pointermove`, onPointerMove)
 
-		return () => {
-			window.removeEventListener(`pointermove`, onPointerMove)
+			return () => {
+				window.removeEventListener(`pointermove`, onPointerMove)
+			}
 		}
+		
 	}, [])
 
 	return (
