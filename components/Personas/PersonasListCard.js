@@ -39,31 +39,6 @@ const Add = styled(Button)`
 `
 
 const MyCard = styled(Card)`
-<<<<<<< HEAD
-  .ant-card-head {
-    border-bottom: 2px solid #d9d9d9;
-  }
-`;
-
-const PersonasListCard = ({
-  handleEdit,
-  title,
-  cardData = [],
-  id,
-  product
-}) => {
-  const userRole = "member";
-  const [isEdit, setIsEdit] = useState(false);
-  const [newPersona, setNewPersona] = useState();
-	const [list, setList] = useState(cardData);
-
-  const toggleEdit = () => setIsEdit((s) => !s);
-
-  const onFinish = () => {
-    // const values = list.filter((it) => it.trim().length > 0);
-    // handleEdit(values);
-
-=======
 	.ant-card-head {
 		min-height: unset;
 		border-bottom: 2px solid #d9d9d9;
@@ -95,7 +70,6 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 			])
 		}
 	}, [cardData])
->>>>>>> restructure
 
 	const toggleEdit = () => setIsEdit((s) => !s)
 
@@ -121,75 +95,6 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 			}
 		})
 
-<<<<<<< HEAD
-    setIsEdit(false);
-  };
-
-  const onCancel = () => {
-    setIsEdit(false);
-  };
-
-  const add = () => {
-    const newList = [...list, {
-      role: "",
-      product_id: product,
-      goals: [""],
-      interactions: [""],
-      dailyLife: [""],
-      tasks: [""],
-      responsibilities: [""],
-      priorities: [""],
-      frustrations: [""],
-      changes: [""],
-      description: "",
-    }];
-    setList(newList);
-
-  };
-
-  const addPersona = () => {
-		db.collection("Personas").add({
-			role: newPersona,
-			product_id: product,
-			goals: [""],
-			interactions: [""],
-			dailyLife: [""],
-			tasks: [""],
-			responsibilities: [""],
-			priorities: [""],
-			frustrations: [""],
-			changes: [""],
-			description: "",
-		}).then(() => {
-      setNewPersona();
-    })
-	}
-
-  const remove = (index, id) => {
-    const newList = list.filter((_, i) => i !== index);
-    setList(newList);
-    db.collection("Personas").doc(id).delete();
-  };
-
-  const updatePersona = (value, id) => {
-    db.collection("Personas").doc(id).update({ role: value })
-  }
-
-  // This function is expensive but debounce doesn't work
-  const onChange = (value, i) => {
-    const newList = [...list];
-    newList[i].role = value;
-
-    setList(newList);
-
-    // debounce(() => updatePersona(e.target.value, id),
-    //   2000
-    // );
-    // db.collection("Personas").doc(id).update({ role: value });
-  };
-
-  return isEdit ? (
-=======
 		setIsEdit(false)
 	}
 
@@ -265,7 +170,6 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 	}
 
 	return isEdit ? (
->>>>>>> restructure
 		<Card
 			className="border-2 border-[#D9D9D9]"
 			extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
@@ -274,13 +178,8 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 				background: "#F5F5F5",
 			}}
 		>
-<<<<<<< HEAD
-			{cardData.length >= 1 ? (
-				cardData.map((it, i) => (
-=======
 			{list &&
 				list.map((it, i) => (
->>>>>>> restructure
 					<Input
 						key={i}
 						value={it.role}
@@ -310,29 +209,7 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 							) : null
 						}
 					/>
-<<<<<<< HEAD
-				))
-			) : (
-				<MyInput
-					value={newPersona}
-					className="mb-[12px]"
-					onChange={(e) => setNewPersona(e.target.value)}
-					autoFocus
-					addonAfter={
-
-							<button onClick={addPersona}>
-								<PlusCircleOutlined
-									style={{
-										color: "#009C7E",
-									}}
-								/>
-							</button>
-					}
-				/>
-			)}
-=======
 				))}
->>>>>>> restructure
 		</Card>
 	) : (
 		<>
