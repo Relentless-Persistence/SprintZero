@@ -293,7 +293,7 @@ export default function Personas() {
               </Col>
               <Col xs={{ span: 24 }} sm={{ span: 12 }}>
                 <DescriptionCard
-                  handleEdit={(value) => handleDescription(value, id)}
+                  handleEdit={(value) => handleDescription(value, activeRole.id)}
                   title="Description"
                   name={activeRole?.id}
                   cardData={activeRole?.description}
