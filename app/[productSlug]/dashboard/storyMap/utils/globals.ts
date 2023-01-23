@@ -1,4 +1,4 @@
-/* eslint-disable no-var */
+/* eslint-disable no-var, @typescript-eslint/no-unnecessary-condition */
 
 import type {EpicBoundaries, FeatureBoundaries, StoryBoundaries, StoryMapMeta} from "./types"
 import type {Id} from "~/types"
@@ -30,21 +30,6 @@ declare global {
 			  }
 			| undefined
 	}
-}
-
-if (typeof window !== `undefined`) {
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	globalThis.__storyMapScrollPosition = globalThis.__storyMapScrollPosition ?? {current: 0}
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	globalThis.__storyMapMeta = globalThis.__storyMapMeta ?? {current: {}}
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	globalThis.__elementRegistry = globalThis.__elementRegistry ?? {epics: {}, features: {}, stories: {}}
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	globalThis.__boundaries = globalThis.__boundaries ?? {epic: {}, feature: {}, story: {}}
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	globalThis.__pointerLocation = globalThis.__pointerLocation ?? {current: [0, 0]}
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	globalThis.__dragState = globalThis.__dragState ?? {current: undefined}
 }
 
 export const storyMapTop = 224
