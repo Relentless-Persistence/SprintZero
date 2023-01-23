@@ -34,7 +34,16 @@ export default function Objectives() {
         .collection("Goals")
         .where("product_id", "==", activeProduct.id)
         .onSnapshot((snapshot) => {
-          setData(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          if(snapshot.empty) {
+            db.collection("Goals").add({
+							product_id: activeProduct.id,
+							description: "",
+							name: "001",
+						})
+          } else {
+            setData(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+          }
+          console.log("snapshot", snapshot)
         });
     }
   };
