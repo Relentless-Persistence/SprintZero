@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/router"
 // import Image from "next/image";
 import { Button, Typography, message, Image } from "antd"
@@ -21,10 +21,25 @@ const Login = () => {
 	const router = useRouter()
 	const { user } = useAuth()
 	const { type, product } = router.query
+
 	const { executeRecaptcha } = useGoogleReCaptcha()
 	// const paid = usePaymentConfirm();
 	// const [activeProduct, setActiveProduct] = useState();
 	const [activeProduct, setActiveProduct] = useRecoilState(activeProductState)
+
+	const handleLoginForm = useCallback(
+		(provider) => {
+			
+			if (!executeRecaptcha) {
+				console.log("Execute recaptcha not yet available")
+				return
+			}
+			executeRecaptcha("enquiryFormSubmit").then((gReCaptchaToken) => {
+				handleLogin(provider, gReCaptchaToken)
+			})
+		},
+		[executeRecaptcha],
+	)
 
 	const fetchProducts = async (user) => {
 		if (user) {
@@ -47,56 +62,58 @@ const Login = () => {
 		}
 	}, [activeProduct])
 
-	const handleOnClick = async (provider) => {
-		try {
-			auth.signInWithPopup(provider).then(async (res) => {
-				var user = res.user
+	const handleLogin = async (provider, gReCaptchaToken) => {
+		if(gReCaptchaToken) {
+			try {
+				auth.signInWithPopup(provider).then(async (res) => {
+					var user = res.user
 
-				// check if user is in db, if not, add them
-				const userRef = db.collection("Users").doc(user.uid)
-				const doc = await userRef.get()
-				if (!doc.exists) {
-					alert("You are not signed up for the Beta - temp alert to be replaced")
-					// userRef.set({
-					// 	avatar: user.photoURL,
-					// 	email: user.email,
-					// 	name: user.displayName,
-					// 	products: [],
-					// })
-				}
+					// check if user is in db, if not, add them
+					const userRef = db.collection("Users").doc(user.uid)
+					const doc = await userRef.get()
+					if (!doc.exists) {
+						alert("You are not signed up for the Beta - temp alert to be replaced")
+						// userRef.set({
+						// 	avatar: user.photoURL,
+						// 	email: user.email,
+						// 	name: user.displayName,
+						// 	products: [],
+						// })
+					}
 
-				await fetchProducts(user).then(async (product) => {
-					if (res.additionalUserInfo.isNewUser) {
-						// if user has a company custom email
-						if (!/@relentlesspersistenceinc.com\s*$/.test(user.email)) {
-							message.error({
-								content: "Sorry, you can't login at this moment.",
-								className: "custom-message",
-							})
-							await auth.signOut()
-							router.push("https://www.sprintzero.app/")
+					await fetchProducts(user).then(async (product) => {
+						if (res.additionalUserInfo.isNewUser) {
+							// if user has a company custom email
+							if (!/@relentlesspersistenceinc.com\s*$/.test(user.email)) {
+								message.error({
+									content: "Sorry, you can't login at this moment.",
+									className: "custom-message",
+								})
+								await auth.signOut()
+								router.push("https://www.sprintzero.app/")
+							} else {
+								message.success({
+									content: "Successfully logged in",
+									className: "custom-message",
+								})
+								router.push("/tos")
+							}
 						} else {
 							message.success({
 								content: "Successfully logged in",
 								className: "custom-message",
 							})
-							router.push("/tos")
+							router.push(product ? `/${product.id}/dashboard` : `/product`)
 						}
-					} else {
-						message.success({
-							content: "Successfully logged in",
-							className: "custom-message",
-						})
-						router.push(product ? `/${product.id}/dashboard` : `/product`)
-					}
+					})
 				})
-			})
-		} catch (error) {
-			console.log(error.message)
-			message.error({
-				content: "An error occurred while trying to log you in",
-				className: "custom-message",
-			})
+			} catch (error) {
+				console.log(error.message)
+				message.error({
+					content: "An error occurred while trying to log you in",
+					className: "custom-message",
+				})
+			}
 		}
 	}
 
@@ -104,7 +121,7 @@ const Login = () => {
 		<>
 			<div className="mb-4 flex items-center justify-center">
 				<div>
-					<Title level={1} style={{ fontWeight: "normal" }}>
+					<Title level={1} style={{fontWeight: "normal"}}>
 						Authenticate Yourself Before You Wreck Yourself
 					</Title>
 					<Text className="text-left text-xl">Select a provider below to sign in with</Text>
@@ -114,14 +131,14 @@ const Login = () => {
 			<div className="mt-10 flex flex-col items-center justify-center space-y-[24px]">
 				<Button
 					className="flex h-[54px] w-[345px] items-center justify-start space-x-4 rounded-[10px] border-black bg-white text-[20px] font-semibold"
-					onClick={() => handleOnClick(appleProvider)}
-					icon={<AppleFilled style={{ fontSize: "20px", marginTop: "-5px" }} />}
+					onClick={() => handleLoginForm(appleProvider)}
+					icon={<AppleFilled style={{fontSize: "20px", marginTop: "-5px"}} />}
 				>
 					<p>Sign in with Apple</p>
 				</Button>
 				<Button
 					className="flex h-[54px] w-[345px] items-center justify-start space-x-4 rounded-[10px] border-black bg-white text-[20px] font-semibold"
-					onClick={() => handleOnClick(googleProvider)}
+					onClick={() => handleLoginForm(googleProvider)}
 				>
 					<Image src="/images/googleIcon.png" alt="google" width={23} height={23} preview={false} />
 					<p>Sign in with Google</p>
@@ -129,7 +146,7 @@ const Login = () => {
 
 				{/* <Button
 					className="flex h-[54px] w-[345px] items-center justify-start space-x-4 rounded-[10px] border-black bg-white text-[20px] font-semibold"
-					onClick={() => handleOnClick(microsoftProvider)}
+					onClick={() => handleLoginForm(microsoftProvider)}
 				>
 					<Image src="/images/microsoftIcon.png" alt="microsoft" width={24} height={24} preview={false} />
 					<p>Sign in with Microsoft</p>
