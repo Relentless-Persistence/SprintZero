@@ -263,59 +263,39 @@ export const ActionFormCard = ({
   };
 
   return (
-    <Card
-      className="border-2 mb-2"
-      bordered={false}
-      type="inner"
-      extra={
-        useAction ? (
-          version === 1 ? (
-            <ActionButtons
-              className="ml-[12px]"
-              onCancel={onCancel}
-              onSubmit={handleSubmit}
-            />
-          ) : (
-            <LightActionButtons
-              className="ml-[12px]"
-              onCancel={onCancel}
-              onSubmit={handleSubmit}
-            />
-          )
-        ) : (
-          <CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
-        )
-      }
-      title={
-        <Input
-          value={item.title}
-          onChange={(e) => handleChange(e, "title")}
-          placeholder="Result name..."
-        />
-      }
-      headStyle={{
-        background: "#F5F5F5",
-      }}
-    >
-      {extraItems}
-      <TextArea
-        className="my-4"
-        autoSize={{ minRows: 3 }}
-        value={item.description}
-        onChange={(e) => handleChange(e, "description")}
-        placeholder="Result description..."
-      />
-      <Button
-        type="danger"
-        ghost
-        block
-        onClick={onDelete}
-        disabled={isDisabled}
-      >
-        Remove
-      </Button>
-    </Card>
-  );
+		<Card
+			className="mb-2 border-2"
+			bordered={false}
+			type="inner"
+			extra={
+				useAction ? (
+					version === 1 ? (
+						<ActionButtons className="ml-[12px]" onCancel={onCancel} onSubmit={handleSubmit} />
+					) : (
+						<LightActionButtons className="ml-[12px]" onCancel={onCancel} onSubmit={handleSubmit} />
+					)
+				) : (
+					<CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
+				)
+			}
+			title={<Input value={item.title} onChange={(e) => handleChange(e, "title")} placeholder="Result name..." />}
+			headStyle={{
+				background: "#F5F5F5",
+			}}
+		>
+			{extraItems}
+			<TextArea
+				className="my-4"
+				autoSize={{minRows: 3}}
+				value={item.description}
+				onChange={(e) => handleChange(e, "description")}
+				placeholder="Result description..."
+			/>
+			<Button block className="mt-2 border-[#FF4D4F] text-[#FF4D4F]" onClick={onDelete} disabled={isDisabled}>
+				Remove
+			</Button>
+		</Card>
+	)
 };
 
 export const ObjectiveActionFormCard = ({
@@ -407,3 +387,82 @@ export const ObjectiveActionFormCard = ({
     </Card>
   );
 };
+
+export const LearningsActionFormCard = ({
+	title,
+	description,
+  artifact,
+	id,
+	useAction = true,
+	version = 1,
+	onSubmit,
+	onCancel,
+	className,
+	extraItems,
+	headerSmall = false,
+	onDelete,
+	isDisabled = false,
+}) => {
+	const [item, setItem] = useState({
+		title,
+		description,
+    artifact
+	})
+
+	const handleChange = (e, key) => {
+		const {value} = e.target
+
+		setItem({
+			...item,
+			id,
+			[key]: value,
+		})
+	}
+
+	const handleSubmit = () => {
+		onSubmit(item)
+		setItem({item: "", description: "", artifact: ""})
+	}
+
+	return (
+		<Card
+			className="mb-2 border-2"
+			bordered={false}
+			type="inner"
+			extra={
+				useAction ? (
+					version === 1 ? (
+						<ActionButtons className="ml-[12px]" onCancel={onCancel} onSubmit={handleSubmit} />
+					) : (
+						<LightActionButtons className="ml-[12px]" onCancel={onCancel} onSubmit={handleSubmit} />
+					)
+				) : (
+					<CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
+				)
+			}
+			title={<Input value={item.title} onChange={(e) => handleChange(e, "title")} placeholder="Learning name..." />}
+			headStyle={{
+				background: "#F5F5F5",
+			}}
+		>
+			{extraItems}
+			<TextArea
+				className="my-4"
+				autoSize={{minRows: 3}}
+				value={item.description}
+				onChange={(e) => handleChange(e, "description")}
+				placeholder="Learning description..."
+			/>
+			<Input
+				className="mt-4"
+				value={item.artifact}
+				addonBefore={<span>Artifact</span>}
+				onChange={(e) => handleChange(e, "artifact")}
+				placeholder="https://reduct.video/product/"
+			/>
+			<Button block className="mt-2 border-[#FF4D4F] text-[#FF4D4F]" onClick={onDelete} disabled={isDisabled}>
+				Remove
+			</Button>
+		</Card>
+	)
+}

@@ -140,7 +140,7 @@ export default function Retrospective() {
 	}
 
 	const updateRetroAction = (actionIndex, i, id) => {
-		data[i].actions[actionIndex].checked = !data[i].actions[actionIndex].checked
+		data[i].actions[actionIndex].completed = !data[i].actions[actionIndex].completed
 
 		db.collection(`Retrospectives`).doc(id).update(data[i])
 	}
@@ -226,7 +226,7 @@ export default function Retrospective() {
 														<div key={actionIndex}>
 															<AppCheckbox
 																key={a.label}
-																checked={a.checked}
+																checked={a.completed}
 																onChange={() => updateRetroAction(actionIndex, i, c.id)}
 															>
 																{a.name}
