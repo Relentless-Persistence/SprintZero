@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-import {Row, Col, Breadcrumb} from "antd"
+import {Row, Col, Breadcrumb} from "antd5"
 import {useState, useEffect} from "react"
 
 import {db} from "../../../../config/firebase-config"

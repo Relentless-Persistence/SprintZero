@@ -6,9 +6,9 @@ const EpicSchema = z.object({
 	id: idSchema,
 
 	description: z.string(),
+	effort: z.number().min(0).max(1),
 	name: z.string(),
-	priorityLevel: z.number(),
-	visibilityLevel: z.number(),
+	userValue: z.number().min(0).max(1),
 
 	commentIds: z.array(idSchema),
 	featureIds: z.array(idSchema),
@@ -21,9 +21,9 @@ const FeatureSchema = z.object({
 	id: idSchema,
 
 	description: z.string(),
+	effort: z.number().min(0).max(1),
 	name: z.string(),
-	priorityLevel: z.number(),
-	visibilityLevel: z.number(),
+	userValue: z.number().min(0).max(1),
 
 	commentIds: z.array(idSchema),
 	nameInputStateId: idSchema,
@@ -46,8 +46,6 @@ const StorySchema = z.object({
 	designLink: z.string().url().nullable(),
 	name: z.string(),
 	points: z.number(),
-	priorityLevel: z.number(),
-	visibilityLevel: z.number(),
 
 	commentIds: z.array(idSchema),
 	nameInputStateId: idSchema,

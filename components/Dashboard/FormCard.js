@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import styled from "styled-components";
 
-import { Card, Input, Space, Button } from "antd";
+import { Card, Input, Space, Button } from "antd5";
 
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
 import ActionButtons, { LightActionButtons } from "../Personas/ActionButtons";

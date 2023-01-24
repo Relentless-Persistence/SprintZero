@@ -27,7 +27,11 @@ const HomePage: FC = () => {
 		},
 	})
 
-	return <div>{`I'm just an empty page for now`}</div>
+	return (
+		<div className="grid h-full place-items-center">
+			<p className="text-xl">Redirecting you to your dashboard...</p>
+		</div>
+	)
 }
 
 export default HomePage

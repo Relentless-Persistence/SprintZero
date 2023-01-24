@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Radio } from 'antd';
+import { Radio } from 'antd5';
 
 const RadioButton = styled( Radio.Button )`
   border-color:${ props => props.checked ? "#4A801D" : "#262626" } !important;
@@ -9,7 +9,7 @@ const RadioButton = styled( Radio.Button )`
   {
       color:${ props => props.checked ? "#4A801D" : "#262626" } !important;
   }
-    
+
   &::before,&:after
   {
     background-color:transparent !important;
@@ -26,7 +26,7 @@ export const RadioButtonWithFill = styled( Radio.Button )`
   {
       color:${ props => props.checked ? "#fff" : "#262626" } !important;
   }
-  
+
   &::before,&:after
   {
     background-color:transparent !important;

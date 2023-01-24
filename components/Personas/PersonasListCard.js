@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useCallback} from "react"
 import styled from "styled-components"
 
-import {Card, Form, Button} from "antd"
-import {Input} from "antd5"
+import { Card, Form, Button } from "antd5";
+import { Input } from "antd5"
 
 import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
 
@@ -173,7 +173,7 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 		<Card
 			className="border-2 border-[#D9D9D9]"
 			extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
-			title={<strong>{title}</strong>}
+			title={<p>{title}</p>}
 			headStyle={{
 				background: "#F5F5F5",
 			}}
@@ -198,7 +198,7 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 							</div>
 						}
 						suffix={
-							i === list.length - 1 ? (
+							i === cardData.length - 1 ? (
 								<button className="ml-[5px] flex items-center" onClick={add}>
 									<PlusCircleOutlined
 										style={{
@@ -223,7 +223,7 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 							</CardHeaderLink>
 						) : null
 					}
-					title={<strong>{title}</strong>}
+					title={<p>{title}</p>}
 					headStyle={{
 						background: "#F5F5F5",
 					}}

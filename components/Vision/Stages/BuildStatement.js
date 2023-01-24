@@ -1,7 +1,7 @@
 import React, {useState} from "react"
 import {Card, Form, Typography, Input, Segmented, Space, message, notification} from "antd5"
 import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
-import {Button} from "antd"
+import {Button} from "antd5"
 
 const {Title, Text} = Typography
 
@@ -73,7 +73,7 @@ const BuildStatement = ({
 				<Form layout="vertical">
 					<Form.Item label={<span className="font-semibold">Type</span>} className="font-semibold">
 						<Segmented
-							
+
 							value={type}
 							options={["Mobile", "Tablet", "Desktop", "Watch", "Web"]}
 							onChange={(value) => setType(value)}
@@ -85,7 +85,7 @@ const BuildStatement = ({
 							value={value}
 							onChange={(e) => setValue(e.target.value)}
 							placeholder="eg. Making it easy to to create albums of photos/videos"
-							
+
 						/>
 					</Form.Item>
 
@@ -120,7 +120,7 @@ const BuildStatement = ({
 										</button>
 									</div>
 								}
-								
+
 							/>
 						))}
 					</Form.Item>

@@ -45,13 +45,19 @@ type AddEpicVars = {
 }
 
 export const addEpic = async ({storyMapState, data: initialData, position}: AddEpicVars): Promise<void> => {
+	const prevEpicUserValue =
+		position === undefined
+			? storyMapState.epics[storyMapState.epics.length - 1]?.userValue ?? 0
+			: storyMapState.epics[position - 1]!.userValue
+	const nextEpicUserValue = position === undefined ? 1 : storyMapState.epics[position]!.userValue
+
 	const id = nanoid() as Id
 	const data: Epic = {
 		id,
 		description: ``,
-		name: ``,
-		priorityLevel: 0,
-		visibilityLevel: 0,
+		effort: 0.5,
+		name: `Epic ${storyMapState.epics.length + 1}`,
+		userValue: (prevEpicUserValue + nextEpicUserValue) / 2,
 		commentIds: [],
 		featureIds: [],
 		keeperIds: [],
@@ -71,7 +77,7 @@ export const addEpic = async ({storyMapState, data: initialData, position}: AddE
 type UpdateEpicVars = {
 	storyMapState: StoryMapState
 	epicId: Id
-	data: Partial<Pick<Epic, `description` | `name` | `priorityLevel` | `visibilityLevel` | `commentIds` | `keeperIds`>>
+	data: Partial<Pick<Epic, `description` | `name` | `commentIds` | `keeperIds`>>
 }
 
 export const updateEpic = async ({storyMapState, epicId, data}: UpdateEpicVars): Promise<void> => {
@@ -113,13 +119,23 @@ export const addFeature = async ({
 	data: initialData,
 	position,
 }: AddFeatureVars): Promise<void> => {
+	const featureList = storyMapState.epics.find(({id}) => id === epicId)!.featureIds
+	const prevFeatureUserValue =
+		position === undefined
+			? storyMapState.features.find((feature) => feature.id === featureList.at(-1))?.userValue ?? 0
+			: storyMapState.features.find((feature) => feature.id === featureList[position - 1])!.userValue
+	const nextFeatureUserValue =
+		position === undefined
+			? 1
+			: storyMapState.features.find((feature) => feature.id === featureList[position])!.userValue
+
 	const id = nanoid() as Id
 	const data: Feature = {
 		id,
 		description: ``,
-		name: ``,
-		priorityLevel: 0,
-		visibilityLevel: 0,
+		effort: 0.5,
+		name: `Feature ${storyMapState.features.length + 1}`,
+		userValue: (prevFeatureUserValue + nextFeatureUserValue) / 2,
 		commentIds: [],
 		nameInputStateId: await createInputState(),
 		storyIds: [],
@@ -192,8 +208,6 @@ export const addStory = async ({
 		designLink: null,
 		name: ``,
 		points: 0,
-		priorityLevel: 0,
-		visibilityLevel: 0,
 		commentIds: [],
 		nameInputStateId: await createInputState(),
 		...initialData,
@@ -263,9 +277,8 @@ export const updateInputState = async ({id, inputState, userId}: UpdateInputStat
 }
 
 type SetStoryMapStateVars = {
-	productId: Id
 	storyMapState: StoryMapState
 }
 
-export const setStoryMapState = async ({productId, storyMapState}: SetStoryMapStateVars): Promise<void> =>
-	await updateDoc(doc(db, Products._, productId), {storyMapState})
+export const setStoryMapState = async ({storyMapState}: SetStoryMapStateVars): Promise<void> =>
+	await updateDoc(doc(db, Products._, storyMapState.productId), {storyMapState})

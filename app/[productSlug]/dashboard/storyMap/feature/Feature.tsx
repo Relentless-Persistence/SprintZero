@@ -8,10 +8,10 @@ import {useEffect, useRef} from "react"
 import type {FC} from "react"
 import type {Feature as FeatureType} from "~/types/db/Products"
 
-import {currentVersionAtom} from "../atoms"
-import {dragState, elementRegistry, storyMapMeta} from "../utils/globals"
 import FeatureContent from "./FeatureContent"
 import StoryList from "./StoryList"
+import {currentVersionAtom} from "../atoms"
+import {dragState, elementRegistry, storyMapMeta} from "../utils/globals"
 
 export type FeatureProps = {
 	feature: FeatureType

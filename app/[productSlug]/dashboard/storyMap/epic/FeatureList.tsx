@@ -15,18 +15,16 @@ export type FeatureListProps = {
 
 const FeatureList: FC<FeatureListProps> = ({epic, inert = false}) => {
 	const storyMapState = useAtomValue(storyMapStateAtom)
-	const features = epic.featureIds.map((id) => storyMapState.features.find((feature) => feature.id === id)!)
+	const features = epic.featureIds.map((id) => storyMapState.features.find((feature) => feature.id === id))
 
 	return (
 		<>
-			{features.map((feature) => (
-				<Feature key={feature.id} feature={feature} inert={inert} />
-			))}
+			{features.map((feature) => feature && <Feature key={feature.id} feature={feature} inert={inert} />)}
 
 			{features.length === 0 && (
 				<button
 					type="button"
-					onClick={() => void addFeature({storyMapState, epicId: epic.id, data: {name: `Feature`}})}
+					onClick={() => void addFeature({storyMapState, epicId: epic.id, data: {}})}
 					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
 				>
 					<CopyOutlined />

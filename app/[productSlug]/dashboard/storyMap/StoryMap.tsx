@@ -36,15 +36,17 @@ const StoryMap: FC = () => {
 	}, [setDragPos, x, y])
 
 	useEffect(() => {
-		const handlePointerMove = (e: PointerEvent) => {
-			pointerLocation.current = [e.clientX, e.clientY]
-			x.set(e.clientX)
-			y.set(e.clientY)
-		}
-		window.addEventListener(`pointermove`, handlePointerMove)
+		if(typeof window !== `undefined`) {
+			const handlePointerMove = (e: PointerEvent) => {
+				pointerLocation.current = [e.clientX, e.clientY]
+				x.set(e.clientX)
+				y.set(e.clientY)
+			}
+			window.addEventListener(`pointermove`, handlePointerMove)
 
-		return () => {
-			window.removeEventListener(`pointermove`, handlePointerMove)
+			return () => {
+				window.removeEventListener(`pointermove`, handlePointerMove)
+			}
 		}
 	}, [x, y])
 
@@ -168,14 +170,7 @@ const StoryMap: FC = () => {
 			)
 
 			if (JSON.stringify(newStoryMapState) === JSON.stringify(storyMapState)) return
-			if (target !== `stay`)
-				console.log(
-					target[0],
-					[...storyMapState.epics, ...storyMapState.features, ...storyMapState.stories].find(
-						(epic) => epic.id === target[1].id,
-					)?.name,
-				)
-			setStoryMapState({productId: activeProductId, storyMapState: newStoryMapState})
+			setStoryMapState({storyMapState: newStoryMapState})
 			expectedStoryMapState.current = newStoryMapState
 
 			// Update startItem type
@@ -213,7 +208,7 @@ const StoryMap: FC = () => {
 
 				<button
 					type="button"
-					onClick={() => void addEpic({storyMapState, data: {name: `Epic`, description: ``}})}
+					onClick={() => void addEpic({storyMapState, data: {}})}
 					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#4f2dc8] transition-colors hover:bg-[#faf8ff]"
 				>
 					<ReadOutlined />

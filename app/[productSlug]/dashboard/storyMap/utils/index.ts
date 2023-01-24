@@ -1,10 +1,11 @@
 import {doc, onSnapshot} from "firebase9/firestore"
 import {useAtomValue, useSetAtom} from "jotai"
+import {sortBy} from "lodash"
 import {useEffect} from "react"
 
 import type {CurrentVersionId, EpicMeta, FeatureMeta, StoryMapMeta, StoryMeta} from "./types"
 import type {Id} from "~/types"
-import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
+import type {Epic, Feature, StoryMapState} from "~/types/db/Products"
 
 import {currentVersionAtom, storyMapStateAtom} from "../atoms"
 import {boundaries, elementRegistry, layerBoundaries, storyMapMeta, storyMapScrollPosition} from "./globals"
@@ -15,20 +16,27 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) / arr.length
 
 export const useSubscribeToData = (): void => {
-	const activeProduct = useActiveProductId()
+	const activeProductId = useActiveProductId()
 	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const currentVersion = useAtomValue(currentVersionAtom)
 
 	useEffect(() => {
-		if (activeProduct === undefined) return
+		if (!activeProductId) return
 
-		return onSnapshot(doc(db, Products._, activeProduct), (doc) => {
+		return onSnapshot(doc(db, Products._, activeProductId), (doc) => {
 			const data = ProductSchema.parse({id: doc.id, ...doc.data()})
 			setStoryMapState(data.storyMapState)
 			genStoryMapMeta(data.storyMapState, currentVersion.id)
 		})
-	}, [activeProduct, currentVersion.id, setStoryMapState])
+	}, [activeProductId, currentVersion.id, setStoryMapState])
 }
+
+export const sortEpics = (epics: Epic[]): Epic[] => sortBy(epics, [(epic: Epic) => epic.userValue])
+export const sortFeatures = (storyMapState: StoryMapState, featureIds: Id[]): Id[] =>
+	sortBy(
+		featureIds.map((id) => storyMapState.features.find((feature) => feature.id === id)!),
+		[(feature: Feature) => feature.userValue],
+	).map((feature) => feature.id)
 
 const genStoryMapMeta = (storyMapState: StoryMapState, currentVersionId: CurrentVersionId): void => {
 	const meta: StoryMapMeta = {}
@@ -209,29 +217,3 @@ export const calculateBoundaries = (storyMapState: StoryMapState, currentVersion
 	}
 	//#endregion
 }
-
-export const convertEpicToFeature = (epic: Epic): Feature => ({
-	id: epic.id,
-	description: epic.description,
-	name: epic.name,
-	priorityLevel: 0,
-	visibilityLevel: 0,
-	commentIds: epic.commentIds,
-	nameInputStateId: epic.nameInputStateId,
-	storyIds: [],
-})
-
-export const convertFeatureToStory = (feature: Feature, versionId: Id): Story => ({
-	id: feature.id,
-	acceptanceCriteria: [],
-	codeLink: null,
-	description: feature.description,
-	designLink: null,
-	name: feature.name,
-	points: 0,
-	priorityLevel: feature.priorityLevel,
-	visibilityLevel: feature.visibilityLevel,
-	commentIds: feature.commentIds,
-	nameInputStateId: feature.nameInputStateId,
-	versionId,
-})

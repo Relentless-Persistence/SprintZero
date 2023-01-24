@@ -2,10 +2,9 @@
 
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Button} from "antd5"
-import {doc, setDoc, updateDoc} from "firebase9/firestore"
+import {addDoc, collection, doc, setDoc, updateDoc} from "firebase9/firestore"
 import {motion} from "framer-motion"
 import {useAtomValue} from "jotai"
-import {nanoid} from "nanoid"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
@@ -14,6 +13,7 @@ import {v4 as uuid} from "uuid"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
+import type {Version} from "~/types/db/Versions"
 
 import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
@@ -22,6 +22,7 @@ import Slide4 from "./Slide4"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {Users} from "~/types/db/Users"
+import {Versions} from "~/types/db/Versions"
 import {getUser} from "~/utils/api/queries"
 import {userIdAtom} from "~/utils/atoms"
 
@@ -55,10 +56,13 @@ const ProductConfiguration: FC = () => {
 		if (!userId || !user) return
 
 		setHasSubmitted(true)
-		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}`
+
+		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}` as Id
+		addDoc(collection(db, Versions._), {name: `v1.0`, product: slug} satisfies Omit<Version, `id`>)
+
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
-			storyMapState: {productId: slug as Id, epics: [], features: [], stories: []},
+			storyMapState: {productId: slug, epics: [], features: [], stories: []},
 			members: [{user: userId, type: `editor`}],
 			owner: userId,
 		} satisfies Omit<Product, `id`>)

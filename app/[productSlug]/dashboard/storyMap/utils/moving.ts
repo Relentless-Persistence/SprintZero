@@ -4,7 +4,7 @@ import type {StoryMapItem, StoryMapTarget} from "./types"
 import type {Id} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 
-import {meta} from "."
+import {meta, sortEpics, sortFeatures} from "."
 
 export const moveItem = (
 	currentState: StoryMapState,
@@ -23,14 +23,24 @@ export const moveItem = (
 				if (targetLocation[1].type === `epic`) {
 					// Epic to epic (reordering)
 
-					const epicIndex = state.epics.findIndex((epic) => epic.id === startItem.id)
-					const epic = state.epics[epicIndex]!
+					const startPosition = state.epics.findIndex((epic) => epic.id === startItem.id)!
+					let newUserValue: number
+					if (startPosition < targetPosition) {
+						const targetEpic = state.epics.find((epic, i) => i === targetPosition) ?? state.epics.at(-1)!
+						const targetEpicPlusOne = state.epics.find((epic, i) => i === targetPosition + 1)
+						const userValue1 = targetEpic.userValue
+						const userValue2 = targetEpicPlusOne ? targetEpicPlusOne.userValue : 1
+						newUserValue = (userValue1 + userValue2) / 2
+					} else {
+						const targetEpic = state.epics.find((epic, i) => i === targetPosition) ?? state.epics.at(0)!
+						const targetEpicMinusOne = state.epics.find((epic, i) => i === targetPosition - 1)
+						const userValue1 = targetEpic.userValue
+						const userValue2 = targetEpicMinusOne ? targetEpicMinusOne.userValue : 0
+						newUserValue = (userValue1 + userValue2) / 2
+					}
 
-					// Insert the epic at the new location
-					state.epics.splice(targetPosition, 0, epic)
-
-					// Remove the epic from its original location
-					state.epics.splice(epicIndex < targetPosition ? epicIndex : epicIndex + 1, 1)
+					state.epics[startPosition]!.userValue = newUserValue
+					state.epics = sortEpics(state.epics)
 				} else if (targetLocation[1].type === `feature`) {
 					// Epic to feature
 
@@ -40,9 +50,9 @@ export const moveItem = (
 					const newFeature: Feature = {
 						id: existingEpic.id,
 						description: existingEpic.description,
+						effort: 0.5,
 						name: existingEpic.name,
-						priorityLevel: existingEpic.priorityLevel,
-						visibilityLevel: existingEpic.visibilityLevel,
+						userValue: 0.5,
 						commentIds: existingEpic.commentIds,
 						nameInputStateId: existingEpic.nameInputStateId,
 						storyIds: existingEpic.featureIds,
@@ -67,8 +77,6 @@ export const moveItem = (
 							designLink: null,
 							name: feature.name,
 							points: 0,
-							priorityLevel: feature.priorityLevel,
-							visibilityLevel: feature.visibilityLevel,
 							commentIds: feature.commentIds,
 							nameInputStateId: feature.nameInputStateId,
 							versionId: currentVersionId,
@@ -88,9 +96,9 @@ export const moveItem = (
 					const newEpic: Epic = {
 						id: existingFeature.id,
 						description: existingFeature.description,
+						effort: 0.5,
 						name: existingFeature.name,
-						priorityLevel: existingFeature.priorityLevel,
-						visibilityLevel: existingFeature.visibilityLevel,
+						userValue: 0.5,
 						commentIds: existingFeature.commentIds,
 						featureIds: existingFeature.storyIds,
 						keeperIds: [],
@@ -111,9 +119,9 @@ export const moveItem = (
 						const feature: Feature = {
 							id: story.id,
 							description: story.description,
+							effort: 0.5,
 							name: story.name,
-							priorityLevel: story.priorityLevel,
-							visibilityLevel: story.visibilityLevel,
+							userValue: 0.5,
 							commentIds: story.commentIds,
 							nameInputStateId: story.nameInputStateId,
 							storyIds: [],
@@ -126,9 +134,24 @@ export const moveItem = (
 					if (isForeign) {
 						// Feature to feature (reparenting)
 
-						// Insert the feature as a feature at the new location
 						const newHost = state.epics.find((epic) => epic.id === meta(targetLocation[1].id).parent)!
-						newHost.featureIds.splice(targetPosition, 0, startItem.id)
+
+						// Update the feature's userValue
+						const prevFeatureId = newHost.featureIds[targetPosition - 1]
+						const nextFeatureId = newHost.featureIds[targetPosition]
+						const prevFeatureUserValue = prevFeatureId
+							? state.features.find((feature) => feature.id === prevFeatureId)!.userValue
+							: 0
+						const nextFeatureUserValue = nextFeatureId
+							? state.features.find((feature) => feature.id === nextFeatureId)!.userValue
+							: 1
+						const newFeatureUserValue = (prevFeatureUserValue + nextFeatureUserValue) / 2
+						const existingFeature = state.features.find((feature) => feature.id === startItem.id)!
+						existingFeature.userValue = newFeatureUserValue
+
+						// Insert the feature as a feature at the new location
+						newHost.featureIds.push(startItem.id)
+						newHost.featureIds = sortFeatures(state as StoryMapState, newHost.featureIds)
 
 						// Remove the feature from its current location
 						const currentHost = state.epics.find((epic) => epic.id === meta(startItem.id).parent)!
@@ -137,13 +160,28 @@ export const moveItem = (
 						// Feature to feature (reordering)
 
 						const startPosition = meta(startItem.id).position
+						let newUserValue: number
+						if (startPosition < targetPosition) {
+							const targetFeature = state.features.find((feature) => feature.id === targetLocation[1].id)!
+							const targetFeaturePlusOne = state.features.find(
+								(feature) => feature.id === meta(targetLocation[1].id).nextItem,
+							)
+							const userValue1 = targetFeature.userValue
+							const userValue2 = targetFeaturePlusOne ? targetFeaturePlusOne.userValue : 1
+							newUserValue = (userValue1 + userValue2) / 2
+						} else {
+							const targetFeature = state.features.find((feature) => feature.id === targetLocation[1].id)!
+							const targetFeatureMinusOne = state.features.find(
+								(feature) => feature.id === meta(targetLocation[1].id).prevItem,
+							)
+							const userValue1 = targetFeature.userValue
+							const userValue2 = targetFeatureMinusOne ? targetFeatureMinusOne.userValue : 0
+							newUserValue = (userValue1 + userValue2) / 2
+						}
+
+						state.features.find((feature) => feature.id === startItem.id)!.userValue = newUserValue
 						const host = state.epics.find((epic) => epic.id === meta(startItem.id).parent)!
-
-						// Insert the feature as a feature at the new location
-						host.featureIds.splice(targetPosition, 0, startItem.id)
-
-						// Remove the feature from its current location
-						host.featureIds.splice(startPosition < targetPosition ? startPosition : startPosition + 1, 1)
+						host.featureIds = sortFeatures(state as StoryMapState, host.featureIds)
 					}
 				} else {
 					// Feature to story
@@ -159,8 +197,6 @@ export const moveItem = (
 						designLink: null,
 						name: existingFeature.name,
 						points: 0,
-						priorityLevel: existingFeature.priorityLevel,
-						visibilityLevel: existingFeature.visibilityLevel,
 						commentIds: existingFeature.commentIds,
 						nameInputStateId: existingFeature.nameInputStateId,
 						versionId: currentVersionId,
@@ -190,9 +226,9 @@ export const moveItem = (
 					const newFeature: Feature = {
 						id: existingStory.id,
 						description: existingStory.description,
+						effort: 0.5,
 						name: existingStory.name,
-						priorityLevel: existingStory.priorityLevel,
-						visibilityLevel: existingStory.visibilityLevel,
+						userValue: 0.5,
 						commentIds: existingStory.commentIds,
 						nameInputStateId: existingStory.nameInputStateId,
 						storyIds: [],
@@ -242,9 +278,9 @@ export const moveItem = (
 					const newFeature: Feature = {
 						id: existingEpic.id,
 						description: existingEpic.description,
+						effort: 0.5,
 						name: existingEpic.name,
-						priorityLevel: existingEpic.priorityLevel,
-						visibilityLevel: existingEpic.visibilityLevel,
+						userValue: 0.5,
 						commentIds: existingEpic.commentIds,
 						nameInputStateId: existingEpic.nameInputStateId,
 						storyIds: existingEpic.featureIds,
@@ -286,8 +322,6 @@ export const moveItem = (
 						designLink: null,
 						name: existingFeature.name,
 						points: 0,
-						priorityLevel: existingFeature.priorityLevel,
-						visibilityLevel: existingFeature.visibilityLevel,
 						commentIds: existingFeature.commentIds,
 						nameInputStateId: existingFeature.nameInputStateId,
 						versionId: currentVersionId,

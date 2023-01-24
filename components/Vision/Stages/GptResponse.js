@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button} from "antd"
+import {Button} from "antd5"
 import {Card, Input, Space, Typography, message, Skeleton} from "antd5";
 
 const {TextArea} = Input;

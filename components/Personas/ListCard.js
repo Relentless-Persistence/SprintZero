@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
-import { Card, Input, Form, Button } from "antd";
+import { Card, Input, Form, Button } from "antd5";
 
 import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 
@@ -37,7 +37,6 @@ const Add = styled(Button)`
 
 const MyCard = styled(Card)`
   .ant-card-head {
-    min-height: unset;
     border-bottom: 2px solid #d9d9d9;
   }
 `;
@@ -92,7 +91,7 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
     <MyCard
       className="border-2 border-[#D9D9D9]"
       extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
-      title={<strong>{title}</strong>}
+      title={<p>{title}</p>}
       headStyle={{
         background: "#F5F5F5",
       }}
@@ -147,7 +146,7 @@ const ListCard = ({ handleEdit, title = "Goals", cardData = [], id }) => {
               </CardHeaderLink>
             ) : null
           }
-          title={<strong>{title}</strong>}
+          title={<p>{title}</p>}
           headStyle={{
             background: "#F5F5F5",
           }}

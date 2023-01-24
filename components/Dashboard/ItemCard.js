@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Button, Card } from "antd";
+import { Button, Card } from "antd5";
 
 import CardHeaderButton, { CardHeaderLink } from "./CardHeaderButton";
 import FormCard, { ActionFormCard, ObjectiveActionFormCard } from "./FormCard";
