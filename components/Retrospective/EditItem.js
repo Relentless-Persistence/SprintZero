@@ -35,12 +35,15 @@ const EditItem = ({show, retro, setRetro, setEditMode}) => {
 				.update(data)
 				.then((docRef) => {
 					message.success("Retrospective updated successfully")
-					setShow(false)
+					setEditMode(false)
 					setActions([])
+					setTitle("")
+					setDescription("")
+					setType("")
 					setVal()
-					form.resetFields()
 				})
 				.catch((error) => {
+					console.log(error)
 					message.error("Error adding Retrospective")
 				})
 		}
