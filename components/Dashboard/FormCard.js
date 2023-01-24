@@ -158,7 +158,7 @@ export function ObjectiveFormCard({
   extraItems,
   onSubmit,
   onCancel,
-  title
+  titlePlaceholder
 }) {
   const [item, setItem] = useState(
     isEdit
@@ -202,9 +202,14 @@ export function ObjectiveFormCard({
           </Space>
         )
       }
-      // title={
-      //   title
-      // }
+      title={
+        <Input
+          value={item.name}
+          onChange={(e) => handleChange(e, "name")}
+          placeholder={titlePlaceholder}
+        />
+      }
+      
       headStyle={{
         background: "#F5F5F5",
       }}
@@ -314,7 +319,7 @@ export const ActionFormCard = ({
 };
 
 export const ObjectiveActionFormCard = ({
-  title,
+  name,
   description,
   id,
   useAction = true,
@@ -328,7 +333,7 @@ export const ObjectiveActionFormCard = ({
   isDisabled = false,
 }) => {
   const [item, setItem] = useState({
-    title,
+    name,
     description,
   });
 
@@ -371,9 +376,13 @@ export const ObjectiveActionFormCard = ({
           <CardHeaderLink onClick={handleSubmit}>Done</CardHeaderLink>
         )
       }
-      // title={
-      //   title
-      // }
+      title={
+        <Input
+          value={item.name}
+          onChange={(e) => handleChange(e, "name")}
+          placeholder="Result name..."
+        />
+      }
       headStyle={{
         background: "#F5F5F5",
       }}

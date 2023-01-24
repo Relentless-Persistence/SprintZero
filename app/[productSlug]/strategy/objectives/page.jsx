@@ -176,9 +176,10 @@ export default function Objectives() {
 		const id = data[activeGoalIndex].id
 		if (id) {
 			// eslint-disable-next-line no-negated-condition
-			if (item.description !== ``) {
+			if (item.description !== `` && item.name !== ``) {
 				const data = {
 					goal_id: id,
+					name: item.name,
 					description: item.description,
 				}
 				db.collection(`Result`)
@@ -198,11 +199,12 @@ export default function Objectives() {
 	}
 
 	const editItem = async (id, item) => {
-		if (id && item.description !== ``) {
+		if (id && item.description !== `` && item.name !== ``) {
 			await db
 				.collection(`Result`)
 				.doc(id)
 				.update({
+					name: item.name,
 					description: item.description,
 				})
 				.then(() => {
