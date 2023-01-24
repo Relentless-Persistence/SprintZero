@@ -207,7 +207,7 @@ const AddEvent = ({
       title={
         <Row>
           <Col span={12}>
-            <h1 className="font-[600] font[#262626] font-[20px] leading-[28px]">
+            <h1 className="font[#262626] font-[20px] leading-[28px]">
               Touchpoint
             </h1>
           </Col>

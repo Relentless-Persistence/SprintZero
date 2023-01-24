@@ -6,12 +6,12 @@
 import {useQuery} from "@tanstack/react-query"
 import {Card, Avatar, message, Empty, Breadcrumb, Button} from "antd5"
 import {useAtomValue} from "jotai"
-import {findIndex} from "lodash"
+// import {findIndex} from "lodash"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
 import AppCheckbox from "~/components/AppCheckbox"
-import CardHeaderButton, {CardHeaderLink} from "~/components/Dashboard/CardHeaderButton"
+import {CardHeaderLink} from "~/components/Dashboard/CardHeaderButton"
 import {ActionFormCard} from "~/components/Dashboard/FormCard"
 import MasonryGrid from "~/components/Dashboard/MasonryGrid"
 import AddItem from "~/components/Retrospective/AddItem"
@@ -101,14 +101,6 @@ export default function Retrospective() {
 		}
 	}, [activeType])
 
-	const handleRightNav = (name) => {
-		const index = findIndex(types, (o) => o === name)
-
-		if (index > -1) {
-			setActiveTabIndex(index)
-		}
-	}
-
 	// Fetch data from firebase
 	const fetchRetrospects = async () => {
 		if (activeProductId) {
@@ -117,7 +109,6 @@ export default function Retrospective() {
         .where(`type`, `==`, activeType)
 				.onSnapshot((snapshot) => {
 					setData(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-          console.log(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 				})
 		}
 	}
@@ -139,7 +130,7 @@ export default function Retrospective() {
 				message.success(`Retrospective updated successfully`)
 				setActiveEditIndex(null)
 			})
-			.catch((error) => {
+			.catch(() => {
 				message.error(`An error occurred`)
 			})
 	}
