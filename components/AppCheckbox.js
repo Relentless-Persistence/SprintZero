@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Checkbox } from 'antd';
+import { Checkbox } from 'antd5';
 
 const AppCheckbox = styled( Checkbox )`
         .ant-checkbox-checked .ant-checkbox-inner 

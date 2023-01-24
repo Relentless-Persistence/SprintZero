@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-import {Row, Col, Input, Form, Drawer, message} from "antd"
+import {Row, Col, Input, Form, Drawer, message} from "antd5"
 import styled from "styled-components"
 
 import {Title} from "../Dashboard/SectionTitle"
@@ -44,11 +44,11 @@ const AddItem = ({show, setShow, product, user, type}) => {
 			title,
 			description,
 			type,
-			product_id: product.id,
+			product_id: product,
 			user: {
-				id: user.uid,
-				name: user.displayName,
-				photo: user.photoURL || "https://joeschmoe.io/api/v1/random",
+				id: user.id,
+				name: user.name,
+				photo: user.avatar || "https://joeschmoe.io/api/v1/random",
 			},
       actions
 		}
@@ -92,7 +92,7 @@ const AddItem = ({show, setShow, product, user, type}) => {
 
 	return (
 		<Drawer
-			visible={show}
+			open={show}
 			destroyOnClose={true}
 			closable={false}
 			placement={"bottom"}
