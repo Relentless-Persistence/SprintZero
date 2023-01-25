@@ -11,13 +11,13 @@ import {
   Avatar,
   Row,
   Col,
-  Comment,
   Button,
   List,
   DatePicker,
   TimePicker,
   message,
-} from "antd";
+} from "antd5";
+import {Comment} from "antd"
 import { SendOutlined, FlagOutlined, UserOutlined } from "@ant-design/icons";
 import ActionButtons from "../../components/Personas/ActionButtons";
 import { CardTitle } from "../../components/Dashboard/CardTitle";
@@ -25,6 +25,7 @@ import DrawerSubTitle from "../../components/Dashboard/DrawerSubTitle";
 import { db } from "../../config/firebase-config";
 import { useAuth } from "../../contexts/AuthContext";
 import moment from "moment";
+
 
 const { TextArea } = Input;
 
@@ -41,8 +42,8 @@ const SubTasks = styled.div`
   }
 `;
 
-const EditTask = ({ editMode, setEditMode, task, setTask }) => {
-  const { user } = useAuth();
+const EditTask = ({ editMode, setEditMode, task, setTask, user }) => {
+
   const [title, setTitle] = useState(task.title);
   const [subject, setSubject] = useState(task.subject);
   const [description, setDescription] = useState(task.description);
@@ -50,6 +51,11 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
   const [time, setTime] = useState(task.time);
   const [comments, setComments] = useState(null);
   const [comment, setComment] = useState("");
+	const [subtasks, setSubtasks] = useState(task.subtasks)
+	const [show, setShow] = useState(false)
+	const [val, setVal] = useState("")
+
+	console.log("user", user)
 
   const handleDrawerDateChange = (date, dateString) => {
     setDate(dateString);
@@ -69,6 +75,7 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
         description,
         date,
         time,
+				subtasks
       })
       .then(() => {
         message.success("Task updated successfully");
@@ -89,7 +96,7 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
           setComments(
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
-          console.log(
+          console.log("comments",
             snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
           );
         });
@@ -100,8 +107,8 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
     const data = {
       task_id: task.id,
       author: {
-        name: user.displayName,
-        avatar: user.photoURL,
+        name: user.name,
+        avatar: user.avatar,
       },
       comment: comment,
       createdAt: new Date().toISOString(),
@@ -122,20 +129,27 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
   }, [task]);
 
   const updateSubtask = (i) => {
-    task.subtasks[i].completed = !task.subtasks[i].completed;
-
-    db
-      .collection("tasks")
-      .doc(task.id)
-      .update(task)
-      .then(() => {
-        message.success("subtask updated successfully");
-      });
+		let newSubtasks = [...subtasks]
+    newSubtasks[i].completed = !newSubtasks[i].completed
+		setSubtasks(newSubtasks);
   }
+
+	const addItemDone = async (e) => {
+		if (e.key === "Enter") {
+			let newSubtasks = [...subtasks]
+			newSubtasks.push({
+				name: val,
+				completed: false,
+			})
+			setSubtasks(newSubtasks);
+			setShow(false)
+			setVal("")
+		}
+	}
 
   return (
 		<ResizeableDrawer
-			visible={editMode}
+			open={editMode}
 			closable={false}
 			placement={"bottom"}
 			headerStyle={{background: "#F5F5F5"}}
@@ -162,9 +176,9 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
 			<Row gutter={[24, 24]} className="mt-[15px]">
 				<Col span={8}>
 					<div>
-						<DrawerSubTitle>Subject</DrawerSubTitle>
+						<DrawerSubTitle>Title</DrawerSubTitle>
 
-						<Input className="mb-[24px]" onChange={(e) => setSubject(e.target.value)} value={subject} />
+						<Input className="mb-[24px]" onChange={(e) => setTitle(e.target.value)} value={title} />
 
 						<DrawerSubTitle>Description</DrawerSubTitle>
 
@@ -186,16 +200,23 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
 							defaultValue={moment(task.time, "HH:mm:ss")}
 							format={"HH:mm:ss"}
 						/>
-						,
 					</div>
 
-					<DrawerSubTitle>Subtasks</DrawerSubTitle>
+					<DrawerSubTitle>Actions</DrawerSubTitle>
 					<SubTasks>
-						{task.subtasks?.map((subtask, i) => (
+						{subtasks?.map((subtask, i) => (
 							<Checkbox key={subtask.name} checked={subtask.completed} onChange={() => updateSubtask(i)}>
 								{subtask.name}
 							</Checkbox>
 						))}
+
+						{show ? (
+							<Input value={val} onKeyPress={addItemDone} onChange={(e) => setVal(e.target.value)} />
+						) : (
+							<Checkbox checked={false} onChange={() => setShow((s) => !s)}>
+								<span className="text-[#BFBFBF]">Add New</span>
+							</Checkbox>
+						)}
 					</SubTasks>
 				</Col>
 				<Col className="pr-[20px]" span={8}>
@@ -221,35 +242,37 @@ const EditTask = ({ editMode, setEditMode, task, setTask }) => {
 						)}
 					</div>
 
-					<Comment
-						avatar={<Avatar src={user.photoURL} alt="Han Solo" />}
-						content={
-							<Form>
-								<Form.Item>
-									<TextArea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
-								</Form.Item>
+					{user && (
+						<Comment
+							avatar={<Avatar src={user.avatar} alt="avatar" />}
+							content={
+								<Form>
+									<Form.Item>
+										<TextArea rows={2} value={comment} onChange={(e) => setComment(e.target.value)} />
+									</Form.Item>
 
-								<Form.Item>
-									<Button
-										className="mr-[8px] inline-flex items-center justify-between"
-										disabled={comment.length <= 1}
-										onClick={submitComment}
-									>
-										<SendOutlined />
-										Post
-									</Button>
+									<Form.Item>
+										<Button
+											className="mr-[8px] inline-flex items-center justify-between"
+											disabled={comment.length <= 1}
+											onClick={submitComment}
+										>
+											<SendOutlined />
+											Post
+										</Button>
 
-									<Button
-										className="inline-flex items-center justify-between border-[#4A801D] text-[#4A801D]"
-										onClick={() => setComment("")}
-									>
-										<UserOutlined />
-										Cancel
-									</Button>
-								</Form.Item>
-							</Form>
-						}
-					/>
+										<Button
+											className="inline-flex items-center justify-between border-[#4A801D] text-[#4A801D]"
+											onClick={() => setComment("")}
+										>
+											<UserOutlined />
+											Cancel
+										</Button>
+									</Form.Item>
+								</Form>
+							}
+						/>
+					)}
 				</Col>
 			</Row>
 		</ResizeableDrawer>

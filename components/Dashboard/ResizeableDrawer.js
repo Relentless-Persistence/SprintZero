@@ -3,7 +3,7 @@ import
 {
 
     Drawer
-} from 'antd';
+} from 'antd5';
 
 const DEFAULT_HEIGHT = 378;
 

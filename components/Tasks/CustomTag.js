@@ -1,4 +1,4 @@
-import { Alert } from "antd";
+import { Alert } from "antd5";
 import React from "react";
 
 const CustomTag = ({ shortTitle, due_date }) => {

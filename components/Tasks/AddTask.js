@@ -16,7 +16,7 @@ import {
   DatePicker,
   TimePicker,
   message,
-} from "antd";
+} from "antd5";
 import { SendOutlined, FlagOutlined, UserOutlined } from "@ant-design/icons";
 import ActionButtons from "../../components/Personas/ActionButtons";
 import { CardTitle } from "../../components/Dashboard/CardTitle";
@@ -78,7 +78,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
       date,
       time,
       status: "Backlog",
-      product_id: product.id,
+      product_id: product,
       order,
       board,
       subtasks
@@ -94,7 +94,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
         setDate("")
         setTime("");
         setCreateMode(false);
-        subtasks([])
+        setSubtasks([])
       })
       .catch((error) => {
         message.error("Error creating new task");
@@ -103,8 +103,8 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
   }
 
   return (
-    <ResizeableDrawer
-      visible={createMode}
+    <Drawer
+      open={createMode}
       closable={false}
       placement={"bottom"}
       headerStyle={{ background: "#F5F5F5" }}
@@ -151,14 +151,6 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
           </div>
         </Col>
         <Col span={8}>
-          <DrawerSubTitle>Subject</DrawerSubTitle>
-
-          <Input
-            className="mb-[24px]"
-            onChange={(e) => setSubject(e.target.value)}
-            value={subject}
-            required
-          />
           <DrawerSubTitle>Due</DrawerSubTitle>
 
           <div className="mb-[24px]">
@@ -198,7 +190,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
           </SubTasks>
         </Col>
       </Row>
-    </ResizeableDrawer>
+    </Drawer>
   );
 };
 
