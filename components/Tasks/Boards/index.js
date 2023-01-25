@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import { Board as RBoard, useCard, useColumn } from "react-sdndk";
 
-import { Card as Acard, Row, Col } from "antd";
+import { Card as Acard, Row, Col } from "antd5";
 import { CardTitle } from "../../Dashboard/CardTitle";
 
 const Grid = styled.div`
@@ -20,6 +20,7 @@ const StyledCol = styled(Acard)`
   .ant-card-head {
     min-height: unset;
     border-bottom: 2px solid #d9d9d9;
+    padding: 16px 24px;
   }
 
   .ant-card-body {
@@ -38,7 +39,7 @@ const StyledCard = styled.div`
   background: #fff;
   /* display: grid;
   grid-template-columns: 40px 1fr; */
-  padding: 16px;
+  padding: 16px 24px;
   align-items: center;
   gap: 10px;
   opacity: ${(props) => (props.$isDraggging ? 0 : 1)};

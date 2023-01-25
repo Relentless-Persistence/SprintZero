@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import { Board as RBoard, useCard, useColumn } from "react-sdndk";
 
-import { Card as Acard, Row, Col } from "antd";
+import { Card as Acard, Row, Col } from "antd5";
 import { CardTitle } from "../Dashboard/CardTitle";
 
 const Grid = styled.div`
