@@ -26,6 +26,7 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, async (user) => {
 			if (!user) {
+				setUserId(`signed-out`)
 				replace(`/login`)
 				return
 			}
