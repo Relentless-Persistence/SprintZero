@@ -148,8 +148,8 @@ body {
 }
 
 .custom-message {
-	position: absolute;
-	top: 41px;
+	position: fixed;
+	bottom: 42px;
 	right: 42px;
 }
 

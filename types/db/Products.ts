@@ -44,6 +44,14 @@ const StorySchema = z.object({
 	codeLink: z.string().url().nullable(),
 	description: z.string(),
 	designLink: z.string().url().nullable(),
+	ethicsApproved: z.boolean().nullable(),
+	ethicsColumn: z.union([z.literal(`identified`), z.literal(`under-review`), z.literal(`adjudicated`)]).nullable(),
+	ethicsVotes: z.array(
+		z.object({
+			userId: idSchema,
+			vote: z.boolean(),
+		}),
+	),
 	name: z.string(),
 	points: z.number(),
 
@@ -69,7 +77,7 @@ export const ProductSchema = z.object({
 	]),
 	members: z.array(
 		z.object({
-			user: idSchema,
+			userId: idSchema,
 			type: z.union([z.literal(`editor`), z.literal(`viewer`)]),
 		}),
 	),
@@ -81,8 +89,6 @@ export const ProductSchema = z.object({
 
 		productId: idSchema,
 	}),
-
-	owner: idSchema,
 })
 
 export const Products = genDbNames(`Products`, ProductSchema)

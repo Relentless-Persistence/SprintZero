@@ -4,15 +4,16 @@ import {useAtomValue} from "jotai"
 import type {FC} from "react"
 import type {Feature as FeatureType} from "~/types/db/Products"
 
-import {currentVersionAtom, storyMapStateAtom} from "../atoms"
+import {currentVersionAtom} from "../atoms"
 import {addStory} from "~/utils/api/mutations"
+import {activeProductAtom} from "~/utils/atoms"
 
 export type AddStoryButtonProps = {
 	feature: FeatureType
 }
 
 const AddStoryButton: FC<AddStoryButtonProps> = ({feature}) => {
-	const storyMapState = useAtomValue(storyMapStateAtom)
+	const activeProduct = useAtomValue(activeProductAtom)
 	const currentVersion = useAtomValue(currentVersionAtom)
 
 	if (currentVersion.id === `__ALL_VERSIONS__`) return null
@@ -22,9 +23,9 @@ const AddStoryButton: FC<AddStoryButtonProps> = ({feature}) => {
 			onClick={() => {
 				if (currentVersion.id !== `__ALL_VERSIONS__`)
 					addStory({
-						storyMapState,
+						storyMapState: activeProduct!.storyMapState,
 						featureId: feature.id,
-						data: {name: `Story`, description: `description`, versionId: currentVersion.id},
+						data: {versionId: currentVersion.id},
 					})
 			}}
 			className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"

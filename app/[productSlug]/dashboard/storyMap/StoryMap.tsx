@@ -9,34 +9,31 @@ import type {StoryMapItem, StoryMapTarget} from "./utils/types"
 import type {FC} from "react"
 import type {StoryMapState} from "~/types/db/Products"
 
-import {currentVersionAtom, dragPosAtom, dragStateAtom, storyMapStateAtom} from "./atoms"
+import {currentVersionAtom, dragPosAtom, dragStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
 import Feature from "./feature/Feature"
 import Story from "./story/Story"
-import {calculateBoundaries, meta, useSubscribeToData} from "./utils"
+import {calculateBoundaries, genStoryMapMeta, meta} from "./utils"
 import {dragState, elementRegistry, pointerLocation, storyMapTop} from "./utils/globals"
 import {moveItem} from "./utils/moving"
 import {getHoveringItems, getTargetItem as getTargetLocation} from "./utils/targeting"
 import {addEpic, setStoryMapState} from "~/utils/api/mutations"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {activeProductAtom} from "~/utils/atoms"
 
 const StoryMap: FC = () => {
-	const storyMapState = useAtomValue(storyMapStateAtom)
-	const activeProductId = useActiveProductId()
+	const activeProduct = useAtomValue(activeProductAtom)
 	const currentVersion = useAtomValue(currentVersionAtom)
 	const setDragPos = useSetAtom(dragPosAtom)
 	const [reactDragState, setReactDragState] = useAtom(dragStateAtom)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
 
-	useSubscribeToData()
-
 	useEffect(() => {
 		setDragPos([x, y])
 	}, [setDragPos, x, y])
 
 	useEffect(() => {
-		if(typeof window !== `undefined`) {
+		if (typeof window !== `undefined`) {
 			const handlePointerMove = (e: PointerEvent) => {
 				pointerLocation.current = [e.clientX, e.clientY]
 				x.set(e.clientX)
@@ -51,16 +48,19 @@ const StoryMap: FC = () => {
 	}, [x, y])
 
 	useAnimationFrame(() => {
-		calculateBoundaries(storyMapState, currentVersion.id)
+		if (activeProduct?.storyMapState) {
+			calculateBoundaries(activeProduct.storyMapState, currentVersion.id)
+			genStoryMapMeta(activeProduct.storyMapState, currentVersion.id)
+		}
 	})
 
-	const originalStoryMapState = useRef(storyMapState)
+	const originalStoryMapState = useRef<StoryMapState | undefined>(undefined)
 	const startTarget = useRef<StoryMapTarget | undefined>(undefined)
 	const startItem = useRef<StoryMapItem | undefined>(undefined)
 	const expectedStoryMapState = useRef<StoryMapState | undefined>(undefined)
 
 	const handlePanStart = () => {
-		originalStoryMapState.current = storyMapState
+		originalStoryMapState.current = activeProduct?.storyMapState
 		const hoveringItems = getHoveringItems()
 		if (hoveringItems.story) {
 			const storyBoundingBox = elementRegistry[hoveringItems.story]?.content.getBoundingClientRect()
@@ -144,11 +144,11 @@ const StoryMap: FC = () => {
 	}
 
 	const handlePan = () => {
-		if (!startItem.current || !activeProductId || !dragState.current) return
+		if (!startItem.current || !activeProduct || !originalStoryMapState.current || !dragState.current) return
 
 		if (
 			expectedStoryMapState.current &&
-			JSON.stringify(storyMapState) !== JSON.stringify(expectedStoryMapState.current)
+			JSON.stringify(activeProduct) !== JSON.stringify(expectedStoryMapState.current)
 		)
 			return
 		expectedStoryMapState.current = undefined
@@ -162,14 +162,14 @@ const StoryMap: FC = () => {
 
 		if (JSON.stringify(target) !== JSON.stringify(startTarget.current)) {
 			const newStoryMapState = moveItem(
-				storyMapState,
+				activeProduct.storyMapState,
 				originalStoryMapState.current,
 				startItem.current,
 				target,
 				currentVersion.id === `__ALL_VERSIONS__` ? undefined : currentVersion.id,
 			)
 
-			if (JSON.stringify(newStoryMapState) === JSON.stringify(storyMapState)) return
+			if (JSON.stringify(newStoryMapState) === JSON.stringify(activeProduct)) return
 			setStoryMapState({storyMapState: newStoryMapState})
 			expectedStoryMapState.current = newStoryMapState
 
@@ -202,13 +202,13 @@ const StoryMap: FC = () => {
 				}}
 				className="relative z-10 flex w-max items-start gap-8"
 			>
-				{storyMapState.epics.map((epic) => (
+				{activeProduct?.storyMapState.epics.map((epic) => (
 					<Epic key={epic.id} epic={epic} />
 				))}
 
 				<button
 					type="button"
-					onClick={() => void addEpic({storyMapState, data: {}})}
+					onClick={() => void addEpic({storyMapState: activeProduct!.storyMapState, data: {}})}
 					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#4f2dc8] transition-colors hover:bg-[#faf8ff]"
 				>
 					<ReadOutlined />
@@ -218,17 +218,17 @@ const StoryMap: FC = () => {
 
 			{dragState.current && (
 				<motion.div id="drag-host" className="fixed top-0 left-0 z-20" style={dragHostStyle}>
-					{activeProductId &&
+					{activeProduct &&
 						(() => {
-							for (const epic of storyMapState.epics) {
+							for (const epic of activeProduct.storyMapState.epics) {
 								if (epic.id === dragState.current.id) return <Epic epic={epic} inert />
 							}
 
-							for (const feature of storyMapState.features) {
+							for (const feature of activeProduct.storyMapState.features) {
 								if (feature.id === dragState.current.id) return <Feature feature={feature} inert />
 							}
 
-							for (const story of storyMapState.stories) {
+							for (const story of activeProduct.storyMapState.stories) {
 								if (story.id === dragState.current.id) return <Story story={story} inert />
 							}
 						})()}

@@ -63,8 +63,7 @@ const ProductConfiguration: FC = () => {
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
 			storyMapState: {productId: slug, epics: [], features: [], stories: []},
-			members: [{user: userId, type: `editor`}],
-			owner: userId,
+			members: [{userId, type: `editor`}],
 		} satisfies Omit<Product, `id`>)
 		await setDoc(doc(db, Products._, slug), finalData)
 
@@ -144,6 +143,7 @@ const ProductConfiguration: FC = () => {
 							htmlType="submit"
 							form="current-slide"
 							disabled={!canProceed || hasSubmitted}
+							className="bg-green-s500"
 						>
 							Start
 						</Button>
@@ -153,6 +153,7 @@ const ProductConfiguration: FC = () => {
 							htmlType="submit"
 							form="current-slide"
 							disabled={currentSlide === numSlides - 1 || !canProceed || hasSubmitted}
+							className="bg-green-s500"
 						>
 							Next
 						</Button>

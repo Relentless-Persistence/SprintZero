@@ -5,7 +5,7 @@ import {genDbNames, idSchema} from "~/types"
 export const UserSchema = z.object({
 	id: idSchema,
 
-	avatar: z.string(),
+	avatar: z.string().nullable(),
 	email: z.string(),
 	name: z.string(),
 

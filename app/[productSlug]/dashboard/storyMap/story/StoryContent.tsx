@@ -2,37 +2,34 @@
 
 import {useQueryClient} from "@tanstack/react-query"
 import produce from "immer"
-import {useAtomValue, useSetAtom} from "jotai"
+import {useAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
 import type {Story as StoryType} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
-import {storyMapStateAtom} from "../atoms"
+import StoryDrawer from "./StoryDrawer"
 import AutoSizingInput from "../AutoSizingInput"
-import ItemDrawer from "../ItemDrawer"
-import {deleteStory, updateStory} from "~/utils/api/mutations"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {updateStory} from "~/utils/api/mutations"
+import {activeProductAtom} from "~/utils/atoms"
 
 export type StoryContentProps = {
 	story: StoryType
 }
 
 const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> = ({story}, ref) => {
-	const storyMapState = useAtomValue(storyMapStateAtom)
+	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-	const activeProduct = useActiveProductId()
 	const version = useQueryClient()
-		.getQueryData<Version[]>([`all-versions`, activeProduct])
+		.getQueryData<Version[]>([`all-versions`, activeProduct?.id])
 		?.find((version) => version.id === story.versionId)
 
-	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const updateLocalStoryName = (newName: string) => {
-		setStoryMapState((state) =>
-			produce(state, (state) => {
-				state.stories.find(({id}) => id === story.id)!.name = newName
+		setActiveProduct((activeProduct) =>
+			produce(activeProduct, (draft) => {
+				draft!.storyMapState.stories.find(({id}) => id === story.id)!.name = newName
 			}),
 		)
 	}
@@ -56,7 +53,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 						value={story.name}
 						onChange={(value) => {
 							updateLocalStoryName(value)
-							updateStory({storyMapState, storyId: story.id, data: {name: value}})
+							updateStory({storyMapState: activeProduct!.storyMapState, storyId: story.id, data: {name: value}})
 						}}
 						inputStateId={story.nameInputStateId}
 						inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
@@ -64,29 +61,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 				</div>
 			</div>
 
-			<ItemDrawer
-				title={story.name}
-				itemType="User story"
-				data={{
-					points: story.points,
-					description: story.description,
-					onDescriptionChange: (value) =>
-						void updateStory({storyMapState, storyId: story.id, data: {description: value}}),
-					checklist: {
-						title: `Acceptance criteria`,
-						items: story.acceptanceCriteria.map((item) => ({id: item.id, label: item.name, checked: item.checked})),
-						onItemToggle: () => {},
-					},
-					commentIds: story.commentIds,
-					onCommentAdd: () => {},
-					onDelete: () => {
-						setIsDrawerOpen(false)
-						deleteStory({storyMapState, storyId: story.id})
-					},
-				}}
-				isOpen={isDrawerOpen}
-				onClose={() => void setIsDrawerOpen(false)}
-			/>
+			<StoryDrawer story={story} isOpen={isDrawerOpen} onClose={() => void setIsDrawerOpen(false)} />
 		</>
 	)
 }

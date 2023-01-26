@@ -33,10 +33,8 @@ const Feature: FC<FeatureProps> = ({feature, inert = false}) => {
 		return () => {
 			if (!containerRef.current || !contentRef.current) return
 			elementRegistry[feature.id] = {
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				container: containerRef.current,
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				content: contentRef.current,
+				container: containerRef.current, // eslint-disable-line react-hooks/exhaustive-deps
+				content: contentRef.current, // eslint-disable-line react-hooks/exhaustive-deps
 			}
 		}
 	}, [feature.id, inert])

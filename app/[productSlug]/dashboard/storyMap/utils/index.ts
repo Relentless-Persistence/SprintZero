@@ -1,35 +1,12 @@
-import {doc, onSnapshot} from "firebase9/firestore"
-import {useAtomValue, useSetAtom} from "jotai"
 import {sortBy} from "lodash"
-import {useEffect} from "react"
 
 import type {CurrentVersionId, EpicMeta, FeatureMeta, StoryMapMeta, StoryMeta} from "./types"
 import type {Id} from "~/types"
 import type {Epic, Feature, StoryMapState} from "~/types/db/Products"
 
-import {currentVersionAtom, storyMapStateAtom} from "../atoms"
 import {boundaries, elementRegistry, layerBoundaries, storyMapMeta, storyMapScrollPosition} from "./globals"
-import {db} from "~/config/firebase"
-import {Products, ProductSchema} from "~/types/db/Products"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) / arr.length
-
-export const useSubscribeToData = (): void => {
-	const activeProductId = useActiveProductId()
-	const setStoryMapState = useSetAtom(storyMapStateAtom)
-	const currentVersion = useAtomValue(currentVersionAtom)
-
-	useEffect(() => {
-		if (!activeProductId) return
-
-		return onSnapshot(doc(db, Products._, activeProductId), (doc) => {
-			const data = ProductSchema.parse({id: doc.id, ...doc.data()})
-			setStoryMapState(data.storyMapState)
-			genStoryMapMeta(data.storyMapState, currentVersion.id)
-		})
-	}, [activeProductId, currentVersion.id, setStoryMapState])
-}
 
 export const sortEpics = (epics: Epic[]): Epic[] => sortBy(epics, [(epic: Epic) => epic.userValue])
 export const sortFeatures = (storyMapState: StoryMapState, featureIds: Id[]): Id[] =>
@@ -38,7 +15,7 @@ export const sortFeatures = (storyMapState: StoryMapState, featureIds: Id[]): Id
 		[(feature: Feature) => feature.userValue],
 	).map((feature) => feature.id)
 
-const genStoryMapMeta = (storyMapState: StoryMapState, currentVersionId: CurrentVersionId): void => {
+export const genStoryMapMeta = (storyMapState: StoryMapState, currentVersionId: CurrentVersionId): void => {
 	const meta: StoryMapMeta = {}
 	storyMapState.epics.forEach((epic, i) => {
 		meta[epic.id] = {

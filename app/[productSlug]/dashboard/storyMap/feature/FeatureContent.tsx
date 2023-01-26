@@ -2,16 +2,16 @@
 
 import {CopyOutlined} from "@ant-design/icons"
 import produce from "immer"
-import {useAtomValue, useSetAtom} from "jotai"
+import {useAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
 import type {Feature as FeatureType} from "~/types/db/Products"
 
-import {storyMapStateAtom} from "../atoms"
+import FeatureDrawer from "./FeatureDrawer"
 import AutoSizingInput from "../AutoSizingInput"
-import ItemDrawer from "../ItemDrawer"
-import {deleteFeature, updateFeature} from "~/utils/api/mutations"
+import {updateFeature} from "~/utils/api/mutations"
+import {activeProductAtom} from "~/utils/atoms"
 
 export type FeatureContentProps = {
 	feature: FeatureType
@@ -19,15 +19,12 @@ export type FeatureContentProps = {
 
 const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentProps> = ({feature}, ref) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const storyMapState = useAtomValue(storyMapStateAtom)
-	const stories = storyMapState.stories.filter((story) => feature.storyIds.includes(story.id))
-	const points = stories.reduce((acc, story) => acc + story.points, 0)
+	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
 
-	const setStoryMapState = useSetAtom(storyMapStateAtom)
 	const updateLocalFeatureName = (newName: string) => {
-		setStoryMapState((state) =>
-			produce(state, (state) => {
-				state.features.find(({id}) => id === feature.id)!.name = newName
+		setActiveProduct((activeProduct) =>
+			produce(activeProduct, (draft) => {
+				draft!.storyMapState.features.find(({id}) => id === feature.id)!.name = newName
 			}),
 		)
 	}
@@ -49,31 +46,14 @@ const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentPro
 					value={feature.name}
 					onChange={(value) => {
 						updateLocalFeatureName(value)
-						updateFeature({storyMapState, featureId: feature.id, data: {name: value}})
+						updateFeature({storyMapState: activeProduct!.storyMapState, featureId: feature.id, data: {name: value}})
 					}}
 					inputStateId={feature.nameInputStateId}
 					inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
 				/>
 			</div>
 
-			<ItemDrawer
-				title={feature.name}
-				itemType="Feature"
-				data={{
-					points,
-					description: feature.description,
-					onDescriptionChange: (value) =>
-						void updateFeature({storyMapState, featureId: feature.id, data: {description: value}}),
-					commentIds: feature.commentIds,
-					onCommentAdd: () => {},
-					onDelete: () => {
-						setIsDrawerOpen(false)
-						deleteFeature({storyMapState, featureId: feature.id})
-					},
-				}}
-				isOpen={isDrawerOpen}
-				onClose={() => void setIsDrawerOpen(false)}
-			/>
+			<FeatureDrawer feature={feature} isOpen={isDrawerOpen} onClose={() => void setIsDrawerOpen(false)} />
 		</>
 	)
 }

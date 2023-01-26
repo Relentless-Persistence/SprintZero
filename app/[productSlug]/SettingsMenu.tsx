@@ -10,15 +10,20 @@ import {
 	UserOutlined,
 } from "@ant-design/icons"
 import {Menu} from "antd5"
+import {signOut} from "firebase9/auth"
+import {useSetAtom} from "jotai"
 import Link from "next/link"
-import {usePathname} from "next/navigation"
+import {usePathname, useRouter} from "next/navigation"
 
 import type {FC} from "react"
 
 import {auth} from "~/config/firebase"
+import {userIdAtom} from "~/utils/atoms"
 
 const SettingsMenu: FC = () => {
 	const pathname = usePathname()
+	const router = useRouter()
+	const setUserId = useSetAtom(userIdAtom)
 
 	return (
 		<div className="flex h-full flex-col justify-between">
@@ -60,7 +65,11 @@ const SettingsMenu: FC = () => {
 						key: `settings-logout`,
 						icon: <LogoutOutlined />,
 						label: `Logout`,
-						onClick: () => void auth.signOut(),
+						onClick: async () => {
+							await signOut(auth)
+							setUserId(undefined)
+							router.push(`/login`)
+						},
 					},
 				]}
 				style={{borderInlineEnd: `unset`}}

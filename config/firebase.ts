@@ -1,5 +1,5 @@
 import {initializeApp} from "firebase9/app"
-import {getAuth} from "firebase9/auth"
+import {getAuth, GoogleAuthProvider, OAuthProvider} from "firebase9/auth"
 import {getFirestore} from "firebase9/firestore"
 
 const firebaseConfig = {
@@ -15,3 +15,7 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+
+export const googleAuthProvider = new GoogleAuthProvider()
+export const appleAuthProvider = new OAuthProvider(`apple.com`)
+export const microsoftAuthProvider = new OAuthProvider(`microsoft.com`)

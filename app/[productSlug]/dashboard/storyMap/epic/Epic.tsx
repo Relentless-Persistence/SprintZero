@@ -7,10 +7,10 @@ import {useEffect, useRef} from "react"
 import type {FC} from "react"
 import type {Epic as EpicType} from "~/types/db/Products"
 
-import {dragState, elementRegistry} from "../utils/globals"
 import EpicContent from "./EpicContent"
 import FeatureList from "./FeatureList"
 import SmallAddFeatureButton from "./SmallAddFeatureButton"
+import {dragState, elementRegistry} from "../utils/globals"
 
 export type EpicProps = {
 	epic: EpicType
@@ -29,10 +29,8 @@ const Epic: FC<EpicProps> = ({epic, inert = false}) => {
 		return () => {
 			if (!containerRef.current || !contentRef.current) return
 			elementRegistry[epic.id] = {
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				container: containerRef.current,
-				// eslint-disable-next-line react-hooks/exhaustive-deps
-				content: contentRef.current,
+				container: containerRef.current, // eslint-disable-line react-hooks/exhaustive-deps
+				content: contentRef.current, // eslint-disable-line react-hooks/exhaustive-deps
 			}
 		}
 	}, [epic.id, inert])

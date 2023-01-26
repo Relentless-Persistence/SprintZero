@@ -4,12 +4,14 @@ import {nanoid} from "nanoid"
 
 import type {SetRequired} from "type-fest"
 import type {Id} from "~/types"
+import type {Comment} from "~/types/db/Comments"
 import type {InputState} from "~/types/db/InputStates"
 import type {Epic, Feature, Product, Story, StoryMapState} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
 import {storyMapMeta} from "~/app/[productSlug]/dashboard/storyMap/utils/globals"
 import {db} from "~/config/firebase"
+import {Comments} from "~/types/db/Comments"
 import {InputStates} from "~/types/db/InputStates"
 import {Products} from "~/types/db/Products"
 import {Versions} from "~/types/db/Versions"
@@ -206,7 +208,10 @@ export const addStory = async ({
 		codeLink: null,
 		description: ``,
 		designLink: null,
-		name: ``,
+		ethicsApproved: null,
+		ethicsColumn: null,
+		ethicsVotes: [],
+		name: `Story ${storyMapState.stories.length + 1}`,
 		points: 0,
 		commentIds: [],
 		nameInputStateId: await createInputState(),
@@ -282,3 +287,12 @@ type SetStoryMapStateVars = {
 
 export const setStoryMapState = async ({storyMapState}: SetStoryMapStateVars): Promise<void> =>
 	await updateDoc(doc(db, Products._, storyMapState.productId), {storyMapState})
+
+type AddCommentVars = {
+	comment: Omit<Comment, `id`>
+}
+
+export const addComment = async ({comment}: AddCommentVars): Promise<Id> => {
+	const ref = await addDoc(collection(db, Comments._), comment)
+	return ref.id as Id
+}

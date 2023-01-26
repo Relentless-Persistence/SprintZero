@@ -3,17 +3,20 @@
 import {CloseOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Drawer, Layout, Menu} from "antd5"
-import {useAtomValue} from "jotai"
+import {doc, onSnapshot} from "firebase9/firestore"
+import {useAtomValue, useSetAtom} from "jotai"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
-import {useState} from "react"
+import {useEffect, useState} from "react"
 
 import type {ReactNode, FC} from "react"
 
 import SettingsMenu from "./SettingsMenu"
 import SideMenu from "./SideMenu"
+import {db} from "~/config/firebase"
+import {Products, ProductSchema} from "~/types/db/Products"
 import {getProductsByUser, getUser} from "~/utils/api/queries"
-import {userIdAtom} from "~/utils/atoms"
+import {activeProductAtom, userIdAtom} from "~/utils/atoms"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type DashboardLayoutProps = {
@@ -37,6 +40,15 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	})
 
 	const activeProductId = useActiveProductId()
+	const setActiveProduct = useSetAtom(activeProductAtom)
+	useEffect(() => {
+		if (!activeProductId) return
+
+		return onSnapshot(doc(db, Products._, activeProductId), (doc) => {
+			const data = ProductSchema.parse({id: doc.id, ...doc.data()})
+			setActiveProduct(data)
+		})
+	}, [activeProductId, setActiveProduct])
 
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
@@ -72,7 +84,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 				<Layout.Sider theme="light">
 					<SideMenu />
 				</Layout.Sider>
-				<Layout.Content>{children}</Layout.Content>
+				<Layout.Content className="relative">{children}</Layout.Content>
 			</Layout>
 
 			<Drawer
