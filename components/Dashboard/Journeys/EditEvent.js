@@ -13,7 +13,7 @@ import {
   Drawer,
   Button,
   message,
-} from "antd";
+} from "antd5";
 import { Title } from "../SectionTitle";
 import ActionButtons from "../../Personas/ActionButtons";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
@@ -79,7 +79,6 @@ const EditEvent = ({
   journeyDur,
   journeyType,
 }) => {
-  console.log("event", event);
   const [evt, setEvt] = useState({ ...event });
   const [participants, setParticipants] = useState([]);
 
@@ -88,8 +87,8 @@ const EditEvent = ({
       //console.log( journeyStart );
       const jStart = new Date(journeyStart);
       const jEnd = add(jStart, {
-        [`${[journeyType]}s`]: journeyDur,
-      });
+				[`${journeyType}`]: journeyDur,
+			})
       const validStart = isWithinInterval(new Date(start), {
         start: jStart,
         end: jEnd,
@@ -104,8 +103,7 @@ const EditEvent = ({
   };
 
   const handleNameChange = (e) => {
-    const name = capitalize(e.target.name);
-    setEvt({ ...evt, title: name });
+    setEvt({ ...evt, title: e.target.value });
   };
 
   const handleDescChange = (e) => {
@@ -115,7 +113,7 @@ const EditEvent = ({
   const handleTimeChange = (field, dateTime) => {
     let time = "";
     if (dateTime) {
-      time = new Date(dateTime._d).toISOString();
+      time = new Date(dateTime.$d).toISOString();
     }
     setEvt({ ...evt, [field]: time });
   };
@@ -221,7 +219,7 @@ const EditEvent = ({
       title={
         <Row>
           <Col span={12} className="flex items-center space-x-4">
-            <h1 className="font-[600] font[#262626] font-[20px] leading-[28px]">
+            <h1 className="font-semibold text-[#262626] text-[20px] leading-[28px]">
               Touchpoint
             </h1>
             <Button
@@ -242,7 +240,7 @@ const EditEvent = ({
       }
       placement={"bottom"}
       closable={false}
-      visible={editEvent}
+      open={editEvent}
       headerStyle={{
         background: "#F5F5F5",
       }}
