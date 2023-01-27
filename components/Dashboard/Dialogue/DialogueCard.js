@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Card, Tag } from "antd";
+import { Card, Tag } from "antd5";
 import styled from "styled-components";
 
 import { CardHeaderLink } from "../CardHeaderButton";

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Row, Col, Menu, Button, Input, Form, Drawer, Select } from "antd";
+import { Row, Col, Menu, Button, Input, Form, Drawer, Select } from "antd5";
 import styled from "styled-components";
 
 import { CloseOutlined } from "@ant-design/icons";
@@ -44,6 +44,8 @@ const EditNote = ({
   onSubmit,
   height = 378,
   activeProduct,
+  personas,
+  view
 }) => {
   const [form] = Form.useForm();
   const [name, setName] = useState(dialogue.name);
@@ -52,26 +54,11 @@ const EditNote = ({
   const [region, setRegion] = useState(dialogue.name);
   const [type, setType] = useState(dialogue.type);
   const [edu, setEdu] = useState(dialogue.education);
-  const [personas, setPersonas] = useState(null);
-
-  const fetchPersonas = async () => {
-    const res = db
-      .collection("Personas")
-      .where("product_id", "==", activeProduct.id)
-      .onSnapshot((snapshot) => {
-        setPersonas(
-          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        );
-      });
-  };
-
-  useEffect(() => {
-    fetchPersonas();
-  }, []);
+  
 
   const onClose = () => {
-    setDialogue(null);
     setVisible(false);
+    setDialogue(null)
   };
 
   const handleChangeTitle = (index, e) => {
@@ -109,7 +96,11 @@ const EditNote = ({
       updatedAt: new Date().toISOString(),
     };
 
-    db.collection("Dialogues").doc(dialogue.id).update(data);
+    db.collection("Dialogues").doc(dialogue.id).update(data)
+    .then(() => {
+      setVisible(false)
+      setDialogue(null)
+    })
   };
 
   const add = () => {
@@ -118,7 +109,7 @@ const EditNote = ({
 
   return (
     <Drawer
-      visible={visible}
+      open={visible}
       closable={false}
       height={height}
       placement={"bottom"}
@@ -220,7 +211,7 @@ const EditNote = ({
             <Title className="text-right">Education Level</Title>
             <Select
               defaultValue={edu}
-              onChange={(value) => setEdu(dialogue.id, value)}
+              onChange={(value) => setEdu(value)}
               className="w-full"
             >
               {education.map((item, i) => (
