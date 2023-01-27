@@ -1,11 +1,9 @@
-# dependencies
+# package managers
 /node_modules
 /.pnp
 .pnp.js
 package-lock.json
-
-# testing
-/coverage
+yarn.lock
 
 # next.js
 /.next/
@@ -31,8 +29,10 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# vercel
-.vercel
-
 # firebase
 /.firebase
+
+# playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/

@@ -4,7 +4,6 @@ import {useQuery} from "@tanstack/react-query"
 import {Avatar, Button} from "antd5"
 import {addDoc, collection, doc, setDoc, updateDoc} from "firebase9/firestore"
 import {motion} from "framer-motion"
-import {useAtomValue} from "jotai"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
@@ -24,7 +23,7 @@ import {Products, ProductSchema} from "~/types/db/Products"
 import {Users} from "~/types/db/Users"
 import {Versions} from "~/types/db/Versions"
 import {getUser} from "~/utils/api/queries"
-import {userIdAtom} from "~/utils/atoms"
+import {useUserId} from "~/utils/atoms"
 
 const numSlides = 4
 
@@ -39,7 +38,7 @@ type FormInputs = {
 }
 
 const ProductConfiguration: FC = () => {
-	const userId = useAtomValue(userIdAtom)
+	const userId = useUserId()
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const [canProceed, setCanProceed] = useState(false)
 	const [formData, setFormData] = useState<Partial<FormInputs>>({})
@@ -47,8 +46,8 @@ const ProductConfiguration: FC = () => {
 
 	const {data: user} = useQuery({
 		queryKey: [`user`, userId],
-		queryFn: getUser(userId!),
-		enabled: userId !== undefined,
+		queryFn: getUser(userId as Id),
+		enabled: userId !== undefined && userId !== `signed-out`,
 	})
 
 	const router = useRouter()
@@ -63,7 +62,7 @@ const ProductConfiguration: FC = () => {
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
 			storyMapState: {productId: slug, epics: [], features: [], stories: []},
-			members: [{userId, type: `editor`}],
+			members: [{userId: userId as Id, type: `editor`}],
 		} satisfies Omit<Product, `id`>)
 		await setDoc(doc(db, Products._, slug), finalData)
 

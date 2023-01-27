@@ -4,7 +4,6 @@ import {AppleFilled} from "@ant-design/icons"
 import {message} from "antd5"
 import {signInWithPopup, signOut} from "firebase9/auth"
 import {doc, getDoc, setDoc} from "firebase9/firestore"
-import {useAtomValue} from "jotai"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import React, {useEffect, useState} from "react"
@@ -15,11 +14,11 @@ import type {User} from "~/types/db/Users"
 
 import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/config/firebase"
 import {UserSchema, Users} from "~/types/db/Users"
-import {userIdAtom} from "~/utils/atoms"
+import {useUserId} from "~/utils/atoms"
 
 const LoginPage: FC = () => {
 	const router = useRouter()
-	const userId = useAtomValue(userIdAtom)
+	const userId = useUserId()
 	const [hasSignedIn, setHasSignedIn] = useState(false)
 
 	useEffect(() => {
@@ -76,6 +75,7 @@ const LoginPage: FC = () => {
 					type="button"
 					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
 					onClick={() => handleOnClick(appleAuthProvider)}
+					data-testid="apple-sign-in"
 				>
 					<AppleFilled className="text-[27px]" />
 					<p>Sign in with Apple</p>
@@ -84,6 +84,7 @@ const LoginPage: FC = () => {
 					type="button"
 					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
 					onClick={() => handleOnClick(googleAuthProvider)}
+					data-testid="google-sign-in"
 				>
 					<Image src="/images/googleIcon.png" alt="" width={29} height={29} priority />
 					<p>Sign in with Google</p>
@@ -93,6 +94,7 @@ const LoginPage: FC = () => {
 					type="button"
 					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-8 text-xl font-medium"
 					onClick={() => handleOnClick(microsoftAuthProvider)}
+					data-testid="microsoft-sign-in"
 				>
 					<Image src="/images/microsoftIcon.png" alt="" width={23} height={23} priority />
 					<p>Sign in with Microsoft</p>

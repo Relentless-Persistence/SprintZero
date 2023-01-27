@@ -1,10 +1,9 @@
 import {useQuery} from "@tanstack/react-query"
-import {useAtomValue} from "jotai"
 import {usePathname, useRouter} from "next/navigation"
 
 import type {Id} from "~/types"
 
-import {userIdAtom} from "./atoms"
+import {useUserId} from "./atoms"
 import {getProductsByUser} from "~/utils/api/queries"
 
 export const useActiveProductId = (): Id | undefined => {
@@ -13,7 +12,8 @@ export const useActiveProductId = (): Id | undefined => {
 	const productId = slugs?.[1] as Id | undefined
 
 	const router = useRouter()
-	const userId = useAtomValue(userIdAtom)
+	const userId = useUserId()
+
 	useQuery({
 		queryKey: [`all-products`, userId],
 		queryFn: getProductsByUser(userId!),

@@ -1,7 +1,6 @@
 "use client"
 
 import {doc, onSnapshot} from "firebase9/firestore"
-import {useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
@@ -10,7 +9,7 @@ import type {Id} from "~/types"
 import {db} from "~/config/firebase"
 import {InputStates, InputStateSchema} from "~/types/db/InputStates"
 import {updateInputState} from "~/utils/api/mutations"
-import {userIdAtom} from "~/utils/atoms"
+import {useUserId} from "~/utils/atoms"
 
 export type MultiUserInputProps = {
 	value: string
@@ -20,7 +19,7 @@ export type MultiUserInputProps = {
 }
 
 const MultiUserInput: FC<MultiUserInputProps> = ({value, onChange, inputStateId, inputProps}) => {
-	const userId = useAtomValue(userIdAtom)
+	const userId = useUserId()
 	const ref = useRef<HTMLInputElement | undefined>(undefined)
 
 	useEffect(() => {
@@ -43,7 +42,7 @@ const MultiUserInput: FC<MultiUserInputProps> = ({value, onChange, inputStateId,
 					end: ref.current?.selectionEnd ?? null,
 					direction: ref.current?.selectionDirection ?? null,
 				},
-				userId,
+				userId: userId as Id,
 			})
 		}
 	}

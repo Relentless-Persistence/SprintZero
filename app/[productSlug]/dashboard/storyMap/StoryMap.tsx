@@ -210,6 +210,7 @@ const StoryMap: FC = () => {
 					type="button"
 					onClick={() => void addEpic({storyMapState: activeProduct!.storyMapState, data: {}})}
 					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#4f2dc8] transition-colors hover:bg-[#faf8ff]"
+					data-testid="add-epic"
 				>
 					<ReadOutlined />
 					<span>Add epic</span>

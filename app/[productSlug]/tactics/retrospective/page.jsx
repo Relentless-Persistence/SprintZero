@@ -5,7 +5,6 @@
 // import {SortAscendingOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Card, Avatar, message, Empty, Breadcrumb, Button} from "antd5"
-import {useAtomValue} from "jotai"
 // import {findIndex} from "lodash"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
@@ -19,7 +18,7 @@ import EditItem from "~/components/Retrospective/EditItem"
 import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
 import {getUser} from "~/utils/api/queries"
-import {userIdAtom} from "~/utils/atoms"
+import {useUserId} from "~/utils/atoms"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const {Meta} = Card
@@ -76,7 +75,7 @@ const Version = styled.li`
 `
 
 export default function Retrospective() {
-	const userId = useAtomValue(userIdAtom)
+	const userId = useUserId()
 	const {data: user} = useQuery({
 		queryKey: [`user`, userId],
 		queryFn: getUser(userId),
@@ -106,7 +105,7 @@ export default function Retrospective() {
 		if (activeProductId) {
 			db.collection(`Retrospectives`)
 				.where(`product_id`, `==`, activeProductId)
-        .where(`type`, `==`, activeType)
+				.where(`type`, `==`, activeType)
 				.onSnapshot((snapshot) => {
 					setData(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 				})
@@ -174,72 +173,71 @@ export default function Retrospective() {
 
 					{data?.length > 0 ? (
 						<MasonryGrid>
-							{data
-								.map((c, i) =>
-									i === activeEditIndex ? (
-										<div key={i}>
-											<ActionFormCard
-												title={c.title}
-												description={c.description}
-												id={c.id}
-												className="mb-[16px]"
-												onCancel={() => setActiveEditIndex(null)}
-												onSubmit={onEdit}
-												onDelete={() => removeRetro(c.id)}
-											/>
-										</div>
-									) : (
-										<MyCard
+							{data.map((c, i) =>
+								i === activeEditIndex ? (
+									<div key={i}>
+										<ActionFormCard
+											title={c.title}
+											description={c.description}
+											id={c.id}
 											className="mb-[16px]"
-											// extra={ user === c.name ? <CardHeaderLink>Edit</CardHeaderLink> : null }
-											key={i}
-										>
-											<Meta
-												className="flex items-center"
-												avatar={
-													<Avatar
-														size={48}
-														src={c.user?.photo}
-														style={{
-															border: `2px solid #315613`,
-														}}
-													/>
-												}
-												title={c.user?.name}
-											/>
+											onCancel={() => setActiveEditIndex(null)}
+											onSubmit={onEdit}
+											onDelete={() => removeRetro(c.id)}
+										/>
+									</div>
+								) : (
+									<MyCard
+										className="mb-[16px]"
+										// extra={ user === c.name ? <CardHeaderLink>Edit</CardHeaderLink> : null }
+										key={i}
+									>
+										<Meta
+											className="flex items-center"
+											avatar={
+												<Avatar
+													size={48}
+													src={c.user?.photo}
+													style={{
+														border: `2px solid #315613`,
+													}}
+												/>
+											}
+											title={c.user?.name}
+										/>
 
-											{user && userRole !== `viewer` && user.id === c.user?.id ? (
-												<CardHeaderLink onClick={() => editRetro(c)} className="absolute top-[28px] right-[16px]">
-													Edit
-												</CardHeaderLink>
-											) : null}
+										{user && userRole !== `viewer` && user.id === c.user?.id ? (
+											<CardHeaderLink onClick={() => editRetro(c)} className="absolute top-[28px] right-[16px]">
+												Edit
+											</CardHeaderLink>
+										) : null}
 
-											<article className="space-y-4">
-												<div>
-													<h5 className="font-semibold] text-[16px] text-[#595959]">{c.title}</h5>
-													<p>{c.description}</p>
-												</div>
+										<article className="space-y-4">
+											<div>
+												<h5 className="font-semibold] text-[16px] text-[#595959]">{c.title}</h5>
+												<p>{c.description}</p>
+											</div>
 
-												<div className="">
-													<h5 className="font-semibold] text-[16px] text-[#595959]">Proposed Actions</h5>
-													{c.actions.map((a, actionIndex) => (
-														<div key={actionIndex}>
-															<AppCheckbox
-																key={a.label}
-																checked={a.completed}
-																onChange={() => updateRetroAction(actionIndex, i, c.id)}
-															>
-																{a.name}
-															</AppCheckbox>
-														</div>
-													))}
-												</div>
-											</article>
+											<div className="">
+												<h5 className="font-semibold] text-[16px] text-[#595959]">Proposed Actions</h5>
+												{c.actions.map((a, actionIndex) => (
+													<div key={actionIndex}>
+														<AppCheckbox
+															key={a.label}
+															checked={a.completed}
+															onChange={() => updateRetroAction(actionIndex, i, c.id)}
+														>
+															{a.name}
+														</AppCheckbox>
+													</div>
+												))}
+											</div>
+										</article>
 
-											<br />
-										</MyCard>
-									),
-								)}
+										<br />
+									</MyCard>
+								),
+							)}
 						</MasonryGrid>
 					) : (
 						<div className="flex items-center justify-center">

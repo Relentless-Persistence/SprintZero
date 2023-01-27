@@ -3,7 +3,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {useQuery} from "@tanstack/react-query"
 import {message, Breadcrumb, Button} from "antd5"
-import {useAtomValue} from "jotai"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -14,12 +13,10 @@ import EditTask from "~/components/Tasks/EditTask"
 import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
 import {getUser} from "~/utils/api/queries"
-import {userIdAtom} from "~/utils/atoms"
+import {useUserId} from "~/utils/atoms"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const boards = [`Board 0`, `Board 1`, `Board 2`, `Board 3`, `Board 4`]
-
-
 
 const Versions = styled.ul`
 	list-style: none;
@@ -42,8 +39,8 @@ const Version = styled.li`
 export default function Tasks() {
 	const userRole = `member`
 	const activeProductId = useActiveProductId()
+	const userId = useUserId()
 
-  const userId = useAtomValue(userIdAtom)
 	const {data: user} = useQuery({
 		queryKey: [`user`, userId],
 		queryFn: getUser(userId),
@@ -67,8 +64,7 @@ export default function Tasks() {
 	// Fetch data from firebase
 	const fetchTasks = async () => {
 		if (activeProductId) {
-			db
-				.collection(`tasks`)
+			db.collection(`tasks`)
 				.where(`product_id`, `==`, activeProductId)
 				.where(`board`, `==`, activeBoard)
 				.onSnapshot((snapshot) => {
@@ -115,10 +111,6 @@ export default function Tasks() {
 		fetchTasks()
 	}, [activeProductId, activeBoard])
 
-	
-
-	
-
 	const handleDrop = async (card, targetColId) => {
 		const selectedTask = data[card.colId].data[card.id]
 		const targetTask = data[targetColId]
@@ -141,14 +133,11 @@ export default function Tasks() {
 	// const handleSwap = (currentCard, targetCard) => {
 	// 	const info = {...data}
 
-		
-
 	// 	const selectedTask = data[currentCard.colId].data[currentCard.id]
 	// 	const selectedTaskOrder = data[currentCard.colId].data[currentCard.id].order
 	// 	const targetTask = data[targetCard.colId].data[currentCard.id]
 	// 	const targetTaskOrder = data[targetCard.colId].data[currentCard.id].order
 
-		
 	// }
 
 	const renderCol = (card) => {
@@ -169,7 +158,7 @@ export default function Tasks() {
 	return (
 		<div className="flex items-start justify-between">
 			<div className="w-full overflow-x-auto">
-				<div className="pt-[24px] px-[42px]">
+				<div className="px-[42px] pt-[24px]">
 					<div className="mb-4 flex items-center justify-between">
 						{breadCrumb && (
 							<Breadcrumb>
@@ -211,7 +200,9 @@ export default function Tasks() {
 						</div>
 					</div>
 
-					{task && user && <EditTask editMode={editMode} setEditMode={setEditMode} task={task} setTask={setTask} user={user} />}
+					{task && user && (
+						<EditTask editMode={editMode} setEditMode={setEditMode} task={task} setTask={setTask} user={user} />
+					)}
 
 					{data && (
 						<AddTask
@@ -230,7 +221,7 @@ export default function Tasks() {
 					<Versions>
 						{boards.map((item, i) => (
 							<Version
-								className={`text-sm py-[16px] px-[24px]  ${activeBoard === item ? `font-[600]` : ``}`}
+								className={`py-[16px] px-[24px] text-sm  ${activeBoard === item ? `font-[600]` : ``}`}
 								key={i}
 								active={activeBoard === item}
 								onClick={() => setActiveBoard(item)}

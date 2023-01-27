@@ -7,7 +7,7 @@ import type {Story} from "~/types/db/Products"
 
 import Comments from "~/components/Comments"
 import {updateStory} from "~/utils/api/mutations"
-import {activeProductAtom, userIdAtom} from "~/utils/atoms"
+import {activeProductAtom, useUserId} from "~/utils/atoms"
 
 export type StoryDrawerProps = {
 	story: Story
@@ -17,7 +17,7 @@ export type StoryDrawerProps = {
 
 const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 	const activeProduct = useAtomValue(activeProductAtom)
-	const userId = useAtomValue(userIdAtom)
+	const userId = useUserId()
 
 	const addVote = (vote: boolean) => {
 		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== userId)

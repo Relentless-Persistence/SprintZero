@@ -4,7 +4,7 @@ import {CloseOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Drawer, Layout, Menu} from "antd5"
 import {doc, onSnapshot} from "firebase9/firestore"
-import {useAtomValue, useSetAtom} from "jotai"
+import {useSetAtom} from "jotai"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
@@ -16,7 +16,7 @@ import SideMenu from "./SideMenu"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {getProductsByUser, getUser} from "~/utils/api/queries"
-import {activeProductAtom, userIdAtom} from "~/utils/atoms"
+import {activeProductAtom, useUserId} from "~/utils/atoms"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type DashboardLayoutProps = {
@@ -25,8 +25,8 @@ export type DashboardLayoutProps = {
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	const router = useRouter()
+	const userId = useUserId()
 
-	const userId = useAtomValue(userIdAtom)
 	const {data: user} = useQuery({
 		queryKey: [`user`, userId],
 		queryFn: getUser(userId!),

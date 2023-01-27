@@ -1,7 +1,6 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Input} from "antd5"
-import {useAtomValue} from "jotai"
 import {useState} from "react"
 
 import type {FC} from "react"
@@ -9,7 +8,7 @@ import type {Id} from "~/types"
 
 import {addComment} from "~/utils/api/mutations"
 import {getComment, getUser} from "~/utils/api/queries"
-import {userIdAtom} from "~/utils/atoms"
+import {useUserId} from "~/utils/atoms"
 
 export type CommentsProps = {
 	commentList: Id[]
@@ -19,7 +18,7 @@ export type CommentsProps = {
 }
 
 const Comments: FC<CommentsProps> = ({commentList, onCommentListChange, flagged, onFlag}) => {
-	const userId = useAtomValue(userIdAtom)
+	const userId = useUserId()
 	const [commentDraft, setCommentDraft] = useState(``)
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

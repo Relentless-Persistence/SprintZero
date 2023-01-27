@@ -8,12 +8,16 @@ import Final from "./Final"
 import GptResponse from "./GptResponse"
 import axios from "axios"
 import {db} from "../../../config/firebase-config"
-import { useAuth } from "../../../contexts/AuthContext"
-import {userIdAtom} from "~/utils/atoms"
+import {useAuth} from "../../../contexts/AuthContext"
+import {useUserId} from "~/utils/atoms"
 
-const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "", acceptedResponse: ""}, productId, setEditMode}) => {
-  // const {user} = useAuth();
-	const userId = useAtomValue(userIdAtom)
+const Stages = ({
+	vision = {type: "", value: "", features: [""], gptResponse: "", acceptedResponse: ""},
+	productId,
+	setEditMode,
+}) => {
+	// const {user} = useAuth();
+	const userId = useUserId()
 
 	const [current, setCurrent] = useState(0)
 	const [type, setType] = useState(vision.type)
@@ -26,7 +30,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 	const [step2, setStep2] = useState(false)
 	const [step3, setStep3] = useState(false)
 
-  // const prevValue = vision.value;
+	// const prevValue = vision.value;
 
 	const {data: user} = useQuery({
 		queryKey: [`user`, userId],
@@ -45,7 +49,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 				acceptedVision,
 			})
 			.then((res) => {
-        createEvent(res.id);
+				createEvent(res.id)
 				setEditMode(false)
 			})
 	}
@@ -58,26 +62,26 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 				value,
 				features,
 				acceptedVision,
-				gptResponse
+				gptResponse,
 			})
 			.then(() => {
-        createEvent(vision.id)
+				createEvent(vision.id)
 				setEditMode(false)
 			})
 	}
 
-  const createEvent = (id) => {
-    db.collection("VisionEvents").add({
-      user: {
-        id: userId,
-        name: user.name,
-      },
-      // prevValue,
-      // newValue: value,
-      vision_id: id,
-      createdAt: new Date().toISOString(),
-    })
-  }
+	const createEvent = (id) => {
+		db.collection("VisionEvents").add({
+			user: {
+				id: userId,
+				name: user.name,
+			},
+			// prevValue,
+			// newValue: value,
+			vision_id: id,
+			createdAt: new Date().toISOString(),
+		})
+	}
 
 	const gptQuestion = `Write a product vision for a ${type} app. It is ${value}. Which has the following features; ${features.map(
 		(feature) => `${feature} `,
@@ -113,7 +117,7 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 	}, [current])
 
 	useEffect(() => {
-		if(vision.id) {
+		if (vision.id) {
 			setCurrent(2)
 		}
 	}, [])
@@ -121,9 +125,9 @@ const Stages = ({vision = {type: "", value: "", features: [""], gptResponse: "",
 	return (
 		<div id="stages" className="w-full">
 			<Steps
-			onChange={(value) => {
-				setCurrent(value)
-			}}
+				onChange={(value) => {
+					setCurrent(value)
+				}}
 				direction="vertical"
 				current={current}
 				items={[

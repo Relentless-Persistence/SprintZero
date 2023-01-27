@@ -1,28 +1,21 @@
 "use client"
 
 import {useQuery} from "@tanstack/react-query"
-import {useAtomValue} from "jotai"
 import {useRouter} from "next/navigation"
-import {useEffect} from "react"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import {getProductsByUser} from "~/utils/api/queries"
-import {userIdAtom} from "~/utils/atoms"
+import {useUserId} from "~/utils/atoms"
 
 const HomePage: FC = () => {
 	const router = useRouter()
-	const userId = useAtomValue(userIdAtom)
-
-	useEffect(() => {
-		if (userId === undefined) router.replace(`/login`)
-	}, [router, userId])
+	const userId = useUserId()
 
 	useQuery({
 		queryKey: [`all-products`, userId],
-		queryFn: getProductsByUser(userId as Id),
-		enabled: userId !== undefined && userId !== `signed-out`,
+		queryFn: getProductsByUser(userId!),
+		enabled: userId !== undefined,
 		onSuccess: (products) => {
 			const firstProduct = products[0]
 			if (firstProduct) {
