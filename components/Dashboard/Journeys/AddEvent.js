@@ -11,12 +11,13 @@ import {
   DatePicker,
   TimePicker,
   Drawer,
-} from "antd";
+} from "antd5";
 import { Title } from "../SectionTitle";
 import ActionButtons from "../../Personas/ActionButtons";
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer";
 
 import { add, isWithinInterval } from "../../../utils";
+import { notification } from "antd5";
 
 const { TextArea } = Input;
 
@@ -82,10 +83,9 @@ const AddEvent = ({
 
   const validateEvtDur = (start, end) => {
     if (start && end) {
-      //console.log( journeyStart );
       const jStart = new Date(journeyStart);
       const jEnd = add(jStart, {
-        [`${[journeyType]}s`]: journeyDur,
+        [`${journeyType}`]: journeyDur,
       });
 
       const validStart = isWithinInterval(new Date(start), {
@@ -105,8 +105,7 @@ const AddEvent = ({
   };
 
   const handleNameChange = (e) => {
-    const name = capitalize(e.target.name)
-    setEvt({ ...evt, title: name });
+    setEvt({...evt, title: e.target.value})
   };
 
   const handleDescChange = (e) => {
@@ -116,7 +115,7 @@ const AddEvent = ({
   const handleTimeChange = (field, dateTime) => {
     let time = "";
     if (dateTime) {
-      time = new Date(dateTime._d).toISOString();
+      time = new Date(dateTime.$d).toISOString();
     }
 
     setEvt({ ...evt, [field]: time });
@@ -140,13 +139,12 @@ const AddEvent = ({
     const newEvt = {
       ...evt,
       isDelighted: !!+evt.isDelighted,
-      id: new Date().getTime(),
     };
 
     const validTimes = validateEvtDur(newEvt.start, newEvt.end);
 
     if (!validTimes) {
-      alert("The event duration does not fall within the journey duration");
+      notification.error({message: "The event duration does not fall within the journey duration"});
 
       return;
     }
@@ -167,38 +165,42 @@ const AddEvent = ({
 
   const renderPicker = (field) => {
     switch (journeyType) {
-      case "year":
-        return (
-          <DatePicker
-            picker="year"
-            onChange={(dateTime) => handleTimeChange(field, dateTime)}
-          />
-        );
+			case "year":
+				return (
+					<DatePicker
+						picker="year"
+						onChange={(dateTime) => handleTimeChange(field, dateTime)}
+						format={"YYYY"}
+					/>
+				)
 
-      case "year":
-        return (
-          <DatePicker
-            picker="month"
-            onChange={(dateTime) => handleTimeChange(field, dateTime)}
-          />
-        );
+			case "year":
+				return (
+					<DatePicker
+						picker="month"
+						onChange={(dateTime) => handleTimeChange(field, dateTime)}
+						format={"MM/YYYY"}
+					/>
+				)
 
-      case "hour":
-      case "minute":
-      case "second":
-        return (
-          <TimePicker
-            onChange={(dateTime) => handleTimeChange(field, dateTime)}
-          />
-        );
+			case "hour":
+			case "minute":
+			case "second":
+				return (
+					<TimePicker
+						onChange={(dateTime) => handleTimeChange(field, dateTime)}
+						format={"HH:mm:ss"}
+					/>
+				)
 
-      default:
-        return (
-          <DatePicker
-            onChange={(dateTime) => handleTimeChange(field, dateTime)}
-          />
-        );
-    }
+			default:
+				return (
+					<DatePicker
+						onChange={(dateTime) => handleTimeChange(field, dateTime)}
+						format={"DD/MM/YYYY"}
+					/>
+				)
+		}
   };
 
   return (
@@ -218,7 +220,7 @@ const AddEvent = ({
       }
       placement={"bottom"}
       closable={false}
-      visible={showDrawer}
+      open={showDrawer}
       headerStyle={{
         background: "#F5F5F5",
       }}

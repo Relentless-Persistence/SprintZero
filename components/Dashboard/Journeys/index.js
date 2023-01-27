@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Divider } from "antd";
+import { Divider } from "antd5";
 import { Dot, Ellipse } from "./ellipse";
 
 import { intervalToDuration } from "../../../utils/dateTimeHelpers";

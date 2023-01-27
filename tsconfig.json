@@ -27,7 +27,7 @@
 			}
 		]
 	},
-	"include": ["**/*.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/[productSlug]/strategy/kickoff/page.js", "app/[productSlug]/strategy/kickoff/page.jsx"],
+	"include": ["**/*.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/[productSlug]/strategy/kickoff/page.js", "app/[productSlug]/strategy/kickoff/page.jsx", "app/[productSlug]/userbase/journeys/head.jsx"],
 	"exclude": ["node_modules"],
 	"types": ["node"]
 }
