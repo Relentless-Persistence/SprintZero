@@ -26,6 +26,9 @@ export const useActiveProductId = (): Id | undefined => {
 				router.replace(`/product`)
 			}
 		},
+		onError: () => {
+			router.replace(`/product`)
+		},
 	})
 
 	return productId

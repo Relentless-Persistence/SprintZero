@@ -57,7 +57,7 @@ const ProductConfiguration: FC = () => {
 		setHasSubmitted(true)
 
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}` as Id
-		addDoc(collection(db, Versions._), {name: `v1.0`, product: slug} satisfies Omit<Version, `id`>)
+		addDoc(collection(db, Versions._), {name: `1.0`, product: slug} satisfies Omit<Version, `id`>)
 
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
