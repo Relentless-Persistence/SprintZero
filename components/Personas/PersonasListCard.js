@@ -170,7 +170,7 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 	}
 
 	return isEdit ? (
-		<Card
+		<MyCard
 			className="border-2 border-[#D9D9D9]"
 			extra={<ActionButtons onCancel={onCancel} onSubmit={onFinish} />}
 			title={<p>{title}</p>}
@@ -210,7 +210,7 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 						}
 					/>
 				))}
-		</Card>
+		</MyCard>
 	) : (
 		<>
 			{userRole && (
