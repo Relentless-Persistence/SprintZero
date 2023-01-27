@@ -28,10 +28,6 @@ export default function Visions() {
 				.onSnapshot((snapshot) => {
 					if (snapshot.empty === true) {
 						setEditMode(true)
-						notification.info({
-							message: `Create a product vision here`,
-							placement: `bottomRight`,
-						})
 					} else {
 						setVision(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0])
 					}

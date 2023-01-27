@@ -42,3 +42,7 @@ ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 .ant-tabs-tabpane.ant-tabs-tabpane-active {
 	height: 100%;
 }
+
+.ant-card .ant-card-meta {
+	margin: 0;
+}
