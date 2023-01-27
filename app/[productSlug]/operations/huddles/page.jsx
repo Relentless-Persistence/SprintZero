@@ -3,14 +3,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {Row, Col, Breadcrumb} from "antd5"
 import {useAtomValue} from "jotai"
-import {findIndex} from "lodash"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
 
 import HuddleCard from "~/components/Huddle"
 import {db} from "~/config/firebase-config"
-import {splitRoutes, getTimeAgo} from "~/utils"
+import {splitRoutes} from "~/utils"
 import {activeProductAtom} from "~/utils/atoms"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -74,11 +73,9 @@ export default function Huddle() {
 	const team = useAtomValue(activeProductAtom)?.members
 	const [data, setData] = useState([])
 	const [blockers, setBlockers] = useState(null)
-	const [activeTimeIndex, setActiveTimeIndex] = useState(0)
 	const [activeTime, setActiveTime] = useState(`Today`)
 	const [todayInTime, setTodayInTime] = useState(null)
 	const [yesterdayInTime, setYesterdayInTime] = useState(null)
-	const [blocker, setBlocker] = useState(null)
 	const [breadCrumb, setBreadCrumb] = useState(null)
 
 	useEffect(() => {
@@ -118,14 +115,6 @@ export default function Huddle() {
 		setTodayInTime(intervals_dictt[activeTime].setHours(0, 0, 0, 0))
 		setYesterdayInTime(subtractDays(1, intervals_dictt[activeTime]).setHours(0, 0, 0, 0))
 	}, [activeProductId, activeTime])
-
-	const setActiveRightNav = (interval) => {
-		const huddleIndex = findIndex(intervals, (v) => v === interval)
-		if (huddleIndex > -1) {
-			setActiveTime(intervals[huddleIndex])
-			setActiveTimeIndex(huddleIndex)
-		}
-	}
 
 	return (
 		<div className="flex items-start justify-between">
