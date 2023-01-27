@@ -87,6 +87,10 @@ export const calculateBoundaries = (storyMapState: StoryMapState, currentVersion
 	].every(({id}) => elementRegistry[id])
 	if (!allElementsRegistered) return
 
+	boundaries.epic = {}
+	boundaries.feature = {}
+	boundaries.story = {}
+
 	//#region Calculate initial boundaries
 	storyMapState.epics.forEach((epic) => {
 		const element = elementRegistry[epic.id]!.container

@@ -4,7 +4,7 @@ import type {Id} from "~/types"
 import {meta} from "."
 import {boundaries, dragState, layerBoundaries, pointerLocation, storyMapMeta, storyMapScrollPosition} from "./globals"
 
-export const getTargetItem = (): StoryMapTarget => {
+export const getTargetLocation = (): StoryMapTarget => {
 	if (!dragState.current) return `stay`
 
 	const x = pointerLocation.current[0] - dragState.current.xOffsetFromCenter + storyMapScrollPosition.current

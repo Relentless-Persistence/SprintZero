@@ -16,7 +16,7 @@ import Story from "./story/Story"
 import {calculateBoundaries, genStoryMapMeta, meta} from "./utils"
 import {dragState, elementRegistry, pointerLocation, storyMapTop} from "./utils/globals"
 import {moveItem} from "./utils/moving"
-import {getHoveringItems, getTargetItem as getTargetLocation} from "./utils/targeting"
+import {getHoveringItems, getTargetLocation} from "./utils/targeting"
 import {addEpic, setStoryMapState} from "~/utils/api/mutations"
 import {activeProductAtom} from "~/utils/atoms"
 
@@ -55,8 +55,8 @@ const StoryMap: FC = () => {
 	})
 
 	const originalStoryMapState = useRef<StoryMapState | undefined>(undefined)
-	const startTarget = useRef<StoryMapTarget | undefined>(undefined)
-	const startItem = useRef<StoryMapItem | undefined>(undefined)
+	const startTarget = useRef<StoryMapTarget | undefined>(undefined) // To see when the target changes
+	const draggingItem = useRef<StoryMapItem | undefined>(undefined) // Tracking which item is being dragged
 	const expectedStoryMapState = useRef<StoryMapState | undefined>(undefined)
 
 	const handlePanStart = () => {
@@ -77,7 +77,7 @@ const StoryMap: FC = () => {
 			)
 				return
 
-			startItem.current = {
+			draggingItem.current = {
 				type: `story`,
 				id: hoveringItems.story,
 			}
@@ -103,7 +103,7 @@ const StoryMap: FC = () => {
 			)
 				return
 
-			startItem.current = {
+			draggingItem.current = {
 				type: `feature`,
 				id: hoveringItems.feature,
 			}
@@ -129,7 +129,7 @@ const StoryMap: FC = () => {
 			)
 				return
 
-			startItem.current = {
+			draggingItem.current = {
 				type: `epic`,
 				id: hoveringItems.epic,
 			}
@@ -144,14 +144,17 @@ const StoryMap: FC = () => {
 	}
 
 	const handlePan = () => {
-		if (!startItem.current || !activeProduct || !originalStoryMapState.current || !dragState.current) return
+		if (!draggingItem.current || !activeProduct?.storyMapState || !originalStoryMapState.current || !dragState.current)
+			return
 
 		if (
 			expectedStoryMapState.current &&
-			JSON.stringify(activeProduct) !== JSON.stringify(expectedStoryMapState.current)
+			JSON.stringify(activeProduct.storyMapState) !== JSON.stringify(expectedStoryMapState.current)
 		)
 			return
 		expectedStoryMapState.current = undefined
+		calculateBoundaries(activeProduct.storyMapState, currentVersion.id)
+		genStoryMapMeta(activeProduct.storyMapState, currentVersion.id)
 
 		if (!startTarget.current) {
 			startTarget.current = getTargetLocation()
@@ -164,23 +167,26 @@ const StoryMap: FC = () => {
 			const newStoryMapState = moveItem(
 				activeProduct.storyMapState,
 				originalStoryMapState.current,
-				startItem.current,
+				draggingItem.current,
 				target,
 				currentVersion.id === `__ALL_VERSIONS__` ? undefined : currentVersion.id,
 			)
 
-			if (JSON.stringify(newStoryMapState) === JSON.stringify(activeProduct)) return
+			if (JSON.stringify(newStoryMapState) === JSON.stringify(activeProduct.storyMapState)) return
 			setStoryMapState({storyMapState: newStoryMapState})
 			expectedStoryMapState.current = newStoryMapState
 
 			// Update startItem type
-			if (newStoryMapState.epics.find((epic) => epic.id === startItem.current!.id)) {
-				startItem.current.type = dragState.current.type = `epic`
-			} else if (newStoryMapState.features.find((feature) => feature.id === startItem.current!.id)) {
-				startItem.current.type = dragState.current.type = `feature`
-			} else if (newStoryMapState.stories.find((story) => story.id === startItem.current!.id))
-				startItem.current.type = dragState.current.type = `story`
-			startTarget.current = undefined
+			if (newStoryMapState.epics.find((epic) => epic.id === draggingItem.current!.id)) {
+				draggingItem.current.type = dragState.current.type = `epic`
+				startTarget.current = undefined
+			} else if (newStoryMapState.features.find((feature) => feature.id === draggingItem.current!.id)) {
+				draggingItem.current.type = dragState.current.type = `feature`
+				startTarget.current = undefined
+			} else if (newStoryMapState.stories.find((story) => story.id === draggingItem.current!.id)) {
+				draggingItem.current.type = dragState.current.type = `story`
+				startTarget.current = undefined
+			}
 		}
 	}
 
@@ -196,7 +202,7 @@ const StoryMap: FC = () => {
 				onPanStart={handlePanStart}
 				onPanEnd={() => {
 					startTarget.current = undefined
-					startItem.current = undefined
+					draggingItem.current = undefined
 					dragState.current = undefined
 					setReactDragState(undefined)
 				}}

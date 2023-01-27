@@ -4,7 +4,7 @@ import type {StoryMapItem, StoryMapTarget} from "./types"
 import type {Id} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
 
-import {meta, sortEpics, sortFeatures} from "."
+import {avg, meta, sortEpics, sortFeatures} from "."
 
 export const moveItem = (
 	currentState: StoryMapState,
@@ -26,17 +26,13 @@ export const moveItem = (
 					const startPosition = state.epics.findIndex((epic) => epic.id === startItem.id)!
 					let newUserValue: number
 					if (startPosition < targetPosition) {
-						const targetEpic = state.epics.find((epic, i) => i === targetPosition) ?? state.epics.at(-1)!
-						const targetEpicPlusOne = state.epics.find((epic, i) => i === targetPosition + 1)
-						const userValue1 = targetEpic.userValue
-						const userValue2 = targetEpicPlusOne ? targetEpicPlusOne.userValue : 1
-						newUserValue = (userValue1 + userValue2) / 2
+						const epicBefore = state.epics.find((epic, i) => i === targetPosition - 1)
+						const epicAfter = state.epics.find((epic, i) => i === targetPosition)
+						newUserValue = avg(epicBefore?.userValue ?? 0, epicAfter?.userValue ?? 1)
 					} else {
-						const targetEpic = state.epics.find((epic, i) => i === targetPosition) ?? state.epics.at(0)!
-						const targetEpicMinusOne = state.epics.find((epic, i) => i === targetPosition - 1)
-						const userValue1 = targetEpic.userValue
-						const userValue2 = targetEpicMinusOne ? targetEpicMinusOne.userValue : 0
-						newUserValue = (userValue1 + userValue2) / 2
+						const epicBefore = state.epics.find((epic, i) => i === targetPosition - 2)
+						const epicAfter = state.epics.find((epic, i) => i === targetPosition - 1)
+						newUserValue = avg(epicBefore?.userValue ?? 0, epicAfter?.userValue ?? 1)
 					}
 
 					state.epics[startPosition]!.userValue = newUserValue
@@ -46,13 +42,17 @@ export const moveItem = (
 
 					if (!currentVersionId) return
 
+					const featureBefore = state.features.find((feature, i) => i === targetPosition - 1)
+					const featureAfter = state.features.find((feature, i) => i === targetPosition)
+					const newUserValue = avg(featureBefore?.userValue ?? 0, featureAfter?.userValue ?? 1)
+
 					const existingEpic = state.epics.find((epic) => epic.id === startItem.id)!
 					const newFeature: Feature = {
 						id: existingEpic.id,
 						description: existingEpic.description,
 						effort: 0.5,
 						name: existingEpic.name,
-						userValue: 0.5,
+						userValue: newUserValue,
 						commentIds: existingEpic.commentIds,
 						nameInputStateId: existingEpic.nameInputStateId,
 						storyIds: existingEpic.featureIds,
@@ -95,13 +95,17 @@ export const moveItem = (
 				if (targetLocation[1].type === `epic`) {
 					// Feature to epic
 
+					const epicBefore = state.epics.find((epic, i) => i === targetPosition - 1)
+					const epicAfter = state.epics.find((epic, i) => i === targetPosition)
+					const newUserValue = avg(epicBefore?.userValue ?? 0, epicAfter?.userValue ?? 1)
+
 					const existingFeature = state.features.find((feature) => feature.id === startItem.id)!
 					const newEpic: Epic = {
 						id: existingFeature.id,
 						description: existingFeature.description,
 						effort: 0.5,
 						name: existingFeature.name,
-						userValue: 0.5,
+						userValue: newUserValue,
 						commentIds: existingFeature.commentIds,
 						featureIds: existingFeature.storyIds,
 						keeperIds: [],
@@ -228,13 +232,17 @@ export const moveItem = (
 				} else if (targetLocation[1].type === `feature`) {
 					// Story to feature
 
+					const featureBefore = state.features.find((feature, i) => i === targetPosition - 1)
+					const featureAfter = state.features.find((feature, i) => i === targetPosition)
+					const newUserValue = avg(featureBefore?.userValue ?? 0, featureAfter?.userValue ?? 1)
+
 					const existingStory = state.stories.find((story) => story.id === startItem.id)!
 					const newFeature: Feature = {
 						id: existingStory.id,
 						description: existingStory.description,
 						effort: 0.5,
 						name: existingStory.name,
-						userValue: 0.5,
+						userValue: newUserValue,
 						commentIds: existingStory.commentIds,
 						nameInputStateId: existingStory.nameInputStateId,
 						storyIds: [],
