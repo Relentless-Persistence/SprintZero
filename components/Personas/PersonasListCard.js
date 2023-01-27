@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useCallback} from "react"
 import styled from "styled-components"
 
-import { Card, Form, Button } from "antd5";
-import { Input } from "antd5"
+import {Card, Form, Button} from "antd5"
+import {Input} from "antd5"
 
 import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
 
@@ -40,7 +40,6 @@ const Add = styled(Button)`
 
 const MyCard = styled(Card)`
 	.ant-card-head {
-		min-height: unset;
 		border-bottom: 2px solid #d9d9d9;
 	}
 `
@@ -143,9 +142,11 @@ const PersonasListCard = ({handleEdit, title, cardData, id, product}) => {
 	}
 
 	const remove = (index, id) => {
-		if(index === 0) {
-			db.collection("Personas").doc(id).delete()
-			.then(() => setIsEdit(false))
+		if (index === 0) {
+			db.collection("Personas")
+				.doc(id)
+				.delete()
+				.then(() => setIsEdit(false))
 		}
 		const newList = list.filter((_, i) => i !== index)
 		setList(newList)

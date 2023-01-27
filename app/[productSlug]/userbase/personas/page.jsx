@@ -2,9 +2,9 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import {Card, Empty, Breadcrumb} from "antd"
+import {Card, Empty, Breadcrumb} from "antd5"
 import {findIndex} from "lodash"
-import Link from "next/link";
+import Link from "next/link"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -31,16 +31,15 @@ const Version = styled.li`
 	line-height: 24px;
 `
 
-
 export default function Personas() {
 	const activeProductId = useActiveProductId()
 	const [roles, setRoles] = useState(null)
 	const [activeRole, setActiveRole] = useState(null)
 	const [rightNav, setRightNav] = useState([])
 	// const [newRole, setNewRole] = useState(``)
-  const [breadCrumb, setBreadCrumb] = useState(null)
+	const [breadCrumb, setBreadCrumb] = useState(null)
 
-  useEffect(() => {
+	useEffect(() => {
 		if (activeRole) {
 			setBreadCrumb(splitRoutes(`userbase/personas/${activeRole.role}`))
 		}
@@ -158,7 +157,7 @@ export default function Personas() {
 	}
 
 	return (
-		<div className="w-full flex items-start justify-between">
+		<div className="flex w-full items-start justify-between">
 			<div className="w-full">
 				<div className="py-[24px] px-[42px]">
 					<div className="mb-4">

@@ -3,10 +3,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import {AimOutlined} from "@ant-design/icons"
-import {Input, message, Breadcrumb, Button} from "antd"
-import {findIndex} from "lodash" 
+import {Input, message, Breadcrumb, Button} from "antd5"
+import {findIndex} from "lodash"
 import {useState, useEffect} from "react"
-import styled from "styled-components"                                                      
+import styled from "styled-components"
 
 import {ObjectiveFormCard} from "~/components/Dashboard/FormCard"
 import {ObjectiveItemCard} from "~/components/Dashboard/ItemCard"
@@ -14,7 +14,6 @@ import MasonryGrid from "~/components/Dashboard/MasonryGrid"
 import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
 import {useActiveProductId} from "~/utils/useActiveProductId"
-
 
 const Versions = styled.ul`
 	list-style: none;
@@ -57,11 +56,11 @@ export default function Objectives() {
 	const [activeGoal, setActiveGoal] = useState(null)
 	const [activeGoalIndex, setActiveGoalIndex] = useState(0)
 	const [results, setResults] = useState(null)
-  const [breadCrumb, setBreadCrumb] = useState(null)
-  const [showSideAdd, setShowSideAdd] = useState(false)
-  const [sideAddValue, setSideAddValue] = useState(``);
+	const [breadCrumb, setBreadCrumb] = useState(null)
+	const [showSideAdd, setShowSideAdd] = useState(false)
+	const [sideAddValue, setSideAddValue] = useState(``)
 
-  useEffect(() => {
+	useEffect(() => {
 		if (activeGoal) {
 			setBreadCrumb(splitRoutes(`strategy/accessibility/${activeGoal}`))
 		}
@@ -153,24 +152,23 @@ export default function Objectives() {
 	}
 
 	const cancelAdd = () => {
-		setShowAdd(false);
+		setShowAdd(false)
 	}
 
-  const onEnter = (e) => {
+	const onEnter = (e) => {
 		if (e.key === `Enter`) {
-			db.collection(`Goals`).add({
-				product_id: activeProductId,
-				description: ``,
-				name: sideAddValue,
-			})
-      .then(() => {
-        setShowSideAdd(false)
-			  setSideAddValue(``)
-      })
-			
+			db.collection(`Goals`)
+				.add({
+					product_id: activeProductId,
+					description: ``,
+					name: sideAddValue,
+				})
+				.then(() => {
+					setShowSideAdd(false)
+					setSideAddValue(``)
+				})
 		}
 	}
-
 
 	const addItemDone = (item) => {
 		const id = data[activeGoalIndex].id
