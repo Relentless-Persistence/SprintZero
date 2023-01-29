@@ -6,13 +6,13 @@ import {Avatar, Drawer, Layout, Menu} from "antd5"
 import {doc, onSnapshot} from "firebase9/firestore"
 import {useSetAtom} from "jotai"
 import Image from "next/image"
-import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
 
 import type {ReactNode, FC} from "react"
 
 import SettingsMenu from "./SettingsMenu"
 import SideMenu from "./SideMenu"
+import LinkTo from "~/components/LinkTo"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {getProductsByUser, getUser} from "~/utils/api/queries"
@@ -24,7 +24,6 @@ export type DashboardLayoutProps = {
 }
 
 const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
-	const router = useRouter()
 	const userId = useUserId()
 
 	const {data: user} = useQuery({
@@ -65,13 +64,12 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 						items={products?.map((product) => ({
 							key: product.id,
 							label: (
-								<button type="button" onClick={() => void router.replace(product.id)} className="relative capitalize">
+								<LinkTo href={`/${product.id}/dashboard`} className="relative">
 									{product.name}
-									{activeProductId === product.id && <div className="absolute left-0 bottom-0 h-1 w-full bg-green" />}
-								</button>
+								</LinkTo>
 							),
 						}))}
-						className="grow"
+						className="grow [&>.ant-menu-item-selected]:shadow-[inset_0px_-4px_0px_0px_#73c92d]"
 						style={{background: `transparent`}}
 					/>
 

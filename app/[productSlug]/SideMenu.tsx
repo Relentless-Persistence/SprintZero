@@ -122,7 +122,7 @@ const SideMenu: FC = () => {
 					onOpenChange={(keys) => {
 						setOpenKeys(keys.slice(-1))
 					}}
-					style={{borderInlineEnd: `unset`}}
+					// style={{borderInlineEnd: `unset`}}
 				/>
 			)}
 		</>
