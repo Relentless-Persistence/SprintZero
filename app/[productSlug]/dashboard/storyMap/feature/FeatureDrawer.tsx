@@ -89,7 +89,19 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 							<Button size="small" onClick={() => void setEditMode(false)}>
 								Cancel
 							</Button>
-							<Button size="small" type="primary" htmlType="submit" form="story-form" className="bg-green-s500">
+							<Button
+								size="small"
+								type="primary"
+								onClick={() => {
+									void updateFeature({
+										storyMapState: activeProduct!.storyMapState,
+										featureId: feature.id,
+										data: {name: draftTitle},
+									})
+									void setEditMode(false)
+								}}
+								className="bg-green-s500"
+							>
 								Done
 							</Button>
 						</>
