@@ -65,6 +65,7 @@ export type Story = z.infer<typeof StorySchema>
 export const ProductSchema = z.object({
 	id: idSchema,
 
+	// General product info
 	cadence: z.number(),
 	effortCost: z.number().nullable(),
 	gate: z.union([
@@ -83,6 +84,8 @@ export const ProductSchema = z.object({
 		}),
 	),
 	name: z.string(),
+
+	// Story map info
 	storyMapState: z.object({
 		epics: z.array(EpicSchema),
 		features: z.array(FeatureSchema),
@@ -90,6 +93,12 @@ export const ProductSchema = z.object({
 
 		productId: idSchema,
 	}),
+
+	// Kickoff info
+	problemStatement: z.string(),
+	personas: z.array(z.object({id: z.string(), text: z.string()})),
+	successMetrics: z.array(z.object({id: z.string(), text: z.string()})),
+	businessPriorities: z.array(z.object({id: z.string(), text: z.string()})),
 })
 
 export const Products = genDbNames(`Products`, ProductSchema)

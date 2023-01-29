@@ -40,6 +40,15 @@ export const addVersion = async ({productId, versionName}: AddVersionVars): Prom
 	await addDoc(collection(db, Versions._), data)
 }
 
+type UpdateProductVars = {
+	id: Id
+	data: Partial<Product>
+}
+
+export const updateProduct = async ({id, data}: UpdateProductVars): Promise<void> => {
+	await updateDoc(doc(db, Products._, id), data)
+}
+
 type AddEpicVars = {
 	storyMapState: StoryMapState
 	data: Partial<Epic>
