@@ -1,18 +1,12 @@
-import {Input as AntdInput} from "antd5"
+/* Specifically for use with react-hook-form. Use Antd's plain <Input /> otherwise. */
+
+import {Input} from "antd5"
 import {useController} from "react-hook-form"
 
 import type {InputProps as AntdInputProps} from "antd5"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
-
-type FieldValues = Record<string, any>
-
-type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
-
-export type InputProps<TFieldValues extends FieldValues> = AntdInputProps &
-	ControllerProps<TFieldValues> & {control: Exclude<ControllerProps<TFieldValues>["control"], undefined>} & {
-		currencyFormat?: boolean
-	}
+import type {SetRequired} from "type-fest"
 
 const formatAsCurrency = (str: string) => {
 	let newStr = str.replace(/[^0-9.]/g, ``)
@@ -23,22 +17,31 @@ const formatAsCurrency = (str: string) => {
 	return `$${newStr}`
 }
 
-const Input = <TFieldValues extends FieldValues = FieldValues>({
+type FieldValues = Record<string, any>
+
+type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
+
+export type RhfInputProps<TFieldValues extends FieldValues> = AntdInputProps &
+	SetRequired<ControllerProps<TFieldValues>, `control`> & {
+		currencyFormat?: boolean
+	}
+
+const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 	control,
 	name,
 	currencyFormat,
 	...props
-}: InputProps<TFieldValues>): ReactElement | null => {
+}: RhfInputProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name})
 
 	const format = (str: string) => {
-		if (str.length === 0) return undefined
+		if (str.length === 0) return null
 		if (currencyFormat) return formatAsCurrency(str)
 		return str
 	}
 
 	return (
-		<AntdInput
+		<Input
 			onChange={(e) => void field.onChange(format(e.target.value))}
 			onBlur={field.onBlur}
 			value={field.value}
@@ -49,4 +52,4 @@ const Input = <TFieldValues extends FieldValues = FieldValues>({
 	)
 }
 
-export default Input
+export default RhfInput

@@ -7,16 +7,16 @@ import {z} from "zod"
 import type {FC} from "react"
 
 import SlideContainer from "./SlideContainer"
-import Input from "~/components/Input"
+import RhfInput from "~/components/rhf/RhfInput"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 
-const schema = z.object({
+const formSchema = z.object({
 	name: z.string().min(1, {message: `Product name is required.`}).max(32),
 	email1: z.string().email().nullable(),
 	email2: z.string().email().nullable(),
 	email3: z.string().email().nullable(),
 })
-type FormInputs = z.infer<typeof schema>
+type FormInputs = z.infer<typeof formSchema>
 
 export type Slide1Props = {
 	currentSlide: number
@@ -28,7 +28,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	const isActive = currentSlide === 0
 	const {control, formState, getFieldState, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
-		resolver: zodResolver(schema),
+		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: ``,
 			email1: null,
@@ -58,7 +58,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						validateStatus={formValidateStatus(getFieldState(`name`, formState))}
 						help={formState.errors.name?.message}
 					>
-						<Input htmlSize={32} maxLength={32} control={control} name="name" />
+						<RhfInput htmlSize={32} maxLength={32} control={control} name="name" />
 					</Form.Item>
 
 					<p className="text-lg font-semibold">Team</p>
@@ -68,7 +68,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						validateStatus={formValidateStatus(getFieldState(`email1`, formState))}
 						help={formState.errors.email1?.message}
 					>
-						<Input type="email" placeholder="Email address" control={control} name="email1" />
+						<RhfInput type="email" placeholder="Email address" control={control} name="email1" />
 					</Form.Item>
 					<Form.Item
 						label="Slot two"
@@ -76,7 +76,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						validateStatus={formValidateStatus(getFieldState(`email2`, formState))}
 						help={formState.errors.email2?.message}
 					>
-						<Input type="email" placeholder="Email address" control={control} name="email2" />
+						<RhfInput type="email" placeholder="Email address" control={control} name="email2" />
 					</Form.Item>
 					<Form.Item
 						label="Slot three"
@@ -84,7 +84,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						validateStatus={formValidateStatus(getFieldState(`email3`, formState))}
 						help={formState.errors.email3?.message}
 					>
-						<Input type="email" placeholder="Email address" control={control} name="email3" />
+						<RhfInput type="email" placeholder="Email address" control={control} name="email3" />
 					</Form.Item>
 
 					<input type="submit" hidden />

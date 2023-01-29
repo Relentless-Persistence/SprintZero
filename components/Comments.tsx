@@ -49,27 +49,29 @@ const Comments: FC<CommentsProps> = ({commentList, onCommentListChange, flagged,
 
 	return (
 		<div className="absolute inset-0 flex flex-col">
-			<div className="space-y-4 overflow-auto">
-				{comments.length === 0 ? (
-					<p className="italic text-laurel">Nothing here yet</p>
-				) : (
-					comments.map((comment) => {
-						if (!comment.data) return null
-						const author = commentAuthors.find((author) => author.data?.id === comment.data.authorId)?.data
-						return (
-							<div key={comment.data.id} className="flex gap-2">
-								<Avatar src={author?.avatar} />
-								<div className="space-y-1">
-									<p className="text-xs text-laurel">{author?.name}</p>
-									<p>{comment.data.text}</p>
+			<div className="flex grow flex-col-reverse overflow-auto">
+				<div className="space-y-4">
+					{comments.length === 0 ? (
+						<p className="italic text-laurel">Nothing here yet</p>
+					) : (
+						comments.map((comment) => {
+							if (!comment.data) return null
+							const author = commentAuthors.find((author) => author.data?.id === comment.data.authorId)?.data
+							return (
+								<div key={comment.data.id} className="flex gap-2">
+									<Avatar src={author?.avatar} />
+									<div className="space-y-1">
+										<p className="text-xs text-laurel">{author?.name}</p>
+										<p>{comment.data.text}</p>
+									</div>
 								</div>
-							</div>
-						)
-					})
-				)}
+							)
+						})
+					)}
+				</div>
 			</div>
 			<form onSubmit={handleSubmit} className="mt-4 space-y-4">
-				<Input.TextArea value={commentDraft} onChange={(e) => void setCommentDraft(e.target.value)} />
+				<Input value={commentDraft} onChange={(e) => void setCommentDraft(e.target.value)} />
 				<div className="flex gap-2">
 					<Button
 						htmlType="submit"

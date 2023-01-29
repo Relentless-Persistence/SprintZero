@@ -7,17 +7,17 @@ import {z} from "zod"
 import type {FC} from "react"
 
 import SlideContainer from "./SlideContainer"
-import Input from "~/components/Input"
+import RhfInput from "~/components/rhf/RhfInput"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 
-const schema = z.object({
+const formSchema = z.object({
 	effortCost: z
 		.string()
 		.regex(/(\.[0-9]{2})?/, {message: `Must have two decimal places.`})
 		.regex(/^\$[0-9]+(\.[0-9]{2})?$/, `Invalid format.`)
 		.nullable(),
 })
-type FormInputs = z.infer<typeof schema>
+type FormInputs = z.infer<typeof formSchema>
 
 type Slide4Props = {
 	currentSlide: number
@@ -29,7 +29,7 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	const isActive = currentSlide === 3
 	const {control, formState, handleSubmit, getFieldState} = useForm<FormInputs>({
 		mode: `onChange`,
-		resolver: zodResolver(schema),
+		resolver: zodResolver(formSchema),
 		defaultValues: {
 			effortCost: null,
 		},
@@ -57,7 +57,7 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						validateStatus={formValidateStatus(getFieldState(`effortCost`, formState))}
 						help={formState.errors.effortCost?.message}
 					>
-						<Input currencyFormat placeholder="$0.00" htmlSize={20} control={control} name="effortCost" />
+						<RhfInput currencyFormat placeholder="$0.00" htmlSize={20} control={control} name="effortCost" />
 					</Form.Item>
 
 					<input type="submit" hidden />

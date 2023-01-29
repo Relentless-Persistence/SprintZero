@@ -1,8 +1,7 @@
 "use client"
 
 import {useQueryClient} from "@tanstack/react-query"
-import produce from "immer"
-import {useAtom} from "jotai"
+import {useAtomValue} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
@@ -10,8 +9,6 @@ import type {Story as StoryType} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
 import StoryDrawer from "./StoryDrawer"
-import AutoSizingInput from "../AutoSizingInput"
-import {updateStory} from "~/utils/api/mutations"
 import {activeProductAtom} from "~/utils/atoms"
 
 export type StoryContentProps = {
@@ -19,20 +16,12 @@ export type StoryContentProps = {
 }
 
 const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> = ({story}, ref) => {
-	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
+	const activeProduct = useAtomValue(activeProductAtom)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	const version = useQueryClient()
 		.getQueryData<Version[]>([`all-versions`, activeProduct?.id])
 		?.find((version) => version.id === story.versionId)
-
-	const updateLocalStoryName = (newName: string) => {
-		setActiveProduct((activeProduct) =>
-			produce(activeProduct, (draft) => {
-				draft!.storyMapState.stories.find(({id}) => id === story.id)!.name = newName
-			}),
-		)
-	}
 
 	return (
 		<>
@@ -49,15 +38,7 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 					<p className="-rotate-90">{version?.name}</p>
 				</button>
 				<div className="mx-auto px-1 text-xs text-black">
-					<AutoSizingInput
-						value={story.name}
-						onChange={(value) => {
-							updateLocalStoryName(value)
-							updateStory({storyMapState: activeProduct!.storyMapState, storyId: story.id, data: {name: value}})
-						}}
-						inputStateId={story.nameInputStateId}
-						inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
-					/>
+					<p>{story.name}</p>
 				</div>
 			</div>
 

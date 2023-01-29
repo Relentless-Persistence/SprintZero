@@ -41,7 +41,7 @@ const StorySchema = z.object({
 			checked: z.boolean(),
 		}),
 	),
-	codeLink: z.string().url().nullable(),
+	branchName: z.string().nullable(),
 	description: z.string(),
 	designLink: z.string().url().nullable(),
 	ethicsApproved: z.boolean().nullable(),
@@ -53,6 +53,7 @@ const StorySchema = z.object({
 		}),
 	),
 	name: z.string(),
+	pageLink: z.string().url().nullable(),
 	points: z.number(),
 
 	commentIds: z.array(idSchema),

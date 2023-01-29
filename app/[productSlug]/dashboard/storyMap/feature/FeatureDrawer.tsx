@@ -1,5 +1,5 @@
-import {CloseOutlined} from "@ant-design/icons"
-import {Button, Drawer, Input, Tag, Typography} from "antd5"
+import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
+import {Button, Drawer, Form, Input, Tag, Typography} from "antd5"
 import produce from "immer"
 import {useAtom} from "jotai"
 import {useState} from "react"
@@ -10,6 +10,7 @@ import type {Feature} from "~/types/db/Products"
 import Comments from "~/components/Comments"
 import {deleteFeature, updateFeature} from "~/utils/api/mutations"
 import {activeProductAtom} from "~/utils/atoms"
+import dollarFormat from "~/utils/dollarFormat"
 
 export type FeatureDrawerProps = {
 	feature: Feature
@@ -20,6 +21,7 @@ export type FeatureDrawerProps = {
 const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
 	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
+	const [draftTitle, setDraftTitle] = useState(feature.name)
 
 	const updateLocalFeatureDescription = (newDescription: string) => {
 		setActiveProduct((activeProduct) =>
@@ -38,11 +40,9 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 
 	return (
 		<Drawer
-			title={feature.name}
-			placement="bottom"
-			closable={false}
-			extra={
-				<div className="flex items-center gap-2">
+			title={
+				<div className="flex flex-col gap-1">
+					<p>{feature.name}</p>
 					<div>
 						{editMode ? (
 							<button
@@ -54,85 +54,105 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 									})
 								}
 							>
-								<Tag color="#cf1322">Delete</Tag>
+								<Tag color="#cf1322" icon={<DeleteFilled />}>
+									Delete
+								</Tag>
 							</button>
 						) : (
-							<>
-								<Tag color="#91d5ff">
-									{points} point{points === 1 ? `` : `s`} total
+							<div>
+								<Tag color="#585858" icon={<NumberOutlined />}>
+									{points} point{points === 1 ? `` : `s`}
 								</Tag>
-								{activeProduct?.effortCost && <Tag color="#a4df74">${activeProduct.effortCost * points}</Tag>}
-								<button type="button" onClick={() => void setEditMode(true)} className="text-sm text-[#396417]">
-									Edit
-								</button>
-							</>
+								<Tag
+									color={typeof activeProduct?.effortCost === `number` ? `#389e0d` : `#f5f5f5`}
+									icon={<DollarOutlined />}
+									style={
+										typeof activeProduct?.effortCost === `number`
+											? {}
+											: {color: `#d9d9d9`, border: `1px solid currentColor`}
+									}
+								>
+									{dollarFormat((activeProduct?.effortCost ?? 1) * points)}
+								</Tag>
+							</div>
 						)}
 					</div>
-
-					<div className="grow" />
-
+				</div>
+			}
+			placement="bottom"
+			closable={false}
+			height={500}
+			extra={
+				<div className="flex items-center gap-2">
 					{editMode ? (
 						<>
 							<Button size="small" onClick={() => void setEditMode(false)}>
 								Cancel
 							</Button>
-							<Button size="small" onClick={() => void setEditMode(false)}>
+							<Button size="small" type="primary" htmlType="submit" form="story-form" className="bg-green-s500">
 								Done
 							</Button>
 						</>
 					) : (
-						<button type="button" onClick={() => void onClose()}>
-							<CloseOutlined />
+						<button type="button" onClick={() => void setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
+							Edit
 						</button>
 					)}
 				</div>
 			}
-			className="[&_.ant-drawer-header-title]:flex-[0_0_auto] [&_.ant-drawer-extra]:flex-[1_1_0%]"
-			headerStyle={{gap: `1rem`}}
 			open={isOpen}
 			onClose={() => void onClose()}
 		>
-			<div className="grid h-full grid-cols-2 gap-4">
-				{/* Left column */}
-				<div className="space-y-4">
-					<div>
-						<Typography.Title level={4}>Feature</Typography.Title>
-						<Input.TextArea
-							rows={4}
-							value={feature.description}
-							onChange={async (e) => {
-								updateLocalFeatureDescription(e.target.value)
-								updateFeature({
-									storyMapState: activeProduct!.storyMapState,
-									featureId: feature.id,
-									data: {
-										description: e.target.value,
-									},
-								})
-							}}
-						/>
+			{editMode ? (
+				<Form layout="vertical">
+					<Form.Item label="Title">
+						<Input value={draftTitle} onChange={(e) => void setDraftTitle(e.target.value)} />
+					</Form.Item>
+				</Form>
+			) : (
+				<div className="grid h-full grid-cols-2 gap-8">
+					{/* Left column */}
+					<div className="h-full min-h-0 space-y-4">
+						<div className="h-[calc(100%-4rem)] space-y-2">
+							<p className="text-xl font-semibold text-[#595959]">Feature</p>
+							<Input.TextArea
+								rows={4}
+								value={feature.description}
+								onChange={async (e) => {
+									updateLocalFeatureDescription(e.target.value)
+									updateFeature({
+										storyMapState: activeProduct!.storyMapState,
+										featureId: feature.id,
+										data: {
+											description: e.target.value,
+										},
+									})
+								}}
+								className="max-h-[calc(100%-2.25rem)]"
+							/>
+						</div>
 					</div>
-				</div>
 
-				{/* Right column */}
-				<div className="flex h-full flex-col">
-					<Typography.Title level={4}>Comments</Typography.Title>
-					<div className="relative grow">
-						<Comments
-							commentList={feature.commentIds}
-							onCommentListChange={(newCommentList) =>
-								void updateFeature({
-									storyMapState: activeProduct!.storyMapState,
-									featureId: feature.id,
-									data: {
-										commentIds: newCommentList,
-									},
-								})
-							}
-						/>
+					{/* Right column */}
+					<div className="flex h-full flex-col">
+						<Typography.Title level={4}>Comments</Typography.Title>
+						<div className="relative grow">
+							<Comments
+								commentList={feature.commentIds}
+								onCommentListChange={(newCommentList) =>
+									void updateFeature({
+										storyMapState: activeProduct!.storyMapState,
+										featureId: feature.id,
+										data: {
+											commentIds: newCommentList,
+										},
+									})
+								}
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</Drawer>
 	)
 }

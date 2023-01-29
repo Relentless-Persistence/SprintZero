@@ -82,6 +82,17 @@ module.exports = {
 			rules: {
 				"react/button-has-type": `warn`,
 				"react/display-name": `warn`,
+				"react/forbid-elements": [
+					`error`,
+					{
+						forbid: [
+							{
+								element: `a`,
+								message: `please use <LinkTo> instead.`,
+							},
+						],
+					},
+				],
 				"react/jsx-boolean-value": `warn`,
 				"react/jsx-curly-brace-presence": `warn`,
 				"react/jsx-no-useless-fragment": [`warn`, {allowExpressions: true}],

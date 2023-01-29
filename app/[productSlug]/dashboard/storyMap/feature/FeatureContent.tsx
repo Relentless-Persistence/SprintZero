@@ -1,17 +1,12 @@
 "use client"
 
 import {CopyOutlined} from "@ant-design/icons"
-import produce from "immer"
-import {useAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
 import type {Feature as FeatureType} from "~/types/db/Products"
 
 import FeatureDrawer from "./FeatureDrawer"
-import AutoSizingInput from "../AutoSizingInput"
-import {updateFeature} from "~/utils/api/mutations"
-import {activeProductAtom} from "~/utils/atoms"
 
 export type FeatureContentProps = {
 	feature: FeatureType
@@ -19,15 +14,6 @@ export type FeatureContentProps = {
 
 const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentProps> = ({feature}, ref) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
-
-	const updateLocalFeatureName = (newName: string) => {
-		setActiveProduct((activeProduct) =>
-			produce(activeProduct, (draft) => {
-				draft!.storyMapState.features.find(({id}) => id === feature.id)!.name = newName
-			}),
-		)
-	}
 
 	return (
 		<>
@@ -42,15 +28,7 @@ const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentPro
 				>
 					<CopyOutlined />
 				</button>
-				<AutoSizingInput
-					value={feature.name}
-					onChange={(value) => {
-						updateLocalFeatureName(value)
-						updateFeature({storyMapState: activeProduct!.storyMapState, featureId: feature.id, data: {name: value}})
-					}}
-					inputStateId={feature.nameInputStateId}
-					inputProps={{onPointerDownCapture: (e: React.PointerEvent<HTMLInputElement>) => void e.stopPropagation()}}
-				/>
+				<p>{feature.name}</p>
 			</div>
 
 			<FeatureDrawer feature={feature} isOpen={isDrawerOpen} onClose={() => void setIsDrawerOpen(false)} />

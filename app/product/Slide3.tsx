@@ -9,7 +9,7 @@ import type {FC} from "react"
 
 import SlideContainer from "./SlideContainer"
 
-const schema = z.object({
+const formSchema = z.object({
 	gate: z.union([
 		z.literal(`Monday`),
 		z.literal(`Tuesday`),
@@ -20,7 +20,7 @@ const schema = z.object({
 		z.literal(`Sunday`),
 	]),
 })
-type FormInputs = z.infer<typeof schema>
+type FormInputs = z.infer<typeof formSchema>
 
 export type Slide3Props = {
 	currentSlide: number
@@ -32,7 +32,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	const isActive = currentSlide === 2
 	const {register, formState, handleSubmit, control} = useForm<FormInputs>({
 		mode: `onChange`,
-		resolver: zodResolver(schema),
+		resolver: zodResolver(formSchema),
 	})
 
 	const onSubmit = handleSubmit((data) => void onComplete(data))

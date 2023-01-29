@@ -7,7 +7,7 @@ import type {FC} from "react"
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import {storyMapScrollPosition} from "./storyMap/utils/globals"
-import VersionList from "./VersionList"
+import VersionList from "./storyMap/VersionList"
 import {setStoryMapState} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

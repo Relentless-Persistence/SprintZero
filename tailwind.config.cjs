@@ -3,6 +3,7 @@ module.exports = {
 	theme: {
 		colors: {
 			transparent: `transparent`,
+			current: `currentColor`,
 			white: `white`,
 			black: `black`,
 			green: {
