@@ -11,7 +11,6 @@ import {activeProductAtom} from "~/utils/atoms"
 const EthicsPage: FC = () => {
 	const activeProduct = useAtomValue(activeProductAtom)
 	const stories = activeProduct?.storyMapState.stories
-	const features = activeProduct?.storyMapState.features
 
 	return (
 		<>
@@ -32,44 +31,29 @@ const EthicsPage: FC = () => {
 				<div className="grid w-full grow grid-cols-3 gap-6">
 					<Card title="Identified">
 						<div className="space-y-4">
-							{features &&
-								stories
-									?.filter((story) => story.ethicsColumn === `identified`)
-									.map((story) => (
-										<Story
-											key={story.id}
-											story={story}
-											featureName={features.find((feature) => feature.storyIds.includes(story.id))!.name}
-										/>
-									))}
+							{stories
+								?.filter((story) => story.ethicsColumn === `identified`)
+								.map((story) => (
+									<Story key={story.id} story={story} />
+								))}
 						</div>
 					</Card>
 					<Card title="Under Review">
 						<div className="space-y-4">
-							{features &&
-								stories
-									?.filter((story) => story.ethicsColumn === `under-review`)
-									.map((story) => (
-										<Story
-											key={story.id}
-											story={story}
-											featureName={features.find((feature) => feature.storyIds.includes(story.id))!.name}
-										/>
-									))}
+							{stories
+								?.filter((story) => story.ethicsColumn === `underReview`)
+								.map((story) => (
+									<Story key={story.id} story={story} />
+								))}
 						</div>
 					</Card>
 					<Card title="Adjudicated">
 						<div className="space-y-4">
-							{features &&
-								stories
-									?.filter((story) => story.ethicsColumn === `adjudicated`)
-									.map((story) => (
-										<Story
-											key={story.id}
-											story={story}
-											featureName={features.find((feature) => feature.storyIds.includes(story.id))!.name}
-										/>
-									))}
+							{stories
+								?.filter((story) => story.ethicsColumn === `adjudicated`)
+								.map((story) => (
+									<Story key={story.id} story={story} />
+								))}
 						</div>
 					</Card>
 				</div>

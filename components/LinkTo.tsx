@@ -3,7 +3,7 @@
 // Please always use this component instead of an anchor tag
 
 import Link from "next/link"
-import {ComponentProps, forwardRef, PropsWithoutRef} from "react"
+import {forwardRef} from "react"
 
 import type {ForwardedRef, ReactNode, ReactElement, ComponentPropsWithoutRef} from "react"
 

@@ -10,6 +10,7 @@ import {
 import {Menu} from "antd5"
 import Link from "next/link"
 import {usePathname} from "next/navigation"
+import {useState} from "react"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -113,16 +114,17 @@ const SideMenu: FC = () => {
 	const activeProductId = useActiveProductId()
 
 	const items = getItems(activeProductId ?? (`` as Id))
+	const [openKey, setOpenKey] = useState<string | undefined>(
+		items.find((item) => item.children?.find((child) => child.key === pathname?.replace(/^\/[^/]+\//, ``)))?.key,
+	)
 
 	return (
 		<>
 			{activeProductId && (
 				<Menu
 					mode="inline"
-					defaultOpenKeys={[
-						items.find((item) => item.children?.find((child) => child.key === pathname?.replace(/^\/[^/]+\//, ``)))
-							?.key ?? ``,
-					]}
+					openKeys={openKey ? [openKey] : []}
+					onOpenChange={(openKeys) => void setOpenKey(openKeys.find((key) => key !== openKey))}
 					selectedKeys={[pathname?.replace(/^\/[^/]+\//, ``) ?? ``]}
 					items={items}
 				/>

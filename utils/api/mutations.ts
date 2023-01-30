@@ -226,6 +226,7 @@ export const addStory = async ({
 		name: `Story ${storyMapState.stories.length + 1}`,
 		pageLink: null,
 		points: 0,
+		sprintColumn: `productBacklog`,
 		commentIds: [],
 		nameInputStateId: await createInputState(),
 		...initialData,

@@ -8,7 +8,7 @@ import type {ForwardRefRenderFunction} from "react"
 import type {Story as StoryType} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
-import StoryDrawer from "./StoryDrawer"
+import StoryDrawer from "~/components/StoryDrawer"
 import {activeProductAtom} from "~/utils/atoms"
 
 export type StoryContentProps = {
@@ -42,7 +42,12 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 				</div>
 			</div>
 
-			<StoryDrawer story={story} isOpen={isDrawerOpen} onClose={() => void setIsDrawerOpen(false)} />
+			<StoryDrawer
+				story={story}
+				hideAdjudicationResponse
+				isOpen={isDrawerOpen}
+				onClose={() => void setIsDrawerOpen(false)}
+			/>
 		</>
 	)
 }

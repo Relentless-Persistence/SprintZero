@@ -27,15 +27,7 @@ import {useUserId} from "~/utils/atoms"
 
 const numSlides = 4
 
-type FormInputs = {
-	cadence: number
-	effortCost: number | null
-	email1: string | null
-	email2: string | null
-	email3: string | null
-	gate: `Monday` | `Tuesday` | `Wednesday` | `Thursday` | `Friday` | `Saturday` | `Sunday`
-	name: string
-}
+type FormInputs = Pick<Product, `cadence` | `effortCost` | `gate` | `name`>
 
 const ProductConfiguration: FC = () => {
 	const userId = useUserId()
@@ -61,8 +53,8 @@ const ProductConfiguration: FC = () => {
 
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
-			storyMapState: {productId: slug, epics: [], features: [], stories: []},
 			members: [{userId: userId as Id, type: `editor`}],
+			storyMapState: {epics: [], features: [], stories: [], productId: slug},
 			problemStatement: ``,
 			personas: [],
 			successMetrics: [],
@@ -78,6 +70,7 @@ const ProductConfiguration: FC = () => {
 			valueProposition: ``,
 			features: [],
 			finalVision: ``,
+			updates: [],
 		} satisfies Omit<Product, `id`>)
 		await setDoc(doc(db, Products._, slug), finalData)
 

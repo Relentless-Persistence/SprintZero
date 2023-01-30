@@ -6,6 +6,7 @@ import {onAuthStateChanged} from "firebase9/auth"
 import {useSetAtom} from "jotai"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
+import {z} from "zod"
 
 import type {ReactNode, FC} from "react"
 import type {Id} from "~/types"
@@ -14,6 +15,18 @@ import "./styles.css"
 import {auth} from "~/config/firebase"
 import {queryClient} from "~/config/reactQuery"
 import {userIdAtom} from "~/utils/atoms"
+
+z.setErrorMap((issue, ctx) => {
+	switch (issue.code) {
+		case z.ZodIssueCode.invalid_string: {
+			switch (issue.validation) {
+				case `url`:
+					return {message: `Invalid URL.`}
+			}
+		}
+	}
+	return {message: ctx.defaultError}
+})
 
 export type RootLayoutProps = {
 	children: ReactNode

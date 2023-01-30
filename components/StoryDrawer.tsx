@@ -1,42 +1,49 @@
 import {
 	BlockOutlined,
+	CloseOutlined,
 	CodeOutlined,
-	DeleteFilled,
+	DislikeOutlined,
 	DollarOutlined,
+	FlagOutlined,
+	LikeOutlined,
 	LinkOutlined,
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useQuery} from "@tanstack/react-query"
-import {Button, Checkbox, Drawer, Tag, Select, Segmented, Input, Form} from "antd5"
+import {Button, Checkbox, Drawer, Tag, Input, Form, Radio} from "antd5"
+import clsx from "clsx"
 import produce from "immer"
-import {useAtom, useAtomValue} from "jotai"
+import {useAtom} from "jotai"
 import {nanoid} from "nanoid"
 import {useState} from "react"
 import {useForm} from "react-hook-form"
-import {z} from "zod"
 
 import type {FC} from "react"
+import type {z} from "zod"
 import type {Story} from "~/types/db/Products"
 
-import {currentVersionAtom} from "../atoms"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
-import {idSchema} from "~/types"
+import RhfSegmented from "~/components/rhf/RhfSegmented"
+import RhfSelect from "~/components/rhf/RhfSelect"
+import {StorySchema, sprintColumns} from "~/types/db/Products"
 import {deleteStory, updateStory} from "~/utils/api/mutations"
 import {getVersionsByProduct} from "~/utils/api/queries"
-import {activeProductAtom} from "~/utils/atoms"
+import {activeProductAtom, useUserId} from "~/utils/atoms"
 import dollarFormat from "~/utils/dollarFormat"
 import {formValidateStatus} from "~/utils/formValidateStatus"
+import objectEntries from "~/utils/objectEntries"
 
-const formSchema = z.object({
-	name: z.string(),
-	points: z.number(),
-	versionId: idSchema,
-	designLink: z.string().url(`Invalid URL.`).nullable(),
-	branchName: z.string().nullable(),
-	pageLink: z.string().url(`Invalid URL.`).nullable(),
+const formSchema = StorySchema.pick({
+	branchName: true,
+	designLink: true,
+	name: true,
+	pageLink: true,
+	points: true,
+	sprintColumn: true,
+	versionId: true,
 })
 type FormInputs = z.infer<typeof formSchema>
 
@@ -44,24 +51,35 @@ export type StoryDrawerProps = {
 	story: Story
 	isOpen: boolean
 	onClose: () => void
+	hideAdjudicationResponse?: boolean
+	hideAcceptanceCriteria?: boolean
+	disableEditing?: boolean
 }
 
-const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
+const StoryDrawer: FC<StoryDrawerProps> = ({
+	story,
+	isOpen,
+	onClose,
+	hideAdjudicationResponse,
+	hideAcceptanceCriteria,
+	disableEditing,
+}) => {
 	const [editMode, setEditMode] = useState(false)
 	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
+	const userId = useUserId()
 	const [newAcceptanceCriterion, setNewAcceptanceCriterion] = useState(``)
-	const currentVersion = useAtomValue(currentVersionAtom)
 
 	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: story.name,
-			points: story.points,
-			versionId: story.versionId,
-			designLink: story.designLink,
 			branchName: story.branchName,
+			designLink: story.designLink,
+			name: story.name,
 			pageLink: story.pageLink,
+			points: story.points,
+			sprintColumn: story.sprintColumn,
+			versionId: story.versionId,
 		},
 	})
 
@@ -109,15 +127,39 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 		})
 	}
 
+	const addVote = (vote: boolean) => {
+		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== userId)
+		ethicsVotes.push({userId: userId!, vote})
+		const votingComplete = ethicsVotes.length === activeProduct?.members.length
+
+		let ethicsColumn: `identified` | `underReview` | `adjudicated` = `identified`
+		if (ethicsVotes.length === 1) ethicsColumn = `underReview`
+		if (votingComplete) ethicsColumn = `adjudicated`
+
+		updateStory({
+			storyMapState: activeProduct!.storyMapState,
+			storyId: story.id,
+			data: {
+				ethicsApproved: votingComplete
+					? ethicsVotes.filter((vote) => vote.vote === true).length >
+					  ethicsVotes.filter((vote) => vote.vote === false).length
+					: null,
+				ethicsColumn,
+				ethicsVotes,
+			},
+		})
+	}
+
 	return (
 		<Drawer
 			title={
-				<div className="flex flex-col gap-1">
-					<p>{story.name}</p>
+				<div className="flex h-14 flex-col justify-center gap-1">
+					{!editMode && <p>{story.name}</p>}
 					<div>
 						{editMode ? (
-							<button
-								type="button"
+							<Button
+								type="primary"
+								danger
 								onClick={async () =>
 									void deleteStory({
 										storyMapState: activeProduct!.storyMapState,
@@ -125,31 +167,31 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 									})
 								}
 							>
-								<Tag color="#cf1322" icon={<DeleteFilled />}>
-									Delete
-								</Tag>
-							</button>
+								Delete
+							</Button>
 						) : (
-							<div className="flex gap-4">
+							<div className="relative">
 								<div>
 									<Tag color="#585858" icon={<NumberOutlined />}>
 										{story.points} point{story.points === 1 ? `` : `s`}
 									</Tag>
 									<Tag
-										color={typeof activeProduct?.effortCost === `number` ? `#389e0d` : `#f5f5f5`}
+										color={typeof activeProduct?.effortCost === `number` ? `#585858` : `#f5f5f5`}
 										icon={<DollarOutlined />}
-										style={
-											typeof activeProduct?.effortCost === `number`
-												? {}
-												: {color: `#d9d9d9`, border: `1px solid currentColor`}
-										}
+										className={clsx(
+											typeof activeProduct?.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
+										)}
 									>
-										{dollarFormat((activeProduct?.effortCost ?? 1) * story.points)}
+										{dollarFormat((activeProduct?.effortCost ?? 0) * story.points)}
+									</Tag>
+									<Tag color="#585858" icon={<FlagOutlined />}>
+										{sprintColumns[story.sprintColumn]}
 									</Tag>
 								</div>
-								<div>
+
+								<div className="absolute left-96 top-0">
 									<Tag
-										color={story.branchName ? `#9254de` : `#f5f5f5`}
+										color={story.branchName ? `#0958d9` : `#f5f5f5`}
 										icon={<CodeOutlined />}
 										style={story.branchName ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
 									>
@@ -157,7 +199,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 									</Tag>
 									<LinkTo href={story.designLink} openInNewTab>
 										<Tag
-											color={story.designLink ? `#1677ff` : `#f5f5f5`}
+											color={story.designLink ? `#0958d9` : `#f5f5f5`}
 											icon={<BlockOutlined />}
 											style={story.designLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
 										>
@@ -166,7 +208,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 									</LinkTo>
 									<LinkTo href={story.pageLink} openInNewTab>
 										<Tag
-											color={story.pageLink ? `#1677ff` : `#f5f5f5`}
+											color={story.pageLink ? `#0958d9` : `#f5f5f5`}
 											icon={<LinkOutlined />}
 											style={story.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
 										>
@@ -183,20 +225,25 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 			closable={false}
 			height={500}
 			extra={
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-4">
 					{editMode ? (
 						<>
-							<Button size="small" onClick={() => void setEditMode(false)}>
-								Cancel
-							</Button>
-							<Button size="small" type="primary" htmlType="submit" form="story-form" className="bg-green-s500">
+							<Button onClick={() => void setEditMode(false)}>Cancel</Button>
+							<Button type="primary" htmlType="submit" form="story-form" className="bg-green-s500">
 								Done
 							</Button>
 						</>
 					) : (
-						<button type="button" onClick={() => void setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
-							Edit
-						</button>
+						!disableEditing && (
+							<>
+								<button type="button" onClick={() => void setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
+									Edit
+								</button>
+								<button type="button" onClick={() => void onClose()}>
+									<CloseOutlined />
+								</button>
+							</>
+						)
 					)}
 				</div>
 			}
@@ -219,16 +266,21 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 							hasFeedback
 							validateStatus={formValidateStatus(getFieldState(`points`, formState))}
 						>
-							<Segmented options={[1, 2, 3, 5, 8, 13]} />
+							<RhfSegmented control={control} name="points" options={[1, 2, 3, 5, 8, 13]} />
 						</Form.Item>
 						<Form.Item label="Version">
-							<Select
-								defaultValue={currentVersion.id}
+							<RhfSelect
+								control={control}
+								name="versionId"
 								options={versions?.map((version) => ({label: version.name, value: version.id}))}
 							/>
 						</Form.Item>
-						<Form.Item label="Status">
-							<Select />
+						<Form.Item label="Status" className="shrink-0 basis-56">
+							<RhfSelect
+								control={control}
+								name="sprintColumn"
+								options={objectEntries(sprintColumns).map(([key, value]) => ({label: value, value: key}))}
+							/>
 						</Form.Item>
 					</div>
 					<Form.Item
@@ -260,6 +312,40 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 				<div className="grid h-full grid-cols-2 gap-8">
 					{/* Left column */}
 					<div className="flex h-full min-h-0 flex-col gap-6">
+						{!hideAdjudicationResponse && (
+							<div className="space-y-2">
+								{story.ethicsApproved === null ? (
+									<>
+										<div>
+											<p className="text-xl font-semibold">Adjudication Response</p>
+											<p className="text-xs">
+												Do you think this would provide value and reaffirm the commitment to our users?
+											</p>
+										</div>
+
+										<Radio.Group onChange={(e) => void addVote(e.target.value === `allow`)}>
+											<Radio value="allow">Allow</Radio>
+											<Radio value="reject">Reject</Radio>
+										</Radio.Group>
+									</>
+								) : (
+									<>
+										<p className="text-xl font-semibold">Adjudication Response</p>
+										{story.ethicsApproved ? (
+											<div className="inline-flex items-center gap-2 bg-[#90D855] py-2 px-4">
+												<LikeOutlined />
+												Allowed
+											</div>
+										) : (
+											<div className="inline-flex items-center gap-2 bg-[#FFA39E] py-2 px-4">
+												<DislikeOutlined />
+												Rejected
+											</div>
+										)}
+									</>
+								)}
+							</div>
+						)}
 						<div className="max-h-[calc(100%-8rem)] space-y-2">
 							<p className="text-xl font-semibold text-[#595959]">Story</p>
 							<Input.TextArea
@@ -279,38 +365,40 @@ const StoryDrawer: FC<StoryDrawerProps> = ({story, isOpen, onClose}) => {
 							/>
 						</div>
 
-						<div className="flex min-h-0 flex-1 flex-col gap-2">
-							<p className="text-xl font-semibold text-[#595959]">Acceptance Criteria</p>
-							<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
-								{story.acceptanceCriteria.map((criterion) => (
-									<Checkbox
-										key={criterion.id}
-										checked={criterion.checked}
-										onChange={(e) => void toggleAcceptanceCriterion(criterion.id, e.target.checked)}
-										style={{marginLeft: `0px`}}
+						{!hideAcceptanceCriteria && (
+							<div className="flex min-h-0 flex-1 flex-col gap-2">
+								<p className="text-xl font-semibold text-[#595959]">Acceptance Criteria</p>
+								<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
+									{story.acceptanceCriteria.map((criterion) => (
+										<Checkbox
+											key={criterion.id}
+											checked={criterion.checked}
+											onChange={(e) => void toggleAcceptanceCriterion(criterion.id, e.target.checked)}
+											style={{marginLeft: `0px`}}
+										>
+											{criterion.name}
+										</Checkbox>
+									))}
+									<form
+										onSubmit={(e) => {
+											e.preventDefault()
+											addAcceptanceCriterion()
+											setNewAcceptanceCriterion(``)
+										}}
 									>
-										{criterion.name}
-									</Checkbox>
-								))}
-								<form
-									onSubmit={(e) => {
-										e.preventDefault()
-										addAcceptanceCriterion()
-										setNewAcceptanceCriterion(``)
-									}}
-								>
-									<Input
-										size="small"
-										placeholder="Add item"
-										value={newAcceptanceCriterion}
-										onChange={(e) => void setNewAcceptanceCriterion(e.target.value)}
-										className="w-40"
-									/>
+										<Input
+											size="small"
+											placeholder="Add item"
+											value={newAcceptanceCriterion}
+											onChange={(e) => void setNewAcceptanceCriterion(e.target.value)}
+											className="w-40"
+										/>
 
-									<input type="submit" hidden />
-								</form>
+										<input type="submit" hidden />
+									</form>
+								</div>
 							</div>
-						</div>
+						)}
 					</div>
 
 					{/* Right column */}

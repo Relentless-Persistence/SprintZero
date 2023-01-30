@@ -1,4 +1,3 @@
-import {DislikeFilled, LikeFilled} from "@ant-design/icons"
 import {useAtomValue} from "jotai"
 import {useState} from "react"
 
@@ -22,22 +21,17 @@ const Story: FC<StoryProps> = ({story}) => {
 			<button
 				type="button"
 				onClick={() => void setIsDrawerOpen(true)}
-				className="flex w-full items-center justify-between gap-2 border border-laurel bg-[#fafafa] px-4 py-3 text-left"
+				className="w-full space-y-1 border border-laurel bg-[#fafafa] px-4 py-3 text-left"
 			>
-				<div className="space-y-1">
-					<p className="font-medium">{story.name}</p>
-					<p className="inline-block border border-green-t600 bg-green-t1100 px-1 py-0.5 text-xs text-green-s800">
-						{featureName}
-					</p>
-				</div>
-				{story.ethicsApproved === true && <LikeFilled className="text-xl text-[#54A31C]" />}
-				{story.ethicsApproved === false && <DislikeFilled className="text-xl text-[#FA541C]" />}
+				<p className="font-medium">{story.name}</p>
+				<p className="inline-block border border-green-t600 bg-green-t1100 px-1 py-0.5 text-xs text-green-s800">
+					{featureName}
+				</p>
 			</button>
 
 			<StoryDrawer
 				story={story}
-				hideAcceptanceCriteria
-				disableEditing
+				hideAdjudicationResponse
 				isOpen={isDrawerOpen}
 				onClose={() => void setIsDrawerOpen(false)}
 			/>

@@ -1,9 +1,9 @@
-/* Specifically for use with react-hook-form. Use Antd's plain <Segmented /> otherwise. */
+/* Specifically for use with react-hook-form. Use Antd's plain <Select /> otherwise. */
 
-import {Segmented} from "antd5"
+import {Select} from "antd5"
 import {useController} from "react-hook-form"
 
-import type {SegmentedProps as AntdSegmentedProps} from "antd5"
+import type {SelectProps as AntdSelectProps} from "antd5"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
@@ -12,26 +12,25 @@ type FieldValues = Record<string, any>
 
 type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
 
-export type RhfSegmentedProps<TFieldValues extends FieldValues> = Omit<AntdSegmentedProps, `ref`> &
+export type RhfSelectProps<TFieldValues extends FieldValues> = Omit<AntdSelectProps, `ref`> &
 	SetRequired<ControllerProps<TFieldValues>, `control`>
 
-const RhfSegmented = <TFieldValues extends FieldValues = FieldValues>({
+const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	control,
 	name,
 	...props
-}: RhfSegmentedProps<TFieldValues>): ReactElement | null => {
+}: RhfSelectProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name})
 
 	return (
-		<Segmented
+		<Select
 			{...props}
 			onChange={(value) => void field.onChange(value)}
 			onBlur={field.onBlur}
 			value={field.value}
-			name={field.name}
 			ref={(v) => void field.ref(v)}
 		/>
 	)
 }
 
-export default RhfSegmented
+export default RhfSelect

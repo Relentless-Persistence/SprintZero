@@ -3,7 +3,7 @@ import {z} from "zod"
 
 import {genDbNames, idSchema} from "~/types"
 
-const EpicSchema = z.object({
+export const EpicSchema = z.object({
 	id: idSchema,
 
 	description: z.string(),
@@ -18,7 +18,7 @@ const EpicSchema = z.object({
 })
 export type Epic = z.infer<typeof EpicSchema>
 
-const FeatureSchema = z.object({
+export const FeatureSchema = z.object({
 	id: idSchema,
 
 	description: z.string(),
@@ -32,7 +32,7 @@ const FeatureSchema = z.object({
 })
 export type Feature = z.infer<typeof FeatureSchema>
 
-const StorySchema = z.object({
+export const StorySchema = z.object({
 	id: idSchema,
 
 	acceptanceCriteria: z.array(
@@ -46,7 +46,7 @@ const StorySchema = z.object({
 	description: z.string(),
 	designLink: z.string().url().nullable(),
 	ethicsApproved: z.boolean().nullable(),
-	ethicsColumn: z.union([z.literal(`identified`), z.literal(`under-review`), z.literal(`adjudicated`)]).nullable(),
+	ethicsColumn: z.union([z.literal(`identified`), z.literal(`underReview`), z.literal(`adjudicated`)]).nullable(),
 	ethicsVotes: z.array(
 		z.object({
 			userId: idSchema,
@@ -56,6 +56,20 @@ const StorySchema = z.object({
 	name: z.string(),
 	pageLink: z.string().url().nullable(),
 	points: z.number(),
+	sprintColumn: z.union([
+		z.literal(`productBacklog`),
+		z.literal(`designBacklog`),
+		z.literal(`designing`),
+		z.literal(`critique`),
+		z.literal(`devReady`),
+		z.literal(`devBacklog`),
+		z.literal(`developing`),
+		z.literal(`designReview`),
+		z.literal(`codeReview`),
+		z.literal(`qa`),
+		z.literal(`productionQueue`),
+		z.literal(`shipped`),
+	]),
 
 	commentIds: z.array(idSchema),
 	nameInputStateId: idSchema,
@@ -134,3 +148,18 @@ export const ProductSchema = z.object({
 export const Products = genDbNames(`Products`, ProductSchema)
 export type Product = z.infer<typeof ProductSchema>
 export type StoryMapState = Product[`storyMapState`]
+
+export const sprintColumns = {
+	productBacklog: `Product Backlog`,
+	designBacklog: `Design Sprint Backlog`,
+	designing: `Designing`,
+	critique: `Critique`,
+	devReady: `Design Done / Dev Ready`,
+	devBacklog: `Dev Sprint Backlog`,
+	developing: `Developing`,
+	designReview: `Design Review`,
+	codeReview: `Peer Code Review`,
+	qa: `QA`,
+	productionQueue: `Production Queue`,
+	shipped: `Shipped`,
+}
