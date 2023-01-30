@@ -2,7 +2,7 @@
 
 import {useQuery} from "@tanstack/react-query"
 import {Avatar, Button} from "antd5"
-import {addDoc, collection, doc, setDoc, updateDoc} from "firebase9/firestore"
+import {addDoc, collection, doc, setDoc} from "firebase9/firestore"
 import {motion} from "framer-motion"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
@@ -20,7 +20,6 @@ import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
-import {Users} from "~/types/db/Users"
 import {Versions} from "~/types/db/Versions"
 import {getUser} from "~/utils/api/queries"
 import {useUserId} from "~/utils/atoms"
@@ -49,11 +48,11 @@ const ProductConfiguration: FC = () => {
 		setHasSubmitted(true)
 
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}` as Id
-		addDoc(collection(db, Versions._), {name: `1.0`, product: slug} satisfies Omit<Version, `id`>)
+		addDoc(collection(db, Versions._), {name: `1.0`, productId: slug} satisfies Omit<Version, `id`>)
 
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
-			members: [{userId: userId as Id, type: `editor`}],
+			members: {[userId]: {type: `editor`}},
 			storyMapState: {epics: [], features: [], stories: [], productId: slug},
 			problemStatement: ``,
 			personas: [],
@@ -73,8 +72,6 @@ const ProductConfiguration: FC = () => {
 			updates: [],
 		} satisfies Omit<Product, `id`>)
 		await setDoc(doc(db, Products._, slug), finalData)
-
-		await updateDoc(doc(db, Users._, userId), {products: [...user.products, slug]})
 
 		router.push(`/${slug}/dashboard`)
 	}

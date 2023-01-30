@@ -13,6 +13,7 @@ import {deleteEpic, updateEpic} from "~/utils/api/mutations"
 import {getUser} from "~/utils/api/queries"
 import {activeProductAtom} from "~/utils/atoms"
 import dollarFormat from "~/utils/dollarFormat"
+import {objectKeys} from "~/utils/objectMethods"
 
 export type EpicDrawerProps = {
 	epic: Epic
@@ -44,11 +45,12 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 	})
 
 	const res = useQueries({
-		queries:
-			activeProduct?.members.map((member) => ({
-				queryKey: [`user`, member.userId],
-				queryFn: getUser(member.userId),
-			})) ?? [],
+		queries: activeProduct
+			? objectKeys(activeProduct.members).map((id) => ({
+					queryKey: [`user`, id],
+					queryFn: getUser(id),
+			  }))
+			: [],
 	})
 
 	return (

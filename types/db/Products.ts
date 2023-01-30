@@ -92,12 +92,13 @@ export const ProductSchema = z.object({
 		z.literal(`Saturday`),
 		z.literal(`Sunday`),
 	]),
-	members: z.array(
+	members: z.record(
+		idSchema,
 		z.object({
-			userId: idSchema,
 			type: z.union([z.literal(`editor`), z.literal(`viewer`)]),
 		}),
 	),
+
 	name: z.string(),
 
 	// Story map info

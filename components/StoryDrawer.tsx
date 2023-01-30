@@ -34,7 +34,7 @@ import {getVersionsByProduct} from "~/utils/api/queries"
 import {activeProductAtom, useUserId} from "~/utils/atoms"
 import dollarFormat from "~/utils/dollarFormat"
 import {formValidateStatus} from "~/utils/formValidateStatus"
-import objectEntries from "~/utils/objectEntries"
+import {objectEntries, objectKeys} from "~/utils/objectMethods"
 
 const formSchema = StorySchema.pick({
 	branchName: true,
@@ -130,7 +130,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 	const addVote = (vote: boolean) => {
 		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== userId)
 		ethicsVotes.push({userId: userId!, vote})
-		const votingComplete = ethicsVotes.length === activeProduct?.members.length
+		const votingComplete = ethicsVotes.length === objectKeys(activeProduct!.members).length
 
 		let ethicsColumn: `identified` | `underReview` | `adjudicated` = `identified`
 		if (ethicsVotes.length === 1) ethicsColumn = `underReview`

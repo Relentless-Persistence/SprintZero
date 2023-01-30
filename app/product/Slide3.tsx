@@ -3,23 +3,14 @@ import {Form} from "antd5"
 import clsx from "clsx"
 import {useEffect} from "react"
 import {useForm, useWatch} from "react-hook-form"
-import {z} from "zod"
 
 import type {FC} from "react"
+import type {z} from "zod"
 
 import SlideContainer from "./SlideContainer"
+import {ProductSchema} from "~/types/db/Products"
 
-const formSchema = z.object({
-	gate: z.union([
-		z.literal(`Monday`),
-		z.literal(`Tuesday`),
-		z.literal(`Wednesday`),
-		z.literal(`Thursday`),
-		z.literal(`Friday`),
-		z.literal(`Saturday`),
-		z.literal(`Sunday`),
-	]),
-})
+const formSchema = ProductSchema.pick({gate: true})
 type FormInputs = z.infer<typeof formSchema>
 
 export type Slide3Props = {

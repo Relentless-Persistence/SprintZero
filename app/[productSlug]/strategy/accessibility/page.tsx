@@ -44,19 +44,21 @@ const Accessibility = () => {
 	}, [activeProduct?.accessibilityMissionStatements, currentTab])
 
 	const [accessibilityItems, setAccessibilityItems] = useState<AccessibilityItem[]>([])
-	useEffect(() => {
-		return onSnapshot(
-			query(collection(db, AccessibilityItems._), where(AccessibilityItems.productId, `==`, activeProductId)),
-			(docs) => {
-				const data: AccessibilityItem[] = []
-				docs.forEach((doc) => {
-					const _data = AccessibilityItemSchema.parse({...doc.data(), id: doc.id})
-					data.push(_data)
-				})
-				setAccessibilityItems(data)
-			},
-		)
-	}, [activeProductId])
+	useEffect(
+		() =>
+			onSnapshot(
+				query(collection(db, AccessibilityItems._), where(AccessibilityItems.productId, `==`, activeProductId)),
+				(docs) => {
+					const data: AccessibilityItem[] = []
+					docs.forEach((doc) => {
+						const _data = AccessibilityItemSchema.parse({...doc.data(), id: doc.id})
+						data.push(_data)
+					})
+					setAccessibilityItems(data)
+				},
+			),
+		[activeProductId],
+	)
 
 	const currentItems = accessibilityItems.filter((item) => item.type === currentTab)
 

@@ -8,8 +8,6 @@ export const UserSchema = z.object({
 	avatar: z.string().nullable(),
 	email: z.string(),
 	name: z.string(),
-
-	products: z.array(idSchema),
 })
 
 export const Users = genDbNames(`Users`, UserSchema)

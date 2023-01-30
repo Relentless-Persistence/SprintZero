@@ -7,6 +7,7 @@ import type {Id} from "~/types"
 import type {AccessibilityItem} from "~/types/db/AccessibilityItems"
 import type {Comment} from "~/types/db/Comments"
 import type {InputState} from "~/types/db/InputStates"
+import type {Objective} from "~/types/db/Objectives"
 import type {Epic, Feature, Product, Story, StoryMapState} from "~/types/db/Products"
 import type {Version} from "~/types/db/Versions"
 
@@ -15,6 +16,7 @@ import {db} from "~/config/firebase"
 import {AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {Comments} from "~/types/db/Comments"
 import {InputStates} from "~/types/db/InputStates"
+import {Objectives, ObjectiveSchema} from "~/types/db/Objectives"
 import {ProductSchema, Products} from "~/types/db/Products"
 import {Versions} from "~/types/db/Versions"
 
@@ -28,7 +30,7 @@ export const addVersion = async ({productId, versionName}: AddVersionVars): Prom
 		await getDocs(
 			query(
 				collection(db, Versions._),
-				where(Versions.product, `==`, productId),
+				where(Versions.productId, `==`, productId),
 				where(Versions.name, `==`, versionName),
 			),
 		)
@@ -37,7 +39,7 @@ export const addVersion = async ({productId, versionName}: AddVersionVars): Prom
 
 	const data: Omit<Version, `id`> = {
 		name: versionName,
-		product: productId,
+		productId,
 	}
 	await addDoc(collection(db, Versions._), data)
 }
@@ -335,4 +337,14 @@ type DeleteAccessibilityItemVars = {
 
 export const deleteAccessibilityItem = async ({id}: DeleteAccessibilityItemVars): Promise<void> => {
 	await deleteDoc(doc(db, AccessibilityItems._, id))
+}
+
+type UpdateObjectiveVars = {
+	id: Id
+	data: Partial<Omit<Objective, `id`>>
+}
+
+export const updateObjective = async ({id, data}: UpdateObjectiveVars): Promise<void> => {
+	const safeData = ObjectiveSchema.parse(data)
+	await updateDoc(doc(db, Objectives._, id), safeData)
 }

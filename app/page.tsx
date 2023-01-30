@@ -17,6 +17,7 @@ const HomePage: FC = () => {
 		queryFn: getProductsByUser(userId!),
 		enabled: userId !== undefined,
 		onSuccess: (products) => {
+			console.log(products)
 			const firstProduct = products[0]
 			if (firstProduct) {
 				router.replace(`/${firstProduct.id}/dashboard`)

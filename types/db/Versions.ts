@@ -7,7 +7,7 @@ export const VersionSchema = z.object({
 
 	name: z.string(),
 
-	product: idSchema,
+	productId: idSchema,
 })
 
 export const Versions = genDbNames(`Versions`, VersionSchema)

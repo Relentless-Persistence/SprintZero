@@ -6,14 +6,16 @@ import {signInWithPopup, signOut} from "firebase9/auth"
 import {doc, getDoc, setDoc} from "firebase9/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
-import React, {useEffect, useState} from "react"
+import {useEffect, useState} from "react"
 
 import type {AuthProvider} from "firebase9/auth"
 import type {FC} from "react"
+import type {Id} from "~/types"
 import type {User} from "~/types/db/Users"
 
 import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/config/firebase"
-import {UserSchema, Users} from "~/types/db/Users"
+import {Users} from "~/types/db/Users"
+import {getProductsByUser} from "~/utils/api/queries"
 import {useUserId} from "~/utils/atoms"
 
 const LoginPage: FC = () => {
@@ -43,14 +45,12 @@ const LoginPage: FC = () => {
 						avatar: res.user.photoURL,
 						email: res.user.email,
 						name: res.user.displayName,
-						products: [],
 					} satisfies Omit<User, `id`>)
 					router.push(`/tos`)
 				} else {
-					const _user = await getDoc(doc(db, Users._, res.user.uid))
-					const user = UserSchema.parse({id: _user.id, ..._user.data()})
-					if (user.products.length === 0) router.push(`/product`)
-					else router.push(`/${user.products[0]}/dashboard`)
+					const products = await getProductsByUser(res.user.uid as Id)()
+					if (products.length === 0) router.push(`/product`)
+					else router.push(`/${products[0]}/dashboard`)
 				}
 			} else {
 				message.error({content: `Sorry, you are not yet enrolled in the beta.`})

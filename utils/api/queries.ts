@@ -25,18 +25,15 @@ export const getProduct = (id: Id) => async (): Promise<Product> => {
 }
 
 export const getProductsByUser = (userId: Id) => async (): Promise<Product[]> => {
-	const _user = await getDoc(doc(db, Users._, userId))
-	const user = UserSchema.parse({id: _user.id, ..._user.data()})
-	const queries = user.products.map((productId) => getDoc(doc(db, Products._, productId)))
+	const _data = await getDocs(query(collection(db, Products._), where(userId, `in`, Products.members)))
 
-	const _data = await Promise.all(queries)
-	const data = ProductSchema.array().parse(_data.map((doc) => ({id: doc.id, ...doc.data()})))
+	const data = ProductSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
 }
 
 export const getVersionsByProduct = (productId: Id) => async (): Promise<Version[]> => {
 	const _data = await getDocs(
-		query(collection(db, Versions._), where(Versions.product, `==`, productId), orderBy(Versions.name)),
+		query(collection(db, Versions._), where(Versions.productId, `==`, productId), orderBy(Versions.name)),
 	)
 	const data = VersionSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data
