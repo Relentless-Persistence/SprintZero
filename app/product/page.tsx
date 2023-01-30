@@ -63,6 +63,21 @@ const ProductConfiguration: FC = () => {
 			...data,
 			storyMapState: {productId: slug, epics: [], features: [], stories: []},
 			members: [{userId: userId as Id, type: `editor`}],
+			problemStatement: ``,
+			personas: [],
+			successMetrics: [],
+			businessPriorities: [],
+			accessibilityMissionStatements: {
+				auditory: ``,
+				cognitive: ``,
+				physical: ``,
+				speech: ``,
+				visual: ``,
+			},
+			productType: `mobile`,
+			valueProposition: ``,
+			features: [],
+			finalVision: ``,
 		} satisfies Omit<Product, `id`>)
 		await setDoc(doc(db, Products._, slug), finalData)
 

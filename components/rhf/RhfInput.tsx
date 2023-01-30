@@ -21,7 +21,7 @@ type FieldValues = Record<string, any>
 
 type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
 
-export type RhfInputProps<TFieldValues extends FieldValues> = AntdInputProps &
+export type RhfInputProps<TFieldValues extends FieldValues> = Omit<AntdInputProps, `ref`> &
 	SetRequired<ControllerProps<TFieldValues>, `control`> & {
 		currencyFormat?: boolean
 	}
@@ -42,12 +42,12 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 
 	return (
 		<Input
+			{...props}
 			onChange={(e) => void field.onChange(format(e.target.value))}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}
 			ref={(v) => void field.ref(v?.input)}
-			{...props}
 		/>
 	)
 }

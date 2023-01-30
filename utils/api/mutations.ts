@@ -15,7 +15,7 @@ import {db} from "~/config/firebase"
 import {AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {Comments} from "~/types/db/Comments"
 import {InputStates} from "~/types/db/InputStates"
-import {Products} from "~/types/db/Products"
+import {ProductSchema, Products} from "~/types/db/Products"
 import {Versions} from "~/types/db/Versions"
 
 type AddVersionVars = {
@@ -48,7 +48,8 @@ type UpdateProductVars = {
 }
 
 export const updateProduct = async ({id, data}: UpdateProductVars): Promise<void> => {
-	await updateDoc(doc(db, Products._, id), data)
+	const validData = ProductSchema.parse(data)
+	await updateDoc(doc(db, Products._, id), validData)
 }
 
 type AddEpicVars = {

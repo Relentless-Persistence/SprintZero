@@ -41,7 +41,7 @@ module.exports = {
 			blue: `#009cd5`,
 		},
 		fontFamily: {
-			courier: [`Courier Prime`, `monospace`],
+			mono: [`monospace`],
 		},
 	},
 }

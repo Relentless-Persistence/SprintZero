@@ -37,7 +37,7 @@ export const layerBoundaries: [number, number] = [62 + storyMapTop, 156 + storyM
 
 export let storyMapScrollPosition = globalThis.__storyMapScrollPosition ?? {current: 0}
 export let storyMapMeta = globalThis.__storyMapMeta ?? {current: {}}
-export let elementRegistry = globalThis.__elementRegistry ?? {epics: {}, features: {}, stories: {}}
+export let elementRegistry = globalThis.__elementRegistry ?? {}
 export let boundaries = globalThis.__boundaries ?? {epic: {}, feature: {}, story: {}}
 export let pointerLocation = globalThis.__pointerLocation ?? {current: [0, 0]}
 export let dragState = globalThis.__dragState ?? {current: undefined}

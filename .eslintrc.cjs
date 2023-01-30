@@ -39,6 +39,7 @@ module.exports = {
 		"no-empty": [`warn`, {allowEmptyCatch: true}],
 		"no-mixed-spaces-and-tabs": [`warn`, `smart-tabs`],
 		"no-negated-condition": `warn`,
+		"no-nested-ternary": `warn`,
 		"no-param-reassign": `error`,
 		"no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
 		"object-shorthand": `warn`,

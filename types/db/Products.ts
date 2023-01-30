@@ -1,3 +1,4 @@
+import {Timestamp} from "firebase9/firestore"
 import {z} from "zod"
 
 import {genDbNames, idSchema} from "~/types"
@@ -108,6 +109,26 @@ export const ProductSchema = z.object({
 		speech: z.string(),
 		visual: z.string(),
 	}),
+
+	// Vision info
+	productType: z.union([
+		z.literal(`mobile`),
+		z.literal(`tablet`),
+		z.literal(`desktop`),
+		z.literal(`watch`),
+		z.literal(`web`),
+	]),
+	valueProposition: z.string(),
+	features: z.array(z.object({id: z.string(), text: z.string()})),
+	finalVision: z.string(),
+	updates: z.array(
+		z.object({
+			id: z.string(),
+			userId: idSchema,
+			text: z.string(),
+			timestamp: z.instanceof(Timestamp),
+		}),
+	),
 })
 
 export const Products = genDbNames(`Products`, ProductSchema)
