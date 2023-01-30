@@ -23,14 +23,13 @@ const MultiUserInput: FC<MultiUserInputProps> = ({value, onChange, inputStateId,
 	const ref = useRef<HTMLInputElement | undefined>(undefined)
 
 	useEffect(() => {
-		const unsubscribe = onSnapshot(doc(db, InputStates._, inputStateId), (doc) => {
+		return onSnapshot(doc(db, InputStates._, inputStateId), (doc) => {
 			if (!ref.current || !userId) return
 			const data = InputStateSchema.parse({id: doc.id, ...doc.data()})
 			ref.current.selectionStart = data.selections[userId]?.start ?? null
 			ref.current.selectionEnd = data.selections[userId]?.end ?? null
 			ref.current.selectionDirection = data.selections[userId]?.direction ?? null
 		})
-		return unsubscribe
 	}, [inputStateId, userId])
 
 	const storeCursorPosition = () => {

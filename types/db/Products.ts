@@ -99,6 +99,15 @@ export const ProductSchema = z.object({
 	personas: z.array(z.object({id: z.string(), text: z.string()})),
 	successMetrics: z.array(z.object({id: z.string(), text: z.string()})),
 	businessPriorities: z.array(z.object({id: z.string(), text: z.string()})),
+
+	// Accessibility info
+	accessibilityMissionStatements: z.object({
+		auditory: z.string(),
+		cognitive: z.string(),
+		physical: z.string(),
+		speech: z.string(),
+		visual: z.string(),
+	}),
 })
 
 export const Products = genDbNames(`Products`, ProductSchema)

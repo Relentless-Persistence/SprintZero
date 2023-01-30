@@ -11,7 +11,7 @@ import TextListEditor from "./TextListEditor"
 import {updateProduct} from "~/utils/api/mutations"
 import {activeProductAtom} from "~/utils/atoms"
 
-const Kickoff: FC = () => {
+const KickoffPage: FC = () => {
 	const activeProduct = useAtomValue(activeProductAtom)
 	const [editingSection, setEditingSection] = useState<
 		`problemStatement` | `personas` | `successMetrics` | `businessPriorities` | undefined
@@ -22,14 +22,13 @@ const Kickoff: FC = () => {
 
 	return (
 		<div className="h-full space-y-6 px-12 py-8">
-			<div className="mb-4">
-				<Breadcrumb>
-					<Breadcrumb.Item>Strategy</Breadcrumb.Item>
-					<Breadcrumb.Item>Kickoff</Breadcrumb.Item>
-				</Breadcrumb>
-			</div>
+			<Breadcrumb>
+				<Breadcrumb.Item>Strategy</Breadcrumb.Item>
+				<Breadcrumb.Item>Kickoff</Breadcrumb.Item>
+			</Breadcrumb>
 			<div className="grid grid-cols-2 gap-8">
 				<Card
+					type="inner"
 					title="Problem Statement"
 					extra={
 						<EditButtons
@@ -54,6 +53,7 @@ const Kickoff: FC = () => {
 				</Card>
 
 				<Card
+					type="inner"
 					title="Success Metrics"
 					extra={
 						<EditButtons
@@ -87,6 +87,7 @@ const Kickoff: FC = () => {
 				</Card>
 
 				<Card
+					type="inner"
 					title="Identified Personas"
 					extra={
 						<EditButtons
@@ -120,6 +121,7 @@ const Kickoff: FC = () => {
 				</Card>
 
 				<Card
+					type="inner"
 					title="Business Priorities"
 					extra={
 						<EditButtons
@@ -156,4 +158,4 @@ const Kickoff: FC = () => {
 	)
 }
 
-export default Kickoff
+export default KickoffPage

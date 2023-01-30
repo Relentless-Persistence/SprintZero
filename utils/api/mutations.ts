@@ -1,9 +1,10 @@
-import {addDoc, collection, doc, getDocs, query, updateDoc, where} from "firebase9/firestore"
+import {addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where} from "firebase9/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 
 import type {SetRequired} from "type-fest"
 import type {Id} from "~/types"
+import type {AccessibilityItem} from "~/types/db/AccessibilityItems"
 import type {Comment} from "~/types/db/Comments"
 import type {InputState} from "~/types/db/InputStates"
 import type {Epic, Feature, Product, Story, StoryMapState} from "~/types/db/Products"
@@ -11,6 +12,7 @@ import type {Version} from "~/types/db/Versions"
 
 import {storyMapMeta} from "~/app/[productSlug]/dashboard/storyMap/utils/globals"
 import {db} from "~/config/firebase"
+import {AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {Comments} from "~/types/db/Comments"
 import {InputStates} from "~/types/db/InputStates"
 import {Products} from "~/types/db/Products"
@@ -305,4 +307,30 @@ type AddCommentVars = {
 export const addComment = async ({comment}: AddCommentVars): Promise<Id> => {
 	const ref = await addDoc(collection(db, Comments._), comment)
 	return ref.id as Id
+}
+
+type AddAccessibilityItemVars = {
+	item: Omit<AccessibilityItem, `id`>
+}
+
+export const addAccessibilityItem = async ({item}: AddAccessibilityItemVars): Promise<Id> => {
+	const ref = await addDoc(collection(db, AccessibilityItems._), item)
+	return ref.id as Id
+}
+
+type UpdateAccessibilityItemVars = {
+	id: Id
+	data: Partial<Omit<AccessibilityItem, `id`>>
+}
+
+export const updateAccessibilityItem = async ({id, data}: UpdateAccessibilityItemVars): Promise<void> => {
+	await updateDoc(doc(db, AccessibilityItems._, id), data)
+}
+
+type DeleteAccessibilityItemVars = {
+	id: Id
+}
+
+export const deleteAccessibilityItem = async ({id}: DeleteAccessibilityItemVars): Promise<void> => {
+	await deleteDoc(doc(db, AccessibilityItems._, id))
 }

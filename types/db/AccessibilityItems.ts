@@ -5,9 +5,17 @@ import {genDbNames, idSchema} from "~/types"
 export const AccessibilityItemSchema = z.object({
 	id: idSchema,
 
-	type: z.string(),
+	name: z.string(),
+	text: z.string(),
+	type: z.union([
+		z.literal(`auditory`),
+		z.literal(`cognitive`),
+		z.literal(`physical`),
+		z.literal(`speech`),
+		z.literal(`visual`),
+	]),
 
-	product: idSchema,
+	productId: idSchema,
 })
 
 export const AccessibilityItems = genDbNames(`AccessibilityItems`, AccessibilityItemSchema)

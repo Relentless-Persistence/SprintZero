@@ -41,3 +41,7 @@ ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 .ant-card .ant-card-meta {
 	margin: 0;
 }
+
+.ant-tabs-right > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+	padding-right: 0px;
+}
