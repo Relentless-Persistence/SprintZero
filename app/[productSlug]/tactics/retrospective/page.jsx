@@ -5,7 +5,7 @@
 // import {SortAscendingOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
 import {Card, Avatar, message, Empty, Breadcrumb, Button} from "antd5"
-// import {findIndex} from "lodash"
+import {collection, where, query, onSnapshot, doc, updateDoc, deleteDoc} from "firebase9/firestore"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -14,12 +14,14 @@ import {CardHeaderLink} from "~/components/Dashboard/CardHeaderButton"
 import {ActionFormCard} from "~/components/Dashboard/FormCard"
 import MasonryGrid from "~/components/Dashboard/MasonryGrid"
 import AddItem from "./AddItem"
-import EditItem from "~/components/Retrospective/EditItem"
-import {db} from "~/config/firebase-config"
+import EditItem from "./EditItem"
+import {db} from "~/config/firebase"
+// import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
 import {getUser} from "~/utils/api/queries"
 import {useUserId} from "~/utils/atoms"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+import { notification } from "antd5"
 
 const {Meta} = Card
 const types = [`Enjoyable`, `Puzzling`, `Frustrating`]
@@ -103,12 +105,11 @@ export default function Retrospective() {
 	// Fetch data from firebase
 	const fetchRetrospects = async () => {
 		if (activeProductId) {
-			db.collection(`Retrospectives`)
-				.where(`product_id`, `==`, activeProductId)
-				.where(`type`, `==`, activeType)
-				.onSnapshot((snapshot) => {
-					setData(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-				})
+			const docRef = collection(db, `Retrospectives`)
+			const q = query(docRef, where(`product_id`, `==`, activeProductId), where(`type`, `==`, activeType))
+			onSnapshot(q, (snapshot) => {
+				setData(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+			})
 		}
 	}
 
@@ -117,31 +118,32 @@ export default function Retrospective() {
 	}, [activeProductId, activeType])
 
 	const onEdit = async (item) => {
+		const docRef = doc(db, "Retrospectives", item.id)
 		const data = {
 			title: item.title,
 			description: item.description,
 		}
-		await db
-			.collection(`Retrospectives`)
-			.doc(item.id)
-			.update(data)
-			.then(() => {
-				message.success(`Retrospective updated successfully`)
+
+		try {
+			await updateDoc(docRef, data).then(() => {
+				notification.success({message: `Retrospective updated successfully`})
 				setActiveEditIndex(null)
 			})
-			.catch(() => {
-				message.error(`An error occurred`)
-			})
+		} catch (error) {
+			notification.error({message: `An error occurred` })
+		}
 	}
 
-	const removeRetro = (id) => {
-		db.collection(`Retrospectives`).doc(id).delete()
+	const removeRetro = async (id) => {
+		const docRef = doc(db, "Retrospectives", id)
+		await deleteDoc(docRef);
 	}
 
 	const updateRetroAction = (actionIndex, i, id) => {
+		const docRef = doc(db, "Retrospectives", id)
 		data[i].actions[actionIndex].completed = !data[i].actions[actionIndex].completed
 
-		db.collection(`Retrospectives`).doc(id).update(data[i])
+		updateDoc(docRef, data[i])
 	}
 
 	const editRetro = (item) => {
@@ -220,7 +222,7 @@ export default function Retrospective() {
 
 											<div className="">
 												<h5 className="font-semibold] text-[16px] text-[#595959]">Proposed Actions</h5>
-												{c.actions.map((a, actionIndex) => (
+												{c.actions?.map((a, actionIndex) => (
 													<div key={actionIndex}>
 														<AppCheckbox
 															key={a.label}

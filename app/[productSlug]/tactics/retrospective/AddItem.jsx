@@ -1,5 +1,3 @@
-"use client"
-
 import {useState} from "react"
 import {Row, Col, Input, Form, Drawer, message} from "antd5"
 
