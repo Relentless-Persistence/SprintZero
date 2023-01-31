@@ -46,11 +46,11 @@ const SettingsMenu: FC = () => {
 						label: <Link href="/settings/config">Configuration</Link>,
 					},
 					{key: `settings-team`, icon: <TeamOutlined />, label: <Link href="/settings/team">Team</Link>},
-					{
-						key: `settings-integrations`,
-						icon: <ApiOutlined />,
-						label: <Link href="/settings/integrations">Integrations</Link>,
-					},
+					// {
+					// 	key: `settings-integrations`,
+					// 	icon: <ApiOutlined />,
+					// 	label: <Link href="/settings/integrations">Integrations</Link>,
+					// },
 				]}
 				style={{borderInlineEnd: `unset`}}
 			/>
@@ -59,7 +59,7 @@ const SettingsMenu: FC = () => {
 					{
 						key: `settings-support`,
 						icon: <FormOutlined />,
-						label: <Link href="/settings/support">Support</Link>,
+						label: <Link href="https://www.sprintzero.app/contact" target="_blank">Support</Link>,
 					},
 					{
 						key: `settings-logout`,
