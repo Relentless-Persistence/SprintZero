@@ -25,7 +25,10 @@ export const getProduct = (id: Id) => async (): Promise<Product> => {
 }
 
 export const getProductsByUser = (userId: Id) => async (): Promise<Product[]> => {
-	const _data = await getDocs(query(collection(db, Products._), where(userId, `in`, Products.members)))
+	const _data = await getDocs(
+		// TODO: this is not the final intended query
+		query(collection(db, Products._), where(`${Products.members}.${userId}.type`, `==`, `editor`)),
+	)
 
 	const data = ProductSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
 	return data

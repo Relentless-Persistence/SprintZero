@@ -12,6 +12,7 @@ import {v4 as uuid} from "uuid"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
 import Slide1 from "./Slide1"
@@ -20,6 +21,7 @@ import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
 import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
+import {StoryMapStates} from "~/types/db/StoryMapStates"
 import {Versions} from "~/types/db/Versions"
 import {getUser} from "~/utils/api/queries"
 import {useUserId} from "~/utils/atoms"
@@ -50,10 +52,19 @@ const ProductConfiguration: FC = () => {
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}` as Id
 		addDoc(collection(db, Versions._), {name: `1.0`, productId: slug} satisfies Omit<Version, `id`>)
 
+		const storyMapStateId = (
+			await addDoc(collection(db, StoryMapStates._), {
+				productId: slug,
+				epics: [],
+				features: [],
+				stories: [],
+			} satisfies Omit<StoryMapState, `id`>)
+		).id as Id
+
 		const finalData = ProductSchema.omit({id: true}).parse({
 			...data,
+			storyMapStateId,
 			members: {[userId]: {type: `editor`}},
-			storyMapState: {epics: [], features: [], stories: [], productId: slug},
 			problemStatement: ``,
 			personas: [],
 			successMetrics: [],

@@ -1,12 +1,13 @@
 import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
 import {Button, Drawer, Form, Input, Tag, Typography} from "antd5"
 import produce from "immer"
-import {useAtom} from "jotai"
+import {useAtom, useAtomValue} from "jotai"
 import {useState} from "react"
 
 import type {FC} from "react"
-import type {Feature} from "~/types/db/Products"
+import type {Feature} from "~/types/db/StoryMapStates"
 
+import {storyMapStateAtom} from "../atoms"
 import Comments from "~/components/Comments"
 import {deleteFeature, updateFeature} from "~/utils/api/mutations"
 import {activeProductAtom} from "~/utils/atoms"
@@ -19,22 +20,23 @@ export type FeatureDrawerProps = {
 }
 
 const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
+	const activeProduct = useAtomValue(activeProductAtom)
+	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
 	const [editMode, setEditMode] = useState(false)
-	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
 	const [draftTitle, setDraftTitle] = useState(feature.name)
 
 	const updateLocalFeatureDescription = (newDescription: string) => {
-		setActiveProduct((activeProduct) =>
-			produce(activeProduct, (draft) => {
-				const index = draft!.storyMapState.features.findIndex(({id}) => id === feature.id)
-				draft!.storyMapState.features[index]!.description = newDescription
+		setStoryMapState((cur) =>
+			produce(cur, (draft) => {
+				const index = draft!.features.findIndex(({id}) => id === feature.id)
+				draft!.features[index]!.description = newDescription
 			}),
 		)
 	}
 
 	let points = 0
 	feature.storyIds.forEach((storyId) => {
-		const story = activeProduct?.storyMapState.stories.find((story) => story.id === storyId)
+		const story = storyMapState?.stories.find((story) => story.id === storyId)
 		points += story?.points ?? 0
 	})
 
@@ -49,7 +51,7 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 								type="button"
 								onClick={async () =>
 									void deleteFeature({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										featureId: feature.id,
 									})
 								}
@@ -94,7 +96,7 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 								type="primary"
 								onClick={() => {
 									void updateFeature({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										featureId: feature.id,
 										data: {name: draftTitle},
 									})
@@ -133,7 +135,7 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 								onChange={async (e) => {
 									updateLocalFeatureDescription(e.target.value)
 									updateFeature({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										featureId: feature.id,
 										data: {
 											description: e.target.value,
@@ -153,7 +155,7 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 								commentList={feature.commentIds}
 								onCommentListChange={(newCommentList) =>
 									void updateFeature({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										featureId: feature.id,
 										data: {
 											commentIds: newCommentList,

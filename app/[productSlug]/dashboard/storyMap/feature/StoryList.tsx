@@ -1,12 +1,11 @@
 import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
-import type {Feature as FeatureType} from "~/types/db/Products"
+import type {Feature as FeatureType} from "~/types/db/StoryMapStates"
 
-import {currentVersionAtom} from "../atoms"
+import {currentVersionAtom, storyMapStateAtom} from "../atoms"
 import AddStoryButton from "../story/AddStoryButton"
 import Story from "../story/Story"
-import {activeProductAtom} from "~/utils/atoms"
 
 export type StoryListProps = {
 	feature: FeatureType
@@ -15,9 +14,9 @@ export type StoryListProps = {
 
 const StoryList: FC<StoryListProps> = ({feature, inert = false}) => {
 	const currentVersion = useAtomValue(currentVersionAtom)
-	const activeProduct = useAtomValue(activeProductAtom)
+	const storyMapState = useAtomValue(storyMapStateAtom)
 	const stories = feature.storyIds
-		.map((id) => activeProduct?.storyMapState.stories.find((story) => story.id === id))
+		.map((id) => storyMapState?.stories.find((story) => story.id === id))
 		.filter((story) => currentVersion.id === `__ALL_VERSIONS__` || story?.versionId === currentVersion.id)
 
 	if (stories.length === 0) return <AddStoryButton feature={feature} />

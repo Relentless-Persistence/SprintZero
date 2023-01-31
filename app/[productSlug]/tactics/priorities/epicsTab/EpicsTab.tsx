@@ -5,23 +5,24 @@ import {doc, onSnapshot} from "firebase9/firestore"
 import {useEffect, useRef, useState} from "react"
 
 import type {FC} from "react"
-import type {StoryMapState} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
 import {db} from "~/config/firebase"
-import {Products, ProductSchema} from "~/types/db/Products"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {StoryMapStates, StoryMapStateSchema} from "~/types/db/StoryMapStates"
 
 const EpicsTab: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [storyMapState, setStoryMapState] = useState<StoryMapState>({
-		productId: activeProductId!,
-		epics: [],
-		features: [],
-		stories: [],
-	})
+	const [storyMapState, setStoryMapState] = useState<StoryMapState>()
+	useEffect(
+		() =>
+			onSnapshot(doc(db, StoryMapStates._), (doc) => {
+				const data = StoryMapStateSchema.parse({id: doc.id, ...doc.data()})
+				setStoryMapState(data)
+			}),
+		[],
+	)
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
@@ -40,15 +41,6 @@ const EpicsTab: FC = () => {
 			}
 		}
 	}, [])
-
-	useEffect(() => {
-		if (!activeProductId) return
-
-		return onSnapshot(doc(db, Products._, activeProductId), (doc) => {
-			const data = ProductSchema.parse({id: doc.id, ...doc.data()})
-			setStoryMapState(data.storyMapState)
-		})
-	}, [activeProductId])
 
 	useEffect(() => {
 		if (typeof window !== `undefined`) {
@@ -80,7 +72,7 @@ const EpicsTab: FC = () => {
 			<div className="relative grow">
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
-						{storyMapState.epics.map((epic) => (
+						{storyMapState?.epics.map((epic) => (
 							<Epic key={epic.id} epic={epic} storyMapState={storyMapState} />
 						))}
 					</PrioritiesMatrix>

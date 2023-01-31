@@ -7,7 +7,7 @@ import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Epic as EpicType, StoryMapState} from "~/types/db/Products"
+import type {Epic as EpicType, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
 import {sortEpics} from "~/app/[productSlug]/dashboard/storyMap/utils"
@@ -38,7 +38,7 @@ const Epic: FC<EpicProps> = ({epic, storyMapState}) => {
 			newEpic.userValue = y
 			state.epics = sortEpics(state.epics)
 		})
-		debouncedSetStoryMapState({storyMapState: newStoryMapState})
+		debouncedSetStoryMapState({id: newStoryMapState.id, data: newStoryMapState})
 	}
 
 	return (

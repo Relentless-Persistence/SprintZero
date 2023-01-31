@@ -1,20 +1,21 @@
 import {DislikeFilled, LikeFilled} from "@ant-design/icons"
-import {useAtomValue} from "jotai"
 import {useState} from "react"
 
+import type {SetStateAction} from "jotai"
 import type {FC} from "react"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryDrawer from "~/components/StoryDrawer"
-import {Story} from "~/types/db/Products"
-import {activeProductAtom} from "~/utils/atoms"
+import {Story} from "~/types/db/StoryMapStates"
 
 export type StoryProps = {
+	storyMapState: StoryMapState
+	setStoryMapState: (val: SetStateAction<StoryMapState>) => void
 	story: Story
 }
 
-const Story: FC<StoryProps> = ({story}) => {
-	const activeProduct = useAtomValue(activeProductAtom)
-	const featureName = activeProduct?.storyMapState.features.find((feature) => feature.storyIds.includes(story.id))?.name
+const Story: FC<StoryProps> = ({storyMapState, setStoryMapState, story}) => {
+	const featureName = storyMapState.features.find((feature) => feature.storyIds.includes(story.id))?.name
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	return (
@@ -35,6 +36,8 @@ const Story: FC<StoryProps> = ({story}) => {
 			</button>
 
 			<StoryDrawer
+				storyMapState={storyMapState}
+				setStoryMapState={setStoryMapState}
 				story={story}
 				hideAcceptanceCriteria
 				disableEditing

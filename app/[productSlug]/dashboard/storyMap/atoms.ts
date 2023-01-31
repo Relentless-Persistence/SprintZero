@@ -2,6 +2,9 @@ import {atom} from "jotai"
 
 import type {CurrentVersionId} from "./utils/types"
 import type {MotionValue} from "framer-motion"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
+
+export const storyMapStateAtom = atom<StoryMapState | undefined>(undefined)
 
 export const currentVersionAtom = atom<{id: CurrentVersionId; name: string}>({
 	id: `__ALL_VERSIONS__`,

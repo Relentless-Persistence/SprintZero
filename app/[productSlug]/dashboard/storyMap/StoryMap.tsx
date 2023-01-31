@@ -1,15 +1,16 @@
 "use client"
 
 import {ReadOutlined} from "@ant-design/icons"
+import {collection, onSnapshot, query, where} from "firebase9/firestore"
 import {motion, useAnimationFrame, useMotionTemplate, useMotionValue, useTransform} from "framer-motion"
 import {useAtom, useAtomValue, useSetAtom} from "jotai"
 import {useEffect, useRef} from "react"
 
 import type {StoryMapItem, StoryMapTarget} from "./utils/types"
 import type {FC} from "react"
-import type {StoryMapState} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {currentVersionAtom, dragPosAtom, dragStateAtom} from "./atoms"
+import {currentVersionAtom, dragPosAtom, dragStateAtom, storyMapStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
 import Feature from "./feature/Feature"
 import Story from "./story/Story"
@@ -17,16 +18,32 @@ import {calculateBoundaries, genStoryMapMeta, meta} from "./utils"
 import {dragState, elementRegistry, pointerLocation, storyMapTop} from "./utils/globals"
 import {moveItem} from "./utils/moving"
 import {getHoveringItems, getTargetLocation} from "./utils/targeting"
-import {addEpic, setStoryMapState} from "~/utils/api/mutations"
-import {activeProductAtom} from "~/utils/atoms"
+import {db} from "~/config/firebase"
+import {StoryMapStates, StoryMapStateSchema} from "~/types/db/StoryMapStates"
+import {addEpic, setStoryMapState as setDbStoryMapState} from "~/utils/api/mutations"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMap: FC = () => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const activeProductId = useActiveProductId()
+	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
 	const currentVersion = useAtomValue(currentVersionAtom)
 	const setDragPos = useSetAtom(dragPosAtom)
 	const [reactDragState, setReactDragState] = useAtom(dragStateAtom)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
+
+	useEffect(() => {
+		if (!activeProductId) return
+		return onSnapshot(
+			query(collection(db, StoryMapStates._), where(StoryMapStates.productId, `==`, activeProductId)),
+			(docs) => {
+				const doc = docs.docs[0]
+				if (!doc) return
+				const data = StoryMapStateSchema.parse({id: doc.id, ...doc.data()})
+				setStoryMapState(data)
+			},
+		)
+	}, [activeProductId, setStoryMapState])
 
 	useEffect(() => {
 		setDragPos([x, y])
@@ -48,9 +65,9 @@ const StoryMap: FC = () => {
 	}, [x, y])
 
 	useAnimationFrame(() => {
-		if (activeProduct?.storyMapState) {
-			calculateBoundaries(activeProduct.storyMapState, currentVersion.id)
-			genStoryMapMeta(activeProduct.storyMapState, currentVersion.id)
+		if (storyMapState) {
+			calculateBoundaries(storyMapState, currentVersion.id)
+			genStoryMapMeta(storyMapState, currentVersion.id)
 		}
 	})
 
@@ -60,7 +77,7 @@ const StoryMap: FC = () => {
 	const expectedStoryMapState = useRef<StoryMapState | undefined>(undefined)
 
 	const handlePanStart = () => {
-		originalStoryMapState.current = activeProduct?.storyMapState
+		originalStoryMapState.current = storyMapState
 		const hoveringItems = getHoveringItems()
 		if (hoveringItems.story) {
 			const storyBoundingBox = elementRegistry[hoveringItems.story]?.content.getBoundingClientRect()
@@ -144,17 +161,16 @@ const StoryMap: FC = () => {
 	}
 
 	const handlePan = () => {
-		if (!draggingItem.current || !activeProduct?.storyMapState || !originalStoryMapState.current || !dragState.current)
-			return
+		if (!draggingItem.current || !storyMapState || !originalStoryMapState.current || !dragState.current) return
 
 		if (
 			expectedStoryMapState.current &&
-			JSON.stringify(activeProduct.storyMapState) !== JSON.stringify(expectedStoryMapState.current)
+			JSON.stringify(storyMapState) !== JSON.stringify(expectedStoryMapState.current)
 		)
 			return
 		expectedStoryMapState.current = undefined
-		calculateBoundaries(activeProduct.storyMapState, currentVersion.id)
-		genStoryMapMeta(activeProduct.storyMapState, currentVersion.id)
+		calculateBoundaries(storyMapState, currentVersion.id)
+		genStoryMapMeta(storyMapState, currentVersion.id)
 
 		if (!startTarget.current) {
 			startTarget.current = getTargetLocation()
@@ -165,15 +181,15 @@ const StoryMap: FC = () => {
 
 		if (JSON.stringify(target) !== JSON.stringify(startTarget.current)) {
 			const newStoryMapState = moveItem(
-				activeProduct.storyMapState,
+				storyMapState,
 				originalStoryMapState.current,
 				draggingItem.current,
 				target,
 				currentVersion.id === `__ALL_VERSIONS__` ? undefined : currentVersion.id,
 			)
 
-			if (JSON.stringify(newStoryMapState) === JSON.stringify(activeProduct.storyMapState)) return
-			setStoryMapState({storyMapState: newStoryMapState})
+			if (JSON.stringify(newStoryMapState) === JSON.stringify(storyMapState)) return
+			setDbStoryMapState({id: newStoryMapState.id, data: newStoryMapState})
 			expectedStoryMapState.current = newStoryMapState
 
 			// Update startItem type
@@ -208,13 +224,13 @@ const StoryMap: FC = () => {
 				}}
 				className="relative z-10 flex w-max items-start gap-8"
 			>
-				{activeProduct?.storyMapState.epics.map((epic) => (
+				{storyMapState?.epics.map((epic) => (
 					<Epic key={epic.id} epic={epic} />
 				))}
 
 				<button
 					type="button"
-					onClick={() => void addEpic({storyMapState: activeProduct!.storyMapState, data: {}})}
+					onClick={() => void addEpic({storyMapState: storyMapState!, data: {}})}
 					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#4f2dc8] transition-colors hover:bg-[#faf8ff]"
 					data-testid="add-epic"
 				>
@@ -225,17 +241,17 @@ const StoryMap: FC = () => {
 
 			{dragState.current && (
 				<motion.div id="drag-host" className="fixed top-0 left-0 z-20" style={dragHostStyle}>
-					{activeProduct &&
+					{storyMapState &&
 						(() => {
-							for (const epic of activeProduct.storyMapState.epics) {
+							for (const epic of storyMapState.epics) {
 								if (epic.id === dragState.current.id) return <Epic epic={epic} inert />
 							}
 
-							for (const feature of activeProduct.storyMapState.features) {
+							for (const feature of storyMapState.features) {
 								if (feature.id === dragState.current.id) return <Feature feature={feature} inert />
 							}
 
-							for (const story of activeProduct.storyMapState.stories) {
+							for (const story of storyMapState.stories) {
 								if (story.id === dragState.current.id) return <Story story={story} inert />
 							}
 						})()}

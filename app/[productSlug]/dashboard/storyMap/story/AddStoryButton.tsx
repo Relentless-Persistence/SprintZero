@@ -2,18 +2,17 @@ import {FileOutlined} from "@ant-design/icons"
 import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
-import type {Feature as FeatureType} from "~/types/db/Products"
+import type {Feature as FeatureType} from "~/types/db/StoryMapStates"
 
-import {currentVersionAtom} from "../atoms"
+import {currentVersionAtom, storyMapStateAtom} from "../atoms"
 import {addStory} from "~/utils/api/mutations"
-import {activeProductAtom} from "~/utils/atoms"
 
 export type AddStoryButtonProps = {
 	feature: FeatureType
 }
 
 const AddStoryButton: FC<AddStoryButtonProps> = ({feature}) => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const storyMapState = useAtomValue(storyMapStateAtom)
 	const currentVersion = useAtomValue(currentVersionAtom)
 
 	if (currentVersion.id === `__ALL_VERSIONS__`) return null
@@ -23,7 +22,7 @@ const AddStoryButton: FC<AddStoryButtonProps> = ({feature}) => {
 			onClick={() => {
 				if (currentVersion.id !== `__ALL_VERSIONS__`)
 					addStory({
-						storyMapState: activeProduct!.storyMapState,
+						storyMapState: storyMapState!,
 						featureId: feature.id,
 						data: {versionId: currentVersion.id},
 					})

@@ -7,7 +7,7 @@ import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Feature as FeatureType, StoryMapState} from "~/types/db/Products"
+import type {Feature as FeatureType, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
 import {sortFeatures} from "~/app/[productSlug]/dashboard/storyMap/utils"
@@ -39,7 +39,7 @@ const Feature: FC<FeatureProps> = ({feature, storyMapState}) => {
 			const host = state.epics.find(({featureIds}) => featureIds.includes(feature.id))!
 			host.featureIds = sortFeatures(state, host.featureIds)
 		})
-		debouncedSetStoryMapState({storyMapState: newStoryMapState})
+		debouncedSetStoryMapState({id: newStoryMapState.id, data: newStoryMapState})
 	}
 
 	return (

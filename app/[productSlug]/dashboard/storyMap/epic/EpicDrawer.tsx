@@ -2,12 +2,13 @@ import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Form, Input, Tag, Typography} from "antd5"
 import produce from "immer"
-import {useAtom} from "jotai"
+import {useAtom, useAtomValue} from "jotai"
 import {useState} from "react"
 
 import type {FC} from "react"
-import type {Epic} from "~/types/db/Products"
+import type {Epic} from "~/types/db/StoryMapStates"
 
+import {storyMapStateAtom} from "../atoms"
 import Comments from "~/components/Comments"
 import {deleteEpic, updateEpic} from "~/utils/api/mutations"
 import {getUser} from "~/utils/api/queries"
@@ -23,23 +24,24 @@ export type EpicDrawerProps = {
 
 const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
-	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
+	const activeProduct = useAtomValue(activeProductAtom)
+	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
 	const [draftTitle, setDraftTitle] = useState(epic.name)
 
 	const updateLocalEpicDescription = (newDescription: string) => {
-		setActiveProduct((activeProduct) =>
-			produce(activeProduct, (draft) => {
-				const index = draft!.storyMapState.epics.findIndex(({id}) => id === epic.id)
-				draft!.storyMapState.epics[index]!.description = newDescription
+		setStoryMapState((cur) =>
+			produce(cur, (draft) => {
+				const index = draft!.epics.findIndex(({id}) => id === epic.id)
+				draft!.epics[index]!.description = newDescription
 			}),
 		)
 	}
 
 	let points = 0
 	epic.featureIds.forEach((featureId) => {
-		const feature = activeProduct?.storyMapState.features.find((feature) => feature.id === featureId)
+		const feature = storyMapState?.features.find((feature) => feature.id === featureId)
 		feature?.storyIds.forEach((storyId) => {
-			const story = activeProduct?.storyMapState.stories.find((story) => story.id === storyId)
+			const story = storyMapState?.stories.find((story) => story.id === storyId)
 			points += story?.points ?? 0
 		})
 	})
@@ -64,7 +66,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 								type="button"
 								onClick={async () =>
 									void deleteEpic({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										epicId: epic.id,
 									})
 								}
@@ -109,7 +111,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 								type="primary"
 								onClick={() => {
 									void updateEpic({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										epicId: epic.id,
 										data: {name: draftTitle},
 									})
@@ -148,7 +150,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 								onChange={async (e) => {
 									updateLocalEpicDescription(e.target.value)
 									updateEpic({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										epicId: epic.id,
 										data: {
 											description: e.target.value,
@@ -170,7 +172,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 												checked={epic.keeperIds.includes(user.data.id)}
 												onChange={(e) =>
 													void updateEpic({
-														storyMapState: activeProduct!.storyMapState,
+														storyMapState: storyMapState!,
 														epicId: epic.id,
 														data: {
 															keeperIds: e.target.checked
@@ -196,7 +198,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 								commentList={epic.commentIds}
 								onCommentListChange={(newCommentList) =>
 									void updateEpic({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState: storyMapState!,
 										epicId: epic.id,
 										data: {
 											commentIds: newCommentList,

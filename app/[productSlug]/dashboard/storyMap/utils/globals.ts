@@ -1,13 +1,12 @@
 /* eslint-disable no-var, @typescript-eslint/no-unnecessary-condition */
 
 import type {EpicBoundaries, FeatureBoundaries, StoryBoundaries, StoryMapMeta} from "./types"
-import type {Id} from "~/types"
 
 declare global {
 	var __storyMapScrollPosition: {current: number}
 	var __storyMapMeta: {current: StoryMapMeta}
 	var __elementRegistry: Record<
-		Id,
+		string,
 		| {
 				container: HTMLElement
 				content: HTMLElement
@@ -15,15 +14,15 @@ declare global {
 		| undefined
 	>
 	var __boundaries: {
-		epic: Record<Id, EpicBoundaries>
-		feature: Record<Id, FeatureBoundaries>
-		story: Record<Id, StoryBoundaries>
+		epic: Record<string, EpicBoundaries>
+		feature: Record<string, FeatureBoundaries>
+		story: Record<string, StoryBoundaries>
 	}
 	var __pointerLocation: {current: [number, number]}
 	var __dragState: {
 		current:
 			| {
-					id: Id
+					id: string
 					type: `epic` | `feature` | `story`
 					offset: [number, number]
 					xOffsetFromCenter: number

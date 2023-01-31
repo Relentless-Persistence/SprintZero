@@ -5,7 +5,7 @@ import {motion} from "framer-motion"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Epic as EpicType} from "~/types/db/Products"
+import type {Epic as EpicType} from "~/types/db/StoryMapStates"
 
 import EpicContent from "./EpicContent"
 import FeatureList from "./FeatureList"

@@ -1,26 +1,28 @@
 "use client"
 
 import {useQueryClient} from "@tanstack/react-query"
-import {useAtomValue} from "jotai"
+import {useAtom} from "jotai"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Story as StoryType} from "~/types/db/Products"
+import type {Story as StoryType} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
+import {storyMapStateAtom} from "../atoms"
 import StoryDrawer from "~/components/StoryDrawer"
-import {activeProductAtom} from "~/utils/atoms"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type StoryContentProps = {
 	story: StoryType
 }
 
 const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> = ({story}, ref) => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const activeProductId = useActiveProductId()
+	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	const version = useQueryClient()
-		.getQueryData<Version[]>([`all-versions`, activeProduct?.id])
+		.getQueryData<Version[]>([`all-versions`, activeProductId])
 		?.find((version) => version.id === story.versionId)
 
 	return (
@@ -42,12 +44,16 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 				</div>
 			</div>
 
-			<StoryDrawer
-				story={story}
-				hideAdjudicationResponse
-				isOpen={isDrawerOpen}
-				onClose={() => void setIsDrawerOpen(false)}
-			/>
+			{storyMapState && (
+				<StoryDrawer
+					storyMapState={storyMapState}
+					setStoryMapState={setStoryMapState}
+					story={story}
+					hideAdjudicationResponse
+					isOpen={isDrawerOpen}
+					onClose={() => void setIsDrawerOpen(false)}
+				/>
+			)}
 		</>
 	)
 }

@@ -4,7 +4,7 @@ import {CopyOutlined} from "@ant-design/icons"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Feature as FeatureType} from "~/types/db/Products"
+import type {Feature as FeatureType} from "~/types/db/StoryMapStates"
 
 import FeatureDrawer from "./FeatureDrawer"
 

@@ -3,35 +3,35 @@ import type {Id} from "~/types"
 export type EpicMeta = {
 	type: `epic`
 	parent: undefined
-	children: Id[]
+	children: string[]
 	position: number
-	prevItem: Id | undefined
-	nextItem: Id | undefined
+	prevItem: string | undefined
+	nextItem: string | undefined
 }
 
 export type FeatureMeta = {
 	type: `feature`
-	parent: Id
-	children: Id[]
+	parent: string
+	children: string[]
 	position: number
-	prevItem: Id | undefined
-	nextItem: Id | undefined
+	prevItem: string | undefined
+	nextItem: string | undefined
 }
 
 export type StoryMeta = {
 	type: `story`
-	parent: Id
+	parent: string
 	children: undefined
 	position: number
-	prevItem: Id | undefined
-	nextItem: Id | undefined
+	prevItem: string | undefined
+	nextItem: string | undefined
 }
 
-export type StoryMapMeta = Record<Id, EpicMeta | FeatureMeta | StoryMeta>
+export type StoryMapMeta = Record<string, EpicMeta | FeatureMeta | StoryMeta>
 
 export type StoryMapItem = {
 	type: `epic` | `feature` | `story`
-	id: Id
+	id: string
 }
 
 export type StoryMapTarget = [`before` | `after` | `beneath`, StoryMapItem] | `stay`

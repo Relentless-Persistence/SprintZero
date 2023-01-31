@@ -14,21 +14,23 @@ import {useQuery} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Tag, Input, Form, Radio} from "antd5"
 import clsx from "clsx"
 import produce from "immer"
-import {useAtom} from "jotai"
+import {useAtomValue} from "jotai"
 import {nanoid} from "nanoid"
 import {useState} from "react"
 import {useForm} from "react-hook-form"
 
+import type {SetStateAction} from "jotai"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Story} from "~/types/db/Products"
+import type {Story, StoryMapState} from "~/types/db/StoryMapStates"
 
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {StorySchema, sprintColumns} from "~/types/db/Products"
+import {sprintColumns} from "~/types/db/Products"
+import {StorySchema} from "~/types/db/StoryMapStates"
 import {deleteStory, updateStory} from "~/utils/api/mutations"
 import {getVersionsByProduct} from "~/utils/api/queries"
 import {activeProductAtom, useUserId} from "~/utils/atoms"
@@ -48,6 +50,8 @@ const formSchema = StorySchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
+	storyMapState: StoryMapState
+	setStoryMapState: (val: SetStateAction<StoryMapState>) => void
 	story: Story
 	isOpen: boolean
 	onClose: () => void
@@ -57,6 +61,8 @@ export type StoryDrawerProps = {
 }
 
 const StoryDrawer: FC<StoryDrawerProps> = ({
+	storyMapState,
+	setStoryMapState,
 	story,
 	isOpen,
 	onClose,
@@ -65,7 +71,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 	disableEditing,
 }) => {
 	const [editMode, setEditMode] = useState(false)
-	const [activeProduct, setActiveProduct] = useAtom(activeProductAtom)
+	const activeProduct = useAtomValue(activeProductAtom)
 	const userId = useUserId()
 	const [newAcceptanceCriterion, setNewAcceptanceCriterion] = useState(``)
 
@@ -84,7 +90,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 	})
 
 	const onSubmit = handleSubmit((data) => {
-		updateStory({storyMapState: activeProduct!.storyMapState, storyId: story.id, data})
+		updateStory({storyMapState, storyId: story.id, data})
 		setEditMode(false)
 	})
 
@@ -95,10 +101,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 	})
 
 	const updateLocalStoryDescription = (newDescription: string) => {
-		setActiveProduct((activeProduct) =>
-			produce(activeProduct, (draft) => {
-				const index = draft!.storyMapState.stories.findIndex(({id}) => id === story.id)
-				draft!.storyMapState.stories[index]!.description = newDescription
+		setStoryMapState((cur) =>
+			produce(cur, (draft) => {
+				const index = draft.stories.findIndex(({id}) => id === story.id)
+				draft.stories[index]!.description = newDescription
 			}),
 		)
 	}
@@ -109,7 +115,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 			draft[index]!.checked = checked
 		})
 		updateStory({
-			storyMapState: activeProduct!.storyMapState,
+			storyMapState,
 			storyId: story.id,
 			data: {
 				acceptanceCriteria: newAcceptanceCriteria,
@@ -119,7 +125,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 
 	const addAcceptanceCriterion = () => {
 		updateStory({
-			storyMapState: activeProduct!.storyMapState,
+			storyMapState,
 			storyId: story.id,
 			data: {
 				acceptanceCriteria: [...story.acceptanceCriteria, {id: nanoid(), name: newAcceptanceCriterion, checked: false}],
@@ -137,7 +143,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 		if (votingComplete) ethicsColumn = `adjudicated`
 
 		updateStory({
-			storyMapState: activeProduct!.storyMapState,
+			storyMapState,
 			storyId: story.id,
 			data: {
 				ethicsApproved: votingComplete
@@ -162,7 +168,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 								danger
 								onClick={async () =>
 									void deleteStory({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState,
 										storyId: story.id,
 									})
 								}
@@ -354,7 +360,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 								onChange={async (e) => {
 									updateLocalStoryDescription(e.target.value)
 									updateStory({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState,
 										storyId: story.id,
 										data: {
 											description: e.target.value,
@@ -409,7 +415,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 								commentList={story.commentIds}
 								onCommentListChange={(newCommentList) =>
 									void updateStory({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState,
 										storyId: story.id,
 										data: {
 											commentIds: newCommentList,
@@ -419,7 +425,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 								flagged={story.ethicsColumn !== null}
 								onFlag={() =>
 									void updateStory({
-										storyMapState: activeProduct!.storyMapState,
+										storyMapState,
 										storyId: story.id,
 										data: {ethicsColumn: `identified`},
 									})

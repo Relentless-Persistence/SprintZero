@@ -2,7 +2,7 @@ import {ReadOutlined} from "@ant-design/icons"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Epic as EpicType} from "~/types/db/Products"
+import type {Epic as EpicType} from "~/types/db/StoryMapStates"
 
 import EpicDrawer from "./EpicDrawer"
 

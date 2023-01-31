@@ -1,8 +1,7 @@
 import produce from "immer"
 
 import type {StoryMapItem, StoryMapTarget} from "./types"
-import type {Id} from "~/types"
-import type {Epic, Feature, Story, StoryMapState} from "~/types/db/Products"
+import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {avg, meta, sortEpics, sortFeatures} from "."
 
@@ -11,7 +10,7 @@ export const moveItem = (
 	originalState: StoryMapState,
 	startItem: StoryMapItem,
 	targetLocation: StoryMapTarget,
-	currentVersionId: Id | undefined,
+	currentVersion: string | undefined,
 ): StoryMapState =>
 	produce(currentState, (state) => {
 		if (targetLocation === `stay`) return
@@ -40,7 +39,7 @@ export const moveItem = (
 				} else if (targetLocation[1].type === `feature`) {
 					// Epic to feature
 
-					if (!currentVersionId) return
+					if (!currentVersion) return
 
 					const featureBefore = state.features.find((feature, i) => i === targetPosition - 1)
 					const featureAfter = state.features.find((feature, i) => i === targetPosition)
@@ -54,7 +53,6 @@ export const moveItem = (
 						name: existingEpic.name,
 						userValue: newUserValue,
 						commentIds: existingEpic.commentIds,
-						nameInputStateId: existingEpic.nameInputStateId,
 						storyIds: existingEpic.featureIds,
 					}
 
@@ -82,9 +80,8 @@ export const moveItem = (
 							pageLink: null,
 							points: 0,
 							sprintColumn: `productBacklog`,
+							versionId: currentVersion,
 							commentIds: feature.commentIds,
-							nameInputStateId: feature.nameInputStateId,
-							versionId: currentVersionId,
 						}
 						state.stories.push(story)
 					}
@@ -111,7 +108,6 @@ export const moveItem = (
 						commentIds: existingFeature.commentIds,
 						featureIds: existingFeature.storyIds,
 						keeperIds: [],
-						nameInputStateId: existingFeature.nameInputStateId,
 					}
 
 					// Insert the feature as an epic at the new location
@@ -132,7 +128,6 @@ export const moveItem = (
 							name: story.name,
 							userValue: 0.5,
 							commentIds: story.commentIds,
-							nameInputStateId: story.nameInputStateId,
 							storyIds: [],
 						}
 						state.features.push(feature)
@@ -195,7 +190,7 @@ export const moveItem = (
 				} else {
 					// Feature to story
 
-					if (!currentVersionId) return
+					if (!currentVersion) return
 
 					const existingFeature = state.features.find((feature) => feature.id === startItem.id)!
 					const newStory: Story = {
@@ -212,8 +207,7 @@ export const moveItem = (
 						points: 0,
 						sprintColumn: `productBacklog`,
 						commentIds: existingFeature.commentIds,
-						nameInputStateId: existingFeature.nameInputStateId,
-						versionId: currentVersionId,
+						versionId: currentVersion,
 					}
 
 					// Insert the feature as a story at the new location
@@ -248,7 +242,6 @@ export const moveItem = (
 						name: existingStory.name,
 						userValue: newUserValue,
 						commentIds: existingStory.commentIds,
-						nameInputStateId: existingStory.nameInputStateId,
 						storyIds: [],
 					}
 
@@ -300,7 +293,6 @@ export const moveItem = (
 						name: existingEpic.name,
 						userValue: 0.5,
 						commentIds: existingEpic.commentIds,
-						nameInputStateId: existingEpic.nameInputStateId,
 						storyIds: existingEpic.featureIds,
 					}
 
@@ -329,7 +321,7 @@ export const moveItem = (
 				} else if (targetLocation[1].type === `feature`) {
 					// Feature to first story of another feature
 
-					if (!currentVersionId) return
+					if (!currentVersion) return
 
 					const existingFeature = state.features.find((feature) => feature.id === startItem.id)!
 					const newStory: Story = {
@@ -345,9 +337,8 @@ export const moveItem = (
 						pageLink: null,
 						points: 0,
 						sprintColumn: `productBacklog`,
+						versionId: currentVersion,
 						commentIds: existingFeature.commentIds,
-						nameInputStateId: existingFeature.nameInputStateId,
-						versionId: currentVersionId,
 					}
 
 					// Insert the feature as a story at the new location

@@ -3,80 +3,6 @@ import {z} from "zod"
 
 import {genDbNames, idSchema} from "~/types"
 
-export const EpicSchema = z.object({
-	id: idSchema,
-
-	description: z.string(),
-	effort: z.number().min(0).max(1),
-	name: z.string(),
-	userValue: z.number().min(0).max(1),
-
-	commentIds: z.array(idSchema),
-	featureIds: z.array(idSchema),
-	keeperIds: z.array(idSchema),
-	nameInputStateId: idSchema,
-})
-export type Epic = z.infer<typeof EpicSchema>
-
-export const FeatureSchema = z.object({
-	id: idSchema,
-
-	description: z.string(),
-	effort: z.number().min(0).max(1),
-	name: z.string(),
-	userValue: z.number().min(0).max(1),
-
-	commentIds: z.array(idSchema),
-	nameInputStateId: idSchema,
-	storyIds: z.array(idSchema),
-})
-export type Feature = z.infer<typeof FeatureSchema>
-
-export const StorySchema = z.object({
-	id: idSchema,
-
-	acceptanceCriteria: z.array(
-		z.object({
-			id: z.string(),
-			name: z.string(),
-			checked: z.boolean(),
-		}),
-	),
-	branchName: z.string().nullable(),
-	description: z.string(),
-	designLink: z.string().url().nullable(),
-	ethicsApproved: z.boolean().nullable(),
-	ethicsColumn: z.union([z.literal(`identified`), z.literal(`underReview`), z.literal(`adjudicated`)]).nullable(),
-	ethicsVotes: z.array(
-		z.object({
-			userId: idSchema,
-			vote: z.boolean(),
-		}),
-	),
-	name: z.string(),
-	pageLink: z.string().url().nullable(),
-	points: z.number(),
-	sprintColumn: z.union([
-		z.literal(`productBacklog`),
-		z.literal(`designBacklog`),
-		z.literal(`designing`),
-		z.literal(`critique`),
-		z.literal(`devReady`),
-		z.literal(`devBacklog`),
-		z.literal(`developing`),
-		z.literal(`designReview`),
-		z.literal(`codeReview`),
-		z.literal(`qa`),
-		z.literal(`productionQueue`),
-		z.literal(`shipped`),
-	]),
-
-	commentIds: z.array(idSchema),
-	nameInputStateId: idSchema,
-	versionId: idSchema,
-})
-export type Story = z.infer<typeof StorySchema>
-
 export const ProductSchema = z.object({
 	id: idSchema,
 
@@ -98,17 +24,9 @@ export const ProductSchema = z.object({
 			type: z.union([z.literal(`editor`), z.literal(`viewer`)]),
 		}),
 	),
-
 	name: z.string(),
 
-	// Story map info
-	storyMapState: z.object({
-		epics: z.array(EpicSchema),
-		features: z.array(FeatureSchema),
-		stories: z.array(StorySchema),
-
-		productId: idSchema,
-	}),
+	storyMapStateId: idSchema,
 
 	// Kickoff info
 	problemStatement: z.string(),
@@ -148,7 +66,6 @@ export const ProductSchema = z.object({
 
 export const Products = genDbNames(`Products`, ProductSchema)
 export type Product = z.infer<typeof ProductSchema>
-export type StoryMapState = Product[`storyMapState`]
 
 export const sprintColumns = {
 	productBacklog: `Product Backlog`,

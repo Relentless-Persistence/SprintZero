@@ -1,6 +1,7 @@
 "use client"
 
 import {motion} from "framer-motion"
+import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
 
@@ -9,10 +10,11 @@ import StoryMapHeader from "./storyMap/StoryMapHeader"
 import {storyMapScrollPosition} from "./storyMap/utils/globals"
 import VersionList from "./storyMap/VersionList"
 import {setStoryMapState} from "~/utils/api/mutations"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {activeProductAtom} from "~/utils/atoms"
 
 const Dashboard: FC = () => {
-	const activeProductId = useActiveProductId()
+	const activeProduct = useAtomValue(activeProductAtom)
+
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="flex flex-col gap-8">
@@ -37,7 +39,10 @@ const Dashboard: FC = () => {
 				type="button"
 				className="fixed bottom-8 right-8 rounded-md border border-laurel px-2 py-1 text-laurel transition-colors hover:border-black hover:text-black"
 				onClick={() =>
-					void setStoryMapState({storyMapState: {productId: activeProductId!, epics: [], features: [], stories: []}})
+					void setStoryMapState({
+						id: activeProduct!.storyMapStateId,
+						data: {productId: activeProduct!.id, epics: [], features: [], stories: []},
+					})
 				}
 			>
 				Reset story map

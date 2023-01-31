@@ -6,11 +6,11 @@ import {useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Story as StoryType} from "~/types/db/Products"
+import type {Story as StoryType} from "~/types/db/StoryMapStates"
 
 import StoryContent from "./StoryContent"
+import {storyMapStateAtom} from "../atoms"
 import {dragState, elementRegistry, storyMapMeta} from "../utils/globals"
-import {activeProductAtom} from "~/utils/atoms"
 
 export type StoryProps = {
 	story: StoryType
@@ -18,9 +18,9 @@ export type StoryProps = {
 }
 
 const Story: FC<StoryProps> = ({story, inert = false}) => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const storyMapState = useAtomValue(storyMapStateAtom)
 	const storyMeta = storyMapMeta.current[story.id]
-	const parentFeature = activeProduct?.storyMapState.features.find((feature) => feature.id === storyMeta?.parent)
+	const parentFeature = storyMapState?.features.find((feature) => feature.id === storyMeta?.parent)
 	const parentEpicId = parentFeature && storyMapMeta.current[parentFeature.id]?.parent
 
 	const containerRef = useRef<HTMLDivElement>(null)

@@ -2,14 +2,14 @@ import {sortBy} from "lodash"
 
 import type {CurrentVersionId, EpicMeta, FeatureMeta, StoryMapMeta, StoryMeta} from "./types"
 import type {Id} from "~/types"
-import type {Epic, Feature, StoryMapState} from "~/types/db/Products"
+import type {Epic, Feature, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {boundaries, elementRegistry, layerBoundaries, storyMapMeta, storyMapScrollPosition} from "./globals"
 
 export const avg = (...arr: number[]): number => arr.reduce((a, b) => a + b, 0) / arr.length
 
 export const sortEpics = (epics: Epic[]): Epic[] => sortBy(epics, [(epic: Epic) => epic.userValue])
-export const sortFeatures = (storyMapState: StoryMapState, featureIds: Id[]): Id[] =>
+export const sortFeatures = (storyMapState: StoryMapState, featureIds: string[]): string[] =>
 	sortBy(
 		featureIds.map((id) => storyMapState.features.find((feature) => feature.id === id)!),
 		[(feature: Feature) => feature.userValue],
@@ -66,7 +66,7 @@ export const genStoryMapMeta = (storyMapState: StoryMapState, currentVersionId: 
 }
 
 export const meta = <T extends `epic` | `feature` | `story` | `unknown` = `unknown`>(
-	id: Id,
+	id: string,
 ): T extends `epic` ? EpicMeta : T extends `feature` ? FeatureMeta : T extends `story` ? StoryMeta : StoryMapMeta[Id] =>
 	storyMapMeta.current[id] as any
 
@@ -135,8 +135,8 @@ export const calculateBoundaries = (storyMapState: StoryMapState, currentVersion
 		const epicMeta = storyMapMeta.current[id as Id]
 		if (!epicMeta) continue
 
-		const prevEpicBoundaries = epicMeta.prevItem && boundaries.epic[epicMeta.prevItem]
-		const nextEpicBoundaries = epicMeta.nextItem && boundaries.epic[epicMeta.nextItem]
+		const prevEpicBoundaries = epicMeta.prevItem ? boundaries.epic[epicMeta.prevItem] : undefined
+		const nextEpicBoundaries = epicMeta.nextItem ? boundaries.epic[epicMeta.nextItem] : undefined
 
 		epicBoundaries.centerWithLeft = prevEpicBoundaries && avg(prevEpicBoundaries.left, epicBoundaries.right)
 		epicBoundaries.centerWithRight = nextEpicBoundaries && avg(nextEpicBoundaries.right, epicBoundaries.left)
@@ -147,8 +147,8 @@ export const calculateBoundaries = (storyMapState: StoryMapState, currentVersion
 		const featureMeta = storyMapMeta.current[id as Id]
 		if (!featureMeta) continue
 
-		const prevFeatureBoundaries = featureMeta.prevItem && boundaries.feature[featureMeta.prevItem]
-		const nextFeatureBoundaries = featureMeta.nextItem && boundaries.feature[featureMeta.nextItem]
+		const prevFeatureBoundaries = featureMeta.prevItem ? boundaries.feature[featureMeta.prevItem] : undefined
+		const nextFeatureBoundaries = featureMeta.nextItem ? boundaries.feature[featureMeta.nextItem] : undefined
 
 		featureBoundaries.centerWithLeft = prevFeatureBoundaries && avg(prevFeatureBoundaries.left, featureBoundaries.right)
 		featureBoundaries.centerWithRight =
