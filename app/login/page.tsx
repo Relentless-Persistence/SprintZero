@@ -1,7 +1,7 @@
 "use client"
 
 import {AppleFilled} from "@ant-design/icons"
-import {message} from "antd5"
+import {notification} from "antd5"
 import {signInWithPopup, signOut} from "firebase9/auth"
 import {doc, getDoc, setDoc} from "firebase9/firestore"
 import Image from "next/image"
@@ -36,7 +36,7 @@ const LoginPage: FC = () => {
 			const isRpEmail = /@relentlesspersistenceinc\.com$/.test(res.user.email)
 			if (isRpEmail) {
 				setHasSignedIn(true)
-				message.success({content: `Successfully logged in. Redirecting...`})
+				notification.success({message: `Successfully logged in. Redirecting...`})
 
 				const isNewUser = !(await getDoc(doc(db, Users._, res.user.uid))).exists()
 
@@ -53,12 +53,12 @@ const LoginPage: FC = () => {
 					else router.push(`/${products[0]}/dashboard`)
 				}
 			} else {
-				message.error({content: `Sorry, you are not yet enrolled in the beta.`})
+				notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
 				await signOut(auth)
 			}
 		} catch (error) {
 			console.error(error.message)
-			message.error({content: `An error occurred while trying to log you in.`})
+			notification.error({message: `An error occurred while trying to log you in.`})
 		}
 	}
 

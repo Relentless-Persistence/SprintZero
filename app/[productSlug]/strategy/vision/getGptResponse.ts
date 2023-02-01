@@ -1,4 +1,4 @@
-import {message} from "antd5"
+import {notification} from "antd5"
 import axios from "axios1"
 import {z} from "zod"
 
@@ -24,7 +24,7 @@ export const generateProductVision = async ({
 		gptResponse = res.trimStart()
 	} catch (error) {
 		console.error(error)
-		message.error(`Something went wrong!`)
+		notification.error({message: `Something went wrong!`})
 	}
 
 	return gptResponse

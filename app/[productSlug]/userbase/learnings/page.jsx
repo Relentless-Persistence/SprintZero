@@ -2,7 +2,7 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import {Radio, message, Empty, notification, Breadcrumb, Button} from "antd5"
+import {Radio, Empty, notification, Breadcrumb, Button} from "antd5"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -76,10 +76,10 @@ export default function Learnings() {
 		db.collection(`Learnings`)
 			.add(data)
 			.then(() => {
-				message.success(`New item added successfully`)
+				notification.success({message: `New item added successfully`})
 			})
 			.catch(() => {
-				message.error(`Error adding item`)
+				notification.error({message: `Error adding item`})
 			})
 		setShowAdd(false)
 	}
@@ -103,7 +103,7 @@ export default function Learnings() {
 			.doc(id)
 			.update(data)
 			.then(() => {
-				message.success(`Learning updated successfully`)
+				notification.success({message: `Learning updated successfully`})
 				if (temp) {
 					notification.info({
 						message: `Learning moved to new section`,

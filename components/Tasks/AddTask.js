@@ -15,7 +15,7 @@ import {
   List,
   DatePicker,
   TimePicker,
-  message,
+  notification,
 } from "antd5";
 import { SendOutlined, FlagOutlined, UserOutlined } from "@ant-design/icons";
 import ActionButtons from "../../components/Personas/ActionButtons";
@@ -87,7 +87,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
     db.collection("tasks")
       .add(data)
       .then((docRef) => {
-        message.success("Task created successfully");
+        notification.success({message: "Task created successfully"})
         setTitle("")
         setSubject("")
         setDescription("")
@@ -97,7 +97,7 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
         setSubtasks([])
       })
       .catch((error) => {
-        message.error("Error creating new task");
+        notification.error({message: "Error creating new task"})
         console.log(error)
       });
   }

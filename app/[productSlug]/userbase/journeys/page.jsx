@@ -2,7 +2,7 @@
 "use client"
 
 /* eslint-disable react-hooks/exhaustive-deps */
-import {Input, Select, Button, InputNumber, message, Breadcrumb} from "antd5"
+import {Input, Select, Button, InputNumber, notification, Breadcrumb} from "antd5"
 import {findIndex} from "lodash"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
@@ -176,7 +176,7 @@ export default function Journeys() {
 					setAddJourney(false)
 				})
 		} else {
-			message.error(`Please fill all required field`)
+			notification.error({message: `Please fill all required field`})
 		}
 	}
 

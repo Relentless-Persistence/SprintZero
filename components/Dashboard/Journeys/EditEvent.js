@@ -12,7 +12,7 @@ import {
   TimePicker,
   Drawer,
   Button,
-  message,
+  notification,
 } from "antd5";
 import { Title } from "../SectionTitle";
 import ActionButtons from "../../Personas/ActionButtons";
@@ -154,9 +154,10 @@ const EditEvent = ({
     }
 
     if (isValid) {
-      db.collection("journeyEvents").doc(event.id)
-      .update(evt)
-      .then(() => message.success("Event updated!"))
+      db.collection("journeyEvents")
+				.doc(event.id)
+				.update(evt)
+				.then(() => notification.success({message: "Event updated!"}))
       setEditEvent(false);
       setEvt(null);
     } else {

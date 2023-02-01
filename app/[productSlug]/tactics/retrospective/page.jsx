@@ -4,24 +4,23 @@
 
 // import {SortAscendingOutlined} from "@ant-design/icons"
 import {useQuery} from "@tanstack/react-query"
-import {Card, Avatar, message, Empty, Breadcrumb, Button} from "antd5"
+import {Card, Avatar, notification, Empty, Breadcrumb, Button} from "antd5"
 import {collection, where, query, onSnapshot, doc, updateDoc, deleteDoc} from "firebase9/firestore"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
+import AddItem from "./AddItem"
+import EditItem from "./EditItem"
 import AppCheckbox from "~/components/AppCheckbox"
 import {CardHeaderLink} from "~/components/Dashboard/CardHeaderButton"
 import {ActionFormCard} from "~/components/Dashboard/FormCard"
 import MasonryGrid from "~/components/Dashboard/MasonryGrid"
-import AddItem from "./AddItem"
-import EditItem from "./EditItem"
 import {db} from "~/config/firebase"
 // import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
 import {getUser} from "~/utils/api/queries"
 import {useUserId} from "~/utils/atoms"
 import {useActiveProductId} from "~/utils/useActiveProductId"
-import { notification } from "antd5"
 
 const {Meta} = Card
 const types = [`Enjoyable`, `Puzzling`, `Frustrating`]
@@ -118,7 +117,7 @@ export default function Retrospective() {
 	}, [activeProductId, activeType])
 
 	const onEdit = async (item) => {
-		const docRef = doc(db, "Retrospectives", item.id)
+		const docRef = doc(db, `Retrospectives`, item.id)
 		const data = {
 			title: item.title,
 			description: item.description,
@@ -135,12 +134,12 @@ export default function Retrospective() {
 	}
 
 	const removeRetro = async (id) => {
-		const docRef = doc(db, "Retrospectives", id)
+		const docRef = doc(db, `Retrospectives`, id)
 		await deleteDoc(docRef);
 	}
 
 	const updateRetroAction = (actionIndex, i, id) => {
-		const docRef = doc(db, "Retrospectives", id)
+		const docRef = doc(db, `Retrospectives`, id)
 		data[i].actions[actionIndex].completed = !data[i].actions[actionIndex].completed
 
 		updateDoc(docRef, data[i])
@@ -229,7 +228,7 @@ export default function Retrospective() {
 															checked={a.completed}
 															onChange={() => updateRetroAction(actionIndex, i, c.id)}
 														>
-															{a.name}
+															<span className={a.completed ? `line-through` : null}>{a.name}</span>
 														</AppCheckbox>
 													</div>
 												))}

@@ -15,7 +15,7 @@ import {
   List,
   DatePicker,
   TimePicker,
-  message,
+  notification,
 } from "antd5";
 import {Comment} from "antd"
 import { SendOutlined, FlagOutlined, UserOutlined } from "@ant-design/icons";
@@ -78,12 +78,12 @@ const EditTask = ({ editMode, setEditMode, task, setTask, user }) => {
 				subtasks
       })
       .then(() => {
-        message.success("Task updated successfully");
+        notification.success({message: "Task updated successfully"})
         setTask(null);
       })
       .catch((error) => {
         console.log(error);
-        message.error("An error occurred!");
+        notification.error({message: "An error occurred!"})
       });
   };
 
@@ -116,11 +116,11 @@ const EditTask = ({ editMode, setEditMode, task, setTask, user }) => {
     db.collection("tasksComments")
       .add(data)
       .then((docRef) => {
-        message.success("Comment added successfully");
+        notification.success({message: "Comment added successfully"})
         setComment("");
       })
       .catch((error) => {
-        message.error("Error adding comment");
+        notification.error({message: "Error adding comment"})
       });
   };
 

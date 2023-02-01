@@ -1,14 +1,13 @@
-import React, {useState} from "react"
-import {Row, Col, Input, Form, Drawer, message, Radio} from "antd5"
-import styled from "styled-components"
+import { notification, Row, Col, Input, Form, Drawer, Radio } from "antd5"
+import {doc, updateDoc} from "firebase9/firestore"
+import {useState} from "react"
 
+
+import AppCheckbox from "~/components/AppCheckbox"
 import {Title} from "~/components/Dashboard/SectionTitle"
 import ActionButtons from "~/components/Personas/ActionButtons"
-import AppCheckbox from "~/components/AppCheckbox"
-
-import {doc, updateDoc} from "firebase9/firestore"
 import {db} from "~/config/firebase"
-import { notification } from "antd5"
+
 
 const {TextArea} = Input
 
@@ -20,10 +19,10 @@ const EditItem = ({show, retro, setRetro, setEditMode}) => {
 	const [description, setDescription] = useState(retro.description)
 	const [type, setType] = useState(retro.type)
 	const [addAction, setAddAction] = useState(false)
-	const [val, setVal] = useState("")
+	const [val, setVal] = useState(``)
 
 	const handleFinish = async () => {
-    const docRef = doc(db, "Retrospectives", retro.id)
+    const docRef = doc(db, `Retrospectives`, retro.id)
 		const data = {
 			title,
 			description,
@@ -34,25 +33,24 @@ const EditItem = ({show, retro, setRetro, setEditMode}) => {
 		if (title && description) {
       try {
         await updateDoc(docRef, data).then(() => {
-					notification.success({message: "Retrospective updated successfully"})
+					notification.success({message: `Retrospective updated successfully`})
 					setEditMode(false)
 					setActions([])
-					setTitle("")
-					setDescription("")
-					setType("")
+					setTitle(``)
+					setDescription(``)
+					setType(``)
 					setVal()
           setRetro(null)
 				})
       } catch (error) {
-        console.log(error)
-				notification.error("Error adding Retrospective")
+				notification.error(`Error adding Retrospective`)
       }
 		}
 	}
 
 	const handleKeyDown = (e) => {
 		// let newActions = [...actions]
-		if (e.key === "Enter") {
+		if (e.key === `Enter`) {
 			let newActions = [...actions]
 			newActions.push({
 				name: e.target.value,
@@ -78,10 +76,10 @@ const EditItem = ({show, retro, setRetro, setEditMode}) => {
 	return (
 		<Drawer
 			open={show}
-			destroyOnClose={true}
+			destroyOnClose
 			closable={false}
-			placement={"bottom"}
-			headerStyle={{background: "#F5F5F5"}}
+			placement="bottom"
+			headerStyle={{background: `#F5F5F5`}}
 			title={
 				<Row>
 					<Col span={12}>
@@ -105,7 +103,7 @@ const EditItem = ({show, retro, setRetro, setEditMode}) => {
 									rules={[
 										{
 											required: true,
-											message: "Please input a subject",
+											message: `Please input a subject`,
 										},
 									]}
 								>
@@ -132,7 +130,7 @@ const EditItem = ({show, retro, setRetro, setEditMode}) => {
 								rules={[
 									{
 										required: true,
-										message: "Please input a description",
+										message: `Please input a description`,
 									},
 								]}
 							>
@@ -146,9 +144,9 @@ const EditItem = ({show, retro, setRetro, setEditMode}) => {
 						<div>
 							<ul>
 								{actions.map((a, i) => (
-									<li>
-										<AppCheckbox key={a.label} checked={a.completed} onChange={() => handleCheck(i)}>
-											{a.name}
+									<li key={a.label}>
+										<AppCheckbox checked={a.completed} onChange={() => handleCheck(i)}>
+											<span className={a.completed ? `line-through` : null}>{a.name}</span>
 										</AppCheckbox>
 									</li>
 								))}

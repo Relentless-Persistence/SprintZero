@@ -2,7 +2,7 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 import {useQuery} from "@tanstack/react-query"
-import {message, Breadcrumb, Button} from "antd5"
+import {Breadcrumb, Button, notification} from "antd5"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -123,10 +123,10 @@ export default function Tasks() {
 				order: targetTask.data.length <= 0 ? 0 : targetTask.data.length === 1 ? 1 : targetTask.data.length - 1,
 			})
 			.then(() => {
-				message.success(`Task updated successfully`)
+				notification.success({message: `Task updated successfully`})
 			})
 			.catch(() => {
-				message.error(`An error occurred!`)
+				notification.error({message: `An error occurred!`})
 			})
 	}
 

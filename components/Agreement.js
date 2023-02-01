@@ -5,7 +5,7 @@ import {termsOfAgreement} from "../fakeData/terms"
 import {db} from "../config/firebase-config"
 import {useAuth} from "../contexts/AuthContext"
 import {useRouter} from "next/router"
-import {message} from "antd5"
+import {notification} from "antd5"
 import {auth} from "../config/firebase-config"
 
 const Agreement = () => {
@@ -16,7 +16,7 @@ const Agreement = () => {
 
 	const onNext = (e) => {
 		if (agree === false) {
-			message.error("You have to agree to the Terms and Conditions!")
+			notification.error({message: "You have to agree to the Terms and Conditions!"})
 		} else {
 			const data = {
 				user_id: user.uid,

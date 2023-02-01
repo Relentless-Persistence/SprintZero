@@ -9,7 +9,7 @@ import { findIndex } from "lodash";
 import { activeProductState } from "../../atoms/productAtom";
 import { useRecoilValue } from "recoil";
 import { db } from "../../config/firebase-config";
-import { Button, Dropdown, message, Menu } from "antd";
+import { Button, Dropdown, notification, Menu } from "antd";
 import { FireOutlined } from "@ant-design/icons";
 import deleteData from "../../components/Settings/Config/deleteData";
 import { useAuth } from "../../contexts/AuthContext";
@@ -61,7 +61,7 @@ const config = () => {
         cadence,
       })
       .then(() => {
-        message.success("Cadence updated successfully");
+        notification.success({message: "Cadence updated successfully"});
         // window.location.reload(false);
       });
   };
@@ -73,7 +73,7 @@ const config = () => {
         gate,
       })
       .then(() => {
-        message.success("Gate updated successfully");
+        notification.success({message: "Gate updated successfully"})
         // window.location.reload(false);
       });
   };
