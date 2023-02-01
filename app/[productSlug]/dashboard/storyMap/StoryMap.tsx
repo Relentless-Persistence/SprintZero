@@ -1,5 +1,3 @@
-"use client"
-
 import {ReadOutlined} from "@ant-design/icons"
 import {doc} from "firebase/firestore"
 import {motion, useAnimationFrame, useMotionTemplate, useMotionValue, useTransform} from "framer-motion"
@@ -22,8 +20,8 @@ import {dragState, elementRegistry, pointerLocation, storyMapTop} from "./utils/
 import {moveItem} from "./utils/moving"
 import {getHoveringItems, getTargetLocation} from "./utils/targeting"
 import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
-import {addEpic, setStoryMapState as setDbStoryMapState} from "~/utils/api/mutations"
 import {db} from "~/utils/firebase"
+import {addEpic, setStoryMapState as setDbStoryMapState} from "~/utils/mutations"
 
 export type StoryMapProps = {
 	activeProduct: WithDocumentData<Product>
@@ -220,7 +218,13 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 				className="relative z-10 flex w-max items-start gap-8"
 			>
 				{storyMapState?.epics.map((epic) => (
-					<Epic key={epic.id} activeProduct={activeProduct} storyMapState={storyMapState} epicId={epic.id} />
+					<Epic
+						key={epic.id}
+						activeProduct={activeProduct}
+						storyMapState={storyMapState}
+						currentVersionId={currentVersionId}
+						epicId={epic.id}
+					/>
 				))}
 
 				<button
@@ -240,13 +244,27 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 						(() => {
 							for (const epic of storyMapState.epics) {
 								if (epic.id === dragState.current.id)
-									return <Epic activeProduct={activeProduct} storyMapState={storyMapState} epicId={epic.id} inert />
+									return (
+										<Epic
+											activeProduct={activeProduct}
+											storyMapState={storyMapState}
+											currentVersionId={currentVersionId}
+											epicId={epic.id}
+											inert
+										/>
+									)
 							}
 
 							for (const feature of storyMapState.features) {
 								if (feature.id === dragState.current.id)
 									return (
-										<Feature activeProduct={activeProduct} storyMapState={storyMapState} featureId={feature.id} inert />
+										<Feature
+											activeProduct={activeProduct}
+											storyMapState={storyMapState}
+											currentVersionId={currentVersionId}
+											featureId={feature.id}
+											inert
+										/>
 									)
 							}
 

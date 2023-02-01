@@ -2,16 +2,19 @@ import {ReadOutlined} from "@ant-design/icons"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Epic as EpicType} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import EpicDrawer from "./EpicDrawer"
 
 export type EpicContentProps = {
-	epic: EpicType
+	storyMapState: WithDocumentData<StoryMapState>
+	epicId: string
 }
 
-const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = ({epic}, ref) => {
+const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = ({storyMapState, epicId}, ref) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const epic = storyMapState.epics.find((epic) => epic.id === epicId)!
 
 	return (
 		<>
@@ -29,7 +32,12 @@ const EpicContent: ForwardRefRenderFunction<HTMLDivElement, EpicContentProps> = 
 				<p>{epic.name}</p>
 			</div>
 
-			<EpicDrawer epic={epic} isOpen={isDrawerOpen} onClose={() => void setIsDrawerOpen(false)} />
+			<EpicDrawer
+				storyMapState={storyMapState}
+				epicId={epicId}
+				isOpen={isDrawerOpen}
+				onClose={() => void setIsDrawerOpen(false)}
+			/>
 		</>
 	)
 }

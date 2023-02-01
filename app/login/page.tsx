@@ -3,7 +3,7 @@
 import {AppleFilled} from "@ant-design/icons"
 import {notification} from "antd"
 import {signInWithPopup, signOut} from "firebase/auth"
-import {doc, getDoc, setDoc} from "firebase/firestore"
+import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
@@ -11,11 +11,10 @@ import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {AuthProvider} from "firebase/auth"
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {User} from "~/types/db/Users"
 
+import {ProductConverter, Products} from "~/types/db/Products"
 import {Users} from "~/types/db/Users"
-import {getProductsByUser} from "~/utils/api/queries"
 import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/utils/firebase"
 
 const LoginPage: FC = () => {
@@ -48,7 +47,12 @@ const LoginPage: FC = () => {
 					} satisfies Omit<User, `id`>)
 					router.push(`/tos`)
 				} else {
-					const products = await getProductsByUser(res.user.uid as Id)()
+					const {docs: products} = await getDocs(
+						query(
+							collection(db, Products._),
+							where(`${Products.members}.${res.user.uid}.type`, `==`, `editor`),
+						).withConverter(ProductConverter),
+					)
 					if (products.length === 0) router.push(`/product`)
 					else router.push(`/${products[0]}/dashboard`)
 				}

@@ -1,19 +1,23 @@
-"use client"
-
 import {CopyOutlined} from "@ant-design/icons"
 import {forwardRef, useState} from "react"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Feature as FeatureType} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import FeatureDrawer from "./FeatureDrawer"
 
 export type FeatureContentProps = {
-	feature: FeatureType
+	storyMapState: WithDocumentData<StoryMapState>
+	featureId: string
 }
 
-const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentProps> = ({feature}, ref) => {
+const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentProps> = (
+	{storyMapState, featureId},
+	ref,
+) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const feature = storyMapState.features.find((feature) => feature.id === featureId)!
 
 	return (
 		<>
@@ -31,7 +35,12 @@ const FeatureContent: ForwardRefRenderFunction<HTMLDivElement, FeatureContentPro
 				<p>{feature.name}</p>
 			</div>
 
-			<FeatureDrawer feature={feature} isOpen={isDrawerOpen} onClose={() => void setIsDrawerOpen(false)} />
+			<FeatureDrawer
+				storyMapState={storyMapState}
+				featureId={featureId}
+				isOpen={isDrawerOpen}
+				onClose={() => void setIsDrawerOpen(false)}
+			/>
 		</>
 	)
 }

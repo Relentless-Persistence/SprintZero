@@ -1,29 +1,31 @@
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
-import {useQuery} from "@tanstack/react-query"
 import {Breadcrumb, Button} from "antd"
-import {useAtomValue, useSetAtom} from "jotai"
+import {collection} from "firebase/firestore"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 
-import type {FC} from "react"
+import type {Dispatch, FC, SetStateAction} from "react"
+import type {Id} from "~/types"
 
-import {currentVersionAtom, newVersionInputAtom} from "./atoms"
-import {getAllVersions} from "~/utils/api/queries"
+import {VersionConverter, Versions} from "~/types/db/Versions"
+import {db} from "~/utils/firebase"
 
-const StoryMapHeader: FC = () => {
-	const currentVersion = useAtomValue(currentVersionAtom)
-	const setNewVersionInput = useSetAtom(newVersionInputAtom)
+export type StoryMapHeaderProps = {
+	currentVersionId: Id | `__ALL_VERSIONS__`
+	setNewVersionInputValue: Dispatch<SetStateAction<string>>
+}
 
-	const [versions] = useCollectionData()
+const StoryMapHeader: FC<StoryMapHeaderProps> = ({currentVersionId, setNewVersionInputValue}) => {
+	const [versions] = useCollectionData(collection(db, Versions._).withConverter(VersionConverter))
 
 	return (
 		<div className="flex flex-col gap-8">
 			<div className="flex justify-between px-12 pt-8">
 				<Breadcrumb>
 					<Breadcrumb.Item>Story Map</Breadcrumb.Item>
-					<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersion.id)?.name}</Breadcrumb.Item>
+					<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersionId)?.name}</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<Button onClick={() => void setNewVersionInput(``)} className="bg-white">
+				<Button onClick={() => void setNewVersionInputValue(``)} className="bg-white">
 					+ Add version
 				</Button>
 			</div>

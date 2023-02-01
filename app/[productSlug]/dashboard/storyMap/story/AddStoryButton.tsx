@@ -1,31 +1,25 @@
 import {FileOutlined} from "@ant-design/icons"
-import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
-import type {Feature as FeatureType} from "~/types/db/StoryMapStates"
+import type {Id, WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {currentVersionAtom, storyMapStateAtom} from "../atoms"
-import {addStory} from "~/utils/api/mutations"
+import {addStory} from "~/utils/mutations"
 
 export type AddStoryButtonProps = {
-	feature: FeatureType
+	storyMapState: WithDocumentData<StoryMapState>
+	currentVersionId: Id | `__ALL_VERSIONS__`
+	featureId: string
 }
 
-const AddStoryButton: FC<AddStoryButtonProps> = ({feature}) => {
-	const storyMapState = useAtomValue(storyMapStateAtom)
-	const currentVersion = useAtomValue(currentVersionAtom)
-
-	if (currentVersion.id === `__ALL_VERSIONS__`) return null
+const AddStoryButton: FC<AddStoryButtonProps> = ({storyMapState, currentVersionId, featureId}) => {
+	if (currentVersionId === `__ALL_VERSIONS__`) return null
 	return (
 		<button
 			type="button"
 			onClick={() => {
-				if (currentVersion.id !== `__ALL_VERSIONS__`)
-					addStory({
-						storyMapState: storyMapState!,
-						featureId: feature.id,
-						data: {versionId: currentVersion.id},
-					})
+				if (currentVersionId !== `__ALL_VERSIONS__`)
+					addStory({storyMapState, featureId, data: {versionId: currentVersionId}})
 			}}
 			className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
 		>

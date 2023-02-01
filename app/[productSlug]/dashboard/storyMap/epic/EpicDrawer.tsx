@@ -1,64 +1,57 @@
 import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
-import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Form, Input, Tag, Typography} from "antd"
-import {doc} from "firebase/firestore"
-import produce from "immer"
-import {useAtom} from "jotai"
-import {useState} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {collection, doc, documentId, query, where} from "firebase/firestore"
+import {useEffect, useState} from "react"
+import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {Epic} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {storyMapStateAtom} from "../atoms"
 import Comments from "~/components/Comments"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {deleteEpic, updateEpic} from "~/utils/api/mutations"
-import {getUser} from "~/utils/api/queries"
+import {UserConverter, Users} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
+import {deleteEpic, updateEpic} from "~/utils/mutations"
 import {objectKeys} from "~/utils/objectMethods"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type EpicDrawerProps = {
-	epic: Epic
+	storyMapState: WithDocumentData<StoryMapState>
+	epicId: string
 	isOpen: boolean
 	onClose: () => void
 }
 
-const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
+const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose}) => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 	const [editMode, setEditMode] = useState(false)
-	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
+	const epic = storyMapState.epics.find((epic) => epic.id === epicId)!
 	const [draftTitle, setDraftTitle] = useState(epic.name)
+	const [description, setDescription] = useState(epic.description)
 
-	const updateLocalEpicDescription = (newDescription: string) => {
-		setStoryMapState((cur) =>
-			produce(cur, (draft) => {
-				const index = draft!.epics.findIndex(({id}) => id === epic.id)
-				draft!.epics[index]!.description = newDescription
-			}),
-		)
-	}
+	useEffect(() => {
+		setDescription(epic.description)
+	}, [epic.description])
 
 	let points = 0
 	epic.featureIds.forEach((featureId) => {
-		const feature = storyMapState?.features.find((feature) => feature.id === featureId)
+		const feature = storyMapState.features.find((feature) => feature.id === featureId)
 		feature?.storyIds.forEach((storyId) => {
-			const story = storyMapState?.stories.find((story) => story.id === storyId)
+			const story = storyMapState.stories.find((story) => story.id === storyId)
 			points += story?.points ?? 0
 		})
 	})
 
-	const res = useQueries({
-		queries: activeProduct
-			? objectKeys(activeProduct.members).map((id) => ({
-					queryKey: [`user`, id],
-					queryFn: getUser(id),
-			  }))
-			: [],
-	})
+	const [productMembers] = useCollectionData(
+		activeProduct
+			? query(collection(db, Users._), where(documentId(), `in`, objectKeys(activeProduct.members))).withConverter(
+					UserConverter,
+			  )
+			: undefined,
+	)
 
 	return (
 		<Drawer
@@ -151,9 +144,9 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 							<p className="text-xl font-semibold text-[#595959]">Epic</p>
 							<Input.TextArea
 								rows={4}
-								value={epic.description}
+								value={description}
 								onChange={(e) => {
-									updateLocalEpicDescription(e.target.value)
+									setDescription(e.target.value)
 									updateEpic({
 										storyMapState: storyMapState!,
 										epicId: epic.id,
@@ -169,28 +162,25 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 						<div className="flex min-h-0 flex-1 flex-col gap-2">
 							<p className="text-xl font-semibold text-[#595959]">Keeper(s)</p>
 							<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
-								{res.map(
-									(user) =>
-										user.data && (
-											<Checkbox
-												key={user.data.id}
-												checked={epic.keeperIds.includes(user.data.id)}
-												onChange={(e) =>
-													void updateEpic({
-														storyMapState: storyMapState!,
-														epicId: epic.id,
-														data: {
-															keeperIds: e.target.checked
-																? [...epic.keeperIds, user.data!.id]
-																: epic.keeperIds.filter((id) => id !== user.data!.id),
-														},
-													})
-												}
-											>
-												{user.data.name}
-											</Checkbox>
-										),
-								)}
+								{productMembers?.map((user) => (
+									<Checkbox
+										key={user.id}
+										checked={epic.keeperIds.includes(user.id)}
+										onChange={(e) =>
+											void updateEpic({
+												storyMapState: storyMapState!,
+												epicId: epic.id,
+												data: {
+													keeperIds: e.target.checked
+														? [...epic.keeperIds, user.id]
+														: epic.keeperIds.filter((id) => id !== user.id),
+												},
+											})
+										}
+									>
+										{user.name}
+									</Checkbox>
+								))}
 							</div>
 						</div>
 					</div>
@@ -199,18 +189,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 					<div className="flex h-full flex-col">
 						<Typography.Title level={4}>Comments</Typography.Title>
 						<div className="relative grow">
-							<Comments
-								commentList={epic.commentIds}
-								onCommentListChange={(newCommentList) =>
-									void updateEpic({
-										storyMapState: storyMapState!,
-										epicId: epic.id,
-										data: {
-											commentIds: newCommentList,
-										},
-									})
-								}
-							/>
+							<Comments storyMapStateId={storyMapState.id} parentId={epicId} />
 						</div>
 					</div>
 				</div>

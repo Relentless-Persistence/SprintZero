@@ -7,6 +7,7 @@ export const CommentSchema = z.object({
 	type: z.union([z.literal(`design`), z.literal(`code`)]),
 
 	authorId: idSchema,
+	parentId: z.string(),
 })
 
 export const Comments = genDbNames(`Comments`, CommentSchema)

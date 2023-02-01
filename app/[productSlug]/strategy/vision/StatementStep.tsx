@@ -17,7 +17,7 @@ import {generateProductVision} from "./getGptResponse"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {updateProduct} from "~/utils/api/mutations"
+import {updateProduct} from "~/utils/mutations"
 import {auth, db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

@@ -1,11 +1,9 @@
-"use client"
-
 import clsx from "clsx"
 import {motion} from "framer-motion"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
+import type {Id, WithDocumentData} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
@@ -17,11 +15,12 @@ import {dragState, elementRegistry} from "../utils/globals"
 export type EpicProps = {
 	activeProduct: WithDocumentData<Product>
 	storyMapState: WithDocumentData<StoryMapState>
+	currentVersionId: Id | `__ALL_VERSIONS__`
 	epicId: string
 	inert?: boolean
 }
 
-const Epic: FC<EpicProps> = ({activeProduct, storyMapState, epicId, inert = false}) => {
+const Epic: FC<EpicProps> = ({activeProduct, storyMapState, currentVersionId, epicId, inert = false}) => {
 	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
 	const epic = storyMapState.epics.find((epic) => epic.id === epicId)!
@@ -49,7 +48,7 @@ const Epic: FC<EpicProps> = ({activeProduct, storyMapState, epicId, inert = fals
 			ref={containerRef}
 		>
 			<div className="cursor-grab touch-none select-none transition-transform hover:scale-105" ref={contentRef}>
-				<EpicContent epic={epic} />
+				<EpicContent storyMapState={storyMapState} epicId={epicId} />
 			</div>
 
 			{/* Pad out the remaining columns in row 1 */}
@@ -81,13 +80,19 @@ const Epic: FC<EpicProps> = ({activeProduct, storyMapState, epicId, inert = fals
 
 						{i === epic.featureIds.length - 1 && epic.featureIds.length > 0 && (
 							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-								<SmallAddFeatureButton epic={epic} />
+								<SmallAddFeatureButton storyMapState={storyMapState} epicId={epicId} />
 							</div>
 						)}
 					</div>
 				))}
 
-			<FeatureList activeProduct={activeProduct} storyMapState={storyMapState} epicId={epicId} inert={inert} />
+			<FeatureList
+				activeProduct={activeProduct}
+				storyMapState={storyMapState}
+				currentVersionId={currentVersionId}
+				epicId={epicId}
+				inert={inert}
+			/>
 		</motion.div>
 	)
 }

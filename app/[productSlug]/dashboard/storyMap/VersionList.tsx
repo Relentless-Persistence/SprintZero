@@ -1,7 +1,7 @@
 "use client"
 
 import {Button, Input, Tabs} from "antd"
-import {collection, query, where} from "firebase/firestore"
+import {collection, query} from "firebase/firestore"
 import {useEffect} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 
@@ -10,9 +10,8 @@ import type {Id} from "~/types"
 
 import {StoryMapStates} from "~/types/db/StoryMapStates"
 import {VersionConverter, Versions} from "~/types/db/Versions"
-import {addVersion} from "~/utils/api/mutations"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {addVersion} from "~/utils/mutations"
 
 export type VersionListProps = {
 	currentVersionId: Id | `__ALL_VERSIONS__` | undefined
@@ -29,12 +28,8 @@ const VersionList: FC<VersionListProps> = ({
 	setNewVersionInputValue,
 	storyMapStateId,
 }) => {
-	const activeProductId = useActiveProductId()
 	const [versions] = useCollectionData(
-		query(
-			collection(db, StoryMapStates._, storyMapStateId, Versions._),
-			where(Versions.productId, `==`, activeProductId),
-		).withConverter(VersionConverter),
+		query(collection(db, StoryMapStates._, storyMapStateId, Versions._)).withConverter(VersionConverter),
 	)
 	useEffect(() => {
 		if (currentVersionId === undefined && versions?.[0]) setCurrentVersionId(versions[0].id)
@@ -63,7 +58,7 @@ const VersionList: FC<VersionListProps> = ({
 				<form
 					onSubmit={async (evt) => {
 						evt.preventDefault()
-						await addVersion({productId: activeProductId, versionName: newVersionInputValue})
+						await addVersion({storyMapStateId, versionName: newVersionInputValue})
 						setNewVersionInputValue(undefined)
 					}}
 					className="flex flex-col gap-2"

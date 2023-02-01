@@ -1,14 +1,13 @@
 "use client"
 
-import {useQueries} from "@tanstack/react-query"
 import {Button, Tag, Timeline, Breadcrumb, Card, Empty, Steps} from "antd"
 import {formatDistanceToNow} from "date-fns"
-import {doc, Timestamp} from "firebase/firestore"
+import {collection, doc, documentId, query, Timestamp, where} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -17,9 +16,9 @@ import FinalStep from "./FinalStep"
 import ResponseStep from "./ResponseStep"
 import StatementStep from "./StatementStep"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {updateProduct} from "~/utils/api/mutations"
-import {getUser} from "~/utils/api/queries"
+import {UserConverter} from "~/types/db/Users"
 import {auth, db} from "~/utils/firebase"
+import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const VisionsPage: FC = () => {
@@ -32,13 +31,18 @@ const VisionsPage: FC = () => {
 	const [gptResponse, setGptResponse] = useState<string | undefined>(undefined)
 	const [gptResponseAccepted, setGptResponseAccepted] = useState(false)
 
-	const data = useQueries({
-		queries:
-			activeProduct?.updates.map((update) => ({
-				queryKey: [`user`, update.userId],
-				queryFn: getUser(update.userId),
-			})) ?? [],
-	})
+	const [users] = useCollectionData(
+		activeProduct
+			? query(
+					collection(db, Products._, activeProductId),
+					where(
+						documentId(),
+						`in`,
+						activeProduct.updates.map((update) => update.userId),
+					),
+			  ).withConverter(UserConverter)
+			: undefined,
+	)
 
 	return (
 		<div className="flex h-full flex-col gap-6 px-12 pt-8">
@@ -150,9 +154,7 @@ const VisionsPage: FC = () => {
 									<div className="space-y-1">
 										<p className="font-mono">{formatDistanceToNow(update.timestamp.toDate(), {addSuffix: true})}</p>
 										<p className="text-xs">
-											<span className="text-[#1890ff]">
-												@{data.find((user) => user.data?.id === update.userId)?.data?.name}
-											</span>
+											<span className="text-[#1890ff]">@{users?.find((user) => user.id === update.userId)?.name}</span>
 											{` `}
 											{update.text.split(`"`).map((text, i) =>
 												i % 2 === 0 ? (

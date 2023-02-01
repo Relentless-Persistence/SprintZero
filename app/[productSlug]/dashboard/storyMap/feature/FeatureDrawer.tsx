@@ -1,48 +1,39 @@
 import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
 import {Button, Drawer, Form, Input, Tag, Typography} from "antd"
 import {doc} from "firebase/firestore"
-import produce from "immer"
-import {useAtom} from "jotai"
 import {useState} from "react"
 import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {Feature} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {storyMapStateAtom} from "../atoms"
 import Comments from "~/components/Comments"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {deleteFeature, updateFeature} from "~/utils/api/mutations"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
+import {deleteFeature, updateFeature} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type FeatureDrawerProps = {
-	feature: Feature
+	storyMapState: WithDocumentData<StoryMapState>
+	featureId: string
 	isOpen: boolean
 	onClose: () => void
 }
 
-const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
+const FeatureDrawer: FC<FeatureDrawerProps> = ({storyMapState, featureId, isOpen, onClose}) => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 
-	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
 	const [editMode, setEditMode] = useState(false)
+	const feature = storyMapState.features.find((feature) => feature.id === featureId)!
 	const [draftTitle, setDraftTitle] = useState(feature.name)
-
-	const updateLocalFeatureDescription = (newDescription: string) => {
-		setStoryMapState((cur) =>
-			produce(cur, (draft) => {
-				const index = draft!.features.findIndex(({id}) => id === feature.id)
-				draft!.features[index]!.description = newDescription
-			}),
-		)
-	}
+	const [description, setDescription] = useState(feature.description)
 
 	let points = 0
 	feature.storyIds.forEach((storyId) => {
-		const story = storyMapState?.stories.find((story) => story.id === storyId)
+		const story = storyMapState.stories.find((story) => story.id === storyId)
 		points += story?.points ?? 0
 	})
 
@@ -137,9 +128,9 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 							<p className="text-xl font-semibold text-[#595959]">Feature</p>
 							<Input.TextArea
 								rows={4}
-								value={feature.description}
+								value={description}
 								onChange={(e) => {
-									updateLocalFeatureDescription(e.target.value)
+									setDescription(e.target.value)
 									updateFeature({
 										storyMapState: storyMapState!,
 										featureId: feature.id,
@@ -157,18 +148,7 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 					<div className="flex h-full flex-col">
 						<Typography.Title level={4}>Comments</Typography.Title>
 						<div className="relative grow">
-							<Comments
-								commentList={feature.commentIds}
-								onCommentListChange={(newCommentList) =>
-									void updateFeature({
-										storyMapState: storyMapState!,
-										featureId: feature.id,
-										data: {
-											commentIds: newCommentList,
-										},
-									})
-								}
-							/>
+							<Comments storyMapStateId={storyMapState.id} parentId={feature.id} />
 						</div>
 					</div>
 				</div>

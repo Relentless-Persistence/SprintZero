@@ -13,8 +13,8 @@ import StoryMapHeader from "./storyMap/StoryMapHeader"
 import {storyMapScrollPosition} from "./storyMap/utils/globals"
 import VersionList from "./storyMap/VersionList"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {setStoryMapState} from "~/utils/api/mutations"
 import {db} from "~/utils/firebase"
+import {setStoryMapState} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Dashboard: FC = () => {
@@ -27,7 +27,9 @@ const Dashboard: FC = () => {
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="flex flex-col gap-8">
-				<StoryMapHeader />
+				{currentVersionId && (
+					<StoryMapHeader currentVersionId={currentVersionId} setNewVersionInputValue={setNewVesionInputValue} />
+				)}
 
 				<div className="relative w-full grow">
 					<motion.div

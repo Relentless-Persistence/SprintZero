@@ -21,27 +21,22 @@ import {Versions} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 
 type AddVersionVars = {
-	productId: Id
+	storyMapStateId: Id
 	versionName: string
 }
 
-export const addVersion = async ({productId, versionName}: AddVersionVars): Promise<void> => {
+export const addVersion = async ({storyMapStateId, versionName}: AddVersionVars): Promise<void> => {
 	const existingDoc = (
 		await getDocs(
-			query(
-				collection(db, Versions._),
-				where(Versions.productId, `==`, productId),
-				where(Versions.name, `==`, versionName),
-			),
+			query(collection(db, StoryMapStates._, storyMapStateId, Versions._), where(Versions.name, `==`, versionName)),
 		)
 	).docs[0]
 	if (existingDoc) throw new Error(`Version already exists.`)
 
-	const data: Omit<Version, `id`> = {
+	const data: Version = {
 		name: versionName,
-		productId,
 	}
-	await addDoc(collection(db, Versions._), data)
+	await addDoc(collection(db, StoryMapStates._, storyMapStateId, Versions._), data)
 }
 
 type UpdateProductVars = {
@@ -274,11 +269,12 @@ export const setStoryMapState = async ({id, data}: SetStoryMapStateVars): Promis
 }
 
 type AddCommentVars = {
+	storyMapStateId: Id
 	comment: Omit<Comment, `id`>
 }
 
-export const addComment = async ({comment}: AddCommentVars): Promise<Id> => {
-	const ref = await addDoc(collection(db, Comments._), comment)
+export const addComment = async ({storyMapStateId, comment}: AddCommentVars): Promise<Id> => {
+	const ref = await addDoc(collection(db, StoryMapStates._, storyMapStateId, Comments._), comment)
 	return ref.id as Id
 }
 

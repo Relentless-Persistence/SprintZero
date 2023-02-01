@@ -13,7 +13,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import {ObjectiveConverter, Objectives} from "~/types/db/Objectives"
-import {updateObjective} from "~/utils/api/mutations"
+import {updateObjective} from "~/utils/mutations"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

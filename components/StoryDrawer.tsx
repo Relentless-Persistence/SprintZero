@@ -12,7 +12,7 @@ import {
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Button, Checkbox, Drawer, Tag, Input, Form, Radio} from "antd"
 import clsx from "clsx"
-import {collection, query, where} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
@@ -32,12 +32,12 @@ import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {sprintColumns} from "~/types/db/Products"
-import {StorySchema} from "~/types/db/StoryMapStates"
+import {StoryMapStates, StorySchema} from "~/types/db/StoryMapStates"
 import {VersionConverter, Versions} from "~/types/db/Versions"
-import {deleteStory, updateStory} from "~/utils/api/mutations"
 import dollarFormat from "~/utils/dollarFormat"
 import {auth, db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
+import {deleteStory, updateStory} from "~/utils/mutations"
 import {objectEntries, objectKeys} from "~/utils/objectMethods"
 
 const formSchema = StorySchema.pick({
@@ -102,9 +102,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 	})
 
 	const [versions] = useCollectionData(
-		query(collection(db, Versions._), where(Versions.productId, `==`, activeProduct.id)).withConverter(
-			VersionConverter,
-		),
+		collection(db, StoryMapStates._, storyMapState.id, Versions._).withConverter(VersionConverter),
 	)
 
 	const toggleAcceptanceCriterion = (id: string, checked: boolean) => {
@@ -411,16 +409,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 						<p className="text-xl font-semibold text-[#595959]">Comments</p>
 						<div className="relative grow">
 							<Comments
-								commentList={story.commentIds}
-								onCommentListChange={(newCommentList) =>
-									void updateStory({
-										storyMapState,
-										storyId: story.id,
-										data: {
-											commentIds: newCommentList,
-										},
-									})
-								}
+								storyMapStateId={storyMapState.id}
+								parentId={storyId}
 								flagged={story.ethicsColumn !== null}
 								onFlag={() =>
 									void updateStory({

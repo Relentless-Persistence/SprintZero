@@ -77,7 +77,6 @@ const ProductConfiguration: FC = () => {
 
 		await addDoc(collection(db, StoryMapStates._, storyMapStateId, Versions._), {
 			name: `1.0`,
-			productId: slug,
 		} satisfies Version)
 
 		router.push(`/${slug}/dashboard`)

@@ -12,12 +12,7 @@ import type {Id} from "~/types"
 import LinkTo from "~/components/LinkTo"
 import {AccessibilityItemConverter, AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {
-	addAccessibilityItem,
-	deleteAccessibilityItem,
-	updateAccessibilityItem,
-	updateProduct,
-} from "~/utils/api/mutations"
+import {addAccessibilityItem, deleteAccessibilityItem, updateAccessibilityItem, updateProduct} from "~/utils/mutations"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

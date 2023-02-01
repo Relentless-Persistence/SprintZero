@@ -1,21 +1,22 @@
 import {CopyOutlined} from "@ant-design/icons"
 
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
+import type {Id, WithDocumentData} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Feature from "../feature/Feature"
-import {addFeature} from "~/utils/api/mutations"
+import {addFeature} from "~/utils/mutations"
 
 export type FeatureListProps = {
 	activeProduct: WithDocumentData<Product>
 	storyMapState: WithDocumentData<StoryMapState>
+	currentVersionId: Id | `__ALL_VERSIONS__`
 	epicId: string
 	inert?: boolean
 }
 
-const FeatureList: FC<FeatureListProps> = ({activeProduct, storyMapState, epicId, inert = false}) => {
+const FeatureList: FC<FeatureListProps> = ({activeProduct, storyMapState, currentVersionId, epicId, inert = false}) => {
 	const epic = storyMapState.epics.find((epic) => epic.id === epicId)!
 	const features = epic.featureIds.map((id) => storyMapState.features.find((feature) => feature.id === id))
 
@@ -28,6 +29,7 @@ const FeatureList: FC<FeatureListProps> = ({activeProduct, storyMapState, epicId
 							key={feature.id}
 							activeProduct={activeProduct}
 							storyMapState={storyMapState}
+							currentVersionId={currentVersionId}
 							featureId={feature.id}
 							inert={inert}
 						/>

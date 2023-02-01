@@ -1,11 +1,9 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, genDbNames} from "~/types"
 
 export const VersionSchema = z.object({
 	name: z.string(),
-
-	productId: idSchema,
 })
 
 export const Versions = genDbNames(`Versions`, VersionSchema)

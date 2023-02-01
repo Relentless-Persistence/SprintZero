@@ -1,5 +1,3 @@
-"use client"
-
 import {collection, documentId, query, where} from "firebase/firestore"
 import {forwardRef, useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"

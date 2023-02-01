@@ -1,23 +1,21 @@
 import {PlusOutlined} from "@ant-design/icons"
-import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
-import type {Epic as EpicType} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {storyMapStateAtom} from "../atoms"
-import {addFeature} from "~/utils/api/mutations"
+import {addFeature} from "~/utils/mutations"
 
 export type SmallAddFeatureButtonProps = {
-	epic: EpicType
+	storyMapState: WithDocumentData<StoryMapState>
+	epicId: string
 }
 
-const SmallAddFeatureButton: FC<SmallAddFeatureButtonProps> = ({epic}) => {
-	const storyMapState = useAtomValue(storyMapStateAtom)
-
+const SmallAddFeatureButton: FC<SmallAddFeatureButtonProps> = ({storyMapState, epicId}) => {
 	return (
 		<button
 			type="button"
-			onClick={() => void addFeature({storyMapState: storyMapState!, epicId: epic.id, data: {}})}
+			onClick={() => void addFeature({storyMapState, epicId, data: {}})}
 			className="grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white"
 		>
 			<PlusOutlined />

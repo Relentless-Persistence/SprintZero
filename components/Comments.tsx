@@ -1,74 +1,76 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
-import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Input} from "antd"
+import {collection, documentId, query, where} from "firebase/firestore"
+import _ from "lodash"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
+import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import {addComment} from "~/utils/api/mutations"
-import {getComment, getUser} from "~/utils/api/queries"
-import {auth} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {CommentConverter, Comments as DbComments} from "~/types/db/Comments"
+import {StoryMapStates} from "~/types/db/StoryMapStates"
+import {UserConverter, Users} from "~/types/db/Users"
+import {auth, db} from "~/utils/firebase"
+import {addComment} from "~/utils/mutations"
 
 export type CommentsProps = {
-	commentList: Id[]
-	onCommentListChange: (newCommentList: Id[]) => void
+	storyMapStateId: Id
+	parentId: string
 	flagged?: boolean
 	onFlag?: () => void
 }
 
-const Comments: FC<CommentsProps> = ({commentList, onCommentListChange, flagged, onFlag}) => {
-	const activeProductId = useActiveProductId()
+const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag}) => {
 	const [user] = useAuthState(auth)
 	const [commentDraft, setCommentDraft] = useState(``)
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		const id = await addComment({
+		await addComment({
+			storyMapStateId,
 			comment: {
 				text: commentDraft,
 				type: `code`,
 				authorId: user!.uid as Id,
+				parentId,
 			},
 		})
-		onCommentListChange([...commentList, id])
 		setCommentDraft(``)
 	}
 
-	const comments = useQueries({
-		queries: commentList.map((comment) => ({
-			queryKey: [`comment`, comment],
-			queryFn: getComment(comment, activeProductId),
-		})),
-	})
+	const [comments] = useCollectionData(
+		query(
+			collection(db, StoryMapStates._, storyMapStateId, DbComments._),
+			where(DbComments.parentId, `==`, parentId),
+		).withConverter(CommentConverter),
+	)
 
-	const commentAuthors = useQueries({
-		queries: comments
-			.flatMap((comment) => (comment.data ? [comment.data] : []))
-			.map((comment) => ({
-				queryKey: [`user`, comment.authorId],
-				queryFn: getUser(comment.authorId),
-			})),
-	})
+	const [commentAuthors] = useCollectionData(
+		comments
+			? query(
+					collection(db, Users._),
+					where(documentId(), `in`, _.uniq(comments.map((comment) => comment.authorId))),
+			  ).withConverter(UserConverter)
+			: undefined,
+	)
 
 	return (
 		<div className="absolute inset-0 flex flex-col">
 			<div className="flex grow flex-col-reverse overflow-auto">
 				<div className="space-y-4">
-					{comments.length === 0 ? (
+					{comments?.length === 0 ? (
 						<p className="italic text-laurel">Nothing here yet</p>
 					) : (
-						comments.map((comment) => {
-							if (!comment.data) return null
-							const author = commentAuthors.find((author) => author.data?.id === comment.data?.authorId)?.data
+						comments?.map((comment) => {
+							const author = commentAuthors?.find((author) => author.id === comment.authorId)
 							return (
-								<div key={comment.data.id} className="flex gap-2">
+								<div key={comment.id} className="flex gap-2">
 									<Avatar src={author?.avatar} />
 									<div className="space-y-1">
 										<p className="text-xs text-laurel">{author?.name}</p>
-										<p>{comment.data.text}</p>
+										<p>{comment.text}</p>
 									</div>
 								</div>
 							)

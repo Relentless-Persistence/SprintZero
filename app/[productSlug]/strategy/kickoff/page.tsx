@@ -10,7 +10,7 @@ import type {FC} from "react"
 import EditButtons from "./EditButtons"
 import TextListEditor from "./TextListEditor"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {updateProduct} from "~/utils/api/mutations"
+import {updateProduct} from "~/utils/mutations"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
