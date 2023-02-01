@@ -1,29 +1,39 @@
 "use client"
 
-import {useQueryClient} from "@tanstack/react-query"
-import {useAtom} from "jotai"
+import {collection, documentId, query, where} from "firebase/firestore"
 import {forwardRef, useState} from "react"
+import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {ForwardRefRenderFunction} from "react"
-import type {Story as StoryType} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {storyMapStateAtom} from "../atoms"
 import StoryDrawer from "~/components/StoryDrawer"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {StoryMapStates} from "~/types/db/StoryMapStates"
+import {VersionConverter, Versions} from "~/types/db/Versions"
+import {db} from "~/utils/firebase"
 
 export type StoryContentProps = {
-	story: StoryType
+	activeProduct: WithDocumentData<Product>
+	storyMapState: WithDocumentData<StoryMapState>
+	storyId: string
 }
 
-const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> = ({story}, ref) => {
-	const activeProductId = useActiveProductId()
-	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
+const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> = (
+	{activeProduct, storyMapState, storyId},
+	ref,
+) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-	const version = useQueryClient()
-		.getQueryData<Version[]>([`all-versions`, activeProductId])
-		?.find((version) => version.id === story.versionId)
+	const story = storyMapState.stories.find((story) => story.id === storyId)!
+	const [versions] = useCollectionData(
+		query(
+			collection(db, StoryMapStates._, storyMapState.id, Versions._),
+			where(documentId(), `==`, story.versionId),
+		).withConverter(VersionConverter),
+	)
+	const version = versions?.[0]
 
 	return (
 		<>
@@ -44,16 +54,14 @@ const StoryContent: ForwardRefRenderFunction<HTMLDivElement, StoryContentProps> 
 				</div>
 			</div>
 
-			{storyMapState && (
-				<StoryDrawer
-					storyMapState={storyMapState}
-					setStoryMapState={setStoryMapState}
-					story={story}
-					hideAdjudicationResponse
-					isOpen={isDrawerOpen}
-					onClose={() => void setIsDrawerOpen(false)}
-				/>
-			)}
+			<StoryDrawer
+				activeProduct={activeProduct}
+				storyMapState={storyMapState}
+				storyId={storyId}
+				hideAdjudicationResponse
+				isOpen={isDrawerOpen}
+				onClose={() => void setIsDrawerOpen(false)}
+			/>
 		</>
 	)
 }

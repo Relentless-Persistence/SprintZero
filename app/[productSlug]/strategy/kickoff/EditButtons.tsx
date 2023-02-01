@@ -1,4 +1,4 @@
-import {Button} from "antd5"
+import {Button} from "antd"
 
 import type {FC} from "react"
 

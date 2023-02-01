@@ -1,13 +1,14 @@
 "use client"
 
 import {useQueries} from "@tanstack/react-query"
-import {Button, Tag, Timeline, Breadcrumb, Card, Empty, Steps} from "antd5"
+import {Button, Tag, Timeline, Breadcrumb, Card, Empty, Steps} from "antd"
 import {formatDistanceToNow} from "date-fns"
-import {Timestamp} from "firebase9/firestore"
+import {doc, Timestamp} from "firebase/firestore"
 import produce from "immer"
-import {useAtomValue} from "jotai"
 import {nanoid} from "nanoid"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -15,13 +16,16 @@ import type {Id} from "~/types"
 import FinalStep from "./FinalStep"
 import ResponseStep from "./ResponseStep"
 import StatementStep from "./StatementStep"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {updateProduct} from "~/utils/api/mutations"
 import {getUser} from "~/utils/api/queries"
-import {activeProductAtom, userIdAtom} from "~/utils/atoms"
+import {auth, db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const VisionsPage: FC = () => {
-	const activeProduct = useAtomValue(activeProductAtom)
-	const userId = useAtomValue(userIdAtom)
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [user] = useAuthState(auth)
 
 	const [editMode, setEditMode] = useState(false)
 	const [currentStep, setCurrentStep] = useState(0)
@@ -98,7 +102,7 @@ const VisionsPage: FC = () => {
 														if (draft.finalVision === ``) {
 															draft.updates.push({
 																id: nanoid(),
-																userId: userId as Id,
+																userId: user!.uid as Id,
 																text: `created the product vision.`,
 																timestamp: Timestamp.now(),
 															})

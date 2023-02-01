@@ -1,18 +1,19 @@
 "use client"
 
 import {ReadOutlined} from "@ant-design/icons"
-import {collection, onSnapshot, query, where} from "firebase/firestore"
+import {doc} from "firebase/firestore"
 import {motion, useAnimationFrame, useMotionTemplate, useMotionValue, useTransform} from "framer-motion"
 import {useAtom, useSetAtom} from "jotai"
 import {useEffect, useRef} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {StoryMapItem, StoryMapTarget} from "./utils/types"
-import type {DocumentReference} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id, WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {dragPosAtom, dragStateAtom, storyMapStateAtom} from "./atoms"
+import {dragPosAtom, dragStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
 import Feature from "./feature/Feature"
 import Story from "./story/Story"
@@ -20,39 +21,24 @@ import {calculateBoundaries, genStoryMapMeta, meta} from "./utils"
 import {dragState, elementRegistry, pointerLocation, storyMapTop} from "./utils/globals"
 import {moveItem} from "./utils/moving"
 import {getHoveringItems, getTargetLocation} from "./utils/targeting"
-import {StoryMapStates, StoryMapStateSchema} from "~/types/db/StoryMapStates"
+import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
 import {addEpic, setStoryMapState as setDbStoryMapState} from "~/utils/api/mutations"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type StoryMapProps = {
+	activeProduct: WithDocumentData<Product>
 	currentVersionId: Id | `__ALL_VERSIONS__`
 }
 
-const StoryMap: FC<StoryMapProps> = ({currentVersionId}) => {
-	const activeProductId = useActiveProductId()
-	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
+const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
+	const [storyMapState] = useDocumentData(
+		doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
+	)
 
 	const setDragPos = useSetAtom(dragPosAtom)
 	const [reactDragState, setReactDragState] = useAtom(dragStateAtom)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
-
-	useEffect(() => {
-		return onSnapshot(
-			query(collection(db, StoryMapStates._), where(StoryMapStates.productId, `==`, activeProductId)),
-			(docs) => {
-				const doc = docs.docs[0]
-				if (!doc) return
-				const data: WithDocumentData<StoryMapState> = {
-					...StoryMapStateSchema.parse(doc.data()),
-					id: doc.id as Id,
-					ref: doc.ref as DocumentReference<StoryMapState>,
-				}
-				setStoryMapState(data)
-			},
-		)
-	}, [activeProductId, setStoryMapState])
 
 	useEffect(() => {
 		setDragPos([x, y])
@@ -234,7 +220,7 @@ const StoryMap: FC<StoryMapProps> = ({currentVersionId}) => {
 				className="relative z-10 flex w-max items-start gap-8"
 			>
 				{storyMapState?.epics.map((epic) => (
-					<Epic key={epic.id} epic={epic} />
+					<Epic key={epic.id} activeProduct={activeProduct} storyMapState={storyMapState} epicId={epic.id} />
 				))}
 
 				<button
@@ -253,15 +239,20 @@ const StoryMap: FC<StoryMapProps> = ({currentVersionId}) => {
 					{storyMapState &&
 						(() => {
 							for (const epic of storyMapState.epics) {
-								if (epic.id === dragState.current.id) return <Epic epic={epic} inert />
+								if (epic.id === dragState.current.id)
+									return <Epic activeProduct={activeProduct} storyMapState={storyMapState} epicId={epic.id} inert />
 							}
 
 							for (const feature of storyMapState.features) {
-								if (feature.id === dragState.current.id) return <Feature feature={feature} inert />
+								if (feature.id === dragState.current.id)
+									return (
+										<Feature activeProduct={activeProduct} storyMapState={storyMapState} featureId={feature.id} inert />
+									)
 							}
 
 							for (const story of storyMapState.stories) {
-								if (story.id === dragState.current.id) return <Story story={story} inert />
+								if (story.id === dragState.current.id)
+									return <Story activeProduct={activeProduct} storyMapState={storyMapState} storyId={story.id} inert />
 							}
 						})()}
 				</motion.div>

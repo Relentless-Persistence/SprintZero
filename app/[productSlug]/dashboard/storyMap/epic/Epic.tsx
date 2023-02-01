@@ -5,7 +5,9 @@ import {motion} from "framer-motion"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Epic as EpicType} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import EpicContent from "./EpicContent"
 import FeatureList from "./FeatureList"
@@ -13,33 +15,36 @@ import SmallAddFeatureButton from "./SmallAddFeatureButton"
 import {dragState, elementRegistry} from "../utils/globals"
 
 export type EpicProps = {
-	epic: EpicType
+	activeProduct: WithDocumentData<Product>
+	storyMapState: WithDocumentData<StoryMapState>
+	epicId: string
 	inert?: boolean
 }
 
-const Epic: FC<EpicProps> = ({epic, inert = false}) => {
+const Epic: FC<EpicProps> = ({activeProduct, storyMapState, epicId, inert = false}) => {
 	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
+	const epic = storyMapState.epics.find((epic) => epic.id === epicId)!
 	useEffect(() => {
 		if (inert || !containerRef.current || !contentRef.current) return
-		elementRegistry[epic.id] = {
+		elementRegistry[epicId] = {
 			container: containerRef.current,
 			content: contentRef.current,
 		}
 		return () => {
 			if (!containerRef.current || !contentRef.current) return
-			elementRegistry[epic.id] = {
+			elementRegistry[epicId] = {
 				container: containerRef.current, // eslint-disable-line react-hooks/exhaustive-deps
 				content: contentRef.current, // eslint-disable-line react-hooks/exhaustive-deps
 			}
 		}
-	}, [epic.id, inert])
+	}, [epicId, inert])
 
 	return (
 		<motion.div
-			layoutId={dragState.current?.id === epic.id ? undefined : `epic-${epic.id}`}
-			layout={dragState.current?.id === epic.id ? undefined : `position`}
-			className={clsx(`grid justify-items-center gap-x-4`, dragState.current?.id === epic.id && !inert && `invisible`)}
+			layoutId={dragState.current?.id === epicId ? undefined : `epic-${epicId}`}
+			layout={dragState.current?.id === epicId ? undefined : `position`}
+			className={clsx(`grid justify-items-center gap-x-4`, dragState.current?.id === epicId && !inert && `invisible`)}
 			style={{gridTemplateColumns: `repeat(${epic.featureIds.length}, auto)`}}
 			ref={containerRef}
 		>
@@ -82,7 +87,7 @@ const Epic: FC<EpicProps> = ({epic, inert = false}) => {
 					</div>
 				))}
 
-			<FeatureList epic={epic} inert={inert} />
+			<FeatureList activeProduct={activeProduct} storyMapState={storyMapState} epicId={epicId} inert={inert} />
 		</motion.div>
 	)
 }

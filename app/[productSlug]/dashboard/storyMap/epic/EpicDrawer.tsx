@@ -1,19 +1,24 @@
 import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Form, Input, Tag, Typography} from "antd"
+import {doc} from "firebase/firestore"
 import produce from "immer"
-import {useAtom, useAtomValue} from "jotai"
+import {useAtom} from "jotai"
 import {useState} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Epic} from "~/types/db/StoryMapStates"
 
 import {storyMapStateAtom} from "../atoms"
 import Comments from "~/components/Comments"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {deleteEpic, updateEpic} from "~/utils/api/mutations"
 import {getUser} from "~/utils/api/queries"
 import dollarFormat from "~/utils/dollarFormat"
+import {db} from "~/utils/firebase"
 import {objectKeys} from "~/utils/objectMethods"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type EpicDrawerProps = {
 	epic: Epic
@@ -22,8 +27,9 @@ export type EpicDrawerProps = {
 }
 
 const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 	const [editMode, setEditMode] = useState(false)
-	const activeProduct = useAtomValue(activeProductAtom)
 	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
 	const [draftTitle, setDraftTitle] = useState(epic.name)
 
@@ -63,7 +69,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 						{editMode ? (
 							<button
 								type="button"
-								onClick={async () =>
+								onClick={() =>
 									void deleteEpic({
 										storyMapState: storyMapState!,
 										epicId: epic.id,
@@ -146,7 +152,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 							<Input.TextArea
 								rows={4}
 								value={epic.description}
-								onChange={async (e) => {
+								onChange={(e) => {
 									updateLocalEpicDescription(e.target.value)
 									updateEpic({
 										storyMapState: storyMapState!,
@@ -175,8 +181,8 @@ const EpicDrawer: FC<EpicDrawerProps> = ({epic, isOpen, onClose}) => {
 														epicId: epic.id,
 														data: {
 															keeperIds: e.target.checked
-																? [...epic.keeperIds, user.data.id]
-																: epic.keeperIds.filter((id) => id !== user.data.id),
+																? [...epic.keeperIds, user.data!.id]
+																: epic.keeperIds.filter((id) => id !== user.data!.id),
 														},
 													})
 												}

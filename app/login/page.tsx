@@ -1,31 +1,31 @@
 "use client"
 
 import {AppleFilled} from "@ant-design/icons"
-import {notification} from "antd5"
-import {signInWithPopup, signOut} from "firebase9/auth"
-import {doc, getDoc, setDoc} from "firebase9/firestore"
+import {notification} from "antd"
+import {signInWithPopup, signOut} from "firebase/auth"
+import {doc, getDoc, setDoc} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
 
-import type {AuthProvider} from "firebase9/auth"
+import type {AuthProvider} from "firebase/auth"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {User} from "~/types/db/Users"
 
-import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/utils/firebase"
 import {Users} from "~/types/db/Users"
 import {getProductsByUser} from "~/utils/api/queries"
-import {useUserId} from "~/utils/atoms"
+import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/utils/firebase"
 
 const LoginPage: FC = () => {
 	const router = useRouter()
-	const userId = useUserId()
+	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
 
 	useEffect(() => {
-		if (userId && !hasSignedIn) router.replace(`/`)
-	}, [hasSignedIn, router, userId])
+		if (user?.uid && !hasSignedIn) router.replace(`/`)
+	}, [hasSignedIn, router, user?.uid])
 
 	const handleOnClick = async (provider: AuthProvider) => {
 		try {

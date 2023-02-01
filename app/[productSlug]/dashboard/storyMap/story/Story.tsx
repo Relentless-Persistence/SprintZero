@@ -2,26 +2,28 @@
 
 import clsx from "clsx"
 import {motion} from "framer-motion"
-import {useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Story as StoryType} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryContent from "./StoryContent"
-import {storyMapStateAtom} from "../atoms"
 import {dragState, elementRegistry, storyMapMeta} from "../utils/globals"
 
 export type StoryProps = {
-	story: StoryType
+	activeProduct: WithDocumentData<Product>
+	storyMapState: WithDocumentData<StoryMapState>
+	storyId: string
 	inert?: boolean
 }
 
-const Story: FC<StoryProps> = ({story, inert = false}) => {
-	const storyMapState = useAtomValue(storyMapStateAtom)
-	const storyMeta = storyMapMeta.current[story.id]
-	const parentFeature = storyMapState?.features.find((feature) => feature.id === storyMeta?.parent)
+const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId, inert = false}) => {
+	const storyMeta = storyMapMeta.current[storyId]
+	const parentFeature = storyMapState.features.find((feature) => feature.id === storyMeta?.parent)
 	const parentEpicId = parentFeature && storyMapMeta.current[parentFeature.id]?.parent
+	const story = storyMapState.stories.find((story) => story.id === storyId)!
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
@@ -62,7 +64,7 @@ const Story: FC<StoryProps> = ({story, inert = false}) => {
 			ref={containerRef}
 		>
 			<div className="cursor-grab touch-none select-none transition-transform hover:scale-105" ref={contentRef}>
-				<StoryContent story={story} />
+				<StoryContent activeProduct={activeProduct} storyMapState={storyMapState} storyId={story.id} />
 			</div>
 		</motion.div>
 	)

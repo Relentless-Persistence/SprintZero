@@ -1,11 +1,12 @@
 import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
-import {Card, Form, Input, Button} from "antd5"
+import {Card, Form, Input, Button} from "antd"
 import {diffArrays} from "diff"
-import {Timestamp} from "firebase9/firestore"
+import {doc, Timestamp} from "firebase/firestore"
 import produce from "immer"
-import {useAtomValue} from "jotai"
 import {nanoid} from "nanoid"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 import {useFieldArray, useForm} from "react-hook-form"
 import {z} from "zod"
 
@@ -15,8 +16,10 @@ import type {Id} from "~/types"
 import {generateProductVision} from "./getGptResponse"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {updateProduct} from "~/utils/api/mutations"
-import {activeProductAtom, userIdAtom} from "~/utils/atoms"
+import {auth, db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const listToSentence = (list: string[]) => {
 	if (list.length === 0) return ``
@@ -37,8 +40,9 @@ export type BuildStatementProps = {
 }
 
 const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
-	const activeProduct = useAtomValue(activeProductAtom)
-	const userId = useAtomValue(userIdAtom)
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [user] = useAuthState(auth)
 	const [status, setStatus] = useState<`initial` | `submitted` | `finished`>(`initial`)
 
 	const {control, handleSubmit} = useForm<FormInputs>({
@@ -101,7 +105,7 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 			if (operations.length > 0)
 				draft.updates.push({
 					id: nanoid(),
-					userId: userId as Id,
+					userId: user!.uid as Id,
 					text: operationsText,
 					timestamp: Timestamp.now(),
 				})

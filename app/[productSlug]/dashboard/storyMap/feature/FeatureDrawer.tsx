@@ -1,16 +1,21 @@
 import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
 import {Button, Drawer, Form, Input, Tag, Typography} from "antd"
+import {doc} from "firebase/firestore"
 import produce from "immer"
-import {useAtom, useAtomValue} from "jotai"
+import {useAtom} from "jotai"
 import {useState} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Feature} from "~/types/db/StoryMapStates"
 
 import {storyMapStateAtom} from "../atoms"
 import Comments from "~/components/Comments"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {deleteFeature, updateFeature} from "~/utils/api/mutations"
 import dollarFormat from "~/utils/dollarFormat"
+import {db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type FeatureDrawerProps = {
 	feature: Feature
@@ -19,7 +24,9 @@ export type FeatureDrawerProps = {
 }
 
 const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+
 	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
 	const [editMode, setEditMode] = useState(false)
 	const [draftTitle, setDraftTitle] = useState(feature.name)
@@ -48,7 +55,7 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 						{editMode ? (
 							<button
 								type="button"
-								onClick={async () =>
+								onClick={() =>
 									void deleteFeature({
 										storyMapState: storyMapState!,
 										featureId: feature.id,
@@ -131,7 +138,7 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({feature, isOpen, onClose}) => {
 							<Input.TextArea
 								rows={4}
 								value={feature.description}
-								onChange={async (e) => {
+								onChange={(e) => {
 									updateLocalFeatureDescription(e.target.value)
 									updateFeature({
 										storyMapState: storyMapState!,

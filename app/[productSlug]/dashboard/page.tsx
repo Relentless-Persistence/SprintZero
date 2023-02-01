@@ -37,7 +37,9 @@ const Dashboard: FC = () => {
 							storyMapScrollPosition.current = e.currentTarget.scrollLeft
 						}}
 					>
-						{currentVersionId !== undefined && <StoryMap currentVersionId={currentVersionId} />}
+						{activeProduct !== undefined && currentVersionId !== undefined && (
+							<StoryMap activeProduct={activeProduct} currentVersionId={currentVersionId} />
+						)}
 					</motion.div>
 				</div>
 			</div>

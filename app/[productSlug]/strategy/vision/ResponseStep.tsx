@@ -1,11 +1,14 @@
-import {Button, Card, Space, Skeleton} from "antd5"
-import {useAtomValue} from "jotai"
+import {Button, Card, Space, Skeleton} from "antd"
+import {doc} from "firebase/firestore"
 import {useState} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
 import {generateProductVision} from "./getGptResponse"
-import {activeProductAtom} from "~/utils/atoms"
+import {ProductConverter, Products} from "~/types/db/Products"
+import {db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type ResponseStepProps = {
 	gptResponse: string | undefined
@@ -14,7 +17,8 @@ export type ResponseStepProps = {
 }
 
 const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFinish}) => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 	const [isRedoing, setIsRedoing] = useState(false)
 
 	return (

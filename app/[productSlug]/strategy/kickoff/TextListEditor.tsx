@@ -1,5 +1,5 @@
 import {MinusCircleOutlined, PlusCircleOutlined} from "@ant-design/icons"
-import {Button, Input} from "antd5"
+import {Button, Input} from "antd"
 import produce from "immer"
 import {nanoid} from "nanoid"
 

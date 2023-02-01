@@ -2,12 +2,15 @@ import {FlagOutlined, SendOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Input} from "antd"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
 
 import {addComment} from "~/utils/api/mutations"
 import {getComment, getUser} from "~/utils/api/queries"
+import {auth} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type CommentsProps = {
 	commentList: Id[]
@@ -17,7 +20,8 @@ export type CommentsProps = {
 }
 
 const Comments: FC<CommentsProps> = ({commentList, onCommentListChange, flagged, onFlag}) => {
-	const userId = useUserId()
+	const activeProductId = useActiveProductId()
+	const [user] = useAuthState(auth)
 	const [commentDraft, setCommentDraft] = useState(``)
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -26,7 +30,7 @@ const Comments: FC<CommentsProps> = ({commentList, onCommentListChange, flagged,
 			comment: {
 				text: commentDraft,
 				type: `code`,
-				authorId: userId!,
+				authorId: user!.uid as Id,
 			},
 		})
 		onCommentListChange([...commentList, id])
@@ -34,7 +38,10 @@ const Comments: FC<CommentsProps> = ({commentList, onCommentListChange, flagged,
 	}
 
 	const comments = useQueries({
-		queries: commentList.map((comment) => ({queryKey: [`comment`, comment], queryFn: getComment(comment)})),
+		queries: commentList.map((comment) => ({
+			queryKey: [`comment`, comment],
+			queryFn: getComment(comment, activeProductId),
+		})),
 	})
 
 	const commentAuthors = useQueries({
@@ -55,7 +62,7 @@ const Comments: FC<CommentsProps> = ({commentList, onCommentListChange, flagged,
 					) : (
 						comments.map((comment) => {
 							if (!comment.data) return null
-							const author = commentAuthors.find((author) => author.data?.id === comment.data.authorId)?.data
+							const author = commentAuthors.find((author) => author.data?.id === comment.data?.authorId)?.data
 							return (
 								<div key={comment.data.id} className="flex gap-2">
 									<Avatar src={author?.avatar} />

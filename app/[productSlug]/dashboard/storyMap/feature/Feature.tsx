@@ -6,7 +6,9 @@ import {useAtomValue} from "jotai"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {Feature as FeatureType} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import FeatureContent from "./FeatureContent"
 import StoryList from "./StoryList"
@@ -14,42 +16,45 @@ import {currentVersionAtom} from "../atoms"
 import {dragState, elementRegistry, storyMapMeta} from "../utils/globals"
 
 export type FeatureProps = {
-	feature: FeatureType
+	activeProduct: WithDocumentData<Product>
+	storyMapState: WithDocumentData<StoryMapState>
+	featureId: string
 	inert?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({feature, inert = false}) => {
+const Feature: FC<FeatureProps> = ({activeProduct, storyMapState, featureId, inert = false}) => {
 	const currentVersion = useAtomValue(currentVersionAtom)
-	const featureMeta = storyMapMeta.current[feature.id]
+	const feature = storyMapState.features.find((feature) => feature.id === featureId)!
+	const featureMeta = storyMapMeta.current[featureId]
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
 		if (inert || !containerRef.current || !contentRef.current) return
-		elementRegistry[feature.id] = {
+		elementRegistry[featureId] = {
 			container: containerRef.current,
 			content: contentRef.current,
 		}
 		return () => {
 			if (!containerRef.current || !contentRef.current) return
-			elementRegistry[feature.id] = {
+			elementRegistry[featureId] = {
 				container: containerRef.current, // eslint-disable-line react-hooks/exhaustive-deps
 				content: contentRef.current, // eslint-disable-line react-hooks/exhaustive-deps
 			}
 		}
-	}, [feature.id, inert])
+	}, [featureId, inert])
 
 	return (
 		<motion.div
 			layoutId={
-				dragState.current?.id === featureMeta?.parent || dragState.current?.id === feature.id
+				dragState.current?.id === featureMeta?.parent || dragState.current?.id === featureId
 					? undefined
-					: `feature-${feature.id}`
+					: `feature-${featureId}`
 			}
 			layout={
-				dragState.current?.id === featureMeta?.parent || dragState.current?.id === feature.id ? undefined : `position`
+				dragState.current?.id === featureMeta?.parent || dragState.current?.id === featureId ? undefined : `position`
 			}
-			className={clsx(`flex flex-col items-center`, dragState.current?.id === feature.id && !inert && `invisible`)}
+			className={clsx(`flex flex-col items-center`, dragState.current?.id === featureId && !inert && `invisible`)}
 			ref={containerRef}
 		>
 			<div className="cursor-grab touch-none select-none transition-transform hover:scale-105" ref={contentRef}>
@@ -60,7 +65,7 @@ const Feature: FC<FeatureProps> = ({feature, inert = false}) => {
 				<div className="h-8 w-px border border-dashed border-[#006378]" />
 			)}
 
-			<StoryList feature={feature} inert={inert} />
+			<StoryList activeProduct={activeProduct} storyMapState={storyMapState} featureId={featureId} inert={inert} />
 		</motion.div>
 	)
 }

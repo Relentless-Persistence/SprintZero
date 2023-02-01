@@ -1,27 +1,27 @@
 "use client"
 
-import {Breadcrumb} from "antd5"
-import {doc, onSnapshot} from "firebase9/firestore"
-import {useEffect, useRef, useState} from "react"
+import {Breadcrumb} from "antd"
+import {doc} from "firebase/firestore"
+import {useEffect, useRef} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
 
 import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
+import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
-import {StoryMapStates, StoryMapStateSchema} from "~/types/db/StoryMapStates"
 
-const EpicsTab: FC = () => {
-	const [storyMapState, setStoryMapState] = useState<StoryMapState>()
-	useEffect(
-		() =>
-			onSnapshot(doc(db, StoryMapStates._), (doc) => {
-				const data = StoryMapStateSchema.parse({id: doc.id, ...doc.data()})
-				setStoryMapState(data)
-			}),
-		[],
+export type EpicsTabProps = {
+	activeProduct: WithDocumentData<Product>
+}
+
+const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
+	const [storyMapState] = useDocumentData(
+		doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
 	)
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)

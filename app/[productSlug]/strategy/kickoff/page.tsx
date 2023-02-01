@@ -1,18 +1,22 @@
 "use client"
 
-import {Breadcrumb, Card, Input} from "antd5"
-import {useAtomValue} from "jotai"
+import {Breadcrumb, Card, Input} from "antd"
+import {doc} from "firebase/firestore"
 import {useState} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
 import EditButtons from "./EditButtons"
 import TextListEditor from "./TextListEditor"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {updateProduct} from "~/utils/api/mutations"
-import {activeProductAtom} from "~/utils/atoms"
+import {db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const KickoffPage: FC = () => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 	const [editingSection, setEditingSection] = useState<
 		`problemStatement` | `personas` | `successMetrics` | `businessPriorities` | undefined
 	>(undefined)

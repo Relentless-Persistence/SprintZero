@@ -7,6 +7,7 @@ import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
+import type {WithDocumentData} from "~/types"
 import type {Epic as EpicType, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
@@ -16,7 +17,7 @@ import {setStoryMapState} from "~/utils/api/mutations"
 const debouncedSetStoryMapState = debounce(setStoryMapState, 100)
 
 export type EpicProps = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	epic: EpicType
 }
 

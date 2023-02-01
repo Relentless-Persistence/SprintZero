@@ -1,42 +1,34 @@
 "use client"
 
 import {AimOutlined} from "@ant-design/icons"
-import {Input, Breadcrumb, Button, Card, Empty} from "antd5"
-import {collection, onSnapshot, query, where} from "firebase9/firestore"
+import {Input, Breadcrumb, Button, Card, Empty} from "antd"
+import {collection, query, where} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
-import {useState, useEffect} from "react"
+import {useState} from "react"
+import {useCollectionData} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {Objective} from "~/types/db/Objectives"
 
-import {db} from "~/utils/firebase"
-import {Objectives, ObjectiveSchema} from "~/types/db/Objectives"
+import {ObjectiveConverter, Objectives} from "~/types/db/Objectives"
 import {updateObjective} from "~/utils/api/mutations"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const ObjectivesPage: FC = () => {
 	const activeProductId = useActiveProductId()
 
-	const [objectives, setObjectives] = useState<Objective[]>([])
-	useEffect(
-		() =>
-			onSnapshot(query(collection(db, Objectives._), where(Objectives.productId, `==`, activeProductId)), (docs) => {
-				const data: Objective[] = []
-				docs.forEach((doc) => {
-					const _data = ObjectiveSchema.parse({...doc.data(), id: doc.id})
-					data.push(_data)
-				})
-				setObjectives(data)
-			}),
-		[activeProductId],
+	const [objectives] = useCollectionData(
+		query(collection(db, Objectives._), where(Objectives.productId, `==`, activeProductId)).withConverter(
+			ObjectiveConverter,
+		),
 	)
 
 	const [resultDraft, setResultDraft] = useState<{name: string; text: string} | undefined>(undefined)
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<Id | undefined>(undefined)
-	const currentObjective = objectives.find((objective) => objective.id === currentObjectiveId)
+	const currentObjective = objectives?.find((objective) => objective.id === currentObjectiveId)
 	const [title, setTitle] = useState(``)
 	const [activeResultId, setActiveResultId] = useState<string | undefined>(undefined)
 

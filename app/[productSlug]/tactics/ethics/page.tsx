@@ -1,25 +1,24 @@
 "use client"
 
 import {Breadcrumb, Card} from "antd"
-import {doc, onSnapshot} from "firebase/firestore"
-import {useEffect, useState} from "react"
+import {doc} from "firebase/firestore"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Story from "./Story"
-import {StoryMapStateSchema, StoryMapStates} from "~/types/db/StoryMapStates"
+import {ProductConverter, Products} from "~/types/db/Products"
+import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const EthicsPage: FC = () => {
-	const [storyMapState, setStoryMapState] = useState<StoryMapState>()
-	useEffect(
-		() =>
-			onSnapshot(doc(db, StoryMapStates._), (doc) => {
-				const data = StoryMapStateSchema.parse({id: doc.id, ...doc.data()})
-				setStoryMapState(data)
-			}),
-		[],
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [storyMapState] = useDocumentData(
+		activeProduct
+			? doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
+			: undefined,
 	)
 
 	return (
@@ -41,44 +40,47 @@ const EthicsPage: FC = () => {
 				<div className="grid w-full grow grid-cols-3 gap-6">
 					<Card title="Identified">
 						<div className="space-y-4">
-							{storyMapState?.stories
-								.filter((story) => story.ethicsColumn === `identified`)
-								.map((story) => (
-									<Story
-										key={story.id}
-										storyMapState={storyMapState}
-										setStoryMapState={setStoryMapState}
-										story={story}
-									/>
-								))}
+							{activeProduct &&
+								storyMapState?.stories
+									.filter((story) => story.ethicsColumn === `identified`)
+									.map((story) => (
+										<Story
+											key={story.id}
+											activeProduct={activeProduct}
+											storyMapState={storyMapState}
+											storyId={story.id}
+										/>
+									))}
 						</div>
 					</Card>
 					<Card title="Under Review">
 						<div className="space-y-4">
-							{storyMapState?.stories
-								.filter((story) => story.ethicsColumn === `underReview`)
-								.map((story) => (
-									<Story
-										key={story.id}
-										storyMapState={storyMapState}
-										setStoryMapState={setStoryMapState}
-										story={story}
-									/>
-								))}
+							{activeProduct &&
+								storyMapState?.stories
+									.filter((story) => story.ethicsColumn === `underReview`)
+									.map((story) => (
+										<Story
+											key={story.id}
+											activeProduct={activeProduct}
+											storyMapState={storyMapState}
+											storyId={story.id}
+										/>
+									))}
 						</div>
 					</Card>
 					<Card title="Adjudicated">
 						<div className="space-y-4">
-							{storyMapState?.stories
-								.filter((story) => story.ethicsColumn === `adjudicated`)
-								.map((story) => (
-									<Story
-										key={story.id}
-										storyMapState={storyMapState}
-										setStoryMapState={setStoryMapState}
-										story={story}
-									/>
-								))}
+							{activeProduct &&
+								storyMapState?.stories
+									.filter((story) => story.ethicsColumn === `adjudicated`)
+									.map((story) => (
+										<Story
+											key={story.id}
+											activeProduct={activeProduct}
+											storyMapState={storyMapState}
+											storyId={story.id}
+										/>
+									))}
 						</div>
 					</Card>
 				</div>

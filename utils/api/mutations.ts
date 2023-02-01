@@ -3,7 +3,7 @@ import produce from "immer"
 import {nanoid} from "nanoid"
 
 import type {SetRequired} from "type-fest"
-import type {Id} from "~/types"
+import type {Id, WithDocumentData} from "~/types"
 import type {AccessibilityItem} from "~/types/db/AccessibilityItems"
 import type {Comment} from "~/types/db/Comments"
 import type {Objective} from "~/types/db/Objectives"
@@ -55,7 +55,7 @@ export const updateProduct = async ({id, data}: UpdateProductVars): Promise<void
 }
 
 type AddEpicVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	data: Partial<Epic>
 	position?: number
 }
@@ -88,7 +88,7 @@ export const addEpic = async ({storyMapState, data: initialData, position}: AddE
 }
 
 type UpdateEpicVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	epicId: string
 	data: Partial<Pick<Epic, `description` | `name` | `commentIds` | `keeperIds`>>
 }
@@ -105,7 +105,7 @@ export const updateEpic = async ({storyMapState, epicId, data}: UpdateEpicVars):
 }
 
 type DeleteEpicVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	epicId: string
 }
 
@@ -114,11 +114,11 @@ export const deleteEpic = async ({storyMapState, epicId}: DeleteEpicVars): Promi
 		state.epics = state.epics.filter(({id}) => id !== epicId)
 	})
 
-	updateDoc(doc(db, StoryMapStates._, storyMapState.id), newStoryMapState)
+	await updateDoc(doc(db, StoryMapStates._, storyMapState.id), newStoryMapState)
 }
 
 type AddFeatureVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	epicId: string
 	data: Partial<Feature>
 	position?: number
@@ -161,7 +161,7 @@ export const addFeature = async ({
 }
 
 type DeleteFeatureVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	featureId: string
 }
 
@@ -172,11 +172,11 @@ export const deleteFeature = async ({storyMapState, featureId}: DeleteFeatureVar
 		epic.featureIds = epic.featureIds.filter((id) => id !== featureId)
 		state.features.filter(({id}) => id !== featureId)
 	})
-	updateDoc(doc(db, StoryMapStates._, storyMapState.id), newStoryMapState)
+	await updateDoc(doc(db, StoryMapStates._, storyMapState.id), newStoryMapState)
 }
 
 type UpdateFeatureVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	featureId: string
 	data: Partial<Pick<Feature, `description` | `name` | `commentIds`>>
 }
@@ -193,7 +193,7 @@ export const updateFeature = async ({storyMapState, featureId, data}: UpdateFeat
 }
 
 type AddStoryVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	featureId: string
 	data: SetRequired<Partial<Story>, `versionId`>
 	position?: number
@@ -232,7 +232,7 @@ export const addStory = async ({
 }
 
 type DeleteStoryVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	storyId: string
 }
 
@@ -247,7 +247,7 @@ export const deleteStory = async ({storyMapState, storyId}: DeleteStoryVars): Pr
 }
 
 type UpdateStoryVars = {
-	storyMapState: StoryMapState
+	storyMapState: WithDocumentData<StoryMapState>
 	storyId: string
 	data: Partial<Story>
 }

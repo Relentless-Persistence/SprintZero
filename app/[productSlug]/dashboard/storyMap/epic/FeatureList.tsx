@@ -1,25 +1,38 @@
 import {CopyOutlined} from "@ant-design/icons"
-import {useAtomValue} from "jotai"
 
 import type {FC} from "react"
-import type {Epic as EpicType} from "~/types/db/StoryMapStates"
+import type {WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {storyMapStateAtom} from "../atoms"
 import Feature from "../feature/Feature"
 import {addFeature} from "~/utils/api/mutations"
 
 export type FeatureListProps = {
-	epic: EpicType
+	activeProduct: WithDocumentData<Product>
+	storyMapState: WithDocumentData<StoryMapState>
+	epicId: string
 	inert?: boolean
 }
 
-const FeatureList: FC<FeatureListProps> = ({epic, inert = false}) => {
-	const storyMapState = useAtomValue(storyMapStateAtom)
-	const features = epic.featureIds.map((id) => storyMapState?.features.find((feature) => feature.id === id))
+const FeatureList: FC<FeatureListProps> = ({activeProduct, storyMapState, epicId, inert = false}) => {
+	const epic = storyMapState.epics.find((epic) => epic.id === epicId)!
+	const features = epic.featureIds.map((id) => storyMapState.features.find((feature) => feature.id === id))
 
 	return (
 		<>
-			{features.map((feature) => feature && <Feature key={feature.id} feature={feature} inert={inert} />)}
+			{features.map(
+				(feature) =>
+					feature && (
+						<Feature
+							key={feature.id}
+							activeProduct={activeProduct}
+							storyMapState={storyMapState}
+							featureId={feature.id}
+							inert={inert}
+						/>
+					),
+			)}
 
 			{features.length === 0 && (
 				<button

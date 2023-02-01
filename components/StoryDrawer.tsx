@@ -10,19 +10,21 @@ import {
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {useQuery} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Tag, Input, Form, Radio} from "antd"
 import clsx from "clsx"
+import {collection, query, where} from "firebase/firestore"
 import produce from "immer"
-import {useAtomValue} from "jotai"
 import {nanoid} from "nanoid"
-import {useState} from "react"
+import {useEffect, useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import {useCollectionData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
-import type {SetStateAction} from "jotai"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Story, StoryMapState} from "~/types/db/StoryMapStates"
+import type {Id, WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
@@ -31,9 +33,10 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {sprintColumns} from "~/types/db/Products"
 import {StorySchema} from "~/types/db/StoryMapStates"
+import {VersionConverter, Versions} from "~/types/db/Versions"
 import {deleteStory, updateStory} from "~/utils/api/mutations"
-import {getAllVersions} from "~/utils/api/queries"
 import dollarFormat from "~/utils/dollarFormat"
+import {auth, db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {objectEntries, objectKeys} from "~/utils/objectMethods"
 
@@ -49,9 +52,9 @@ const formSchema = StorySchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
-	storyMapState: StoryMapState
-	setStoryMapState: (val: SetStateAction<StoryMapState>) => void
-	story: Story
+	activeProduct: WithDocumentData<Product>
+	storyMapState: WithDocumentData<StoryMapState>
+	storyId: string
 	isOpen: boolean
 	onClose: () => void
 	hideAdjudicationResponse?: boolean
@@ -60,19 +63,24 @@ export type StoryDrawerProps = {
 }
 
 const StoryDrawer: FC<StoryDrawerProps> = ({
+	activeProduct,
 	storyMapState,
-	setStoryMapState,
-	story,
+	storyId,
 	isOpen,
 	onClose,
 	hideAdjudicationResponse,
 	hideAcceptanceCriteria,
 	disableEditing,
 }) => {
+	const [user] = useAuthState(auth)
 	const [editMode, setEditMode] = useState(false)
-	const activeProduct = useAtomValue(activeProductAtom)
-	const userId = useUserId()
 	const [newAcceptanceCriterion, setNewAcceptanceCriterion] = useState(``)
+	const story = storyMapState.stories.find((story) => story.id === storyId)!
+	const [description, setDescription] = useState(story.description)
+
+	useEffect(() => {
+		setDescription(story.description)
+	}, [story.description])
 
 	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -93,20 +101,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 		setEditMode(false)
 	})
 
-	const {data: versions} = useQuery({
-		queryKey: [`all-versions`, activeProduct?.id],
-		queryFn: getAllVersions(activeProduct!.id),
-		enabled: activeProduct !== undefined,
-	})
-
-	const updateLocalStoryDescription = (newDescription: string) => {
-		setStoryMapState((cur) =>
-			produce(cur, (draft) => {
-				const index = draft.stories.findIndex(({id}) => id === story.id)
-				draft.stories[index]!.description = newDescription
-			}),
-		)
-	}
+	const [versions] = useCollectionData(
+		query(collection(db, Versions._), where(Versions.productId, `==`, activeProduct.id)).withConverter(
+			VersionConverter,
+		),
+	)
 
 	const toggleAcceptanceCriterion = (id: string, checked: boolean) => {
 		const newAcceptanceCriteria = produce(story.acceptanceCriteria, (draft) => {
@@ -133,8 +132,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 	}
 
 	const addVote = (vote: boolean) => {
-		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== userId)
-		ethicsVotes.push({userId: userId!, vote})
+		if (!user) return
+		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== user.uid)
+		ethicsVotes.push({userId: user.uid as Id, vote})
 		const votingComplete = ethicsVotes.length === objectKeys(activeProduct!.members).length
 
 		let ethicsColumn: `identified` | `underReview` | `adjudicated` = `identified`
@@ -165,7 +165,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 							<Button
 								type="primary"
 								danger
-								onClick={async () =>
+								onClick={() =>
 									void deleteStory({
 										storyMapState,
 										storyId: story.id,
@@ -181,13 +181,13 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 										{story.points} point{story.points === 1 ? `` : `s`}
 									</Tag>
 									<Tag
-										color={typeof activeProduct?.effortCost === `number` ? `#585858` : `#f5f5f5`}
+										color={typeof activeProduct.effortCost === `number` ? `#585858` : `#f5f5f5`}
 										icon={<DollarOutlined />}
 										className={clsx(
-											typeof activeProduct?.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
+											typeof activeProduct.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
 										)}
 									>
-										{dollarFormat((activeProduct?.effortCost ?? 0) * story.points)}
+										{dollarFormat((activeProduct.effortCost ?? 0) * story.points)}
 									</Tag>
 									<Tag color="#585858" icon={<FlagOutlined />}>
 										{sprintColumns[story.sprintColumn]}
@@ -355,9 +355,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 							<p className="text-xl font-semibold text-[#595959]">Story</p>
 							<Input.TextArea
 								rows={4}
-								value={story.description}
-								onChange={async (e) => {
-									updateLocalStoryDescription(e.target.value)
+								value={description}
+								onChange={(e) => {
+									setDescription(e.target.value)
 									updateStory({
 										storyMapState,
 										storyId: story.id,

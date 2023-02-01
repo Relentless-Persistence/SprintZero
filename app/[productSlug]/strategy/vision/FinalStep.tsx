@@ -1,4 +1,4 @@
-import {Button, Card, Input, Skeleton, Space} from "antd5"
+import {Button, Card, Input, Skeleton, Space} from "antd"
 import {useEffect, useState} from "react"
 
 import type {FC} from "react"

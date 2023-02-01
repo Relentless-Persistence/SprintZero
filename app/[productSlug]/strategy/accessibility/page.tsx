@@ -1,25 +1,24 @@
 "use client"
 
 import {GlobalOutlined} from "@ant-design/icons"
-import {Button, Empty, Breadcrumb, Card, Input, Tabs} from "antd5"
-import {collection, onSnapshot, query, where} from "firebase9/firestore"
-import {useAtomValue} from "jotai"
+import {Button, Empty, Breadcrumb, Card, Input, Tabs} from "antd"
+import {collection, doc, query, where} from "firebase/firestore"
 import {useState, useEffect} from "react"
+import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {Id} from "~/types"
-import type {AccessibilityItem} from "~/types/db/AccessibilityItems"
 
 import LinkTo from "~/components/LinkTo"
-import {db} from "~/utils/firebase"
-import {AccessibilityItems, AccessibilityItemSchema} from "~/types/db/AccessibilityItems"
+import {AccessibilityItemConverter, AccessibilityItems} from "~/types/db/AccessibilityItems"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {
 	addAccessibilityItem,
 	deleteAccessibilityItem,
 	updateAccessibilityItem,
 	updateProduct,
 } from "~/utils/api/mutations"
-import {activeProductAtom} from "~/utils/atoms"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const descriptions = {
@@ -37,30 +36,20 @@ const Accessibility = () => {
 	const [itemDraft, setItemDraft] = useState<{name: string; text: string} | undefined>(undefined)
 	const [missionStatement, setMissionStatement] = useState(``)
 
-	const activeProduct = useAtomValue(activeProductAtom)
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 
 	useEffect(() => {
 		setMissionStatement(activeProduct?.accessibilityMissionStatements[currentTab] ?? ``)
 	}, [activeProduct?.accessibilityMissionStatements, currentTab])
 
-	const [accessibilityItems, setAccessibilityItems] = useState<AccessibilityItem[]>([])
-	useEffect(
-		() =>
-			onSnapshot(
-				query(collection(db, AccessibilityItems._), where(AccessibilityItems.productId, `==`, activeProductId)),
-				(docs) => {
-					const data: AccessibilityItem[] = []
-					docs.forEach((doc) => {
-						const _data = AccessibilityItemSchema.parse({...doc.data(), id: doc.id})
-						data.push(_data)
-					})
-					setAccessibilityItems(data)
-				},
-			),
-		[activeProductId],
+	const [accessibilityItems] = useCollectionData(
+		query(
+			collection(db, AccessibilityItems._),
+			where(AccessibilityItems.productId, `==`, activeProductId),
+		).withConverter(AccessibilityItemConverter),
 	)
 
-	const currentItems = accessibilityItems.filter((item) => item.type === currentTab)
+	const currentItems = accessibilityItems?.filter((item) => item.type === currentTab)
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
@@ -105,13 +94,13 @@ const Accessibility = () => {
 					}}
 				/>
 
-				{accessibilityItems.length > 0 && (
+				{accessibilityItems && accessibilityItems.length > 0 && (
 					<Masonry
 						breakpointCols={3}
 						className="grid grid-cols-3 gap-8"
 						columnClassName="bg-clip-padding space-y-8 !w-full"
 					>
-						{currentItems.map((item) => (
+						{currentItems?.map((item) => (
 							<Card
 								key={item.id}
 								type="inner"
@@ -247,7 +236,7 @@ const Accessibility = () => {
 					</Masonry>
 				)}
 
-				{currentItems.length === 0 && !itemDraft && (
+				{currentItems && currentItems.length === 0 && !itemDraft && (
 					<div className="grid grow place-items-center">
 						<div
 							style={{

@@ -1,21 +1,23 @@
 import {DislikeFilled, LikeFilled} from "@ant-design/icons"
 import {useState} from "react"
 
-import type {SetStateAction} from "jotai"
 import type {FC} from "react"
+import type {WithDocumentData} from "~/types"
+import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryDrawer from "~/components/StoryDrawer"
 import {Story} from "~/types/db/StoryMapStates"
 
 export type StoryProps = {
-	storyMapState: StoryMapState
-	setStoryMapState: (val: SetStateAction<StoryMapState>) => void
-	story: Story
+	activeProduct: WithDocumentData<Product>
+	storyMapState: WithDocumentData<StoryMapState>
+	storyId: string
 }
 
-const Story: FC<StoryProps> = ({storyMapState, setStoryMapState, story}) => {
-	const featureName = storyMapState.features.find((feature) => feature.storyIds.includes(story.id))?.name
+const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId}) => {
+	const story = storyMapState.stories.find((story) => story.id === storyId)!
+	const featureName = storyMapState.features.find((feature) => feature.storyIds.includes(storyId))?.name
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	return (
@@ -36,9 +38,9 @@ const Story: FC<StoryProps> = ({storyMapState, setStoryMapState, story}) => {
 			</button>
 
 			<StoryDrawer
+				activeProduct={activeProduct}
 				storyMapState={storyMapState}
-				setStoryMapState={setStoryMapState}
-				story={story}
+				storyId={storyId}
 				hideAcceptanceCriteria
 				disableEditing
 				isOpen={isDrawerOpen}

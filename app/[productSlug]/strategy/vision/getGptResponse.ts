@@ -1,4 +1,4 @@
-import {notification} from "antd5"
+import {notification} from "antd"
 import axios from "axios1"
 import {z} from "zod"
 
