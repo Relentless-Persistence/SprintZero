@@ -1,16 +1,18 @@
 "use client"
 
 import {ReadOutlined} from "@ant-design/icons"
-import {collection, onSnapshot, query, where} from "firebase9/firestore"
+import {collection, onSnapshot, query, where} from "firebase/firestore"
 import {motion, useAnimationFrame, useMotionTemplate, useMotionValue, useTransform} from "framer-motion"
-import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {useAtom, useSetAtom} from "jotai"
 import {useEffect, useRef} from "react"
 
 import type {StoryMapItem, StoryMapTarget} from "./utils/types"
+import type {DocumentReference} from "firebase/firestore"
 import type {FC} from "react"
+import type {Id, WithDocumentData} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {currentVersionAtom, dragPosAtom, dragStateAtom, storyMapStateAtom} from "./atoms"
+import {dragPosAtom, dragStateAtom, storyMapStateAtom} from "./atoms"
 import Epic from "./epic/Epic"
 import Feature from "./feature/Feature"
 import Story from "./story/Story"
@@ -18,28 +20,35 @@ import {calculateBoundaries, genStoryMapMeta, meta} from "./utils"
 import {dragState, elementRegistry, pointerLocation, storyMapTop} from "./utils/globals"
 import {moveItem} from "./utils/moving"
 import {getHoveringItems, getTargetLocation} from "./utils/targeting"
-import {db} from "~/config/firebase"
 import {StoryMapStates, StoryMapStateSchema} from "~/types/db/StoryMapStates"
 import {addEpic, setStoryMapState as setDbStoryMapState} from "~/utils/api/mutations"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const StoryMap: FC = () => {
+export type StoryMapProps = {
+	currentVersionId: Id | `__ALL_VERSIONS__`
+}
+
+const StoryMap: FC<StoryMapProps> = ({currentVersionId}) => {
 	const activeProductId = useActiveProductId()
 	const [storyMapState, setStoryMapState] = useAtom(storyMapStateAtom)
-	const currentVersion = useAtomValue(currentVersionAtom)
+
 	const setDragPos = useSetAtom(dragPosAtom)
 	const [reactDragState, setReactDragState] = useAtom(dragStateAtom)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
 
 	useEffect(() => {
-		if (!activeProductId) return
 		return onSnapshot(
 			query(collection(db, StoryMapStates._), where(StoryMapStates.productId, `==`, activeProductId)),
 			(docs) => {
 				const doc = docs.docs[0]
 				if (!doc) return
-				const data = StoryMapStateSchema.parse({id: doc.id, ...doc.data()})
+				const data: WithDocumentData<StoryMapState> = {
+					...StoryMapStateSchema.parse(doc.data()),
+					id: doc.id as Id,
+					ref: doc.ref as DocumentReference<StoryMapState>,
+				}
 				setStoryMapState(data)
 			},
 		)
@@ -66,15 +75,15 @@ const StoryMap: FC = () => {
 
 	useAnimationFrame(() => {
 		if (storyMapState) {
-			calculateBoundaries(storyMapState, currentVersion.id)
-			genStoryMapMeta(storyMapState, currentVersion.id)
+			calculateBoundaries(storyMapState, currentVersionId)
+			genStoryMapMeta(storyMapState, currentVersionId)
 		}
 	})
 
-	const originalStoryMapState = useRef<StoryMapState | undefined>(undefined)
+	const originalStoryMapState = useRef<WithDocumentData<StoryMapState> | undefined>(undefined)
 	const startTarget = useRef<StoryMapTarget | undefined>(undefined) // To see when the target changes
 	const draggingItem = useRef<StoryMapItem | undefined>(undefined) // Tracking which item is being dragged
-	const expectedStoryMapState = useRef<StoryMapState | undefined>(undefined)
+	const expectedStoryMapState = useRef<WithDocumentData<StoryMapState> | undefined>(undefined)
 
 	const handlePanStart = () => {
 		originalStoryMapState.current = storyMapState
@@ -169,8 +178,8 @@ const StoryMap: FC = () => {
 		)
 			return
 		expectedStoryMapState.current = undefined
-		calculateBoundaries(storyMapState, currentVersion.id)
-		genStoryMapMeta(storyMapState, currentVersion.id)
+		calculateBoundaries(storyMapState, currentVersionId)
+		genStoryMapMeta(storyMapState, currentVersionId)
 
 		if (!startTarget.current) {
 			startTarget.current = getTargetLocation()
@@ -185,7 +194,7 @@ const StoryMap: FC = () => {
 				originalStoryMapState.current,
 				draggingItem.current,
 				target,
-				currentVersion.id === `__ALL_VERSIONS__` ? undefined : currentVersion.id,
+				currentVersionId === `__ALL_VERSIONS__` ? undefined : currentVersionId,
 			)
 
 			if (JSON.stringify(newStoryMapState) === JSON.stringify(storyMapState)) return

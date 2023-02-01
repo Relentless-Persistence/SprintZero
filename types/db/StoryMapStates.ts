@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genDbNames, idSchema} from "~/types"
+import {genConverter, genDbNames, idSchema} from "~/types"
 
 export const EpicSchema = z.object({
 	id: z.string(),
@@ -74,8 +74,6 @@ export const StorySchema = z.object({
 export type Story = z.infer<typeof StorySchema>
 
 export const StoryMapStateSchema = z.object({
-	id: idSchema,
-
 	epics: z.array(EpicSchema),
 	features: z.array(FeatureSchema),
 	stories: z.array(StorySchema),
@@ -85,3 +83,4 @@ export const StoryMapStateSchema = z.object({
 
 export const StoryMapStates = genDbNames(`StoryMapStates`, StoryMapStateSchema)
 export type StoryMapState = z.infer<typeof StoryMapStateSchema>
+export const StoryMapStateConverter = genConverter(StoryMapStateSchema)

@@ -1,20 +1,14 @@
 "use client"
 
-import {QueryClientProvider} from "@tanstack/react-query"
-import {ConfigProvider} from "antd5"
-import {onAuthStateChanged} from "firebase9/auth"
-import {useSetAtom} from "jotai"
+import {ConfigProvider} from "antd"
 import {useRouter} from "next/navigation"
-import {useEffect} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
 import {z} from "zod"
 
 import type {ReactNode, FC} from "react"
-import type {Id} from "~/types"
 
 import "./styles.css"
-import {auth} from "~/config/firebase"
-import {queryClient} from "~/config/reactQuery"
-import {userIdAtom} from "~/utils/atoms"
+import {auth} from "~/utils/firebase"
 
 z.setErrorMap((issue, ctx) => {
 	switch (issue.code) {
@@ -33,30 +27,17 @@ export type RootLayoutProps = {
 }
 
 const RootLayout: FC<RootLayoutProps> = ({children}) => {
-	const setUserId = useSetAtom(userIdAtom)
+	const router = useRouter()
 
-	const {replace} = useRouter()
-	useEffect(() => {
-		const unsubscribe = onAuthStateChanged(auth, async (user) => {
-			if (!user) {
-				setUserId(`signed-out`)
-				replace(`/login`)
-				return
-			}
-			setUserId(user.uid as Id)
-		})
-
-		return unsubscribe
-	}, [setUserId, replace])
+	const [user, loading] = useAuthState(auth)
+	if (!user && !loading) router.replace(`/login`)
 
 	return (
 		<ConfigProvider theme={{token: {colorPrimary: `#4a801d`}}}>
-			<QueryClientProvider client={queryClient}>
-				<html lang="en" className="h-full">
-					<head></head>
-					<body className="h-full bg-[#f0f2f5] text-sm">{children}</body>
-				</html>
-			</QueryClientProvider>
+			<html lang="en" className="h-full">
+				<head></head>
+				<body className="h-full bg-[#f0f2f5] text-sm">{!loading && children}</body>
+			</html>
 		</ConfigProvider>
 	)
 }

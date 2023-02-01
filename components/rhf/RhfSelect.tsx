@@ -1,9 +1,9 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <Select /> otherwise. */
 
-import {Select} from "antd5"
+import {Select} from "antd"
 import {useController} from "react-hook-form"
 
-import type {SelectProps as AntdSelectProps} from "antd5"
+import type {SelectProps as AntdSelectProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"

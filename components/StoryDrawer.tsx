@@ -11,7 +11,7 @@ import {
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useQuery} from "@tanstack/react-query"
-import {Button, Checkbox, Drawer, Tag, Input, Form, Radio} from "antd5"
+import {Button, Checkbox, Drawer, Tag, Input, Form, Radio} from "antd"
 import clsx from "clsx"
 import produce from "immer"
 import {useAtomValue} from "jotai"
@@ -32,8 +32,7 @@ import RhfSelect from "~/components/rhf/RhfSelect"
 import {sprintColumns} from "~/types/db/Products"
 import {StorySchema} from "~/types/db/StoryMapStates"
 import {deleteStory, updateStory} from "~/utils/api/mutations"
-import {getVersionsByProduct} from "~/utils/api/queries"
-import {activeProductAtom, useUserId} from "~/utils/atoms"
+import {getAllVersions} from "~/utils/api/queries"
 import dollarFormat from "~/utils/dollarFormat"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {objectEntries, objectKeys} from "~/utils/objectMethods"
@@ -96,7 +95,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 
 	const {data: versions} = useQuery({
 		queryKey: [`all-versions`, activeProduct?.id],
-		queryFn: getVersionsByProduct(activeProduct!.id),
+		queryFn: getAllVersions(activeProduct!.id),
 		enabled: activeProduct !== undefined,
 	})
 

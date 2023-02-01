@@ -1,30 +1,35 @@
 "use client"
 
-import {useQuery} from "@tanstack/react-query"
+import {collection, query, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
+import {useEffect} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import {useCollectionDataOnce} from "react-firebase-hooks/firestore"
+import invariant from "tiny-invariant"
 
 import type {FC} from "react"
 
-import {getProductsByUser} from "~/utils/api/queries"
-import {useUserId} from "~/utils/atoms"
+import {ProductConverter, Products} from "~/types/db/Products"
+import {auth, db} from "~/utils/firebase"
 
 const HomePage: FC = () => {
 	const router = useRouter()
-	const userId = useUserId()
+	const [user] = useAuthState(auth)
+	invariant(user, `User must be logged in.`)
 
-	useQuery({
-		queryKey: [`all-products`, userId],
-		queryFn: getProductsByUser(userId!),
-		enabled: userId !== undefined,
-		onSuccess: (products) => {
-			const firstProduct = products[0]
-			if (firstProduct) {
-				router.replace(`/${firstProduct.id}/dashboard`)
-			} else {
-				router.replace(`/product`)
-			}
-		},
-	})
+	const [products, loading] = useCollectionDataOnce(
+		query(collection(db, Products._), where(`${Products.members}.${user.uid}.type`, `==`, `editor`)).withConverter(
+			ProductConverter,
+		),
+	)
+
+	useEffect(() => {
+		if (!products || loading) return
+
+		const firstProduct = products[0]
+		if (firstProduct) router.replace(`/${firstProduct.id}/dashboard`)
+		else router.replace(`/product`)
+	}, [loading, products, router])
 
 	return (
 		<div className="grid h-full place-items-center">

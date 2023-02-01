@@ -1,49 +1,84 @@
-import {collection, doc, getDoc, getDocs, orderBy, query, where} from "firebase9/firestore"
+import {collection, doc, getDoc, getDocs, orderBy, query, where} from "firebase/firestore"
 
-import type {Id} from "~/types"
+import type {DocumentReference} from "firebase/firestore"
+import type {Id, WithDocumentData} from "~/types"
 import type {Comment} from "~/types/db/Comments"
 import type {Product} from "~/types/db/Products"
 import type {User} from "~/types/db/Users"
 import type {Version} from "~/types/db/Versions"
 
-import {db} from "~/config/firebase"
+import {db} from "~/utils/firebase"
 import {Comments, CommentSchema} from "~/types/db/Comments"
 import {ProductSchema, Products} from "~/types/db/Products"
 import {Users, UserSchema} from "~/types/db/Users"
 import {VersionSchema, Versions} from "~/types/db/Versions"
 
-export const getUser = (id: Id) => async (): Promise<User> => {
-	const _data = await getDoc(doc(db, Users._, id))
-	const data = UserSchema.parse({id: _data.id, ..._data.data()})
-	return data
+export const getUser = (id: Id) => async (): Promise<WithDocumentData<User> | undefined> => {
+	try {
+		const data = await getDoc(doc(db, Users._, id))
+		return {
+			...UserSchema.parse(data.data()),
+			id: data.id as Id,
+			ref: data.ref as DocumentReference<User>,
+		}
+	} catch (e) {
+		console.error(e)
+	}
 }
 
-export const getProduct = (id: Id) => async (): Promise<Product> => {
-	const productDoc = await getDoc(doc(db, Products._, id))
-	const product = ProductSchema.parse({id: productDoc.id, ...productDoc.data()})
-	return product
+export const getProduct = (id: Id) => async (): Promise<WithDocumentData<Product> | undefined> => {
+	try {
+		const data = await getDoc(doc(db, Products._, id))
+		return {
+			...ProductSchema.parse(data.data()),
+			id: data.id as Id,
+			ref: data.ref as DocumentReference<Product>,
+		}
+	} catch (e) {
+		console.error(e)
+	}
 }
 
-export const getProductsByUser = (userId: Id) => async (): Promise<Product[]> => {
-	const _data = await getDocs(
-		// TODO: this is not the final intended query
-		query(collection(db, Products._), where(`${Products.members}.${userId}.type`, `==`, `editor`)),
-	)
-
-	const data = ProductSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-	return data
+export const getProductsByUser = (userId: Id) => async (): Promise<WithDocumentData<Product>[]> => {
+	try {
+		const data = await getDocs(
+			// TODO: this is not the final intended query
+			query(collection(db, Products._), where(`${Products.members}.${userId}.type`, `==`, `editor`)),
+		)
+		return data.docs.map((doc) => ({
+			...ProductSchema.parse(doc.data()),
+			id: doc.id as Id,
+			ref: doc.ref as DocumentReference<Product>,
+		}))
+	} catch (e) {
+		console.error(e)
+		return []
+	}
 }
 
-export const getVersionsByProduct = (productId: Id) => async (): Promise<Version[]> => {
-	const _data = await getDocs(
-		query(collection(db, Versions._), where(Versions.productId, `==`, productId), orderBy(Versions.name)),
-	)
-	const data = VersionSchema.array().parse(_data.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-	return data
+export const getAllVersions = (productId: Id) => async (): Promise<WithDocumentData<Version>[]> => {
+	try {
+		const data = await getDocs(query(collection(db, Products._, productId, Versions._), orderBy(Versions.name)))
+		return data.docs.map((doc) => ({
+			...VersionSchema.parse(doc.data()),
+			id: doc.id as Id,
+			ref: doc.ref as DocumentReference<Version>,
+		}))
+	} catch (e) {
+		console.error(e)
+		return []
+	}
 }
 
-export const getComment = (id: Id) => async (): Promise<Comment> => {
-	const _data = await getDoc(doc(db, Comments._, id))
-	const data = CommentSchema.parse({id: _data.id, ..._data.data()})
-	return data
+export const getComment = (id: Id, productId: Id) => async (): Promise<WithDocumentData<Comment> | undefined> => {
+	try {
+		const data = await getDoc(doc(db, Products._, productId, Comments._, id))
+		return {
+			...CommentSchema.parse(data.data()),
+			id: data.id as Id,
+			ref: data.ref as DocumentReference<Comment>,
+		}
+	} catch (e) {
+		console.error(e)
+	}
 }

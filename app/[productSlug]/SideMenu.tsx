@@ -7,7 +7,7 @@ import {
 	PullRequestOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
-import {Menu} from "antd5"
+import {Menu} from "antd"
 import Link from "next/link"
 import {usePathname} from "next/navigation"
 import {useState} from "react"
@@ -113,7 +113,7 @@ const SideMenu: FC = () => {
 	const pathname = usePathname()
 	const activeProductId = useActiveProductId()
 
-	const items = getItems(activeProductId ?? (`` as Id))
+	const items = getItems(activeProductId)
 	const [openKey, setOpenKey] = useState<string | undefined>(
 		items.find((item) => item.children?.find((child) => child.key === pathname?.replace(/^\/[^/]+\//, ``)))?.key,
 	)

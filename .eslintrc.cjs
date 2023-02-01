@@ -44,6 +44,7 @@ module.exports = {
 		"no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
 		"object-shorthand": `warn`,
 		quotes: [`warn`, `backtick`],
+		"require-await": `warn`,
 		yoda: `warn`,
 	},
 	overrides: [

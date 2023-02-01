@@ -1,6 +1,6 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
-import {Avatar, Button, Input} from "antd5"
+import {Avatar, Button, Input} from "antd"
 import {useState} from "react"
 
 import type {FC} from "react"
@@ -8,7 +8,6 @@ import type {Id} from "~/types"
 
 import {addComment} from "~/utils/api/mutations"
 import {getComment, getUser} from "~/utils/api/queries"
-import {useUserId} from "~/utils/atoms"
 
 export type CommentsProps = {
 	commentList: Id[]

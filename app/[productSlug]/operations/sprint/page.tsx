@@ -8,7 +8,7 @@ import type {FC} from "react"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Story from "./Story"
-import {db} from "~/config/firebase"
+import {db} from "~/utils/firebase"
 import {StoryMapStates, StoryMapStateSchema} from "~/types/db/StoryMapStates"
 
 const SprintPage: FC = () => {

@@ -1,5 +1,5 @@
 import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
-import {Button, Drawer, Form, Input, Tag, Typography} from "antd5"
+import {Button, Drawer, Form, Input, Tag, Typography} from "antd"
 import produce from "immer"
 import {useAtom, useAtomValue} from "jotai"
 import {useState} from "react"
@@ -10,7 +10,6 @@ import type {Feature} from "~/types/db/StoryMapStates"
 import {storyMapStateAtom} from "../atoms"
 import Comments from "~/components/Comments"
 import {deleteFeature, updateFeature} from "~/utils/api/mutations"
-import {activeProductAtom} from "~/utils/atoms"
 import dollarFormat from "~/utils/dollarFormat"
 
 export type FeatureDrawerProps = {

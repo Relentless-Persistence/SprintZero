@@ -1,6 +1,6 @@
-import {initializeApp} from "firebase9/app"
-import {getAuth, GoogleAuthProvider, OAuthProvider} from "firebase9/auth"
-import {getFirestore} from "firebase9/firestore"
+import {initializeApp} from "firebase/app"
+import {getAuth, GoogleAuthProvider, OAuthProvider} from "firebase/auth"
+import {connectFirestoreEmulator, getFirestore} from "firebase/firestore"
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY,
@@ -15,6 +15,7 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+connectFirestoreEmulator(db, `localhost`, 8080)
 
 export const googleAuthProvider = new GoogleAuthProvider()
 export const appleAuthProvider = new OAuthProvider(`apple.com`)

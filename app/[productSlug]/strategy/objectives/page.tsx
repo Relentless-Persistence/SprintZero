@@ -12,7 +12,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Objective} from "~/types/db/Objectives"
 
-import {db} from "~/config/firebase"
+import {db} from "~/utils/firebase"
 import {Objectives, ObjectiveSchema} from "~/types/db/Objectives"
 import {updateObjective} from "~/utils/api/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"

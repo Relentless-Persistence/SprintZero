@@ -11,7 +11,7 @@ import type {Id} from "~/types"
 import type {AccessibilityItem} from "~/types/db/AccessibilityItems"
 
 import LinkTo from "~/components/LinkTo"
-import {db} from "~/config/firebase"
+import {db} from "~/utils/firebase"
 import {AccessibilityItems, AccessibilityItemSchema} from "~/types/db/AccessibilityItems"
 import {
 	addAccessibilityItem,

@@ -1,5 +1,5 @@
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Form} from "antd5"
+import {Form} from "antd"
 import clsx from "clsx"
 import {useEffect} from "react"
 import {useForm, useWatch} from "react-hook-form"

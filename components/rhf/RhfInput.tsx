@@ -1,9 +1,9 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <Input /> otherwise. */
 
-import {Input} from "antd5"
+import {Input} from "antd"
 import {useController} from "react-hook-form"
 
-import type {InputProps as AntdInputProps} from "antd5"
+import type {InputProps as AntdInputProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"

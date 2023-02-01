@@ -1,11 +1,9 @@
-import {Timestamp} from "firebase9/firestore"
+import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genDbNames, idSchema} from "~/types"
+import {genDbNames, idSchema, genConverter} from "~/types"
 
 export const ProductSchema = z.object({
-	id: idSchema,
-
 	// General product info
 	cadence: z.number(),
 	effortCost: z.number().nullable(),
@@ -66,6 +64,7 @@ export const ProductSchema = z.object({
 
 export const Products = genDbNames(`Products`, ProductSchema)
 export type Product = z.infer<typeof ProductSchema>
+export const ProductConverter = genConverter(ProductSchema)
 
 export const sprintColumns = {
 	productBacklog: `Product Backlog`,

@@ -1,17 +1,18 @@
 import produce from "immer"
 
 import type {StoryMapItem, StoryMapTarget} from "./types"
+import type {WithDocumentData} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {avg, meta, sortEpics, sortFeatures} from "."
 
 export const moveItem = (
-	currentState: StoryMapState,
-	originalState: StoryMapState,
+	currentState: WithDocumentData<StoryMapState>,
+	originalState: WithDocumentData<StoryMapState>,
 	startItem: StoryMapItem,
 	targetLocation: StoryMapTarget,
 	currentVersion: string | undefined,
-): StoryMapState =>
+): WithDocumentData<StoryMapState> =>
 	produce(currentState, (state) => {
 		if (targetLocation === `stay`) return
 		if (targetLocation[0] === `before` || targetLocation[0] === `after`) {

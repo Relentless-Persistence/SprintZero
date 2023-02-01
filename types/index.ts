@@ -1,34 +1,16 @@
 import {z} from "zod"
 
-import type {Timestamp} from "firebase9/firestore"
-import type {ZodTypeAny, ZodObject, ZodArray} from "zod"
+import type {FirestoreDataConverter, DocumentReference} from "firebase/firestore"
+import type {Schema} from "type-fest"
+import type {AnyZodObject, ZodSchema, ZodTypeDef} from "zod"
 
 export const idSchema = z.string().brand<`Id`>()
 export type Id = z.infer<typeof idSchema>
 
-type Primitives = string | number | boolean | Date | Id | Timestamp
-
-export type DbName<T extends Record<string, any>> = {_: string} & {
-	[key in keyof T]: T[key] extends Primitives | Primitives[]
-		? string
-		: T[key] extends Array<Record<string, any>>
-		? DbName<T[key][number]>
-		: T[key] extends Record<string, any>
-		? DbName<T[key]>
-		: string
-}
-
-export type ZodSchema<T> = ZodObject<{
-	[key1 in keyof T]: T[key1] extends Primitives | Primitives[]
-		? ZodTypeAny
-		: T[key1] extends Array<Record<string, any>>
-		? ZodArray<ZodObject<{[key2 in keyof T[key1][number]]: ZodTypeAny}>>
-		: T[key1] extends Record<string, any>
-		? ZodObject<{[key2 in keyof T[key1]]: ZodTypeAny}>
-		: ZodTypeAny
-}>
-
-export const genDbNames = <T extends Record<string, any>>(collectionName: string, schema: ZodSchema<T>): DbName<T> => {
+export const genDbNames = <T extends AnyZodObject>(
+	collectionName: string,
+	schema: T,
+): Schema<z.infer<T>, string> & {_: string} => {
 	const dbNames = new Proxy(
 		{},
 		{
@@ -46,5 +28,21 @@ export const genDbNames = <T extends Record<string, any>>(collectionName: string
 			},
 		},
 	)
-	return dbNames as DbName<T>
+	return dbNames as any
 }
+
+export type WithDocumentData<T> = T & {
+	id: Id
+	ref: DocumentReference<T>
+}
+
+export const genConverter = <T extends Record<string, any>>(
+	schema: ZodSchema<T, ZodTypeDef, unknown>,
+): FirestoreDataConverter<WithDocumentData<T>> => ({
+	toFirestore: (data) => schema.parse(data),
+	fromFirestore: (snap) => ({
+		...schema.parse(snap.data()),
+		id: snap.id as Id,
+		ref: snap.ref as DocumentReference<T>,
+	}),
+})

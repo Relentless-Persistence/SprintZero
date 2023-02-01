@@ -1,4 +1,4 @@
-import {addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where} from "firebase9/firestore"
+import {addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 
@@ -12,13 +12,13 @@ import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapState
 import type {Version} from "~/types/db/Versions"
 
 import {storyMapMeta} from "~/app/[productSlug]/dashboard/storyMap/utils/globals"
-import {db} from "~/config/firebase"
 import {AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {Comments} from "~/types/db/Comments"
 import {Objectives, ObjectiveSchema} from "~/types/db/Objectives"
 import {ProductSchema, Products} from "~/types/db/Products"
 import {StoryMapStateSchema, StoryMapStates} from "~/types/db/StoryMapStates"
 import {Versions} from "~/types/db/Versions"
+import {db} from "~/utils/firebase"
 
 type AddVersionVars = {
 	productId: Id

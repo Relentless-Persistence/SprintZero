@@ -1,19 +1,28 @@
 "use client"
 
+import {doc} from "firebase/firestore"
 import {motion} from "framer-motion"
-import {useAtomValue} from "jotai"
+import {useState} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
+import type {Id} from "~/types"
 
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import {storyMapScrollPosition} from "./storyMap/utils/globals"
 import VersionList from "./storyMap/VersionList"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {setStoryMapState} from "~/utils/api/mutations"
-import {activeProductAtom} from "~/utils/atoms"
+import {db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Dashboard: FC = () => {
-	const activeProduct = useAtomValue(activeProductAtom)
+	const activeProductId = useActiveProductId()
+	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+
+	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__` | undefined>(undefined)
+	const [newVesionInputValue, setNewVesionInputValue] = useState<string | undefined>(undefined)
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
@@ -28,12 +37,20 @@ const Dashboard: FC = () => {
 							storyMapScrollPosition.current = e.currentTarget.scrollLeft
 						}}
 					>
-						<StoryMap />
+						{currentVersionId !== undefined && <StoryMap currentVersionId={currentVersionId} />}
 					</motion.div>
 				</div>
 			</div>
 
-			<VersionList />
+			{activeProduct && (
+				<VersionList
+					currentVersionId={currentVersionId}
+					setCurrentVersionId={setCurrentVersionId}
+					newVersionInputValue={newVesionInputValue}
+					setNewVersionInputValue={setNewVesionInputValue}
+					storyMapStateId={activeProduct.storyMapStateId}
+				/>
+			)}
 
 			<button
 				type="button"

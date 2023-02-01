@@ -1,12 +1,13 @@
 "use client"
 
-import {useQuery} from "@tanstack/react-query"
-import {Avatar, Button} from "antd5"
-import {addDoc, collection, doc, setDoc} from "firebase9/firestore"
+import {Avatar, Button} from "antd"
+import {addDoc, collection, doc, setDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import invariant from "tiny-invariant"
 import {v4 as uuid} from "uuid"
 
 import type {FC} from "react"
@@ -19,38 +20,28 @@ import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {db} from "~/config/firebase"
 import {Products, ProductSchema} from "~/types/db/Products"
 import {StoryMapStates} from "~/types/db/StoryMapStates"
 import {Versions} from "~/types/db/Versions"
-import {getUser} from "~/utils/api/queries"
-import {useUserId} from "~/utils/atoms"
+import {auth, db} from "~/utils/firebase"
 
 const numSlides = 4
 
 type FormInputs = Pick<Product, `cadence` | `effortCost` | `gate` | `name`>
 
 const ProductConfiguration: FC = () => {
-	const userId = useUserId()
+	const [user] = useAuthState(auth)
+	invariant(user, `User must be logged in`)
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const [canProceed, setCanProceed] = useState(false)
 	const [formData, setFormData] = useState<Partial<FormInputs>>({})
 	const [hasSubmitted, setHasSubmitted] = useState(false)
 
-	const {data: user} = useQuery({
-		queryKey: [`user`, userId],
-		queryFn: getUser(userId as Id),
-		enabled: userId !== undefined && userId !== `signed-out`,
-	})
-
 	const router = useRouter()
 	const submitForm = async (data: FormInputs) => {
-		if (!userId || !user) return
-
 		setHasSubmitted(true)
 
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}` as Id
-		addDoc(collection(db, Versions._), {name: `1.0`, productId: slug} satisfies Omit<Version, `id`>)
 
 		const storyMapStateId = (
 			await addDoc(collection(db, StoryMapStates._), {
@@ -58,13 +49,13 @@ const ProductConfiguration: FC = () => {
 				epics: [],
 				features: [],
 				stories: [],
-			} satisfies Omit<StoryMapState, `id`>)
+			} satisfies StoryMapState)
 		).id as Id
 
-		const finalData = ProductSchema.omit({id: true}).parse({
+		const finalData = ProductSchema.parse({
 			...data,
 			storyMapStateId,
-			members: {[userId]: {type: `editor`}},
+			members: {[user.uid as Id]: {type: `editor`}},
 			problemStatement: ``,
 			personas: [],
 			successMetrics: [],
@@ -81,8 +72,13 @@ const ProductConfiguration: FC = () => {
 			features: [],
 			finalVision: ``,
 			updates: [],
-		} satisfies Omit<Product, `id`>)
+		} satisfies Product)
 		await setDoc(doc(db, Products._, slug), finalData)
+
+		await addDoc(collection(db, StoryMapStates._, storyMapStateId, Versions._), {
+			name: `1.0`,
+			productId: slug,
+		} satisfies Version)
 
 		router.push(`/${slug}/dashboard`)
 	}
@@ -93,10 +89,10 @@ const ProductConfiguration: FC = () => {
 				<div className="flex justify-between">
 					<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={178} height={42} priority />
 					<div className="flex items-center gap-2">
-						<Avatar src={user?.avatar} size="large" alt="Avatar" className="border border-black" />
+						<Avatar src={user.photoURL} size="large" alt="Avatar" className="border border-black" />
 						<div className="flex w-min flex-col gap-1">
-							<p className="font-semibold">{user?.name}</p>
-							<p className="text-ellipsis text-[#595959]">{user?.email}</p>
+							<p className="font-semibold">{user.displayName}</p>
+							<p className="text-ellipsis text-[#595959]">{user.email}</p>
 						</div>
 					</div>
 				</div>
@@ -140,9 +136,9 @@ const ProductConfiguration: FC = () => {
 						<Slide4
 							currentSlide={currentSlide}
 							setCanProceed={setCanProceed}
-							onComplete={(data) => {
+							onComplete={async (data) => {
 								setFormData((cur) => ({...cur, ...data}))
-								submitForm({...formData, ...data} as FormInputs)
+								await submitForm({...formData, ...data} as FormInputs)
 							}}
 						/>
 					</motion.div>

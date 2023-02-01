@@ -1,55 +1,51 @@
 "use client"
 
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-import {Button, Input, Tabs} from "antd5"
-import {useAtom} from "jotai"
-import {useEffect, useRef} from "react"
+import {Button, Input, Tabs} from "antd"
+import {collection, query, where} from "firebase/firestore"
+import {useEffect} from "react"
+import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import {currentVersionAtom, newVersionInputAtom} from "./atoms"
+import {StoryMapStates} from "~/types/db/StoryMapStates"
+import {VersionConverter, Versions} from "~/types/db/Versions"
 import {addVersion} from "~/utils/api/mutations"
-import {getVersionsByProduct} from "~/utils/api/queries"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const VersionList: FC = () => {
-	const queryClient = useQueryClient()
+export type VersionListProps = {
+	currentVersionId: Id | `__ALL_VERSIONS__` | undefined
+	setCurrentVersionId: (id: Id | `__ALL_VERSIONS__`) => void
+	newVersionInputValue: string | undefined
+	setNewVersionInputValue: (value: string | undefined) => void
+	storyMapStateId: Id
+}
+
+const VersionList: FC<VersionListProps> = ({
+	currentVersionId,
+	setCurrentVersionId,
+	newVersionInputValue,
+	setNewVersionInputValue,
+	storyMapStateId,
+}) => {
 	const activeProductId = useActiveProductId()
-	const [newVersionInput, setNewVersionInput] = useAtom(newVersionInputAtom)
-
-	const [currentVersion, setCurrentVersion] = useAtom(currentVersionAtom)
-
-	const {data: versions} = useQuery({
-		queryKey: [`all-versions`, activeProductId],
-		queryFn: getVersionsByProduct(activeProductId!),
-		enabled: activeProductId !== undefined,
-	})
-
-	const hasSetInitialVersion = useRef(false)
+	const [versions] = useCollectionData(
+		query(
+			collection(db, StoryMapStates._, storyMapStateId, Versions._),
+			where(Versions.productId, `==`, activeProductId),
+		).withConverter(VersionConverter),
+	)
 	useEffect(() => {
-		if (!hasSetInitialVersion.current && versions?.[0]) {
-			setCurrentVersion({id: versions[0].id, name: versions[0].name})
-			hasSetInitialVersion.current = true
-		}
-	}, [setCurrentVersion, versions])
-
-	const addVersionMutation = useMutation({
-		mutationFn: addVersion,
-		onSuccess: () => {
-			setNewVersionInput(undefined)
-			queryClient.invalidateQueries({queryKey: [`all-versions`, activeProductId], exact: true})
-		},
-	})
+		if (currentVersionId === undefined && versions?.[0]) setCurrentVersionId(versions[0].id)
+	}, [currentVersionId, setCurrentVersionId, versions])
 
 	return (
 		<div className="flex flex-col gap-8">
 			<Tabs
 				tabPosition="right"
-				onChange={(key) =>
-					void setCurrentVersion({id: key as Id, name: versions?.find((version) => version.id === key)?.name ?? `All`})
-				}
-				activeKey={currentVersion.id}
+				onChange={(key) => void setCurrentVersionId(key as Id)}
+				activeKey={currentVersionId}
 				items={[
 					...(versions ?? []).map((version) => ({
 						key: version.id,
@@ -63,17 +59,18 @@ const VersionList: FC = () => {
 				className="bg-transparent"
 			/>
 
-			{newVersionInput !== undefined && (
+			{newVersionInputValue !== undefined && (
 				<form
-					onSubmit={(evt) => {
+					onSubmit={async (evt) => {
 						evt.preventDefault()
-						addVersionMutation.mutate({productId: activeProductId!, versionName: newVersionInput})
+						await addVersion({productId: activeProductId, versionName: newVersionInputValue})
+						setNewVersionInputValue(undefined)
 					}}
 					className="flex flex-col gap-2"
 				>
 					<Input
-						value={newVersionInput}
-						onChange={(evt) => void setNewVersionInput(evt.target.value)}
+						value={newVersionInputValue}
+						onChange={(evt) => void setNewVersionInputValue(evt.target.value)}
 						htmlSize={1}
 						placeholder="Version name"
 						className="w-full"
@@ -81,9 +78,6 @@ const VersionList: FC = () => {
 					<Button htmlType="submit" className="bg-white">
 						Add
 					</Button>
-					{addVersionMutation.isError && addVersionMutation.error instanceof Error && (
-						<p>{addVersionMutation.error.message}</p>
-					)}
 				</form>
 			)}
 		</div>

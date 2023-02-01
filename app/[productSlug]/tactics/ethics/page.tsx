@@ -1,15 +1,15 @@
 "use client"
 
-import {Breadcrumb, Card} from "antd5"
-import {doc, onSnapshot} from "firebase9/firestore"
+import {Breadcrumb, Card} from "antd"
+import {doc, onSnapshot} from "firebase/firestore"
 import {useEffect, useState} from "react"
 
 import type {FC} from "react"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Story from "./Story"
-import {db} from "~/config/firebase"
 import {StoryMapStateSchema, StoryMapStates} from "~/types/db/StoryMapStates"
+import {db} from "~/utils/firebase"
 
 const EthicsPage: FC = () => {
 	const [storyMapState, setStoryMapState] = useState<StoryMapState>()

@@ -1,9 +1,9 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <Segmented /> otherwise. */
 
-import {Segmented} from "antd5"
+import {Segmented} from "antd"
 import {useController} from "react-hook-form"
 
-import type {SegmentedProps as AntdSegmentedProps} from "antd5"
+import type {SegmentedProps as AntdSegmentedProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"

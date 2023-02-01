@@ -13,7 +13,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {User} from "~/types/db/Users"
 
-import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/config/firebase"
+import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/utils/firebase"
 import {Users} from "~/types/db/Users"
 import {getProductsByUser} from "~/utils/api/queries"
 import {useUserId} from "~/utils/atoms"

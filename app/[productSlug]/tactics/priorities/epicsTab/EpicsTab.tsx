@@ -10,7 +10,7 @@ import type {StoryMapState} from "~/types/db/StoryMapStates"
 import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
-import {db} from "~/config/firebase"
+import {db} from "~/utils/firebase"
 import {StoryMapStates, StoryMapStateSchema} from "~/types/db/StoryMapStates"
 
 const EpicsTab: FC = () => {

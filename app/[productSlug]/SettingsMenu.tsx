@@ -1,7 +1,6 @@
 "use client"
 
 import {
-	ApiOutlined,
 	DollarOutlined,
 	FormOutlined,
 	LogoutOutlined,
@@ -9,21 +8,18 @@ import {
 	TeamOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
-import {Menu} from "antd5"
-import {signOut} from "firebase9/auth"
-import {useSetAtom} from "jotai"
+import {Menu} from "antd"
+import {signOut} from "firebase/auth"
 import Link from "next/link"
 import {usePathname, useRouter} from "next/navigation"
 
 import type {FC} from "react"
 
-import {auth} from "~/config/firebase"
-import {userIdAtom} from "~/utils/atoms"
+import {auth} from "~/utils/firebase"
 
 const SettingsMenu: FC = () => {
 	const pathname = usePathname()
 	const router = useRouter()
-	const setUserId = useSetAtom(userIdAtom)
 
 	return (
 		<div className="flex h-full flex-col justify-between">
@@ -59,7 +55,11 @@ const SettingsMenu: FC = () => {
 					{
 						key: `settings-support`,
 						icon: <FormOutlined />,
-						label: <Link href="https://www.sprintzero.app/contact" target="_blank">Support</Link>,
+						label: (
+							<Link href="https://www.sprintzero.app/contact" target="_blank">
+								Support
+							</Link>
+						),
 					},
 					{
 						key: `settings-logout`,
@@ -67,7 +67,6 @@ const SettingsMenu: FC = () => {
 						label: `Logout`,
 						onClick: async () => {
 							await signOut(auth)
-							setUserId(undefined)
 							router.push(`/login`)
 						},
 					},

@@ -1,10 +1,8 @@
 import {z} from "zod"
 
-import {genDbNames, idSchema} from "~/types"
+import {genConverter, genDbNames, idSchema} from "~/types"
 
 export const ObjectiveSchema = z.object({
-	id: idSchema,
-
 	name: z.string(),
 	results: z.array(
 		z.object({
@@ -20,3 +18,4 @@ export const ObjectiveSchema = z.object({
 
 export const Objectives = genDbNames(`Objectives`, ObjectiveSchema)
 export type Objective = z.infer<typeof ObjectiveSchema>
+export const ObjectiveConverter = genConverter(ObjectiveSchema)
