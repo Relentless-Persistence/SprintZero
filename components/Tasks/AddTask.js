@@ -18,6 +18,7 @@ import {
   notification,
 } from "antd5";
 import { SendOutlined, FlagOutlined, UserOutlined } from "@ant-design/icons";
+import AppCheckbox from "~/components/AppCheckbox"
 import ActionButtons from "../../components/Personas/ActionButtons";
 import { CardTitle } from "../../components/Dashboard/CardTitle";
 import DrawerSubTitle from "../../components/Dashboard/DrawerSubTitle";
@@ -103,95 +104,74 @@ const AddTask = ({ createMode, setCreateMode, product, order, board}) => {
   }
 
   return (
-    <Drawer
-      open={createMode}
-      closable={false}
-      placement={"bottom"}
-      headerStyle={{ background: "#F5F5F5" }}
-      title={
-        <Row>
-          <Col span={21}>
-            <CardTitle className="inline-block mr-[10px]">
-              Create a Task
-            </CardTitle>
-          </Col>
+		<Drawer
+			open={createMode}
+			closable={false}
+			placement={"bottom"}
+			headerStyle={{background: "#F5F5F5"}}
+			title={
+				<Row>
+					<Col span={21}>
+						<CardTitle className="mr-[10px] inline-block">Create a Task</CardTitle>
+					</Col>
 
-          <Col span={3}>
-            <div className="flex justify-end">
-              <ActionButtons
-                onCancel={() => setCreateMode(false)}
-                onSubmit={() => createTask(false)}
-              />
-            </div>
-          </Col>
-        </Row>
-      }
-    >
-      <Row gutter={[24, 24]} className="mt-[15px]">
-        <Col span={8}>
-          <div>
-            <DrawerSubTitle>Title</DrawerSubTitle>
+					<Col span={3}>
+						<div className="flex justify-end">
+							<ActionButtons onCancel={() => setCreateMode(false)} onSubmit={() => createTask(false)} />
+						</div>
+					</Col>
+				</Row>
+			}
+		>
+			<Row gutter={[24, 24]} className="mt-[15px]">
+				<Col span={8}>
+					<div>
+						<DrawerSubTitle>Title</DrawerSubTitle>
 
-            <Input
-              className="mb-[24px]"
-              onChange={(e) => setTitle(e.target.value)}
-              value={title}
-              maxLength="50"
-              required
-            />
+						<Input
+							className="mb-[24px]"
+							onChange={(e) => setTitle(e.target.value)}
+							value={title}
+							maxLength="50"
+							required
+						/>
 
-            <DrawerSubTitle>Description</DrawerSubTitle>
+						<DrawerSubTitle>Description</DrawerSubTitle>
 
-            <TextArea
-              onChange={(e) => setDescription(e.target.value)}
-              value={description}
-              rows={4}
-              required
-            />
-          </div>
-        </Col>
-        <Col span={8}>
-          <DrawerSubTitle>Due</DrawerSubTitle>
+						<TextArea onChange={(e) => setDescription(e.target.value)} value={description} rows={4} required />
+					</div>
+				</Col>
+				<Col span={8}>
+					<DrawerSubTitle>Due</DrawerSubTitle>
 
-          <div className="mb-[24px]">
-            <DatePicker
-              className="mr-[8px]"
-              onChange={handleDrawerDateChange}
-              format={"MM-DD-YYYY"}
-              required
-            />
-            <TimePicker onChange={handleDrawerTimeChange} format={"HH:mm:ss"} required />
-            ,
-          </div>
-        </Col>
+					<div className="mb-[24px]">
+						<DatePicker className="mr-[8px]" onChange={handleDrawerDateChange} format={"MM-DD-YYYY"} required />
+						<TimePicker onChange={handleDrawerTimeChange} format={"HH:mm:ss"} required />,
+					</div>
+				</Col>
 
-        <Col span={8}>
-          <DrawerSubTitle>Subtasks</DrawerSubTitle>
-          <SubTasks>
-            {subtasks?.map((subtask, i) => (
-              <Checkbox key={subtask.name} checked={subtask.completed}>
-                {subtask.name}
-              </Checkbox>
-            ))}
-            {show ? (
-                <Input
-                  value={val}
-                  onKeyPress={addItemDone}
-                  onChange={(e) => setVal(e.target.value)}
-                />
-            ) : (
-                <Checkbox
-                  checked={false}
-                  onChange={() => setShow((s) => !s)}
-                >
-                  <span className="text-[#BFBFBF]">Add Item</span>
-                </Checkbox>
-            )}
-          </SubTasks>
-        </Col>
-      </Row>
-    </Drawer>
-  );
+				<Col span={8}>
+					<DrawerSubTitle>Subtasks</DrawerSubTitle>
+					<div>
+						{subtasks?.map((subtask, i) => (
+							<div key={subtask.name}>
+								<AppCheckbox checked={subtask.completed}>
+									<span className={subtask.completed ? `line-through` : null}>{subtask.name}</span>
+								</AppCheckbox>
+							</div>
+						))}
+						{show ? (
+							<Input value={val} onKeyPress={addItemDone} onChange={(e) => setVal(e.target.value)} />
+						) : (
+							<AppCheckbox checked={false} onChange={() => setShow((s) => !s)}>
+								<span className="text-[#BFBFBF]">Add Item</span>
+							</AppCheckbox>
+						)}
+					</div>
+				</Col>
+			</Row>
+		</Drawer>
+	)
 };
 
 export default AddTask;

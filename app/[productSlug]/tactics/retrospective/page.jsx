@@ -129,13 +129,13 @@ export default function Retrospective() {
 				setActiveEditIndex(null)
 			})
 		} catch (error) {
-			notification.error({message: `An error occurred` })
+			notification.error({message: `An error occurred`})
 		}
 	}
 
 	const removeRetro = async (id) => {
 		const docRef = doc(db, `Retrospectives`, id)
-		await deleteDoc(docRef);
+		await deleteDoc(docRef)
 	}
 
 	const updateRetroAction = (actionIndex, i, id) => {
@@ -224,7 +224,6 @@ export default function Retrospective() {
 												{c.actions?.map((a, actionIndex) => (
 													<div key={actionIndex}>
 														<AppCheckbox
-															key={a.label}
 															checked={a.completed}
 															onChange={() => updateRetroAction(actionIndex, i, c.id)}
 														>

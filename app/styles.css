@@ -45,3 +45,7 @@ ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 .ant-tabs-right > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
 	padding-right: 0px;
 }
+
+#comment .ant-list-item {
+	padding: 12px 0px !important;
+}
