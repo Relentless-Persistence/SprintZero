@@ -11,7 +11,7 @@ import type {Product} from "~/types/db/Products"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
-import {storyMapMeta} from "~/app/[productSlug]/dashboard/storyMap/utils/globals"
+import {storyMapMeta} from "~/app/(authenticated)/[productSlug]/dashboard/storyMap/utils/globals"
 import {AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {Comments} from "~/types/db/Comments"
 import {Objectives, ObjectiveSchema} from "~/types/db/Objectives"
@@ -45,7 +45,7 @@ type UpdateProductVars = {
 }
 
 export const updateProduct = async ({id, data}: UpdateProductVars): Promise<void> => {
-	const validData = ProductSchema.parse(data)
+	const validData = ProductSchema.partial().parse(data)
 	await updateDoc(doc(db, Products._, id), validData)
 }
 

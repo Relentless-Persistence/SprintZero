@@ -1,6 +1,6 @@
 "use client"
 
-import {CopyOutlined} from "@ant-design/icons"
+import {ReadOutlined} from "@ant-design/icons"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import produce from "immer"
 import {clamp, debounce} from "lodash"
@@ -8,44 +8,43 @@ import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
 import type {WithDocumentData} from "~/types"
-import type {Feature as FeatureType, StoryMapState} from "~/types/db/StoryMapStates"
+import type {Epic as EpicType, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
-import {sortFeatures} from "~/app/[productSlug]/dashboard/storyMap/utils"
+import {sortEpics} from "~/app/(authenticated)/[productSlug]/dashboard/storyMap/utils"
 import {setStoryMapState} from "~/utils/mutations"
 
 const debouncedSetStoryMapState = debounce(setStoryMapState, 100)
 
-export type FeatureProps = {
+export type EpicProps = {
 	storyMapState: WithDocumentData<StoryMapState>
-	feature: FeatureType
+	epic: EpicType
 }
 
-const Feature: FC<FeatureProps> = ({feature, storyMapState}) => {
-	const x = useMotionValue(feature.effort)
-	const y = useMotionValue(feature.userValue)
+const Epic: FC<EpicProps> = ({epic, storyMapState}) => {
+	const x = useMotionValue(epic.effort)
+	const y = useMotionValue(epic.userValue)
 
 	useEffect(() => {
-		x.set(storyMapState.features.find(({id}) => id === feature.id)!.effort)
-		y.set(storyMapState.features.find(({id}) => id === feature.id)!.userValue)
-	}, [feature.id, storyMapState.features, x, y])
+		x.set(storyMapState.epics.find((e) => e.id === epic.id)!.effort)
+		y.set(storyMapState.epics.find((e) => e.id === epic.id)!.userValue)
+	}, [epic.id, storyMapState.epics, x, y])
 
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
-	const moveFeature = (x: number, y: number) => {
+	const moveEpic = (x: number, y: number) => {
 		const newStoryMapState = produce(storyMapState, (state) => {
-			const newFeature = state.features.find(({id}) => id === feature.id)!
-			newFeature.effort = x
-			newFeature.userValue = y
-			const host = state.epics.find(({featureIds}) => featureIds.includes(feature.id))!
-			host.featureIds = sortFeatures(state, host.featureIds)
+			const newEpic = state.epics.find((e) => e.id === epic.id)!
+			newEpic.effort = x
+			newEpic.userValue = y
+			state.epics = sortEpics(state.epics)
 		})
 		debouncedSetStoryMapState({id: newStoryMapState.id, data: newStoryMapState})
 	}
 
 	return (
 		<motion.div
-			key={feature.id}
+			key={epic.id}
 			onPointerDown={(e) => {
 				const boundingBox = ref.current!.getBoundingClientRect()
 				const center = [boundingBox.left + boundingBox.width / 2, boundingBox.top + boundingBox.height / 2] as const
@@ -59,16 +58,16 @@ const Feature: FC<FeatureProps> = ({feature, storyMapState}) => {
 
 				x.set(newX)
 				y.set(newY)
-				moveFeature(newX, newY)
+				moveEpic(newX, newY)
 			}}
-			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378]"
+			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]"
 			style={{top: useMotionTemplate`calc(${y}% * 100)`, left: useMotionTemplate`calc(${x}% * 100)`}}
 			ref={ref}
 		>
-			<CopyOutlined />
-			<p>{feature.name}</p>
+			<ReadOutlined />
+			<p>{epic.name}</p>
 		</motion.div>
 	)
 }
 
-export default Feature
+export default Epic

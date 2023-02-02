@@ -31,16 +31,12 @@ const VisionsPage: FC = () => {
 	const [gptResponse, setGptResponse] = useState<string | undefined>(undefined)
 	const [gptResponseAccepted, setGptResponseAccepted] = useState(false)
 
+	const updatesUsers = activeProduct?.updates.map((update) => update.userId)
 	const [users] = useCollectionData(
-		activeProduct
-			? query(
-					collection(db, Products._, activeProductId),
-					where(
-						documentId(),
-						`in`,
-						activeProduct.updates.map((update) => update.userId),
-					),
-			  ).withConverter(UserConverter)
+		updatesUsers && updatesUsers.length > 0
+			? query(collection(db, Products._, activeProductId), where(documentId(), `in`, updatesUsers)).withConverter(
+					UserConverter,
+			  )
 			: undefined,
 	)
 
@@ -129,7 +125,7 @@ const VisionsPage: FC = () => {
 								style={{boxShadow: `0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)`}}
 							>
 								{activeProduct?.finalVision ? (
-									<p className="whitespace-pre-line">{activeProduct.finalVision}</p>
+									<p>{activeProduct.finalVision}</p>
 								) : (
 									<div className="flex items-center justify-center">
 										<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;

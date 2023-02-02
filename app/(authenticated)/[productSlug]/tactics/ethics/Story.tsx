@@ -7,7 +7,6 @@ import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryDrawer from "~/components/StoryDrawer"
-import {Story} from "~/types/db/StoryMapStates"
 
 export type StoryProps = {
 	activeProduct: WithDocumentData<Product>

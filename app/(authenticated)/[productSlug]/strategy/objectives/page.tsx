@@ -13,8 +13,8 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import {ObjectiveConverter, Objectives} from "~/types/db/Objectives"
-import {updateObjective} from "~/utils/mutations"
 import {db} from "~/utils/firebase"
+import {updateObjective} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const ObjectivesPage: FC = () => {
@@ -133,7 +133,7 @@ const ObjectivesPage: FC = () => {
 									{result.id === activeResultId && resultDraft ? (
 										<div className="flex flex-col items-stretch gap-2">
 											<div className="relative h-max">
-												<p className="invisible min-w-0 break-words border p-1">{resultDraft.text || `filler`}</p>
+												<p className="invisible min-w-0 border p-1">{resultDraft.text || `filler`}</p>
 												<Input.TextArea
 													value={resultDraft.text}
 													onChange={(e) =>
@@ -158,7 +158,7 @@ const ObjectivesPage: FC = () => {
 											</Button>
 										</div>
 									) : (
-										<p className="min-w-0 break-all">{result.text}</p>
+										<p className="min-w-0">{result.text}</p>
 									)}
 								</Card>
 							))}
@@ -213,7 +213,7 @@ const ObjectivesPage: FC = () => {
 									}
 								>
 									<div className="relative h-max">
-										<p className="invisible break-all border p-1">{resultDraft.text || `filler`}</p>
+										<p className="invisible border p-1">{resultDraft.text || `filler`}</p>
 										<Input.TextArea
 											value={resultDraft.text}
 											onChange={(e) => void setResultDraft((result) => ({name: result!.name, text: e.target.value}))}

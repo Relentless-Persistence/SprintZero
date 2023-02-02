@@ -45,3 +45,9 @@ ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 .ant-tabs-right > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
 	padding-right: 0px;
 }
+
+p,
+li {
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}

@@ -40,6 +40,14 @@ service cloud.firestore {
       allow create:
       	if request.auth != null
 
+      match /Comments/{commentId} {
+        allow read, create:
+          if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)
+
+        allow update, delete:
+          if resource.data.authorId == request.auth.uid
+      }
+
       match /Versions/{versionId} {
         allow read, write:
           if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)

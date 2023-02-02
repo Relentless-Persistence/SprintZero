@@ -12,8 +12,8 @@ import type {Id} from "~/types"
 import LinkTo from "~/components/LinkTo"
 import {AccessibilityItemConverter, AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {addAccessibilityItem, deleteAccessibilityItem, updateAccessibilityItem, updateProduct} from "~/utils/mutations"
 import {db} from "~/utils/firebase"
+import {addAccessibilityItem, deleteAccessibilityItem, updateAccessibilityItem, updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const descriptions = {
@@ -158,7 +158,7 @@ const Accessibility = () => {
 								{item.id === activeItemId && itemDraft ? (
 									<div className="flex flex-col items-stretch gap-2">
 										<div className="relative h-max">
-											<p className="invisible min-w-0 break-words border p-1">{itemDraft.text || `filler`}</p>
+											<p className="invisible min-w-0 border p-1">{itemDraft.text || `filler`}</p>
 											<Input.TextArea
 												value={itemDraft.text}
 												onChange={(e) => void setItemDraft((item) => ({name: item!.name, text: e.target.value}))}
@@ -170,7 +170,7 @@ const Accessibility = () => {
 										</Button>
 									</div>
 								) : (
-									<p className="min-w-0 break-all">{item.text}</p>
+									<p className="min-w-0">{item.text}</p>
 								)}
 							</Card>
 						))}
@@ -219,7 +219,7 @@ const Accessibility = () => {
 								}
 							>
 								<div className="relative h-max">
-									<p className="invisible break-all border p-1">{itemDraft.text || `filler`}</p>
+									<p className="invisible border p-1">{itemDraft.text || `filler`}</p>
 									<Input.TextArea
 										value={itemDraft.text}
 										onChange={(e) => void setItemDraft((item) => ({name: item!.name, text: e.target.value}))}

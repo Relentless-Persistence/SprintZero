@@ -47,12 +47,11 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 		).withConverter(CommentConverter),
 	)
 
+	const commentAuthorIds = _.uniq(comments?.map((comment) => comment.authorId))
+	console.log(commentAuthorIds)
 	const [commentAuthors] = useCollectionData(
-		comments
-			? query(
-					collection(db, Users._),
-					where(documentId(), `in`, _.uniq(comments.map((comment) => comment.authorId))),
-			  ).withConverter(UserConverter)
+		commentAuthorIds.length > 0
+			? query(collection(db, Users._), where(documentId(), `in`, commentAuthorIds)).withConverter(UserConverter)
 			: undefined,
 	)
 
