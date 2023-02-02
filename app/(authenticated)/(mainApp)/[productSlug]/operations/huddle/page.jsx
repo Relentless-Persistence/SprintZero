@@ -1,16 +1,15 @@
 "use client"
 
 /* eslint-disable react-hooks/exhaustive-deps */
-import {Row, Col, Breadcrumb} from "antd5"
+import {Row, Col, Breadcrumb} from "antd"
 import {useAtomValue} from "jotai"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
-
 import HuddleCard from "~/components/Huddle"
-import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
 import {activeProductAtom} from "~/utils/atoms"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Versions = styled.ul`
@@ -39,7 +38,6 @@ function subtractDays(numOfDays, date_today) {
 }
 
 const intervals = [`Today`, `Yesterday`, `2 days ago`, `3 days ago`, `1 week ago`, `2 weeks ago`, `1 month ago`]
-
 
 const today_fixeddd = new Date(new Date().toJSON().slice(0, 10))
 const yesterday_fixed = subtractDays(1, today_fixeddd)

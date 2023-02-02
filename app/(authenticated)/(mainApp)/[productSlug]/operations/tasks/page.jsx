@@ -1,8 +1,7 @@
 "use client"
 
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useQuery} from "@tanstack/react-query"
-import {Breadcrumb, Button, notification} from "antd5"
+import {Breadcrumb, Button, notification} from "antd"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -10,10 +9,8 @@ import AddTask from "~/components/Tasks/AddTask"
 import {Board} from "~/components/Tasks/Boards"
 import CustomTag from "~/components/Tasks/CustomTag"
 import EditTask from "~/components/Tasks/EditTask"
-import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
-import {getUser} from "~/utils/api/queries"
-import {useUserId} from "~/utils/atoms"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const boards = [`Board 0`, `Board 1`, `Board 2`, `Board 3`, `Board 4`]

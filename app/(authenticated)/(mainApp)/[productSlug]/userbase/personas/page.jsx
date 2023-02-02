@@ -2,15 +2,15 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import {Card, Empty, Breadcrumb} from "antd5"
+import {Card, Empty, Breadcrumb} from "antd"
 import {findIndex} from "lodash"
 import Link from "next/link"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
 import {ListCard, DescriptionCard, TimeLineCard} from "~/components/Personas"
-import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Versions = styled.ul`

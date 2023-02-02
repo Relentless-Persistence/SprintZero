@@ -1,23 +1,32 @@
-import React from 'react';
-import {Button} from "antd5"
-import {Card, Input, Space, Typography, message, Skeleton} from "antd5"
+import React from "react"
+import {Button} from "antd"
+import {Card, Input, Space, Typography, message, Skeleton} from "antd"
 
-const {TextArea} = Input;
-const {Text} = Typography;
+const {TextArea} = Input
+const {Text} = Typography
 
-const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVision, createVision, updateVision, id, setEditMode}) => {
+const Final = ({
+	setCurrent,
+	gptResponse,
+	disabled,
+	acceptedVision,
+	setAcceptedVision,
+	createVision,
+	updateVision,
+	id,
+	setEditMode,
+}) => {
+	const onSave = () => {
+		if (id) {
+			updateVision()
+		} else {
+			createVision()
+		}
+	}
 
-  const onSave = () => {
-    if(id) {
-      updateVision()
-    } else {
-      createVision()
-    }
-  }
-
-  const onCancel = () => {
+	const onCancel = () => {
 		setEditMode(false)
-  }
+	}
 
 	return (
 		<div style={{width: "100%"}} className="mb-7">
@@ -35,17 +44,11 @@ const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVi
 				}}
 				className="mt-3"
 			>
-				<TextArea
-					value={acceptedVision}
-					rows={12}
-					onChange={(e) => setAcceptedVision(e.target.value)}
-				/>
+				<TextArea value={acceptedVision} rows={12} onChange={(e) => setAcceptedVision(e.target.value)} />
 			</Card>
 			<Space className="mt-6 flex justify-end">
-				<Button  onClick={onCancel}>
-					Cancel
-				</Button>
-				<Button  onClick={onSave} className="bg-green-s500 text-white">
+				<Button onClick={onCancel}>Cancel</Button>
+				<Button onClick={onSave} className="bg-green-s500 text-white">
 					Save
 				</Button>
 			</Space>
@@ -53,4 +56,4 @@ const Final = ({setCurrent, gptResponse, disabled, acceptedVision, setAcceptedVi
 	)
 }
 
-export default Final;
+export default Final

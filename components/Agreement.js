@@ -5,7 +5,7 @@ import {termsOfAgreement} from "../fakeData/terms"
 import {db} from "../config/firebase-config"
 import {useAuth} from "../contexts/AuthContext"
 import {useRouter} from "next/router"
-import {notification} from "antd5"
+import {notification} from "antd"
 import {auth} from "../config/firebase-config"
 
 const Agreement = () => {

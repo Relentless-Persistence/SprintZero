@@ -2,15 +2,15 @@
 "use client"
 
 /* eslint-disable react-hooks/exhaustive-deps */
-import {Input, Select, Button, InputNumber, notification, Breadcrumb} from "antd5"
+import {Input, Select, Button, InputNumber, notification, Breadcrumb} from "antd"
 import {findIndex} from "lodash"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
 import {Chart} from "~/components/Dashboard/Journeys"
 import AddEvent from "~/components/Dashboard/Journeys/AddEvent"
-import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const {Option} = Select

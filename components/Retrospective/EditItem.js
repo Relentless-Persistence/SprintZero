@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-import {Row, Col, Input, Form, Drawer, message, Radio} from "antd5"
+import {Row, Col, Input, Form, Drawer, message, Radio} from "antd"
 import styled from "styled-components"
 
 import {Title} from "../Dashboard/SectionTitle"

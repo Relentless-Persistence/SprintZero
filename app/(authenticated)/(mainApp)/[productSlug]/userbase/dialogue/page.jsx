@@ -2,14 +2,14 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 import {CloseOutlined} from "@ant-design/icons"
-import {Row, Col, Select, Breadcrumb, Input, Button} from "antd5"
+import {Row, Col, Select, Breadcrumb, Input, Button} from "antd"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
 import {DialogueCard, AddNote, EditNote} from "~/components/Dashboard/Dialogue"
 import ResizeableDrawer from "~/components/Dashboard/ResizeableDrawer"
-import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Title = styled.p`
@@ -139,7 +139,7 @@ export default function Dialogue() {
 			name: interviewee,
 			post: persona,
 			type: activeDialogue,
-      notes: [],
+			notes: [],
 			updatedAt: new Date().toISOString(),
 			product_id: activeProductId,
 		}
@@ -247,9 +247,9 @@ export default function Dialogue() {
 							}}
 							open={visible}
 							onClose={() => {
-                setVisible(false)
-                setDialogue(null)
-              }}
+								setVisible(false)
+								setDialogue(null)
+							}}
 							title={
 								<Row gutter={[16, 16]}>
 									<Col span={12} className="flex items-center space-x-[12px]">
@@ -328,8 +328,8 @@ export default function Dialogue() {
 							setVisible={setVisibleEdit}
 							onSubmit={editDialogue}
 							activeProduct={activeProductId}
-              personas={personas}
-              view={setVisible}
+							personas={personas}
+							view={setVisible}
 						/>
 					)}
 

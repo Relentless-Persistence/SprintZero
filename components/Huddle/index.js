@@ -1,153 +1,145 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { Card, Checkbox, Input, Avatar, message } from "antd5";
-import AppCheckbox from "../AppCheckbox";
-import { db, serverTimestamp } from "../../config/firebase-config";
-import {isToday, isYesterday} from 'date-fns'
+import React, {useState, useEffect} from "react"
+import styled from "styled-components"
+import {Card, Checkbox, Input, Avatar, message} from "antd"
+import AppCheckbox from "../AppCheckbox"
+import {db, serverTimestamp} from "../../config/firebase-config"
+import {isToday, isYesterday} from "date-fns"
 import {useQuery} from "@tanstack/react-query"
 import {getUser} from "~/utils/api/queries"
 
 const MyCard = styled(Card)`
-  border: 1px solid #d9d9d9;
-  .ant-card-meta-title {
-    margin-bottom: 0 !important;
-  }
+	border: 1px solid #d9d9d9;
+	.ant-card-meta-title {
+		margin-bottom: 0 !important;
+	}
 
-  .ant-card-body {
-    flex-grow: 1;
-    max-height: 65vh;
-    overflow-y: auto;
-    padding: 12px 16px;
-  }
+	.ant-card-body {
+		flex-grow: 1;
+		max-height: 65vh;
+		overflow-y: auto;
+		padding: 12px 16px;
+	}
 
-  .section {
-    margin-bottom: 20px;
-    h4 {
-      font-weight: 600;
-      font-size: 16px;
-      line-height: 24px;
-      margin-bottom: 5px;
-    }
+	.section {
+		margin-bottom: 20px;
+		h4 {
+			font-weight: 600;
+			font-size: 16px;
+			line-height: 24px;
+			margin-bottom: 5px;
+		}
 
-    .ant-checkbox-checked .ant-checkbox-inner {
-      background: #4a801d;
-      border: 1px solid #4a801d;
-      border-radius: 2px;
-    }
-  }
-`;
+		.ant-checkbox-checked .ant-checkbox-inner {
+			background: #4a801d;
+			border: 1px solid #4a801d;
+			border-radius: 2px;
+		}
+	}
+`
 
-const HuddleCard = ({
-  todayInTime,
-  yesterdayInTime,
-  today,
-  yesterday,
-  member,
-  product,
-  blockers
-}) => {
-  const [showAddNewBlocker, setShowAddNewBlocker] = useState(false);
-  const [newBlocker, setNewBlocker] = useState("");
-  const [showAddNewToday, setShowAddNewToday] = useState(false);
-  const [newToday, setNewToday] = useState("");
-  const [showAddNewYesterday, setShowAddNewYesterday] = useState(false);
-  const [newYesterday, setNewYesterday] = useState("");
+const HuddleCard = ({todayInTime, yesterdayInTime, today, yesterday, member, product, blockers}) => {
+	const [showAddNewBlocker, setShowAddNewBlocker] = useState(false)
+	const [newBlocker, setNewBlocker] = useState("")
+	const [showAddNewToday, setShowAddNewToday] = useState(false)
+	const [newToday, setNewToday] = useState("")
+	const [showAddNewYesterday, setShowAddNewYesterday] = useState(false)
+	const [newYesterday, setNewYesterday] = useState("")
 
 	const {data: user} = useQuery({
 		queryKey: [`user`, member.userId],
 		queryFn: getUser(member.userId),
 		enabled: member.userId !== undefined,
 	})
-  
-  console.log("todayInTime", todayInTime);
 
-  const onBlockerDone = (e) => {
-    // setShowAddNewBlocker(false)
-    if(e.key === "Escape") {
-      setNewBlocker();
-      setShowAddNewBlocker(false);
-      console.log("working")
-    }
-    if (newBlocker !== "") {
-      if (e.key === "Enter") {
-        db.collection("HuddleBlockers")
-          .add({
-            user: {
-							id: user.id
+	console.log("todayInTime", todayInTime)
+
+	const onBlockerDone = (e) => {
+		// setShowAddNewBlocker(false)
+		if (e.key === "Escape") {
+			setNewBlocker()
+			setShowAddNewBlocker(false)
+			console.log("working")
+		}
+		if (newBlocker !== "") {
+			if (e.key === "Enter") {
+				db.collection("HuddleBlockers")
+					.add({
+						user: {
+							id: user.id,
 						},
-            completed: false,
-            title: newBlocker,
-            createdAt: new Date(),
-            product_id: product,
-          })
-          .then((docRef) => {
-            // message.success("New blocker added successfully");
-          })
-          .catch((error) => {
-            // message.error("Error adding blocker item");
-          });
-        setShowAddNewBlocker(false);
-        setNewBlocker("");
-      }
-    }
-  };
+						completed: false,
+						title: newBlocker,
+						createdAt: new Date(),
+						product_id: product,
+					})
+					.then((docRef) => {
+						// message.success("New blocker added successfully");
+					})
+					.catch((error) => {
+						// message.error("Error adding blocker item");
+					})
+				setShowAddNewBlocker(false)
+				setNewBlocker("")
+			}
+		}
+	}
 
-  const updateBlocker = async (id, checked) => {
-    await db
-      .collection("HuddleBlockers")
-      .doc(id)
-      .update({
-        completed: checked,
-      })
-      .then(() => {
-        // message.success("Blocker updated successfully");
-      });
-  };
+	const updateBlocker = async (id, checked) => {
+		await db
+			.collection("HuddleBlockers")
+			.doc(id)
+			.update({
+				completed: checked,
+			})
+			.then(() => {
+				// message.success("Blocker updated successfully");
+			})
+	}
 
-  // Today
-  const onTodayDone = (e) => {
-    if (newToday !== "") {
-      if (e.key === "Enter") {
-        db.collection("Huddles")
-          .add({
-            user: {
-							id: user.id
+	// Today
+	const onTodayDone = (e) => {
+		if (newToday !== "") {
+			if (e.key === "Enter") {
+				db.collection("Huddles")
+					.add({
+						user: {
+							id: user.id,
 						},
-            completed: false,
-            title: newToday,
-            createdAt: new Date(),
-            product_id: product,
-          })
-          .then((docRef) => {
-            // message.success("New huddle added successfully");
-          })
-          .catch((error) => {
-            // message.error("Error adding huddle item");
+						completed: false,
+						title: newToday,
+						createdAt: new Date(),
+						product_id: product,
+					})
+					.then((docRef) => {
+						// message.success("New huddle added successfully");
+					})
+					.catch((error) => {
+						// message.error("Error adding huddle item");
 						console.log(error)
-          });
-        setShowAddNewToday(false);
-        setNewToday("");
-      }
-    }
-  };
+					})
+				setShowAddNewToday(false)
+				setNewToday("")
+			}
+		}
+	}
 
-  const updateToday = async (id, checked) => {
-    await db
-      .collection("Huddles")
-      .doc(id)
-      .update({
-        completed: checked,
-      })
-      .then(() => {
-        // message.success("Huddle updated successfully");
-      });
-  };
+	const updateToday = async (id, checked) => {
+		await db
+			.collection("Huddles")
+			.doc(id)
+			.update({
+				completed: checked,
+			})
+			.then(() => {
+				// message.success("Huddle updated successfully");
+			})
+	}
 
-  // Yesterday
-  const onYesterdayDone = (e) => {
-    if (newYesterday !== "") {
-      if (e.key === "Enter") {
-        db.collection("Huddles")
+	// Yesterday
+	const onYesterdayDone = (e) => {
+		if (newYesterday !== "") {
+			if (e.key === "Enter") {
+				db.collection("Huddles")
 					.add({
 						user: {
 							id: user.id,
@@ -163,27 +155,27 @@ const HuddleCard = ({
 					.catch((error) => {
 						console.error("Error adding huddle item")
 					})
-        setShowAddNewYesterday(false);
-        setNewYesterday("");
-      }
-    }
-  };
+				setShowAddNewYesterday(false)
+				setNewYesterday("")
+			}
+		}
+	}
 
-  const updateYesterday = async (id, checked) => {
-    await db
-      .collection("Huddles")
-      .doc(id)
-      .update({
-        completed: checked,
-      })
-      .then(() => {
-        // message.success("Yesterday huddle updated successfully");
-      });
-  };
+	const updateYesterday = async (id, checked) => {
+		await db
+			.collection("Huddles")
+			.doc(id)
+			.update({
+				completed: checked,
+			})
+			.then(() => {
+				// message.success("Yesterday huddle updated successfully");
+			})
+	}
 
-  return (
+	return (
 		<Card
-		id="huddleCard"
+			id="huddleCard"
 			style={{display: "flex", flexDirection: "column"}}
 			title={
 				<Card.Meta
@@ -409,6 +401,6 @@ const HuddleCard = ({
 			</section>
 		</Card>
 	)
-};
+}
 
-export default HuddleCard;
+export default HuddleCard

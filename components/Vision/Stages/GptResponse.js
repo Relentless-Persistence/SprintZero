@@ -1,8 +1,8 @@
-import React from 'react';
-import {Button} from "antd5"
-import {Card, Input, Space, Typography, message, Skeleton} from "antd5";
+import React from "react"
+import {Button} from "antd"
+import {Card, Input, Space, Typography, message, Skeleton} from "antd"
 
-const {TextArea} = Input;
+const {TextArea} = Input
 const {Text} = Typography
 
 const GptResponse = ({gptRequest, gptResponse, setCurrent, disabled, setGptResponse, setAcceptedVision}) => {
@@ -35,7 +35,7 @@ const GptResponse = ({gptRequest, gptResponse, setCurrent, disabled, setGptRespo
 				{gptResponse ? gptResponse : <Skeleton active />}
 			</Card>
 			<Space className="mt-6 flex justify-end">
-				<Button className="bg-white"  onClick={redo}>
+				<Button className="bg-white" onClick={redo}>
 					Redo
 				</Button>
 				<Button
@@ -49,4 +49,4 @@ const GptResponse = ({gptRequest, gptResponse, setCurrent, disabled, setGptRespo
 	)
 }
 
-export default GptResponse;
+export default GptResponse

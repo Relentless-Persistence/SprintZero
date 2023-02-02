@@ -1,7 +1,7 @@
 import React, {useState} from "react"
-import {Card, Form, Typography, Input, Segmented, Space, message, notification} from "antd5"
+import {Card, Form, Typography, Input, Segmented, Space, message, notification} from "antd"
 import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
-import {Button} from "antd5"
+import {Button} from "antd"
 
 const {Title, Text} = Typography
 
@@ -42,14 +42,14 @@ const BuildStatement = ({
 		} else {
 			notification.error({
 				message: "Some fields are missing!",
-				placement: "bottomRight"
+				placement: "bottomRight",
 			})
 		}
 	}
 
 	const onReset = () => {
-		setType("");
-		setValue("");
+		setType("")
+		setValue("")
 		setFeatures([""])
 		setGptResponse("")
 	}
@@ -68,12 +68,11 @@ const BuildStatement = ({
 					boxShadow:
 						"0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)",
 				}}
-				className="w-full mt-3"
+				className="mt-3 w-full"
 			>
 				<Form layout="vertical">
 					<Form.Item label={<span className="font-semibold">Type</span>} className="font-semibold">
 						<Segmented
-
 							value={type}
 							options={["Mobile", "Tablet", "Desktop", "Watch", "Web"]}
 							onChange={(value) => setType(value)}
@@ -85,19 +84,18 @@ const BuildStatement = ({
 							value={value}
 							onChange={(e) => setValue(e.target.value)}
 							placeholder="eg. Making it easy to to create albums of photos/videos"
-
 						/>
 					</Form.Item>
 
 					<Form.Item label={<span className="font-semibold">Features</span>}>
 						{features.map((feature, i) => (
 							<Input
-                key={i}
+								key={i}
 								className="mb-2"
 								prefix={
 									<div className="flex items-center justify-between">
 										{i !== 0 ? (
-											<button  className="mr-[5px] flex items-center" onClick={() => removeFeature(i)}>
+											<button className="mr-[5px] flex items-center" onClick={() => removeFeature(i)}>
 												<MinusCircleOutlined
 													style={{
 														color: "#C82D73",
@@ -120,16 +118,15 @@ const BuildStatement = ({
 										</button>
 									</div>
 								}
-
 							/>
 						))}
 					</Form.Item>
 				</Form>
 			</Card>
 			<Space className="mt-6 flex justify-end">
-				<Button  onClick={onReset}>Reset</Button>
+				<Button onClick={onReset}>Reset</Button>
 				<Button
-					className="border-none bg-green-s500 text-white hover:text-white outline-none hover:border-none hover:bg-green-s400 hover:outline-none focus:outline-none"
+					className="border-none bg-green-s500 text-white outline-none hover:border-none hover:bg-green-s400 hover:text-white hover:outline-none focus:outline-none"
 					onClick={onSubmit}
 				>
 					Submit

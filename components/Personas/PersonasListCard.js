@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useCallback} from "react"
 import styled from "styled-components"
 
-import {Card, Form, Button} from "antd5"
-import {Input} from "antd5"
+import {Card, Form, Button} from "antd"
+import {Input} from "antd"
 
 import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
 

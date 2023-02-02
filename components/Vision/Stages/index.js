@@ -1,4 +1,4 @@
-import {Steps, message} from "antd5"
+import {Steps, message} from "antd"
 import {useAtomValue} from "jotai"
 import {useQuery} from "@tanstack/react-query"
 import React, {useState, useEffect} from "react"

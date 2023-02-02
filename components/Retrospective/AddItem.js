@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-import {Row, Col, Input, Form, Drawer, message} from "antd5"
+import {Row, Col, Input, Form, Drawer, message} from "antd"
 import styled from "styled-components"
 
 import {Title} from "../Dashboard/SectionTitle"
@@ -50,11 +50,11 @@ const AddItem = ({show, setShow, product, user, type}) => {
 				name: user.name,
 				photo: user.avatar || "https://joeschmoe.io/api/v1/random",
 			},
-      actions
+			actions,
 		}
 
-		if(title && description) {
-      db.collection("Retrospectives")
+		if (title && description) {
+			db.collection("Retrospectives")
 				.add(data)
 				.then((docRef) => {
 					message.success("Retrospective submitted successfully")
@@ -66,7 +66,7 @@ const AddItem = ({show, setShow, product, user, type}) => {
 				.catch((error) => {
 					message.error("Error adding Retrospective")
 				})
-    }
+		}
 	}
 
 	const handleChange = (e, field) => {
@@ -77,15 +77,15 @@ const AddItem = ({show, setShow, product, user, type}) => {
 	}
 
 	const handleKeyDown = (e) => {
-    // let newActions = [...actions]
+		// let newActions = [...actions]
 		if (e.key === "Enter") {
-      let newActions = [...actions]
+			let newActions = [...actions]
 			newActions.push({
 				name: e.target.value,
 				completed: false,
 			})
-      setVal();
-      setActions(newActions);
+			setVal()
+			setActions(newActions)
 			setAddAction(false)
 		}
 	}

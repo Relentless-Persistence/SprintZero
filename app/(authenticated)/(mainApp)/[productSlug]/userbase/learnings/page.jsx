@@ -2,7 +2,7 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import {Radio, Empty, notification, Breadcrumb, Button} from "antd5"
+import {Radio, Empty, notification, Breadcrumb, Button} from "antd"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -10,8 +10,8 @@ import {RadioButtonWithFill} from "~/components/AppRadioBtn"
 import {LearningsActionFormCard} from "~/components/Dashboard/FormCard"
 import {LearningsItemCard} from "~/components/Dashboard/ItemCard"
 import MasonryGrid from "~/components/Dashboard/MasonryGrid"
-import {db} from "~/config/firebase-config"
 import {splitRoutes} from "~/utils"
+import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const names = [`Validated`, `Assumed`, `Disproven`]
@@ -69,7 +69,7 @@ export default function Learnings() {
 		const data = {
 			name: item.title,
 			description: item.description,
-      artifact: item.artifact,
+			artifact: item.artifact,
 			type: activeLearning,
 			product_id: activeProductId,
 		}
@@ -119,8 +119,8 @@ export default function Learnings() {
 				}
 			})
 			.catch((err) => {
-        // eslint-disable-next-line no-console
-        console.log(err)
+				// eslint-disable-next-line no-console
+				console.log(err)
 			})
 	}
 

@@ -10,7 +10,7 @@ import {db} from "../../../config/firebase-config"
 import {activeProductState} from "../../../atoms/productAtom"
 import {useRecoilValue} from "recoil"
 
-import {Row, Col, Typography, Button, Card, Tag, Timeline} from "antd5"
+import {Row, Col, Typography, Button, Card, Tag, Timeline} from "antd"
 import Stages from "../../../components/Vision/Stages"
 
 import {formatDistance} from "date-fns"
@@ -24,10 +24,9 @@ export default function Visions() {
 	const [vision, setVision] = useState(null)
 	const [events, setEvents] = useState(null)
 
-
 	const fetchVisions = () => {
-		if(activeProduct){
-      db.collection("Visions")
+		if (activeProduct) {
+			db.collection("Visions")
 				.where("product_id", "==", activeProduct.id)
 				.onSnapshot((snapshot) => {
 					if (snapshot.empty === true) {
@@ -36,7 +35,7 @@ export default function Visions() {
 						setVision(snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))[0])
 					}
 				})
-    }
+		}
 	}
 
 	useEffect(() => {
@@ -118,7 +117,7 @@ export default function Visions() {
 							{events &&
 								events.map((event, i) => (
 									<Timeline.Item color="#54A31C" key={i}>
-										<p className="mb-[10px] font-courier text-xs">{getLastUpdate(event.createdAt)}</p>
+										<p className="font-courier mb-[10px] text-xs">{getLastUpdate(event.createdAt)}</p>
 										{i === 0 ? (
 											<p className="text-xs">
 												<span className="text-[#1890FF]">@{event.user.name}</span> created Product Vision{" "}
