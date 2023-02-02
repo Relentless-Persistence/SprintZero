@@ -33,6 +33,14 @@ service cloud.firestore {
       	if request.auth != null
     }
 
+    match /RetrospectiveItems/{id} {
+    	allow read, update, delete:
+      	if isEditorOnProduct(resource.data.productId)
+
+      allow create:
+      	if request.auth != null
+    }
+
     match /StoryMapStates/{storyMapStateId} {
     	allow read, update, delete:
       	if isEditorOnProduct(resource.data.productId)
