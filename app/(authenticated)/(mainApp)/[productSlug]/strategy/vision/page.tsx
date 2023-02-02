@@ -1,13 +1,14 @@
 "use client"
 
-import {Button, Tag, Timeline, Breadcrumb, Card, Empty, Steps} from "antd"
+import {useQueries} from "@tanstack/react-query"
+import {Button, Tag, Timeline, Breadcrumb, Card, Steps} from "antd"
 import {formatDistanceToNow} from "date-fns"
-import {collection, doc, documentId, query, Timestamp, where} from "firebase/firestore"
+import {doc, getDoc, Timestamp} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
-import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -15,8 +16,9 @@ import type {Id} from "~/types"
 import FinalStep from "./FinalStep"
 import ResponseStep from "./ResponseStep"
 import StatementStep from "./StatementStep"
+import NoData from "~/components/NoData"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {UserConverter} from "~/types/db/Users"
+import {UserConverter, Users} from "~/types/db/Users"
 import {auth, db} from "~/utils/firebase"
 import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -31,14 +33,13 @@ const VisionsPage: FC = () => {
 	const [gptResponse, setGptResponse] = useState<string | undefined>(undefined)
 	const [gptResponseAccepted, setGptResponseAccepted] = useState(false)
 
-	const updatesUsers = activeProduct?.updates.map((update) => update.userId)
-	const [users] = useCollectionData(
-		updatesUsers && updatesUsers.length > 0
-			? query(collection(db, Products._, activeProductId), where(documentId(), `in`, updatesUsers)).withConverter(
-					UserConverter,
-			  )
-			: undefined,
-	)
+	const usersData = useQueries({
+		queries:
+			activeProduct?.updates.map((update) => ({
+				queryKey: [`user`, update.userId],
+				queryFn: async () => (await getDoc(doc(db, Users._, update.userId).withConverter(UserConverter))).data(),
+			})) ?? [],
+	})
 
 	return (
 		<div className="flex h-full flex-col gap-6 px-12 pt-8">
@@ -65,7 +66,7 @@ const VisionsPage: FC = () => {
 					</div>
 
 					<div>
-						{editMode ? (
+						{editMode && (
 							<Steps
 								direction="vertical"
 								current={currentStep}
@@ -119,19 +120,19 @@ const VisionsPage: FC = () => {
 								]}
 								className="[&_.ant-steps-item-title]:w-full"
 							/>
-						) : (
+						)}
+						{!editMode && activeProduct?.finalVision && (
 							<Card
 								className="border border-[#D9D9D9]"
 								style={{boxShadow: `0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)`}}
 							>
-								{activeProduct?.finalVision ? (
-									<p>{activeProduct.finalVision}</p>
-								) : (
-									<div className="flex items-center justify-center">
-										<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
-									</div>
-								)}
+								<p>{activeProduct.finalVision}</p>
 							</Card>
+						)}
+						{!editMode && !activeProduct?.finalVision && (
+							<div className="grid place-items-center">
+								<NoData />
+							</div>
 						)}
 					</div>
 				</div>
@@ -150,7 +151,9 @@ const VisionsPage: FC = () => {
 									<div className="space-y-1">
 										<p className="font-mono">{formatDistanceToNow(update.timestamp.toDate(), {addSuffix: true})}</p>
 										<p className="text-xs">
-											<span className="text-[#1890ff]">@{users?.find((user) => user.id === update.userId)?.name}</span>
+											<span className="text-[#1890ff]">
+												@{usersData.find((user) => user.data?.id === update.userId)?.data?.name}
+											</span>
 											{` `}
 											{update.text.split(`"`).map((text, i) =>
 												i % 2 === 0 ? (

@@ -29,10 +29,13 @@ export type RhfInputProps<TFieldValues extends FieldValues> = Omit<AntdInputProp
 const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 	control,
 	name,
+	rules,
+	shouldUnregister,
+	defaultValue,
 	currencyFormat,
 	...props
 }: RhfInputProps<TFieldValues>): ReactElement | null => {
-	const {field} = useController({control, name})
+	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	const format = (str: string) => {
 		if (str.length === 0) return null

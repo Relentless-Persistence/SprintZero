@@ -82,6 +82,7 @@ module.exports = {
 				`plugin:@tanstack/eslint-plugin-query/recommended`,
 			],
 			rules: {
+				"@tanstack/query/exhaustive-deps": `off`,
 				"react/button-has-type": `warn`,
 				"react/display-name": `warn`,
 				"react/forbid-elements": [

@@ -18,9 +18,12 @@ export type RhfSegmentedProps<TFieldValues extends FieldValues> = Omit<AntdSegme
 const RhfSegmented = <TFieldValues extends FieldValues = FieldValues>({
 	control,
 	name,
+	rules,
+	shouldUnregister,
+	defaultValue,
 	...props
 }: RhfSegmentedProps<TFieldValues>): ReactElement | null => {
-	const {field} = useController({control, name})
+	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	return (
 		<Segmented

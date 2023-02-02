@@ -7,6 +7,7 @@ specifiers:
   '@playwright/test': 1.30.0
   '@stripe/react-stripe-js': ^1.6.0
   '@stripe/stripe-js': ^1.19.1
+  '@tanstack/react-query': 4.24.4
   '@types/diff': 5.0.2
   '@types/lodash': 4.14.191
   '@types/node': 18.11.18
@@ -30,7 +31,7 @@ specifiers:
   eslint-plugin-react: 7.32.2
   eslint-plugin-react-hooks: 4.6.0
   firebase: 9.16.0
-  framer-motion: 8.5.5
+  framer-motion: 9.0.1
   immer: 9.0.19
   immutability-helper: ^3.1.1
   jotai: 2.0.0
@@ -73,6 +74,7 @@ dependencies:
   '@playwright/test': 1.30.0
   '@stripe/react-stripe-js': 1.15.0_mljfwq7caaxrtdqn7u72ntpebq
   '@stripe/stripe-js': 1.44.1
+  '@tanstack/react-query': 4.24.4_biqbaboplfbrettd7655fr4n2y
   '@types/diff': 5.0.2
   '@types/lodash': 4.14.191
   '@types/node': 18.11.18
@@ -96,7 +98,7 @@ dependencies:
   eslint-plugin-react: 7.32.2_eslint@8.33.0
   eslint-plugin-react-hooks: 4.6.0_eslint@8.33.0
   firebase: 9.16.0
-  framer-motion: 8.5.5_biqbaboplfbrettd7655fr4n2y
+  framer-motion: 9.0.1_biqbaboplfbrettd7655fr4n2y
   immer: 9.0.19
   immutability-helper: 3.1.1
   jotai: 2.0.0_react@18.2.0
@@ -221,7 +223,7 @@ packages:
     resolution: {integrity: sha512-KnPEaAH+XNJMjax9U35W67nzPI+QQ2x27pYlzmSIWrbj4/k8PGrARXfzDTjwoozHJY8qG62Z+Ww6Alhu2FctXQ==}
     dependencies:
       '@antv/util': 2.0.17
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/component/0.8.28:
@@ -235,7 +237,7 @@ packages:
       '@antv/scale': 0.3.18
       '@antv/util': 2.0.17
       fecha: 4.2.3
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/coord/0.3.1:
@@ -243,13 +245,13 @@ packages:
     dependencies:
       '@antv/matrix-util': 3.1.0-beta.3
       '@antv/util': 2.0.17
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/dom-util/2.0.4:
     resolution: {integrity: sha512-2shXUl504fKwt82T3GkuT4Uoc6p9qjCKnJ8gXGLSW4T1W37dqf9AV28aCfoVPHp2BUXpSsB+PAJX2rG/jLHsLQ==}
     dependencies:
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/event-emitter/0.1.3:
@@ -269,7 +271,7 @@ packages:
       d3-interpolate: 1.4.0
       d3-timer: 1.0.10
       detect-browser: 5.3.0
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/g-canvas/0.5.12:
@@ -281,7 +283,7 @@ packages:
       '@antv/path-util': 2.0.15
       '@antv/util': 2.0.17
       gl-matrix: 3.4.3
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/g-math/0.1.7:
@@ -298,7 +300,7 @@ packages:
       '@antv/g-math': 0.1.7
       '@antv/util': 2.0.17
       detect-browser: 5.3.0
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/g2/4.2.8:
@@ -318,7 +320,7 @@ packages:
       '@antv/path-util': 2.0.15
       '@antv/scale': 0.3.18
       '@antv/util': 2.0.17
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/g2plot/2.4.22:
@@ -340,7 +342,7 @@ packages:
     dependencies:
       '@antv/util': 2.0.17
       gl-matrix: 3.4.3
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/matrix-util/3.1.0-beta.3:
@@ -348,7 +350,7 @@ packages:
     dependencies:
       '@antv/util': 2.0.17
       gl-matrix: 3.4.3
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/path-util/2.0.15:
@@ -356,7 +358,7 @@ packages:
     dependencies:
       '@antv/matrix-util': 3.0.4
       '@antv/util': 2.0.17
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/scale/0.3.18:
@@ -364,14 +366,14 @@ packages:
     dependencies:
       '@antv/util': 2.0.17
       fecha: 4.2.3
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@antv/util/2.0.17:
     resolution: {integrity: sha512-o6I9hi5CIUvLGDhth0RxNSFDRwXeywmt6ExR4+RmVAzIi48ps6HUy+svxOCayvrPBN37uE6TAc2KDofRo0nK9Q==}
     dependencies:
       csstype: 3.1.1
-      tslib: 2.5.0
+      tslib: 2.4.1
     dev: false
 
   /@babel/code-frame/7.18.6:
@@ -1470,6 +1472,28 @@ packages:
     resolution: {integrity: sha512-4C7nX/dvpzB7za4Ql9K81xK3HPxCpHMgwTZVyf+9JQ6VUbn9jjZVN7/Nkdz/Ugzs2CSjqnL/UPXroiVBVHUWUw==}
     dependencies:
       tslib: 2.5.0
+    dev: false
+
+  /@tanstack/query-core/4.24.4:
+    resolution: {integrity: sha512-9dqjv9eeB6VHN7lD3cLo16ZAjfjCsdXetSAD5+VyKqLUvcKTL0CklGQRJu+bWzdrS69R6Ea4UZo8obHYZnG6aA==}
+    dev: false
+
+  /@tanstack/react-query/4.24.4_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-RpaS/3T/a3pHuZJbIAzAYRu+1nkp+/enr9hfRXDS/mojwx567UiMksoqW4wUFWlwIvWTXyhot2nbIipTKEg55Q==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@tanstack/query-core': 4.24.4
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
 
   /@types/d3-timer/2.0.1:
@@ -3156,8 +3180,8 @@ packages:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: false
 
-  /framer-motion/8.5.5_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-5IDx5bxkjWHWUF3CVJoSyUVOtrbAxtzYBBowRE2uYI/6VYhkEBD+rbTHEGuUmbGHRj6YqqSfoG7Aa1cLyWCrBA==}
+  /framer-motion/9.0.1_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-0EP7+b/hnsbrFOum9zU+23Fq2cJJrLOqv/yJ26fIzK4CC33ZAjXZGi1/XyblbgnUF0cxZ/SEDj5IYHeQo42qNg==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -6003,6 +6027,14 @@ packages:
 
   /use-memo-one/1.1.3_react@18.2.0:
     resolution: {integrity: sha512-g66/K7ZQGYrI6dy8GLpVcMsBp4s17xNkYJVSMvTEevGy3nDxHOfE6z8BVE22+5G5x7t3+bhzrlTDB7ObrEE0cQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /use-sync-external-store/1.2.0_react@18.2.0:
+    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:

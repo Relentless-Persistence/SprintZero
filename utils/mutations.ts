@@ -260,7 +260,7 @@ export const updateStory = async ({storyMapState, storyId, data}: UpdateStoryVar
 
 type SetStoryMapStateVars = {
 	id: Id
-	data: Omit<StoryMapState, `id`>
+	data: StoryMapState
 }
 
 export const setStoryMapState = async ({id, data}: SetStoryMapStateVars): Promise<void> => {
@@ -270,7 +270,7 @@ export const setStoryMapState = async ({id, data}: SetStoryMapStateVars): Promis
 
 type AddCommentVars = {
 	storyMapStateId: Id
-	comment: Omit<Comment, `id`>
+	comment: Comment
 }
 
 export const addComment = async ({storyMapStateId, comment}: AddCommentVars): Promise<Id> => {
@@ -279,7 +279,7 @@ export const addComment = async ({storyMapStateId, comment}: AddCommentVars): Pr
 }
 
 type AddAccessibilityItemVars = {
-	item: Omit<AccessibilityItem, `id`>
+	item: AccessibilityItem
 }
 
 export const addAccessibilityItem = async ({item}: AddAccessibilityItemVars): Promise<Id> => {
@@ -289,7 +289,7 @@ export const addAccessibilityItem = async ({item}: AddAccessibilityItemVars): Pr
 
 type UpdateAccessibilityItemVars = {
 	id: Id
-	data: Partial<Omit<AccessibilityItem, `id`>>
+	data: Partial<AccessibilityItem>
 }
 
 export const updateAccessibilityItem = async ({id, data}: UpdateAccessibilityItemVars): Promise<void> => {
@@ -306,10 +306,10 @@ export const deleteAccessibilityItem = async ({id}: DeleteAccessibilityItemVars)
 
 type UpdateObjectiveVars = {
 	id: Id
-	data: Partial<Omit<Objective, `id`>>
+	data: Partial<Objective>
 }
 
 export const updateObjective = async ({id, data}: UpdateObjectiveVars): Promise<void> => {
-	const safeData = ObjectiveSchema.parse(data)
+	const safeData = ObjectiveSchema.partial().parse(data)
 	await updateDoc(doc(db, Objectives._, id), safeData)
 }

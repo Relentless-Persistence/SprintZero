@@ -1,7 +1,7 @@
 "use client"
 
 import {GlobalOutlined} from "@ant-design/icons"
-import {Button, Empty, Breadcrumb, Card, Input, Tabs} from "antd"
+import {Button, Breadcrumb, Card, Input, Tabs} from "antd"
 import {collection, doc, query, where} from "firebase/firestore"
 import {useState, useEffect} from "react"
 import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
@@ -9,7 +9,9 @@ import Masonry from "react-masonry-css"
 
 import type {Id} from "~/types"
 
+import EditableTextAreaCard from "~/components/EditableTextAreaCard"
 import LinkTo from "~/components/LinkTo"
+import NoData from "~/components/NoData"
 import {AccessibilityItemConverter, AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
@@ -17,7 +19,7 @@ import {addAccessibilityItem, deleteAccessibilityItem, updateAccessibilityItem, 
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const descriptions = {
-	auditory: `Auditory disabilities range from mild or moderate hearing loss in one or both ears ("hard of hearing") to substantial and uncorrectable hearing loss in both ears ("deafness”"). Some people with auditory disabilities can hear sounds but sometimes not sufficiently to understand all speech, especially when there is background noise. This can include people using hearing aids.`,
+	auditory: `Auditory disabilities range from mild or moderate hearing loss in one or both ears ("hard of hearing") to substantial and uncorrectable hearing loss in both ears ("deafness"). Some people with auditory disabilities can hear sounds but sometimes not sufficiently to understand all speech, especially when there is background noise. This can include people using hearing aids.`,
 	cognitive: `Cognitive, learning, and neurological disabilities involve neurodiversity and neurological disorders, as well as behavioral and mental health disorders that are not necessarily neurological. They may affect any part of the nervous system and impact how well people hear, move, see, speak, and understand information. Cognitive, learning, and neurological disabilities do not necessarily affect the intelligence of a person.`,
 	physical: `Physical disabilities (sometimes called "motor disabilities") include weakness and limitations of muscular control (such as involuntary movements including tremors, lack of coordination, or paralysis), limitations of sensation, joint disorders (such as arthritis), pain that impedes movement, and missing limbs.`,
 	speech: `Speech disabilities include difficulty producing speech that is recognizable by others or by voice recognition software. For example, the loudness or clarity of someone's voice might be difficult to understand.`,
@@ -96,83 +98,29 @@ const Accessibility = () => {
 						columnClassName="bg-clip-padding space-y-8"
 					>
 						{currentItems?.map((item) => (
-							<Card
+							<EditableTextAreaCard
 								key={item.id}
-								type="inner"
-								title={
-									item.id === activeItemId && itemDraft ? (
-										<Input
-											size="small"
-											value={itemDraft.name}
-											onChange={(e) => void setItemDraft((item) => ({name: e.target.value, text: item!.text}))}
-											className="mr-4"
-										/>
-									) : (
-										<p>{item.name}</p>
-									)
-								}
-								extra={
-									item.id === activeItemId && itemDraft ? (
-										<div className="ml-4 flex gap-2">
-											<Button
-												size="small"
-												onClick={() => {
-													setActiveItemId(undefined)
-													setItemDraft(undefined)
-												}}
-											>
-												Cancel
-											</Button>
-											<Button
-												size="small"
-												type="primary"
-												className="bg-green-s500"
-												onClick={() => {
-													updateAccessibilityItem({
-														id: item.id,
-														data: {
-															name: itemDraft.name,
-															text: itemDraft.text,
-														},
-													})
-													setActiveItemId(undefined)
-													setItemDraft(undefined)
-												}}
-											>
-												Done
-											</Button>
-										</div>
-									) : (
-										<button
-											type="button"
-											onClick={() => {
-												setItemDraft({name: item.name, text: item.text})
-												setActiveItemId(item.id)
-											}}
-										>
-											Edit
-										</button>
-									)
-								}
-							>
-								{item.id === activeItemId && itemDraft ? (
-									<div className="flex flex-col items-stretch gap-2">
-										<div className="relative h-max">
-											<p className="invisible min-w-0 border p-1">{itemDraft.text || `filler`}</p>
-											<Input.TextArea
-												value={itemDraft.text}
-												onChange={(e) => void setItemDraft((item) => ({name: item!.name, text: e.target.value}))}
-												className="absolute inset-0"
-											/>
-										</div>
-										<Button danger onClick={() => void deleteAccessibilityItem({id: item.id})}>
-											Remove
-										</Button>
-									</div>
-								) : (
-									<p className="min-w-0">{item.text}</p>
-								)}
-							</Card>
+								isEditing={item.id === activeItemId && itemDraft !== undefined}
+								onEditStart={() => {
+									setItemDraft({name: item.name, text: item.text})
+									setActiveItemId(item.id)
+								}}
+								title={item.name}
+								text={item.text}
+								onCancel={() => {
+									setActiveItemId(undefined)
+									setItemDraft(undefined)
+								}}
+								onCommit={(title, text) => {
+									updateAccessibilityItem({
+										id: item.id,
+										data: {name: title, text},
+									})
+									setActiveItemId(undefined)
+									setItemDraft(undefined)
+								}}
+								onDelete={() => void deleteAccessibilityItem({id: item.id})}
+							/>
 						))}
 
 						{itemDraft && !activeItemId && (
@@ -233,14 +181,7 @@ const Accessibility = () => {
 
 				{currentItems && currentItems.length === 0 && !itemDraft && (
 					<div className="grid grow place-items-center">
-						<div
-							style={{
-								boxShadow: `0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)`,
-							}}
-							className="rounded-md bg-white px-20 py-4"
-						>
-							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-						</div>
+						<NoData />
 					</div>
 				)}
 			</div>

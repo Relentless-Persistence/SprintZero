@@ -18,9 +18,12 @@ export type RhfSelectProps<TFieldValues extends FieldValues> = Omit<AntdSelectPr
 const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	control,
 	name,
+	rules,
+	shouldUnregister,
+	defaultValue,
 	...props
 }: RhfSelectProps<TFieldValues>): ReactElement | null => {
-	const {field} = useController({control, name})
+	const {field} = useController({control, name, rules, defaultValue, shouldUnregister})
 
 	return (
 		<Select

@@ -26,7 +26,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	const [product, loading] = useDocumentDataOnce(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 
 	useEffect(() => {
-		if (!product && !loading) router.replace(`/product`)
+		if (!product && !loading) router.replace(`/`)
 	}, [loading, product, router])
 
 	if (loading || !product) return null

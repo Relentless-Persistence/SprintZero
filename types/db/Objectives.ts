@@ -11,7 +11,7 @@ export const ObjectiveSchema = z.object({
 			text: z.string(),
 		}),
 	),
-	title: z.string(),
+	statement: z.string(),
 
 	productId: idSchema,
 })

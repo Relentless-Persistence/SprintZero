@@ -1,13 +1,12 @@
-import {PlusCircleOutlined, MinusCircleOutlined} from "@ant-design/icons"
-import {Card, Form, Input, Button} from "antd"
+import {Card, Form, Button} from "antd"
 import {diffArrays} from "diff"
 import {doc, Timestamp} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocumentData} from "react-firebase-hooks/firestore"
-import {useFieldArray, useForm} from "react-hook-form"
+import {useForm} from "react-hook-form"
 import {z} from "zod"
 
 import type {FC} from "react"
@@ -16,9 +15,10 @@ import type {Id} from "~/types"
 import {generateProductVision} from "./getGptResponse"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
+import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
 import {ProductConverter, Products} from "~/types/db/Products"
-import {updateProduct} from "~/utils/mutations"
 import {auth, db} from "~/utils/firebase"
+import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const listToSentence = (list: string[]) => {
@@ -54,12 +54,11 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 		},
 	})
 
-	const {fields: features, append: appendFeature, remove: removeFeature} = useFieldArray({control, name: `features`})
-
 	const onSubmit = handleSubmit(async (data: FormInputs) => {
 		if (status !== `initial`) return
 		setStatus(`submitted`)
 
+		data.features = data.features.filter((feature) => feature.text !== ``)
 		const gptResponse = await generateProductVision({
 			productType: data.type,
 			valueProposition: data.valueProposition,
@@ -153,19 +152,7 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 						</Form.Item>
 
 						<Form.Item label={<span className="font-semibold">Features</span>}>
-							{features.map((feature, i) => (
-								<Input.Group key={feature.id} compact className="!inline-flex">
-									<Button onClick={() => void removeFeature(i)}>
-										<MinusCircleOutlined className="align-middle text-[#c82d73]" />
-									</Button>
-									<RhfInput control={control} name={`features.${i}.text`} />
-									{i === features.length - 1 && (
-										<Button onClick={() => void appendFeature({id: nanoid(), text: ``})}>
-											<PlusCircleOutlined className="align-middle text-[#009c7e]" />
-										</Button>
-									)}
-								</Input.Group>
-							))}
+							<RhfTextListEditor control={control} name="features" />
 						</Form.Item>
 					</div>
 				</Form>

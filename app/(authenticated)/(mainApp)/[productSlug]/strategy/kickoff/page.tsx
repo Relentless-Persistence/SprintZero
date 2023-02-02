@@ -1,6 +1,6 @@
 "use client"
 
-import {Breadcrumb, Card, Input} from "antd"
+import {Breadcrumb, Card} from "antd"
 import {doc} from "firebase/firestore"
 import {useState} from "react"
 import {useDocumentData} from "react-firebase-hooks/firestore"
@@ -8,8 +8,8 @@ import {useDocumentData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 
 import EditButtons from "./EditButtons"
-import TextListEditor from "./TextListEditor"
-import StretchyInput from "~/components/StretchyInput"
+import TextListEditor from "../../../../../../components/TextListEditor"
+import EditableTextAreaCard from "~/components/EditableTextAreaCard"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {updateProduct} from "~/utils/mutations"
@@ -33,36 +33,23 @@ const KickoffPage: FC = () => {
 			</Breadcrumb>
 			<div className="grid grid-cols-2 gap-8">
 				<div className="flex flex-col gap-8">
-					<Card
-						type="inner"
-						title="Problem Statement"
-						extra={
-							<EditButtons
-								onEditStart={() => {
-									setTextState(activeProduct?.problemStatement ?? ``)
-									setEditingSection(`problemStatement`)
-								}}
-								onEditEnd={() => {
-									setTextState(``)
-									setEditingSection(undefined)
-								}}
-								isEditing={editingSection === `problemStatement`}
-								onCommit={() => void updateProduct({id: activeProduct!.id, data: {problemStatement: textState}})}
-							/>
-						}
-					>
-						{editingSection === `problemStatement` ? (
-							<StretchyInput text={textState} className="py-[4px] px-[11px]">
-								<Input.TextArea
-									value={textState}
-									onChange={(e) => void setTextState(e.target.value)}
-									className="!resize-none"
-								/>
-							</StretchyInput>
-						) : (
-							<p>{activeProduct?.problemStatement}</p>
-						)}
-					</Card>
+					{activeProduct && (
+						<EditableTextAreaCard
+							isEditing={editingSection === `problemStatement`}
+							onEditStart={() => {
+								setTextState(activeProduct.problemStatement)
+								setEditingSection(`problemStatement`)
+							}}
+							title="Problem Statement"
+							disableTitleEditing
+							text={activeProduct.problemStatement}
+							onCancel={() => void setEditingSection(undefined)}
+							onCommit={() => {
+								updateProduct({id: activeProduct!.id, data: {problemStatement: textState}})
+								setEditingSection(undefined)
+							}}
+						/>
+					)}
 
 					<Card
 						type="inner"
