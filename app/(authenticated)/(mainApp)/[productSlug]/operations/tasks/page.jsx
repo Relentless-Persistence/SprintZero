@@ -1,7 +1,9 @@
 "use client"
 
 /* eslint-disable react-hooks/exhaustive-deps */
-import {Breadcrumb, Button, notification} from "antd"
+import {useQuery} from "@tanstack/react-query"
+import {Breadcrumb, Button, notification} from "antd5"
+import {collection, where, query, onSnapshot, updateDoc} from "firebase9/firestore"
 import {useState, useEffect} from "react"
 import styled from "styled-components"
 
@@ -10,8 +12,12 @@ import {Board} from "~/components/Tasks/Boards"
 import CustomTag from "~/components/Tasks/CustomTag"
 import EditTask from "~/components/Tasks/EditTask"
 import {splitRoutes} from "~/utils"
+import {getUser} from "~/utils/api/queries"
+import {useUserId} from "~/utils/atoms"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+
+
 
 const boards = [`Board 0`, `Board 1`, `Board 2`, `Board 3`, `Board 4`]
 
@@ -59,48 +65,43 @@ export default function Tasks() {
 	}, [activeBoard])
 
 	// Fetch data from firebase
-	const fetchTasks = async () => {
+	const fetchTasks = () => {
 		if (activeProductId) {
-			db.collection(`tasks`)
-				.where(`product_id`, `==`, activeProductId)
-				.where(`board`, `==`, activeBoard)
-				.onSnapshot((snapshot) => {
-					const data = snapshot.docs.map((doc) => ({
-						id: doc.id,
-						...doc.data(),
-					}))
-					const backlog = data.filter((item) => item.status === `Backlog`).sort((a, b) => a.order - b.order)
-					const doing = data.filter((item) => item.status === `Doing`).sort((a, b) => a.order - b.order)
-					const review = data.filter((item) => item.status === `Review`).sort((a, b) => a.order - b.order)
-					const done = data.filter((item) => item.status === `Done`).sort((a, b) => a.order - b.order)
+			const docRef = collection(db, `tasks`)
+			const q = query(docRef, where(`product_id`, `==`, activeProductId), where(`board`, `==`, activeBoard))
+			onSnapshot(q, (snapshot) => {
+				const data = snapshot.docs.map((doc) => ({
+					id: doc.id,
+					...doc.data(),
+				}))
+				const backlog = data.filter((item) => item.status === `Backlog`).sort((a, b) => a.order - b.order)
+				const doing = data.filter((item) => item.status === `Doing`).sort((a, b) => a.order - b.order)
+				const review = data.filter((item) => item.status === `Review`).sort((a, b) => a.order - b.order)
+				const done = data.filter((item) => item.status === `Done`).sort((a, b) => a.order - b.order)
 
-					setData([
-						{
-							columnId: `0`,
-							columnName: `Backlog`,
-							data: backlog,
-						},
-						{
-							columnId: `1`,
-							columnName: `Doing`,
-							data: doing,
-						},
-						{
-							columnId: `2`,
-							columnName: `Review`,
-							data: review,
-						},
-						{
-							columnId: `3`,
-							columnName: `Done`,
-							data: done,
-						},
-					])
-
-					// if(data.length < 1) {
-					//   setCreateMode(true)
-					// }
-				})
+				setData([
+					{
+						columnId: `0`,
+						columnName: `Backlog`,
+						data: backlog,
+					},
+					{
+						columnId: `1`,
+						columnName: `Doing`,
+						data: doing,
+					},
+					{
+						columnId: `2`,
+						columnName: `Review`,
+						data: review,
+					},
+					{
+						columnId: `3`,
+						columnName: `Done`,
+						data: done,
+					},
+				])
+			})
 		}
 	}
 
@@ -109,22 +110,19 @@ export default function Tasks() {
 	}, [activeProductId, activeBoard])
 
 	const handleDrop = async (card, targetColId) => {
+		const docRef = collection(db, `tasks`, selectedTask.id)
 		const selectedTask = data[card.colId].data[card.id]
 		const targetTask = data[targetColId]
 
-		await db
-			.collection(`tasks`)
-			.doc(selectedTask.id)
-			.update({
+		try {
+			await updateDoc(docRef, {
 				status: targetTask.columnName,
-				order: targetTask.data.length <= 0 ? 0 : targetTask.data.length === 1 ? 1 : targetTask.data.length - 1,
+			}).then(() => {
+				notification.success({message: `Task moved successfully`})
 			})
-			.then(() => {
-				notification.success({message: `Task updated successfully`})
-			})
-			.catch(() => {
-				notification.error({message: `An error occurred!`})
-			})
+		} catch (error) {
+			notification.error({message: `An error occurred!`})
+		}
 	}
 
 	// const handleSwap = (currentCard, targetCard) => {
@@ -213,7 +211,7 @@ export default function Tasks() {
 				</div>
 			</div>
 
-			<div className="w-[112px]">
+			<div className="min-w-max">
 				<div className="">
 					<Versions>
 						{boards.map((item, i) => (

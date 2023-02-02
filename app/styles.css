@@ -55,3 +55,7 @@ li {
 	white-space: pre-wrap;
 	overflow-wrap: break-word;
 }
+
+#comment .ant-list-item {
+	padding: 12px 0px !important;
+}
