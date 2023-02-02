@@ -22,12 +22,13 @@ const Header: FC = () => {
 	const [user] = useAuthState(auth)
 	invariant(user, `User state not loaded`)
 	const [allProducts] = useCollectionDataOnce(
-		query(collection(db, Products._), where(`${Products.members}.${user.uid}.type`, `==`, `editor`)),
+		query(collection(db, Products._), where(`${Products.members}.${user.uid}.type`, `==`, `editor`)).withConverter(
+			ProductConverter,
+		),
 	)
 
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
-	if (!activeProduct) return null
 	return (
 		<>
 			<Layout.Header style={{paddingInline: `unset`}}>
@@ -37,7 +38,7 @@ const Header: FC = () => {
 					<Menu
 						theme="dark"
 						mode="horizontal"
-						selectedKeys={[activeProduct.id]}
+						selectedKeys={[activeProduct?.id ?? ``]}
 						items={allProducts?.map((product) => ({
 							key: product.id,
 							label: (

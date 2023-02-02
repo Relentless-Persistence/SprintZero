@@ -46,6 +46,10 @@ ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 	padding-right: 0px;
 }
 
+.ant-notification-notice-message {
+	margin-bottom: 0px !important;
+}
+
 p,
 li {
 	white-space: pre-wrap;

@@ -32,16 +32,16 @@ const Agreement = () => {
 	}
 
 	const onCancel = (e) => {
-    auth.signOut();
+		auth.signOut()
 		router.push("/")
 	}
 
 	return (
 		<div>
-			<h1 className="text-[38px]">Let’s Get Started!</h1>
-			<p className="mb-8 text-xl">
+			<h1 className="text-3xl">Let's Get Started!</h1>
+			<p className="text-xl text-[#595959]">
 				Thanks for choosing SprintZero to build your next product experience! Start by reviewing and accepting our terms
-				of service.{" "}
+				of service.
 			</p>
 
 			<TextArea placeholder="Legal Copy" size="Large" value={terms} readOnly rows={10} className="mb-4"></TextArea>

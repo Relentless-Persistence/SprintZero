@@ -5,6 +5,7 @@ import {genConverter, genDbNames} from "~/types"
 export const UserSchema = z.object({
 	avatar: z.string().nullable(),
 	email: z.string(),
+	hasAcceptedTos: z.boolean(),
 	name: z.string(),
 })
 

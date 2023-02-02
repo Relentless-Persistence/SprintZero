@@ -11,7 +11,7 @@ import type {WithDocumentData} from "~/types"
 import type {Feature as FeatureType, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
-import {sortFeatures} from "~/app/(authenticated)/[productSlug]/dashboard/storyMap/utils"
+import {sortFeatures} from "~/app/(authenticated)/(mainApp)/[productSlug]/dashboard/storyMap/utils"
 import {setStoryMapState} from "~/utils/mutations"
 
 const debouncedSetStoryMapState = debounce(setStoryMapState, 100)

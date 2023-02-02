@@ -14,7 +14,7 @@ import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
 import {ProductConverter, Products} from "~/types/db/Products"
-import {Users} from "~/types/db/Users"
+import {UserConverter, Users} from "~/types/db/Users"
 import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/utils/firebase"
 
 const LoginPage: FC = () => {
@@ -35,16 +35,21 @@ const LoginPage: FC = () => {
 			const isRpEmail = /@relentlesspersistenceinc\.com$/.test(res.user.email)
 			if (isRpEmail) {
 				setHasSignedIn(true)
-				notification.success({message: `Successfully logged in. Redirecting...`})
+				notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 
-				const isNewUser = !(await getDoc(doc(db, Users._, res.user.uid))).exists()
+				const user = (await getDoc(doc(db, Users._, res.user.uid).withConverter(UserConverter))).data()
+				const isNewUser = !user
 
 				if (isNewUser) {
 					await setDoc(doc(db, Users._, res.user.uid), {
 						avatar: res.user.photoURL,
 						email: res.user.email,
+						hasAcceptedTos: false,
 						name: res.user.displayName,
-					} satisfies Omit<User, `id`>)
+					} satisfies User)
+					router.push(`/tos`)
+					// eslint-disable-next-line no-negated-condition
+				} else if (!user.hasAcceptedTos) {
 					router.push(`/tos`)
 				} else {
 					const {docs: products} = await getDocs(
