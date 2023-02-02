@@ -15,7 +15,7 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
-if (process.env.NODE_ENV === `development`) connectFirestoreEmulator(db, `localhost`, 8080)
+// if (process.env.NODE_ENV === `development`) connectFirestoreEmulator(db, `localhost`, 8080)
 
 export const googleAuthProvider = new GoogleAuthProvider()
 export const appleAuthProvider = new OAuthProvider(`apple.com`)
