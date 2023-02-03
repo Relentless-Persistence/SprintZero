@@ -2,7 +2,7 @@ import {z} from "zod"
 
 import {genConverter, genDbNames, idSchema} from "~/types"
 
-export const RetrospectiveItemsSchema = z.object({
+export const RetrospectiveItemSchema = z.object({
 	description: z.string(),
 	proposedActions: z.array(
 		z.object({
@@ -18,9 +18,9 @@ export const RetrospectiveItemsSchema = z.object({
 	userId: idSchema,
 })
 
-export const RetrospectiveItems = genDbNames(`RetrospectiveItems`, RetrospectiveItemsSchema)
-export type RetrospectiveItem = z.infer<typeof RetrospectiveItemsSchema>
-export const RetrospectiveItemConverter = genConverter(RetrospectiveItemsSchema)
+export const RetrospectiveItems = genDbNames(`RetrospectiveItems`, RetrospectiveItemSchema)
+export type RetrospectiveItem = z.infer<typeof RetrospectiveItemSchema>
+export const RetrospectiveItemConverter = genConverter(RetrospectiveItemSchema)
 
 export const retrospectiveTabs = {
 	enjoyable: `Enjoyable`,
