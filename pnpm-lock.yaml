@@ -25,6 +25,7 @@ specifiers:
   classnames: ^2.3.1
   clsx: 1.2.1
   date-fns: ^2.28.0
+  dayjs: 1.11.7
   diff: 5.1.0
   eslint: 8.33.0
   eslint-config-next: 13.1.6
@@ -93,6 +94,7 @@ dependencies:
   classnames: 2.3.2
   clsx: 1.2.1
   date-fns: 2.29.3
+  dayjs: 1.11.7
   diff: 5.1.0
   eslint: 8.33.0
   eslint-config-next: 13.1.6_4vsywjlpuriuw3tl5oq6zy5a64

@@ -1,4 +1,4 @@
-import {addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where} from "firebase/firestore"
+import {addDoc, collection, deleteDoc, doc, getDocs, query, Timestamp, updateDoc, where} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 
@@ -205,6 +205,7 @@ export const addStory = async ({
 		id,
 		acceptanceCriteria: [],
 		branchName: null,
+		createdAt: Timestamp.now(),
 		description: ``,
 		designLink: null,
 		ethicsApproved: null,
@@ -218,9 +219,9 @@ export const addStory = async ({
 		...initialData,
 	}
 
-	const newStoryMapState = produce(storyMapState, (state) => {
-		state.stories.push(data)
-		const feature = state.features.find(({id}) => id === featureId)!
+	const newStoryMapState = produce(storyMapState, (draft) => {
+		draft.stories.push(data)
+		const feature = draft.features.find(({id}) => id === featureId)!
 		feature.storyIds.splice(position ?? Infinity, 0, id)
 	})
 	await updateDoc(doc(db, StoryMapStates._, storyMapState.id), newStoryMapState)

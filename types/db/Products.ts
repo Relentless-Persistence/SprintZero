@@ -7,15 +7,7 @@ export const ProductSchema = z.object({
 	// General product info
 	cadence: z.number(),
 	effortCost: z.number().nullable(),
-	gate: z.union([
-		z.literal(`Monday`),
-		z.literal(`Tuesday`),
-		z.literal(`Wednesday`),
-		z.literal(`Thursday`),
-		z.literal(`Friday`),
-		z.literal(`Saturday`),
-		z.literal(`Sunday`),
-	]),
+	sprintStartDayOfWeek: z.number().int().min(0).max(6),
 	members: z.record(
 		idSchema,
 		z.object({
