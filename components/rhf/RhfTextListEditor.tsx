@@ -7,9 +7,7 @@ import type {SetRequired} from "type-fest"
 import TextListEditor from "../TextListEditor"
 
 type FieldValues = Record<string, any>
-
 type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
-
 export type RhfTextListEditorProps<TFieldValues extends FieldValues> = SetRequired<
 	ControllerProps<TFieldValues>,
 	`control`
