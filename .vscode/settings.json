@@ -1,10 +1,11 @@
 {
-	"typescript.enablePromptUseWorkspaceTsdk": true,
-	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"javascript.preferences.importModuleSpecifier": "shortest",
-	"typescript.preferences.importModuleSpecifier": "shortest",
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": true
-	}
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "javascript.preferences.importModuleSpecifier": "shortest",
+  "typescript.preferences.importModuleSpecifier": "shortest",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.tsdk": "node_modules/.pnpm/typescript@4.9.5/node_modules/typescript/lib"
 }

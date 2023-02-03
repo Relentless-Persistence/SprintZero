@@ -1,14 +1,18 @@
-import {Button, Drawer} from "antd"
+import {Button, Checkbox, Drawer, Input} from "antd"
+import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
 import {useFieldArray, useForm} from "react-hook-form"
 
+import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 import type {Task} from "~/types/db/Tasks"
 
+import RhfCheckbox from "~/components/rhf/RhfCheckbox"
+import RhfDateTimePicker from "~/components/rhf/RhfDateTimePicker"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 
-type FormInputs = Omit<Task, `productId`>
+type FormInputs = Omit<Task, `productId` | `dueDate`> & {dueDate: Dayjs}
 
 export type TaskDrawerProps = {
 	initialValues: FormInputs
@@ -73,15 +77,43 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 				</div>
 
 				{/* Column 2 */}
-				<div className="flex h-full flex-col">
+				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
 						<p className="text-xl font-semibold text-[#595959]">Due</p>
-						<RhfInput control={control} name="title" />
+						<RhfDateTimePicker control={control} name="dueDate" />
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<p className="text-xl font-semibold text-[#595959]">Actions</p>
+						{actions.map((action, i) => (
+							<RhfCheckbox key={action.id} control={control} name={`actions.${i}.checked`}>
+								{action.name}
+							</RhfCheckbox>
+						))}
+						<Checkbox disabled>
+							<Input
+								size="small"
+								placeholder="Add new"
+								value={newActionInput}
+								onChange={(e) => void setNewActionInput(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === `Enter`) {
+										e.preventDefault()
+										newAction({
+											id: nanoid(),
+											checked: false,
+											name: newActionInput,
+										})
+										setNewActionInput(``)
+									}
+								}}
+							/>
+						</Checkbox>
 					</div>
 				</div>
 
 				{/* Column 3 */}
-				<div className="flex h-full flex-col"></div>
+				<div className="flex h-full flex-col gap-6"></div>
 			</form>
 		</Drawer>
 	)

@@ -1,46 +1,59 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <DatePicker /> otherwise. */
 
 import {DatePicker} from "antd"
-import {Path, useController} from "react-hook-form"
+import dayjs from "dayjs"
+import {useController} from "react-hook-form"
 
-import type {DatePickerProps as AntdDatePickerProps} from "antd"
+import type {Dayjs} from "dayjs"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
-import { Dayjs } from "dayjs"
 
 type FieldValues = Record<string, any>
-export type RhfDateTimePickerProps<TFieldValues extends FieldValues, Name extends Path<TFieldValues>> = SetRequired<
-	UseControllerProps<TFieldValues, Name>,
+export type RhfDateTimePickerProps<TFieldValues extends FieldValues> = SetRequired<
+	UseControllerProps<TFieldValues>,
 	`control`
 >
 
-const RhfDateTimePicker = <Name extends string, TFieldValues extends {[key: Name]: Dayjs}>({
+const RhfDateTimePicker = <TFieldValues extends FieldValues>({
 	control,
 	name,
 	rules,
 	shouldUnregister,
 	defaultValue,
-	...props
-}: RhfDateTimePickerProps<TFieldValues, Name>): ReactElement | null => {
+}: RhfDateTimePickerProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	return (
-		<div>
+		<div className="flex gap-2">
 			<DatePicker
-				{...props}
 				picker="date"
-				onChange={(date) => void field.onChange(field.value date)}
+				onChange={(date) => {
+					if (!date) return
+					field.onChange(
+						((field.value ?? dayjs()) as Dayjs)
+							.set(`year`, date.year())
+							.set(`month`, date.month())
+							.set(`date`, date.date()),
+					)
+				}}
 				value={field.value}
 				name={field.name}
 				ref={(v) => void field.ref(v)}
 			/>
 
 			<DatePicker
-				{...props}
 				picker="time"
-				onChange={(e) => void field.onChange(e.target.checked)}
-				checked={field.value}
+				onChange={(date) => {
+					if (!date) return
+					field.onChange(
+						((field.value ?? dayjs()) as Dayjs)
+							.set(`hour`, date.hour())
+							.set(`minute`, date.minute())
+							.set(`second`, date.second()),
+					)
+				}}
+				value={field.value}
 				name={field.name}
 				ref={(v) => void field.ref(v)}
 			/>
