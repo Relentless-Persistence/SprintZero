@@ -1,6 +1,6 @@
 "use client"
 
-import {AppleFilled} from "@ant-design/icons"
+import {AppleFilled, GithubOutlined} from "@ant-design/icons"
 import {notification} from "antd"
 import {signInWithPopup, signOut} from "firebase/auth"
 import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
@@ -15,7 +15,7 @@ import type {User} from "~/types/db/Users"
 
 import {ProductConverter, Products} from "~/types/db/Products"
 import {UserConverter, Users} from "~/types/db/Users"
-import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider} from "~/utils/firebase"
+import {appleAuthProvider, auth, db, googleAuthProvider, microsoftAuthProvider, githubAuthProvider} from "~/utils/firebase"
 
 const LoginPage: FC = () => {
 	const router = useRouter()
@@ -97,6 +97,16 @@ const LoginPage: FC = () => {
 				>
 					<Image src="/images/googleIcon.png" alt="" width={29} height={29} priority />
 					<p>Sign in with Google</p>
+				</button>
+
+				<button
+					type="button"
+					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
+					onClick={() => handleOnClick(githubAuthProvider)}
+					data-testid="github-sign-in"
+				>
+					<GithubOutlined />
+					<p>Sign in with Github</p>
 				</button>
 
 				<button

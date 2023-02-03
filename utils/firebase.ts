@@ -1,5 +1,5 @@
 import {initializeApp} from "firebase/app"
-import {getAuth, GoogleAuthProvider, OAuthProvider} from "firebase/auth"
+import {getAuth, GoogleAuthProvider, OAuthProvider, GithubAuthProvider } from "firebase/auth"
 import {connectFirestoreEmulator, getFirestore} from "firebase/firestore"
 
 const firebaseConfig = {
@@ -20,3 +20,4 @@ if (process.env.NODE_ENV === `development`) connectFirestoreEmulator(db, `localh
 export const googleAuthProvider = new GoogleAuthProvider()
 export const appleAuthProvider = new OAuthProvider(`apple.com`)
 export const microsoftAuthProvider = new OAuthProvider(`microsoft.com`)
+export const githubAuthProvider = new GithubAuthProvider()
