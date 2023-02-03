@@ -7,6 +7,7 @@ specifiers:
   '@playwright/test': 1.30.0
   '@stripe/react-stripe-js': ^1.6.0
   '@stripe/stripe-js': ^1.19.1
+  '@tanstack/eslint-plugin-query': 4.24.0
   '@tanstack/react-query': 4.24.4
   '@types/diff': 5.0.2
   '@types/lodash': 4.14.191
@@ -74,6 +75,7 @@ dependencies:
   '@playwright/test': 1.30.0
   '@stripe/react-stripe-js': 1.15.0_mljfwq7caaxrtdqn7u72ntpebq
   '@stripe/stripe-js': 1.44.1
+  '@tanstack/eslint-plugin-query': 4.24.0
   '@tanstack/react-query': 4.24.4_biqbaboplfbrettd7655fr4n2y
   '@types/diff': 5.0.2
   '@types/lodash': 4.14.191
@@ -1472,6 +1474,10 @@ packages:
     resolution: {integrity: sha512-4C7nX/dvpzB7za4Ql9K81xK3HPxCpHMgwTZVyf+9JQ6VUbn9jjZVN7/Nkdz/Ugzs2CSjqnL/UPXroiVBVHUWUw==}
     dependencies:
       tslib: 2.5.0
+    dev: false
+
+  /@tanstack/eslint-plugin-query/4.24.0:
+    resolution: {integrity: sha512-I2tLnW42yk72c0ceFPt8iFMRDgyrwa0UtUXe2E5D5kOenGx25/Npbhpj1dVHr7XO6lcQDZw5mSyv8wPikq7eLQ==}
     dev: false
 
   /@tanstack/query-core/4.24.4:

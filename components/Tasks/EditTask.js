@@ -2,13 +2,13 @@
 import React, {useState, useEffect} from "react"
 import styled from "styled-components"
 import ResizeableDrawer from "../../components/Dashboard/ResizeableDrawer"
-import {Input, Checkbox, Form, Avatar, Row, Col, Button, List, DatePicker, TimePicker, notification} from "antd5"
+import {Input, Checkbox, Form, Avatar, Row, Col, Button, List, DatePicker, TimePicker, notification} from "antd"
 import {SendOutlined, FlagOutlined, UserOutlined} from "@ant-design/icons"
 import ActionButtons from "../../components/Personas/ActionButtons"
 import {CardTitle} from "../../components/Dashboard/CardTitle"
 import DrawerSubTitle from "../../components/Dashboard/DrawerSubTitle"
-import {db} from "~/config/firebase"
-import {collection, addDoc, updateDoc, query, where, onSnapshot} from "firebase9/firestore"
+import {db} from "~/utils/firebase"
+import {collection, addDoc, updateDoc, query, where, onSnapshot} from "firebase/firestore"
 import moment from "moment"
 
 const {TextArea} = Input
@@ -213,7 +213,7 @@ const EditTask = ({editMode, setEditMode, task, setTask, user}) => {
 											description={item.comment}
 										/>
 									</List.Item>
-								)}								
+								)}
 							/>
 						)}
 					</div>

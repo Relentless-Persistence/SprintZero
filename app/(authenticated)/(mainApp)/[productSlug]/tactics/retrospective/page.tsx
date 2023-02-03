@@ -1,137 +1,161 @@
 "use client"
 
-import {Avatar, Empty, Breadcrumb, Button} from "antd"
+import {useQueries} from "@tanstack/react-query"
+import {Avatar, Breadcrumb, Button, Card, Checkbox, Tabs} from "antd"
+import clsx from "clsx"
+import {addDoc, collection, doc, getDoc, query, setDoc, where} from "firebase/firestore"
+import {useState} from "react"
+import {useCollectionData} from "react-firebase-hooks/firestore"
+import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
+import type {RetrospectiveItem} from "~/types/db/RetrospectiveItems"
+
+import RetrospectiveDrawer from "./RetrospectiveDrawer"
+import NoData from "~/components/NoData"
+import {RetrospectiveItemConverter, RetrospectiveItems, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
+import {UserConverter, Users} from "~/types/db/Users"
+import {db} from "~/utils/firebase"
+import {objectEntries} from "~/utils/objectMethods"
+import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useUser} from "~/utils/useUser"
 
 const RetrospectivePage: FC = () => {
+	const user = useUser()
+
+	const activeProductId = useActiveProductId()
+	const [retrospectiveItems, loading] = useCollectionData(
+		query(
+			collection(db, RetrospectiveItems._),
+			where(RetrospectiveItems.productId, `==`, activeProductId),
+		).withConverter(RetrospectiveItemConverter),
+	)
+
+	const [currentTab, setCurrentTab] = useState<`enjoyable` | `puzzling` | `frustrating`>(`enjoyable`)
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+
+	const itemsForCurrentTab = retrospectiveItems?.filter((item) => item.type === currentTab) ?? []
+
+	const usersData = useQueries({
+		queries: itemsForCurrentTab.map((item) => ({
+			queryKey: [`user`, item.userId],
+			queryFn: async () => (await getDoc(doc(db, Users._, item.userId).withConverter(UserConverter))).data(),
+		})),
+	})
+
+	const usersOwnItem = itemsForCurrentTab.find((item) => item.userId === user?.id)
+	const userFirst = itemsForCurrentTab.filter((item) => item.userId !== user?.id)
+	if (usersOwnItem) userFirst.unshift(usersOwnItem)
+
 	return (
-		<div className="flex items-start justify-between">
-			<div className="w-full">
-				<div className="py-[24px] px-[42px]">
-					<div className="mb-4 flex items-center justify-between">
-						<Breadcrumb>
-							<Breadcrumb.Item>Tactics</Breadcrumb.Item>
-							<Breadcrumb.Item>Retrospective</Breadcrumb.Item>
-						</Breadcrumb>
+		<div className="flex h-full items-start justify-between">
+			<div className="h-full w-full space-y-8 px-12 py-8">
+				<div className="flex items-center justify-between">
+					<Breadcrumb>
+						<Breadcrumb.Item>Tactics</Breadcrumb.Item>
+						<Breadcrumb.Item>Retrospective</Breadcrumb.Item>
+						<Breadcrumb.Item>{retrospectiveTabs[currentTab]}</Breadcrumb.Item>
+					</Breadcrumb>
 
-						<div>
-							<Button className="bg-white hover:border-none hover:text-black" onClick={() => setShowAdd(true)}>
-								Add New
-							</Button>
-						</div>
+					<div>
+						<Button className="bg-white" onClick={() => void setIsDrawerOpen(true)}>
+							Add New
+						</Button>
 					</div>
+				</div>
 
-					{data?.length > 0 ? (
-						<MasonryGrid>
-							{data.map((c, i) =>
-								i === activeEditIndex ? (
-									<div key={i}>
-										<ActionFormCard
-											title={c.title}
-											description={c.description}
-											id={c.id}
-											className="mb-[16px]"
-											onCancel={() => setActiveEditIndex(null)}
-											onSubmit={onEdit}
-											onDelete={() => removeRetro(c.id)}
-										/>
+				{userFirst.length > 0 ? (
+					<Masonry
+						breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
+						className="flex gap-8"
+						columnClassName="bg-clip-padding space-y-8"
+					>
+						{userFirst.map((item) => (
+							<Card
+								key={item.id}
+								type="inner"
+								title={(() => {
+									const user = usersData.find((user) => user.data?.id === item.userId)?.data
+
+									return (
+										<div className="my-4 flex items-center gap-4">
+											<Avatar src={user?.avatar} size="large" />
+											<p>{user?.name}</p>
+										</div>
+									)
+								})()}
+								extra={
+									item.userId === user?.id ? (
+										<button type="button" onClick={() => void setIsDrawerOpen(true)} className="text-green-s500">
+											Edit
+										</button>
+									) : undefined
+								}
+							>
+								<div className="flex flex-col gap-4">
+									<div className="space-y-2">
+										<p className="text-xl font-semibold text-[#595959]">{item.title}</p>
+										<p className="italic">{item.description}</p>
 									</div>
-								) : (
-									<MyCard
-										className="mb-[16px]"
-										// extra={ user === c.name ? <CardHeaderLink>Edit</CardHeaderLink> : null }
-										key={i}
-									>
-										<Meta
-											className="flex items-center"
-											avatar={
-												<Avatar
-													size={48}
-													src={c.user?.photo}
-													style={{
-														border: `2px solid #315613`,
-													}}
-												/>
-											}
-											title={c.user?.name}
-										/>
-
-										{user && userRole !== `viewer` && user.id === c.user?.id ? (
-											<CardHeaderLink onClick={() => editRetro(c)} className="absolute top-[28px] right-[16px]">
-												Edit
-											</CardHeaderLink>
-										) : null}
-
-										<article className="space-y-4">
-											<div>
-												<h5 className="font-semibold] text-[16px] text-[#595959]">{c.title}</h5>
-												<p>{c.description}</p>
-											</div>
-
-											<div className="">
-												<h5 className="font-semibold] text-[16px] text-[#595959]">Proposed Actions</h5>
-												{c.actions?.map((a, actionIndex) => (
-													<div key={actionIndex}>
-														<AppCheckbox
-															key={a.label}
-															checked={a.completed}
-															onChange={() => updateRetroAction(actionIndex, i, c.id)}
-														>
-															<span className={a.completed ? `line-through` : null}>{a.name}</span>
-														</AppCheckbox>
-													</div>
-												))}
-											</div>
-										</article>
-
-										<br />
-									</MyCard>
-								),
-							)}
-						</MasonryGrid>
-					) : (
-						<div className="flex items-center justify-center">
-							<div
-								style={{
-									boxShadow: `0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)`,
-								}}
-								className="flex h-[187px] w-[320px] items-center justify-center rounded bg-white"
-							>
-								<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-							</div>
-						</div>
-					)}
-					<AddItem
-						show={showAdd}
-						setShow={setShowAdd}
-						user={user}
-						product={activeProductId}
-						type={types[activeTabIndex]}
-					/>
-
-					{selectedRetro && (
-						<EditItem retro={selectedRetro} setRetro={setSelectedRetro} show={editMode} setEditMode={setEditMode} />
-					)}
-				</div>
-			</div>
-
-			<div className="w-auto">
-				<div>
-					<Versions>
-						{types.map((item, i) => (
-							<Version
-								className={`py-[16px] px-[24px]  ${activeType === item ? `font-[600]` : ``}`}
-								key={i}
-								active={activeType === item}
-								onClick={() => setActiveType(item)}
-							>
-								{item.render ? item.render() : item}
-							</Version>
+									<div className="space-y-2">
+										<p className="text-xl font-semibold text-[#595959]">Proposed Actions</p>
+										<ul>
+											{item.proposedActions.map((action) => (
+												<li key={action.id}>
+													<Checkbox
+														checked={action.checked}
+														className={clsx(`pointer-events-none`, action.checked && `line-through`)}
+													>
+														{action.label}
+													</Checkbox>
+												</li>
+											))}
+										</ul>
+									</div>
+								</div>
+							</Card>
 						))}
-					</Versions>
-				</div>
+					</Masonry>
+				) : (
+					<div className="grid h-full place-items-center">
+						<NoData />
+					</div>
+				)}
 			</div>
+
+			<Tabs
+				tabPosition="right"
+				activeKey={currentTab}
+				onChange={(key: `enjoyable` | `puzzling` | `frustrating`) => void setCurrentTab(key)}
+				items={objectEntries(retrospectiveTabs).map(([key, label]) => ({key, label}))}
+			/>
+
+			{!loading && isDrawerOpen && (
+				<RetrospectiveDrawer
+					initialValues={
+						usersOwnItem ?? {
+							description: ``,
+							proposedActions: [],
+							title: ``,
+							type: currentTab,
+						}
+					}
+					onCancel={() => void setIsDrawerOpen(false)}
+					onCommit={async (values) => {
+						const data: RetrospectiveItem = {
+							...values,
+							productId: activeProductId,
+							userId: user!.id,
+						}
+						if (usersOwnItem) {
+							await setDoc(doc(db, RetrospectiveItems._, usersOwnItem.id), data)
+						} else {
+							await addDoc(collection(db, RetrospectiveItems._), data)
+						}
+						setIsDrawerOpen(false)
+					}}
+				/>
+			)}
 		</div>
 	)
 }
