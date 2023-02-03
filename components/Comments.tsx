@@ -1,7 +1,7 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
 import {Avatar, Button, Input} from "antd"
 import {collection, documentId, query, where} from "firebase/firestore"
-import _ from "lodash"
+import {uniq} from "lodash"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useCollectionData} from "react-firebase-hooks/firestore"
@@ -47,8 +47,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 		).withConverter(CommentConverter),
 	)
 
-	const commentAuthorIds = _.uniq(comments?.map((comment) => comment.authorId))
-	console.log(commentAuthorIds)
+	const commentAuthorIds = uniq(comments?.map((comment) => comment.authorId))
 	const [commentAuthors] = useCollectionData(
 		commentAuthorIds.length > 0
 			? query(collection(db, Users._), where(documentId(), `in`, commentAuthorIds)).withConverter(UserConverter)

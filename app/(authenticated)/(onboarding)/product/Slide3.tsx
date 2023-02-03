@@ -3,20 +3,21 @@ import {Form} from "antd"
 import clsx from "clsx"
 import {useEffect} from "react"
 import {useForm, useWatch} from "react-hook-form"
+import {z} from "zod"
 
 import type {FC} from "react"
-import type {z} from "zod"
 
 import SlideContainer from "./SlideContainer"
-import {ProductSchema} from "~/types/db/Products"
 
-const formSchema = ProductSchema.pick({gate: true})
+const formSchema = z.object({
+	sprintStartDayOfWeek: z.enum([`0`, `1`, `2`, `3`, `4`, `5`, `6`]),
+})
 type FormInputs = z.infer<typeof formSchema>
 
 export type Slide3Props = {
 	currentSlide: number
 	setCanProceed: (canProceed: boolean) => void
-	onComplete: (data: FormInputs) => void
+	onComplete: (data: {sprintStartDayOfWeek: number}) => void
 }
 
 const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
@@ -26,11 +27,11 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 		resolver: zodResolver(formSchema),
 	})
 
-	const onSubmit = handleSubmit((data) => void onComplete(data))
+	const onSubmit = handleSubmit((data) => void onComplete({sprintStartDayOfWeek: parseInt(data.sprintStartDayOfWeek)}))
 
 	useEffect(() => void (isActive && setCanProceed(formState.isValid)), [isActive, formState.isValid, setCanProceed])
 
-	const gate = useWatch({control, name: `gate`})
+	const sprintStartDayOfWeek = useWatch({control, name: `sprintStartDayOfWeek`})
 
 	return (
 		<SlideContainer isActive={isActive}>
@@ -45,8 +46,8 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						<div className="flex flex-col gap-4">
 							<input
 								type="radio"
-								{...register(`gate`)}
-								value="Monday"
+								{...register(`sprintStartDayOfWeek`)}
+								value="1"
 								hidden
 								id="gate-monday"
 								className="appearance-none"
@@ -55,7 +56,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								htmlFor="gate-monday"
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
-									gate === `Monday`
+									sprintStartDayOfWeek === `1`
 										? `border-green-s500 bg-green-s500 text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
@@ -64,8 +65,8 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 							</label>
 							<input
 								type="radio"
-								{...register(`gate`)}
-								value="Tuesday"
+								{...register(`sprintStartDayOfWeek`)}
+								value="2"
 								hidden
 								id="gate-tuesday"
 								className="appearance-none"
@@ -74,7 +75,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								htmlFor="gate-tuesday"
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
-									gate === `Tuesday`
+									sprintStartDayOfWeek === `2`
 										? `border-green-s500 bg-green-s500 text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
@@ -83,8 +84,8 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 							</label>
 							<input
 								type="radio"
-								{...register(`gate`)}
-								value="Wednesday"
+								{...register(`sprintStartDayOfWeek`)}
+								value="3"
 								hidden
 								id="gate-wednesday"
 								className="appearance-none"
@@ -93,7 +94,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								htmlFor="gate-wednesday"
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
-									gate === `Wednesday`
+									sprintStartDayOfWeek === `3`
 										? `border-green-s500 bg-green-s500 text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
@@ -102,8 +103,8 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 							</label>
 							<input
 								type="radio"
-								{...register(`gate`)}
-								value="Thursday"
+								{...register(`sprintStartDayOfWeek`)}
+								value="4"
 								hidden
 								id="gate-thursday"
 								className="appearance-none"
@@ -112,7 +113,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								htmlFor="gate-thursday"
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
-									gate === `Thursday`
+									sprintStartDayOfWeek === `4`
 										? `border-green-s500 bg-green-s500 text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
@@ -121,8 +122,8 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 							</label>
 							<input
 								type="radio"
-								{...register(`gate`)}
-								value="Friday"
+								{...register(`sprintStartDayOfWeek`)}
+								value="5"
 								hidden
 								id="gate-friday"
 								className="appearance-none"
@@ -131,7 +132,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								htmlFor="gate-friday"
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
-									gate === `Friday`
+									sprintStartDayOfWeek === `5`
 										? `border-green-s500 bg-green-s500 text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
@@ -140,8 +141,8 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 							</label>
 							<input
 								type="radio"
-								{...register(`gate`)}
-								value="Saturday"
+								{...register(`sprintStartDayOfWeek`)}
+								value="6"
 								hidden
 								id="gate-saturday"
 								className="appearance-none"
@@ -150,7 +151,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								htmlFor="gate-saturday"
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
-									gate === `Saturday`
+									sprintStartDayOfWeek === `6`
 										? `border-green-s500 bg-green-s500 text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
@@ -159,8 +160,8 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 							</label>
 							<input
 								type="radio"
-								{...register(`gate`)}
-								value="Sunday"
+								{...register(`sprintStartDayOfWeek`)}
+								value="0"
 								hidden
 								id="gate-sunday"
 								className="appearance-none"
@@ -169,7 +170,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								htmlFor="gate-sunday"
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
-									gate === `Sunday`
+									sprintStartDayOfWeek === `0`
 										? `border-green-s500 bg-green-s500 text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}

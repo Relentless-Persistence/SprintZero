@@ -73,6 +73,14 @@ service cloud.firestore {
       }
     }
 
+    match /Tasks/{retrospectiveItemId} {
+    	allow read, update, delete:
+      	if isEditorOnProduct(resource.data.productId)
+
+      allow create:
+      	if request.auth != null
+    }
+
     match /Users/{userId} {
     	allow get, create:
       	if request.auth != null

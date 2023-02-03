@@ -10,9 +10,8 @@ import {OL} from "./NumberList"
 
 import {CardHeaderLink} from "../Dashboard/CardHeaderButton"
 import ActionButtons from "./ActionButtons"
-import {db} from "../../config/firebase-config"
+import {db} from "~/utils/firebase"
 import {capitalize, debounce} from "lodash"
-import {useAuth} from "../../contexts/AuthContext"
 
 const MyInput = styled(Input)`
 	.ant-input-group-wrapper {

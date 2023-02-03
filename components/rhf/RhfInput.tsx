@@ -18,9 +18,7 @@ const formatAsCurrency = (str: string) => {
 }
 
 type FieldValues = Record<string, any>
-
 type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
-
 export type RhfInputProps<TFieldValues extends FieldValues> = Omit<AntdInputProps, `ref`> &
 	SetRequired<ControllerProps<TFieldValues>, `control`> & {
 		currencyFormat?: boolean

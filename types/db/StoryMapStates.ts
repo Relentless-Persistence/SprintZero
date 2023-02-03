@@ -1,3 +1,4 @@
+import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
 import {genConverter, genDbNames, idSchema} from "~/types"
@@ -40,6 +41,7 @@ export const StorySchema = z.object({
 		}),
 	),
 	branchName: z.string().nullable(),
+	createdAt: z.instanceof(Timestamp),
 	description: z.string(),
 	designLink: z.string().url().nullable(),
 	ethicsApproved: z.boolean().nullable(),

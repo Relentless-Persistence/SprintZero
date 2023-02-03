@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-#dashboard button.ant-btn-default {
+button.ant-btn-default {
 	background-color: white;
 }
 
-#dashboard button.ant-btn-primary {
+button.ant-btn-primary {
 	background-color: #4a801e;
 }
 
@@ -58,4 +58,8 @@ li {
 
 #comment .ant-list-item {
 	padding: 12px 0px !important;
+}
+
+.ant-checkbox-wrapper + .ant-checkbox-wrapper {
+	margin-left: 0px;
 }

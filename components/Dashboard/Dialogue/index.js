@@ -1,3 +1,3 @@
-export * from "./DialogueCard";
-export * from "./AddNote";
-export * from "./EditNote";
+export * from "./DialogueCard"
+export * from "./AddNote"
+export * from "./EditNote"

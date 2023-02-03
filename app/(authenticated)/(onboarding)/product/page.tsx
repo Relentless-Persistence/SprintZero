@@ -1,9 +1,8 @@
 "use client"
 
-import {Avatar, Button} from "antd"
+import {Button} from "antd"
 import {addDoc, collection, doc, setDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
-import Image from "next/image"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
@@ -27,7 +26,7 @@ import {auth, db} from "~/utils/firebase"
 
 const numSlides = 4
 
-type FormInputs = Pick<Product, `cadence` | `effortCost` | `gate` | `name`>
+type FormInputs = Pick<Product, `cadence` | `effortCost` | `name` | `sprintStartDayOfWeek`>
 
 const ProductConfiguration: FC = () => {
 	const [user] = useAuthState(auth)
