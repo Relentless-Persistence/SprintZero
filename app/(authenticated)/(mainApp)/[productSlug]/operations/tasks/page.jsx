@@ -1,7 +1,6 @@
 "use client"
 
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useQuery} from "@tanstack/react-query"
 import {Breadcrumb, Button, notification} from "antd"
 import {collection, where, query, onSnapshot, updateDoc} from "firebase/firestore"
 import {useState, useEffect} from "react"
@@ -14,6 +13,7 @@ import EditTask from "~/components/Tasks/EditTask"
 import {splitRoutes} from "~/utils"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useUser} from "~/utils/useUser"
 
 const boards = [`Board 0`, `Board 1`, `Board 2`, `Board 3`, `Board 4`]
 
@@ -38,13 +38,7 @@ const Version = styled.li`
 export default function Tasks() {
 	const userRole = `member`
 	const activeProductId = useActiveProductId()
-	const userId = useUserId()
-
-	const {data: user} = useQuery({
-		queryKey: [`user`, userId],
-		queryFn: getUser(userId),
-		enabled: userId !== undefined,
-	})
+	const user = useUser()
 
 	const [createMode, setCreateMode] = useState(false)
 	const [editMode, setEditMode] = useState(false)

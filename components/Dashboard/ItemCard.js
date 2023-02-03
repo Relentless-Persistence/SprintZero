@@ -5,7 +5,6 @@ import {Button, Card} from "antd"
 import CardHeaderButton, {CardHeaderLink} from "./CardHeaderButton"
 import FormCard, {ActionFormCard, ObjectiveActionFormCard, LearningsActionFormCard} from "./FormCard"
 import {CardTitle as Title} from "./CardTitle"
-import {useAuth} from "../../contexts/AuthContext"
 
 const MyCard = styled(Card)`
 	.ant-card-head {

@@ -7,7 +7,7 @@ import ActionButtons from "../../Personas/ActionButtons"
 import ResizeableDrawer from "../../../components/Dashboard/ResizeableDrawer"
 
 import {add, isWithinInterval} from "../../../utils"
-import {db} from "../../../config/firebase-config"
+import {db} from "~/utils/firebase"
 
 const {TextArea} = Input
 

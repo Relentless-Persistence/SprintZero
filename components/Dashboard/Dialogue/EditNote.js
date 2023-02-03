@@ -5,7 +5,7 @@ import styled from "styled-components"
 
 import {CloseOutlined} from "@ant-design/icons"
 import ActionButtons from "../../Personas/ActionButtons"
-import {db} from "../../../config/firebase-config"
+import {db} from "~/utils/firebase"
 import update from "immutability-helper"
 
 const {TextArea} = Input
