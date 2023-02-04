@@ -54,7 +54,12 @@ const EditableListCard: FC<EditableListCardProps> = ({
 							size="small"
 							type="primary"
 							className="bg-green-s500"
-							onClick={() => void onCommit(titleDraft, listDraft)}
+							onClick={() =>
+								void onCommit(
+									titleDraft,
+									listDraft.filter((item) => item.text !== ``),
+								)
+							}
 						>
 							Done
 						</Button>

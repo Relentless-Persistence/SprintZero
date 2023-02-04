@@ -4,27 +4,25 @@ import {Button, Checkbox, Input} from "antd"
 import {doc, updateDoc} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
-import invariant from "tiny-invariant"
 
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
 import {termsOfAgreement} from "./terms"
 import {Users} from "~/types/db/Users"
-import {auth, db} from "~/utils/firebase"
+import {db} from "~/utils/firebase"
+import {useUser} from "~/utils/useUser"
 
 const TosPage: FC = () => {
 	const router = useRouter()
 	const [agree, setAgree] = useState(false)
-	const [user] = useAuthState(auth)
-	invariant(user, `User must be logged in`)
+	const user = useUser()
 
 	const [hasAccepted, setHasAccepted] = useState(false)
 	const onAccept = async () => {
 		if (hasAccepted) return
 		setHasAccepted(true)
-		await updateDoc(doc(db, Users._, user.uid), {
+		await updateDoc(doc(db, Users._, user!.id), {
 			hasAcceptedTos: true,
 		} satisfies Partial<User>)
 		router.push(`/product`)

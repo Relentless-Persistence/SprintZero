@@ -1,4 +1,4 @@
-import {doc} from "firebase/firestore"
+import {doc, setDoc} from "firebase/firestore"
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocumentData} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
@@ -18,7 +18,19 @@ export const useUser = (): WithDocumentData<User> | undefined => {
 	if (loading) {
 		return undefined
 	} else {
-		invariant(dbUser, `User is not in the database`)
-		return dbUser
+		if (dbUser) {
+			return dbUser
+		} else {
+			invariant(user.email, `User has no email`)
+			invariant(user.displayName, `User has no name`)
+
+			setDoc(doc(db, Users._, user.uid), {
+				avatar: user.photoURL,
+				email: user.email,
+				hasAcceptedTos: false,
+				name: user.displayName,
+			} satisfies User)
+			return undefined
+		}
 	}
 }
