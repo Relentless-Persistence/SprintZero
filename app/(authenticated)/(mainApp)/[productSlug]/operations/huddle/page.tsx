@@ -2,7 +2,7 @@
 
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Card, Checkbox, Input, Tabs} from "antd"
-import {formatISO, subDays, subMonths} from "date-fns"
+import dayjs from "dayjs"
 import {addDoc, arrayUnion, collection, doc, getDoc, query, updateDoc, where} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
@@ -39,9 +39,9 @@ const HuddlePage: FC = () => {
 	const [newTaskTodayText, setNewTaskTodayText] = useState(``)
 	const [newTaskYesterdayText, setNewTaskYesterdayText] = useState(``)
 
-	const date = currentTab === `30` ? subMonths(new Date(), 1) : subDays(new Date(), Number(currentTab))
-	const formattedDateToday = formatISO(date, {representation: `date`})
-	const formattedDateYesterday = formatISO(subDays(date, 1), {representation: `date`})
+	const date = currentTab === `30` ? dayjs().subtract(1, `month`) : dayjs().subtract(Number(currentTab), `day`)
+	const formattedDateToday = dayjs(date).format(`YYYY-MM-DD`)
+	const formattedDateYesterday = dayjs(date).subtract(1, `day`).format(`YYYY-MM-DD`)
 	const [huddles] = useCollectionData(
 		query(
 			collection(db, Products._, activeProductId, Huddles._),
@@ -87,7 +87,7 @@ const HuddlePage: FC = () => {
 							>
 								<div className="space-y-4">
 									<div className="space-y-1">
-										<p className="text-lg font-semibold text-[#595959]">Blockers</p>
+										<p className="text-lg font-semibold text-gray">Blockers</p>
 										<ul className="flex flex-col gap-1">
 											{huddleItemToday?.blockers.map((blocker) => (
 												<li key={blocker.id}>
@@ -140,7 +140,7 @@ const HuddlePage: FC = () => {
 										</ul>
 									</div>
 									<div className="space-y-1">
-										<p className="text-lg font-semibold text-[#595959]">Today</p>
+										<p className="text-lg font-semibold text-gray">Today</p>
 										<ul className="flex flex-col gap-1">
 											{huddleItemToday?.tasks.map((task) => (
 												<li key={task.id}>
@@ -193,7 +193,7 @@ const HuddlePage: FC = () => {
 										</ul>
 									</div>
 									<div className="space-y-1">
-										<p className="text-lg font-semibold text-[#595959]">Yesterday</p>
+										<p className="text-lg font-semibold text-gray">Yesterday</p>
 										<ul className="flex flex-col gap-1">
 											{huddleItemYesterday?.tasks.map((task) => (
 												<li key={task.id}>

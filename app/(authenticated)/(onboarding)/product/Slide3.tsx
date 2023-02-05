@@ -57,7 +57,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									sprintStartDayOfWeek === `1`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -76,7 +76,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									sprintStartDayOfWeek === `2`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -95,7 +95,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									sprintStartDayOfWeek === `3`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -114,7 +114,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									sprintStartDayOfWeek === `4`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -133,7 +133,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									sprintStartDayOfWeek === `5`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -152,7 +152,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									sprintStartDayOfWeek === `6`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -171,7 +171,7 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									sprintStartDayOfWeek === `0`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>

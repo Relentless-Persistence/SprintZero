@@ -86,7 +86,7 @@ const RetrospectivePage: FC = () => {
 								})()}
 								extra={
 									item.userId === user?.id ? (
-										<button type="button" onClick={() => void setIsDrawerOpen(true)} className="text-green-s500">
+										<button type="button" onClick={() => void setIsDrawerOpen(true)} className="text-green">
 											Edit
 										</button>
 									) : undefined
@@ -94,11 +94,11 @@ const RetrospectivePage: FC = () => {
 							>
 								<div className="flex flex-col gap-4">
 									<div className="space-y-2">
-										<p className="text-xl font-semibold text-[#595959]">{item.title}</p>
+										<p className="text-gray text-xl font-semibold">{item.title}</p>
 										<p className="italic">{item.description}</p>
 									</div>
 									<div className="space-y-2">
-										<p className="text-xl font-semibold text-[#595959]">Proposed Actions</p>
+										<p className="text-gray text-xl font-semibold">Proposed Actions</p>
 										<ul>
 											{item.proposedActions.map((action) => (
 												<li key={action.id}>

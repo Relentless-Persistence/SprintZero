@@ -1,5 +1,5 @@
 import {initializeApp} from "firebase/app"
-import {getAuth, GoogleAuthProvider, OAuthProvider, GithubAuthProvider } from "firebase/auth"
+import {getAuth, GoogleAuthProvider, OAuthProvider, GithubAuthProvider} from "firebase/auth"
 import {connectFirestoreEmulator, getFirestore} from "firebase/firestore"
 
 const firebaseConfig = {
@@ -15,7 +15,8 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
-if (process.env.NODE_ENV === `development`) connectFirestoreEmulator(db, `localhost`, 8080)
+if (process.env.NODE_ENV === `development` && process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT !== undefined)
+	connectFirestoreEmulator(db, `localhost`, parseInt(process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT))
 
 export const googleAuthProvider = new GoogleAuthProvider()
 export const appleAuthProvider = new OAuthProvider(`apple.com`)

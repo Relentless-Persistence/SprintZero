@@ -9,9 +9,8 @@ import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
 
 type FieldValues = Record<string, any>
-type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
 export type RhfSelectProps<TFieldValues extends FieldValues> = Omit<AntdSelectProps, `ref`> &
-	SetRequired<ControllerProps<TFieldValues>, `control`>
+	SetRequired<UseControllerProps<TFieldValues>, `control`>
 
 const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	control,

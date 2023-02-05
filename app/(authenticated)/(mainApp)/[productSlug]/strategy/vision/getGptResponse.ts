@@ -1,5 +1,5 @@
 import {notification} from "antd"
-import axios from "axios1"
+import axios from "axios"
 import {z} from "zod"
 
 type ProductVisionInput = {

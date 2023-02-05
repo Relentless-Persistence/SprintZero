@@ -23,7 +23,7 @@ const OnboardingLayout: FC<OnboardingLayoutProps> = ({children}) => {
 						<Avatar src={user?.avatar} size="large" alt="Avatar" className="border border-black" />
 						<div className="flex w-min flex-col gap-1">
 							<p className="font-semibold">{user?.name}</p>
-							<p className="text-ellipsis text-[#595959]">{user?.email}</p>
+							<p className="text-gray text-ellipsis">{user?.email}</p>
 						</div>
 					</div>
 				</div>

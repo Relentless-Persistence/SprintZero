@@ -47,9 +47,7 @@ const PersonasPage: FC = () => {
 		<Tabs
 			tabPosition="right"
 			activeKey={newPersonaInput !== undefined && activeTab === `add` ? `new` : activeTab}
-			onChange={(key) => {
-				if (key !== `new`) setActiveTab(key)
-			}}
+			onChange={(key) => void setActiveTab(key)}
 			items={(() => {
 				const items = []
 				if (personas) {
@@ -58,13 +56,15 @@ const PersonasPage: FC = () => {
 							key: persona.id,
 							label: persona.name,
 							children: (
-								<div className="flex flex-col gap-6 px-12 py-8">
-									<Breadcrumb>
-										<Breadcrumb.Item>Userbase</Breadcrumb.Item>
-										<Breadcrumb.Item>Personas</Breadcrumb.Item>
-									</Breadcrumb>
+								<div className="flex h-full flex-col overflow-auto">
+									<div className="sticky top-0 z-10 bg-[#f0f2f5] px-12 pt-8 pb-6">
+										<Breadcrumb>
+											<Breadcrumb.Item>Userbase</Breadcrumb.Item>
+											<Breadcrumb.Item>Personas</Breadcrumb.Item>
+										</Breadcrumb>
+									</div>
 
-									<div className="grid grid-cols-2 gap-4">
+									<div className="grid grid-cols-2 gap-4 px-12 pb-8">
 										<div className="flex flex-col gap-4">
 											<EditableListCard
 												isEditing={isEditingCard === `goals`}

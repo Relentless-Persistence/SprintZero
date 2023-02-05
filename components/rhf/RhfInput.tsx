@@ -8,6 +8,20 @@ import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
 
+const formatAsNumber = (str: string) => {
+	let newStr = str.replace(/[^0-9.]/g, ``)
+	if (newStr.includes(`.`)) {
+		const [integer, fractional] = newStr.split(`.`)
+		newStr = `${integer}.${fractional}`
+	}
+	return `${newStr}`
+}
+
+const formatAsInteger = (str: string) => {
+	let newStr = str.replace(/[^0-9]/g, ``)
+	parseInt(newStr)
+}
+
 const formatAsCurrency = (str: string) => {
 	let newStr = str.replace(/[^0-9.]/g, ``)
 	if (newStr.includes(`.`)) {
@@ -18,10 +32,9 @@ const formatAsCurrency = (str: string) => {
 }
 
 type FieldValues = Record<string, any>
-type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
 export type RhfInputProps<TFieldValues extends FieldValues> = Omit<AntdInputProps, `ref`> &
-	SetRequired<ControllerProps<TFieldValues>, `control`> & {
-		currencyFormat?: boolean
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
+		number?: boolean | `integer` | `currency`
 	}
 
 const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
@@ -30,14 +43,16 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 	rules,
 	shouldUnregister,
 	defaultValue,
-	currencyFormat,
+	number,
 	...props
 }: RhfInputProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	const format = (str: string) => {
 		if (str.length === 0) return null
-		if (currencyFormat) return formatAsCurrency(str)
+		if (number === true) return formatAsNumber(str)
+		if (number === `integer`) return formatAsInteger(str)
+		if (number === `currency`) return formatAsCurrency(str)
 		return str
 	}
 

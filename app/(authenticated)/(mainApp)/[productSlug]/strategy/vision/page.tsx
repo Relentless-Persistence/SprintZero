@@ -2,7 +2,8 @@
 
 import {useQueries} from "@tanstack/react-query"
 import {Button, Tag, Timeline, Breadcrumb, Card, Steps} from "antd"
-import {formatDistanceToNow} from "date-fns"
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 import {doc, getDoc, Timestamp} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
@@ -22,6 +23,8 @@ import {UserConverter, Users} from "~/types/db/Users"
 import {auth, db} from "~/utils/firebase"
 import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+
+dayjs.extend(relativeTime)
 
 const VisionsPage: FC = () => {
 	const activeProductId = useActiveProductId()
@@ -123,7 +126,7 @@ const VisionsPage: FC = () => {
 						)}
 						{!editMode && activeProduct?.finalVision && (
 							<Card
-								className="border border-[#D9D9D9]"
+								className="border border-[#d9d9d9]"
 								style={{boxShadow: `0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)`}}
 							>
 								<p>{activeProduct.finalVision}</p>
@@ -144,12 +147,12 @@ const VisionsPage: FC = () => {
 
 					<Timeline>
 						{!activeProduct?.updates || activeProduct.updates.length === 0 ? (
-							<Timeline.Item color="#54A31C">No Changes Yet</Timeline.Item>
+							<Timeline.Item color="#54a31c">No Changes Yet</Timeline.Item>
 						) : (
 							activeProduct.updates.map((update, i) => (
-								<Timeline.Item color="#54A31C" key={i}>
+								<Timeline.Item color="#54a31c" key={i}>
 									<div className="space-y-1">
-										<p className="font-mono">{formatDistanceToNow(update.timestamp.toDate(), {addSuffix: true})}</p>
+										<p className="font-mono">{dayjs(update.timestamp.toDate()).fromNow()}</p>
 										<p className="text-xs">
 											<span className="text-[#1890ff]">
 												@{usersData.find((user) => user.data?.id === update.userId)?.data?.name}

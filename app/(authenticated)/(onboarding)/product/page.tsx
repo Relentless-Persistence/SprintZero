@@ -3,11 +3,11 @@
 import {Button} from "antd"
 import {addDoc, collection, doc, setDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
+import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import invariant from "tiny-invariant"
-import {v4 as uuid} from "uuid"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -28,7 +28,7 @@ const numSlides = 4
 
 type FormInputs = Pick<Product, `cadence` | `effortCost` | `name` | `sprintStartDayOfWeek`>
 
-const ProductConfiguration: FC = () => {
+const ProductConfigurationPage: FC = () => {
 	const [user] = useAuthState(auth)
 	invariant(user, `User must be logged in`)
 	const [currentSlide, setCurrentSlide] = useState(0)
@@ -41,7 +41,7 @@ const ProductConfiguration: FC = () => {
 		if (hasSubmitted) return
 		setHasSubmitted(true)
 
-		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${uuid().slice(0, 6)}` as Id
+		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
 
 		const storyMapStateId = (
 			await addDoc(collection(db, StoryMapStates._), {
@@ -86,7 +86,7 @@ const ProductConfiguration: FC = () => {
 		<div className="flex grow flex-col gap-8">
 			<div className="flex flex-col gap-2">
 				<h1 className="text-3xl">Product Configuration</h1>
-				<h2 className="text-xl text-[#595959]">
+				<h2 className="text-xl text-gray">
 					Almost time to start building! We just require a few data points before we can begin
 				</h2>
 			</div>
@@ -143,7 +143,7 @@ const ProductConfiguration: FC = () => {
 						form="current-slide"
 						loading={hasSubmitted}
 						disabled={!canProceed}
-						className="bg-green-s500"
+						className="bg-green"
 					>
 						Start
 					</Button>
@@ -153,7 +153,7 @@ const ProductConfiguration: FC = () => {
 						htmlType="submit"
 						form="current-slide"
 						disabled={currentSlide === numSlides - 1 || !canProceed || hasSubmitted}
-						className="bg-green-s500"
+						className="bg-green"
 					>
 						Next
 					</Button>
@@ -163,4 +163,4 @@ const ProductConfiguration: FC = () => {
 	)
 }
 
-export default ProductConfiguration
+export default ProductConfigurationPage

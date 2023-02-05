@@ -1,8 +1,8 @@
 "use client"
 
 import {
+	ApartmentOutlined,
 	DeploymentUnitOutlined,
-	HomeOutlined,
 	NodeExpandOutlined,
 	PullRequestOutlined,
 	UserOutlined,
@@ -19,9 +19,9 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const getItems = (activeProductId: Id) => [
 	{
-		key: `dashboard`,
-		icon: <HomeOutlined />,
-		label: <Link href={`/${activeProductId}/dashboard`}>Home</Link>,
+		key: `map`,
+		icon: <ApartmentOutlined />,
+		label: <Link href={`/${activeProductId}/map`}>Story Map</Link>,
 	},
 	{
 		key: `strategy`,

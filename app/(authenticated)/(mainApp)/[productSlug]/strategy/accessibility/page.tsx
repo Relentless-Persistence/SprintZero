@@ -63,7 +63,7 @@ const Accessibility = () => {
 					</Button>
 				</div>
 
-				<p className="text-[#595959]">
+				<p className="text-gray">
 					{descriptions[currentTab]}
 					{` `}To learn more visit{` `}
 					<span className="font-semibold text-[#2d73c8]">
@@ -147,7 +147,7 @@ const Accessibility = () => {
 										<Button
 											size="small"
 											type="primary"
-											className="bg-green-s500"
+											className="bg-green"
 											onClick={() => {
 												addAccessibilityItem({
 													item: {

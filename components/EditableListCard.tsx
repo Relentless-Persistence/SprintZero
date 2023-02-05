@@ -53,7 +53,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 						<Button
 							size="small"
 							type="primary"
-							className="bg-green-s500"
+							className="bg-green"
 							onClick={() =>
 								void onCommit(
 									titleDraft,
@@ -65,7 +65,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart()} className="text-green-s500">
+					<button type="button" onClick={() => void onEditStart()} className="text-green">
 						Edit
 					</button>
 				)

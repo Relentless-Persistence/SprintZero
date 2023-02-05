@@ -53,14 +53,14 @@ const EditableTextAreaCard: FC<EditableTextAreaCardProps> = ({
 						<Button
 							size="small"
 							type="primary"
-							className="bg-green-s500"
+							className="bg-green"
 							onClick={() => void onCommit(titleDraft, textDraft)}
 						>
 							Done
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart?.()} className="text-green-s500">
+					<button type="button" onClick={() => void onEditStart?.()} className="text-green">
 						Edit
 					</button>
 				)

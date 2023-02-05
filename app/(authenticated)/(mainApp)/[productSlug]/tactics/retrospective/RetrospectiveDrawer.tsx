@@ -53,7 +53,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 					>
 						Cancel
 					</Button>
-					<Button size="small" type="primary" htmlType="submit" form="retrospective-form" className="bg-green-s500">
+					<Button size="small" type="primary" htmlType="submit" form="retrospective-form" className="bg-green">
 						Done
 					</Button>
 				</div>
@@ -68,12 +68,12 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex gap-4">
 						<div className="grow space-y-2">
-							<p className="text-xl font-semibold text-[#595959]">Title</p>
+							<p className="text-gray text-xl font-semibold">Title</p>
 							<RhfInput control={control} name="title" />
 						</div>
 
 						<div className="space-y-2">
-							<p className="text-xl font-semibold text-[#595959]">Category</p>
+							<p className="text-gray text-xl font-semibold">Category</p>
 							<RhfSegmented
 								control={control}
 								name="type"
@@ -83,7 +83,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 					</div>
 
 					<div className="flex grow flex-col gap-2">
-						<p className="text-xl font-semibold text-[#595959]">Description</p>
+						<p className="text-gray text-xl font-semibold">Description</p>
 						<RhfTextArea control={control} name="description" className="grow !resize-none" />
 					</div>
 				</div>
@@ -91,7 +91,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 				{/* Right column */}
 				<div className="flex h-full flex-col">
 					<div className="space-y-2">
-						<p className="text-xl font-semibold text-[#595959]">Proposed Actions</p>
+						<p className="text-gray text-xl font-semibold">Proposed Actions</p>
 						<ul>
 							{proposedActions.map((action, i) => (
 								<li key={action.id} className="mb-1">

@@ -32,7 +32,7 @@ const TosPage: FC = () => {
 		<div className="space-y-8">
 			<div className="flex flex-col gap-2">
 				<h1 className="text-3xl">Let&apos;s Get Started!</h1>
-				<p className="text-xl text-[#595959]">
+				<p className="text-gray text-xl">
 					Thanks for choosing SprintZero to build your next product experience! Start by reviewing and accepting our
 					terms of service.
 				</p>
@@ -54,7 +54,7 @@ const TosPage: FC = () => {
 				<Button className="bg-white" onClick={() => void router.push(`/sign-out`)}>
 					Reject
 				</Button>
-				<Button type="primary" disabled={!agree} loading={hasAccepted} onClick={onAccept} className="bg-[#4A801D]">
+				<Button type="primary" disabled={!agree} loading={hasAccepted} onClick={onAccept} className="bg-[#4a801d]">
 					Accept
 				</Button>
 			</div>

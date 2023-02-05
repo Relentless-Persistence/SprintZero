@@ -57,7 +57,7 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									cadence === `1`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -76,7 +76,7 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									cadence === `2`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>
@@ -95,7 +95,7 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								className={clsx(
 									`w-32 border px-3 py-1 text-center transition-colors`,
 									cadence === `3`
-										? `border-green-s500 bg-green-s500 text-white shadow-md`
+										? `border-green bg-green text-white shadow-md`
 										: `border-[#d9d9d9] bg-white shadow-sm`,
 								)}
 							>

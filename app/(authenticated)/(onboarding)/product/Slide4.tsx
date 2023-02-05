@@ -13,8 +13,7 @@ import {formValidateStatus} from "~/utils/formValidateStatus"
 const formSchema = z.object({
 	effortCost: z
 		.string()
-		.regex(/(\.[0-9]{2})?/, {message: `Must have two decimal places.`})
-		.regex(/^\$[0-9]+(\.[0-9]{2})?$/, `Invalid format.`)
+		.regex(/^\$([0-9],?)+(\.[0-9]?[0-9]?)?$/, `Invalid format.`)
 		.nullable(),
 })
 type FormInputs = z.infer<typeof formSchema>
@@ -57,7 +56,7 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						validateStatus={formValidateStatus(getFieldState(`effortCost`, formState))}
 						help={formState.errors.effortCost?.message}
 					>
-						<RhfInput currencyFormat placeholder="$0.00" htmlSize={20} control={control} name="effortCost" />
+						<RhfInput number="currency" placeholder="$0.00" htmlSize={20} control={control} name="effortCost" />
 					</Form.Item>
 
 					<input type="submit" hidden />

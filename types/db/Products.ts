@@ -14,7 +14,7 @@ export const ProductSchema = z.object({
 			type: z.union([z.literal(`editor`), z.literal(`viewer`)]),
 		}),
 	),
-	name: z.string(),
+	name: z.string().min(1),
 
 	storyMapStateId: idSchema,
 

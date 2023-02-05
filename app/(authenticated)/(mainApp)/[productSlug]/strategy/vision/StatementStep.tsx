@@ -166,7 +166,7 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 					loading={status === `submitted`}
 					disabled={status === `finished`}
 					form="statement-form"
-					className="bg-green-s500"
+					className="bg-green"
 				>
 					Submit
 				</Button>

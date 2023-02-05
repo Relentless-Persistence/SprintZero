@@ -26,7 +26,7 @@ const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 							className="w-full space-y-1 border border-laurel bg-[#fafafa] px-4 py-2 text-left"
 						>
 							<p className="font-medium">{task.title}</p>
-							<p className="inline-block border border-green-t600 bg-green-t1100 px-1 py-0.5 text-xs text-green-s800">
+							<p className="inline-block border border-[#aee383] bg-[#e1f4d1] px-1 py-0.5 text-xs text-[#315613]">
 								{dayjs(task.dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}
 							</p>
 						</button>

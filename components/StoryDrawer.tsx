@@ -232,7 +232,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 					{editMode ? (
 						<>
 							<Button onClick={() => void setEditMode(false)}>Cancel</Button>
-							<Button type="primary" htmlType="submit" form="story-form" className="bg-green-s500">
+							<Button type="primary" htmlType="submit" form="story-form" className="bg-green">
 								Done
 							</Button>
 						</>
@@ -335,12 +335,12 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 									<>
 										<p className="text-xl font-semibold">Adjudication Response</p>
 										{story.ethicsApproved ? (
-											<div className="inline-flex items-center gap-2 bg-[#90D855] py-2 px-4">
+											<div className="inline-flex items-center gap-2 bg-[#90d855] py-2 px-4">
 												<LikeOutlined />
 												Allowed
 											</div>
 										) : (
-											<div className="inline-flex items-center gap-2 bg-[#FFA39E] py-2 px-4">
+											<div className="inline-flex items-center gap-2 bg-[#ffa39e] py-2 px-4">
 												<DislikeOutlined />
 												Rejected
 											</div>
@@ -350,7 +350,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 							</div>
 						)}
 						<div className="max-h-[calc(100%-8rem)] space-y-2">
-							<p className="text-xl font-semibold text-[#595959]">Story</p>
+							<p className="text-gray text-xl font-semibold">Story</p>
 							<Input.TextArea
 								rows={4}
 								value={description}
@@ -370,7 +370,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 
 						{!hideAcceptanceCriteria && (
 							<div className="flex min-h-0 flex-1 flex-col gap-2">
-								<p className="text-xl font-semibold text-[#595959]">Acceptance Criteria</p>
+								<p className="text-gray text-xl font-semibold">Acceptance Criteria</p>
 								<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
 									{story.acceptanceCriteria.map((criterion) => (
 										<Checkbox
@@ -406,7 +406,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
-						<p className="text-xl font-semibold text-[#595959]">Comments</p>
+						<p className="text-gray text-xl font-semibold">Comments</p>
 						<div className="relative grow">
 							<Comments
 								storyMapStateId={storyMapState.id}

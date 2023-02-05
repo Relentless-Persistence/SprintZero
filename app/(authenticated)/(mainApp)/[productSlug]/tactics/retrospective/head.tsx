@@ -1,10 +1,7 @@
-const Head = () => {
-	return (
-		<>
-			<title>Retrospectives | SprintZero</title>
-			<meta name="description" content="Retrospectives" />
-		</>
-	)
+import type {FC} from "react"
+
+const RetrospectiveHead: FC = () => {
+	return <title>Retrospectives | SprintZero</title>
 }
 
-export default Head
+export default RetrospectiveHead

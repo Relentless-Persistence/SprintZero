@@ -11,7 +11,7 @@ import type {WithDocumentData} from "~/types"
 import type {Epic as EpicType, StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
-import {sortEpics} from "~/app/(authenticated)/(mainApp)/[productSlug]/dashboard/storyMap/utils"
+import {sortEpics} from "~/app/(authenticated)/(mainApp)/[productSlug]/map/storyMap/utils"
 import {setStoryMapState} from "~/utils/mutations"
 
 const debouncedSetStoryMapState = debounce(setStoryMapState, 100)

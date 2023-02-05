@@ -1,10 +1,7 @@
-const Head = () => {
-	return (
-		<>
-			<title>Tasks | SprintZero</title>
-			<meta name="description" content="Tasks" />
-		</>
-	)
+import type {FC} from "react"
+
+const TasksHead: FC = () => {
+	return <title>Tasks | SprintZero</title>
 }
 
-export default Head
+export default TasksHead

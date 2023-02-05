@@ -19,7 +19,7 @@ const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, o
 				<Button
 					type="primary"
 					size="small"
-					className="bg-green-s500"
+					className="bg-green"
 					onClick={() => {
 						onCommit()
 						onEditEnd()
@@ -31,7 +31,7 @@ const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, o
 		)
 	} else {
 		return (
-			<button type="button" className="text-green-s500" onClick={() => void onEditStart()}>
+			<button type="button" className="text-green" onClick={() => void onEditStart()}>
 				Edit
 			</button>
 		)

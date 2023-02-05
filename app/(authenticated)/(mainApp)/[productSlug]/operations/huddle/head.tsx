@@ -1,10 +1,7 @@
-const Head = () => {
-	return (
-		<>
-			<title>Huddle | SprintZero</title>
-			<meta name="description" content="Huddle" />
-		</>
-	)
+import type {FC} from "react"
+
+const HuddleHead: FC = () => {
+	return <title>Huddle | SprintZero</title>
 }
 
-export default Head
+export default HuddleHead

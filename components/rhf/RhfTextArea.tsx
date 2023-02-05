@@ -9,9 +9,8 @@ import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
 
 type FieldValues = Record<string, any>
-type ControllerProps<TFieldValues extends FieldValues> = UseControllerProps<TFieldValues>
 export type RhfTextAreaProps<TFieldValues extends FieldValues> = Omit<AntdTextAreaProps, `ref`> &
-	SetRequired<ControllerProps<TFieldValues>, `control`> & {
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
 		currencyFormat?: boolean
 	}
 
