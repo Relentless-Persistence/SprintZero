@@ -19,7 +19,7 @@ const formatAsNumber = (str: string) => {
 
 const formatAsInteger = (str: string) => {
 	let newStr = str.replace(/[^0-9]/g, ``)
-	parseInt(newStr)
+	return parseInt(newStr)
 }
 
 const formatAsCurrency = (str: string) => {

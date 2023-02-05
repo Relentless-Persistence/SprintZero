@@ -26,7 +26,7 @@ service cloud.firestore {
 
       match /JourneyEvents/{journeyEventId} {
         allow read, write:
-          if isEditorOnProduct(journeyId)
+          if isEditorOnProduct(get(/databases/$(database)/documents/Journeys/$(journeyId)).data.productId)
       }
     }
 

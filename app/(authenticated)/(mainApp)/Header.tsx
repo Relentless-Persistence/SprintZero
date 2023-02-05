@@ -32,7 +32,7 @@ const Header: FC = () => {
 	return (
 		<>
 			<Layout.Header style={{paddingInline: `unset`}}>
-				<div id="dashboard" className="flex h-full items-center gap-8 bg-pine px-[17.45px]">
+				<div className="flex h-full items-center gap-8 bg-pine px-[17.45px]">
 					<Image src="/images/logo_beta.png" alt="SprintZero logo" width={178} height={42} priority />
 
 					<Menu
@@ -42,7 +42,7 @@ const Header: FC = () => {
 						items={allProducts?.map((product) => ({
 							key: product.id,
 							label: (
-								<LinkTo href={`/${product.id}/dashboard`} className="relative">
+								<LinkTo href={`/${product.id}/map`} className="relative">
 									{product.name}
 								</LinkTo>
 							),

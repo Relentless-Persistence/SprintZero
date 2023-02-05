@@ -79,7 +79,7 @@ const ProductConfigurationPage: FC = () => {
 			name: `1.0`,
 		} satisfies Version)
 
-		router.push(`/${slug}/dashboard`)
+		router.push(`/${slug}/map`)
 	}
 
 	return (

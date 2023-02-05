@@ -27,7 +27,7 @@ const HomePage: FC = () => {
 		if (!products || loading) return
 
 		const firstProduct = products[0]
-		if (firstProduct) router.replace(`/${firstProduct.id}/dashboard`)
+		if (firstProduct) router.replace(`/${firstProduct.id}/map`)
 		else router.replace(`/product`)
 	}, [loading, products, router])
 

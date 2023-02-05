@@ -66,7 +66,7 @@ const SignInPage: FC = () => {
 						).withConverter(ProductConverter),
 					)
 					if (products.length === 0) router.push(`/product`)
-					else router.push(`/${products[0]!.id}/dashboard`)
+					else router.push(`/${products[0]!.id}/map`)
 				}
 			} else {
 				notification.error({message: `Sorry, you are not yet enrolled in the beta.`})

@@ -10,10 +10,7 @@ module.exports = {
 				DEFAULT: `#54a31c`,
 			},
 			gray: `#595959`,
-			pine: `#101d06`,
 			laurel: `#a6ae9d`,
-			sky: `#00d4ff`,
-			blue: `#009cd5`,
 		},
 		fontFamily: {
 			mono: [`monospace`],
