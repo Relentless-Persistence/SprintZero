@@ -8,7 +8,7 @@ import {useState} from "react"
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
-import {termsOfAgreement} from "./terms"
+import {termsOfService} from "~/components/terms"
 import {Users} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
@@ -32,7 +32,7 @@ const TosPage: FC = () => {
 		<div className="space-y-8">
 			<div className="flex flex-col gap-2">
 				<h1 className="text-3xl">Let&apos;s Get Started!</h1>
-				<p className="text-gray text-xl">
+				<p className="text-xl text-gray">
 					Thanks for choosing SprintZero to build your next product experience! Start by reviewing and accepting our
 					terms of service.
 				</p>
@@ -42,7 +42,7 @@ const TosPage: FC = () => {
 				size="large"
 				readOnly
 				rows={15}
-				value={termsOfAgreement}
+				value={termsOfService}
 				className="resize-none bg-[#eceef1] font-mono text-sm text-black"
 			/>
 
