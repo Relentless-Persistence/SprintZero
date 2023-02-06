@@ -1,4 +1,4 @@
-export const termsOfAgreement = `SprintZero ("Software") is a software product owned and operated by Relentless Persistence Inc. ("we," "us," or "our"). These terms and conditions ("Terms") govern your access to and use of the Software. By accessing or using the Software, you agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use the Software.
+export const termsOfService = `SprintZero ("Software") is a software product owned and operated by Relentless Persistence Inc. ("we," "us," or "our"). These terms and conditions ("Terms") govern your access to and use of the Software. By accessing or using the Software, you agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use the Software.
 
 License
 Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to access and use the Software for your personal or internal business use. You may not use the Software for any other purpose, or allow any third party to access or use the Software, without our prior written consent.

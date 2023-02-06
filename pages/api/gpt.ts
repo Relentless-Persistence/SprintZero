@@ -3,8 +3,7 @@ import {Configuration, OpenAIApi} from "openai"
 import type {NextApiHandler} from "next"
 
 const configuration = new Configuration({
-	// organization: process.env.NEXT_PUBLIC_OPENAI_ORGANIZATION,
-	apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+	apiKey: process.env.OPENAI_API_KEY,
 })
 const openai = new OpenAIApi(configuration)
 
