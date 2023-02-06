@@ -21,4 +21,7 @@ if (process.env.NODE_ENV === `development` && process.env.NEXT_PUBLIC_FIREBASE_E
 export const googleAuthProvider = new GoogleAuthProvider()
 export const appleAuthProvider = new OAuthProvider(`apple.com`)
 export const microsoftAuthProvider = new OAuthProvider(`microsoft.com`)
+microsoftAuthProvider.setCustomParameters({
+	prompt: "select_account",
+})
 export const githubAuthProvider = new GithubAuthProvider()
