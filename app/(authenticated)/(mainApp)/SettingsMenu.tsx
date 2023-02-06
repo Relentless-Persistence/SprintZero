@@ -67,7 +67,7 @@ const SettingsMenu: FC = () => {
 						label: `Logout`,
 						onClick: async () => {
 							await signOut(auth)
-							router.push(`/login`)
+							router.push(`/sign-in`)
 						},
 					},
 				]}
