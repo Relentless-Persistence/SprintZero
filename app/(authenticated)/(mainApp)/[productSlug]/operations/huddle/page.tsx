@@ -17,7 +17,6 @@ import {HuddleConverter, Huddles} from "~/types/db/Huddles"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {UserConverter, Users} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {objectKeys} from "~/utils/objectMethods"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const tabs = [
@@ -51,7 +50,7 @@ const HuddlePage: FC = () => {
 
 	const usersData = useQueries({
 		queries: activeProduct
-			? objectKeys(activeProduct.members).map((userId) => ({
+			? Object.keys(activeProduct.members).map((userId) => ({
 					queryKey: [`user`, userId],
 					queryFn: async () => (await getDoc(doc(db, Users._, userId).withConverter(UserConverter))).data(),
 			  }))

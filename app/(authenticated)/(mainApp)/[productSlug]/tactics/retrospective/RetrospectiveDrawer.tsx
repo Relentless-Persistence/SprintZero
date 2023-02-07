@@ -11,7 +11,6 @@ import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import {retrospectiveTabs} from "~/types/db/RetrospectiveItems"
-import {objectEntries} from "~/utils/objectMethods"
 
 type FormInputs = Omit<RetrospectiveItem, `productId` | `userId`>
 
@@ -68,22 +67,22 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex gap-4">
 						<div className="grow space-y-2">
-							<p className="text-gray text-xl font-semibold">Title</p>
+							<p className="text-xl font-semibold text-gray">Title</p>
 							<RhfInput control={control} name="title" />
 						</div>
 
 						<div className="space-y-2">
-							<p className="text-gray text-xl font-semibold">Category</p>
+							<p className="text-xl font-semibold text-gray">Category</p>
 							<RhfSegmented
 								control={control}
 								name="type"
-								options={objectEntries(retrospectiveTabs).map(([value, label]) => ({label, value}))}
+								options={Object.entries(retrospectiveTabs).map(([value, label]) => ({label, value}))}
 							/>
 						</div>
 					</div>
 
 					<div className="flex grow flex-col gap-2">
-						<p className="text-gray text-xl font-semibold">Description</p>
+						<p className="text-xl font-semibold text-gray">Description</p>
 						<RhfTextArea control={control} name="description" className="grow !resize-none" />
 					</div>
 				</div>
@@ -91,7 +90,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 				{/* Right column */}
 				<div className="flex h-full flex-col">
 					<div className="space-y-2">
-						<p className="text-gray text-xl font-semibold">Proposed Actions</p>
+						<p className="text-xl font-semibold text-gray">Proposed Actions</p>
 						<ul>
 							{proposedActions.map((action, i) => (
 								<li key={action.id} className="mb-1">

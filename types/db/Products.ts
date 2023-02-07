@@ -58,17 +58,9 @@ export const Products = genDbNames(`Products`, ProductSchema)
 export type Product = z.infer<typeof ProductSchema>
 export const ProductConverter = genConverter(ProductSchema)
 
-export const sprintColumns = {
-	productBacklog: `Product Backlog`,
-	designBacklog: `Design Sprint Backlog`,
-	designing: `Designing`,
-	critique: `Critique`,
-	devReady: `Design Done / Dev Ready`,
-	devBacklog: `Dev Sprint Backlog`,
-	developing: `Developing`,
-	designReview: `Design Review`,
-	codeReview: `Peer Code Review`,
-	qa: `QA`,
-	productionQueue: `Production Queue`,
-	shipped: `Shipped`,
+export const kickoffSections = {
+	problemStatement: `Problem Statement`,
+	personas: `Personas`,
+	successMetrics: `Success Metrics`,
+	businessPriorities: `Business Priorities`,
 }

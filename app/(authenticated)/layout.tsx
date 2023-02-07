@@ -23,7 +23,7 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
 	useEffect(() => {
 		if (loading) return
 		if (!user) {
-			router.replace(`/login`)
+			router.replace(`/sign-in`)
 			return
 		}
 		getDoc(doc(db, Users._, user.uid).withConverter(UserConverter)).then((dbUser) => {

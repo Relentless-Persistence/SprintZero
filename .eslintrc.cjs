@@ -93,6 +93,10 @@ module.exports = {
 								element: `a`,
 								message: `please use <LinkTo> instead.`,
 							},
+							{
+								element: `Link`,
+								message: `please use <LinkTo> instead.`,
+							},
 						],
 					},
 				],

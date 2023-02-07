@@ -11,10 +11,9 @@ import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
 import SprintColumn from "./SprintColumn"
-import {ProductConverter, Products, sprintColumns} from "~/types/db/Products"
-import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
+import {ProductConverter, Products} from "~/types/db/Products"
+import {sprintColumns, StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
-import {objectEntries} from "~/utils/objectMethods"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const findPreviousOccurenceOfDayOfWeek = (date: Dayjs, dayOfWeek: number) => {
@@ -83,7 +82,7 @@ const SprintPage: FC = () => {
 						id="sprint-selector"
 						value={currentSprint}
 						onChange={(value) => setCurrentSprint(value)}
-						options={objectEntries(sprintsGrouped).map(([year, sprints]) => ({
+						options={Object.entries(sprintsGrouped).map(([year, sprints]) => ({
 							label: year,
 							options: sprints.map(({startDate, endDate}) => ({
 								label: `${dayjs(startDate).format(`MMM D`)} - ${dayjs(endDate).format(`MMM D`)}`,
@@ -99,7 +98,7 @@ const SprintPage: FC = () => {
 				<div className="flex w-full grow overflow-x-auto pl-12 pb-8">
 					<div className="grid h-full grid-cols-[repeat(12,14rem)] gap-4">
 						{storyMapState &&
-							objectEntries(sprintColumns).map(([id, title]) => (
+							Object.entries(sprintColumns).map(([id, title]) => (
 								<SprintColumn
 									key={id}
 									id={id}

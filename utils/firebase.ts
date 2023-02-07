@@ -19,6 +19,7 @@ if (process.env.NODE_ENV === `development` && process.env.NEXT_PUBLIC_FIREBASE_E
 	connectFirestoreEmulator(db, `localhost`, parseInt(process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT))
 
 export const googleAuthProvider = new GoogleAuthProvider()
+googleAuthProvider.setCustomParameters({prompt: `select_account`})
 export const appleAuthProvider = new OAuthProvider(`apple.com`)
 export const microsoftAuthProvider = new OAuthProvider(`microsoft.com`)
 microsoftAuthProvider.setCustomParameters({prompt: `select_account`})

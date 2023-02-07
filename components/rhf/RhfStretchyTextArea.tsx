@@ -1,6 +1,5 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <TextArea /> otherwise. */
 
-import {Input} from "antd"
 import {useController} from "react-hook-form"
 
 import type {TextAreaProps as AntdTextAreaProps} from "antd/es/input"
@@ -8,30 +7,32 @@ import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
 
+import StretchyTextArea from "../StretchyTextArea"
+
 type FieldValues = Record<string, any>
-export type RhfTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<AntdTextAreaProps, `ref`> &
+export type RhfStretchyTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<AntdTextAreaProps, `ref`> &
 	SetRequired<UseControllerProps<TFieldValues>, `control`>
 
-const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
+const RhfStretchyTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	control,
 	name,
 	rules,
 	shouldUnregister,
 	defaultValue,
 	...props
-}: RhfTextAreaProps<TFieldValues>): ReactElement | null => {
+}: RhfStretchyTextAreaProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	return (
-		<Input.TextArea
+		<StretchyTextArea
 			{...props}
 			onChange={(e) => void field.onChange(e.target.value)}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}
-			ref={(v) => void field.ref(v?.resizableTextArea)}
+			ref={field.ref}
 		/>
 	)
 }
 
-export default RhfTextArea
+export default RhfStretchyTextArea

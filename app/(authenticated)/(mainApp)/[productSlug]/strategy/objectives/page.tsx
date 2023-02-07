@@ -3,9 +3,7 @@
 import {AimOutlined} from "@ant-design/icons"
 import {Input, Breadcrumb, Button, Empty, Tabs} from "antd"
 import {addDoc, collection, query, where} from "firebase/firestore"
-import produce from "immer"
 import {debounce} from "lodash"
-import {nanoid} from "nanoid"
 import {useEffect, useRef, useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
@@ -14,7 +12,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Objective} from "~/types/db/Objectives"
 
-import EditableTextAreaCard from "~/components/EditableTextAreaCard"
+import ObjectiveCard from "./ObjectiveCard"
 import {ObjectiveConverter, Objectives} from "~/types/db/Objectives"
 import {db} from "~/utils/firebase"
 import {updateObjective} from "~/utils/mutations"
@@ -85,60 +83,22 @@ const ObjectivesPage: FC = () => {
 						columnClassName="bg-clip-padding space-y-8"
 					>
 						{currentObjective.results.map((result) => (
-							<EditableTextAreaCard
+							<ObjectiveCard
 								key={result.id}
+								objective={currentObjective}
+								resultId={result.id}
 								isEditing={result.id === activeResultId}
 								onEditStart={() => void setActiveResultId(result.id)}
-								title={result.name}
-								text={result.text}
-								onCancel={() => void setActiveResultId(undefined)}
-								onCommit={(title, text) => {
-									const newObjective = produce(currentObjective, (draft) => {
-										const index = draft.results.findIndex((item) => item.id === result.id)
-										draft.results[index]!.name = title
-										draft.results[index]!.text = text
-									})
-									updateObjective({
-										id: currentObjective.id,
-										data: newObjective,
-									})
-									setActiveResultId(undefined)
-								}}
-								onDelete={() =>
-									void updateObjective({
-										id: currentObjective.id,
-										data: {
-											...currentObjective,
-											results: currentObjective.results.filter(({id}) => result.id === id),
-										},
-									})
-								}
+								onEditEnd={() => void setActiveResultId(undefined)}
 							/>
 						))}
 
 						{activeResultId === `new` && (
-							<EditableTextAreaCard
+							<ObjectiveCard
+								objective={currentObjective}
 								isEditing
-								title=""
-								text=""
-								onCancel={() => void setActiveResultId(undefined)}
-								onCommit={(title, text) => {
-									updateObjective({
-										id: currentObjective.id,
-										data: {
-											...currentObjective,
-											results: [
-												...currentObjective.results,
-												{
-													id: nanoid(),
-													name: title,
-													text,
-												},
-											],
-										},
-									})
-									setActiveResultId(undefined)
-								}}
+								onEditStart={() => void setActiveResultId(`new`)}
+								onEditEnd={() => void setActiveResultId(undefined)}
 							/>
 						)}
 					</Masonry>

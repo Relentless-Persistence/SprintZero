@@ -8,8 +8,8 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 import type {Persona} from "~/types/db/Personas"
 
-import EditableListCard from "~/components/EditableListCard"
-import EditableTextAreaCard from "~/components/EditableTextAreaCard"
+import EditableListCard from "~/app/(authenticated)/(mainApp)/[productSlug]/userbase/personas/EditableListCard"
+import PersonaDescriptionCard from "~/app/(authenticated)/(mainApp)/[productSlug]/userbase/personas/PersonaDescriptionCard"
 import {Personas, PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -70,7 +70,6 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `goals`}
 												onEditStart={() => void setIsEditingCard(`goals`)}
 												title="Goals"
-												disableTitleEditing
 												list={persona.goals}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
@@ -82,7 +81,6 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `interactions`}
 												onEditStart={() => void setIsEditingCard(`interactions`)}
 												title="Interactions"
-												disableTitleEditing
 												list={persona.interactions}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
@@ -96,7 +94,6 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `tasks`}
 												onEditStart={() => void setIsEditingCard(`tasks`)}
 												title="Tasks"
-												disableTitleEditing
 												list={persona.tasks}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
@@ -108,7 +105,6 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `responsibilities`}
 												onEditStart={() => void setIsEditingCard(`responsibilities`)}
 												title="Responsibilities"
-												disableTitleEditing
 												list={persona.responsibilities}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
@@ -122,7 +118,6 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `priorities`}
 												onEditStart={() => void setIsEditingCard(`priorities`)}
 												title="Priorities"
-												disableTitleEditing
 												list={persona.priorities}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
@@ -136,7 +131,6 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `frustrations`}
 												onEditStart={() => void setIsEditingCard(`frustrations`)}
 												title="Frustrations"
-												disableTitleEditing
 												list={persona.frustrations}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
@@ -150,7 +144,6 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `changes`}
 												onEditStart={() => void setIsEditingCard(`changes`)}
 												title="Changes"
-												disableTitleEditing
 												list={persona.changes}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
@@ -160,25 +153,17 @@ const PersonasPage: FC = () => {
 											/>
 										</div>
 										<div className="flex flex-col gap-4">
-											<EditableTextAreaCard
+											<PersonaDescriptionCard
+												personaId={persona.id}
+												text={persona.description}
 												isEditing={isEditingCard === `description`}
 												onEditStart={() => void setIsEditingCard(`description`)}
-												title="Description"
-												disableTitleEditing
-												text={persona.description}
-												onCancel={() => void setIsEditingCard(undefined)}
-												onCommit={async (title, text) => {
-													await updateDoc(doc(db, Personas._, persona.id), {
-														description: text,
-													} satisfies Partial<Persona>)
-													setIsEditingCard(undefined)
-												}}
+												onEditEnd={() => void setIsEditingCard(undefined)}
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `dayInTheLife`}
 												onEditStart={() => void setIsEditingCard(`dayInTheLife`)}
 												title="A Day in the Life"
-												disableTitleEditing
 												list={persona.dayInTheLife}
 												onCancel={() => void setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {

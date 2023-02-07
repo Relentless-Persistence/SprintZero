@@ -55,19 +55,19 @@ export const StorySchema = z.object({
 	name: z.string(),
 	pageLink: z.string().url().nullable(),
 	points: z.number(),
-	sprintColumn: z.union([
-		z.literal(`productBacklog`),
-		z.literal(`designBacklog`),
-		z.literal(`designing`),
-		z.literal(`critique`),
-		z.literal(`devReady`),
-		z.literal(`devBacklog`),
-		z.literal(`developing`),
-		z.literal(`designReview`),
-		z.literal(`codeReview`),
-		z.literal(`qa`),
-		z.literal(`productionQueue`),
-		z.literal(`shipped`),
+	sprintColumn: z.enum([
+		`productBacklog`,
+		`designBacklog`,
+		`designing`,
+		`critique`,
+		`devReady`,
+		`devBacklog`,
+		`developing`,
+		`designReview`,
+		`codeReview`,
+		`qa`,
+		`productionQueue`,
+		`shipped`,
 	]),
 
 	commentIds: z.array(idSchema),
@@ -85,4 +85,20 @@ export const StoryMapStateSchema = z.object({
 
 export const StoryMapStates = genDbNames(`StoryMapStates`, StoryMapStateSchema)
 export type StoryMapState = z.infer<typeof StoryMapStateSchema>
+
 export const StoryMapStateConverter = genConverter(StoryMapStateSchema)
+
+export const sprintColumns = {
+	productBacklog: `Product Backlog`,
+	designBacklog: `Design Sprint Backlog`,
+	designing: `Designing`,
+	critique: `Critique`,
+	devReady: `Design Done / Dev Ready`,
+	devBacklog: `Dev Sprint Backlog`,
+	developing: `Developing`,
+	designReview: `Design Review`,
+	codeReview: `Peer Code Review`,
+	qa: `QA`,
+	productionQueue: `Production Queue`,
+	shipped: `Shipped`,
+}
