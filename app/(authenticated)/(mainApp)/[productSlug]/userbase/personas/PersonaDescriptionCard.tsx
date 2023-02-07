@@ -9,8 +9,6 @@ import type {Persona} from "~/types/db/Personas"
 import StretchyTextArea from "~/components/StretchyTextArea"
 import {Personas} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
-import { useCollectionData } from "react-firebase-hooks/firestore"
-import { useActiveProductId } from "~/utils/useActiveProductId"
 
 export type PersonaDescriptionCardProps = {
 	personaId: Id

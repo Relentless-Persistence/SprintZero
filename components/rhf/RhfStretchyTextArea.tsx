@@ -2,7 +2,7 @@
 
 import {useController} from "react-hook-form"
 
-import type {TextAreaProps as AntdTextAreaProps} from "antd/es/input"
+import type {StretchyTextAreaProps} from "../StretchyTextArea"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
@@ -10,7 +10,10 @@ import type {SetRequired} from "type-fest"
 import StretchyTextArea from "../StretchyTextArea"
 
 type FieldValues = Record<string, any>
-export type RhfStretchyTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<AntdTextAreaProps, `ref`> &
+export type RhfStretchyTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<
+	StretchyTextAreaProps,
+	`ref` | `value` | `onChange` | `name` | `onBlur`
+> &
 	SetRequired<UseControllerProps<TFieldValues>, `control`>
 
 const RhfStretchyTextArea = <TFieldValues extends FieldValues = FieldValues>({

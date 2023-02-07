@@ -12,7 +12,7 @@ export const RetrospectiveItemSchema = z.object({
 		}),
 	),
 	title: z.string(),
-	type: z.union([z.literal(`enjoyable`), z.literal(`puzzling`), z.literal(`frustrating`)]),
+	type: z.enum([`enjoyable`, `puzzling`, `frustrating`]),
 
 	productId: idSchema,
 	userId: idSchema,

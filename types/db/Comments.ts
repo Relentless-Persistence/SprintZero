@@ -4,7 +4,7 @@ import {genConverter, genDbNames, idSchema} from "~/types"
 
 export const CommentSchema = z.object({
 	text: z.string(),
-	type: z.union([z.literal(`design`), z.literal(`code`)]),
+	type: z.enum([`design`, `code`]),
 
 	authorId: idSchema,
 	parentId: z.string(),
