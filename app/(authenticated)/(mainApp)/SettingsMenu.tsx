@@ -2,15 +2,18 @@
 
 import {FormOutlined, LogoutOutlined, SettingOutlined, TeamOutlined, UserOutlined} from "@ant-design/icons"
 import {Menu} from "antd"
-import {usePathname, useRouter} from "next/navigation"
+import {usePathname} from "next/navigation"
 
 import type {FC} from "react"
 
 import LinkTo from "~/components/LinkTo"
 
-const SettingsMenu: FC = () => {
+export type SettingsMenuProps = {
+	onClose: () => void
+}
+
+const SettingsMenu: FC<SettingsMenuProps> = ({onClose}) => {
 	const pathname = usePathname()
-	const router = useRouter()
 
 	return (
 		<div className="flex h-full flex-col justify-between">
@@ -21,6 +24,7 @@ const SettingsMenu: FC = () => {
 						key: `settings-account`,
 						icon: <UserOutlined />,
 						label: <LinkTo href="/settings/account">Account</LinkTo>,
+						onClick: () => void onClose(),
 					},
 					{
 						key: `settings-config`,
@@ -41,12 +45,13 @@ const SettingsMenu: FC = () => {
 								Support
 							</LinkTo>
 						),
+						onClick: () => void onClose(),
 					},
 					{
-						key: `settings-logout`,
+						key: `settings-sign-out`,
 						icon: <LogoutOutlined />,
-						label: `Logout`,
-						onClick: () => void router.push(`/sign-out`),
+						label: <LinkTo href="/sign-out">Sign out</LinkTo>,
+						onClick: () => void onClose(),
 					},
 				]}
 				style={{borderInlineEnd: `unset`}}

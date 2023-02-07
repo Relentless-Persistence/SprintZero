@@ -52,9 +52,9 @@ const VisionsPage: FC = () => {
 			</Breadcrumb>
 
 			<div className="grid min-h-0 flex-1 grid-cols-[1fr_16rem] gap-8">
-				<div className="space-y-6 overflow-auto pb-8">
+				<div className="flex flex-col gap-6 overflow-auto pb-8">
 					<div className="flex items-start justify-between">
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<h1 className="text-4xl font-semibold">Product Vision</h1>
 							{editMode && (
 								<h2 className="text-laurel">
@@ -151,7 +151,7 @@ const VisionsPage: FC = () => {
 						) : (
 							activeProduct.updates.map((update, i) => (
 								<Timeline.Item color="#54a31c" key={i}>
-									<div className="space-y-1">
+									<div className="flex flex-col gap-1">
 										<p className="font-mono">{dayjs(update.timestamp.toDate()).fromNow()}</p>
 										<p className="text-xs">
 											<span className="text-[#1890ff]">

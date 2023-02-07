@@ -2,8 +2,7 @@
 
 import {AimOutlined} from "@ant-design/icons"
 import {Input, Breadcrumb, Button, Empty, Tabs} from "antd"
-import {addDoc, collection, query, where} from "firebase/firestore"
-import {debounce} from "lodash"
+import {addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
@@ -15,10 +14,7 @@ import type {Objective} from "~/types/db/Objectives"
 import ObjectiveCard from "./ObjectiveCard"
 import {ObjectiveConverter, Objectives} from "~/types/db/Objectives"
 import {db} from "~/utils/firebase"
-import {updateObjective} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
-
-const debouncedUpdateObjective = debounce(updateObjective, 300)
 
 const ObjectivesPage: FC = () => {
 	const activeProductId = useActiveProductId()
@@ -49,7 +45,7 @@ const ObjectivesPage: FC = () => {
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
-			<div className="flex w-full flex-col gap-6 px-12 py-8">
+			<div className="flex w-full flex-col gap-6 overflow-auto px-12 py-8">
 				<div className="flex items-center justify-between">
 					<Breadcrumb>
 						<Breadcrumb.Item>Strategy</Breadcrumb.Item>
@@ -66,12 +62,11 @@ const ObjectivesPage: FC = () => {
 					<Input
 						addonBefore={<AimOutlined />}
 						value={statement}
-						onChange={(e) => {
+						onChange={async (e) => {
 							setStatement(e.target.value)
-							debouncedUpdateObjective({
-								id: currentObjective.id,
-								data: {statement},
-							})
+							await updateDoc(doc(db, Objectives._, currentObjective.id), {
+								statement,
+							} satisfies Partial<Objective>)
 						}}
 					/>
 				)}
@@ -80,7 +75,7 @@ const ObjectivesPage: FC = () => {
 					<Masonry
 						breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 						className="flex gap-8"
-						columnClassName="bg-clip-padding space-y-8"
+						columnClassName="bg-clip-padding flex flex-col gap-8"
 					>
 						{currentObjective.results.map((result) => (
 							<ObjectiveCard

@@ -17,7 +17,7 @@ const FinalStep: FC<FinalStepProps> = ({gptResponse, onFinish, onCancel}) => {
 
 	return (
 		<div className="flex w-full flex-col gap-6">
-			<div className="space-y-2">
+			<div className="flex flex-col gap-2">
 				<p className="text-[16px]">Finalize</p>
 				<p className="text-sm text-black/[0.45]">Modify as you see fit</p>
 			</div>

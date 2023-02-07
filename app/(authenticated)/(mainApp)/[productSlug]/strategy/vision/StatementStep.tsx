@@ -117,7 +117,7 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 
 	return (
 		<div className="flex w-full flex-col gap-6">
-			<div className="space-y-2">
+			<div className="flex flex-col gap-2">
 				<p className="text-xl font-semibold">Statement</p>
 				<p className="text-sm text-laurel">What&apos;s this thing gonna be?</p>
 			</div>
@@ -128,7 +128,7 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 				}}
 			>
 				<Form id="statement-form" layout="vertical" onFinish={() => void onSubmit()}>
-					<div className="space-y-4">
+					<div className="flex flex-col gap-4">
 						<Form.Item label={<span className="font-semibold">Type</span>}>
 							<RhfSegmented
 								control={control}

@@ -70,7 +70,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 			}
 		>
 			{isEditing ? (
-				<div className="space-y-2">
+				<div className="flex flex-col gap-2">
 					<TextListEditor textList={listDraft} onChange={setListDraft} />
 					{onDelete && (
 						<Button danger onClick={() => void onDelete()} className="w-full">

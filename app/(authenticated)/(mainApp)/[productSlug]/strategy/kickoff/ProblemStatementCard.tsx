@@ -35,11 +35,12 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 							size="small"
 							type="primary"
 							className="bg-green"
-							onClick={async () =>
-								void (await updateDoc(doc(db, Products._, activeProductId), {
+							onClick={async () => {
+								await updateDoc(doc(db, Products._, activeProductId), {
 									problemStatement: textDraft,
-								} satisfies Partial<Product>))
-							}
+								} satisfies Partial<Product>)
+								onEditEnd()
+							}}
 						>
 							Done
 						</Button>

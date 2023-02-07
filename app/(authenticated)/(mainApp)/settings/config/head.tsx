@@ -1,7 +1,7 @@
 import type {FC} from "react"
 
 const ConfigSettingsHead: FC = () => {
-	return <title>Config Settings | SprintZero</title>
+	return <title>Product Configuration | SprintZero</title>
 }
 
 export default ConfigSettingsHead

@@ -24,7 +24,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 	const newestElement = useRef<string>(``)
 
 	return (
-		<div className="space-y-2">
+		<div className="flex flex-col gap-2">
 			{textList.length > 0 &&
 				textList.map((item, i) => (
 					<Input.Group key={item.id} compact className="!flex w-full">

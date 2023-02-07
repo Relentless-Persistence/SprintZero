@@ -79,9 +79,9 @@ const SignInPage: FC = () => {
 	}
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-8 p-12">
+		<div className="mx-auto flex max-w-4xl flex-col gap-8 p-12">
 			<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={178} height={42} priority />
-			<div className="space-y-2">
+			<div className="flex flex-col gap-2">
 				<h1 className="text-4xl">Authenticate Yourself Before You Wreck Yourself</h1>
 				<p className="text-2xl text-gray">Select a provider below to sign in with</p>
 			</div>
@@ -89,7 +89,7 @@ const SignInPage: FC = () => {
 			<div className="flex flex-col items-center gap-4 py-24">
 				<button
 					type="button"
-					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
+					className="flex h-14 w-80 items-center justify-start gap-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
 					onClick={() => handleOnClick(appleAuthProvider)}
 					data-testid="apple-sign-in"
 				>
@@ -98,7 +98,7 @@ const SignInPage: FC = () => {
 				</button>
 				<button
 					type="button"
-					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
+					className="flex h-14 w-80 items-center justify-start gap-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
 					onClick={() => handleOnClick(googleAuthProvider)}
 					data-testid="google-sign-in"
 				>
@@ -108,7 +108,7 @@ const SignInPage: FC = () => {
 
 				<button
 					type="button"
-					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
+					className="flex h-14 w-80 items-center justify-start gap-4 rounded-lg border border-black bg-white pl-7 text-xl font-medium"
 					onClick={() => handleOnClick(githubAuthProvider)}
 					data-testid="github-sign-in"
 				>
@@ -118,7 +118,7 @@ const SignInPage: FC = () => {
 
 				<button
 					type="button"
-					className="flex h-14 w-80 items-center justify-start space-x-4 rounded-lg border border-black bg-white pl-8 text-xl font-medium"
+					className="flex h-14 w-80 items-center justify-start gap-4 rounded-lg border border-black bg-white pl-8 text-xl font-medium"
 					onClick={() => handleOnClick(microsoftAuthProvider)}
 					data-testid="microsoft-sign-in"
 				>

@@ -69,7 +69,6 @@ export const addEpic = async ({storyMapState, data: initialData, position}: AddE
 		effort: 0.5,
 		name: `Epic ${storyMapState.epics.length + 1}`,
 		userValue: (prevEpicUserValue + nextEpicUserValue) / 2,
-		commentIds: [],
 		featureIds: [],
 		keeperIds: [],
 		...initialData,
@@ -85,7 +84,7 @@ export const addEpic = async ({storyMapState, data: initialData, position}: AddE
 type UpdateEpicVars = {
 	storyMapState: WithDocumentData<StoryMapState>
 	epicId: string
-	data: Partial<Pick<Epic, `description` | `name` | `commentIds` | `keeperIds`>>
+	data: Partial<Pick<Epic, `description` | `name` | `keeperIds`>>
 }
 
 export const updateEpic = async ({storyMapState, epicId, data}: UpdateEpicVars): Promise<void> => {
@@ -142,7 +141,6 @@ export const addFeature = async ({
 		effort: 0.5,
 		name: `Feature ${storyMapState.features.length + 1}`,
 		userValue: (prevFeatureUserValue + nextFeatureUserValue) / 2,
-		commentIds: [],
 		storyIds: [],
 		...initialData,
 	}
@@ -173,7 +171,7 @@ export const deleteFeature = async ({storyMapState, featureId}: DeleteFeatureVar
 type UpdateFeatureVars = {
 	storyMapState: WithDocumentData<StoryMapState>
 	featureId: string
-	data: Partial<Pick<Feature, `description` | `name` | `commentIds`>>
+	data: Partial<Pick<Feature, `description` | `name`>>
 }
 
 export const updateFeature = async ({storyMapState, featureId, data}: UpdateFeatureVars): Promise<void> => {
@@ -215,7 +213,6 @@ export const addStory = async ({
 		pageLink: null,
 		points: 0,
 		sprintColumn: `productBacklog`,
-		commentIds: [],
 		...initialData,
 	}
 

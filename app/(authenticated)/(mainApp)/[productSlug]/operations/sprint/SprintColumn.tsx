@@ -19,7 +19,7 @@ export type SprintColumnProps = {
 const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, activeProduct, storyMapState}) => {
 	return (
 		<Card type="inner" title={title}>
-			<div className="space-y-4">
+			<div className="flex flex-col gap-4">
 				{storyMapState.stories
 					.filter((story) => story.sprintColumn === id)
 					.filter(

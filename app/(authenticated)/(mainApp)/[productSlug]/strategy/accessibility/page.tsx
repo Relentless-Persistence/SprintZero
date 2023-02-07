@@ -95,7 +95,7 @@ const Accessibility = () => {
 					<Masonry
 						breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 						className="flex gap-8"
-						columnClassName="bg-clip-padding space-y-8"
+						columnClassName="bg-clip-padding flex flex-col gap-8"
 					>
 						{currentItems?.map((item) => (
 							<AccessibilityItemCard

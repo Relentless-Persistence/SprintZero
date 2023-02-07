@@ -26,7 +26,7 @@ const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId}) => {
 				onClick={() => void setIsDrawerOpen(true)}
 				className="flex w-full items-center justify-between gap-2 border border-laurel bg-[#fafafa] px-4 py-3 text-left"
 			>
-				<div className="space-y-1">
+				<div className="flex flex-col gap-1">
 					<p className="font-medium">{story.name}</p>
 					<p className="inline-block border border-[#aee383] bg-[#e1f4d1] px-1 py-0.5 text-xs text-[#315613]">
 						{featureName}

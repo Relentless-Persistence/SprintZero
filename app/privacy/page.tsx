@@ -14,7 +14,7 @@ const PrivacyPage: FC = () => {
 				<div className="flex justify-between">
 					<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={178} height={42} priority />
 				</div>
-				<div className="space-y-8">
+				<div className="flex flex-col gap-8">
 					<h1 className="text-3xl">Privacy Policy</h1>
 					<Input.TextArea
 						size="large"

@@ -11,7 +11,6 @@ export const EpicSchema = z.object({
 	name: z.string(),
 	userValue: z.number().min(0).max(1),
 
-	commentIds: z.array(idSchema),
 	featureIds: z.array(z.string()),
 	keeperIds: z.array(idSchema),
 })
@@ -25,7 +24,6 @@ export const FeatureSchema = z.object({
 	name: z.string(),
 	userValue: z.number().min(0).max(1),
 
-	commentIds: z.array(idSchema),
 	storyIds: z.array(z.string()),
 })
 export type Feature = z.infer<typeof FeatureSchema>
@@ -70,7 +68,6 @@ export const StorySchema = z.object({
 		`shipped`,
 	]),
 
-	commentIds: z.array(idSchema),
 	versionId: z.string(),
 })
 export type Story = z.infer<typeof StorySchema>
