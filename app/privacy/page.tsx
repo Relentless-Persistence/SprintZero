@@ -4,8 +4,7 @@ import {Input} from "antd"
 import Image from "next/image"
 
 import type {FC} from "react"
-
-import {termsOfService} from "~/components/terms"
+import {privacyStatement} from "~/components/privacy"
 
 const PrivacyPage: FC = () => {
 	return (
@@ -20,7 +19,7 @@ const PrivacyPage: FC = () => {
 						size="large"
 						readOnly
 						rows={20}
-						value={termsOfService}
+						value={privacyStatement}
 						className="!resize-none bg-[#eceef1] font-mono text-sm text-black"
 					/>
 				</div>
