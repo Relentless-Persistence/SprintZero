@@ -1,18 +1,12 @@
 "use client"
 
-import {
-	DollarOutlined,
-	FormOutlined,
-	LogoutOutlined,
-	SettingOutlined,
-	TeamOutlined,
-	UserOutlined,
-} from "@ant-design/icons"
+import {FormOutlined, LogoutOutlined, SettingOutlined, TeamOutlined, UserOutlined} from "@ant-design/icons"
 import {Menu} from "antd"
-import Link from "next/link"
 import {usePathname, useRouter} from "next/navigation"
 
 import type {FC} from "react"
+
+import LinkTo from "~/components/LinkTo"
 
 const SettingsMenu: FC = () => {
 	const pathname = usePathname()
@@ -26,24 +20,14 @@ const SettingsMenu: FC = () => {
 					{
 						key: `settings-account`,
 						icon: <UserOutlined />,
-						label: <Link href="/settings/account">Account</Link>,
-					},
-					{
-						key: `settings-billing`,
-						icon: <DollarOutlined />,
-						label: <Link href="/settings/billing">Billing</Link>,
+						label: <LinkTo href="/settings/account">Account</LinkTo>,
 					},
 					{
 						key: `settings-config`,
 						icon: <SettingOutlined />,
-						label: <Link href="/settings/config">Configuration</Link>,
+						label: <LinkTo href="/settings/config">Configuration</LinkTo>,
 					},
-					{key: `settings-team`, icon: <TeamOutlined />, label: <Link href="/settings/team">Team</Link>},
-					// {
-					// 	key: `settings-integrations`,
-					// 	icon: <ApiOutlined />,
-					// 	label: <Link href="/settings/integrations">Integrations</Link>,
-					// },
+					{key: `settings-team`, icon: <TeamOutlined />, label: <LinkTo href="/settings/team">Team</LinkTo>},
 				]}
 				style={{borderInlineEnd: `unset`}}
 			/>
@@ -53,9 +37,9 @@ const SettingsMenu: FC = () => {
 						key: `settings-support`,
 						icon: <FormOutlined />,
 						label: (
-							<Link href="https://www.sprintzero.app/contact" target="_blank">
+							<LinkTo href="https://www.sprintzero.app/contact" openInNewTab>
 								Support
-							</Link>
+							</LinkTo>
 						),
 					},
 					{

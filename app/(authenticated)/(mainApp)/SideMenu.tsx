@@ -8,20 +8,20 @@ import {
 	UserOutlined,
 } from "@ant-design/icons"
 import {Menu} from "antd"
-import Link from "next/link"
 import {usePathname} from "next/navigation"
 import {useState} from "react"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
 
+import LinkTo from "~/components/LinkTo"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const getItems = (activeProductId: Id) => [
 	{
 		key: `map`,
 		icon: <ApartmentOutlined />,
-		label: <Link href={`/${activeProductId}/map`}>Story Map</Link>,
+		label: <LinkTo href={`/${activeProductId}/map`}>Story Map</LinkTo>,
 	},
 	{
 		key: `strategy`,
@@ -30,19 +30,19 @@ const getItems = (activeProductId: Id) => [
 		children: [
 			{
 				key: `strategy/kickoff`,
-				label: <Link href={`/${activeProductId}/strategy/kickoff`}>Kickoff</Link>,
+				label: <LinkTo href={`/${activeProductId}/strategy/kickoff`}>Kickoff</LinkTo>,
 			},
 			{
 				key: `strategy/accessibility`,
-				label: <Link href={`/${activeProductId}/strategy/accessibility`}>Accessibility</Link>,
+				label: <LinkTo href={`/${activeProductId}/strategy/accessibility`}>Accessibility</LinkTo>,
 			},
 			{
 				key: `strategy/objectives`,
-				label: <Link href={`/${activeProductId}/strategy/objectives`}>Objectives</Link>,
+				label: <LinkTo href={`/${activeProductId}/strategy/objectives`}>Objectives</LinkTo>,
 			},
 			{
 				key: `strategy/vision`,
-				label: <Link href={`/${activeProductId}/strategy/vision`}>Vision</Link>,
+				label: <LinkTo href={`/${activeProductId}/strategy/vision`}>Vision</LinkTo>,
 			},
 		],
 	},
@@ -53,15 +53,15 @@ const getItems = (activeProductId: Id) => [
 		children: [
 			{
 				key: `tactics/ethics`,
-				label: <Link href={`/${activeProductId}/tactics/ethics`}>Ethics</Link>,
+				label: <LinkTo href={`/${activeProductId}/tactics/ethics`}>Ethics</LinkTo>,
 			},
 			{
 				key: `tactics/priorities`,
-				label: <Link href={`/${activeProductId}/tactics/priorities`}>Priorities</Link>,
+				label: <LinkTo href={`/${activeProductId}/tactics/priorities`}>Priorities</LinkTo>,
 			},
 			{
 				key: `tactics/retrospective`,
-				label: <Link href={`/${activeProductId}/tactics/retrospective`}>Retrospective</Link>,
+				label: <LinkTo href={`/${activeProductId}/tactics/retrospective`}>Retrospective</LinkTo>,
 			},
 		],
 	},
@@ -72,15 +72,15 @@ const getItems = (activeProductId: Id) => [
 		children: [
 			{
 				key: `operations/huddle`,
-				label: <Link href={`/${activeProductId}/operations/huddle`}>Huddle</Link>,
+				label: <LinkTo href={`/${activeProductId}/operations/huddle`}>Huddle</LinkTo>,
 			},
 			{
 				key: `operations/sprint`,
-				label: <Link href={`/${activeProductId}/operations/sprint`}>Sprint</Link>,
+				label: <LinkTo href={`/${activeProductId}/operations/sprint`}>Sprint</LinkTo>,
 			},
 			{
 				key: `operations/tasks`,
-				label: <Link href={`/${activeProductId}/operations/tasks`}>Tasks</Link>,
+				label: <LinkTo href={`/${activeProductId}/operations/tasks`}>Tasks</LinkTo>,
 			},
 		],
 	},
@@ -91,19 +91,19 @@ const getItems = (activeProductId: Id) => [
 		children: [
 			{
 				key: `userbase/dialogue`,
-				label: <Link href={`/${activeProductId}/userbase/dialogue`}>Dialogue</Link>,
+				label: <LinkTo href={`/${activeProductId}/userbase/dialogue`}>Dialogue</LinkTo>,
 			},
 			{
 				key: `userbase/journeys`,
-				label: <Link href={`/${activeProductId}/userbase/journeys`}>Journeys</Link>,
+				label: <LinkTo href={`/${activeProductId}/userbase/journeys`}>Journeys</LinkTo>,
 			},
 			{
 				key: `userbase/learnings`,
-				label: <Link href={`/${activeProductId}/userbase/learnings`}>Learnings</Link>,
+				label: <LinkTo href={`/${activeProductId}/userbase/learnings`}>Learnings</LinkTo>,
 			},
 			{
 				key: `userbase/personas`,
-				label: <Link href={`/${activeProductId}/userbase/personas`}>Personas</Link>,
+				label: <LinkTo href={`/${activeProductId}/userbase/personas`}>Personas</LinkTo>,
 			},
 		],
 	},
