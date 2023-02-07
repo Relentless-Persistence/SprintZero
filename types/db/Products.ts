@@ -11,7 +11,7 @@ export const ProductSchema = z.object({
 	members: z.record(
 		idSchema,
 		z.object({
-			type: z.union([z.literal(`editor`), z.literal(`viewer`)]),
+			type: z.enum([`editor`, `viewer`]),
 		}),
 	),
 	name: z.string().min(1),
@@ -34,13 +34,7 @@ export const ProductSchema = z.object({
 	}),
 
 	// Vision info
-	productType: z.union([
-		z.literal(`mobile`),
-		z.literal(`tablet`),
-		z.literal(`desktop`),
-		z.literal(`watch`),
-		z.literal(`web`),
-	]),
+	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]),
 	valueProposition: z.string(),
 	features: z.array(z.object({id: z.string(), text: z.string()})),
 	finalVision: z.string(),

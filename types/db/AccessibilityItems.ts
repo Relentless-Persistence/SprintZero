@@ -5,13 +5,7 @@ import {genConverter, genDbNames, idSchema} from "~/types"
 export const AccessibilityItemSchema = z.object({
 	name: z.string(),
 	text: z.string(),
-	type: z.union([
-		z.literal(`auditory`),
-		z.literal(`cognitive`),
-		z.literal(`physical`),
-		z.literal(`speech`),
-		z.literal(`visual`),
-	]),
+	type: z.enum([`auditory`, `cognitive`, `physical`, `speech`, `visual`]),
 
 	productId: idSchema,
 })

@@ -45,7 +45,7 @@ export const StorySchema = z.object({
 	description: z.string(),
 	designLink: z.string().url().nullable(),
 	ethicsApproved: z.boolean().nullable(),
-	ethicsColumn: z.union([z.literal(`identified`), z.literal(`underReview`), z.literal(`adjudicated`)]).nullable(),
+	ethicsColumn: z.enum([`identified`, `underReview`, `adjudicated`]).nullable(),
 	ethicsVotes: z.array(
 		z.object({
 			userId: idSchema,

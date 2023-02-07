@@ -10,7 +10,7 @@ import type {FC} from "react"
 import SlideContainer from "./SlideContainer"
 
 const formSchema = z.object({
-	cadence: z.union([z.literal(`1`), z.literal(`2`), z.literal(`3`)]),
+	cadence: z.enum([`1`, `2`, `3`]),
 })
 type FormInputs = z.infer<typeof formSchema>
 

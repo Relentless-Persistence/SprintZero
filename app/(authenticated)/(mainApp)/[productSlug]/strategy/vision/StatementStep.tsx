@@ -29,7 +29,7 @@ const listToSentence = (list: string[]) => {
 }
 
 const formSchema = z.object({
-	type: z.union([z.literal(`mobile`), z.literal(`tablet`), z.literal(`desktop`), z.literal(`watch`), z.literal(`web`)]),
+	type: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]),
 	valueProposition: z.string(),
 	features: z.array(z.object({id: z.string(), text: z.string()})),
 })
