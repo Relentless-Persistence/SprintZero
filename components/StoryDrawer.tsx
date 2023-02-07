@@ -31,14 +31,12 @@ import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {sprintColumns} from "~/types/db/Products"
-import {StoryMapStates, StorySchema} from "~/types/db/StoryMapStates"
+import {sprintColumns, StoryMapStates, StorySchema} from "~/types/db/StoryMapStates"
 import {VersionConverter, Versions} from "~/types/db/Versions"
 import dollarFormat from "~/utils/dollarFormat"
 import {auth, db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {deleteStory, updateStory} from "~/utils/mutations"
-import {objectEntries, objectKeys} from "~/utils/objectMethods"
 
 const formSchema = StorySchema.pick({
 	branchName: true,
@@ -133,7 +131,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 		if (!user) return
 		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== user.uid)
 		ethicsVotes.push({userId: user.uid as Id, vote})
-		const votingComplete = ethicsVotes.length === objectKeys(activeProduct!.members).length
+		const votingComplete = ethicsVotes.length === Object.keys(activeProduct!.members).length
 
 		let ethicsColumn: `identified` | `underReview` | `adjudicated` = `identified`
 		if (ethicsVotes.length === 1) ethicsColumn = `underReview`
@@ -282,7 +280,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 							<RhfSelect
 								control={control}
 								name="sprintColumn"
-								options={objectEntries(sprintColumns).map(([key, value]) => ({label: value, value: key}))}
+								options={Object.entries(sprintColumns).map(([key, value]) => ({label: value, value: key}))}
 							/>
 						</Form.Item>
 					</div>
@@ -350,7 +348,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 							</div>
 						)}
 						<div className="max-h-[calc(100%-8rem)] space-y-2">
-							<p className="text-gray text-xl font-semibold">Story</p>
+							<p className="text-xl font-semibold text-gray">Story</p>
 							<Input.TextArea
 								rows={4}
 								value={description}
@@ -370,7 +368,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 
 						{!hideAcceptanceCriteria && (
 							<div className="flex min-h-0 flex-1 flex-col gap-2">
-								<p className="text-gray text-xl font-semibold">Acceptance Criteria</p>
+								<p className="text-xl font-semibold text-gray">Acceptance Criteria</p>
 								<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
 									{story.acceptanceCriteria.map((criterion) => (
 										<Checkbox
@@ -406,7 +404,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
-						<p className="text-gray text-xl font-semibold">Comments</p>
+						<p className="text-xl font-semibold text-gray">Comments</p>
 						<div className="relative grow">
 							<Comments
 								storyMapStateId={storyMapState.id}

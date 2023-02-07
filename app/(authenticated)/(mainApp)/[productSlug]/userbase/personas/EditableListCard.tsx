@@ -3,37 +3,35 @@ import {useState} from "react"
 
 import type {FC} from "react"
 
-import StretchyInput from "./StretchyInput"
+import TextListEditor from "../../../../../../components/TextListEditor"
 
-export type EditableTextAreaCardProps = {
+export type EditableListCardProps = {
 	isEditing: boolean
-	onEditStart?: () => void
+	onEditStart: () => void
 	title: string
-	disableTitleEditing?: boolean
-	text: string
+	list: Array<{id: string; text: string}>
 	onCancel: () => void
-	onCommit: (title: string, text: string) => void
+	onCommit: (title: string, list: Array<{id: string; text: string}>) => void
 	onDelete?: () => void
 }
 
-const EditableTextAreaCard: FC<EditableTextAreaCardProps> = ({
+const EditableListCard: FC<EditableListCardProps> = ({
 	isEditing,
 	onEditStart,
 	title,
-	disableTitleEditing = false,
-	text,
+	list,
 	onCancel,
 	onCommit,
 	onDelete,
 }) => {
 	const [titleDraft, setTitleDraft] = useState(title)
-	const [textDraft, setTextDraft] = useState(text)
+	const [listDraft, setListDraft] = useState(list)
 
 	return (
 		<Card
 			type="inner"
 			title={
-				isEditing && !disableTitleEditing ? (
+				isEditing ? (
 					<Input
 						size="small"
 						value={titleDraft}
@@ -54,13 +52,18 @@ const EditableTextAreaCard: FC<EditableTextAreaCardProps> = ({
 							size="small"
 							type="primary"
 							className="bg-green"
-							onClick={() => void onCommit(titleDraft, textDraft)}
+							onClick={() =>
+								void onCommit(
+									titleDraft,
+									listDraft.filter((item) => item.text !== ``),
+								)
+							}
 						>
 							Done
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart?.()} className="text-green">
+					<button type="button" onClick={() => void onEditStart()} className="text-green">
 						Edit
 					</button>
 				)
@@ -68,13 +71,7 @@ const EditableTextAreaCard: FC<EditableTextAreaCardProps> = ({
 		>
 			{isEditing ? (
 				<div className="space-y-2">
-					<StretchyInput text={textDraft} className="py-[4px] px-[11px]">
-						<Input.TextArea
-							value={textDraft}
-							onChange={(e) => void setTextDraft(e.target.value)}
-							className="!resize-none overflow-hidden"
-						/>
-					</StretchyInput>
+					<TextListEditor textList={listDraft} onChange={setListDraft} />
 					{onDelete && (
 						<Button danger onClick={() => void onDelete()} className="w-full">
 							Remove
@@ -82,10 +79,14 @@ const EditableTextAreaCard: FC<EditableTextAreaCardProps> = ({
 					)}
 				</div>
 			) : (
-				<p className="min-w-0">{textDraft}</p>
+				<ol className="list-decimal pl-4">
+					{list.map((item) => (
+						<li key={item.id}>{item.text}</li>
+					))}
+				</ol>
 			)}
 		</Card>
 	)
 }
 
-export default EditableTextAreaCard
+export default EditableListCard

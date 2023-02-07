@@ -8,8 +8,8 @@ import {useDocumentData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 
 import EditButtons from "./EditButtons"
+import ProblemStatementCard from "./ProblemStatementCard"
 import TextListEditor from "../../../../../../components/TextListEditor"
-import EditableTextAreaCard from "~/components/EditableTextAreaCard"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {updateProduct} from "~/utils/mutations"
@@ -22,7 +22,6 @@ const KickoffPage: FC = () => {
 		`problemStatement` | `personas` | `successMetrics` | `businessPriorities` | undefined
 	>(undefined)
 
-	const [textState, setTextState] = useState(``)
 	const [textListState, setTextListState] = useState<Array<{id: string; text: string}>>([])
 
 	return (
@@ -34,20 +33,13 @@ const KickoffPage: FC = () => {
 			<div className="grid grid-cols-2 gap-8">
 				<div className="flex flex-col gap-8">
 					{activeProduct && (
-						<EditableTextAreaCard
+						<ProblemStatementCard
+							text={activeProduct.problemStatement}
 							isEditing={editingSection === `problemStatement`}
 							onEditStart={() => {
-								setTextState(activeProduct.problemStatement)
 								setEditingSection(`problemStatement`)
 							}}
-							title="Problem Statement"
-							disableTitleEditing
-							text={activeProduct.problemStatement}
-							onCancel={() => void setEditingSection(undefined)}
-							onCommit={() => {
-								updateProduct({id: activeProduct!.id, data: {problemStatement: textState}})
-								setEditingSection(undefined)
-							}}
+							onEditEnd={() => void setEditingSection(undefined)}
 						/>
 					)}
 

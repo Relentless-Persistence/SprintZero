@@ -16,7 +16,6 @@ import NoData from "~/components/NoData"
 import {RetrospectiveItemConverter, RetrospectiveItems, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
 import {UserConverter, Users} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {objectEntries} from "~/utils/objectMethods"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
 
@@ -94,11 +93,11 @@ const RetrospectivePage: FC = () => {
 							>
 								<div className="flex flex-col gap-4">
 									<div className="space-y-2">
-										<p className="text-gray text-xl font-semibold">{item.title}</p>
+										<p className="text-xl font-semibold text-gray">{item.title}</p>
 										<p className="italic">{item.description}</p>
 									</div>
 									<div className="space-y-2">
-										<p className="text-gray text-xl font-semibold">Proposed Actions</p>
+										<p className="text-xl font-semibold text-gray">Proposed Actions</p>
 										<ul>
 											{item.proposedActions.map((action) => (
 												<li key={action.id}>
@@ -127,7 +126,7 @@ const RetrospectivePage: FC = () => {
 				tabPosition="right"
 				activeKey={currentTab}
 				onChange={(key: `enjoyable` | `puzzling` | `frustrating`) => void setCurrentTab(key)}
-				items={objectEntries(retrospectiveTabs).map(([key, label]) => ({key, label}))}
+				items={Object.entries(retrospectiveTabs).map(([key, label]) => ({key, label}))}
 			/>
 
 			{!loading && isDrawerOpen && (

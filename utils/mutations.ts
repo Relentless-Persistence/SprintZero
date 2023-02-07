@@ -288,15 +288,6 @@ export const addAccessibilityItem = async ({item}: AddAccessibilityItemVars): Pr
 	return ref.id as Id
 }
 
-type UpdateAccessibilityItemVars = {
-	id: Id
-	data: Partial<AccessibilityItem>
-}
-
-export const updateAccessibilityItem = async ({id, data}: UpdateAccessibilityItemVars): Promise<void> => {
-	await updateDoc(doc(db, AccessibilityItems._, id), data)
-}
-
 type DeleteAccessibilityItemVars = {
 	id: Id
 }

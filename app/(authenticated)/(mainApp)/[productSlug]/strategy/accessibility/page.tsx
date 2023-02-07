@@ -9,13 +9,13 @@ import Masonry from "react-masonry-css"
 
 import type {Id} from "~/types"
 
-import EditableTextAreaCard from "~/components/EditableTextAreaCard"
+import AccessibilityItemCard from "./AccessibilityItemCard"
 import LinkTo from "~/components/LinkTo"
 import NoData from "~/components/NoData"
 import {AccessibilityItemConverter, AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
-import {addAccessibilityItem, deleteAccessibilityItem, updateAccessibilityItem, updateProduct} from "~/utils/mutations"
+import {addAccessibilityItem, updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const descriptions = {
@@ -98,28 +98,18 @@ const Accessibility = () => {
 						columnClassName="bg-clip-padding space-y-8"
 					>
 						{currentItems?.map((item) => (
-							<EditableTextAreaCard
+							<AccessibilityItemCard
 								key={item.id}
+								item={item}
 								isEditing={item.id === activeItemId && itemDraft !== undefined}
 								onEditStart={() => {
 									setItemDraft({name: item.name, text: item.text})
 									setActiveItemId(item.id)
 								}}
-								title={item.name}
-								text={item.text}
-								onCancel={() => {
+								onEditEnd={() => {
 									setActiveItemId(undefined)
 									setItemDraft(undefined)
 								}}
-								onCommit={(title, text) => {
-									updateAccessibilityItem({
-										id: item.id,
-										data: {name: title, text},
-									})
-									setActiveItemId(undefined)
-									setItemDraft(undefined)
-								}}
-								onDelete={() => void deleteAccessibilityItem({id: item.id})}
 							/>
 						))}
 

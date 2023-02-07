@@ -29,7 +29,7 @@ specifiers:
   immer: 9.0.19
   jotai: 2.0.0
   lodash: 4.17.21
-  nanoid: 4.0.0
+  nanoid: 4.0.1
   next: 13.1.6
   openai: 3.1.0
   postcss: 8.4.21
@@ -78,7 +78,7 @@ dependencies:
   immer: 9.0.19
   jotai: 2.0.0_react@18.2.0
   lodash: 4.17.21
-  nanoid: 4.0.0
+  nanoid: 4.0.1
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
   openai: 3.1.0
   postcss: 8.4.21
@@ -3174,8 +3174,8 @@ packages:
     hasBin: true
     dev: false
 
-  /nanoid/4.0.0:
-    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+  /nanoid/4.0.1:
+    resolution: {integrity: sha512-udKGtCCUafD3nQtJg9wBhRP3KMbPglUsgV5JVsXhvyBs/oefqb4sqMEhKBBgqZncYowu58p1prsZQBYvAj/Gww==}
     engines: {node: ^14 || ^16 || >=18}
     hasBin: true
     dev: false

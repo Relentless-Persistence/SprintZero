@@ -14,7 +14,6 @@ import {UserConverter, Users} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {deleteEpic, updateEpic} from "~/utils/mutations"
-import {objectKeys} from "~/utils/objectMethods"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type EpicDrawerProps = {
@@ -47,7 +46,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 
 	const [productMembers] = useCollectionData(
 		activeProduct
-			? query(collection(db, Users._), where(documentId(), `in`, objectKeys(activeProduct.members))).withConverter(
+			? query(collection(db, Users._), where(documentId(), `in`, Object.keys(activeProduct.members))).withConverter(
 					UserConverter,
 			  )
 			: undefined,
@@ -141,7 +140,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 					{/* Left column */}
 					<div className="flex h-full min-h-0 flex-col gap-6">
 						<div className="max-h-[calc(100%-8rem)] space-y-2">
-							<p className="text-gray text-xl font-semibold">Epic</p>
+							<p className="text-xl font-semibold text-gray">Epic</p>
 							<Input.TextArea
 								rows={4}
 								value={description}
@@ -160,7 +159,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 						</div>
 
 						<div className="flex min-h-0 flex-1 flex-col gap-2">
-							<p className="text-gray text-xl font-semibold">Keeper(s)</p>
+							<p className="text-xl font-semibold text-gray">Keeper(s)</p>
 							<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
 								{productMembers?.map((user) => (
 									<Checkbox
