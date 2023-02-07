@@ -1,5 +1,5 @@
 import {Button, Card} from "antd"
-import {collection, doc, query, updateDoc, where} from "firebase/firestore"
+import {doc, updateDoc} from "firebase/firestore"
 import {useState} from "react"
 
 import type {FC} from "react"
@@ -27,9 +27,7 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = ({
 	onEditStart,
 	onEditEnd,
 }) => {
-	const activeProductId = useActiveProductId()
 	const [textDraft, setTextDraft] = useState(text)
-	const [dialogues] = useCollectionData(query(collection(db, Dialogues._), where(Dialogues.productId, `==`, activeProductId)).withConverter(DialogueConverter),)
 
 	return (
 		<Card
