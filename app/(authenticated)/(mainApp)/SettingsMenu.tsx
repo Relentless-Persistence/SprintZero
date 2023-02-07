@@ -9,13 +9,10 @@ import {
 	UserOutlined,
 } from "@ant-design/icons"
 import {Menu} from "antd"
-import {signOut} from "firebase/auth"
 import Link from "next/link"
 import {usePathname, useRouter} from "next/navigation"
 
 import type {FC} from "react"
-
-import {auth} from "~/utils/firebase"
 
 const SettingsMenu: FC = () => {
 	const pathname = usePathname()
@@ -65,10 +62,7 @@ const SettingsMenu: FC = () => {
 						key: `settings-logout`,
 						icon: <LogoutOutlined />,
 						label: `Logout`,
-						onClick: async () => {
-							await signOut(auth)
-							router.push(`/sign-in`)
-						},
+						onClick: () => void router.push(`/sign-out`),
 					},
 				]}
 				style={{borderInlineEnd: `unset`}}
