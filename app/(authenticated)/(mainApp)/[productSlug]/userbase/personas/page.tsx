@@ -154,7 +154,10 @@ const PersonasPage: FC = () => {
 										</div>
 										<div className="flex flex-col gap-4">
 											<PersonaDescriptionCard
+												productId={activeProductId}
+												personaName={persona.name}
 												personaId={persona.id}
+												personaPrevQnA={persona.prevQnA}
 												text={persona.description}
 												isEditing={isEditingCard === `description`}
 												onEditStart={() => void setIsEditingCard(`description`)}
@@ -202,6 +205,7 @@ const PersonasPage: FC = () => {
 											responsibilities: [],
 											tasks: [],
 											productId: activeProductId,
+											prevQnA: ``,
 										} satisfies Persona)
 										setActiveTab(ref.id)
 										setNewPersonaInput(undefined)
