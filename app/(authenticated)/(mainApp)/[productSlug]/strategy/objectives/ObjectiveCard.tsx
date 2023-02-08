@@ -81,7 +81,7 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 			}
 		>
 			{isEditing ? (
-				<div className="space-y-2">
+				<div className="flex flex-col gap-2">
 					<StretchyTextArea value={textDraft} onChange={(e) => void setTextDraft(e.target.value)} />
 				</div>
 			) : (

@@ -54,7 +54,6 @@ export const moveItem = (
 						effort: 0.5,
 						name: existingEpic.name,
 						userValue: newUserValue,
-						commentIds: existingEpic.commentIds,
 						storyIds: existingEpic.featureIds,
 					}
 
@@ -84,7 +83,6 @@ export const moveItem = (
 							points: 0,
 							sprintColumn: `productBacklog`,
 							versionId: currentVersion,
-							commentIds: feature.commentIds,
 						}
 						draft.stories.push(story)
 					}
@@ -108,7 +106,6 @@ export const moveItem = (
 						effort: 0.5,
 						name: existingFeature.name,
 						userValue: newUserValue,
-						commentIds: existingFeature.commentIds,
 						featureIds: existingFeature.storyIds,
 						keeperIds: [],
 					}
@@ -130,7 +127,6 @@ export const moveItem = (
 							effort: 0.5,
 							name: story.name,
 							userValue: 0.5,
-							commentIds: story.commentIds,
 							storyIds: [],
 						}
 						draft.features.push(feature)
@@ -210,7 +206,6 @@ export const moveItem = (
 						pageLink: null,
 						points: 0,
 						sprintColumn: `productBacklog`,
-						commentIds: existingFeature.commentIds,
 						versionId: currentVersion,
 					}
 
@@ -245,7 +240,6 @@ export const moveItem = (
 						effort: 0.5,
 						name: existingStory.name,
 						userValue: newUserValue,
-						commentIds: existingStory.commentIds,
 						storyIds: [],
 					}
 
@@ -296,7 +290,6 @@ export const moveItem = (
 						effort: 0.5,
 						name: existingEpic.name,
 						userValue: 0.5,
-						commentIds: existingEpic.commentIds,
 						storyIds: existingEpic.featureIds,
 					}
 
@@ -343,7 +336,6 @@ export const moveItem = (
 						points: 0,
 						sprintColumn: `productBacklog`,
 						versionId: currentVersion,
-						commentIds: existingFeature.commentIds,
 					}
 
 					// Insert the feature as a story at the new location

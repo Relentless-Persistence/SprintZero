@@ -48,7 +48,7 @@ const RetrospectivePage: FC = () => {
 
 	return (
 		<div className="flex h-full items-start justify-between">
-			<div className="h-full w-full space-y-8 px-12 py-8">
+			<div className="flex h-full w-full flex-col gap-8 px-12 py-8">
 				<div className="flex items-center justify-between">
 					<Breadcrumb>
 						<Breadcrumb.Item>Tactics</Breadcrumb.Item>
@@ -67,7 +67,7 @@ const RetrospectivePage: FC = () => {
 					<Masonry
 						breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 						className="flex gap-8"
-						columnClassName="bg-clip-padding space-y-8"
+						columnClassName="bg-clip-padding flex flex-col gap-8"
 					>
 						{userFirst.map((item) => (
 							<Card
@@ -92,11 +92,11 @@ const RetrospectivePage: FC = () => {
 								}
 							>
 								<div className="flex flex-col gap-4">
-									<div className="space-y-2">
+									<div className="flex flex-col gap-2">
 										<p className="text-xl font-semibold text-gray">{item.title}</p>
 										<p className="italic">{item.description}</p>
 									</div>
-									<div className="space-y-2">
+									<div className="flex flex-col gap-2">
 										<p className="text-xl font-semibold text-gray">Proposed Actions</p>
 										<ul>
 											{item.proposedActions.map((action) => (

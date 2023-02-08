@@ -80,7 +80,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 			<form id="journey-event-form" onSubmit={onSubmit}>
 				<div className="grid h-full grid-cols-3 gap-8">
 					<div className="flex flex-col gap-4">
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<p className="text-lg font-semibold text-gray">Subject</p>
 							<RhfInput control={control} name="subject" />
 						</div>
@@ -91,7 +91,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 					</div>
 					<div className="flex flex-col gap-4">
 						<div className="grid grid-cols-2 gap-4">
-							<div className="space-y-2">
+							<div className="flex flex-col gap-2">
 								<p className="text-lg font-semibold text-gray">Start</p>
 								<RhfSelect
 									control={control}
@@ -106,7 +106,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 									className="w-full"
 								/>
 							</div>
-							<div className="space-y-2">
+							<div className="flex flex-col gap-2">
 								<p className="text-lg font-semibold text-gray">End</p>
 								<RhfSelect
 									control={control}
@@ -122,7 +122,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 								/>
 							</div>
 						</div>
-						<div className="space-y-2">
+						<div className="flex flex-col items-start gap-2">
 							<p className="text-lg font-semibold text-gray">Emotion</p>
 							<RhfSegmented
 								control={control}
@@ -133,7 +133,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 								]}
 							/>
 						</div>
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<p className="text-lg font-semibold text-gray">Level</p>
 							<RhfSlider
 								control={control}
@@ -145,7 +145,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 						</div>
 					</div>
 					<div className="flex flex-col gap-4">
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<p className="text-lg font-semibold text-gray">Participants</p>
 						</div>
 					</div>

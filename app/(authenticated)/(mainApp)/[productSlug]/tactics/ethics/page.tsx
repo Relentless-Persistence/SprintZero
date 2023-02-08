@@ -39,7 +39,7 @@ const EthicsPage: FC = () => {
 
 				<div className="grid w-full grow grid-cols-3 gap-6">
 					<Card title="Identified">
-						<div className="space-y-4">
+						<div className="flex flex-col gap-4">
 							{activeProduct &&
 								storyMapState?.stories
 									.filter((story) => story.ethicsColumn === `identified`)
@@ -54,7 +54,7 @@ const EthicsPage: FC = () => {
 						</div>
 					</Card>
 					<Card title="Under Review">
-						<div className="space-y-4">
+						<div className="flex flex-col gap-4">
 							{activeProduct &&
 								storyMapState?.stories
 									.filter((story) => story.ethicsColumn === `underReview`)
@@ -69,7 +69,7 @@ const EthicsPage: FC = () => {
 						</div>
 					</Card>
 					<Card title="Adjudicated">
-						<div className="space-y-4">
+						<div className="flex flex-col gap-4">
 							{activeProduct &&
 								storyMapState?.stories
 									.filter((story) => story.ethicsColumn === `adjudicated`)

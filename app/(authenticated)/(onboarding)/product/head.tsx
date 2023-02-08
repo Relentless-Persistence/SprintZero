@@ -1,7 +1,7 @@
 import type {FC} from "react"
 
-const ProductConfigurationHead: FC = () => {
-	return <title>Product Configuration | SprintZero</title>
+const ProductSetupHead: FC = () => {
+	return <title>Product Setup | SprintZero</title>
 }
 
-export default ProductConfigurationHead
+export default ProductSetupHead

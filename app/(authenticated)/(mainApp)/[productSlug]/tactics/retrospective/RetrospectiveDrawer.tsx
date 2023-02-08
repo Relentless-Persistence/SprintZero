@@ -66,12 +66,12 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 				{/* Left column */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex gap-4">
-						<div className="grow space-y-2">
+						<div className="flex grow flex-col gap-2">
 							<p className="text-xl font-semibold text-gray">Title</p>
 							<RhfInput control={control} name="title" />
 						</div>
 
-						<div className="space-y-2">
+						<div className="flex flex-col gap-2">
 							<p className="text-xl font-semibold text-gray">Category</p>
 							<RhfSegmented
 								control={control}
@@ -89,7 +89,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 
 				{/* Right column */}
 				<div className="flex h-full flex-col">
-					<div className="space-y-2">
+					<div className="flex flex-col gap-2">
 						<p className="text-xl font-semibold text-gray">Proposed Actions</p>
 						<ul>
 							{proposedActions.map((action, i) => (

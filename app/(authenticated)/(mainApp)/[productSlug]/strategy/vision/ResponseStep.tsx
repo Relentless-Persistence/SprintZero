@@ -23,7 +23,7 @@ const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFin
 
 	return (
 		<div className="flex w-full flex-col gap-6">
-			<div className="space-y-2">
+			<div className="flex flex-col gap-2">
 				<p className="text-xl font-semibold">ChatGPT Response</p>
 				<p className="text-sm text-laurel">This is what we got back</p>
 			</div>

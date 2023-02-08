@@ -84,8 +84,8 @@ const HuddlePage: FC = () => {
 									</div>
 								}
 							>
-								<div className="space-y-4">
-									<div className="space-y-1">
+								<div className="flex flex-col gap-4">
+									<div className="flex flex-col gap-1">
 										<p className="text-lg font-semibold text-gray">Blockers</p>
 										<ul className="flex flex-col gap-1">
 											{huddleItemToday?.blockers.map((blocker) => (
@@ -138,7 +138,7 @@ const HuddlePage: FC = () => {
 											</li>
 										</ul>
 									</div>
-									<div className="space-y-1">
+									<div className="flex flex-col gap-1">
 										<p className="text-lg font-semibold text-gray">Today</p>
 										<ul className="flex flex-col gap-1">
 											{huddleItemToday?.tasks.map((task) => (
@@ -191,7 +191,7 @@ const HuddlePage: FC = () => {
 											</li>
 										</ul>
 									</div>
-									<div className="space-y-1">
+									<div className="flex flex-col gap-1">
 										<p className="text-lg font-semibold text-gray">Yesterday</p>
 										<ul className="flex flex-col gap-1">
 											{huddleItemYesterday?.tasks.map((task) => (

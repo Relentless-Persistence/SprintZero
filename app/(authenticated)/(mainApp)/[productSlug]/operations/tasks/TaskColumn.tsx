@@ -15,7 +15,7 @@ export type TaskColumnProps = {
 const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 	return (
 		<Card type="inner" title={title}>
-			<div className="space-y-4">
+			<div className="flex flex-col gap-4">
 				{tasks
 					.filter((task) => task.board === id)
 					.map((task) => (
@@ -23,7 +23,7 @@ const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 							key={task.id}
 							type="button"
 							onClick={() => void onEdit(task.id)}
-							className="w-full space-y-1 border border-laurel bg-[#fafafa] px-4 py-2 text-left"
+							className="flex w-full flex-col gap-1 border border-laurel bg-[#fafafa] px-4 py-2 text-left"
 						>
 							<p className="font-medium">{task.title}</p>
 							<p className="inline-block border border-[#aee383] bg-[#e1f4d1] px-1 py-0.5 text-xs text-[#315613]">

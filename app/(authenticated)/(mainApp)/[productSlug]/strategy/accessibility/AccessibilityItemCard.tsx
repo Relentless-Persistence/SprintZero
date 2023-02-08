@@ -58,7 +58,7 @@ const AccessibilityItemCard: FC<AccessibilityItemCardProps> = ({item, isEditing,
 			}
 		>
 			{isEditing ? (
-				<form id="accessibility-item-form" onSubmit={onSubmit} className="space-y-2">
+				<form id="accessibility-item-form" onSubmit={onSubmit} className="flex flex-col gap-2">
 					<RhfStretchyTextArea control={control} name="text" />
 					<Button
 						danger

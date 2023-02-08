@@ -123,9 +123,9 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({storyMapState, featureId, isOpen
 			) : (
 				<div className="grid h-full grid-cols-2 gap-8">
 					{/* Left column */}
-					<div className="h-full min-h-0 space-y-4">
-						<div className="h-[calc(100%-4rem)] space-y-2">
-							<p className="text-gray text-xl font-semibold">Feature</p>
+					<div className="flex h-full min-h-0 flex-col gap-4">
+						<div className="flex h-[calc(100%-4rem)] flex-col gap-2">
+							<p className="text-xl font-semibold text-gray">Feature</p>
 							<Input.TextArea
 								rows={4}
 								value={description}

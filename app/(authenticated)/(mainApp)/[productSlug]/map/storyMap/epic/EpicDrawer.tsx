@@ -139,7 +139,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 				<div className="grid h-full grid-cols-2 gap-8">
 					{/* Left column */}
 					<div className="flex h-full min-h-0 flex-col gap-6">
-						<div className="max-h-[calc(100%-8rem)] space-y-2">
+						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
 							<p className="text-xl font-semibold text-gray">Epic</p>
 							<Input.TextArea
 								rows={4}

@@ -28,7 +28,7 @@ const numSlides = 4
 
 type FormInputs = Pick<Product, `cadence` | `effortCost` | `name` | `sprintStartDayOfWeek`>
 
-const ProductConfigurationPage: FC = () => {
+const ProductSetupPage: FC = () => {
 	const [user] = useAuthState(auth)
 	invariant(user, `User must be logged in`)
 	const [currentSlide, setCurrentSlide] = useState(0)
@@ -163,4 +163,4 @@ const ProductConfigurationPage: FC = () => {
 	)
 }
 
-export default ProductConfigurationPage
+export default ProductSetupPage

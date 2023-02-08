@@ -252,7 +252,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 			onClose={() => void onClose()}
 		>
 			{editMode ? (
-				<Form id="story-form" layout="vertical" className="space-y-4" onFinish={onSubmit}>
+				<Form id="story-form" layout="vertical" className="flex flex-col gap-4" onFinish={onSubmit}>
 					<div className="flex gap-8">
 						<Form.Item
 							label="Title"
@@ -314,7 +314,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 					{/* Left column */}
 					<div className="flex h-full min-h-0 flex-col gap-6">
 						{!hideAdjudicationResponse && (
-							<div className="space-y-2">
+							<div className="flex flex-col gap-2">
 								{story.ethicsApproved === null ? (
 									<>
 										<div>
@@ -347,7 +347,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 								)}
 							</div>
 						)}
-						<div className="max-h-[calc(100%-8rem)] space-y-2">
+						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
 							<p className="text-xl font-semibold text-gray">Story</p>
 							<Input.TextArea
 								rows={4}

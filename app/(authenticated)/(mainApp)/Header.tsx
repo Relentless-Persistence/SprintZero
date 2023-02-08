@@ -32,7 +32,7 @@ const Header: FC = () => {
 	return (
 		<>
 			<Layout.Header style={{paddingInline: `unset`}}>
-				<div className="flex h-full items-center gap-8 bg-pine px-[17.45px]">
+				<div className="bg-pine flex h-full items-center gap-8 px-[17.45px]">
 					<Image src="/images/logo_beta.png" alt="SprintZero logo" width={178} height={42} priority />
 
 					<Menu
@@ -70,7 +70,7 @@ const Header: FC = () => {
 				}
 				bodyStyle={{padding: `12px`}}
 			>
-				<SettingsMenu />
+				<SettingsMenu onClose={() => void setIsSettingsOpen(false)} />
 			</Drawer>
 		</>
 	)
