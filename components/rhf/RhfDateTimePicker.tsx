@@ -4,7 +4,6 @@ import {DatePicker} from "antd"
 import dayjs from "dayjs"
 import {useController} from "react-hook-form"
 
-import type {Dayjs} from "dayjs"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
@@ -31,10 +30,7 @@ const RhfDateTimePicker = <TFieldValues extends FieldValues>({
 				onChange={(date) => {
 					if (!date) return
 					field.onChange(
-						((field.value ?? dayjs()) as Dayjs)
-							.set(`year`, date.year())
-							.set(`month`, date.month())
-							.set(`date`, date.date()),
+						(field.value ?? dayjs()).set(`year`, date.year()).set(`month`, date.month()).set(`date`, date.date()),
 					)
 				}}
 				value={field.value}
@@ -47,10 +43,7 @@ const RhfDateTimePicker = <TFieldValues extends FieldValues>({
 				onChange={(date) => {
 					if (!date) return
 					field.onChange(
-						((field.value ?? dayjs()) as Dayjs)
-							.set(`hour`, date.hour())
-							.set(`minute`, date.minute())
-							.set(`second`, date.second()),
+						(field.value ?? dayjs()).set(`hour`, date.hour()).set(`minute`, date.minute()).set(`second`, date.second()),
 					)
 				}}
 				value={field.value}

@@ -20,6 +20,7 @@ const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	defaultValue,
 	...props
 }: RhfSelectProps<TFieldValues>): ReactElement | null => {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const {field} = useController({control, name, rules, defaultValue, shouldUnregister})
 
 	return (

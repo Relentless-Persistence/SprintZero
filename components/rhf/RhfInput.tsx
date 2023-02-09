@@ -12,7 +12,7 @@ const formatAsNumber = (str: string) => {
 	let newStr = str.replace(/[^0-9.]/g, ``)
 	if (newStr.includes(`.`)) {
 		const [integer, fractional] = newStr.split(`.`)
-		newStr = `${integer}.${fractional}`
+		newStr = `${integer ?? ``}.${fractional ?? ``}`
 	}
 	return `${newStr}`
 }
@@ -26,7 +26,7 @@ const formatAsCurrency = (str: string) => {
 	let newStr = str.replace(/[^0-9.]/g, ``)
 	if (newStr.includes(`.`)) {
 		const [dollars, cents] = newStr.split(`.`)
-		newStr = `${dollars}.${cents?.slice(0, 2)}`
+		newStr = `${dollars ?? ``}.${cents?.slice(0, 2) ?? ``}`
 	}
 	return `$${newStr}`
 }
