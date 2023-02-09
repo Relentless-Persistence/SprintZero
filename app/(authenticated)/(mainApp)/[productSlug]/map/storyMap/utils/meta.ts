@@ -1,4 +1,4 @@
-import {setDoc, Timestamp} from "firebase/firestore"
+import {Timestamp, setDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 
@@ -8,7 +8,6 @@ import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapState
 
 import {avg} from "~/utils/math"
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const genMeta = (storyMapState: WithDocumentData<StoryMapState>, currentVersionId: Id | `__ALL_VERSIONS__`) => {
 	const epics = Object.entries(storyMapState.items)
 		.filter(([, item]) => item?.type === `epic`)
@@ -27,6 +26,7 @@ export const genMeta = (storyMapState: WithDocumentData<StoryMapState>, currentV
 
 	return {
 		id: storyMapState.id,
+		currentVersionId,
 
 		epics: epics.map((epic) => ({
 			...epic,

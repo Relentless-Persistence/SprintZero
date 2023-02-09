@@ -9,7 +9,7 @@ import type {AccessibilityItem} from "~/types/db/AccessibilityItems"
 
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
-import {AccessibilityItems, AccessibilityItemSchema} from "~/types/db/AccessibilityItems"
+import {AccessibilityItemSchema, AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {db} from "~/utils/firebase"
 
 const formSchema = AccessibilityItemSchema.pick({name: true, text: true, type: true})

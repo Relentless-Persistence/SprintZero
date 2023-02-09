@@ -12,7 +12,7 @@ export const getEpics = (storyMapState: WithDocumentData<StoryMapState>): EpicWi
 	return epics
 }
 
-export const sortEpics = (epics: Epic[]): Epic[] => sortBy(epics, [(epic: Epic) => epic.userValue])
+export const sortEpics = (epics: EpicWithId[]): EpicWithId[] => sortBy(epics, [(epic: EpicWithId) => epic.userValue])
 
 export type FeatureWithId = Feature & {id: Id}
 

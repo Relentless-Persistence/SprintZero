@@ -3,14 +3,7 @@
 import type {Id} from "~/types"
 
 declare global {
-	var __elementRegistry: Record<
-		Id,
-		| {
-				container: HTMLElement
-				content: HTMLElement
-		  }
-		| undefined
-	>
+	var __elementRegistry: Record<Id, HTMLElement | undefined>
 }
 
 export const storyMapTop = 224

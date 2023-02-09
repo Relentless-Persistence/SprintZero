@@ -1,7 +1,9 @@
 import {CopyOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
+import clsx from "clsx"
 import {useEffect, useRef, useState} from "react"
 
 import type {StoryMapMeta} from "./utils/meta"
+import type {DragInfo} from "./utils/types"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
@@ -11,28 +13,21 @@ import {elementRegistry} from "./utils/globals"
 
 export type EpicProps = {
 	meta: StoryMapMeta
-	currentVersionId: Id | `__ALL_VERSIONS__`
+	dragInfo: DragInfo
 	epicId: Id
 	inert?: boolean
 }
 
-const Epic: FC<EpicProps> = ({meta, currentVersionId, epicId, inert = false}) => {
-	const containerRef = useRef<HTMLDivElement>(null)
-	const contentRef = useRef<HTMLDivElement>(null)
+const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 	const epic = meta.epics.find((epic) => epic.id === epicId)!
 
+	const contentRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		if (inert || !containerRef.current || !contentRef.current) return
-		elementRegistry[epicId] = {
-			container: containerRef.current,
-			content: contentRef.current,
-		}
+		if (inert || !contentRef.current) return
+		elementRegistry[epicId] = contentRef.current
 		return () => {
-			if (!containerRef.current || !contentRef.current) return
-			elementRegistry[epicId] = {
-				container: containerRef.current, // eslint-disable-line react-hooks/exhaustive-deps
-				content: contentRef.current, // eslint-disable-line react-hooks/exhaustive-deps
-			}
+			if (!contentRef.current) return
+			elementRegistry[epicId] = contentRef.current // eslint-disable-line react-hooks/exhaustive-deps
 		}
 	}, [epicId, inert])
 
@@ -40,17 +35,23 @@ const Epic: FC<EpicProps> = ({meta, currentVersionId, epicId, inert = false}) =>
 
 	return (
 		<div
-			className="grid justify-items-center gap-x-4"
+			className={clsx(
+				`grid justify-items-center gap-x-4`,
+				dragInfo.itemBeingDragged === epicId && !inert && `invisible`,
+			)}
 			style={{gridTemplateColumns: `repeat(${epic.children.length}, auto)`}}
-			ref={containerRef}
 		>
-			<div className="cursor-grab touch-none select-none transition-transform hover:scale-105" ref={contentRef}>
-				<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]">
-					<button type="button" onClick={() => setIsDrawerOpen(true)} onPointerDownCapture={(e) => e.stopPropagation()}>
-						<ReadOutlined />
-					</button>
-					<p>{epic.name}</p>
-				</div>
+			<div
+				className={clsx(
+					`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8] transition-transform hover:scale-105 active:cursor-grabbing`,
+					inert ? `cursor-grabbing` : `cursor-grab`,
+				)}
+				ref={contentRef}
+			>
+				<button type="button" onClick={() => setIsDrawerOpen(true)} onPointerDownCapture={(e) => e.stopPropagation()}>
+					<ReadOutlined />
+				</button>
+				<p>{epic.name}</p>
 			</div>
 
 			{/* Pad out the remaining columns in row 1 */}
@@ -97,13 +98,7 @@ const Epic: FC<EpicProps> = ({meta, currentVersionId, epicId, inert = false}) =>
 				))}
 
 			{epic.children.map((feature) => (
-				<Feature
-					key={feature.id}
-					meta={meta}
-					currentVersionId={currentVersionId}
-					featureId={feature.id}
-					inert={inert}
-				/>
+				<Feature key={feature.id} meta={meta} dragInfo={dragInfo} featureId={feature.id} inert={inert} />
 			))}
 
 			{epic.children.length === 0 && (

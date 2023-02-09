@@ -1,7 +1,9 @@
 import {CopyOutlined, FileOutlined} from "@ant-design/icons"
+import clsx from "clsx"
 import {useEffect, useRef, useState} from "react"
 
 import type {StoryMapMeta} from "./utils/meta"
+import type {DragInfo} from "./utils/types"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
@@ -11,45 +13,44 @@ import {elementRegistry} from "./utils/globals"
 
 export type FeatureProps = {
 	meta: StoryMapMeta
-	currentVersionId: Id | `__ALL_VERSIONS__`
+	dragInfo: DragInfo
 	featureId: Id
 	inert?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({meta, currentVersionId, featureId, inert = false}) => {
+const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) => {
 	const feature = meta.features.find((feature) => feature.id === featureId)!
 
-	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		if (inert || !containerRef.current || !contentRef.current) return
-		elementRegistry[featureId] = {
-			container: containerRef.current,
-			content: contentRef.current,
-		}
+		if (inert || !contentRef.current) return
+		elementRegistry[featureId] = contentRef.current
 		return () => {
-			if (!containerRef.current || !contentRef.current) return
-			elementRegistry[featureId] = {
-				container: containerRef.current, // eslint-disable-line react-hooks/exhaustive-deps
-				content: contentRef.current, // eslint-disable-line react-hooks/exhaustive-deps
-			}
+			if (!contentRef.current) return
+			elementRegistry[featureId] = contentRef.current // eslint-disable-line react-hooks/exhaustive-deps
 		}
 	}, [featureId, inert])
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	return (
-		<div className="flex flex-col items-center" ref={containerRef}>
-			<div className="cursor-grab touch-none select-none transition-transform hover:scale-105" ref={contentRef}>
-				<div className="flex min-w-[4rem] items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378] transition-transform hover:scale-105">
-					<button type="button" onClick={() => setIsDrawerOpen(true)} onPointerDownCapture={(e) => e.stopPropagation()}>
-						<CopyOutlined />
-					</button>
-					<p>{feature.name}</p>
-				</div>
+		<div
+			className={clsx(`flex flex-col items-center`, dragInfo.itemBeingDragged === featureId && !inert && `invisible`)}
+		>
+			<div
+				className={clsx(
+					`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378] transition-transform hover:scale-105 active:cursor-grabbing`,
+					inert ? `cursor-grabbing` : `cursor-grab`,
+				)}
+				ref={contentRef}
+			>
+				<button type="button" onClick={() => setIsDrawerOpen(true)} onPointerDownCapture={(e) => e.stopPropagation()}>
+					<CopyOutlined />
+				</button>
+				<p>{feature.name}</p>
 			</div>
 
-			{(currentVersionId !== `__ALL_VERSIONS__` || feature.children.length > 0) && (
+			{(meta.currentVersionId !== `__ALL_VERSIONS__` || feature.children.length > 0) && (
 				<div className="h-8 w-px border border-dashed border-[#006378]" />
 			)}
 
@@ -57,7 +58,7 @@ const Feature: FC<FeatureProps> = ({meta, currentVersionId, featureId, inert = f
 				<button
 					type="button"
 					onClick={() => {
-						if (currentVersionId !== `__ALL_VERSIONS__`) meta.addStory({parentId: featureId}).catch(console.error)
+						if (meta.currentVersionId !== `__ALL_VERSIONS__`) meta.addStory({parentId: featureId}).catch(console.error)
 					}}
 					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
 				>
@@ -65,24 +66,23 @@ const Feature: FC<FeatureProps> = ({meta, currentVersionId, featureId, inert = f
 					<span>Add story</span>
 				</button>
 			) : (
-				<div className="flex flex-col items-start rounded-md border border-[#006378] bg-white p-1.5">
+				<div className="flex flex-col items-start gap-3 rounded-md border border-[#006378] bg-white p-3">
 					{feature.children.map((story) => (
-						<Story key={story.id} meta={meta} storyId={story.id} inert={inert} />
+						<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
 					))}
 
-					{currentVersionId !== `__ALL_VERSIONS__` && (
-						<div className="m-1.5">
-							<button
-								type="button"
-								onClick={() => {
-									if (currentVersionId !== `__ALL_VERSIONS__`) meta.addStory({parentId: featureId}).catch(console.error)
-								}}
-								className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
-							>
-								<FileOutlined />
-								<span>Add story</span>
-							</button>
-						</div>
+					{meta.currentVersionId !== `__ALL_VERSIONS__` && (
+						<button
+							type="button"
+							onClick={() => {
+								if (meta.currentVersionId !== `__ALL_VERSIONS__`)
+									meta.addStory({parentId: featureId}).catch(console.error)
+							}}
+							className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
+						>
+							<FileOutlined />
+							<span>Add story</span>
+						</button>
 					)}
 				</div>
 			)}

@@ -5,18 +5,10 @@ module.exports = {
 		es6: true,
 		node: true,
 	},
-	settings: {
-		react: {
-			version: `detect`,
-		},
-	},
 	rules: {
 		eqeqeq: `warn`,
-		"import/named": `off`,
-		"import/no-duplicates": `error`,
+		"import/no-anonymous-default-export": `warn`,
 		"import/no-named-as-default": `off`,
-		"import/no-unresolved": `off`,
-		// "import/no-unused-modules": [`warn`, {unusedExports: true, ignoreExports: [`**/*.tsx`, `**/*.config.*`]}],
 		"import/order": [
 			`warn`,
 			{
@@ -32,15 +24,15 @@ module.exports = {
 				warnOnUnassignedImports: true,
 			},
 		],
-		"prefer-const": `off`,
+		"sort-imports": [`warn`, {ignoreDeclarationSort: true}],
 		"no-console": [`warn`, {allow: [`info`, `warn`, `error`]}],
 		"no-constant-condition": [`error`, {checkLoops: false}],
 		"no-control-regex": `off`,
 		"no-empty": [`warn`, {allowEmptyCatch: true}],
 		"no-mixed-spaces-and-tabs": [`warn`, `smart-tabs`],
-		"no-negated-condition": `warn`,
 		"no-nested-ternary": `warn`,
 		"no-param-reassign": `error`,
+		"no-unused-expressions": [`warn`, {enforceForJSX: true}],
 		"no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
 		"object-shorthand": `warn`,
 		quotes: [`warn`, `backtick`],
@@ -55,16 +47,24 @@ module.exports = {
 				project: `./tsconfig.json`,
 			},
 			plugins: [`@typescript-eslint`],
+			settings: {
+				"import/parsers": {
+					"@typescript-eslint/parser": [`.ts`, `.tsx`],
+				},
+				"import/resolver": {
+					typescript: true,
+					node: true,
+				},
+			},
 			extends: [
 				`plugin:@typescript-eslint/recommended`,
 				`plugin:@typescript-eslint/recommended-requiring-type-checking`,
+				`plugin:import/typescript`,
 			],
 			rules: {
 				"@typescript-eslint/ban-ts-comment": [`warn`, {"ts-ignore": `allow-with-description`}],
 				"@typescript-eslint/consistent-type-imports": `warn`,
-				"@typescript-eslint/explicit-module-boundary-types": `off`,
 				"@typescript-eslint/no-empty-function": `off`,
-				"@typescript-eslint/no-explicit-any": `off`,
 				"@typescript-eslint/no-extra-semi": `off`,
 				"@typescript-eslint/no-floating-promises": `warn`,
 				"@typescript-eslint/no-misused-promises": `warn`,
@@ -75,7 +75,6 @@ module.exports = {
 				"@typescript-eslint/no-unsafe-call": `warn`,
 				"@typescript-eslint/no-unsafe-member-access": `warn`,
 				"@typescript-eslint/no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
-				"@typescript-eslint/no-var-requires": `off`,
 				"@typescript-eslint/quotes": [`warn`, `backtick`],
 				"prefer-const": `off`,
 				quotes: `off`,
@@ -84,6 +83,11 @@ module.exports = {
 		{
 			files: [`**/*.jsx`, `**/*.tsx`],
 			plugins: [`react`, `react-hooks`, `@tanstack/query`],
+			settings: {
+				react: {
+					version: `detect`,
+				},
+			},
 			extends: [
 				`plugin:react/recommended`,
 				`plugin:react-hooks/recommended`,
@@ -116,12 +120,6 @@ module.exports = {
 				"react/no-unknown-property": `off`,
 				"react/prop-types": `off`,
 				"react/self-closing-comp": `off`,
-			},
-		},
-		{
-			files: [`**/*.ts`],
-			rules: {
-				"@typescript-eslint/explicit-module-boundary-types": `warn`,
 			},
 		},
 	],
