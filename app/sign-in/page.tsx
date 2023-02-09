@@ -2,7 +2,13 @@
 
 import {AppleFilled, GithubOutlined} from "@ant-design/icons"
 import {notification} from "antd"
-import {signInWithPopup, signOut} from "firebase/auth"
+import {
+	fetchSignInMethodsForEmail,
+	linkWithCredential,
+	OAuthProvider,
+	signInWithPopup,
+	signOut,
+} from "firebase/auth"
 import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
@@ -33,49 +39,79 @@ const SignInPage: FC = () => {
 		if (user?.uid && !hasSignedIn) router.replace(`/`)
 	}, [hasSignedIn, router, user?.uid])
 
-	const handleOnClick = async (provider: AuthProvider) => {
-		try {
-			const res = await signInWithPopup(auth, provider)
-			if (!res.user.email) throw new Error(`No email address found for user.`)
-			if (!res.user.displayName) throw new Error(`No display name found for user.`)
-
-			const isRpEmail = /@relentlesspersistenceinc\.com$/.test(res.user.email)
-			if (isRpEmail) {
-				setHasSignedIn(true)
-				notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
-
-				const user = (await getDoc(doc(db, Users._, res.user.uid).withConverter(UserConverter))).data()
-				const isNewUser = !user
-
-				if (isNewUser) {
-					await setDoc(doc(db, Users._, res.user.uid), {
-						avatar: res.user.photoURL,
-						email: res.user.email,
-						hasAcceptedTos: false,
-						name: res.user.displayName,
-					} satisfies User)
-					router.push(`/tos`)
-					// eslint-disable-next-line no-negated-condition
-				} else if (!user.hasAcceptedTos) {
-					router.push(`/tos`)
-				} else {
-					const {docs: products} = await getDocs(
-						query(
-							collection(db, Products._),
-							where(`${Products.members}.${res.user.uid}.type`, `==`, `editor`),
-						).withConverter(ProductConverter),
-					)
-					if (products.length === 0) router.push(`/product`)
-					else router.push(`/${products[0]!.id}/map`)
-				}
-			} else {
-				notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
-				await signOut(auth)
-			}
-		} catch (error) {
-			console.error(error.message)
-			notification.error({message: `An error occurred while trying to log you in.`})
+	const getProviderForProviderId = (provider: string) => {
+		if (provider === `google.com`) {
+			return googleAuthProvider
+		} else if (provider === `microsoft.com`) {
+			return microsoftAuthProvider
+		} else {
+			return githubAuthProvider
 		}
+	}
+
+	const processUser = async (res: any) => {
+		if (!res.user.email) throw new Error(`No email address found for user.`)
+		if (!res.user.displayName) throw new Error(`No display name found for user.`)
+
+		const isRpEmail = /@relentlesspersistenceinc\.com$/.test(res.user.email)
+		if (isRpEmail) {
+			setHasSignedIn(true)
+			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
+
+			const user = (await getDoc(doc(db, Users._, res.user.uid).withConverter(UserConverter))).data()
+			const isNewUser = !user
+
+			if (isNewUser) {
+				await setDoc(doc(db, Users._, res.user.uid), {
+					avatar: res.user.photoURL,
+					email: res.user.email,
+					hasAcceptedTos: false,
+					name: res.user.displayName,
+				} satisfies User)
+				router.push(`/tos`)
+				// eslint-disable-next-line no-negated-condition
+			} else if (!user.hasAcceptedTos) {
+				router.push(`/tos`)
+			} else {
+				const {docs: products} = await getDocs(
+					query(
+						collection(db, Products._),
+						where(`${Products.members}.${res.user.uid}.type`, `==`, `editor`),
+					).withConverter(ProductConverter),
+				)
+				if (products.length === 0) router.push(`/product`)
+				else router.push(`/${products[0]!.id}/map`)
+			}
+		} else {
+			notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
+			await signOut(auth)
+		}
+	}
+
+	const handleOnClick = async (provider: AuthProvider) => {
+		signInWithPopup(auth, provider)
+		.then((res) => {
+			processUser(res)
+		})
+		.catch((error) => {
+			if (error.code === "auth/account-exists-with-different-credential") {
+				const email = error.customData.email
+				const credential = OAuthProvider.credentialFromError(error)
+				const verifiedProvider = getProviderForProviderId(error.customData._tokenResponse.verifiedProvider[0])
+
+				signInWithPopup(auth, verifiedProvider).then((result) => {
+					const user = result.user
+					// processUser(result)
+					linkWithCredential(user, credential)
+					.then((usercred) => {
+						processUser(result);
+					})
+				})
+			} else {
+				console.error(error.message)
+				notification.error({message: `An error occurred while trying to log you in.`})
+			}
+		})
 	}
 
 	return (
