@@ -14,6 +14,7 @@ import SprintColumn from "./SprintColumn"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {sprintColumns, StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
+import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const findPreviousOccurenceOfDayOfWeek = (date: Dayjs, dayOfWeek: number) => {
@@ -32,16 +33,16 @@ const SprintPage: FC = () => {
 			: undefined,
 	)
 
-	const oldestStoryDate = storyMapState?.stories.reduce((oldestDate, story) => {
+	const stories = storyMapState ? getStories(storyMapState) : []
+	const oldestStoryDate = stories.reduce((oldestDate, story) => {
 		const storyDate = dayjs(story.createdAt.toDate())
 		if (storyDate.isBefore(oldestDate)) return storyDate
 		else return oldestDate
 	}, dayjs(`9999-12-31`))
 
-	const firstSprintStartDate =
-		oldestStoryDate && activeProduct
-			? findPreviousOccurenceOfDayOfWeek(oldestStoryDate, activeProduct.sprintStartDayOfWeek)
-			: undefined
+	const firstSprintStartDate = activeProduct
+		? findPreviousOccurenceOfDayOfWeek(oldestStoryDate, activeProduct.sprintStartDayOfWeek)
+		: undefined
 
 	const sprints = useMemo(() => {
 		const sprints: Array<{startDate: string; endDate: string}> = []

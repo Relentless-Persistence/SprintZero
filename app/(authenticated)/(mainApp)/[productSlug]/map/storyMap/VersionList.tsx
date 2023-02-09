@@ -39,7 +39,7 @@ const VersionList: FC<VersionListProps> = ({
 		<div className="flex flex-col gap-8">
 			<Tabs
 				tabPosition="right"
-				onChange={(key) => void setCurrentVersionId(key as Id)}
+				onChange={(key) => setCurrentVersionId(key as Id)}
 				activeKey={currentVersionId}
 				items={[
 					...(versions ?? []).map((version) => ({
@@ -56,16 +56,19 @@ const VersionList: FC<VersionListProps> = ({
 
 			{newVersionInputValue !== undefined && (
 				<form
-					onSubmit={async (evt) => {
+					onSubmit={(evt) => {
 						evt.preventDefault()
-						await addVersion({storyMapStateId, versionName: newVersionInputValue})
-						setNewVersionInputValue(undefined)
+						addVersion({storyMapStateId, versionName: newVersionInputValue})
+							.then(() => {
+								setNewVersionInputValue(undefined)
+							})
+							.catch(console.error)
 					}}
 					className="flex flex-col gap-2"
 				>
 					<Input
 						value={newVersionInputValue}
-						onChange={(evt) => void setNewVersionInputValue(evt.target.value)}
+						onChange={(evt) => setNewVersionInputValue(evt.target.value)}
 						htmlSize={1}
 						placeholder="Version name"
 						className="w-full"

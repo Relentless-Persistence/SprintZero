@@ -2,41 +2,38 @@ import {
 	BlockOutlined,
 	CloseOutlined,
 	CodeOutlined,
-	DislikeOutlined,
 	DollarOutlined,
 	FlagOutlined,
-	LikeOutlined,
 	LinkOutlined,
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Button, Checkbox, Drawer, Tag, Input, Form, Radio} from "antd"
+import {Button, Checkbox, Drawer, Tag, Input, Form} from "antd"
 import clsx from "clsx"
-import {collection} from "firebase/firestore"
+import {collection, doc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
+import type {StoryMapMeta} from "./utils/meta"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Id, WithDocumentData} from "~/types"
-import type {Product} from "~/types/db/Products"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
+import type {Id} from "~/types"
 
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
+import {ProductConverter, Products} from "~/types/db/Products"
 import {sprintColumns, StoryMapStates, StorySchema} from "~/types/db/StoryMapStates"
 import {VersionConverter, Versions} from "~/types/db/Versions"
 import dollarFormat from "~/utils/dollarFormat"
-import {auth, db} from "~/utils/firebase"
+import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
-import {deleteStory, updateStory} from "~/utils/mutations"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const formSchema = StorySchema.pick({
 	branchName: true,
@@ -50,35 +47,24 @@ const formSchema = StorySchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
-	activeProduct: WithDocumentData<Product>
-	storyMapState: WithDocumentData<StoryMapState>
-	storyId: string
+	meta: StoryMapMeta
+	storyId: Id
 	isOpen: boolean
 	onClose: () => void
-	hideAdjudicationResponse?: boolean
-	hideAcceptanceCriteria?: boolean
-	disableEditing?: boolean
 }
 
-const StoryDrawer: FC<StoryDrawerProps> = ({
-	activeProduct,
-	storyMapState,
-	storyId,
-	isOpen,
-	onClose,
-	hideAdjudicationResponse,
-	hideAcceptanceCriteria,
-	disableEditing,
-}) => {
-	const [user] = useAuthState(auth)
+const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
 	const [newAcceptanceCriterion, setNewAcceptanceCriterion] = useState(``)
-	const story = storyMapState.stories.find((story) => story.id === storyId)!
-	const [description, setDescription] = useState(story.description)
+	const story = meta.stories.find((story) => story.id === storyId)!
 
+	const [description, setDescription] = useState(story.description)
 	useEffect(() => {
 		setDescription(story.description)
 	}, [story.description])
+
+	const activeProductId = useActiveProductId()
+	const [product] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
 
 	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -94,60 +80,31 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 		},
 	})
 
-	const onSubmit = handleSubmit((data) => {
-		updateStory({storyMapState, storyId: story.id, data})
+	const onSubmit = handleSubmit(async (data) => {
+		await meta.updateStory(story.id, data)
 		setEditMode(false)
 	})
 
 	const [versions] = useCollectionData(
-		collection(db, StoryMapStates._, storyMapState.id, Versions._).withConverter(VersionConverter),
+		collection(db, StoryMapStates._, meta.id, Versions._).withConverter(VersionConverter),
 	)
 
-	const toggleAcceptanceCriterion = (id: string, checked: boolean) => {
+	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
 		const newAcceptanceCriteria = produce(story.acceptanceCriteria, (draft) => {
 			const index = draft.findIndex((criterion) => criterion.id === id)
 			draft[index]!.checked = checked
 		})
-		updateStory({
-			storyMapState,
-			storyId: story.id,
-			data: {
-				acceptanceCriteria: newAcceptanceCriteria,
-			},
+		await meta.updateStory(story.id, {
+			acceptanceCriteria: newAcceptanceCriteria,
 		})
 	}
 
-	const addAcceptanceCriterion = () => {
-		updateStory({
-			storyMapState,
-			storyId: story.id,
-			data: {
-				acceptanceCriteria: [...story.acceptanceCriteria, {id: nanoid(), name: newAcceptanceCriterion, checked: false}],
-			},
-		})
-	}
-
-	const addVote = (vote: boolean) => {
-		if (!user) return
-		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== user.uid)
-		ethicsVotes.push({userId: user.uid as Id, vote})
-		const votingComplete = ethicsVotes.length === Object.keys(activeProduct!.members).length
-
-		let ethicsColumn: `identified` | `underReview` | `adjudicated` = `identified`
-		if (ethicsVotes.length === 1) ethicsColumn = `underReview`
-		if (votingComplete) ethicsColumn = `adjudicated`
-
-		updateStory({
-			storyMapState,
-			storyId: story.id,
-			data: {
-				ethicsApproved: votingComplete
-					? ethicsVotes.filter((vote) => vote.vote === true).length >
-					  ethicsVotes.filter((vote) => vote.vote === false).length
-					: null,
-				ethicsColumn,
-				ethicsVotes,
-			},
+	const addAcceptanceCriterion = async () => {
+		await meta.updateStory(story.id, {
+			acceptanceCriteria: [
+				...story.acceptanceCriteria,
+				{id: nanoid() as Id, name: newAcceptanceCriterion, checked: false},
+			],
 		})
 	}
 
@@ -161,12 +118,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 							<Button
 								type="primary"
 								danger
-								onClick={() =>
-									void deleteStory({
-										storyMapState,
-										storyId: story.id,
-									})
-								}
+								onClick={() => {
+									meta.deleteStory(story.id).catch(console.error)
+								}}
 							>
 								Delete
 							</Button>
@@ -177,13 +131,13 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 										{story.points} point{story.points === 1 ? `` : `s`}
 									</Tag>
 									<Tag
-										color={typeof activeProduct.effortCost === `number` ? `#585858` : `#f5f5f5`}
+										color={typeof product?.effortCost === `number` ? `#585858` : `#f5f5f5`}
 										icon={<DollarOutlined />}
 										className={clsx(
-											typeof activeProduct.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
+											typeof product?.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
 										)}
 									>
-										{dollarFormat((activeProduct.effortCost ?? 0) * story.points)}
+										{dollarFormat((product?.effortCost ?? 0) * story.points)}
 									</Tag>
 									<Tag color="#585858" icon={<FlagOutlined />}>
 										{sprintColumns[story.sprintColumn]}
@@ -229,30 +183,35 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 				<div className="flex items-center gap-4">
 					{editMode ? (
 						<>
-							<Button onClick={() => void setEditMode(false)}>Cancel</Button>
+							<Button onClick={() => setEditMode(false)}>Cancel</Button>
 							<Button type="primary" htmlType="submit" form="story-form" className="bg-green">
 								Done
 							</Button>
 						</>
 					) : (
-						!disableEditing && (
-							<>
-								<button type="button" onClick={() => void setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
-									Edit
-								</button>
-								<button type="button" onClick={() => void onClose()}>
-									<CloseOutlined />
-								</button>
-							</>
-						)
+						<>
+							<button type="button" onClick={() => setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
+								Edit
+							</button>
+							<button type="button" onClick={() => onClose()}>
+								<CloseOutlined />
+							</button>
+						</>
 					)}
 				</div>
 			}
 			open={isOpen}
-			onClose={() => void onClose()}
+			onClose={() => onClose()}
 		>
 			{editMode ? (
-				<Form id="story-form" layout="vertical" className="flex flex-col gap-4" onFinish={onSubmit}>
+				<Form
+					id="story-form"
+					layout="vertical"
+					className="flex flex-col gap-4"
+					onFinish={() => {
+						onSubmit().catch(console.error)
+					}}
+				>
 					<div className="flex gap-8">
 						<Form.Item
 							label="Title"
@@ -313,40 +272,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 				<div className="grid h-full grid-cols-2 gap-8">
 					{/* Left column */}
 					<div className="flex h-full min-h-0 flex-col gap-6">
-						{!hideAdjudicationResponse && (
-							<div className="flex flex-col gap-2">
-								{story.ethicsApproved === null ? (
-									<>
-										<div>
-											<p className="text-xl font-semibold">Adjudication Response</p>
-											<p className="text-xs">
-												Do you think this would provide value and reaffirm the commitment to our users?
-											</p>
-										</div>
-
-										<Radio.Group onChange={(e) => void addVote(e.target.value === `allow`)}>
-											<Radio value="allow">Allow</Radio>
-											<Radio value="reject">Reject</Radio>
-										</Radio.Group>
-									</>
-								) : (
-									<>
-										<p className="text-xl font-semibold">Adjudication Response</p>
-										{story.ethicsApproved ? (
-											<div className="inline-flex items-center gap-2 bg-[#90d855] py-2 px-4">
-												<LikeOutlined />
-												Allowed
-											</div>
-										) : (
-											<div className="inline-flex items-center gap-2 bg-[#ffa39e] py-2 px-4">
-												<DislikeOutlined />
-												Rejected
-											</div>
-										)}
-									</>
-								)}
-							</div>
-						)}
 						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
 							<p className="text-xl font-semibold text-gray">Story</p>
 							<Input.TextArea
@@ -354,52 +279,53 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)
-									updateStory({
-										storyMapState,
-										storyId: story.id,
-										data: {
+									meta
+										.updateStory(story.id, {
 											description: e.target.value,
-										},
-									})
+										})
+										.catch(console.error)
 								}}
 								className="max-h-[calc(100%-2.25rem)]"
 							/>
 						</div>
 
-						{!hideAcceptanceCriteria && (
-							<div className="flex min-h-0 flex-1 flex-col gap-2">
-								<p className="text-xl font-semibold text-gray">Acceptance Criteria</p>
-								<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
-									{story.acceptanceCriteria.map((criterion) => (
-										<Checkbox
-											key={criterion.id}
-											checked={criterion.checked}
-											onChange={(e) => void toggleAcceptanceCriterion(criterion.id, e.target.checked)}
-											style={{marginLeft: `0px`}}
-										>
-											{criterion.name}
-										</Checkbox>
-									))}
-									<form
-										onSubmit={(e) => {
-											e.preventDefault()
-											addAcceptanceCriterion()
-											setNewAcceptanceCriterion(``)
+						<div className="flex min-h-0 flex-1 flex-col gap-2">
+							<p className="text-xl font-semibold text-gray">Acceptance Criteria</p>
+							<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
+								{story.acceptanceCriteria.map((criterion) => (
+									<Checkbox
+										key={criterion.id}
+										checked={criterion.checked}
+										onChange={(e) => {
+											toggleAcceptanceCriterion(criterion.id, e.target.checked).catch(console.error)
 										}}
+										style={{marginLeft: `0px`}}
 									>
-										<Input
-											size="small"
-											placeholder="Add item"
-											value={newAcceptanceCriterion}
-											onChange={(e) => void setNewAcceptanceCriterion(e.target.value)}
-											className="w-40"
-										/>
+										{criterion.name}
+									</Checkbox>
+								))}
+								<form
+									onSubmit={(e) => {
+										e.preventDefault()
+										addAcceptanceCriterion()
+											.then(() => {
+												setNewAcceptanceCriterion(``)
+											})
+											.catch(console.error)
+									}}
+								>
+									<Input
+										size="small"
+										placeholder="Add item"
+										value={newAcceptanceCriterion}
+										onChange={(e) => setNewAcceptanceCriterion(e.target.value)}
+										className="w-40"
+									/>
 
-										<input type="submit" hidden />
-									</form>
-								</div>
+									<input type="submit" hidden />
+								</form>
 							</div>
-						)}
+						</div>
 					</div>
 
 					{/* Right column */}
@@ -407,16 +333,16 @@ const StoryDrawer: FC<StoryDrawerProps> = ({
 						<p className="text-xl font-semibold text-gray">Comments</p>
 						<div className="relative grow">
 							<Comments
-								storyMapStateId={storyMapState.id}
+								storyMapStateId={meta.id}
 								parentId={storyId}
 								flagged={story.ethicsColumn !== null}
-								onFlag={() =>
-									void updateStory({
-										storyMapState,
-										storyId: story.id,
-										data: {ethicsColumn: `identified`},
-									})
-								}
+								onFlag={() => {
+									meta
+										.updateStory(story.id, {
+											ethicsColumn: `identified`,
+										})
+										.catch(console.error)
+								}}
 							/>
 						</div>
 					</div>

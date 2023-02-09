@@ -25,11 +25,11 @@ const RhfSegmented = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Segmented
 			{...props}
-			onChange={(value) => void field.onChange(value)}
+			onChange={(value) => field.onChange(value)}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}
-			ref={(v) => void field.ref(v)}
+			ref={(v) => field.ref(v)}
 		/>
 	)
 }

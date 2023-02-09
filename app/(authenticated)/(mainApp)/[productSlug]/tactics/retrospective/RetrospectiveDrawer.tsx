@@ -22,7 +22,7 @@ export type RetrospectiveDrawerProps = {
 
 const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCancel, onCommit}) => {
 	const [isOpen, setIsOpen] = useState(false)
-	useEffect(() => void setIsOpen(true), [])
+	useEffect(() => setIsOpen(true), [])
 
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -34,7 +34,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 
 	const onSubmit = handleSubmit((data) => {
 		setIsOpen(false)
-		setTimeout(() => void onCommit(data), 300)
+		setTimeout(() => onCommit(data), 300)
 	})
 
 	return (
@@ -103,7 +103,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 								<Input
 									size="small"
 									value={newProposedActionInput}
-									onChange={(e) => void setNewProposedActionInput(e.target.value)}
+									onChange={(e) => setNewProposedActionInput(e.target.value)}
 									placeholder="New item"
 									onKeyDown={(e) => {
 										if (e.key === `Enter`) {

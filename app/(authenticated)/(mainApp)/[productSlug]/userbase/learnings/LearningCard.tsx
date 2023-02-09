@@ -48,7 +48,7 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
-						<Button size="small" onClick={() => void onEditEnd()}>
+						<Button size="small" onClick={() => onEditEnd()}>
 							Cancel
 						</Button>
 						<Button size="small" type="primary" htmlType="submit" form="learning-form">
@@ -56,7 +56,7 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart?.()} className="text-green">
+					<button type="button" onClick={() => onEditStart?.()} className="text-green">
 						Edit
 					</button>
 				)
@@ -76,11 +76,7 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 					/>
 					<RhfStretchyTextArea control={control} name="text" minHeight="4rem" />
 					{item.id && (
-						<Button
-							danger
-							onClick={async () => void (await deleteDoc(doc(db, Learnings._, item.id!)))}
-							className="w-full"
-						>
+						<Button danger onClick={async () => await deleteDoc(doc(db, Learnings._, item.id!))} className="w-full">
 							Remove
 						</Button>
 					)}

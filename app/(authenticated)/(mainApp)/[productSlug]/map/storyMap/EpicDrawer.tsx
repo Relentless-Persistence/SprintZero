@@ -1,33 +1,30 @@
 import {DeleteFilled, DollarOutlined, NumberOutlined} from "@ant-design/icons"
+import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Form, Input, Tag, Typography} from "antd"
-import {collection, doc, documentId, query, where} from "firebase/firestore"
+import {doc, getDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
-import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 
+import type {StoryMapMeta} from "./utils/meta"
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Comments from "~/components/Comments"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {UserConverter, Users} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
-import {deleteEpic, updateEpic} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type EpicDrawerProps = {
-	storyMapState: WithDocumentData<StoryMapState>
+	meta: StoryMapMeta
 	epicId: string
 	isOpen: boolean
 	onClose: () => void
 }
 
-const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose}) => {
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+const EpicDrawer: FC<EpicDrawerProps> = ({meta, epicId, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
-	const epic = storyMapState.epics.find((epic) => epic.id === epicId)!
+	const epic = meta.epics.find((epic) => epic.id === epicId)!
 	const [draftTitle, setDraftTitle] = useState(epic.name)
 	const [description, setDescription] = useState(epic.description)
 
@@ -36,21 +33,22 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 	}, [epic.description])
 
 	let points = 0
-	epic.featureIds.forEach((featureId) => {
-		const feature = storyMapState.features.find((feature) => feature.id === featureId)
-		feature?.storyIds.forEach((storyId) => {
-			const story = storyMapState.stories.find((story) => story.id === storyId)
-			points += story?.points ?? 0
+	epic.children.forEach((feature) => {
+		feature.children.forEach((story) => {
+			points += story.points
 		})
 	})
 
-	const [productMembers] = useCollectionData(
-		activeProduct
-			? query(collection(db, Users._), where(documentId(), `in`, Object.keys(activeProduct.members))).withConverter(
-					UserConverter,
-			  )
-			: undefined,
-	)
+	const activeProductId = useActiveProductId()
+	const [product] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const productMembers = useQueries({
+		queries: product
+			? Object.keys(product.members).map((userId) => ({
+					queryKey: [`user`, userId],
+					queryFn: async () => (await getDoc(doc(db, Users._, userId).withConverter(UserConverter))).data(),
+			  }))
+			: [],
+	})
 
 	return (
 		<Drawer
@@ -61,12 +59,9 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 						{editMode ? (
 							<button
 								type="button"
-								onClick={() =>
-									void deleteEpic({
-										storyMapState: storyMapState!,
-										epicId: epic.id,
-									})
-								}
+								onClick={() => {
+									meta.deleteEpic(epic.id).catch(console.error)
+								}}
 							>
 								<Tag color="#cf1322" icon={<DeleteFilled />}>
 									Delete
@@ -78,15 +73,13 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 									{points} point{points === 1 ? `` : `s`}
 								</Tag>
 								<Tag
-									color={typeof activeProduct?.effortCost === `number` ? `#389e0d` : `#f5f5f5`}
+									color={typeof product?.effortCost === `number` ? `#389e0d` : `#f5f5f5`}
 									icon={<DollarOutlined />}
 									style={
-										typeof activeProduct?.effortCost === `number`
-											? {}
-											: {color: `#d9d9d9`, border: `1px solid currentColor`}
+										typeof product?.effortCost === `number` ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}
 									}
 								>
-									{dollarFormat((activeProduct?.effortCost ?? 1) * points)}
+									{dollarFormat((product?.effortCost ?? 1) * points)}
 								</Tag>
 							</div>
 						)}
@@ -100,19 +93,19 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 				<div className="flex items-center gap-2">
 					{editMode ? (
 						<>
-							<Button size="small" onClick={() => void setEditMode(false)}>
+							<Button size="small" onClick={() => setEditMode(false)}>
 								Cancel
 							</Button>
 							<Button
 								size="small"
 								type="primary"
 								onClick={() => {
-									void updateEpic({
-										storyMapState: storyMapState!,
-										epicId: epic.id,
-										data: {name: draftTitle},
-									})
-									void setEditMode(false)
+									meta
+										.updateEpic(epic.id, {name: draftTitle})
+										.then(() => {
+											setEditMode(false)
+										})
+										.catch(console.error)
 								}}
 								className="bg-green"
 							>
@@ -120,19 +113,19 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 							</Button>
 						</>
 					) : (
-						<button type="button" onClick={() => void setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
+						<button type="button" onClick={() => setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
 							Edit
 						</button>
 					)}
 				</div>
 			}
 			open={isOpen}
-			onClose={() => void onClose()}
+			onClose={() => onClose()}
 		>
 			{editMode ? (
 				<Form layout="vertical">
 					<Form.Item label="Title">
-						<Input value={draftTitle} onChange={(e) => void setDraftTitle(e.target.value)} />
+						<Input value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} />
 					</Form.Item>
 				</Form>
 			) : (
@@ -146,13 +139,11 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)
-									updateEpic({
-										storyMapState: storyMapState!,
-										epicId: epic.id,
-										data: {
+									meta
+										.updateEpic(epic.id, {
 											description: e.target.value,
-										},
-									})
+										})
+										.catch(console.error)
 								}}
 								className="max-h-[calc(100%-2.25rem)]"
 							/>
@@ -161,25 +152,26 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 						<div className="flex min-h-0 flex-1 flex-col gap-2">
 							<p className="text-xl font-semibold text-gray">Keeper(s)</p>
 							<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
-								{productMembers?.map((user) => (
-									<Checkbox
-										key={user.id}
-										checked={epic.keeperIds.includes(user.id)}
-										onChange={(e) =>
-											void updateEpic({
-												storyMapState: storyMapState!,
-												epicId: epic.id,
-												data: {
-													keeperIds: e.target.checked
-														? [...epic.keeperIds, user.id]
-														: epic.keeperIds.filter((id) => id !== user.id),
-												},
-											})
-										}
-									>
-										{user.name}
-									</Checkbox>
-								))}
+								{productMembers.map(
+									(user) =>
+										user.data && (
+											<Checkbox
+												key={user.data.id}
+												checked={epic.keeperIds.includes(user.data.id)}
+												onChange={(e) => {
+													meta
+														.updateEpic(epic.id, {
+															keeperIds: e.target.checked
+																? [...epic.keeperIds, user.data!.id]
+																: epic.keeperIds.filter((id) => id !== user.data!.id),
+														})
+														.catch(console.error)
+												}}
+											>
+												{user.data.name}
+											</Checkbox>
+										),
+								)}
 							</div>
 						</div>
 					</div>
@@ -188,7 +180,7 @@ const EpicDrawer: FC<EpicDrawerProps> = ({storyMapState, epicId, isOpen, onClose
 					<div className="flex h-full flex-col">
 						<Typography.Title level={4}>Comments</Typography.Title>
 						<div className="relative grow">
-							<Comments storyMapStateId={storyMapState.id} parentId={epicId} />
+							<Comments storyMapStateId={meta.id} parentId={epicId} />
 						</div>
 					</div>
 				</div>

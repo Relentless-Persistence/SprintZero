@@ -45,10 +45,10 @@ const TasksPage: FC = () => {
 				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col gap-4">
 					{tasks && (
 						<>
-							<TaskColumn id="backlog" title="Backlog" tasks={tasks} onEdit={(id) => void setEditingTask(id)} />
-							<TaskColumn id="doing" title="Doing" tasks={tasks} onEdit={(id) => void setEditingTask(id)} />
-							<TaskColumn id="review" title="Review" tasks={tasks} onEdit={(id) => void setEditingTask(id)} />
-							<TaskColumn id="done" title="Done" tasks={tasks} onEdit={(id) => void setEditingTask(id)} />
+							<TaskColumn id="backlog" title="Backlog" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
+							<TaskColumn id="doing" title="Doing" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
+							<TaskColumn id="review" title="Review" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
+							<TaskColumn id="done" title="Done" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
 						</>
 					)}
 
@@ -60,7 +60,7 @@ const TasksPage: FC = () => {
 			<Tabs
 				tabPosition="right"
 				activeKey={activeBoard}
-				onChange={(key) => void setActiveBoard(key)}
+				onChange={(key) => setActiveBoard(key)}
 				items={[
 					{key: `0`, label: `Board 0`},
 					{key: `1`, label: `Board 1`},
@@ -91,7 +91,7 @@ const TasksPage: FC = () => {
 						}
 						return initialValues
 					})()}
-					onCancel={() => void setEditingTask(undefined)}
+					onCancel={() => setEditingTask(undefined)}
 					onCommit={async (data) => {
 						if (editingTask === `new`) {
 							await addDoc(collection(db, Tasks._), {

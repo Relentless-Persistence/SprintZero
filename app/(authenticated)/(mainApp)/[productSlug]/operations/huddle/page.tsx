@@ -92,14 +92,14 @@ const HuddlePage: FC = () => {
 												<li key={blocker.id}>
 													<Checkbox
 														checked={blocker.checked}
-														onChange={async (e) =>
-															void (await updateDoc(
+														onChange={(e) => {
+															updateDoc(
 																doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id),
 																produce(huddleItemToday, (draft) => {
 																	draft.blockers.find(({id}) => id === blocker.id)!.checked = e.target.checked
 																}),
-															))
-														}
+															).catch(console.error)
+														}}
 													>
 														{blocker.name}
 													</Checkbox>
@@ -111,26 +111,29 @@ const HuddlePage: FC = () => {
 														placeholder="Add new"
 														size="small"
 														value={newBlockerText}
-														onChange={(e) => void setNewBlockerText(e.currentTarget.value)}
-														onKeyDown={async (e) => {
+														onChange={(e) => setNewBlockerText(e.currentTarget.value)}
+														onKeyDown={(e) => {
 															if (e.key === `Enter`) {
 																if (huddleItemToday) {
-																	await updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id), {
+																	updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id), {
 																		blockers: arrayUnion({
 																			id: nanoid(),
 																			checked: false,
 																			name: newBlockerText,
 																		} satisfies Huddle[`blockers`][number]),
 																	} satisfies WithFieldValue<Partial<Huddle>>)
+																		.then(() => setNewBlockerText(``))
+																		.catch(console.error)
 																} else {
-																	await addDoc(collection(db, Products._, activeProductId, Huddles._), {
+																	addDoc(collection(db, Products._, activeProductId, Huddles._), {
 																		blockers: [{id: nanoid(), checked: false, name: newBlockerText}],
 																		date: formattedDateToday,
 																		tasks: [],
 																		userId: user!.id,
 																	} satisfies Huddle)
+																		.then(() => setNewBlockerText(``))
+																		.catch(console.error)
 																}
-																setNewBlockerText(``)
 															}
 														}}
 													/>
@@ -145,14 +148,14 @@ const HuddlePage: FC = () => {
 												<li key={task.id}>
 													<Checkbox
 														checked={task.checked}
-														onChange={async (e) =>
-															void (await updateDoc(
+														onChange={(e) => {
+															updateDoc(
 																doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id),
 																produce(huddleItemToday, (draft) => {
 																	draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
 																}),
-															))
-														}
+															).catch(console.error)
+														}}
 													>
 														{task.name}
 													</Checkbox>
@@ -164,26 +167,29 @@ const HuddlePage: FC = () => {
 														placeholder="Add new"
 														size="small"
 														value={newTaskTodayText}
-														onChange={(e) => void setNewTaskTodayText(e.currentTarget.value)}
-														onKeyDown={async (e) => {
+														onChange={(e) => setNewTaskTodayText(e.currentTarget.value)}
+														onKeyDown={(e) => {
 															if (e.key === `Enter`) {
 																if (huddleItemToday) {
-																	await updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id), {
+																	updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id), {
 																		tasks: arrayUnion({
 																			id: nanoid(),
 																			checked: false,
 																			name: newTaskTodayText,
 																		} satisfies Huddle[`tasks`][number]),
 																	} satisfies WithFieldValue<Partial<Huddle>>)
+																		.then(() => setNewTaskTodayText(``))
+																		.catch(console.error)
 																} else {
-																	await addDoc(collection(db, Products._, activeProductId, Huddles._), {
+																	addDoc(collection(db, Products._, activeProductId, Huddles._), {
 																		blockers: [],
 																		date: formattedDateToday,
 																		tasks: [{id: nanoid(), checked: false, name: newTaskTodayText}],
 																		userId: user!.id,
 																	} satisfies Huddle)
+																		.then(() => setNewTaskTodayText(``))
+																		.catch(console.error)
 																}
-																setNewTaskTodayText(``)
 															}
 														}}
 													/>
@@ -198,14 +204,14 @@ const HuddlePage: FC = () => {
 												<li key={task.id}>
 													<Checkbox
 														checked={task.checked}
-														onChange={async (e) =>
-															void (await updateDoc(
+														onChange={(e) => {
+															updateDoc(
 																doc(db, Products._, activeProductId, Huddles._, huddleItemYesterday.id),
 																produce(huddleItemYesterday, (draft) => {
 																	draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
 																}),
-															))
-														}
+															).catch(console.error)
+														}}
 													>
 														{task.name}
 													</Checkbox>
@@ -217,29 +223,29 @@ const HuddlePage: FC = () => {
 														placeholder="Add new"
 														size="small"
 														value={newTaskYesterdayText}
-														onChange={(e) => void setNewTaskYesterdayText(e.currentTarget.value)}
-														onKeyDown={async (e) => {
+														onChange={(e) => setNewTaskYesterdayText(e.currentTarget.value)}
+														onKeyDown={(e) => {
 															if (e.key === `Enter`) {
 																if (huddleItemYesterday) {
-																	await updateDoc(
-																		doc(db, Products._, activeProductId, Huddles._, huddleItemYesterday.id),
-																		{
-																			tasks: arrayUnion({
-																				id: nanoid(),
-																				checked: false,
-																				name: newTaskYesterdayText,
-																			} satisfies Huddle[`tasks`][number]),
-																		} satisfies WithFieldValue<Partial<Huddle>>,
-																	)
+																	updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemYesterday.id), {
+																		tasks: arrayUnion({
+																			id: nanoid(),
+																			checked: false,
+																			name: newTaskYesterdayText,
+																		} satisfies Huddle[`tasks`][number]),
+																	} satisfies WithFieldValue<Partial<Huddle>>)
+																		.then(() => setNewTaskYesterdayText(``))
+																		.catch(console.error)
 																} else {
-																	await addDoc(collection(db, Products._, activeProductId, Huddles._), {
+																	addDoc(collection(db, Products._, activeProductId, Huddles._), {
 																		blockers: [],
 																		date: formattedDateYesterday,
 																		tasks: [{id: nanoid(), checked: false, name: newTaskYesterdayText}],
 																		userId: user!.id,
 																	} satisfies Huddle)
+																		.then(() => setNewTaskYesterdayText(``))
+																		.catch(console.error)
 																}
-																setNewTaskYesterdayText(``)
 															}
 														}}
 													/>
@@ -260,7 +266,7 @@ const HuddlePage: FC = () => {
 			<Tabs
 				tabPosition="right"
 				activeKey={currentTab}
-				onChange={(key: (typeof tabs)[number][`key`]) => void setCurrentTab(key)}
+				onChange={(key: (typeof tabs)[number][`key`]) => setCurrentTab(key)}
 				items={[...tabs]}
 			/>
 		</div>

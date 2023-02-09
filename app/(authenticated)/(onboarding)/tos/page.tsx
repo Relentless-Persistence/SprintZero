@@ -46,12 +46,12 @@ const TosPage: FC = () => {
 				className="resize-none bg-[#eceef1] font-mono text-sm text-black"
 			/>
 
-			<Checkbox checked={agree} onChange={() => void setAgree((agree) => !agree)}>
+			<Checkbox checked={agree} onChange={() => setAgree((agree) => !agree)}>
 				By checking this box you agree to our Terms of Service and Privacy Policy.
 			</Checkbox>
 
 			<div className="flex items-center justify-end gap-4">
-				<Button className="bg-white" onClick={() => void router.push(`/sign-out`)}>
+				<Button className="bg-white" onClick={() => router.push(`/sign-out`)}>
 					Reject
 				</Button>
 				<Button type="primary" disabled={!agree} loading={hasAccepted} onClick={onAccept} className="bg-[#4a801d]">

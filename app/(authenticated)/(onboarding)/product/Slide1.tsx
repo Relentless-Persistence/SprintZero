@@ -30,9 +30,11 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 		},
 	})
 
-	const onSubmit = handleSubmit((data) => void onComplete(data))
+	const onSubmit = handleSubmit((data) => onComplete(data))
 
-	useEffect(() => void (isActive && setCanProceed(formState.isValid)), [isActive, formState.isValid, setCanProceed])
+	useEffect(() => {
+		if (isActive) setCanProceed(formState.isValid)
+	}, [isActive, formState.isValid, setCanProceed])
 
 	return (
 		<SlideContainer isActive={isActive}>
@@ -42,7 +44,14 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					<p>Please provide information below</p>
 				</div>
 
-				<Form id={isActive ? `current-slide` : ``} layout="vertical" requiredMark onFinish={onSubmit}>
+				<Form
+					id={isActive ? `current-slide` : ``}
+					layout="vertical"
+					requiredMark
+					onFinish={() => {
+						onSubmit().catch(console.error)
+					}}
+				>
 					<p className="text-lg font-semibold">Product</p>
 					<Form.Item
 						required

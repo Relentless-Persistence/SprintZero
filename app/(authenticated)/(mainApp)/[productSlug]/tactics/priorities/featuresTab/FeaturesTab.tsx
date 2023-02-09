@@ -14,6 +14,7 @@ import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
 import {StoryMapStates, StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
+import {getEpics, getFeatures} from "~/utils/storyMap"
 
 export type FeaturesTabProps = {
 	activeProduct: WithDocumentData<Product>
@@ -24,6 +25,9 @@ const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 	const [storyMapState] = useDocumentData(
 		doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
 	)
+
+	const epics = storyMapState ? getEpics(storyMapState) : []
+	const features = storyMapState ? getFeatures(storyMapState) : []
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
@@ -68,7 +72,7 @@ const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 
 				<Select
 					placeholder="Select an epic"
-					options={storyMapState?.epics.map((epic) => ({value: epic.id, label: epic.name}))}
+					options={epics.map((epic) => ({value: epic.id, label: epic.name}))}
 					onChange={(value) => setSelectedEpic(value as Id)}
 				/>
 			</div>
@@ -82,10 +86,10 @@ const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
 						{selectedEpic &&
-							storyMapState?.epics
-								.find((epic) => epic.id === selectedEpic)!
-								.featureIds.map((id) => storyMapState.features.find((feature) => feature.id === id)!)
-								.map((feature) => <Feature key={feature.id} feature={feature} storyMapState={storyMapState} />)}
+							storyMapState &&
+							features
+								.filter((feature) => feature.parentId === selectedEpic)
+								.map((feature) => <Feature key={feature.id} featureId={feature.id} storyMapState={storyMapState} />)}
 					</PrioritiesMatrix>
 				</div>
 			</div>

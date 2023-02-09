@@ -38,10 +38,7 @@ const JourneysPage: FC = () => {
 
 	if (activeJourney === `new`)
 		return (
-			<AddJourneyPage
-				onCancel={() => void setActiveJourney(journeys?.[0]?.id)}
-				onFinish={(id) => void setActiveJourney(id)}
-			/>
+			<AddJourneyPage onCancel={() => setActiveJourney(journeys?.[0]?.id)} onFinish={(id) => setActiveJourney(id)} />
 		)
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
@@ -52,7 +49,7 @@ const JourneysPage: FC = () => {
 						<Breadcrumb.Item>Journeys</Breadcrumb.Item>
 					</Breadcrumb>
 
-					<Button onClick={() => void setActiveEvent(`new`)}>Add Event</Button>
+					<Button onClick={() => setActiveEvent(`new`)}>Add Event</Button>
 				</div>
 
 				<div className="relative grow">
@@ -134,7 +131,7 @@ const JourneysPage: FC = () => {
 				<Tabs
 					tabPosition="right"
 					activeKey={activeJourney}
-					onChange={(key) => void setActiveJourney(key as Id | `new`)}
+					onChange={(key) => setActiveJourney(key as Id | `new`)}
 					items={journeys
 						.map((journey) => ({key: journey.id as Id | `new`, label: journey.name}))
 						.concat({key: `new`, label: `Add`})}
@@ -145,7 +142,7 @@ const JourneysPage: FC = () => {
 				<EventDrawer
 					journey={journey}
 					activeEvent={activeEvent}
-					onClose={() => void setActiveEvent(undefined)}
+					onClose={() => setActiveEvent(undefined)}
 					onCommit={async (data) => {
 						if (activeEvent === `new`) await addDoc(collection(db, Journeys._, journey.id, JourneyEvents._), data)
 						else if (activeEvent) await updateDoc(doc(db, Journeys._, journey.id, JourneyEvents._, activeEvent), data)

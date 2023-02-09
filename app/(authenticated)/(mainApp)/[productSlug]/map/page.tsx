@@ -1,20 +1,20 @@
 "use client"
 
-import {doc} from "firebase/firestore"
+import {doc, setDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {useState} from "react"
 import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
-import {storyMapScrollPosition} from "./storyMap/utils/globals"
 import VersionList from "./storyMap/VersionList"
 import {ProductConverter, Products} from "~/types/db/Products"
+import {StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
-import {setStoryMapState} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Dashboard: FC = () => {
@@ -32,13 +32,7 @@ const Dashboard: FC = () => {
 				)}
 
 				<div className="relative w-full grow">
-					<motion.div
-						layoutScroll
-						className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2"
-						onScroll={(e) => {
-							storyMapScrollPosition.current = e.currentTarget.scrollLeft
-						}}
-					>
+					<motion.div layoutScroll className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2">
 						{activeProduct !== undefined && currentVersionId !== undefined && (
 							<StoryMap activeProduct={activeProduct} currentVersionId={currentVersionId} />
 						)}
@@ -56,18 +50,20 @@ const Dashboard: FC = () => {
 				/>
 			)}
 
-			<button
-				type="button"
-				className="fixed bottom-8 right-8 rounded-md border border-laurel px-2 py-1 text-laurel transition-colors hover:border-black hover:text-black"
-				onClick={() =>
-					void setStoryMapState({
-						id: activeProduct!.storyMapStateId,
-						data: {productId: activeProduct!.id, epics: [], features: [], stories: []},
-					})
-				}
-			>
-				Reset story map
-			</button>
+			{activeProduct && (
+				<button
+					type="button"
+					className="fixed bottom-8 right-8 rounded-md border border-laurel px-2 py-1 text-laurel transition-colors hover:border-black hover:text-black"
+					onClick={() => {
+						setDoc(doc(db, StoryMapStates._, activeProduct.storyMapStateId), {
+							items: {},
+							productId: activeProduct.id,
+						} satisfies StoryMapState).catch(console.error)
+					}}
+				>
+					Reset story map
+				</button>
+			)}
 		</div>
 	)
 }

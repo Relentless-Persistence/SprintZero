@@ -47,7 +47,7 @@ const PersonasPage: FC = () => {
 		<Tabs
 			tabPosition="right"
 			activeKey={newPersonaInput !== undefined && activeTab === `add` ? `new` : activeTab}
-			onChange={(key) => void setActiveTab(key)}
+			onChange={(key) => setActiveTab(key)}
 			items={(() => {
 				const items = []
 				if (personas) {
@@ -68,10 +68,10 @@ const PersonasPage: FC = () => {
 										<div className="flex flex-col gap-4">
 											<EditableListCard
 												isEditing={isEditingCard === `goals`}
-												onEditStart={() => void setIsEditingCard(`goals`)}
+												onEditStart={() => setIsEditingCard(`goals`)}
 												title="Goals"
 												list={persona.goals}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {goals: list} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -79,10 +79,10 @@ const PersonasPage: FC = () => {
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `interactions`}
-												onEditStart={() => void setIsEditingCard(`interactions`)}
+												onEditStart={() => setIsEditingCard(`interactions`)}
 												title="Interactions"
 												list={persona.interactions}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {
 														interactions: list,
@@ -92,10 +92,10 @@ const PersonasPage: FC = () => {
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `tasks`}
-												onEditStart={() => void setIsEditingCard(`tasks`)}
+												onEditStart={() => setIsEditingCard(`tasks`)}
 												title="Tasks"
 												list={persona.tasks}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {tasks: list} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -103,10 +103,10 @@ const PersonasPage: FC = () => {
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `responsibilities`}
-												onEditStart={() => void setIsEditingCard(`responsibilities`)}
+												onEditStart={() => setIsEditingCard(`responsibilities`)}
 												title="Responsibilities"
 												list={persona.responsibilities}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {
 														responsibilities: list,
@@ -116,10 +116,10 @@ const PersonasPage: FC = () => {
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `priorities`}
-												onEditStart={() => void setIsEditingCard(`priorities`)}
+												onEditStart={() => setIsEditingCard(`priorities`)}
 												title="Priorities"
 												list={persona.priorities}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {
 														priorities: list,
@@ -129,10 +129,10 @@ const PersonasPage: FC = () => {
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `frustrations`}
-												onEditStart={() => void setIsEditingCard(`frustrations`)}
+												onEditStart={() => setIsEditingCard(`frustrations`)}
 												title="Frustrations"
 												list={persona.frustrations}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {
 														frustrations: list,
@@ -142,10 +142,10 @@ const PersonasPage: FC = () => {
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `changes`}
-												onEditStart={() => void setIsEditingCard(`changes`)}
+												onEditStart={() => setIsEditingCard(`changes`)}
 												title="Changes"
 												list={persona.changes}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {changes: list} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -160,15 +160,15 @@ const PersonasPage: FC = () => {
 												personaPrevQnA={persona.prevQnA}
 												text={persona.description}
 												isEditing={isEditingCard === `description`}
-												onEditStart={() => void setIsEditingCard(`description`)}
-												onEditEnd={() => void setIsEditingCard(undefined)}
+												onEditStart={() => setIsEditingCard(`description`)}
+												onEditEnd={() => setIsEditingCard(undefined)}
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `dayInTheLife`}
-												onEditStart={() => void setIsEditingCard(`dayInTheLife`)}
+												onEditStart={() => setIsEditingCard(`dayInTheLife`)}
 												title="A Day in the Life"
 												list={persona.dayInTheLife}
-												onCancel={() => void setIsEditingCard(undefined)}
+												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, Personas._, persona.id), {
 														dayInTheLife: list,
@@ -190,7 +190,7 @@ const PersonasPage: FC = () => {
 							<Input
 								size="small"
 								value={newPersonaInput}
-								onChange={(e) => void setNewPersonaInput(e.target.value)}
+								onChange={(e) => setNewPersonaInput(e.target.value)}
 								onKeyDown={async (e) => {
 									if (e.key === `Enter`) {
 										const ref = await addDoc(collection(db, Personas._), {

@@ -27,9 +27,11 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 		resolver: zodResolver(formSchema),
 	})
 
-	const onSubmit = handleSubmit((data) => void onComplete({sprintStartDayOfWeek: parseInt(data.sprintStartDayOfWeek)}))
+	const onSubmit = handleSubmit((data) => onComplete({sprintStartDayOfWeek: parseInt(data.sprintStartDayOfWeek)}))
 
-	useEffect(() => void (isActive && setCanProceed(formState.isValid)), [isActive, formState.isValid, setCanProceed])
+	useEffect(() => {
+		if (isActive) setCanProceed(formState.isValid)
+	}, [isActive, formState.isValid, setCanProceed])
 
 	const sprintStartDayOfWeek = useWatch({control, name: `sprintStartDayOfWeek`})
 
@@ -41,7 +43,12 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					<p>Which day would you like to begin your sprints?</p>
 				</div>
 
-				<Form id={isActive ? `current-slide` : ``} onFinish={onSubmit}>
+				<Form
+					id={isActive ? `current-slide` : ``}
+					onFinish={() => {
+						onSubmit().catch(console.error)
+					}}
+				>
 					<Form.Item>
 						<div className="flex flex-col gap-4">
 							<input

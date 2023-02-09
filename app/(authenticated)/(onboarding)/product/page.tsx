@@ -45,10 +45,8 @@ const ProductSetupPage: FC = () => {
 
 		const storyMapStateId = (
 			await addDoc(collection(db, StoryMapStates._), {
+				items: {},
 				productId: slug,
-				epics: [],
-				features: [],
-				stories: [],
 			} satisfies StoryMapState)
 		).id as Id
 
@@ -124,15 +122,15 @@ const ProductSetupPage: FC = () => {
 					<Slide4
 						currentSlide={currentSlide}
 						setCanProceed={setCanProceed}
-						onComplete={async (data) => {
+						onComplete={(data) => {
 							setFormData((cur) => ({...cur, ...data}))
-							await submitForm({...formData, ...data} as FormInputs)
+							submitForm({...formData, ...data} as FormInputs).catch(console.error)
 						}}
 					/>
 				</motion.div>
 			</div>
 			<div className="flex justify-between">
-				<Button onClick={() => void setCurrentSlide((val) => Math.max(val - 1, 0))} disabled={currentSlide === 0}>
+				<Button onClick={() => setCurrentSlide((val) => Math.max(val - 1, 0))} disabled={currentSlide === 0}>
 					Previous
 				</Button>
 				{currentSlide === 3 ? (

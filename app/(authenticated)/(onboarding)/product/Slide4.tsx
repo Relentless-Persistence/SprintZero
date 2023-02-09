@@ -5,6 +5,7 @@ import {useForm} from "react-hook-form"
 import {z} from "zod"
 
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 
 import SlideContainer from "./SlideContainer"
 import RhfInput from "~/components/rhf/RhfInput"
@@ -21,7 +22,7 @@ type FormInputs = z.infer<typeof formSchema>
 type Slide4Props = {
 	currentSlide: number
 	setCanProceed: (canProceed: boolean) => void
-	onComplete: (data: {effortCost: number | null}) => void
+	onComplete: (data: {effortCost: number | null}) => Promisable<void>
 }
 
 const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
@@ -34,11 +35,13 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 		},
 	})
 
-	const onSubmit = handleSubmit(
-		(data) => void onComplete({effortCost: data.effortCost ? parseFloat(data.effortCost.slice(1)) : null}),
+	const onSubmit = handleSubmit((data) =>
+		onComplete({effortCost: data.effortCost ? parseFloat(data.effortCost.slice(1)) : null}),
 	)
 
-	useEffect(() => void (isActive && setCanProceed(formState.isValid)), [isActive, formState.isValid, setCanProceed])
+	useEffect(() => {
+		if (isActive) setCanProceed(formState.isValid)
+	}, [isActive, formState.isValid, setCanProceed])
 
 	return (
 		<SlideContainer isActive={isActive}>
@@ -48,7 +51,13 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					<p>How much is 1 story point?</p>
 				</div>
 
-				<Form id={isActive ? `current-slide` : ``} layout="vertical" onFinish={onSubmit}>
+				<Form
+					id={isActive ? `current-slide` : ``}
+					layout="vertical"
+					onFinish={() => {
+						onSubmit().catch(console.error)
+					}}
+				>
 					<Form.Item
 						extra="Optional"
 						required

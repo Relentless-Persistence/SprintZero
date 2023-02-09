@@ -1,45 +1,52 @@
 "use client"
 
 import {ReadOutlined} from "@ant-design/icons"
+import {doc, setDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import produce from "immer"
 import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
-import type {Epic as EpicType, StoryMapState} from "~/types/db/StoryMapStates"
+import type {Id, WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
-import {sortEpics} from "~/app/(authenticated)/(mainApp)/[productSlug]/map/storyMap/utils"
-import {setStoryMapState} from "~/utils/mutations"
+import {StoryMapStates} from "~/types/db/StoryMapStates"
+import {db} from "~/utils/firebase"
+import {getEpics} from "~/utils/storyMap"
 
-const debouncedSetStoryMapState = debounce(setStoryMapState, 100)
+const debouncedSetStoryMapState = debounce(async (id: Id, data: StoryMapState) => {
+	await setDoc(doc(db, StoryMapStates._, id), data)
+}, 100)
 
 export type EpicProps = {
 	storyMapState: WithDocumentData<StoryMapState>
-	epic: EpicType
+	epicId: Id
 }
 
-const Epic: FC<EpicProps> = ({epic, storyMapState}) => {
+const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
+	const epics = getEpics(storyMapState)
+	const epic = epics.find((e) => e.id === epicId)!
+
 	const x = useMotionValue(epic.effort)
 	const y = useMotionValue(epic.userValue)
 
 	useEffect(() => {
-		x.set(storyMapState.epics.find((e) => e.id === epic.id)!.effort)
-		y.set(storyMapState.epics.find((e) => e.id === epic.id)!.userValue)
-	}, [epic.id, storyMapState.epics, x, y])
+		x.set(epics.find((e) => e.id === epic.id)!.effort)
+		y.set(epics.find((e) => e.id === epic.id)!.userValue)
+	}, [epic.id, epics, x, y])
 
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
-	const moveEpic = (x: number, y: number) => {
+	const moveEpic = async (x: number, y: number) => {
 		const newStoryMapState = produce(storyMapState, (state) => {
-			const newEpic = state.epics.find((e) => e.id === epic.id)!
+			const epics = getEpics(state)
+			const newEpic = epics.find((e) => e.id === epic.id)!
 			newEpic.effort = x
 			newEpic.userValue = y
-			state.epics = sortEpics(state.epics)
 		})
-		debouncedSetStoryMapState({id: newStoryMapState.id, data: newStoryMapState})
+		await debouncedSetStoryMapState(newStoryMapState.id, newStoryMapState)
 	}
 
 	return (
@@ -58,7 +65,7 @@ const Epic: FC<EpicProps> = ({epic, storyMapState}) => {
 
 				x.set(newX)
 				y.set(newY)
-				moveEpic(newX, newY)
+				moveEpic(newX, newY).catch(console.error)
 			}}
 			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]"
 			style={{top: useMotionTemplate`calc(${y}% * 100)`, left: useMotionTemplate`calc(${x}% * 100)`}}

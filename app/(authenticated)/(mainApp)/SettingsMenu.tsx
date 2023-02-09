@@ -24,7 +24,7 @@ const SettingsMenu: FC<SettingsMenuProps> = ({onClose}) => {
 						key: `settings-account`,
 						icon: <UserOutlined />,
 						label: <LinkTo href="/settings/account">Account</LinkTo>,
-						onClick: () => void onClose(),
+						onClick: () => onClose(),
 					},
 					{
 						key: `settings-config`,
@@ -45,13 +45,13 @@ const SettingsMenu: FC<SettingsMenuProps> = ({onClose}) => {
 								Support
 							</LinkTo>
 						),
-						onClick: () => void onClose(),
+						onClick: () => onClose(),
 					},
 					{
 						key: `settings-sign-out`,
 						icon: <LogoutOutlined />,
 						label: <LinkTo href="/sign-out">Sign out</LinkTo>,
-						onClick: () => void onClose(),
+						onClick: () => onClose(),
 					},
 				]}
 				style={{borderInlineEnd: `unset`}}

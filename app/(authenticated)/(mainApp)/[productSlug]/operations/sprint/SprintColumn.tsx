@@ -7,6 +7,7 @@ import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import Story from "./Story"
+import {getStories} from "~/utils/storyMap"
 
 export type SprintColumnProps = {
 	id: string
@@ -17,10 +18,12 @@ export type SprintColumnProps = {
 }
 
 const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, activeProduct, storyMapState}) => {
+	const stories = getStories(storyMapState)
+
 	return (
 		<Card type="inner" title={title}>
 			<div className="flex flex-col gap-4">
-				{storyMapState.stories
+				{stories
 					.filter((story) => story.sprintColumn === id)
 					.filter(
 						(story) =>

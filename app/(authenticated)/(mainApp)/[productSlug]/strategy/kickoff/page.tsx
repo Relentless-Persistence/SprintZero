@@ -39,7 +39,7 @@ const KickoffPage: FC = () => {
 							onEditStart={() => {
 								setEditingSection(`problemStatement`)
 							}}
-							onEditEnd={() => void setEditingSection(undefined)}
+							onEditEnd={() => setEditingSection(undefined)}
 						/>
 					)}
 
@@ -58,7 +58,7 @@ const KickoffPage: FC = () => {
 								}}
 								isEditing={editingSection === `personas`}
 								onCommit={() =>
-									void updateProduct({
+									updateProduct({
 										id: activeProduct!.id,
 										data: {personas: textListState.filter((item) => item.text !== ``)},
 									})
@@ -94,7 +94,7 @@ const KickoffPage: FC = () => {
 								}}
 								isEditing={editingSection === `successMetrics`}
 								onCommit={() =>
-									void updateProduct({
+									updateProduct({
 										id: activeProduct!.id,
 										data: {successMetrics: textListState.filter((item) => item.text !== ``)},
 									})
@@ -128,7 +128,7 @@ const KickoffPage: FC = () => {
 								}}
 								isEditing={editingSection === `businessPriorities`}
 								onCommit={() =>
-									void updateProduct({
+									updateProduct({
 										id: activeProduct!.id,
 										data: {businessPriorities: textListState.filter((item) => item.text !== ``)},
 									})

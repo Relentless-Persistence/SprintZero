@@ -73,7 +73,7 @@ const VisionsPage: FC = () => {
 							<Steps
 								direction="vertical"
 								current={currentStep}
-								onChange={(value) => void setCurrentStep(value)}
+								onChange={(value) => setCurrentStep(value)}
 								items={[
 									{
 										title: (
@@ -89,7 +89,7 @@ const VisionsPage: FC = () => {
 										title: (
 											<ResponseStep
 												gptResponse={gptResponse}
-												setGptResponse={(newResponse) => void setGptResponse(newResponse)}
+												setGptResponse={(newResponse) => setGptResponse(newResponse)}
 												onFinish={() => {
 													setGptResponseAccepted(true)
 													setCurrentStep(2)
@@ -116,7 +116,7 @@ const VisionsPage: FC = () => {
 													await updateProduct({id: activeProduct!.id, data: newProduct})
 													setEditMode(false)
 												}}
-												onCancel={() => void setEditMode(false)}
+												onCancel={() => setEditMode(false)}
 											/>
 										),
 									},

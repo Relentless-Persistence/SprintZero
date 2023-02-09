@@ -2,28 +2,29 @@ import {DislikeFilled, LikeFilled} from "@ant-design/icons"
 import {useState} from "react"
 
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
+import type {Id, WithDocumentData} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import StoryDrawer from "~/components/StoryDrawer"
+import StoryDrawer from "~/app/(authenticated)/(mainApp)/[productSlug]/tactics/ethics/StoryDrawer"
+import {getFeatures, getStories} from "~/utils/storyMap"
 
 export type StoryProps = {
 	activeProduct: WithDocumentData<Product>
 	storyMapState: WithDocumentData<StoryMapState>
-	storyId: string
+	storyId: Id
 }
 
 const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId}) => {
-	const story = storyMapState.stories.find((story) => story.id === storyId)!
-	const featureName = storyMapState.features.find((feature) => feature.storyIds.includes(storyId))?.name
+	const story = getStories(storyMapState).find((story) => story.id === storyId)!
+	const featureName = getFeatures(storyMapState).find((feature) => feature.id === story.parentId)!.name
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	return (
 		<>
 			<button
 				type="button"
-				onClick={() => void setIsDrawerOpen(true)}
+				onClick={() => setIsDrawerOpen(true)}
 				className="flex w-full items-center justify-between gap-2 border border-laurel bg-[#fafafa] px-4 py-3 text-left"
 			>
 				<div className="flex flex-col gap-1">
@@ -40,10 +41,8 @@ const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId}) => {
 				activeProduct={activeProduct}
 				storyMapState={storyMapState}
 				storyId={storyId}
-				hideAcceptanceCriteria
-				disableEditing
 				isOpen={isDrawerOpen}
-				onClose={() => void setIsDrawerOpen(false)}
+				onClose={() => setIsDrawerOpen(false)}
 			/>
 		</>
 	)

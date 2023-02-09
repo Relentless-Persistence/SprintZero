@@ -34,10 +34,10 @@ const FinalStep: FC<FinalStepProps> = ({gptResponse, onFinish, onCancel}) => {
 				)}
 			</Card>
 			<Space className="flex justify-end">
-				<Button disabled={!gptResponse} onClick={() => void onCancel()} className="bg-white">
+				<Button disabled={!gptResponse} onClick={() => onCancel()} className="bg-white">
 					Cancel
 				</Button>
-				<Button type="primary" disabled={!gptResponse} onClick={() => void onFinish(visionDraft!)} className="bg-green">
+				<Button type="primary" disabled={!gptResponse} onClick={() => onFinish(visionDraft!)} className="bg-green">
 					Save
 				</Button>
 			</Space>

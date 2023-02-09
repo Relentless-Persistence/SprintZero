@@ -2,7 +2,7 @@
 
 import {GlobalOutlined} from "@ant-design/icons"
 import {Button, Breadcrumb, Card, Input, Tabs} from "antd"
-import {collection, doc, query, where} from "firebase/firestore"
+import {addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useState, useEffect} from "react"
 import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
@@ -15,7 +15,6 @@ import NoData from "~/components/NoData"
 import {AccessibilityItemConverter, AccessibilityItems} from "~/types/db/AccessibilityItems"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
-import {addAccessibilityItem, updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const descriptions = {
@@ -58,7 +57,7 @@ const Accessibility = () => {
 						<Breadcrumb.Item className="capitalize">{currentTab}</Breadcrumb.Item>
 					</Breadcrumb>
 
-					<Button className="bg-white" onClick={() => void setItemDraft({name: ``, text: ``})}>
+					<Button className="bg-white" onClick={() => setItemDraft({name: ``, text: ``})}>
 						Add New
 					</Button>
 				</div>
@@ -79,15 +78,12 @@ const Accessibility = () => {
 					value={missionStatement}
 					onChange={(e) => {
 						setMissionStatement(e.target.value)
-						updateProduct({
-							id: activeProductId!,
-							data: {
-								accessibilityMissionStatements: {
-									...activeProduct!.accessibilityMissionStatements,
-									[currentTab]: e.target.value,
-								},
+						updateDoc(doc(db, Products._, activeProductId), {
+							accessibilityMissionStatements: {
+								...activeProduct!.accessibilityMissionStatements,
+								[currentTab]: e.target.value,
 							},
-						})
+						}).catch(console.error)
 					}}
 				/>
 
@@ -120,7 +116,7 @@ const Accessibility = () => {
 									<Input
 										size="small"
 										value={itemDraft.name}
-										onChange={(e) => void setItemDraft((item) => ({name: e.target.value, text: item!.text}))}
+										onChange={(e) => setItemDraft((item) => ({name: e.target.value, text: item!.text}))}
 									/>
 								}
 								extra={
@@ -139,16 +135,19 @@ const Accessibility = () => {
 											type="primary"
 											className="bg-green"
 											onClick={() => {
-												addAccessibilityItem({
+												addDoc(collection(db, AccessibilityItems._), {
 													item: {
 														name: itemDraft.name,
 														text: itemDraft.text,
 														type: currentTab,
-														productId: activeProductId!,
+														productId: activeProductId,
 													},
 												})
-												setActiveItemId(undefined)
-												setItemDraft(undefined)
+													.then(() => {
+														setActiveItemId(undefined)
+														setItemDraft(undefined)
+													})
+													.catch(console.error)
 											}}
 										>
 											Done
@@ -160,7 +159,7 @@ const Accessibility = () => {
 									<p className="invisible border p-1">{itemDraft.text || `filler`}</p>
 									<Input.TextArea
 										value={itemDraft.text}
-										onChange={(e) => void setItemDraft((item) => ({name: item!.name, text: e.target.value}))}
+										onChange={(e) => setItemDraft((item) => ({name: item!.name, text: e.target.value}))}
 										className="absolute inset-0"
 									/>
 								</div>

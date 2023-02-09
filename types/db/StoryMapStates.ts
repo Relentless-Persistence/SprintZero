@@ -4,36 +4,35 @@ import {z} from "zod"
 import {genConverter, genDbNames, idSchema} from "~/types"
 
 export const EpicSchema = z.object({
-	id: z.string(),
+	type: z.literal(`epic`),
 
 	description: z.string(),
 	effort: z.number().min(0).max(1),
 	name: z.string(),
 	userValue: z.number().min(0).max(1),
 
-	featureIds: z.array(z.string()),
 	keeperIds: z.array(idSchema),
 })
 export type Epic = z.infer<typeof EpicSchema>
 
 export const FeatureSchema = z.object({
-	id: z.string(),
+	type: z.literal(`feature`),
 
 	description: z.string(),
 	effort: z.number().min(0).max(1),
 	name: z.string(),
 	userValue: z.number().min(0).max(1),
 
-	storyIds: z.array(z.string()),
+	parentId: idSchema,
 })
 export type Feature = z.infer<typeof FeatureSchema>
 
 export const StorySchema = z.object({
-	id: z.string(),
+	type: z.literal(`story`),
 
 	acceptanceCriteria: z.array(
 		z.object({
-			id: z.string(),
+			id: idSchema,
 			name: z.string(),
 			checked: z.boolean(),
 		}),
@@ -68,14 +67,13 @@ export const StorySchema = z.object({
 		`shipped`,
 	]),
 
-	versionId: z.string(),
+	parentId: idSchema,
+	versionId: idSchema,
 })
 export type Story = z.infer<typeof StorySchema>
 
 export const StoryMapStateSchema = z.object({
-	epics: z.array(EpicSchema),
-	features: z.array(FeatureSchema),
-	stories: z.array(StorySchema),
+	items: z.record(idSchema, z.discriminatedUnion(`type`, [EpicSchema, FeatureSchema, StorySchema])),
 
 	productId: idSchema,
 })

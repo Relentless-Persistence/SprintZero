@@ -43,7 +43,7 @@ const AccessibilityItemCard: FC<AccessibilityItemCardProps> = ({item, isEditing,
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
-						<Button size="small" onClick={() => void onEditEnd()}>
+						<Button size="small" onClick={() => onEditEnd()}>
 							Cancel
 						</Button>
 						<Button size="small" type="primary" htmlType="submit" form="accessibility-item-form">
@@ -51,7 +51,7 @@ const AccessibilityItemCard: FC<AccessibilityItemCardProps> = ({item, isEditing,
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart()} className="text-green">
+					<button type="button" onClick={() => onEditStart()} className="text-green">
 						Edit
 					</button>
 				)
@@ -62,7 +62,7 @@ const AccessibilityItemCard: FC<AccessibilityItemCardProps> = ({item, isEditing,
 					<RhfStretchyTextArea control={control} name="text" />
 					<Button
 						danger
-						onClick={async () => void (await deleteDoc(doc(db, AccessibilityItems._, item.id)))}
+						onClick={async () => await deleteDoc(doc(db, AccessibilityItems._, item.id))}
 						className="w-full"
 					>
 						Remove

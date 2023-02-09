@@ -41,7 +41,7 @@ const LearningsPage: FC = () => {
 						<Breadcrumb.Item>{tabNames[currentTab]}</Breadcrumb.Item>
 					</Breadcrumb>
 
-					<Button onClick={() => void setActiveLearning(`new`)}>Add New</Button>
+					<Button onClick={() => setActiveLearning(`new`)}>Add New</Button>
 				</div>
 
 				<Masonry
@@ -56,17 +56,13 @@ const LearningsPage: FC = () => {
 								key={learning.id}
 								item={learning}
 								isEditing={activeLearning === learning.id}
-								onEditStart={() => void setActiveLearning(learning.id)}
-								onEditEnd={() => void setActiveLearning(undefined)}
+								onEditStart={() => setActiveLearning(learning.id)}
+								onEditEnd={() => setActiveLearning(undefined)}
 							/>
 						))}
 
 					{activeLearning === `new` && (
-						<LearningItemCard
-							item={{status: currentTab}}
-							isEditing
-							onEditEnd={() => void setActiveLearning(undefined)}
-						/>
+						<LearningItemCard item={{status: currentTab}} isEditing onEditEnd={() => setActiveLearning(undefined)} />
 					)}
 				</Masonry>
 			</div>
@@ -74,7 +70,7 @@ const LearningsPage: FC = () => {
 			<Tabs
 				tabPosition="right"
 				activeKey={currentTab}
-				onChange={(key: keyof typeof tabNames) => void setCurrentTab(key)}
+				onChange={(key: keyof typeof tabNames) => setCurrentTab(key)}
 				items={Object.entries(tabNames).map(([key, label]) => ({key, label}))}
 			/>
 		</div>

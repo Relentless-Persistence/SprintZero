@@ -10,6 +10,7 @@ import Story from "./Story"
 import {ProductConverter, Products} from "~/types/db/Products"
 import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
+import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const EthicsPage: FC = () => {
@@ -20,10 +21,11 @@ const EthicsPage: FC = () => {
 			? doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
 			: undefined,
 	)
+	const stories = storyMapState ? getStories(storyMapState) : []
 
 	return (
 		<>
-			{storyMapState?.stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
+			{stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
 				<div className="absolute z-10 h-full w-full bg-black/20">
 					<p className="absolute bottom-12 right-12 border border-[#ffa39e] bg-[#fff1f0] px-4 py-2">
 						No elements present; flag a user story to populate
@@ -41,7 +43,8 @@ const EthicsPage: FC = () => {
 					<Card title="Identified">
 						<div className="flex flex-col gap-4">
 							{activeProduct &&
-								storyMapState?.stories
+								storyMapState &&
+								stories
 									.filter((story) => story.ethicsColumn === `identified`)
 									.map((story) => (
 										<Story
@@ -56,7 +59,8 @@ const EthicsPage: FC = () => {
 					<Card title="Under Review">
 						<div className="flex flex-col gap-4">
 							{activeProduct &&
-								storyMapState?.stories
+								storyMapState &&
+								stories
 									.filter((story) => story.ethicsColumn === `underReview`)
 									.map((story) => (
 										<Story
@@ -71,7 +75,8 @@ const EthicsPage: FC = () => {
 					<Card title="Adjudicated">
 						<div className="flex flex-col gap-4">
 							{activeProduct &&
-								storyMapState?.stories
+								storyMapState &&
+								stories
 									.filter((story) => story.ethicsColumn === `adjudicated`)
 									.map((story) => (
 										<Story

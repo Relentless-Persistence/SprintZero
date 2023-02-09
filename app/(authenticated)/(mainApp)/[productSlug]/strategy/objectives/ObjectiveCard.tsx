@@ -31,12 +31,7 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 			type="inner"
 			title={
 				isEditing ? (
-					<Input
-						size="small"
-						value={titleDraft}
-						onChange={(e) => void setTitleDraft(e.target.value)}
-						className="mr-4"
-					/>
+					<Input size="small" value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} className="mr-4" />
 				) : (
 					result?.name
 				)
@@ -44,7 +39,7 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
-						<Button size="small" onClick={() => void onEditEnd()}>
+						<Button size="small" onClick={() => onEditEnd()}>
 							Cancel
 						</Button>
 						<Button
@@ -74,7 +69,7 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart?.()} className="text-green">
+					<button type="button" onClick={() => onEditStart?.()} className="text-green">
 						Edit
 					</button>
 				)
@@ -82,7 +77,7 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 		>
 			{isEditing ? (
 				<div className="flex flex-col gap-2">
-					<StretchyTextArea value={textDraft} onChange={(e) => void setTextDraft(e.target.value)} />
+					<StretchyTextArea value={textDraft} onChange={(e) => setTextDraft(e.target.value)} />
 				</div>
 			) : (
 				<p className="min-w-0">{textDraft}</p>

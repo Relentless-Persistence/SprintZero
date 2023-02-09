@@ -39,7 +39,7 @@ const RhfDateTimePicker = <TFieldValues extends FieldValues>({
 				}}
 				value={field.value}
 				name={field.name}
-				ref={(v) => void field.ref(v)}
+				ref={(v) => field.ref(v)}
 			/>
 
 			<DatePicker
@@ -55,7 +55,7 @@ const RhfDateTimePicker = <TFieldValues extends FieldValues>({
 				}}
 				value={field.value}
 				name={field.name}
-				ref={(v) => void field.ref(v)}
+				ref={(v) => field.ref(v)}
 			/>
 		</div>
 	)

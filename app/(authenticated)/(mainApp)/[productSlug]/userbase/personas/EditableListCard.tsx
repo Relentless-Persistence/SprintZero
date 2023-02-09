@@ -32,12 +32,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 			type="inner"
 			title={
 				isEditing ? (
-					<Input
-						size="small"
-						value={titleDraft}
-						onChange={(e) => void setTitleDraft(e.target.value)}
-						className="mr-4"
-					/>
+					<Input size="small" value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} className="mr-4" />
 				) : (
 					<p>{title}</p>
 				)
@@ -45,7 +40,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
-						<Button size="small" onClick={() => void onCancel()}>
+						<Button size="small" onClick={() => onCancel()}>
 							Cancel
 						</Button>
 						<Button
@@ -53,7 +48,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 							type="primary"
 							className="bg-green"
 							onClick={() =>
-								void onCommit(
+								onCommit(
 									titleDraft,
 									listDraft.filter((item) => item.text !== ``),
 								)
@@ -63,7 +58,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart()} className="text-green">
+					<button type="button" onClick={() => onEditStart()} className="text-green">
 						Edit
 					</button>
 				)
@@ -73,7 +68,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 				<div className="flex flex-col gap-2">
 					<TextListEditor textList={listDraft} onChange={setListDraft} />
 					{onDelete && (
-						<Button danger onClick={() => void onDelete()} className="w-full">
+						<Button danger onClick={() => onDelete()} className="w-full">
 							Remove
 						</Button>
 					)}

@@ -28,7 +28,7 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
-						<Button size="small" onClick={() => void onEditEnd()}>
+						<Button size="small" onClick={() => onEditEnd()}>
 							Cancel
 						</Button>
 						<Button
@@ -46,14 +46,14 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => void onEditStart()} className="text-green">
+					<button type="button" onClick={() => onEditStart()} className="text-green">
 						Edit
 					</button>
 				)
 			}
 		>
 			{isEditing ? (
-				<StretchyTextArea value={textDraft} onChange={(e) => void setTextDraft(e.target.value)} />
+				<StretchyTextArea value={textDraft} onChange={(e) => setTextDraft(e.target.value)} />
 			) : (
 				<p className="min-w-0">{textDraft}</p>
 			)}

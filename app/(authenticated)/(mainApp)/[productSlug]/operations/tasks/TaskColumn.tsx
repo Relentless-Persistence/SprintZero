@@ -22,7 +22,7 @@ const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 						<button
 							key={task.id}
 							type="button"
-							onClick={() => void onEdit(task.id)}
+							onClick={() => onEdit(task.id)}
 							className="flex w-full flex-col gap-1 border border-laurel bg-[#fafafa] px-4 py-2 text-left"
 						>
 							<p className="font-medium">{task.title}</p>

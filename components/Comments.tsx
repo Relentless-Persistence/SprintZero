@@ -7,6 +7,7 @@ import {useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 import type {Id} from "~/types"
 
 import {CommentConverter, Comments as DbComments} from "~/types/db/Comments"
@@ -20,7 +21,7 @@ export type CommentsProps = {
 	storyMapStateId: Id
 	parentId: string
 	flagged?: boolean
-	onFlag?: () => void
+	onFlag?: () => Promisable<void>
 }
 
 const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag}) => {
@@ -34,7 +35,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 			comment: {
 				text: commentDraft,
 				type: `code`,
-				authorId: user!.id as Id,
+				authorId: user!.id,
 				parentId,
 			},
 		})
@@ -78,8 +79,13 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 					)}
 				</div>
 			</div>
-			<form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
-				<Input value={commentDraft} onChange={(e) => void setCommentDraft(e.target.value)} />
+			<form
+				onSubmit={(e) => {
+					handleSubmit(e).catch(console.error)
+				}}
+				className="mt-4 flex flex-col gap-4"
+			>
+				<Input value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} />
 				<div className="flex gap-2">
 					<Button
 						htmlType="submit"
@@ -94,7 +100,9 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 							icon={<FlagOutlined />}
 							danger
 							disabled={flagged}
-							onClick={() => void (!flagged && onFlag())}
+							onClick={() => {
+								if (!flagged) Promise.resolve(onFlag()).catch(console.error)
+							}}
 							className="flex items-center"
 						>
 							{flagged ? `Flagged` : `Flag`}

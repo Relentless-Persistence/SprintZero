@@ -22,14 +22,7 @@ const RhfSlider = <TFieldValues extends FieldValues = FieldValues>({
 }: RhfSliderProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
 
-	return (
-		<Slider
-			{...props}
-			onChange={(value) => void field.onChange(value)}
-			value={field.value}
-			ref={(v) => void field.ref(v)}
-		/>
-	)
+	return <Slider {...props} onChange={(value) => field.onChange(value)} value={field.value} ref={(v) => field.ref(v)} />
 }
 
 export default RhfSlider

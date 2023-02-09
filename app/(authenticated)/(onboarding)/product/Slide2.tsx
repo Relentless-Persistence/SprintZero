@@ -27,9 +27,11 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 		resolver: zodResolver(formSchema),
 	})
 
-	const onSubmit = handleSubmit((data) => void onComplete({cadence: parseInt(data.cadence)}))
+	const onSubmit = handleSubmit((data) => onComplete({cadence: parseInt(data.cadence)}))
 
-	useEffect(() => void (isActive && setCanProceed(formState.isValid)), [isActive, formState.isValid, setCanProceed])
+	useEffect(() => {
+		if (isActive) setCanProceed(formState.isValid)
+	}, [isActive, formState.isValid, setCanProceed])
 
 	const cadence = useWatch({control, name: `cadence`})
 
@@ -41,7 +43,12 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					<p>How many weeks will you spend on each sprint?</p>
 				</div>
 
-				<Form id={isActive ? `current-slide` : ``} onFinish={onSubmit}>
+				<Form
+					id={isActive ? `current-slide` : ``}
+					onFinish={() => {
+						onSubmit().catch(console.error)
+					}}
+				>
 					<Form.Item>
 						<div className="flex flex-col gap-4">
 							<input

@@ -49,7 +49,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 
 	const onSubmit = handleSubmit((data) => {
 		onClose()
-		setTimeout(() => void onCommit(data), 300)
+		setTimeout(() => onCommit(data), 300)
 	})
 
 	return (
@@ -61,14 +61,14 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 			title={
 				<div className="flex items-center gap-6">
 					<p className="text-lg">Touchpoint</p>
-					<Button danger type="primary" size="small" disabled={activeEvent === `new`} onClick={() => void onDelete()}>
+					<Button danger type="primary" size="small" disabled={activeEvent === `new`} onClick={() => onDelete()}>
 						Delete
 					</Button>
 				</div>
 			}
 			extra={
 				<div className="flex gap-2">
-					<Button size="small" onClick={() => void onClose()}>
+					<Button size="small" onClick={() => onClose()}>
 						Cancel
 					</Button>
 					<Button type="primary" size="small" htmlType="submit" form="journey-event-form">

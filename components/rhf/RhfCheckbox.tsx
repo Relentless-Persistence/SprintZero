@@ -25,10 +25,10 @@ const RhfCheckbox = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Checkbox
 			{...props}
-			onChange={(e) => void field.onChange(e.target.checked)}
+			onChange={(e) => field.onChange(e.target.checked)}
 			checked={field.value}
 			name={field.name}
-			ref={(v) => void field.ref(v)}
+			ref={(v) => field.ref(v)}
 		/>
 	)
 }

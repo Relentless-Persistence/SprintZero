@@ -25,11 +25,11 @@ const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Input.TextArea
 			{...props}
-			onChange={(e) => void field.onChange(e.target.value)}
+			onChange={(e) => field.onChange(e.target.value)}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}
-			ref={(v) => void field.ref(v?.resizableTextArea)}
+			ref={(v) => field.ref(v?.resizableTextArea)}
 		/>
 	)
 }

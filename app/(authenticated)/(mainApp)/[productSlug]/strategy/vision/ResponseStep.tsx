@@ -54,7 +54,7 @@ const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFin
 				>
 					Redo
 				</Button>
-				<Button type="primary" disabled={!gptResponse} onClick={() => void onFinish()} className="bg-green">
+				<Button type="primary" disabled={!gptResponse} onClick={() => onFinish()} className="bg-green">
 					Accept
 				</Button>
 			</Space>

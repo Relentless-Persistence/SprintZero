@@ -122,7 +122,7 @@ const SideMenu: FC = () => {
 		<Menu
 			mode="inline"
 			openKeys={openKey ? [openKey] : []}
-			onOpenChange={(openKeys) => void setOpenKey(openKeys.find((key) => key !== openKey))}
+			onOpenChange={(openKeys) => setOpenKey(openKeys.find((key) => key !== openKey))}
 			selectedKeys={[pathname?.replace(/^\/[^/]+\//, ``) ?? ``]}
 			items={items}
 		/>

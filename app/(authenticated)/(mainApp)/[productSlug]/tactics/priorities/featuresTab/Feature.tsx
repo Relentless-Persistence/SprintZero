@@ -1,46 +1,52 @@
 "use client"
 
 import {CopyOutlined} from "@ant-design/icons"
+import {doc, setDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import produce from "immer"
 import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
-import type {Feature as FeatureType, StoryMapState} from "~/types/db/StoryMapStates"
+import type {Id, WithDocumentData} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
-import {sortFeatures} from "~/app/(authenticated)/(mainApp)/[productSlug]/map/storyMap/utils"
-import {setStoryMapState} from "~/utils/mutations"
+import {StoryMapStates} from "~/types/db/StoryMapStates"
+import {db} from "~/utils/firebase"
+import {getFeatures} from "~/utils/storyMap"
 
-const debouncedSetStoryMapState = debounce(setStoryMapState, 100)
+const debouncedSetStoryMapState = debounce(async (id: Id, data: StoryMapState) => {
+	await setDoc(doc(db, StoryMapStates._, id), data)
+}, 100)
 
 export type FeatureProps = {
 	storyMapState: WithDocumentData<StoryMapState>
-	feature: FeatureType
+	featureId: Id
 }
 
-const Feature: FC<FeatureProps> = ({feature, storyMapState}) => {
+const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
+	const features = getFeatures(storyMapState)
+	const feature = features.find(({id}) => id === featureId)!
+
 	const x = useMotionValue(feature.effort)
 	const y = useMotionValue(feature.userValue)
 
 	useEffect(() => {
-		x.set(storyMapState.features.find(({id}) => id === feature.id)!.effort)
-		y.set(storyMapState.features.find(({id}) => id === feature.id)!.userValue)
-	}, [feature.id, storyMapState.features, x, y])
+		x.set(features.find(({id}) => id === feature.id)!.effort)
+		y.set(features.find(({id}) => id === feature.id)!.userValue)
+	}, [feature.id, features, x, y])
 
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
-	const moveFeature = (x: number, y: number) => {
+	const moveFeature = async (x: number, y: number) => {
 		const newStoryMapState = produce(storyMapState, (state) => {
-			const newFeature = state.features.find(({id}) => id === feature.id)!
+			const features = getFeatures(state)
+			const newFeature = features.find(({id}) => id === feature.id)!
 			newFeature.effort = x
 			newFeature.userValue = y
-			const host = state.epics.find(({featureIds}) => featureIds.includes(feature.id))!
-			host.featureIds = sortFeatures(state, host.featureIds)
 		})
-		debouncedSetStoryMapState({id: newStoryMapState.id, data: newStoryMapState})
+		await debouncedSetStoryMapState(newStoryMapState.id, newStoryMapState)
 	}
 
 	return (
@@ -59,7 +65,7 @@ const Feature: FC<FeatureProps> = ({feature, storyMapState}) => {
 
 				x.set(newX)
 				y.set(newY)
-				moveFeature(newX, newY)
+				moveFeature(newX, newY).catch(console.error)
 			}}
 			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-[#006378] bg-white px-2 py-1 text-[#006378]"
 			style={{top: useMotionTemplate`calc(${y}% * 100)`, left: useMotionTemplate`calc(${x}% * 100)`}}

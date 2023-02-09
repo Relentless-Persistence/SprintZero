@@ -22,7 +22,7 @@ export type TaskDrawerProps = {
 
 const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) => {
 	const [isOpen, setIsOpen] = useState(false)
-	useEffect(() => void setIsOpen(true), [])
+	useEffect(() => setIsOpen(true), [])
 
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -34,7 +34,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 
 	const onSubmit = handleSubmit((data) => {
 		setIsOpen(false)
-		setTimeout(() => void onCommit(data), 300)
+		setTimeout(() => onCommit(data), 300)
 	})
 
 	return (
@@ -66,12 +66,12 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 				{/* Column 1 */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
-						<p className="text-gray text-xl font-semibold">Title</p>
+						<p className="text-xl font-semibold text-gray">Title</p>
 						<RhfInput control={control} name="title" />
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="text-gray text-xl font-semibold">Description</p>
+						<p className="text-xl font-semibold text-gray">Description</p>
 						<RhfTextArea control={control} name="description" />
 					</div>
 				</div>
@@ -79,12 +79,12 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 				{/* Column 2 */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
-						<p className="text-gray text-xl font-semibold">Due</p>
+						<p className="text-xl font-semibold text-gray">Due</p>
 						<RhfDateTimePicker control={control} name="dueDate" />
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="text-gray text-xl font-semibold">Actions</p>
+						<p className="text-xl font-semibold text-gray">Actions</p>
 						{actions.map((action, i) => (
 							<RhfCheckbox key={action.id} control={control} name={`actions.${i}.checked`}>
 								{action.name}
@@ -95,7 +95,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 								size="small"
 								placeholder="Add new"
 								value={newActionInput}
-								onChange={(e) => void setNewActionInput(e.target.value)}
+								onChange={(e) => setNewActionInput(e.target.value)}
 								onKeyDown={(e) => {
 									if (e.key === `Enter`) {
 										e.preventDefault()

@@ -13,7 +13,7 @@ const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, o
 	if (isEditing) {
 		return (
 			<div className="flex gap-2">
-				<Button size="small" onClick={() => void onEditEnd()}>
+				<Button size="small" onClick={() => onEditEnd()}>
 					Cancel
 				</Button>
 				<Button
@@ -31,7 +31,7 @@ const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, o
 		)
 	} else {
 		return (
-			<button type="button" className="text-green" onClick={() => void onEditStart()}>
+			<button type="button" className="text-green" onClick={() => onEditStart()}>
 				Edit
 			</button>
 		)

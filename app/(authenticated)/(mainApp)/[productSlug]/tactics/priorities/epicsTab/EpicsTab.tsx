@@ -14,6 +14,7 @@ import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
 import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
+import {getEpics} from "~/utils/storyMap"
 
 export type EpicsTabProps = {
 	activeProduct: WithDocumentData<Product>
@@ -23,6 +24,8 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 	const [storyMapState] = useDocumentData(
 		doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
 	)
+
+	const epics = storyMapState ? getEpics(storyMapState) : []
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
@@ -72,9 +75,8 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 			<div className="relative grow">
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
-						{storyMapState?.epics.map((epic) => (
-							<Epic key={epic.id} epic={epic} storyMapState={storyMapState} />
-						))}
+						{storyMapState &&
+							epics.map((epic) => <Epic key={epic.id} epicId={epic.id} storyMapState={storyMapState} />)}
 					</PrioritiesMatrix>
 				</div>
 			</div>

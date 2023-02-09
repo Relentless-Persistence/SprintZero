@@ -51,7 +51,7 @@ const Header: FC = () => {
 						style={{background: `transparent`}}
 					/>
 
-					<button type="button" onClick={() => void setIsSettingsOpen(true)}>
+					<button type="button" onClick={() => setIsSettingsOpen(true)}>
 						<Avatar src={user.photoURL} className="border-2 border-green" />
 					</button>
 				</div>
@@ -62,15 +62,15 @@ const Header: FC = () => {
 				closable={false}
 				width="192px"
 				open={isSettingsOpen}
-				onClose={() => void setIsSettingsOpen(false)}
+				onClose={() => setIsSettingsOpen(false)}
 				extra={
-					<button type="button" onClick={() => void setIsSettingsOpen(false)}>
+					<button type="button" onClick={() => setIsSettingsOpen(false)}>
 						<CloseOutlined />
 					</button>
 				}
 				bodyStyle={{padding: `12px`}}
 			>
-				<SettingsMenu onClose={() => void setIsSettingsOpen(false)} />
+				<SettingsMenu onClose={() => setIsSettingsOpen(false)} />
 			</Drawer>
 		</>
 	)

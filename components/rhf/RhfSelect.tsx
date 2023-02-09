@@ -25,10 +25,10 @@ const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Select
 			{...props}
-			onChange={(value) => void field.onChange(value)}
+			onChange={(value) => field.onChange(value)}
 			onBlur={field.onBlur}
 			value={field.value}
-			ref={(v) => void field.ref(v)}
+			ref={(v) => field.ref(v)}
 		/>
 	)
 }

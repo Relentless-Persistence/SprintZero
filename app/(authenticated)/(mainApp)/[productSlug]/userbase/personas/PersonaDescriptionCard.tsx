@@ -87,7 +87,7 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = ({
 	}
 
 	useEffect(() => {
-		if(dialogueNotes?.length > 0) {
+		if (dialogueNotes?.length > 0) {
 			generatePersonaDescription()
 		}
 	}, [dialogueNotes])
@@ -99,7 +99,7 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = ({
 			// extra={
 			// 	isEditing ? (
 			// 		<div className="ml-4 flex gap-2">
-			// 			<Button size="small" onClick={() => void onEditEnd()}>
+			// 			<Button size="small" onClick={() => onEditEnd()}>
 			// 				Cancel
 			// 			</Button>
 			// 			<Button
@@ -107,7 +107,7 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = ({
 			// 				type="primary"
 			// 				className="bg-green"
 			// 				onClick={async () =>
-			// 					void (await updateDoc(doc(db, Personas._, personaId), {
+			// 					(await updateDoc(doc(db, Personas._, personaId), {
 			// 						description: text,
 			// 					} satisfies Partial<Persona>))
 			// 				}
@@ -116,16 +116,16 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = ({
 			// 			</Button>
 			// 		</div>
 			// 	) : (
-			// 		<button type="button" onClick={() => void onEditStart()} className="text-green">
+			// 		<button type="button" onClick={() => onEditStart()} className="text-green">
 			// 			Edit
 			// 		</button>
 			// 	)
 			// }
 		>
 			{/* {isEditing ? (
-				<StretchyTextArea value={textDraft} onChange={(e) => void setTextDraft(e.target.value)} />
+				<StretchyTextArea value={textDraft} onChange={(e) => setTextDraft(e.target.value)} />
 			) : ( */}
-				<p className="min-w-0">{textDraft}</p>
+			<p className="min-w-0">{textDraft}</p>
 			{/* )} */}
 		</Card>
 	)

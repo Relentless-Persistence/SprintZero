@@ -53,7 +53,7 @@ const ObjectivesPage: FC = () => {
 						<Breadcrumb.Item>{currentObjective?.name}</Breadcrumb.Item>
 					</Breadcrumb>
 
-					<Button className="bg-white" onClick={() => void setActiveResultId(`new`)}>
+					<Button className="bg-white" onClick={() => setActiveResultId(`new`)}>
 						Add New
 					</Button>
 				</div>
@@ -83,8 +83,8 @@ const ObjectivesPage: FC = () => {
 								objective={currentObjective}
 								resultId={result.id}
 								isEditing={result.id === activeResultId}
-								onEditStart={() => void setActiveResultId(result.id)}
-								onEditEnd={() => void setActiveResultId(undefined)}
+								onEditStart={() => setActiveResultId(result.id)}
+								onEditEnd={() => setActiveResultId(undefined)}
 							/>
 						))}
 
@@ -92,8 +92,8 @@ const ObjectivesPage: FC = () => {
 							<ObjectiveCard
 								objective={currentObjective}
 								isEditing
-								onEditStart={() => void setActiveResultId(`new`)}
-								onEditEnd={() => void setActiveResultId(undefined)}
+								onEditStart={() => setActiveResultId(`new`)}
+								onEditEnd={() => setActiveResultId(undefined)}
 							/>
 						)}
 					</Masonry>

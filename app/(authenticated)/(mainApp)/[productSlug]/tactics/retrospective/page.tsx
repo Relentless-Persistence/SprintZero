@@ -57,7 +57,7 @@ const RetrospectivePage: FC = () => {
 					</Breadcrumb>
 
 					<div>
-						<Button className="bg-white" onClick={() => void setIsDrawerOpen(true)}>
+						<Button className="bg-white" onClick={() => setIsDrawerOpen(true)}>
 							Add New
 						</Button>
 					</div>
@@ -85,7 +85,7 @@ const RetrospectivePage: FC = () => {
 								})()}
 								extra={
 									item.userId === user?.id ? (
-										<button type="button" onClick={() => void setIsDrawerOpen(true)} className="text-green">
+										<button type="button" onClick={() => setIsDrawerOpen(true)} className="text-green">
 											Edit
 										</button>
 									) : undefined
@@ -125,7 +125,7 @@ const RetrospectivePage: FC = () => {
 			<Tabs
 				tabPosition="right"
 				activeKey={currentTab}
-				onChange={(key: `enjoyable` | `puzzling` | `frustrating`) => void setCurrentTab(key)}
+				onChange={(key: `enjoyable` | `puzzling` | `frustrating`) => setCurrentTab(key)}
 				items={Object.entries(retrospectiveTabs).map(([key, label]) => ({key, label}))}
 			/>
 
@@ -139,7 +139,7 @@ const RetrospectivePage: FC = () => {
 							type: currentTab,
 						}
 					}
-					onCancel={() => void setIsDrawerOpen(false)}
+					onCancel={() => setIsDrawerOpen(false)}
 					onCommit={async (values) => {
 						const data: RetrospectiveItem = {
 							...values,

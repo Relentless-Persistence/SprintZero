@@ -51,7 +51,7 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 				<Breadcrumb.Item>Journeys</Breadcrumb.Item>
 			</Breadcrumb>
 			<div className="grid grow place-items-center">
-				<Form layout="vertical" onFinish={() => void onSubmit()}>
+				<Form layout="vertical" onFinish={() => onSubmit()}>
 					<div className="flex flex-col gap-4">
 						<h1 className="text-2xl font-semibold">Create Journey</h1>
 						<Form.Item label={<span className="text-gray">Please provide a name:</span>}>
@@ -75,7 +75,7 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 							</div>
 						</Form.Item>
 						<div className="mt-2 flex justify-end gap-4">
-							<Button disabled={journeys?.length === 0} onClick={() => void onCancel()}>
+							<Button disabled={journeys?.length === 0} onClick={() => onCancel()}>
 								Cancel
 							</Button>
 							<Button type="primary" htmlType="submit">

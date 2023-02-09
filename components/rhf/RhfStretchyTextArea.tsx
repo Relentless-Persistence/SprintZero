@@ -29,7 +29,7 @@ const RhfStretchyTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<StretchyTextArea
 			{...props}
-			onChange={(e) => void field.onChange(e.target.value)}
+			onChange={(e) => field.onChange(e.target.value)}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}

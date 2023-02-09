@@ -30,7 +30,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 					<Input.Group key={item.id} compact className="!flex w-full">
 						<Button
 							onClick={() =>
-								void onChange((state) => {
+								onChange((state) => {
 									let newState = [...state]
 									newState.splice(i, 1)
 									if (newState.length === 0) newState = [{id: nanoid(), text: ``}]
@@ -45,13 +45,13 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 						<Input
 							value={item.text}
 							onChange={(e) =>
-								void onChange((state) =>
+								onChange((state) =>
 									produce(state, (draft) => {
 										draft[i]!.text = e.target.value
 									}),
 								)
 							}
-							onBlur={() => void onBlur?.()}
+							onBlur={() => onBlur?.()}
 							onKeyDown={(e) => {
 								if (e.key === `Enter`) {
 									e.preventDefault()

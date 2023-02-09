@@ -47,7 +47,7 @@ const TeamSettingsPage: FC = () => {
 
 			<Tabs
 				activeKey={currentTab}
-				onChange={(key) => void setcurrentTab(key as `editor` | `viewer`)}
+				onChange={(key) => setcurrentTab(key as `editor` | `viewer`)}
 				items={[
 					{
 						label: `Members`,
