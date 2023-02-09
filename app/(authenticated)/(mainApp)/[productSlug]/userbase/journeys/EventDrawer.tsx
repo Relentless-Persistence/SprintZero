@@ -2,6 +2,7 @@ import {Button, Drawer} from "antd"
 import {useForm} from "react-hook-form"
 
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 import type {z} from "zod"
 import type {Id, WithDocumentData} from "~/types"
 import type {Journey} from "~/types/db/Journeys"
@@ -28,8 +29,8 @@ export type EventDrawerProps = {
 	journey: WithDocumentData<Journey>
 	activeEvent: Id | `new` | undefined
 	onClose: () => void
-	onCommit: (event: FormInputs) => void
-	onDelete: () => void
+	onCommit: (event: FormInputs) => Promisable<void>
+	onDelete: () => Promisable<void>
 }
 
 const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCommit, onDelete}) => {
@@ -49,7 +50,9 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 
 	const onSubmit = handleSubmit((data) => {
 		onClose()
-		setTimeout(() => onCommit(data), 300)
+		setTimeout(() => {
+			Promise.resolve(onCommit(data)).catch(console.error)
+		}, 300)
 	})
 
 	return (
@@ -61,7 +64,15 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 			title={
 				<div className="flex items-center gap-6">
 					<p className="text-lg">Touchpoint</p>
-					<Button danger type="primary" size="small" disabled={activeEvent === `new`} onClick={() => onDelete()}>
+					<Button
+						danger
+						type="primary"
+						size="small"
+						disabled={activeEvent === `new`}
+						onClick={() => {
+							Promise.resolve(onDelete()).catch(console.error)
+						}}
+					>
 						Delete
 					</Button>
 				</div>
@@ -77,7 +88,12 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 				</div>
 			}
 		>
-			<form id="journey-event-form" onSubmit={onSubmit}>
+			<form
+				id="journey-event-form"
+				onSubmit={(e) => {
+					onSubmit(e).catch(console.error)
+				}}
+			>
 				<div className="grid h-full grid-cols-3 gap-8">
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-col gap-2">

@@ -15,7 +15,7 @@ import Feature from "./Feature"
 import Story from "./Story"
 import {elementRegistry} from "./utils/globals"
 import {genMeta} from "./utils/meta"
-import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
+import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
 import {sortEpics} from "~/utils/storyMap"
 
@@ -26,13 +26,13 @@ export type StoryMapProps = {
 
 const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 	const [storyMapState] = useDocumentData(
-		doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
+		doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
 		{
 			initialValue: {
 				id: activeProduct.storyMapStateId,
 				items: {},
 				productId: activeProduct.id,
-				ref: doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
+				ref: doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
 			},
 		},
 	)

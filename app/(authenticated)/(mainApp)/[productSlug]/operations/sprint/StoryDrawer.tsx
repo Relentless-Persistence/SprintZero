@@ -8,7 +8,7 @@ import {
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Button, Checkbox, Drawer, Tag, Input, Form} from "antd"
+import {Button, Checkbox, Drawer, Form, Input, Tag} from "antd"
 import clsx from "clsx"
 import {collection, setDoc} from "firebase/firestore"
 import produce from "immer"
@@ -28,8 +28,8 @@ import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {sprintColumns, StoryMapStates, StorySchema} from "~/types/db/StoryMapStates"
-import {VersionConverter, Versions} from "~/types/db/Versions"
+import {StorySchema, sprintColumns} from "~/types/db/StoryMapStates"
+import {VersionConverter} from "~/types/db/Versions"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
@@ -87,7 +87,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 	})
 
 	const [versions] = useCollectionData(
-		collection(db, StoryMapStates._, storyMapState.id, Versions._).withConverter(VersionConverter),
+		collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter),
 	)
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {

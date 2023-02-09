@@ -2,10 +2,11 @@ import {Button, Card, Input, Skeleton, Space} from "antd"
 import {useEffect, useState} from "react"
 
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 
 export type FinalStepProps = {
 	gptResponse: string | undefined
-	onFinish: (finalVision: string) => void
+	onFinish: (finalVision: string) => Promisable<void>
 	onCancel: () => void
 }
 
@@ -37,7 +38,14 @@ const FinalStep: FC<FinalStepProps> = ({gptResponse, onFinish, onCancel}) => {
 				<Button disabled={!gptResponse} onClick={() => onCancel()} className="bg-white">
 					Cancel
 				</Button>
-				<Button type="primary" disabled={!gptResponse} onClick={() => onFinish(visionDraft!)} className="bg-green">
+				<Button
+					type="primary"
+					disabled={!gptResponse}
+					onClick={() => {
+						Promise.resolve(onFinish(visionDraft!)).catch(console.error)
+					}}
+					className="bg-green"
+				>
 					Save
 				</Button>
 			</Space>

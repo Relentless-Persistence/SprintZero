@@ -4,6 +4,7 @@ import {Input} from "antd"
 import Image from "next/image"
 
 import type {FC} from "react"
+
 import {privacyStatement} from "~/components/privacy"
 
 const PrivacyPage: FC = () => {

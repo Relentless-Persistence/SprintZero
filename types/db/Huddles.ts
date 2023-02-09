@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const HuddleSchema = z.object({
 	blockers: z.array(
@@ -22,6 +22,5 @@ export const HuddleSchema = z.object({
 	userId: idSchema,
 })
 
-export const Huddles = genDbNames(`Huddles`, HuddleSchema)
 export type Huddle = z.infer<typeof HuddleSchema>
 export const HuddleConverter = genConverter(HuddleSchema)

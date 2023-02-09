@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const CommentSchema = z.object({
 	text: z.string(),
@@ -10,6 +10,5 @@ export const CommentSchema = z.object({
 	parentId: z.string(),
 })
 
-export const Comments = genDbNames(`Comments`, CommentSchema)
 export type Comment = z.infer<typeof CommentSchema>
 export const CommentConverter = genConverter(CommentSchema)

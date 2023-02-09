@@ -12,12 +12,11 @@ import type {Id, WithDocumentData} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
-import {StoryMapStates} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
 import {getFeatures} from "~/utils/storyMap"
 
 const debouncedSetStoryMapState = debounce(async (id: Id, data: StoryMapState) => {
-	await setDoc(doc(db, StoryMapStates._, id), data)
+	await setDoc(doc(db, `StoryMapStates`, id), data)
 }, 100)
 
 export type FeatureProps = {

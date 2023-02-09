@@ -11,8 +11,8 @@ import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
 import SprintColumn from "./SprintColumn"
-import {ProductConverter, Products} from "~/types/db/Products"
-import {sprintColumns, StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
+import {ProductConverter} from "~/types/db/Products"
+import {StoryMapStateConverter, sprintColumns} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -26,10 +26,10 @@ const findPreviousOccurenceOfDayOfWeek = (date: Dayjs, dayOfWeek: number) => {
 
 const SprintPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [storyMapState] = useDocumentData(
 		activeProduct
-			? doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
+			? doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
 			: undefined,
 	)
 

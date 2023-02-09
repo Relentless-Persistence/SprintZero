@@ -9,6 +9,7 @@ module.exports = {
 		eqeqeq: `warn`,
 		"import/no-anonymous-default-export": `warn`,
 		"import/no-named-as-default": `off`,
+		"import/no-named-as-default-member": `off`,
 		"import/order": [
 			`warn`,
 			{
@@ -74,6 +75,7 @@ module.exports = {
 				"@typescript-eslint/no-unsafe-assignment": `warn`,
 				"@typescript-eslint/no-unsafe-call": `warn`,
 				"@typescript-eslint/no-unsafe-member-access": `warn`,
+				"@typescript-eslint/no-unsafe-return": `off`,
 				"@typescript-eslint/no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
 				"@typescript-eslint/quotes": [`warn`, `backtick`],
 				"prefer-const": `off`,

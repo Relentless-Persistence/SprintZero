@@ -8,8 +8,8 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
-import {ProductConverter, Products} from "~/types/db/Products"
-import {UserConverter, Users} from "~/types/db/Users"
+import {ProductConverter} from "~/types/db/Products"
+import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
 
@@ -17,7 +17,7 @@ const TeamSettingsPage: FC = () => {
 	const user = useUser()
 	const [allProducts] = useCollectionData(
 		user
-			? query(collection(db, Products._), where(`${Products.members}.${user.id}.type`, `==`, `editor`)).withConverter(
+			? query(collection(db, `Products`), where(`members.${user.id}.type`, `==`, `editor`)).withConverter(
 					ProductConverter,
 			  )
 			: undefined,
@@ -33,7 +33,7 @@ const TeamSettingsPage: FC = () => {
 					.filter(([, info]) => info?.type === currentTab)
 					.map(([id]) => ({
 						queryKey: [`user`, id],
-						queryFn: async () => (await getDoc(doc(db, Users._, id).withConverter(UserConverter))).data(),
+						queryFn: async () => (await getDoc(doc(db, `Users`, id).withConverter(UserConverter))).data(),
 					}))
 			: [],
 	})

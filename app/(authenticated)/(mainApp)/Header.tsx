@@ -11,18 +11,18 @@ import type {FC} from "react"
 
 import SettingsMenu from "./SettingsMenu"
 import LinkTo from "~/components/LinkTo"
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Header: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const [user] = useAuthState(auth)
 	invariant(user, `User state not loaded`)
 	const [allProducts] = useCollectionDataOnce(
-		query(collection(db, Products._), where(`${Products.members}.${user.uid}.type`, `==`, `editor`)).withConverter(
+		query(collection(db, `Products`), where(`members.${user.uid}.type`, `==`, `editor`)).withConverter(
 			ProductConverter,
 		),
 	)

@@ -1,7 +1,7 @@
 import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genDbNames, idSchema, genConverter} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const ProductSchema = z.object({
 	// General product info
@@ -48,7 +48,6 @@ export const ProductSchema = z.object({
 	),
 })
 
-export const Products = genDbNames(`Products`, ProductSchema)
 export type Product = z.infer<typeof ProductSchema>
 export const ProductConverter = genConverter(ProductSchema)
 

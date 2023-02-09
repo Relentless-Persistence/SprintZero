@@ -8,13 +8,13 @@ import type {FC} from "react"
 
 import EpicsTab from "./epicsTab/EpicsTab"
 import FeaturesTab from "./featuresTab/FeaturesTab"
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const PrioritiesPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	if (!activeProduct) return null
 	return (

@@ -6,6 +6,7 @@ import type {SetRequired} from "type-fest"
 
 import TextListEditor from "../TextListEditor"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
 export type RhfTextListEditorProps<TFieldValues extends FieldValues> = SetRequired<
 	UseControllerProps<TFieldValues>,

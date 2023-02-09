@@ -7,18 +7,18 @@ import {useDocumentData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 
 import Story from "./Story"
-import {ProductConverter, Products} from "~/types/db/Products"
-import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
+import {ProductConverter} from "~/types/db/Products"
+import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const EthicsPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [storyMapState] = useDocumentData(
 		activeProduct
-			? doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
+			? doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
 			: undefined,
 	)
 	const stories = storyMapState ? getStories(storyMapState) : []

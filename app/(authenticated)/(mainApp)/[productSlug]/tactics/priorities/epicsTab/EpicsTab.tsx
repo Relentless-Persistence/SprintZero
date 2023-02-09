@@ -12,7 +12,7 @@ import type {Product} from "~/types/db/Products"
 import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "../globals"
 import PrioritiesMatrix from "../PrioritiesMatrix"
-import {StoryMapStateConverter, StoryMapStates} from "~/types/db/StoryMapStates"
+import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
 import {getEpics} from "~/utils/storyMap"
 
@@ -22,7 +22,7 @@ export type EpicsTabProps = {
 
 const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 	const [storyMapState] = useDocumentData(
-		doc(db, StoryMapStates._, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
+		doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
 	)
 
 	const epics = storyMapState ? getEpics(storyMapState) : []

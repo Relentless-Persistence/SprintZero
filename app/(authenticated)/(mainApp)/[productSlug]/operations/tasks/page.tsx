@@ -2,17 +2,17 @@
 
 import {Breadcrumb, Button, Tabs} from "antd"
 import dayjs from "dayjs"
-import {addDoc, collection, doc, query, Timestamp, updateDoc, where} from "firebase/firestore"
+import {Timestamp, addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 
-import type {FC, ComponentProps} from "react"
+import type {ComponentProps, FC} from "react"
 import type {Id} from "~/types"
 import type {Task} from "~/types/db/Tasks"
 
 import TaskColumn from "./TaskColumn"
 import TaskDrawer from "./TaskDrawer"
-import {TaskConverter, Tasks} from "~/types/db/Tasks"
+import {TaskConverter} from "~/types/db/Tasks"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -22,7 +22,7 @@ const TasksPage: FC = () => {
 
 	const activeProductId = useActiveProductId()
 	const [tasks, loading] = useCollectionData(
-		query(collection(db, Tasks._), where(Tasks.productId, `==`, activeProductId)).withConverter(TaskConverter),
+		query(collection(db, `Tasks`), where(`productId`, `==`, activeProductId)).withConverter(TaskConverter),
 	)
 
 	return (
@@ -94,13 +94,13 @@ const TasksPage: FC = () => {
 					onCancel={() => setEditingTask(undefined)}
 					onCommit={async (data) => {
 						if (editingTask === `new`) {
-							await addDoc(collection(db, Tasks._), {
+							await addDoc(collection(db, `Tasks`), {
 								...data,
 								dueDate: Timestamp.fromDate(data.dueDate.toDate()),
 								productId: activeProductId,
 							} satisfies Task)
 						} else {
-							await updateDoc(doc(db, Tasks._, editingTask), {
+							await updateDoc(doc(db, `Tasks`, editingTask), {
 								...data,
 								dueDate: Timestamp.fromDate(data.dueDate.toDate()),
 							} satisfies Partial<Task>)

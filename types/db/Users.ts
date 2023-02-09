@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames} from "~/types"
+import {genConverter} from "~/types"
 
 export const UserSchema = z.object({
 	avatar: z.string().nullable(),
@@ -9,6 +9,5 @@ export const UserSchema = z.object({
 	name: z.string(),
 })
 
-export const Users = genDbNames(`Users`, UserSchema)
 export type User = z.infer<typeof UserSchema>
 export const UserConverter = genConverter(UserSchema)

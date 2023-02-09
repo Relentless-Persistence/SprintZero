@@ -6,7 +6,6 @@ import type {FC} from "react"
 import type {Product} from "~/types/db/Products"
 
 import StretchyTextArea from "~/components/StretchyTextArea"
-import {Products} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -35,11 +34,14 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 							size="small"
 							type="primary"
 							className="bg-green"
-							onClick={async () => {
-								await updateDoc(doc(db, Products._, activeProductId), {
+							onClick={() => {
+								updateDoc(doc(db, `Products`, activeProductId), {
 									problemStatement: textDraft,
 								} satisfies Partial<Product>)
-								onEditEnd()
+									.then(() => {
+										onEditEnd()
+									})
+									.catch(console.error)
 							}}
 						>
 							Done

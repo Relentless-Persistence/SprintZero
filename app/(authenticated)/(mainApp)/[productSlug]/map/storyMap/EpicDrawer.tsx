@@ -9,8 +9,8 @@ import type {StoryMapMeta} from "./utils/meta"
 import type {FC} from "react"
 
 import Comments from "~/components/Comments"
-import {ProductConverter, Products} from "~/types/db/Products"
-import {UserConverter, Users} from "~/types/db/Users"
+import {ProductConverter} from "~/types/db/Products"
+import {UserConverter} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -40,12 +40,12 @@ const EpicDrawer: FC<EpicDrawerProps> = ({meta, epicId, isOpen, onClose}) => {
 	})
 
 	const activeProductId = useActiveProductId()
-	const [product] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const productMembers = useQueries({
 		queries: product
 			? Object.keys(product.members).map((userId) => ({
 					queryKey: [`user`, userId],
-					queryFn: async () => (await getDoc(doc(db, Users._, userId).withConverter(UserConverter))).data(),
+					queryFn: async () => (await getDoc(doc(db, `Users`, userId).withConverter(UserConverter))).data(),
 			  }))
 			: [],
 	})

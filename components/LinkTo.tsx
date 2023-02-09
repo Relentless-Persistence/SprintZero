@@ -5,7 +5,7 @@
 import Link from "next/link"
 import {forwardRef} from "react"
 
-import type {ForwardedRef, ReactNode, ReactElement, ComponentPropsWithoutRef} from "react"
+import type {ComponentPropsWithoutRef, ForwardedRef, ReactElement, ReactNode} from "react"
 
 export type Props = Omit<ComponentPropsWithoutRef<typeof Link>, "href" | "rel" | "target" | "ref"> & {
 	href?: string | null

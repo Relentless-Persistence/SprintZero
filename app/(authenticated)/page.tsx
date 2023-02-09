@@ -9,7 +9,7 @@ import invariant from "tiny-invariant"
 
 import type {FC} from "react"
 
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 
 const HomePage: FC = () => {
@@ -18,7 +18,7 @@ const HomePage: FC = () => {
 	invariant(user, `User must be logged in.`)
 
 	const [products, loading] = useCollectionDataOnce(
-		query(collection(db, Products._), where(`${Products.members}.${user.uid}.type`, `==`, `editor`)).withConverter(
+		query(collection(db, `Products`), where(`members.${user.uid}.type`, `==`, `editor`)).withConverter(
 			ProductConverter,
 		),
 	)

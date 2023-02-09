@@ -10,7 +10,7 @@ import type {Learning} from "~/types/db/Learnings"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
-import {Learnings, LearningSchema} from "~/types/db/Learnings"
+import {LearningSchema} from "~/types/db/Learnings"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -36,8 +36,8 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 
 	const activeProductId = useActiveProductId()
 	const onSubmit = handleSubmit(async (data) => {
-		if (item.id) await updateDoc(doc(db, Learnings._, item.id), data satisfies Partial<Learning>)
-		else await addDoc(collection(db, Learnings._), {...data, productId: activeProductId} satisfies Learning)
+		if (item.id) await updateDoc(doc(db, `Learnings`, item.id), data satisfies Partial<Learning>)
+		else await addDoc(collection(db, `Learnings`), {...data, productId: activeProductId} satisfies Learning)
 		onEditEnd()
 	})
 
@@ -63,7 +63,13 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 			}
 		>
 			{isEditing ? (
-				<form id="learning-form" onSubmit={onSubmit} className="flex flex-col gap-4">
+				<form
+					id="learning-form"
+					onSubmit={(e) => {
+						onSubmit(e).catch(console.error)
+					}}
+					className="flex flex-col gap-4"
+				>
 					<RhfSegmented
 						control={control}
 						name="status"
@@ -76,7 +82,13 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 					/>
 					<RhfStretchyTextArea control={control} name="text" minHeight="4rem" />
 					{item.id && (
-						<Button danger onClick={async () => await deleteDoc(doc(db, Learnings._, item.id!))} className="w-full">
+						<Button
+							danger
+							onClick={() => {
+								deleteDoc(doc(db, `Learnings`, item.id!)).catch(console.error)
+							}}
+							className="w-full"
+						>
 							Remove
 						</Button>
 					)}

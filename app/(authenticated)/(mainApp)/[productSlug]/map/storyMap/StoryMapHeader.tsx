@@ -6,7 +6,7 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 import type {Dispatch, FC, SetStateAction} from "react"
 import type {Id} from "~/types"
 
-import {VersionConverter, Versions} from "~/types/db/Versions"
+import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 
 export type StoryMapHeaderProps = {
@@ -15,7 +15,7 @@ export type StoryMapHeaderProps = {
 }
 
 const StoryMapHeader: FC<StoryMapHeaderProps> = ({currentVersionId, setNewVersionInputValue}) => {
-	const [versions] = useCollectionData(collection(db, Versions._).withConverter(VersionConverter))
+	const [versions] = useCollectionData(collection(db, `Versions`).withConverter(VersionConverter))
 
 	return (
 		<div className="flex flex-col gap-8">

@@ -4,6 +4,7 @@ import {useEffect, useState} from "react"
 import {useFieldArray, useForm} from "react-hook-form"
 
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 import type {RetrospectiveItem} from "~/types/db/RetrospectiveItems"
 
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
@@ -17,7 +18,7 @@ type FormInputs = Omit<RetrospectiveItem, `productId` | `userId`>
 export type RetrospectiveDrawerProps = {
 	initialValues: FormInputs
 	onCancel: () => void
-	onCommit: (values: FormInputs) => void
+	onCommit: (values: FormInputs) => Promisable<void>
 }
 
 const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCancel, onCommit}) => {
@@ -34,7 +35,9 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 
 	const onSubmit = handleSubmit((data) => {
 		setIsOpen(false)
-		setTimeout(() => onCommit(data), 300)
+		setTimeout(() => {
+			Promise.resolve(onCommit(data)).catch(console.error)
+		}, 300)
 	})
 
 	return (
@@ -62,7 +65,13 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 			closable={false}
 			maskClosable={false}
 		>
-			<form id="retrospective-form" onSubmit={onSubmit} className="grid h-full grid-cols-[2fr_1fr] gap-8">
+			<form
+				id="retrospective-form"
+				onSubmit={(e) => {
+					onSubmit(e).catch(console.error)
+				}}
+				className="grid h-full grid-cols-[2fr_1fr] gap-8"
+			>
 				{/* Left column */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex gap-4">

@@ -1,7 +1,7 @@
 import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const EpicSchema = z.object({
 	type: z.literal(`epic`),
@@ -78,7 +78,6 @@ export const StoryMapStateSchema = z.object({
 	productId: idSchema,
 })
 
-export const StoryMapStates = genDbNames(`StoryMapStates`, StoryMapStateSchema)
 export type StoryMapState = z.infer<typeof StoryMapStateSchema>
 
 export const StoryMapStateConverter = genConverter(StoryMapStateSchema)

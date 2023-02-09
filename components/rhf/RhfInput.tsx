@@ -31,6 +31,7 @@ const formatAsCurrency = (str: string) => {
 	return `$${newStr}`
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
 export type RhfInputProps<TFieldValues extends FieldValues> = Omit<AntdInputProps, `ref`> &
 	SetRequired<UseControllerProps<TFieldValues>, `control`> & {

@@ -12,8 +12,8 @@ import type {Id} from "~/types"
 import AccessibilityItemCard from "./AccessibilityItemCard"
 import LinkTo from "~/components/LinkTo"
 import NoData from "~/components/NoData"
-import {AccessibilityItemConverter, AccessibilityItems} from "~/types/db/AccessibilityItems"
-import {ProductConverter, Products} from "~/types/db/Products"
+import {AccessibilityItemConverter} from "~/types/db/AccessibilityItems"
+import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -32,17 +32,16 @@ const Accessibility = () => {
 	const [itemDraft, setItemDraft] = useState<{name: string; text: string} | undefined>(undefined)
 	const [missionStatement, setMissionStatement] = useState(``)
 
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	useEffect(() => {
 		setMissionStatement(activeProduct?.accessibilityMissionStatements[currentTab] ?? ``)
 	}, [activeProduct?.accessibilityMissionStatements, currentTab])
 
 	const [accessibilityItems] = useCollectionData(
-		query(
-			collection(db, AccessibilityItems._),
-			where(AccessibilityItems.productId, `==`, activeProductId),
-		).withConverter(AccessibilityItemConverter),
+		query(collection(db, `AccessibilityItems`), where(`productId`, `==`, activeProductId)).withConverter(
+			AccessibilityItemConverter,
+		),
 	)
 
 	const currentItems = accessibilityItems?.filter((item) => item.type === currentTab)
@@ -78,7 +77,7 @@ const Accessibility = () => {
 					value={missionStatement}
 					onChange={(e) => {
 						setMissionStatement(e.target.value)
-						updateDoc(doc(db, Products._, activeProductId), {
+						updateDoc(doc(db, `Products`, activeProductId), {
 							accessibilityMissionStatements: {
 								...activeProduct!.accessibilityMissionStatements,
 								[currentTab]: e.target.value,
@@ -135,7 +134,7 @@ const Accessibility = () => {
 											type="primary"
 											className="bg-green"
 											onClick={() => {
-												addDoc(collection(db, AccessibilityItems._), {
+												addDoc(collection(db, `AccessibilityItems`), {
 													item: {
 														name: itemDraft.name,
 														text: itemDraft.text,

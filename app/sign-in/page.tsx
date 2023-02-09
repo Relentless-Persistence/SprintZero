@@ -2,13 +2,7 @@
 
 import {AppleFilled, GithubOutlined} from "@ant-design/icons"
 import {notification} from "antd"
-import {
-	fetchSignInMethodsForEmail,
-	linkWithCredential,
-	OAuthProvider,
-	signInWithPopup,
-	signOut,
-} from "firebase/auth"
+import {OAuthProvider, linkWithCredential, signInWithPopup, signOut} from "firebase/auth"
 import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
@@ -19,15 +13,15 @@ import type {AuthProvider} from "firebase/auth"
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
-import {ProductConverter, Products} from "~/types/db/Products"
-import {UserConverter, Users} from "~/types/db/Users"
+import {ProductConverter} from "~/types/db/Products"
+import {UserConverter} from "~/types/db/Users"
 import {
 	appleAuthProvider,
 	auth,
 	db,
+	githubAuthProvider,
 	googleAuthProvider,
 	microsoftAuthProvider,
-	githubAuthProvider,
 } from "~/utils/firebase"
 
 const SignInPage: FC = () => {
@@ -58,11 +52,11 @@ const SignInPage: FC = () => {
 			setHasSignedIn(true)
 			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 
-			const user = (await getDoc(doc(db, Users._, res.user.uid).withConverter(UserConverter))).data()
+			const user = (await getDoc(doc(db, `Users`, res.user.uid).withConverter(UserConverter))).data()
 			const isNewUser = !user
 
 			if (isNewUser) {
-				await setDoc(doc(db, Users._, res.user.uid), {
+				await setDoc(doc(db, `Users`, res.user.uid), {
 					avatar: res.user.photoURL,
 					email: res.user.email,
 					hasAcceptedTos: false,
@@ -75,8 +69,8 @@ const SignInPage: FC = () => {
 			} else {
 				const {docs: products} = await getDocs(
 					query(
-						collection(db, Products._),
-						where(`${Products.members}.${res.user.uid}.type`, `==`, `editor`),
+						collection(db, `Products`),
+						where(`Products.members.${res.user.uid}.type`, `==`, `editor`),
 					).withConverter(ProductConverter),
 				)
 				if (products.length === 0) router.push(`/product`)
@@ -90,28 +84,27 @@ const SignInPage: FC = () => {
 
 	const handleOnClick = async (provider: AuthProvider) => {
 		signInWithPopup(auth, provider)
-		.then((res) => {
-			processUser(res)
-		})
-		.catch((error) => {
-			if (error.code === "auth/account-exists-with-different-credential") {
-				const email = error.customData.email
-				const credential = OAuthProvider.credentialFromError(error)
-				const verifiedProvider = getProviderForProviderId(error.customData._tokenResponse.verifiedProvider[0])
+			.then((res) => {
+				processUser(res)
+			})
+			.catch((error) => {
+				if (error.code === `auth/account-exists-with-different-credential`) {
+					const email = error.customData.email
+					const credential = OAuthProvider.credentialFromError(error)
+					const verifiedProvider = getProviderForProviderId(error.customData._tokenResponse.verifiedProvider[0])
 
-				signInWithPopup(auth, verifiedProvider).then((result) => {
-					const user = result.user
-					// processUser(result)
-					linkWithCredential(user, credential)
-					.then((usercred) => {
-						processUser(result);
+					signInWithPopup(auth, verifiedProvider).then((result) => {
+						const user = result.user
+						// processUser(result)
+						linkWithCredential(user, credential).then((usercred) => {
+							processUser(result)
+						})
 					})
-				})
-			} else {
-				console.error(error.message)
-				notification.error({message: `An error occurred while trying to log you in.`})
-			}
-		})
+				} else {
+					console.error(error.message)
+					notification.error({message: `An error occurred while trying to log you in.`})
+				}
+			})
 	}
 
 	return (

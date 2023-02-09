@@ -10,7 +10,7 @@ import type {Journey} from "~/types/db/Journeys"
 
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {JourneyConverter, Journeys, JourneySchema} from "~/types/db/Journeys"
+import {JourneyConverter, JourneySchema} from "~/types/db/Journeys"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -25,7 +25,7 @@ export type AddJourneyPageProps = {
 const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 	const activeProductId = useActiveProductId()
 	const [journeys] = useCollectionData(
-		query(collection(db, Journeys._), where(Journeys.productId, `==`, activeProductId)).withConverter(JourneyConverter),
+		query(collection(db, `Journeys`), where(`productId`, `==`, activeProductId)).withConverter(JourneyConverter),
 	)
 
 	const {control, handleSubmit} = useForm<FormInputs>({
@@ -37,7 +37,7 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
-		const ref = await addDoc(collection(db, Journeys._), {
+		const ref = await addDoc(collection(db, `Journeys`), {
 			...data,
 			productId: activeProductId,
 		} satisfies Journey)
@@ -51,7 +51,12 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 				<Breadcrumb.Item>Journeys</Breadcrumb.Item>
 			</Breadcrumb>
 			<div className="grid grow place-items-center">
-				<Form layout="vertical" onFinish={() => onSubmit()}>
+				<Form
+					layout="vertical"
+					onFinish={() => {
+						onSubmit().catch(console.error)
+					}}
+				>
 					<div className="flex flex-col gap-4">
 						<h1 className="text-2xl font-semibold">Create Journey</h1>
 						<Form.Item label={<span className="text-gray">Please provide a name:</span>}>

@@ -13,9 +13,11 @@ const SignOutPage: FC = () => {
 	const [signOut] = useSignOut(auth)
 
 	useEffect(() => {
-		signOut().then(() => {
-			router.replace(`/sign-in`)
-		})
+		signOut()
+			.then(() => {
+				router.replace(`/sign-in`)
+			})
+			.catch(console.error)
 	}, [router, signOut])
 
 	return null

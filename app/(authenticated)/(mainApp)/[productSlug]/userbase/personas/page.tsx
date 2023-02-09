@@ -1,6 +1,6 @@
 "use client"
 
-import {Breadcrumb, Tabs, Input} from "antd"
+import {Breadcrumb, Input, Tabs} from "antd"
 import {addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
@@ -10,7 +10,7 @@ import type {Persona} from "~/types/db/Personas"
 
 import EditableListCard from "~/app/(authenticated)/(mainApp)/[productSlug]/userbase/personas/EditableListCard"
 import PersonaDescriptionCard from "~/app/(authenticated)/(mainApp)/[productSlug]/userbase/personas/PersonaDescriptionCard"
-import {Personas, PersonaConverter} from "~/types/db/Personas"
+import {PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -32,7 +32,7 @@ const PersonasPage: FC = () => {
 	>(undefined)
 
 	const [personas] = useCollectionData(
-		query(collection(db, Personas._), where(Personas.productId, `==`, activeProductId)).withConverter(PersonaConverter),
+		query(collection(db, `Personas`), where(`productId`, `==`, activeProductId)).withConverter(PersonaConverter),
 	)
 
 	const hasSetDefaultPersona = useRef(false)
@@ -73,7 +73,7 @@ const PersonasPage: FC = () => {
 												list={persona.goals}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {goals: list} satisfies Partial<Persona>)
+													await updateDoc(doc(db, `Personas`, persona.id), {goals: list} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
 												}}
 											/>
@@ -84,7 +84,7 @@ const PersonasPage: FC = () => {
 												list={persona.interactions}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {
+													await updateDoc(doc(db, `Personas`, persona.id), {
 														interactions: list,
 													} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -97,7 +97,7 @@ const PersonasPage: FC = () => {
 												list={persona.tasks}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {tasks: list} satisfies Partial<Persona>)
+													await updateDoc(doc(db, `Personas`, persona.id), {tasks: list} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
 												}}
 											/>
@@ -108,7 +108,7 @@ const PersonasPage: FC = () => {
 												list={persona.responsibilities}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {
+													await updateDoc(doc(db, `Personas`, persona.id), {
 														responsibilities: list,
 													} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -121,7 +121,7 @@ const PersonasPage: FC = () => {
 												list={persona.priorities}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {
+													await updateDoc(doc(db, `Personas`, persona.id), {
 														priorities: list,
 													} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -134,7 +134,7 @@ const PersonasPage: FC = () => {
 												list={persona.frustrations}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {
+													await updateDoc(doc(db, `Personas`, persona.id), {
 														frustrations: list,
 													} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -147,7 +147,7 @@ const PersonasPage: FC = () => {
 												list={persona.changes}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {changes: list} satisfies Partial<Persona>)
+													await updateDoc(doc(db, `Personas`, persona.id), {changes: list} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
 												}}
 											/>
@@ -170,7 +170,7 @@ const PersonasPage: FC = () => {
 												list={persona.dayInTheLife}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
-													await updateDoc(doc(db, Personas._, persona.id), {
+													await updateDoc(doc(db, `Personas`, persona.id), {
 														dayInTheLife: list,
 													} satisfies Partial<Persona>)
 													setIsEditingCard(undefined)
@@ -191,9 +191,9 @@ const PersonasPage: FC = () => {
 								size="small"
 								value={newPersonaInput}
 								onChange={(e) => setNewPersonaInput(e.target.value)}
-								onKeyDown={async (e) => {
+								onKeyDown={(e) => {
 									if (e.key === `Enter`) {
-										const ref = await addDoc(collection(db, Personas._), {
+										addDoc(collection(db, `Personas`), {
 											changes: [],
 											dayInTheLife: [],
 											description: ``,
@@ -207,8 +207,11 @@ const PersonasPage: FC = () => {
 											productId: activeProductId,
 											prevQnA: ``,
 										} satisfies Persona)
-										setActiveTab(ref.id)
-										setNewPersonaInput(undefined)
+											.then((ref) => {
+												setActiveTab(ref.id)
+												setNewPersonaInput(undefined)
+											})
+											.catch(console.error)
 									}
 								}}
 								className="-mx-4 w-16"

@@ -8,7 +8,7 @@ import {
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Button, Checkbox, Drawer, Tag, Input, Form} from "antd"
+import {Button, Checkbox, Drawer, Form, Input, Tag} from "antd"
 import clsx from "clsx"
 import {collection, doc} from "firebase/firestore"
 import produce from "immer"
@@ -27,9 +27,9 @@ import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {ProductConverter, Products} from "~/types/db/Products"
-import {sprintColumns, StoryMapStates, StorySchema} from "~/types/db/StoryMapStates"
-import {VersionConverter, Versions} from "~/types/db/Versions"
+import {ProductConverter} from "~/types/db/Products"
+import {StorySchema, sprintColumns} from "~/types/db/StoryMapStates"
+import {VersionConverter} from "~/types/db/Versions"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
@@ -64,7 +64,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	}, [story.description])
 
 	const activeProductId = useActiveProductId()
-	const [product] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -86,7 +86,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	})
 
 	const [versions] = useCollectionData(
-		collection(db, StoryMapStates._, meta.id, Versions._).withConverter(VersionConverter),
+		collection(db, `StoryMapStates`, meta.id, `Versions`).withConverter(VersionConverter),
 	)
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {

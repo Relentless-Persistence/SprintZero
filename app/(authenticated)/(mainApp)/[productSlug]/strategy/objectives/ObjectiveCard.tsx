@@ -10,7 +10,6 @@ import type {WithDocumentData} from "~/types"
 import type {Objective} from "~/types/db/Objectives"
 
 import StretchyTextArea from "~/components/StretchyTextArea"
-import {Objectives} from "~/types/db/Objectives"
 import {db} from "~/utils/firebase"
 
 export type ObjectiveCardProps = {
@@ -46,22 +45,24 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 							size="small"
 							type="primary"
 							className="bg-green"
-							onClick={async () => {
+							onClick={() => {
 								if (result) {
 									const results = produce(objective.results, (draft) => {
 										const index = draft.findIndex((item) => item.id === result.id)
 										draft[index]!.name = titleDraft
 										draft[index]!.text = textDraft
 									})
-									await updateDoc(doc(db, Objectives._, objective.id), {results} satisfies Partial<Objective>)
+									updateDoc(doc(db, `Objectives`, objective.id), {results} satisfies Partial<Objective>).catch(
+										console.error,
+									)
 								} else {
-									await updateDoc(doc(db, Objectives._, objective.id), {
+									updateDoc(doc(db, `Objectives`, objective.id), {
 										results: arrayUnion({
 											id: nanoid(),
 											name: titleDraft,
 											text: textDraft,
 										} satisfies Objective["results"][number]),
-									} satisfies WithFieldValue<Partial<Objective>>)
+									} satisfies WithFieldValue<Partial<Objective>>).catch(console.error)
 								}
 							}}
 						>

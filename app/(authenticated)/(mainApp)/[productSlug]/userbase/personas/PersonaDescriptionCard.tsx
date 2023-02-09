@@ -1,18 +1,14 @@
-import {Button, Card} from "antd"
+import {Card} from "antd"
 import axios from "axios"
 import {collection, doc, onSnapshot, query, updateDoc, where} from "firebase/firestore"
-import {useState, useEffect} from "react"
+import {useEffect, useState} from "react"
 import {z} from "zod"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {Persona} from "~/types/db/Personas"
+import type {Dialogue} from "~/types/db/Dialogues"
 
-import StretchyTextArea from "~/components/StretchyTextArea"
-import {Personas} from "~/types/db/Personas"
-import {Dialogues, DialogueConverter, Dialogue} from "~/types/db/Dialogues"
 import {db} from "~/utils/firebase"
-import {useCollectionData} from "react-firebase-hooks/firestore"
 
 export type PersonaDescriptionCardProps = {
 	personaId: Id
@@ -40,7 +36,7 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = ({
 
 	const fetchDialogueNotes = () => {
 		const q = query(
-			collection(db, "Dialogues"),
+			collection(db, `Dialogues`),
 			where(`productId`, `==`, productId),
 			where(`persona`, `==`, personaName),
 		)
@@ -72,11 +68,11 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = ({
 				setTextDraft(res.trimStart())
 
 				let prevQnA
-				if (typeof dialogueNotes === "object") {
+				if (typeof dialogueNotes === `object`) {
 					prevQnA = JSON.stringify(dialogueNotes)
 				}
 
-				await updateDoc(doc(db, "Personas", personaId), {
+				await updateDoc(doc(db, `Personas`, personaId), {
 					prevQnA,
 					description: res.trimStart(),
 				})

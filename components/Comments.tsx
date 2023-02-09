@@ -10,9 +10,8 @@ import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {Id} from "~/types"
 
-import {CommentConverter, Comments as DbComments} from "~/types/db/Comments"
-import {StoryMapStates} from "~/types/db/StoryMapStates"
-import {UserConverter, Users} from "~/types/db/Users"
+import {CommentConverter} from "~/types/db/Comments"
+import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {addComment} from "~/utils/mutations"
 import {useUser} from "~/utils/useUser"
@@ -44,8 +43,8 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 
 	const [comments] = useCollectionData(
 		query(
-			collection(db, StoryMapStates._, storyMapStateId, DbComments._),
-			where(DbComments.parentId, `==`, parentId),
+			collection(db, `StoryMapStates`, storyMapStateId, `Comments`),
+			where(`Comments.parentId`, `==`, parentId),
 		).withConverter(CommentConverter),
 	)
 
@@ -53,7 +52,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 	const commentAuthors = useQueries({
 		queries: commentAuthorIds.map((userId) => ({
 			queryKey: [`user`, userId],
-			queryFn: async () => (await getDoc(doc(db, Users._, userId).withConverter(UserConverter))).data(),
+			queryFn: async () => (await getDoc(doc(db, `Users`, userId).withConverter(UserConverter))).data(),
 		})),
 	})
 

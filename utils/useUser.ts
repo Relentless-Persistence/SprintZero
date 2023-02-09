@@ -7,13 +7,13 @@ import type {WithDocumentData} from "~/types"
 import type {User} from "~/types/db/Users"
 
 import {auth, db} from "./firebase"
-import {UserConverter, Users} from "~/types/db/Users"
+import {UserConverter} from "~/types/db/Users"
 
 export const useUser = (): WithDocumentData<User> | undefined => {
 	const [user] = useAuthState(auth)
 	invariant(user, `User is not logged in`)
 
-	const [dbUser, loading] = useDocumentData(doc(db, Users._, user.uid).withConverter(UserConverter))
+	const [dbUser, loading] = useDocumentData(doc(db, `Users`, user.uid).withConverter(UserConverter))
 
 	if (loading) {
 		return undefined
@@ -24,12 +24,13 @@ export const useUser = (): WithDocumentData<User> | undefined => {
 			invariant(user.email, `User has no email`)
 			invariant(user.displayName, `User has no name`)
 
-			setDoc(doc(db, Users._, user.uid), {
+			setDoc(doc(db, `Users`, user.uid), {
 				avatar: user.photoURL,
 				email: user.email,
 				hasAcceptedTos: false,
 				name: user.displayName,
-			} satisfies User)
+			} satisfies User).catch(console.error)
+
 			return undefined
 		}
 	}

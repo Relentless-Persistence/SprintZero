@@ -9,6 +9,7 @@ import type {SetRequired} from "type-fest"
 
 import StretchyTextArea from "../StretchyTextArea"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
 export type RhfStretchyTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<
 	StretchyTextAreaProps,

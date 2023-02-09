@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const PersonaSchema = z.object({
 	prevQnA: z.string(),
@@ -58,6 +58,5 @@ export const PersonaSchema = z.object({
 	productId: idSchema,
 })
 
-export const Personas = genDbNames(`Personas`, PersonaSchema)
 export type Persona = z.infer<typeof PersonaSchema>
 export const PersonaConverter = genConverter(PersonaSchema)

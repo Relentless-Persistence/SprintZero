@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const DialogueSchema = z.object({
 	name: z.string(),
@@ -17,6 +17,5 @@ export const DialogueSchema = z.object({
 	productId: idSchema,
 })
 
-export const Dialogues = genDbNames(`Dialogues`, DialogueSchema)
 export type Dialogue = z.infer<typeof DialogueSchema>
 export const DialogueConverter = genConverter(DialogueSchema)

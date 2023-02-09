@@ -13,9 +13,9 @@ import type {WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {Huddle} from "~/types/db/Huddles"
 
-import {HuddleConverter, Huddles} from "~/types/db/Huddles"
-import {ProductConverter, Products} from "~/types/db/Products"
-import {UserConverter, Users} from "~/types/db/Users"
+import {HuddleConverter} from "~/types/db/Huddles"
+import {ProductConverter} from "~/types/db/Products"
+import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -31,7 +31,7 @@ const tabs = [
 
 const HuddlePage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const [currentTab, setCurrentTab] = useState<(typeof tabs)[number][`key`]>(tabs[0].key)
 	const [newBlockerText, setNewBlockerText] = useState(``)
@@ -43,8 +43,8 @@ const HuddlePage: FC = () => {
 	const formattedDateYesterday = dayjs(date).subtract(1, `day`).format(`YYYY-MM-DD`)
 	const [huddles] = useCollectionData(
 		query(
-			collection(db, Products._, activeProductId, Huddles._),
-			where(Huddles.date, `in`, [formattedDateToday, formattedDateYesterday]),
+			collection(db, `Products`, activeProductId, `Huddles`),
+			where(`date`, `in`, [formattedDateToday, formattedDateYesterday]),
 		).withConverter(HuddleConverter),
 	)
 
@@ -52,7 +52,7 @@ const HuddlePage: FC = () => {
 		queries: activeProduct
 			? Object.keys(activeProduct.members).map((userId) => ({
 					queryKey: [`user`, userId],
-					queryFn: async () => (await getDoc(doc(db, Users._, userId).withConverter(UserConverter))).data(),
+					queryFn: async () => (await getDoc(doc(db, `Users`, userId).withConverter(UserConverter))).data(),
 			  }))
 			: [],
 	})
@@ -94,7 +94,7 @@ const HuddlePage: FC = () => {
 														checked={blocker.checked}
 														onChange={(e) => {
 															updateDoc(
-																doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id),
+																doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id),
 																produce(huddleItemToday, (draft) => {
 																	draft.blockers.find(({id}) => id === blocker.id)!.checked = e.target.checked
 																}),
@@ -115,7 +115,7 @@ const HuddlePage: FC = () => {
 														onKeyDown={(e) => {
 															if (e.key === `Enter`) {
 																if (huddleItemToday) {
-																	updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id), {
+																	updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id), {
 																		blockers: arrayUnion({
 																			id: nanoid(),
 																			checked: false,
@@ -125,7 +125,7 @@ const HuddlePage: FC = () => {
 																		.then(() => setNewBlockerText(``))
 																		.catch(console.error)
 																} else {
-																	addDoc(collection(db, Products._, activeProductId, Huddles._), {
+																	addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
 																		blockers: [{id: nanoid(), checked: false, name: newBlockerText}],
 																		date: formattedDateToday,
 																		tasks: [],
@@ -150,7 +150,7 @@ const HuddlePage: FC = () => {
 														checked={task.checked}
 														onChange={(e) => {
 															updateDoc(
-																doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id),
+																doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id),
 																produce(huddleItemToday, (draft) => {
 																	draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
 																}),
@@ -171,7 +171,7 @@ const HuddlePage: FC = () => {
 														onKeyDown={(e) => {
 															if (e.key === `Enter`) {
 																if (huddleItemToday) {
-																	updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemToday.id), {
+																	updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id), {
 																		tasks: arrayUnion({
 																			id: nanoid(),
 																			checked: false,
@@ -181,7 +181,7 @@ const HuddlePage: FC = () => {
 																		.then(() => setNewTaskTodayText(``))
 																		.catch(console.error)
 																} else {
-																	addDoc(collection(db, Products._, activeProductId, Huddles._), {
+																	addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
 																		blockers: [],
 																		date: formattedDateToday,
 																		tasks: [{id: nanoid(), checked: false, name: newTaskTodayText}],
@@ -206,7 +206,7 @@ const HuddlePage: FC = () => {
 														checked={task.checked}
 														onChange={(e) => {
 															updateDoc(
-																doc(db, Products._, activeProductId, Huddles._, huddleItemYesterday.id),
+																doc(db, `Products`, activeProductId, `Huddles`, huddleItemYesterday.id),
 																produce(huddleItemYesterday, (draft) => {
 																	draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
 																}),
@@ -227,7 +227,7 @@ const HuddlePage: FC = () => {
 														onKeyDown={(e) => {
 															if (e.key === `Enter`) {
 																if (huddleItemYesterday) {
-																	updateDoc(doc(db, Products._, activeProductId, Huddles._, huddleItemYesterday.id), {
+																	updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemYesterday.id), {
 																		tasks: arrayUnion({
 																			id: nanoid(),
 																			checked: false,
@@ -237,7 +237,7 @@ const HuddlePage: FC = () => {
 																		.then(() => setNewTaskYesterdayText(``))
 																		.catch(console.error)
 																} else {
-																	addDoc(collection(db, Products._, activeProductId, Huddles._), {
+																	addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
 																		blockers: [],
 																		date: formattedDateYesterday,
 																		tasks: [{id: nanoid(), checked: false, name: newTaskYesterdayText}],

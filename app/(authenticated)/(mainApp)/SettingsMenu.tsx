@@ -18,7 +18,7 @@ const SettingsMenu: FC<SettingsMenuProps> = ({onClose}) => {
 	return (
 		<div className="flex h-full flex-col justify-between">
 			<Menu
-				selectedKeys={[`settings-${(pathname ?? ``).split(`/`).at(-1)}`]}
+				selectedKeys={[`settings-${(pathname ?? ``).split(`/`).at(-1)!}`]}
 				items={[
 					{
 						key: `settings-account`,

@@ -1,12 +1,13 @@
 import {Button} from "antd"
 
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 
 export type EditButtonsProps = {
 	onEditStart: () => void
 	onEditEnd: () => void
 	isEditing: boolean
-	onCommit: () => void
+	onCommit: () => Promisable<void>
 }
 
 const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, onCommit}) => {
@@ -21,8 +22,11 @@ const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, o
 					size="small"
 					className="bg-green"
 					onClick={() => {
-						onCommit()
-						onEditEnd()
+						Promise.resolve(onCommit())
+							.then(() => {
+								onEditEnd()
+							})
+							.catch(console.error)
 					}}
 				>
 					Done

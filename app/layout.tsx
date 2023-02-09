@@ -4,7 +4,7 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
 import {ConfigProvider} from "antd"
 import {z} from "zod"
 
-import type {ReactNode, FC} from "react"
+import type {FC, ReactNode} from "react"
 
 import "./styles.css"
 

@@ -1,7 +1,7 @@
 "use client"
 
 import {AimOutlined} from "@ant-design/icons"
-import {Input, Breadcrumb, Button, Empty, Tabs} from "antd"
+import {Breadcrumb, Button, Empty, Input, Tabs} from "antd"
 import {addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
@@ -12,7 +12,7 @@ import type {Id} from "~/types"
 import type {Objective} from "~/types/db/Objectives"
 
 import ObjectiveCard from "./ObjectiveCard"
-import {ObjectiveConverter, Objectives} from "~/types/db/Objectives"
+import {ObjectiveConverter} from "~/types/db/Objectives"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -20,9 +20,7 @@ const ObjectivesPage: FC = () => {
 	const activeProductId = useActiveProductId()
 
 	const [objectives] = useCollectionData(
-		query(collection(db, Objectives._), where(Objectives.productId, `==`, activeProductId)).withConverter(
-			ObjectiveConverter,
-		),
+		query(collection(db, `Objectives`), where(`productId`, `==`, activeProductId)).withConverter(ObjectiveConverter),
 	)
 
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<Id | `empty`>(`empty`)
@@ -62,11 +60,11 @@ const ObjectivesPage: FC = () => {
 					<Input
 						addonBefore={<AimOutlined />}
 						value={statement}
-						onChange={async (e) => {
+						onChange={(e) => {
 							setStatement(e.target.value)
-							await updateDoc(doc(db, Objectives._, currentObjective.id), {
+							updateDoc(doc(db, `Objectives`, currentObjective.id), {
 								statement,
-							} satisfies Partial<Objective>)
+							} satisfies Partial<Objective>).catch(console.error)
 						}}
 					/>
 				)}
@@ -116,15 +114,18 @@ const ObjectivesPage: FC = () => {
 			<Tabs
 				tabPosition="right"
 				activeKey={currentObjectiveId}
-				onChange={async (key: Id | `new`) => {
+				onChange={(key: Id | `new`) => {
 					if (key === `new`) {
-						const ref = await addDoc(collection(db, Objectives._), {
+						addDoc(collection(db, `Objectives`), {
 							name: String(objectives!.length + 1).padStart(3, `0`),
 							results: [],
 							statement: ``,
 							productId: activeProductId,
 						} satisfies Objective)
-						setCurrentObjectiveId(ref.id as Id)
+							.then((ref) => {
+								setCurrentObjectiveId(ref.id as Id)
+							})
+							.catch(console.error)
 					} else {
 						setCurrentObjectiveId(key)
 						setStatement(objectives?.find((objective) => objective.id === key)?.statement || ``)

@@ -11,15 +11,15 @@ import type {Id} from "~/types"
 
 import AddJourneyPage from "./AddJourneyPage"
 import EventDrawer from "./EventDrawer"
-import {JourneyEventConverter, JourneyEvents} from "~/types/db/JourneyEvents"
-import {durationUnits, JourneyConverter, Journeys} from "~/types/db/Journeys"
+import {JourneyEventConverter} from "~/types/db/JourneyEvents"
+import {JourneyConverter, durationUnits} from "~/types/db/Journeys"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const JourneysPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [journeys, loading] = useCollectionData(
-		query(collection(db, Journeys._), where(Journeys.productId, `==`, activeProductId)).withConverter(JourneyConverter),
+		query(collection(db, `Journeys`), where(`productId`, `==`, activeProductId)).withConverter(JourneyConverter),
 	)
 
 	const [activeJourney, setActiveJourney] = useState<Id | `new` | undefined>(undefined)
@@ -30,7 +30,7 @@ const JourneysPage: FC = () => {
 
 	const [journeyEvents] = useCollectionData(
 		activeJourney !== undefined && activeJourney !== `new`
-			? collection(db, Journeys._, activeJourney, JourneyEvents._).withConverter(JourneyEventConverter)
+			? collection(db, `Journeys`, activeJourney, `JourneyEvents`).withConverter(JourneyEventConverter)
 			: undefined,
 	)
 
@@ -144,14 +144,14 @@ const JourneysPage: FC = () => {
 					activeEvent={activeEvent}
 					onClose={() => setActiveEvent(undefined)}
 					onCommit={async (data) => {
-						if (activeEvent === `new`) await addDoc(collection(db, Journeys._, journey.id, JourneyEvents._), data)
-						else if (activeEvent) await updateDoc(doc(db, Journeys._, journey.id, JourneyEvents._, activeEvent), data)
+						if (activeEvent === `new`) await addDoc(collection(db, `Journeys`, journey.id, `JourneyEvents`), data)
+						else if (activeEvent) await updateDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEvent), data)
 
 						setActiveEvent(undefined)
 					}}
 					onDelete={async () => {
 						if (activeEvent !== undefined && activeEvent !== `new`)
-							await deleteDoc(doc(db, Journeys._, journey.id, JourneyEvents._, activeEvent))
+							await deleteDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEvent))
 					}}
 				/>
 			)}

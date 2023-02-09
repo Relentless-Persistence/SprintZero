@@ -10,14 +10,14 @@ import type {FC} from "react"
 import EditButtons from "./EditButtons"
 import ProblemStatementCard from "./ProblemStatementCard"
 import TextListEditor from "../../../../../../components/TextListEditor"
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const KickoffPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [editingSection, setEditingSection] = useState<
 		`problemStatement` | `personas` | `successMetrics` | `businessPriorities` | undefined
 	>(undefined)
@@ -57,12 +57,12 @@ const KickoffPage: FC = () => {
 									setEditingSection(undefined)
 								}}
 								isEditing={editingSection === `personas`}
-								onCommit={() =>
-									updateProduct({
+								onCommit={async () => {
+									await updateProduct({
 										id: activeProduct!.id,
 										data: {personas: textListState.filter((item) => item.text !== ``)},
 									})
-								}
+								}}
 							/>
 						}
 					>
@@ -93,12 +93,12 @@ const KickoffPage: FC = () => {
 									setEditingSection(undefined)
 								}}
 								isEditing={editingSection === `successMetrics`}
-								onCommit={() =>
-									updateProduct({
+								onCommit={async () => {
+									await updateProduct({
 										id: activeProduct!.id,
 										data: {successMetrics: textListState.filter((item) => item.text !== ``)},
 									})
-								}
+								}}
 							/>
 						}
 					>

@@ -9,7 +9,7 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 import type {Product} from "~/types/db/Products"
 
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import roundToNearest from "~/utils/roundToNearest"
 import {useUser} from "~/utils/useUser"
@@ -18,7 +18,7 @@ const ConfigSettingsPage: FC = () => {
 	const user = useUser()
 	const [allProducts] = useCollectionData(
 		user
-			? query(collection(db, Products._), where(`${Products.members}.${user.id}.type`, `==`, `editor`)).withConverter(
+			? query(collection(db, `Products`), where(`members.${user.id}.type`, `==`, `editor`)).withConverter(
 					ProductConverter,
 			  )
 			: undefined,
@@ -62,9 +62,11 @@ const ConfigSettingsPage: FC = () => {
 					<span>Product Title</span>
 					<Input
 						value={title}
-						onChange={async (e) => {
+						onChange={(e) => {
 							setTitle(e.target.value)
-							await updateDoc(doc(db, Products._, firstProduct!.id), {name: e.target.value} satisfies Partial<Product>)
+							updateDoc(doc(db, `Products`, firstProduct!.id), {name: e.target.value} satisfies Partial<Product>).catch(
+								console.error,
+							)
 						}}
 						className="w-72"
 					/>
@@ -80,11 +82,11 @@ const ConfigSettingsPage: FC = () => {
 							{label: `Three`, value: 3},
 							{label: `Four`, value: 4},
 						]}
-						onChange={async (value) => {
+						onChange={(value) => {
 							setCadence(value as number)
-							await updateDoc(doc(db, Products._, firstProduct!.id), {
+							updateDoc(doc(db, `Products`, firstProduct!.id), {
 								cadence: value as number,
-							} satisfies Partial<Product>)
+							} satisfies Partial<Product>).catch(console.error)
 						}}
 						className="w-fit"
 					/>
@@ -101,11 +103,11 @@ const ConfigSettingsPage: FC = () => {
 							{label: `Thursday`, value: 4},
 							{label: `Friday`, value: 5},
 						]}
-						onChange={async (value) => {
+						onChange={(value) => {
 							setGate(value as number)
-							await updateDoc(doc(db, Products._, firstProduct!.id), {
+							updateDoc(doc(db, `Products`, firstProduct!.id), {
 								sprintStartDayOfWeek: value as number,
-							} satisfies Partial<Product>)
+							} satisfies Partial<Product>).catch(console.error)
 						}}
 						className="w-fit"
 					/>
@@ -115,11 +117,13 @@ const ConfigSettingsPage: FC = () => {
 					<span>Cost per Story Point</span>
 					<Input
 						value={effortCost ? `$${effortCost}` : undefined}
-						onChange={async (e) => {
+						onChange={(e) => {
 							setEffortCost(e.target.value.replace(/^\$/, ``).replace(/(\.[0-9]{2}).+$/, `$1`))
 							const value =
 								e.target.value === `` ? null : roundToNearest(parseFloat(e.target.value.replace(/[^0-9.]/, ``)), 0.01)
-							await updateDoc(doc(db, Products._, firstProduct!.id), {effortCost: value} satisfies Partial<Product>)
+							updateDoc(doc(db, `Products`, firstProduct!.id), {effortCost: value} satisfies Partial<Product>).catch(
+								console.error,
+							)
 						}}
 						className="w-24"
 					/>
@@ -137,7 +141,7 @@ const ConfigSettingsPage: FC = () => {
 								{
 									key: `confirm`,
 									label: `Confirm`,
-									onClick: async () => {
+									onClick: () => {
 										// await Promise.all([
 										// ])
 									},

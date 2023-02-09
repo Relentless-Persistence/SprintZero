@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const RetrospectiveItemSchema = z.object({
 	description: z.string(),
@@ -18,7 +18,6 @@ export const RetrospectiveItemSchema = z.object({
 	userId: idSchema,
 })
 
-export const RetrospectiveItems = genDbNames(`RetrospectiveItems`, RetrospectiveItemSchema)
 export type RetrospectiveItem = z.infer<typeof RetrospectiveItemSchema>
 export const RetrospectiveItemConverter = genConverter(RetrospectiveItemSchema)
 

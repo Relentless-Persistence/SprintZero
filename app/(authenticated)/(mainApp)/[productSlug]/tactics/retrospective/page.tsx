@@ -13,8 +13,8 @@ import type {RetrospectiveItem} from "~/types/db/RetrospectiveItems"
 
 import RetrospectiveDrawer from "./RetrospectiveDrawer"
 import NoData from "~/components/NoData"
-import {RetrospectiveItemConverter, RetrospectiveItems, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
-import {UserConverter, Users} from "~/types/db/Users"
+import {RetrospectiveItemConverter, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
+import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
@@ -24,10 +24,9 @@ const RetrospectivePage: FC = () => {
 
 	const activeProductId = useActiveProductId()
 	const [retrospectiveItems, loading] = useCollectionData(
-		query(
-			collection(db, RetrospectiveItems._),
-			where(RetrospectiveItems.productId, `==`, activeProductId),
-		).withConverter(RetrospectiveItemConverter),
+		query(collection(db, `RetrospectiveItems`), where(`productId`, `==`, activeProductId)).withConverter(
+			RetrospectiveItemConverter,
+		),
 	)
 
 	const [currentTab, setCurrentTab] = useState<`enjoyable` | `puzzling` | `frustrating`>(`enjoyable`)
@@ -38,7 +37,7 @@ const RetrospectivePage: FC = () => {
 	const usersData = useQueries({
 		queries: itemsForCurrentTab.map((item) => ({
 			queryKey: [`user`, item.userId],
-			queryFn: async () => (await getDoc(doc(db, Users._, item.userId).withConverter(UserConverter))).data(),
+			queryFn: async () => (await getDoc(doc(db, `Users`, item.userId).withConverter(UserConverter))).data(),
 		})),
 	})
 
@@ -147,9 +146,9 @@ const RetrospectivePage: FC = () => {
 							userId: user!.id,
 						}
 						if (usersOwnItem) {
-							await setDoc(doc(db, RetrospectiveItems._, usersOwnItem.id), data)
+							await setDoc(doc(db, `RetrospectiveItems`, usersOwnItem.id), data)
 						} else {
-							await addDoc(collection(db, RetrospectiveItems._), data)
+							await addDoc(collection(db, `RetrospectiveItems`), data)
 						}
 						setIsDrawerOpen(false)
 					}}

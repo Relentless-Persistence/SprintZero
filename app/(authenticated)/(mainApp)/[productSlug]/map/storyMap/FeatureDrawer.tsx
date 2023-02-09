@@ -9,7 +9,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import Comments from "~/components/Comments"
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -23,7 +23,7 @@ export type FeatureDrawerProps = {
 
 const FeatureDrawer: FC<FeatureDrawerProps> = ({meta, featureId, isOpen, onClose}) => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const [editMode, setEditMode] = useState(false)
 	const feature = meta.features.find((feature) => feature.id === featureId)!

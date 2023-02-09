@@ -19,9 +19,7 @@ import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {Products, ProductSchema} from "~/types/db/Products"
-import {StoryMapStates} from "~/types/db/StoryMapStates"
-import {Versions} from "~/types/db/Versions"
+import {ProductSchema} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 
 const numSlides = 4
@@ -44,7 +42,7 @@ const ProductSetupPage: FC = () => {
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
 
 		const storyMapStateId = (
-			await addDoc(collection(db, StoryMapStates._), {
+			await addDoc(collection(db, `StoryMapStates`), {
 				items: {},
 				productId: slug,
 			} satisfies StoryMapState)
@@ -71,9 +69,9 @@ const ProductSetupPage: FC = () => {
 			finalVision: ``,
 			updates: [],
 		} satisfies Product)
-		await setDoc(doc(db, Products._, slug), finalData)
+		await setDoc(doc(db, `Products`, slug), finalData)
 
-		await addDoc(collection(db, StoryMapStates._, storyMapStateId, Versions._), {
+		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), {
 			name: `1.0`,
 		} satisfies Version)
 

@@ -9,7 +9,7 @@ import type {AccessibilityItem} from "~/types/db/AccessibilityItems"
 
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
-import {AccessibilityItemSchema, AccessibilityItems} from "~/types/db/AccessibilityItems"
+import {AccessibilityItemSchema} from "~/types/db/AccessibilityItems"
 import {db} from "~/utils/firebase"
 
 const formSchema = AccessibilityItemSchema.pick({name: true, text: true, type: true})
@@ -33,7 +33,7 @@ const AccessibilityItemCard: FC<AccessibilityItemCardProps> = ({item, isEditing,
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
-		await updateDoc(doc(db, AccessibilityItems._, item.id), data)
+		await updateDoc(doc(db, `AccessibilityItems`, item.id), data)
 	})
 
 	return (
@@ -58,11 +58,19 @@ const AccessibilityItemCard: FC<AccessibilityItemCardProps> = ({item, isEditing,
 			}
 		>
 			{isEditing ? (
-				<form id="accessibility-item-form" onSubmit={onSubmit} className="flex flex-col gap-2">
+				<form
+					id="accessibility-item-form"
+					onSubmit={(e) => {
+						onSubmit(e).catch(console.error)
+					}}
+					className="flex flex-col gap-2"
+				>
 					<RhfStretchyTextArea control={control} name="text" />
 					<Button
 						danger
-						onClick={async () => await deleteDoc(doc(db, AccessibilityItems._, item.id))}
+						onClick={() => {
+							deleteDoc(doc(db, `AccessibilityItems`, item.id)).catch(console.error)
+						}}
 						className="w-full"
 					>
 						Remove

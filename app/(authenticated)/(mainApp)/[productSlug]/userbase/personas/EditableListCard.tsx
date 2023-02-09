@@ -2,8 +2,9 @@ import {Button, Card, Input} from "antd"
 import {useState} from "react"
 
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 
-import TextListEditor from "../../../../../../components/TextListEditor"
+import TextListEditor from "~/components/TextListEditor"
 
 export type EditableListCardProps = {
 	isEditing: boolean
@@ -11,7 +12,7 @@ export type EditableListCardProps = {
 	title: string
 	list: Array<{id: string; text: string}>
 	onCancel: () => void
-	onCommit: (title: string, list: Array<{id: string; text: string}>) => void
+	onCommit: (title: string, list: Array<{id: string; text: string}>) => Promisable<void>
 	onDelete?: () => void
 }
 
@@ -47,12 +48,14 @@ const EditableListCard: FC<EditableListCardProps> = ({
 							size="small"
 							type="primary"
 							className="bg-green"
-							onClick={() =>
-								onCommit(
-									titleDraft,
-									listDraft.filter((item) => item.text !== ``),
-								)
-							}
+							onClick={() => {
+								Promise.resolve(
+									onCommit(
+										titleDraft,
+										listDraft.filter((item) => item.text !== ``),
+									),
+								).catch(console.error)
+							}}
 						>
 							Done
 						</Button>

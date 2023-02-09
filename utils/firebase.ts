@@ -1,5 +1,5 @@
 import {initializeApp} from "firebase/app"
-import {getAuth, GoogleAuthProvider, OAuthProvider, GithubAuthProvider} from "firebase/auth"
+import {GithubAuthProvider, GoogleAuthProvider, OAuthProvider, getAuth} from "firebase/auth"
 import {connectFirestoreEmulator, getFirestore} from "firebase/firestore"
 
 const firebaseConfig = {

@@ -7,9 +7,9 @@ import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocumentDataOnce} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
-import type {ReactNode, FC} from "react"
+import type {FC, ReactNode} from "react"
 
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -23,7 +23,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	invariant(user, `User must be logged in.`)
 	const activeProductId = useActiveProductId()
 
-	const [product, loading] = useDocumentDataOnce(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [product, loading] = useDocumentDataOnce(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	useEffect(() => {
 		if (!product && !loading) router.replace(`/`)

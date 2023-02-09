@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames} from "~/types"
+import {genConverter} from "~/types"
 
 export const JourneyEventSchema = z.object({
 	description: z.string(),
@@ -11,6 +11,5 @@ export const JourneyEventSchema = z.object({
 	subject: z.string(),
 })
 
-export const JourneyEvents = genDbNames(`JourneyEvents`, JourneyEventSchema)
 export type JourneyEvent = z.infer<typeof JourneyEventSchema>
 export const JourneyEventConverter = genConverter(JourneyEventSchema)

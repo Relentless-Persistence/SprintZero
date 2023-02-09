@@ -10,7 +10,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import LearningItemCard from "./LearningCard"
-import {LearningConverter, Learnings} from "~/types/db/Learnings"
+import {LearningConverter} from "~/types/db/Learnings"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -25,9 +25,7 @@ const LearningsPage: FC = () => {
 
 	const activeProductId = useActiveProductId()
 	const [learnings] = useCollectionData(
-		query(collection(db, Learnings._), where(Learnings.productId, `==`, activeProductId)).withConverter(
-			LearningConverter,
-		),
+		query(collection(db, `Learnings`), where(`productId`, `==`, activeProductId)).withConverter(LearningConverter),
 	)
 	const [activeLearning, setActiveLearning] = useState<Id | `new` | undefined>(undefined)
 

@@ -10,8 +10,7 @@ import type {Id} from "~/types"
 
 import StoryDrawer from "./StoryDrawer"
 import {elementRegistry} from "./utils/globals"
-import {StoryMapStates} from "~/types/db/StoryMapStates"
-import {VersionConverter, Versions} from "~/types/db/Versions"
+import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 
 export type StoryProps = {
@@ -38,7 +37,7 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 
 	const [versions] = useCollectionData(
 		query(
-			collection(db, StoryMapStates._, meta.id, Versions._),
+			collection(db, `StoryMapStates`, meta.id, `Versions`),
 			where(documentId(), `==`, story.versionId),
 		).withConverter(VersionConverter),
 	)

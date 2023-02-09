@@ -8,6 +8,7 @@ import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {SetRequired} from "type-fest"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
 export type RhfSelectProps<TFieldValues extends FieldValues> = Omit<AntdSelectProps, `ref`> &
 	SetRequired<UseControllerProps<TFieldValues>, `control`>

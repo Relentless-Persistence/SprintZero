@@ -5,6 +5,7 @@ import {useFieldArray, useForm} from "react-hook-form"
 
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
+import type {Promisable} from "type-fest"
 import type {Task} from "~/types/db/Tasks"
 
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
@@ -17,7 +18,7 @@ type FormInputs = Omit<Task, `productId` | `dueDate`> & {dueDate: Dayjs}
 export type TaskDrawerProps = {
 	initialValues: FormInputs
 	onCancel: () => void
-	onCommit: (values: FormInputs) => void
+	onCommit: (values: FormInputs) => Promisable<void>
 }
 
 const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) => {
@@ -34,7 +35,9 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 
 	const onSubmit = handleSubmit((data) => {
 		setIsOpen(false)
-		setTimeout(() => onCommit(data), 300)
+		setTimeout(() => {
+			Promise.resolve(onCommit(data)).catch(console.error)
+		}, 300)
 	})
 
 	return (
@@ -62,7 +65,13 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 			closable={false}
 			maskClosable={false}
 		>
-			<form id="task-form" onSubmit={onSubmit} className="grid h-full grid-cols-3 gap-8">
+			<form
+				id="task-form"
+				onSubmit={(e) => {
+					onSubmit(e).catch(console.error)
+				}}
+				className="grid h-full grid-cols-3 gap-8"
+			>
 				{/* Column 1 */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">

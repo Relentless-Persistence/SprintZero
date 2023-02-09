@@ -12,14 +12,13 @@ import type {StoryMapState} from "~/types/db/StoryMapStates"
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import VersionList from "./storyMap/VersionList"
-import {ProductConverter, Products} from "~/types/db/Products"
-import {StoryMapStates} from "~/types/db/StoryMapStates"
+import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Dashboard: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__` | undefined>(undefined)
 	const [newVesionInputValue, setNewVesionInputValue] = useState<string | undefined>(undefined)
@@ -55,7 +54,7 @@ const Dashboard: FC = () => {
 					type="button"
 					className="fixed bottom-8 right-8 rounded-md border border-laurel px-2 py-1 text-laurel transition-colors hover:border-black hover:text-black"
 					onClick={() => {
-						setDoc(doc(db, StoryMapStates._, activeProduct.storyMapStateId), {
+						setDoc(doc(db, `StoryMapStates`, activeProduct.storyMapStateId), {
 							items: {},
 							productId: activeProduct.id,
 						} satisfies StoryMapState).catch(console.error)

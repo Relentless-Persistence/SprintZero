@@ -1,10 +1,10 @@
 "use client"
 
 import {useQueries} from "@tanstack/react-query"
-import {Button, Tag, Timeline, Breadcrumb, Card, Steps} from "antd"
+import {Breadcrumb, Button, Card, Steps, Tag, Timeline} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {doc, getDoc, Timestamp} from "firebase/firestore"
+import {Timestamp, doc, getDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
@@ -18,8 +18,8 @@ import FinalStep from "./FinalStep"
 import ResponseStep from "./ResponseStep"
 import StatementStep from "./StatementStep"
 import NoData from "~/components/NoData"
-import {ProductConverter, Products} from "~/types/db/Products"
-import {UserConverter, Users} from "~/types/db/Users"
+import {ProductConverter} from "~/types/db/Products"
+import {UserConverter} from "~/types/db/Users"
 import {auth, db} from "~/utils/firebase"
 import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -28,7 +28,7 @@ dayjs.extend(relativeTime)
 
 const VisionsPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [user] = useAuthState(auth)
 
 	const [editMode, setEditMode] = useState(false)
@@ -40,7 +40,7 @@ const VisionsPage: FC = () => {
 		queries:
 			activeProduct?.updates.map((update) => ({
 				queryKey: [`user`, update.userId],
-				queryFn: async () => (await getDoc(doc(db, Users._, update.userId).withConverter(UserConverter))).data(),
+				queryFn: async () => (await getDoc(doc(db, `Users`, update.userId).withConverter(UserConverter))).data(),
 			})) ?? [],
 	})
 

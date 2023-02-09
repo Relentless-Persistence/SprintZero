@@ -1,4 +1,4 @@
-import {Button, Card, Space, Skeleton} from "antd"
+import {Button, Card, Skeleton, Space} from "antd"
 import {doc} from "firebase/firestore"
 import {useState} from "react"
 import {useDocumentData} from "react-firebase-hooks/firestore"
@@ -6,7 +6,7 @@ import {useDocumentData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 
 import {generateProductVision} from "./getGptResponse"
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -18,7 +18,7 @@ export type ResponseStepProps = {
 
 const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFinish}) => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [isRedoing, setIsRedoing] = useState(false)
 
 	return (
@@ -40,16 +40,19 @@ const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFin
 					className="bg-white"
 					loading={isRedoing}
 					disabled={!gptResponse}
-					onClick={async () => {
+					onClick={() => {
 						if (isRedoing) return
 						setIsRedoing(true)
-						const newResponse = await generateProductVision({
+						generateProductVision({
 							productType: activeProduct!.productType,
 							valueProposition: activeProduct!.valueProposition,
 							features: activeProduct!.features.map((f) => f.text),
 						})
-						setGptResponse(newResponse)
-						setIsRedoing(false)
+							.then((newResponse) => {
+								setGptResponse(newResponse)
+								setIsRedoing(false)
+							})
+							.catch(console.error)
 					}}
 				>
 					Redo

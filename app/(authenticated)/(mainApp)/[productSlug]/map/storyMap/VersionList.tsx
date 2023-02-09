@@ -8,8 +8,7 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import {StoryMapStates} from "~/types/db/StoryMapStates"
-import {VersionConverter, Versions} from "~/types/db/Versions"
+import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 import {addVersion} from "~/utils/mutations"
 
@@ -29,7 +28,7 @@ const VersionList: FC<VersionListProps> = ({
 	storyMapStateId,
 }) => {
 	const [versions] = useCollectionData(
-		query(collection(db, StoryMapStates._, storyMapStateId, Versions._)).withConverter(VersionConverter),
+		query(collection(db, `StoryMapStates`, storyMapStateId, `Versions`)).withConverter(VersionConverter),
 	)
 	useEffect(() => {
 		if (currentVersionId === undefined && versions?.[0]) setCurrentVersionId(versions[0].id)

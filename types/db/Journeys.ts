@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, genDbNames, idSchema} from "~/types"
+import {genConverter, idSchema} from "~/types"
 
 export const JourneySchema = z.object({
 	duration: z.number(),
@@ -10,7 +10,6 @@ export const JourneySchema = z.object({
 	productId: idSchema,
 })
 
-export const Journeys = genDbNames(`Journeys`, JourneySchema)
 export type Journey = z.infer<typeof JourneySchema>
 export const JourneyConverter = genConverter(JourneySchema)
 

@@ -9,7 +9,6 @@ import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
 import {termsOfService} from "~/components/terms"
-import {Users} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
 
@@ -22,7 +21,7 @@ const TosPage: FC = () => {
 	const onAccept = async () => {
 		if (hasAccepted) return
 		setHasAccepted(true)
-		await updateDoc(doc(db, Users._, user!.id), {
+		await updateDoc(doc(db, `Users`, user!.id), {
 			hasAcceptedTos: true,
 		} satisfies Partial<User>)
 		router.push(`/product`)
@@ -54,7 +53,15 @@ const TosPage: FC = () => {
 				<Button className="bg-white" onClick={() => router.push(`/sign-out`)}>
 					Reject
 				</Button>
-				<Button type="primary" disabled={!agree} loading={hasAccepted} onClick={onAccept} className="bg-[#4a801d]">
+				<Button
+					type="primary"
+					disabled={!agree}
+					loading={hasAccepted}
+					onClick={() => {
+						onAccept().catch(console.error)
+					}}
+					className="bg-[#4a801d]"
+				>
 					Accept
 				</Button>
 			</div>

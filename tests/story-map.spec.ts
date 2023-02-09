@@ -1,4 +1,4 @@
-import {test, expect} from "@playwright/test"
+import {expect, test} from "@playwright/test"
 
 test.beforeEach(async ({page}) => {
 	await page.goto(`/produuuuuuuuct-a35e31/map`)

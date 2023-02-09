@@ -1,6 +1,6 @@
-import {Card, Form, Button} from "antd"
+import {Button, Card, Form} from "antd"
 import {diffArrays} from "diff"
-import {doc, Timestamp} from "firebase/firestore"
+import {Timestamp, doc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
@@ -16,7 +16,7 @@ import {generateProductVision} from "./getGptResponse"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
-import {ProductConverter, Products} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -24,7 +24,7 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const listToSentence = (list: string[]) => {
 	if (list.length === 0) return ``
 	if (list.length === 1) return list[0]!
-	const last = list.pop()
+	const last = list.pop()!
 	return `${list.join(`, `)}${list.length > 1 ? `,` : ``} and ${last}`
 }
 
@@ -41,7 +41,7 @@ export type BuildStatementProps = {
 
 const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, Products._, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [user] = useAuthState(auth)
 	const [status, setStatus] = useState<`initial` | `submitted` | `finished`>(`initial`)
 
@@ -127,7 +127,13 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 					boxShadow: `0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)`,
 				}}
 			>
-				<Form id="statement-form" layout="vertical" onFinish={() => onSubmit()}>
+				<Form
+					id="statement-form"
+					layout="vertical"
+					onFinish={() => {
+						onSubmit().catch(console.error)
+					}}
+				>
 					<div className="flex flex-col gap-4">
 						<Form.Item label={<span className="font-semibold">Type</span>}>
 							<RhfSegmented
