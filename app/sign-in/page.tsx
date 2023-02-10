@@ -2,7 +2,15 @@
 
 import {AppleFilled, GithubOutlined} from "@ant-design/icons"
 import {notification} from "antd"
-import {OAuthProvider, linkWithCredential, signInWithPopup, signOut, UserCredential, AuthCredential} from "firebase/auth"
+import {
+	OAuthProvider,
+	linkWithCredential,
+	signInWithPopup,
+	signOut,
+	UserCredential,
+	AuthCredential,
+	sendEmailVerification,
+} from "firebase/auth"
 import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
@@ -46,6 +54,14 @@ const SignInPage: FC = () => {
 		}
 	}
 
+	const verifyEmail = () => {
+		if (auth.currentUser !== null) {
+			sendEmailVerification(auth.currentUser).then(() => {
+				notification.success({message: `Email Verification`, description: `Please check your email to verify your account.`, placement: `bottomRight`})
+			})
+		}
+	}
+
 	const processUser = async (res: UserCredential) => {
 		if (!res.user.email) throw new Error(`No email address found for user.`)
 		if (!res.user.displayName) throw new Error(`No display name found for user.`)
@@ -59,6 +75,9 @@ const SignInPage: FC = () => {
 			const isNewUser = !user
 
 			if (isNewUser) {
+
+				verifyEmail() //verify email address
+
 				await setDoc(doc(db, `Users`, res.user.uid), {
 					avatar: res.user.photoURL,
 					email: res.user.email,
