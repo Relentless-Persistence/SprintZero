@@ -65,6 +65,7 @@ module.exports = {
 			rules: {
 				"@typescript-eslint/ban-ts-comment": [`warn`, {"ts-ignore": `allow-with-description`}],
 				"@typescript-eslint/consistent-type-imports": `warn`,
+				"@typescript-eslint/explicit-module-boundary-types": `warn`,
 				"@typescript-eslint/no-empty-function": `off`,
 				"@typescript-eslint/no-extra-semi": `off`,
 				"@typescript-eslint/no-floating-promises": `warn`,

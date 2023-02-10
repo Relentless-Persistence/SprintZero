@@ -33,11 +33,15 @@ const EpicDrawer: FC<EpicDrawerProps> = ({meta, epicId, isOpen, onClose}) => {
 	}, [epic.description])
 
 	let points = 0
-	epic.children.forEach((feature) => {
-		feature.children.forEach((story) => {
-			points += story.points
+	epic.childrenIds
+		.map((id) => meta.features.find((feature) => feature.id === id)!)
+		.forEach((feature) => {
+			feature.childrenIds
+				.map((id) => meta.stories.find((story) => story.id === id)!)
+				.forEach((story) => {
+					points += story.points
+				})
 		})
-	})
 
 	const activeProductId = useActiveProductId()
 	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))

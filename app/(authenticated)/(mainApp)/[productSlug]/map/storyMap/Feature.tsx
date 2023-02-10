@@ -35,7 +35,7 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 
 	return (
 		<div
-			className={clsx(`flex flex-col items-center`, dragInfo.itemBeingDragged === featureId && !inert && `invisible`)}
+			className={clsx(`flex flex-col items-center`, dragInfo.itemBeingDraggedId === featureId && !inert && `invisible`)}
 		>
 			<div
 				className={clsx(
@@ -50,11 +50,11 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 				<p>{feature.name}</p>
 			</div>
 
-			{(meta.currentVersionId !== `__ALL_VERSIONS__` || feature.children.length > 0) && (
+			{(meta.currentVersionId !== `__ALL_VERSIONS__` || feature.childrenIds.length > 0) && (
 				<div className="h-8 w-px border border-dashed border-[#006378]" />
 			)}
 
-			{feature.children.length === 0 ? (
+			{feature.childrenIds.length === 0 ? (
 				<button
 					type="button"
 					onClick={() => {
@@ -67,9 +67,11 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 				</button>
 			) : (
 				<div className="flex flex-col items-start gap-3 rounded-md border border-[#006378] bg-white p-3">
-					{feature.children.map((story) => (
-						<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
-					))}
+					{feature.childrenIds
+						.map((id) => meta.stories.find((story) => story.id === id)!)
+						.map((story) => (
+							<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
+						))}
 
 					{meta.currentVersionId !== `__ALL_VERSIONS__` && (
 						<button

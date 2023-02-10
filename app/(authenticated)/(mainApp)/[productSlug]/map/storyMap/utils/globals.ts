@@ -7,6 +7,6 @@ declare global {
 }
 
 export const storyMapTop = 224
-export const layerBoundaries: [number, number] = [62 + storyMapTop, 156 + storyMapTop]
+export const layerBoundaries = [62 + storyMapTop, 156 + storyMapTop] as const
 
 export let elementRegistry = globalThis.__elementRegistry ?? {}

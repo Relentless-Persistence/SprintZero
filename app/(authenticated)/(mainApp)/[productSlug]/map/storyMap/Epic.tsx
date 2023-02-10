@@ -37,9 +37,9 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 		<div
 			className={clsx(
 				`grid justify-items-center gap-x-4`,
-				dragInfo.itemBeingDragged === epicId && !inert && `invisible`,
+				dragInfo.itemBeingDraggedId === epicId && !inert && `invisible`,
 			)}
-			style={{gridTemplateColumns: `repeat(${epic.children.length}, auto)`}}
+			style={{gridTemplateColumns: `repeat(${epic.childrenIds.length}, auto)`}}
 		>
 			<div
 				className={clsx(
@@ -55,14 +55,14 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 			</div>
 
 			{/* Pad out the remaining columns in row 1 */}
-			{Array(Math.max(epic.children.length - 1, 0))
+			{Array(Math.max(epic.childrenIds.length - 1, 0))
 				.fill(undefined)
 				.map((_, i) => (
 					<div key={`row1-${i}`} />
 				))}
 
 			{/* Pad out the beginning columns in row 2 */}
-			{Array(Math.max(epic.children.length, 1))
+			{Array(Math.max(epic.childrenIds.length, 1))
 				.fill(undefined)
 				.map((_, i) => (
 					<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1rem-2px)]">
@@ -71,7 +71,7 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 							<div className="absolute left-1/2 top-0 h-[calc(50%-2px)] w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
 						)}
 						{/* Right */}
-						{i < epic.children.length - 1 && (
+						{i < epic.childrenIds.length - 1 && (
 							<div className="absolute left-1/2 top-1/2 h-px w-1/2 -translate-y-1/2 border border-dashed border-[#4f2dc8]" />
 						)}
 						{/* Bottom */}
@@ -81,7 +81,7 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 							<div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-dashed border-[#4f2dc8]" />
 						)}
 
-						{i === epic.children.length - 1 && epic.children.length > 0 && (
+						{i === epic.childrenIds.length - 1 && epic.childrenIds.length > 0 && (
 							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 								<button
 									type="button"
@@ -97,17 +97,19 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 					</div>
 				))}
 
-			{epic.children.map((feature) => (
-				<Feature key={feature.id} meta={meta} dragInfo={dragInfo} featureId={feature.id} inert={inert} />
-			))}
+			{epic.childrenIds
+				.map((id) => meta.features.find((feature) => id === feature.id)!)
+				.map((feature) => (
+					<Feature key={feature.id} meta={meta} dragInfo={dragInfo} featureId={feature.id} inert={inert} />
+				))}
 
-			{epic.children.length === 0 && (
+			{epic.childrenIds.length === 0 && (
 				<button
 					type="button"
 					onClick={() => {
 						meta.addFeature({parentId: epicId}).catch(console.error)
 					}}
-					className="flex items-center gap-2 rounded-md border border-dashed border-[currentColor] bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
+					className="flex items-center gap-2 rounded-md border border-dashed border-current bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
 				>
 					<CopyOutlined />
 					<span>Add feature</span>

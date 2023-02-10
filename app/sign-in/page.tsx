@@ -3,13 +3,12 @@
 import {AppleFilled, GithubOutlined} from "@ant-design/icons"
 import {notification} from "antd"
 import {
+	AuthCredential,
 	OAuthProvider,
 	linkWithCredential,
+	sendEmailVerification,
 	signInWithPopup,
 	signOut,
-	UserCredential,
-	AuthCredential,
-	sendEmailVerification,
 } from "firebase/auth"
 import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
@@ -17,7 +16,7 @@ import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 
-import type {AuthProvider} from "firebase/auth"
+import type {AuthProvider, UserCredential} from "firebase/auth"
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
@@ -43,11 +42,11 @@ const SignInPage: FC = () => {
 
 	const getProviderForProviderId = (providerId: string): AuthProvider => {
 		switch (providerId) {
-			case "google.com":
+			case `google.com`:
 				return googleAuthProvider
-			case "microsoft.com":
+			case `microsoft.com`:
 				return microsoftAuthProvider
-			case "github.com":
+			case `github.com`:
 				return githubAuthProvider
 			default:
 				throw new Error(`Unsupported provider: ${providerId}`)
@@ -57,7 +56,11 @@ const SignInPage: FC = () => {
 	const verifyEmail = () => {
 		if (auth.currentUser !== null) {
 			sendEmailVerification(auth.currentUser).then(() => {
-				notification.success({message: `Email Verification`, description: `Please check your email to verify your account.`, placement: `bottomRight`})
+				notification.success({
+					message: `Email Verification`,
+					description: `Please check your email to verify your account.`,
+					placement: `bottomRight`,
+				})
 			})
 		}
 	}
@@ -75,7 +78,6 @@ const SignInPage: FC = () => {
 			const isNewUser = !user
 
 			if (isNewUser) {
-
 				verifyEmail() //verify email address
 
 				await setDoc(doc(db, `Users`, res.user.uid), {

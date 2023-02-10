@@ -31,9 +31,11 @@ const FeatureDrawer: FC<FeatureDrawerProps> = ({meta, featureId, isOpen, onClose
 	const [description, setDescription] = useState(feature.description)
 
 	let points = 0
-	feature.children.forEach((story) => {
-		points += story.points
-	})
+	feature.childrenIds
+		.map((id) => meta.stories.find((story) => story.id === id)!)
+		.forEach((story) => {
+			points += story.points
+		})
 
 	return (
 		<Drawer

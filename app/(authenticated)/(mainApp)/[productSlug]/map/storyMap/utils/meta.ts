@@ -5,10 +5,17 @@ import {nanoid} from "nanoid"
 import type {SetRequired} from "type-fest"
 import type {Id, WithDocumentData} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
+import type {Version} from "~/types/db/Versions"
 
 import {avg} from "~/utils/math"
+import {sortEpics, sortFeatures, sortStories} from "~/utils/storyMap"
 
-export const genMeta = (storyMapState: WithDocumentData<StoryMapState>, currentVersionId: Id | `__ALL_VERSIONS__`) => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useGenMeta = (
+	storyMapState: WithDocumentData<StoryMapState>,
+	allVersions: Array<WithDocumentData<Version>>,
+	currentVersionId: Id | `__ALL_VERSIONS__`,
+) => {
 	const epics = Object.entries(storyMapState.items)
 		.filter(([, item]) => item?.type === `epic`)
 		.map(([id, item]) => ({id, ...item})) as Array<Epic & {id: Id}>
@@ -19,19 +26,41 @@ export const genMeta = (storyMapState: WithDocumentData<StoryMapState>, currentV
 		.filter(([, item]) => item?.type === `story`)
 		.map(([id, item]) => ({id, ...item})) as Array<Story & {id: Id}>
 
-	const featuresWithChildren = features.map((feature) => ({
-		...feature,
-		children: stories.filter((story) => story.parentId === feature.id),
+	const storiesWithExtra = stories.map((story) => {
+		const siblings = sortStories(
+			stories.filter((sibling) => sibling.parentId === story.parentId),
+			allVersions,
+		)
+		const position = siblings.findIndex((sibling) => sibling.id === story.id)
+
+		return {...story, position}
+	})
+	const featuresWithExtra = features.map((feature) => {
+		const siblings = sortFeatures(features.filter((sibling) => sibling.parentId === feature.parentId))
+		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
+
+		return {
+			...feature,
+			childrenIds: sortStories(
+				storiesWithExtra.filter((story) => story.parentId === feature.id),
+				allVersions,
+			).map((story) => story.id),
+			position,
+		}
+	})
+	const epicsWithExtra = sortEpics(epics).map((epic) => ({
+		...epic,
+		childrenIds: sortFeatures(featuresWithExtra.filter((feature) => feature.parentId === epic.id)).map(
+			(feature) => feature.id,
+		),
+		position: epics.findIndex((sibling) => sibling.id === epic.id),
 	}))
 
 	return {
 		id: storyMapState.id,
 		currentVersionId,
 
-		epics: epics.map((epic) => ({
-			...epic,
-			children: featuresWithChildren.filter((feature) => feature.parentId === epic.id),
-		})),
+		epics: epicsWithExtra,
 		addEpic: async (data: Partial<Epic>) => {
 			const newData = produce(storyMapState, (draft) => {
 				const lastEpic =
@@ -63,7 +92,7 @@ export const genMeta = (storyMapState: WithDocumentData<StoryMapState>, currentV
 			await setDoc(storyMapState.ref, data)
 		},
 
-		features: featuresWithChildren,
+		features: featuresWithExtra,
 		addFeature: async (data: SetRequired<Partial<Feature>, `parentId`>) => {
 			const newData = produce(storyMapState, (draft) => {
 				const lastFeature =
@@ -94,7 +123,7 @@ export const genMeta = (storyMapState: WithDocumentData<StoryMapState>, currentV
 			await setDoc(storyMapState.ref, data)
 		},
 
-		stories,
+		stories: storiesWithExtra,
 		addStory: async (data: SetRequired<Partial<Story>, `parentId`>) => {
 			if (currentVersionId === `__ALL_VERSIONS__`) return
 			const newData = produce(storyMapState, (draft) => {
@@ -133,4 +162,4 @@ export const genMeta = (storyMapState: WithDocumentData<StoryMapState>, currentV
 	}
 }
 
-export type StoryMapMeta = ReturnType<typeof genMeta>
+export type StoryMapMeta = ReturnType<typeof useGenMeta>

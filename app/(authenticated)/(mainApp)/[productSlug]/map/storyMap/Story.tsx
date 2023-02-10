@@ -51,7 +51,7 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 				className={clsx(
 					`flex min-w-[4rem] touch-none select-none items-center gap-1 overflow-hidden rounded border border-laurel bg-[#f5fbf0] pr-1 text-laurel transition-transform hover:scale-105 active:cursor-grabbing`,
 					inert ? `cursor-grabbing` : `cursor-grab`,
-					dragInfo.itemBeingDragged === storyId && !inert && `invisible`,
+					dragInfo.itemBeingDraggedId === storyId && !inert && `invisible`,
 				)}
 				ref={contentRef}
 			>
