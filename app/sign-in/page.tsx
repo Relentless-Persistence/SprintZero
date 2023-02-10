@@ -2,7 +2,7 @@
 
 import {AppleFilled, GithubOutlined} from "@ant-design/icons"
 import {notification} from "antd"
-import {OAuthProvider, linkWithCredential, signInWithPopup, signOut} from "firebase/auth"
+import {OAuthProvider, linkWithCredential, signInWithPopup, signOut, UserCredential, AuthCredential} from "firebase/auth"
 import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
@@ -33,17 +33,20 @@ const SignInPage: FC = () => {
 		if (user?.uid && !hasSignedIn) router.replace(`/`)
 	}, [hasSignedIn, router, user?.uid])
 
-	const getProviderForProviderId = (provider: string) => {
-		if (provider === `google.com`) {
-			return googleAuthProvider
-		} else if (provider === `microsoft.com`) {
-			return microsoftAuthProvider
-		} else {
-			return githubAuthProvider
+	const getProviderForProviderId = (providerId: string): AuthProvider => {
+		switch (providerId) {
+			case "google.com":
+				return googleAuthProvider
+			case "microsoft.com":
+				return microsoftAuthProvider
+			case "github.com":
+				return githubAuthProvider
+			default:
+				throw new Error(`Unsupported provider: ${providerId}`)
 		}
 	}
 
-	const processUser = async (res: any) => {
+	const processUser = async (res: UserCredential) => {
 		if (!res.user.email) throw new Error(`No email address found for user.`)
 		if (!res.user.displayName) throw new Error(`No display name found for user.`)
 
@@ -89,16 +92,29 @@ const SignInPage: FC = () => {
 			})
 			.catch((error) => {
 				if (error.code === `auth/account-exists-with-different-credential`) {
-					const email = error.customData.email
+					// const email = error.customData.email
 					const credential = OAuthProvider.credentialFromError(error)
 					const verifiedProvider = getProviderForProviderId(error.customData._tokenResponse.verifiedProvider[0])
 
 					signInWithPopup(auth, verifiedProvider).then((result) => {
 						const user = result.user
-						// processUser(result)
-						linkWithCredential(user, credential).then((usercred) => {
-							processUser(result)
-						})
+						if (credential !== null) {
+							linkWithCredential(user, credential)
+								.then(() => {
+									processUser(result)
+								})
+								.catch((error) => {
+									console.error(error.message)
+									notification.error({
+										message: `An error occurred while trying to link your account.`,
+									})
+								})
+						} else {
+							console.error(`Credential is null`)
+							notification.error({
+								message: `An error occurred while trying to link your account.`,
+							})
+						}
 					})
 				} else {
 					console.error(error.message)
