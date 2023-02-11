@@ -1,5 +1,5 @@
 import {ReadOutlined} from "@ant-design/icons"
-import {Timestamp, collection, doc, updateDoc} from "firebase/firestore"
+import {Timestamp, collection, deleteField, doc, updateDoc, writeBatch} from "firebase/firestore"
 import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
@@ -187,7 +187,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 					const nextFeatureUserValue =
 						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex])?.userValue ?? 1
 
-					const itemBeingDragged = storyMapState.items[dragInfo.itemBeingDraggedId] as EpicType
+					const itemBeingDragged = meta.epics.find((epic) => epic.id === dragInfo.itemBeingDraggedId)!
 					const data: {[key: `items.${Id}.`]: FeatureType} = {
 						[`items.${dragInfo.itemBeingDraggedId}`]: {
 							type: `feature` as const,
@@ -204,7 +204,17 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 						const item = storyMapState.items[id]
 						return item?.type === `feature` && item.parentId === parentId
 					}
-					await updateDoc(storyMapState.ref, data)
+					const batch = writeBatch(db)
+					batch.update(storyMapState.ref, data)
+					itemBeingDragged.childrenIds.forEach((childId) => {
+						batch.update(doc(db, `StoryMapStates`, meta.id), {[`items.${childId}`]: deleteField()})
+					})
+					itemBeingDragged.childrenIds
+						.flatMap((childId) => meta.stories.filter((story) => story.parentId === childId))
+						.forEach((story) => {
+							batch.update(doc(db, `StoryMapStates`, meta.id), {[`items.${story.id}.parentId`]: id})
+						})
+					await batch.commit()
 				}
 				break
 			}
@@ -246,7 +256,24 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 						const item = storyMapState.items[id]
 						return item?.type === `epic`
 					}
-					await updateDoc(storyMapState.ref, data)
+					const batch = writeBatch(db)
+					batch.update(storyMapState.ref, data)
+					itemBeingDragged.childrenIds
+						.map((storyId) => meta.stories.find((story) => story.id === storyId)!)
+						.forEach((story, i) => {
+							const data: {[key: `items.${Id}.`]: FeatureType} = {
+								[`items.${story.id}`]: {
+									type: `feature` as const,
+									description: story.description,
+									effort: 0.5,
+									name: story.name,
+									userValue: (i + 1) / (itemBeingDragged.childrenIds.length + 1),
+									parentId: id,
+								},
+							}
+							batch.update(doc(db, `StoryMapStates`, meta.id), data)
+						})
+					await batch.commit()
 				} else if (y <= layerBoundaries[1]) {
 					// Reorder features
 					const currentFeature = meta.features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
@@ -426,7 +453,12 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 						const item = storyMapState.items[featureBeingDragged.id]
 						return item?.type === `story`
 					}
-					await updateDoc(storyMapState.ref, data)
+					const batch = writeBatch(db)
+					batch.update(storyMapState.ref, data)
+					featureBeingDragged.childrenIds.forEach((childId) => {
+						batch.update(storyMapState.ref, {[`items.${childId}`]: deleteField()})
+					})
+					await batch.commit()
 				}
 				break
 			}
