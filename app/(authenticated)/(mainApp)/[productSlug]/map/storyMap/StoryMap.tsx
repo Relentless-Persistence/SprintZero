@@ -1,5 +1,5 @@
 import {ReadOutlined} from "@ant-design/icons"
-import {collection, doc, updateDoc} from "firebase/firestore"
+import {Timestamp, collection, doc, updateDoc} from "firebase/firestore"
 import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
@@ -9,7 +9,12 @@ import type {DragInfo} from "./utils/types"
 import type {FC} from "react"
 import type {Id, WithDocumentData} from "~/types"
 import type {Product} from "~/types/db/Products"
-import type {Epic as EpicType, Feature as FeatureType, StoryMapState} from "~/types/db/StoryMapStates"
+import type {
+	Epic as EpicType,
+	Feature as FeatureType,
+	StoryMapState,
+	Story as StoryType,
+} from "~/types/db/StoryMapStates"
 
 import Epic from "./Epic"
 import Feature from "./Feature"
@@ -142,7 +147,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 						}
 						await updateDoc(storyMapState.ref, data)
 					}
-				} else if (y <= layerBoundaries[1]) {
+				} else {
 					// Epic to feature
 					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
 					for (const epic of meta.epics) {
@@ -360,6 +365,171 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 							await updateDoc(storyMapState.ref, data)
 						}
 					}
+				} else {
+					// Feature to story
+					const allFeaturesSorted = meta.features.sort((a, b) => {
+						const aParent = meta.epics.find((epic) => epic.id === a.parentId)!
+						const bParent = meta.epics.find((epic) => epic.id === b.parentId)!
+						return aParent.position - bParent.position || a.position - b.position
+					})
+					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
+					for (const feature of allFeaturesSorted) {
+						const featureRect = elementRegistry[feature.id]?.parentElement?.getBoundingClientRect()
+						const prevFeature = allFeaturesSorted[feature.position - 1]
+						const nextFeature = allFeaturesSorted[feature.position + 1]
+						const prevRect = elementRegistry[prevFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+							right: -Infinity,
+						}
+						const nextRect = elementRegistry[nextFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+							left: Infinity,
+						}
+
+						if (featureRect)
+							allFeatureBounds.push({
+								left: prevRect.right,
+								right: avg(featureRect.right, nextRect.left),
+								id: feature.id,
+							})
+					}
+					allFeatureBounds.at(-1)!.right = Infinity
+
+					const hoveringFeatureId = allFeatureBounds.find((feature) => x >= feature.left && x <= feature.right)?.id
+					const hoveringFeature = meta.features.find((feature) => feature.id === hoveringFeatureId)
+					if (
+						!hoveringFeature ||
+						hoveringFeature.id === dragInfo.itemBeingDraggedId ||
+						currentVersionId === `__ALL_VERSIONS__`
+					)
+						return
+
+					const featureBeingDragged = meta.features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
+					const data: {[key: `items.${string}.`]: StoryType} = {
+						[`items.${dragInfo.itemBeingDraggedId}`]: {
+							type: `story` as const,
+							acceptanceCriteria: [],
+							branchName: null,
+							createdAt: Timestamp.now(),
+							description: featureBeingDragged.description,
+							designLink: null,
+							ethicsApproved: null,
+							ethicsColumn: null,
+							ethicsVotes: [],
+							name: featureBeingDragged.name,
+							pageLink: null,
+							points: 0,
+							sprintColumn: `productBacklog` as const,
+							parentId: hoveringFeature.id,
+							versionId: currentVersionId,
+						},
+					}
+					operationCompleteCondition.current = (storyMapState) => {
+						const item = storyMapState.items[featureBeingDragged.id]
+						return item?.type === `story`
+					}
+					await updateDoc(storyMapState.ref, data)
+				}
+				break
+			}
+			case `story`: {
+				if (y > layerBoundaries[1]) {
+					// Move story between features
+					const allFeaturesSorted = meta.features.sort((a, b) => {
+						const aParent = meta.epics.find((epic) => epic.id === a.parentId)!
+						const bParent = meta.epics.find((epic) => epic.id === b.parentId)!
+						return aParent.position - bParent.position || a.position - b.position
+					})
+					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
+					for (const feature of allFeaturesSorted) {
+						const featureRect = elementRegistry[feature.id]?.parentElement?.getBoundingClientRect()
+						const prevFeature = allFeaturesSorted[feature.position - 1]
+						const nextFeature = allFeaturesSorted[feature.position + 1]
+						const prevRect = elementRegistry[prevFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+							right: -Infinity,
+						}
+						const nextRect = elementRegistry[nextFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+							left: Infinity,
+						}
+
+						if (featureRect)
+							allFeatureBounds.push({
+								left: prevRect.right,
+								right: avg(featureRect.right, nextRect.left),
+								id: feature.id,
+							})
+					}
+					allFeatureBounds.at(-1)!.right = Infinity
+
+					const hoveringFeatureId = allFeatureBounds.find((feature) => x >= feature.left && x <= feature.right)?.id
+					const storyBeingDragged = meta.stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
+					if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) return
+
+					const data: {[key: `items.${string}.parentId`]: Id} = {
+						[`items.${dragInfo.itemBeingDraggedId}.parentId`]: hoveringFeatureId,
+					}
+					operationCompleteCondition.current = (storyMapState) => {
+						const item = storyMapState.items[storyBeingDragged.id]
+						if (item?.type !== `story`) return false
+						return item.parentId === hoveringFeatureId
+					}
+					await updateDoc(storyMapState.ref, data)
+				} else {
+					// Story to feature
+					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
+					for (const epic of meta.epics) {
+						for (const featureId of epic.childrenIds) {
+							const featureRect = elementRegistry[featureId]?.parentElement?.getBoundingClientRect()
+							const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
+							if (featureRect)
+								allFeatureBounds.push({
+									left: prevRect.right,
+									right: featureRect.left + featureRect.width / 2,
+									id: featureId,
+								})
+						}
+						const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
+						const epicRect = elementRegistry[epic.id]?.parentElement?.getBoundingClientRect()
+						if (epicRect) allFeatureBounds.push({left: prevRect.right, right: epicRect.right, id: epic.id})
+					}
+					allFeatureBounds.at(-1)!.right = Infinity
+
+					const itemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
+					let parentId: Id
+					let featureIndex: number
+					if (storyMapState.items[itemId]!.type === `epic`) {
+						parentId = itemId
+						const epic = meta.epics.find((epic) => epic.id === itemId)!
+						featureIndex = epic.childrenIds.length
+					} else {
+						const feature = meta.features.find((feature) => feature.id === itemId)!
+						parentId = feature.parentId
+						featureIndex = feature.position
+					}
+					if (parentId === dragInfo.itemBeingDraggedId) return
+
+					const parent = meta.epics.find((epic) => epic.id === parentId)!
+					const prevFeatureUserValue =
+						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex - 1])?.userValue ?? 0
+					const nextFeatureUserValue =
+						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex])?.userValue ?? 1
+
+					const itemBeingDragged = storyMapState.items[dragInfo.itemBeingDraggedId] as StoryType
+					const data: {[key: `items.${Id}.`]: FeatureType} = {
+						[`items.${dragInfo.itemBeingDraggedId}`]: {
+							type: `feature` as const,
+							description: itemBeingDragged.description,
+							effort: 0.5,
+							name: itemBeingDragged.name,
+							userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
+							parentId,
+						},
+					}
+
+					const id = dragInfo.itemBeingDraggedId
+					operationCompleteCondition.current = (storyMapState) => {
+						const item = storyMapState.items[id]
+						return item?.type === `feature` && item.parentId === parentId
+					}
+					await updateDoc(storyMapState.ref, data)
 				}
 				break
 			}

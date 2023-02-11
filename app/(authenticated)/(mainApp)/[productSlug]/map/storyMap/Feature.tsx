@@ -1,6 +1,8 @@
 import {CopyOutlined, FileOutlined} from "@ant-design/icons"
 import clsx from "clsx"
+import {collection} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
+import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {StoryMapMeta} from "./utils/meta"
 import type {DragInfo} from "./utils/types"
@@ -10,6 +12,9 @@ import type {Id} from "~/types"
 import FeatureDrawer from "./FeatureDrawer"
 import Story from "./Story"
 import {elementRegistry} from "./utils/globals"
+import {VersionConverter} from "~/types/db/Versions"
+import {db} from "~/utils/firebase"
+import {sortStories} from "~/utils/storyMap"
 
 export type FeatureProps = {
 	meta: StoryMapMeta
@@ -32,6 +37,10 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 	}, [featureId, inert])
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+
+	const [versions] = useCollectionData(
+		collection(db, `StoryMapStates`, meta.id, `Versions`).withConverter(VersionConverter),
+	)
 
 	return (
 		<div
@@ -67,11 +76,11 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 				</button>
 			) : (
 				<div className="flex flex-col items-start gap-3 rounded-md border border-[#006378] bg-white p-3">
-					{feature.childrenIds
-						.map((id) => meta.stories.find((story) => story.id === id)!)
-						.map((story) => (
-							<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
-						))}
+					{versions &&
+						sortStories(
+							feature.childrenIds.map((id) => meta.stories.find((story) => story.id === id)!),
+							versions,
+						).map((story) => <Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />)}
 
 					{meta.currentVersionId !== `__ALL_VERSIONS__` && (
 						<button
