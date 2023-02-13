@@ -9,6 +9,7 @@ specifiers:
   '@types/diff': 5.0.2
   '@types/lodash': 4.14.191
   '@types/node': 18.11.19
+  '@types/nodemailer': 6.4.7
   '@types/react': 18.0.27
   '@types/react-dom': 18.0.10
   '@typescript-eslint/eslint-plugin': 5.51.0
@@ -32,6 +33,7 @@ specifiers:
   lodash: 4.17.21
   nanoid: 4.0.1
   next: 13.1.6
+  nodemailer: 6.9.1
   openai: 3.1.0
   postcss: 8.4.21
   prettier: 2.8.3
@@ -82,6 +84,7 @@ dependencies:
   lodash: 4.17.21
   nanoid: 4.0.1
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
+  nodemailer: 6.9.1
   openai: 3.1.0
   postcss: 8.4.21
   prettier: 2.8.3
@@ -99,6 +102,9 @@ dependencies:
   typescript: 4.9.5
   uuid: 9.0.0
   zod: 3.20.2
+
+devDependencies:
+  '@types/nodemailer': 6.4.7
 
 packages:
 
@@ -1108,7 +1114,12 @@ packages:
 
   /@types/node/18.11.19:
     resolution: {integrity: sha512-YUgMWAQBWLObABqrvx8qKO1enAvBUdjZOAWQ5grBAkp5LQv45jBvYKZ3oFS9iKRCQyFjqw6iuEa1vmFqtxYLZw==}
-    dev: false
+
+  /@types/nodemailer/6.4.7:
+    resolution: {integrity: sha512-f5qCBGAn/f0qtRcd4SEn88c8Fp3Swct1731X4ryPKqS61/A3LmmzN8zaEz7hneJvpjFbUUgY7lru/B/7ODTazg==}
+    dependencies:
+      '@types/node': 18.11.19
+    dev: true
 
   /@types/prop-types/15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
@@ -3201,6 +3212,11 @@ packages:
 
   /node-releases/2.0.6:
     resolution: {integrity: sha512-PiVXnNuFm5+iYkLBNeq5211hvO38y63T0i2KKh2KnUs3RpzJ+JtODFjkD8yjLwnDkTYF1eKXheUwdssR+NRZdg==}
+    dev: false
+
+  /nodemailer/6.9.1:
+    resolution: {integrity: sha512-qHw7dOiU5UKNnQpXktdgQ1d3OFgRAekuvbJLcdG5dnEo/GtcTHRYM7+UfJARdOFU9WUQO8OiIamgWPmiSFHYAA==}
+    engines: {node: '>=6.0.0'}
     dev: false
 
   /normalize-path/3.0.0:
