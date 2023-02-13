@@ -2,14 +2,14 @@ import {CopyOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
 import {useEffect, useRef, useState} from "react"
 
-import type {StoryMapMeta} from "./utils/meta"
-import type {DragInfo} from "./utils/types"
+import type {StoryMapMeta} from "./meta"
+import type {DragInfo} from "./types"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
 import EpicDrawer from "./EpicDrawer"
 import Feature from "./Feature"
-import {elementRegistry} from "./utils/globals"
+import {elementRegistry} from "./globals"
 
 export type EpicProps = {
 	meta: StoryMapMeta
@@ -36,14 +36,14 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 	return (
 		<div
 			className={clsx(
-				`grid justify-items-center gap-x-4`,
+				`grid justify-items-center gap-x-6`,
 				dragInfo.itemBeingDraggedId === epicId && !inert && `invisible`,
 			)}
 			style={{gridTemplateColumns: `repeat(${epic.childrenIds.length}, auto)`}}
 		>
 			<div
 				className={clsx(
-					`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8] transition-transform hover:scale-105 active:cursor-grabbing`,
+					`flex touch-none select-none items-center gap-2 rounded border-2 border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] transition-transform hover:scale-105 active:cursor-grabbing`,
 					inert ? `cursor-grabbing` : `cursor-grab`,
 				)}
 				ref={contentRef}
@@ -65,21 +65,17 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 			{Array(Math.max(epic.childrenIds.length, 1))
 				.fill(undefined)
 				.map((_, i) => (
-					<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1rem-2px)]">
+					<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1.5rem)]">
 						{/* Top */}
-						{i === 0 && (
-							<div className="absolute left-1/2 top-0 h-[calc(50%-2px)] w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
-						)}
+						{i === 0 && <div className="absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 border border-[#d0d0d0]" />}
 						{/* Right */}
 						{i < epic.childrenIds.length - 1 && (
-							<div className="absolute left-1/2 top-1/2 h-px w-1/2 -translate-y-1/2 border border-dashed border-[#4f2dc8]" />
+							<div className="absolute left-1/2 top-1/2 h-px w-1/2 -translate-y-1/2 border border-[#d0d0d0]" />
 						)}
 						{/* Bottom */}
-						<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-dashed border-[#4f2dc8]" />
+						<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-[#d0d0d0]" />
 						{/* Left */}
-						{i > 0 && (
-							<div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-dashed border-[#4f2dc8]" />
-						)}
+						{i > 0 && <div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-[#d0d0d0]" />}
 
 						{i === epic.childrenIds.length - 1 && epic.childrenIds.length > 0 && (
 							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -109,7 +105,7 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 					onClick={() => {
 						meta.addFeature({parentId: epicId}).catch(console.error)
 					}}
-					className="flex items-center gap-2 rounded-md border border-dashed border-current bg-white px-2 py-1 text-[#006378] transition-colors hover:bg-[#f2fbfe]"
+					className="flex items-center gap-2 rounded border-2 border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378] transition-colors hover:bg-[#f2fbfe]"
 				>
 					<CopyOutlined />
 					<span>Add feature</span>

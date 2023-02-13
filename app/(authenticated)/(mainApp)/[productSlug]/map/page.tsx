@@ -57,7 +57,13 @@ const Dashboard: FC = () => {
 				/>
 			)}
 
-			<FloatButton.Group trigger="click" type="primary" shape="square" icon={<MenuOutlined />} className="right-36">
+			<FloatButton.Group
+				trigger="click"
+				type="primary"
+				shape="square"
+				icon={<MenuOutlined />}
+				className="right-36 bottom-8"
+			>
 				<FloatButton icon={<RedoOutlined />} />
 				<FloatButton icon={<UndoOutlined />} />
 				<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />

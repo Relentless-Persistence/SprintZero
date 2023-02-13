@@ -5,7 +5,7 @@ import {useEffect, useRef, useState} from "react"
 import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
-import type {DragInfo} from "./utils/types"
+import type {DragInfo} from "./types"
 import type {FC} from "react"
 import type {Id, WithDocumentData} from "~/types"
 import type {Product} from "~/types/db/Products"
@@ -18,9 +18,9 @@ import type {
 
 import Epic from "./Epic"
 import Feature from "./Feature"
+import {elementRegistry, layerBoundaries} from "./globals"
+import {useGenMeta} from "./meta"
 import Story from "./Story"
-import {elementRegistry, layerBoundaries} from "./utils/globals"
-import {useGenMeta} from "./utils/meta"
 import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
@@ -593,7 +593,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, currentVersionId}) => {
 				onClick={() => {
 					meta.addEpic({}).catch(console.error)
 				}}
-				className="flex items-center gap-2 rounded-md border border-dashed border-current bg-white px-2 py-1 text-[#4f2dc8] transition-colors hover:bg-[#faf8ff]"
+				className="flex items-center gap-2 rounded border-2 border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] transition-colors hover:bg-[#faf8ff]"
 				data-testid="add-epic"
 			>
 				<ReadOutlined />

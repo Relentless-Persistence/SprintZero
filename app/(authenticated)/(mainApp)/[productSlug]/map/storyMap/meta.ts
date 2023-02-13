@@ -139,7 +139,7 @@ export const useGenMeta = (
 					ethicsVotes: [],
 					name: `Story ${stories.length + 1}`,
 					pageLink: null,
-					points: 0,
+					points: 1,
 					sprintColumn: `productBacklog`,
 					versionId: currentVersionId,
 					...data,

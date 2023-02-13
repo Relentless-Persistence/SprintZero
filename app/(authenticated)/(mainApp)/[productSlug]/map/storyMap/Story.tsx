@@ -3,13 +3,13 @@ import {collection, documentId, query, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 
-import type {StoryMapMeta} from "./utils/meta"
-import type {DragInfo} from "./utils/types"
+import type {StoryMapMeta} from "./meta"
+import type {DragInfo} from "./types"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
+import {elementRegistry} from "./globals"
 import StoryDrawer from "./StoryDrawer"
-import {elementRegistry} from "./utils/globals"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 
@@ -49,7 +49,7 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 		<div>
 			<div
 				className={clsx(
-					`flex min-w-[4rem] touch-none select-none items-center gap-1 overflow-hidden rounded border border-laurel bg-[#f5fbf0] pr-1 text-laurel transition-transform hover:scale-105 active:cursor-grabbing`,
+					`flex touch-none select-none items-center gap-1 overflow-hidden rounded border-2 border-[#103001] bg-white pr-1 transition-transform hover:scale-105 active:cursor-grabbing`,
 					inert ? `cursor-grabbing` : `cursor-grab`,
 					dragInfo.itemBeingDraggedId === storyId && !inert && `invisible`,
 				)}
@@ -59,11 +59,11 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 					type="button"
 					onClick={() => setIsDrawerOpen(true)}
 					onPointerDownCapture={(e) => e.stopPropagation()}
-					className="border-r-[1px] border-[#aee383] bg-[#e1f4d1] p-0.5 text-[0.6rem]"
+					className="border-r border-[#103001] bg-[#f5f5f5] p-2 text-[0.6rem]"
 				>
-					<p className="-rotate-90">{version?.name}</p>
+					<p className="leading-none [writing-mode:vertical-lr]">{version?.name}</p>
 				</button>
-				<div className="mx-auto px-1 text-xs text-black">
+				<div className="mx-auto px-2 font-medium text-black">
 					<p>{story.name}</p>
 				</div>
 			</div>

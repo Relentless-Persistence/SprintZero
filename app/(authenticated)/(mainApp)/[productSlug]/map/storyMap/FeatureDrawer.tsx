@@ -4,7 +4,7 @@ import {doc} from "firebase/firestore"
 import {useState} from "react"
 import {useDocumentData} from "react-firebase-hooks/firestore"
 
-import type {StoryMapMeta} from "./utils/meta"
+import type {StoryMapMeta} from "./meta"
 import type {FC} from "react"
 import type {Id} from "~/types"
 

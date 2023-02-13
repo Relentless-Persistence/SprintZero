@@ -17,7 +17,7 @@ import {useEffect, useState} from "react"
 import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
-import type {StoryMapMeta} from "./utils/meta"
+import type {StoryMapMeta} from "./meta"
 import type {FC} from "react"
 import type {z} from "zod"
 import type {Id} from "~/types"
@@ -228,7 +228,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						>
 							<RhfSegmented control={control} name="points" options={[1, 2, 3, 5, 8, 13]} />
 						</Form.Item>
-						<Form.Item label="Version">
+						<Form.Item label="Version" className="shrink-0 basis-20">
 							<RhfSelect
 								control={control}
 								name="versionId"
