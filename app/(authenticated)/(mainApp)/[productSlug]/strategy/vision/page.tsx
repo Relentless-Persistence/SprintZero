@@ -4,7 +4,7 @@ import {useQueries} from "@tanstack/react-query"
 import {Breadcrumb, Button, Card, Steps, Tag, Timeline} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {Timestamp, doc, getDoc} from "firebase/firestore"
+import {Timestamp, doc, getDoc, updateDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
@@ -13,6 +13,7 @@ import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
+import type {Product} from "~/types/db/Products"
 
 import FinalStep from "./FinalStep"
 import ResponseStep from "./ResponseStep"
@@ -21,7 +22,6 @@ import NoData from "~/components/NoData"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {auth, db} from "~/utils/firebase"
-import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
@@ -113,7 +113,7 @@ const VisionsPage: FC = () => {
 														}
 														draft.finalVision = finalVision
 													})
-													await updateProduct({id: activeProduct!.id, data: newProduct})
+													await updateDoc(doc(db, `Products`, activeProductId), newProduct satisfies Partial<Product>)
 													setEditMode(false)
 												}}
 												onCancel={() => setEditMode(false)}

@@ -1,7 +1,7 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Input} from "antd"
-import {collection, doc, getDoc, query, where} from "firebase/firestore"
+import {addDoc, collection, doc, getDoc, query, where} from "firebase/firestore"
 import {uniq} from "lodash"
 import {useState} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
@@ -9,11 +9,11 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {Id} from "~/types"
+import type {Comment} from "~/types/db/Comments"
 
 import {CommentConverter} from "~/types/db/Comments"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {addComment} from "~/utils/mutations"
 import {useUser} from "~/utils/useUser"
 
 export type CommentsProps = {
@@ -29,15 +29,13 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		await addComment({
-			storyMapStateId,
-			comment: {
-				text: commentDraft,
-				type: `code`,
-				authorId: user!.id,
-				parentId,
-			},
-		})
+		const data: Comment = {
+			text: commentDraft,
+			type: `code`,
+			authorId: user!.id,
+			parentId,
+		}
+		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Comments`), data)
 		setCommentDraft(``)
 	}
 

@@ -1,18 +1,20 @@
 "use client"
 
-import {doc, setDoc} from "firebase/firestore"
+import {MenuOutlined, PlusOutlined, RedoOutlined, UndoOutlined} from "@ant-design/icons"
+import {FloatButton} from "antd"
+import {collection, doc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {useState} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import VersionList from "./storyMap/VersionList"
 import {ProductConverter} from "~/types/db/Products"
+import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -23,11 +25,17 @@ const Dashboard: FC = () => {
 	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__` | undefined>(undefined)
 	const [newVesionInputValue, setNewVesionInputValue] = useState<string | undefined>(undefined)
 
+	const [versions] = useCollectionData(
+		activeProduct
+			? collection(db, `StoryMapStates`, activeProduct.storyMapStateId, `Versions`).withConverter(VersionConverter)
+			: undefined,
+	)
+
 	return (
-		<div className="grid h-full grid-cols-[1fr_max-content]">
+		<div className="grid h-full grid-cols-[1fr_6rem]">
 			<div className="flex flex-col gap-8">
 				{currentVersionId && (
-					<StoryMapHeader currentVersionId={currentVersionId} setNewVersionInputValue={setNewVesionInputValue} />
+					<StoryMapHeader versionName={versions?.find((version) => version.id === currentVersionId)?.name} />
 				)}
 
 				<div className="relative w-full grow">
@@ -49,20 +57,11 @@ const Dashboard: FC = () => {
 				/>
 			)}
 
-			{activeProduct && (
-				<button
-					type="button"
-					className="fixed bottom-8 right-8 rounded-md border border-laurel px-2 py-1 text-laurel transition-colors hover:border-black hover:text-black"
-					onClick={() => {
-						setDoc(doc(db, `StoryMapStates`, activeProduct.storyMapStateId), {
-							items: {},
-							productId: activeProduct.id,
-						} satisfies StoryMapState).catch(console.error)
-					}}
-				>
-					Reset story map
-				</button>
-			)}
+			<FloatButton.Group trigger="click" type="primary" shape="square" icon={<MenuOutlined />} className="right-36">
+				<FloatButton icon={<RedoOutlined />} />
+				<FloatButton icon={<UndoOutlined />} />
+				<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />
+			</FloatButton.Group>
 		</div>
 	)
 }

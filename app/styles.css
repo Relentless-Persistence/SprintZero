@@ -10,40 +10,12 @@ button.ant-btn-primary {
 	background-color: #4a801e;
 }
 
-*.ant-form-item {
-	margin-bottom: 0px;
-}
-
-*.ant-form-vertical .ant-form-item-label {
-	padding-bottom: 4px;
-}
-
-#stages .ant-steps-item-title {
-	width: 100% !important;
-}
-
 ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 	background-color: transparent;
 }
 
 .ant-menu-light .ant-menu-item-selected {
 	background-color: #e1f4d1;
-}
-
-.ant-tabs-content.ant-tabs-content-right {
-	height: 100%;
-}
-
-.ant-tabs-tabpane.ant-tabs-tabpane-active {
-	height: 100%;
-}
-
-.ant-card .ant-card-meta {
-	margin: 0;
-}
-
-.ant-tabs-right > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
-	padding-right: 0px;
 }
 
 .ant-notification-notice-message {
@@ -62,4 +34,16 @@ li {
 
 .ant-checkbox-wrapper + .ant-checkbox-wrapper {
 	margin-left: 0px;
+}
+
+.ant-tabs-right > .ant-tabs-nav {
+	max-width: 100%;
+}
+
+.ant-tabs-tab-btn {
+	max-width: 100%;
+}
+
+.ant-float-btn-default {
+	background-color: white;
 }

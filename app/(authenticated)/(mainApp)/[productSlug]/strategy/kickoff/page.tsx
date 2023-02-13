@@ -1,18 +1,18 @@
 "use client"
 
 import {Breadcrumb, Card} from "antd"
-import {doc} from "firebase/firestore"
+import {doc, updateDoc} from "firebase/firestore"
 import {useState} from "react"
 import {useDocumentData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
+import type {Product} from "~/types/db/Products"
 
 import EditButtons from "./EditButtons"
 import ProblemStatementCard from "./ProblemStatementCard"
 import TextListEditor from "../../../../../../components/TextListEditor"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
-import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const KickoffPage: FC = () => {
@@ -58,10 +58,10 @@ const KickoffPage: FC = () => {
 								}}
 								isEditing={editingSection === `personas`}
 								onCommit={async () => {
-									await updateProduct({
-										id: activeProduct!.id,
-										data: {personas: textListState.filter((item) => item.text !== ``)},
-									})
+									const data: Partial<Product> = {
+										personas: textListState.filter((item) => item.text !== ``),
+									}
+									await updateDoc(doc(db, `Products`, activeProductId), data)
 								}}
 							/>
 						}
@@ -94,10 +94,10 @@ const KickoffPage: FC = () => {
 								}}
 								isEditing={editingSection === `successMetrics`}
 								onCommit={async () => {
-									await updateProduct({
-										id: activeProduct!.id,
-										data: {successMetrics: textListState.filter((item) => item.text !== ``)},
-									})
+									const data: Partial<Product> = {
+										successMetrics: textListState.filter((item) => item.text !== ``),
+									}
+									await updateDoc(doc(db, `Products`, activeProductId), data)
 								}}
 							/>
 						}
@@ -127,12 +127,12 @@ const KickoffPage: FC = () => {
 									setEditingSection(undefined)
 								}}
 								isEditing={editingSection === `businessPriorities`}
-								onCommit={() =>
-									updateProduct({
-										id: activeProduct!.id,
-										data: {businessPriorities: textListState.filter((item) => item.text !== ``)},
-									})
-								}
+								onCommit={async () => {
+									const data: Partial<Product> = {
+										businessPriorities: textListState.filter((item) => item.text !== ``),
+									}
+									await updateDoc(doc(db, `Products`, activeProductId), data)
+								}}
 							/>
 						}
 					>

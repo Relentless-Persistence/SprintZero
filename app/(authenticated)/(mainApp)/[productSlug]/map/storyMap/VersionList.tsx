@@ -1,16 +1,16 @@
 "use client"
 
-import {Button, Input, Tabs} from "antd"
-import {collection, query} from "firebase/firestore"
+import {Input, Tabs} from "antd"
+import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
 import {useEffect} from "react"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
+import type {Version} from "~/types/db/Versions"
 
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
-import {addVersion} from "~/utils/mutations"
 
 export type VersionListProps = {
 	currentVersionId: Id | `__ALL_VERSIONS__` | undefined
@@ -34,50 +34,68 @@ const VersionList: FC<VersionListProps> = ({
 		if (currentVersionId === undefined && versions?.[0]) setCurrentVersionId(versions[0].id)
 	}, [currentVersionId, setCurrentVersionId, versions])
 
+	const addVersion = async (): Promise<void> => {
+		if (!newVersionInputValue) throw new Error(`Version name is required.`)
+		const existingDoc = (
+			await getDocs(
+				query(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), where(`name`, `==`, newVersionInputValue)),
+			)
+		).docs[0]
+		if (existingDoc) throw new Error(`Version already exists.`)
+
+		const data: Version = {
+			name: newVersionInputValue,
+		}
+		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), data)
+	}
+
 	return (
-		<div className="flex flex-col gap-8">
-			<Tabs
-				tabPosition="right"
-				onChange={(key) => setCurrentVersionId(key as Id)}
-				activeKey={currentVersionId}
-				items={[
-					...(versions ?? []).map((version) => ({
-						key: version.id,
-						label: version.name,
-					})),
+		<Tabs
+			tabPosition="right"
+			onChange={(key) => {
+				if (key !== `__NEW_VERSION__`) setCurrentVersionId(key as Id)
+			}}
+			activeKey={currentVersionId}
+			items={(versions ?? [])
+				.sort((a, b) => a.name.localeCompare(b.name))
+				.map((version) => ({
+					key: version.id as Id | string,
+					label: <p className="overflow-hidden truncate">{version.name}</p>,
+				}))
+				.concat([
 					{
 						key: `__ALL_VERSIONS__`,
-						label: `All`,
+						label: <p>All</p>,
 					},
-				]}
-				className="bg-transparent"
-			/>
-
-			{newVersionInputValue !== undefined && (
-				<form
-					onSubmit={(evt) => {
-						evt.preventDefault()
-						addVersion({storyMapStateId, versionName: newVersionInputValue})
-							.then(() => {
-								setNewVersionInputValue(undefined)
-							})
-							.catch(console.error)
-					}}
-					className="flex flex-col gap-2"
-				>
-					<Input
-						value={newVersionInputValue}
-						onChange={(evt) => setNewVersionInputValue(evt.target.value)}
-						htmlSize={1}
-						placeholder="Version name"
-						className="w-full"
-					/>
-					<Button htmlType="submit" className="bg-white">
-						Add
-					</Button>
-				</form>
-			)}
-		</div>
+				])
+				.concat(
+					newVersionInputValue !== undefined
+						? [
+								{
+									key: `__NEW_VERSION__`,
+									label: (
+										<Input
+											size="small"
+											autoFocus
+											value={newVersionInputValue}
+											onChange={(e) => setNewVersionInputValue(e.target.value)}
+											onPressEnter={() => {
+												if (newVersionInputValue)
+													addVersion()
+														.then(() => {
+															setNewVersionInputValue(undefined)
+														})
+														.catch(console.error)
+											}}
+											className="-mx-2 -my-2 w-[calc(100%+1rem)]"
+										/>
+									),
+								},
+						  ]
+						: [],
+				)}
+			className="h-full min-w-0"
+		/>
 	)
 }
 

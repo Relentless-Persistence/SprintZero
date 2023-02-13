@@ -14,7 +14,6 @@ import Story from "./Story"
 import {elementRegistry} from "./utils/globals"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
-import {sortStories} from "~/utils/storyMap"
 
 export type FeatureProps = {
 	meta: StoryMapMeta
@@ -42,6 +41,13 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 		collection(db, `StoryMapStates`, meta.id, `Versions`).withConverter(VersionConverter),
 	)
 
+	const stories = feature.childrenIds
+		.map((id) => meta.stories.find((story) => story.id === id)!)
+		.filter((story) => {
+			if (meta.currentVersionId === `__ALL_VERSIONS__`) return true
+			return story.versionId === meta.currentVersionId
+		})
+
 	return (
 		<div
 			className={clsx(`flex flex-col items-center`, dragInfo.itemBeingDraggedId === featureId && !inert && `invisible`)}
@@ -63,7 +69,7 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 				<div className="h-8 w-px border border-dashed border-[#006378]" />
 			)}
 
-			{feature.childrenIds.length === 0 ? (
+			{stories.length === 0 && meta.currentVersionId !== `__ALL_VERSIONS__` && (
 				<button
 					type="button"
 					onClick={() => {
@@ -74,13 +80,14 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 					<FileOutlined />
 					<span>Add story</span>
 				</button>
-			) : (
+			)}
+
+			{stories.length > 0 && (
 				<div className="flex flex-col items-start gap-3 rounded-md border border-[#006378] bg-white p-3">
 					{versions &&
-						sortStories(
-							feature.childrenIds.map((id) => meta.stories.find((story) => story.id === id)!),
-							versions,
-						).map((story) => <Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />)}
+						stories.map((story) => (
+							<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
+						))}
 
 					{meta.currentVersionId !== `__ALL_VERSIONS__` && (
 						<button

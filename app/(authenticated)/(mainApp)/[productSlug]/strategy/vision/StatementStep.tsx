@@ -1,6 +1,6 @@
 import {Button, Card, Form} from "antd"
 import {diffArrays} from "diff"
-import {Timestamp, doc} from "firebase/firestore"
+import {Timestamp, doc, updateDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
@@ -11,6 +11,7 @@ import {z} from "zod"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
+import type {Product} from "~/types/db/Products"
 
 import {generateProductVision} from "./getGptResponse"
 import RhfInput from "~/components/rhf/RhfInput"
@@ -18,7 +19,6 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
 import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
-import {updateProduct} from "~/utils/mutations"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const listToSentence = (list: string[]) => {
@@ -109,7 +109,7 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 					timestamp: Timestamp.now(),
 				})
 		})
-		await updateProduct({id: activeProduct!.id, data: newProduct})
+		await updateDoc(doc(db, `Products`, activeProductId), newProduct satisfies Partial<Product>)
 
 		onFinish(gptResponse)
 		setStatus(`finished`)

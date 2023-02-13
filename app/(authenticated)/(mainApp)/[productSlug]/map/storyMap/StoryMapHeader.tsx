@@ -1,34 +1,19 @@
 import {LeftOutlined, RightOutlined} from "@ant-design/icons"
-import {Breadcrumb, Button} from "antd"
-import {collection} from "firebase/firestore"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {Breadcrumb} from "antd"
 
-import type {Dispatch, FC, SetStateAction} from "react"
-import type {Id} from "~/types"
-
-import {VersionConverter} from "~/types/db/Versions"
-import {db} from "~/utils/firebase"
+import type {FC} from "react"
 
 export type StoryMapHeaderProps = {
-	currentVersionId: Id | `__ALL_VERSIONS__`
-	setNewVersionInputValue: Dispatch<SetStateAction<string>>
+	versionName?: string
 }
 
-const StoryMapHeader: FC<StoryMapHeaderProps> = ({currentVersionId, setNewVersionInputValue}) => {
-	const [versions] = useCollectionData(collection(db, `Versions`).withConverter(VersionConverter))
-
+const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName}) => {
 	return (
 		<div className="flex flex-col gap-8">
-			<div className="flex justify-between px-12 pt-8">
-				<Breadcrumb>
-					<Breadcrumb.Item>Story Map</Breadcrumb.Item>
-					<Breadcrumb.Item>{versions?.find((version) => version.id === currentVersionId)?.name}</Breadcrumb.Item>
-				</Breadcrumb>
-
-				<Button onClick={() => setNewVersionInputValue(``)} className="bg-white">
-					+ Add version
-				</Button>
-			</div>
+			<Breadcrumb className="px-12 pt-8">
+				<Breadcrumb.Item>Story Map</Breadcrumb.Item>
+				<Breadcrumb.Item>{versionName}</Breadcrumb.Item>
+			</Breadcrumb>
 			<div className="px-12 text-laurel">
 				<div className="relative text-[0.6rem]">
 					<LeftOutlined className="absolute left-[-6px] -translate-y-1/2" />
