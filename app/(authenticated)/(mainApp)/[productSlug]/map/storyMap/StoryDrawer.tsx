@@ -10,11 +10,11 @@ import {
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Button, Checkbox, Drawer, Form, Input, Tag} from "antd"
 import clsx from "clsx"
-import {collection, doc} from "firebase/firestore"
+import {doc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
 import type {StoryMapMeta} from "./meta"
@@ -29,7 +29,6 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {ProductConverter} from "~/types/db/Products"
 import {StorySchema, sprintColumns} from "~/types/db/StoryMapStates"
-import {VersionConverter} from "~/types/db/Versions"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
@@ -84,10 +83,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 		await meta.updateStory(story.id, data)
 		setEditMode(false)
 	})
-
-	const [versions] = useCollectionData(
-		collection(db, `StoryMapStates`, meta.id, `Versions`).withConverter(VersionConverter),
-	)
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
 		const newAcceptanceCriteria = produce(story.acceptanceCriteria, (draft) => {
@@ -232,7 +227,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							<RhfSelect
 								control={control}
 								name="versionId"
-								options={versions?.map((version) => ({label: version.name, value: version.id}))}
+								options={meta.allVersions.map((version) => ({label: version.name, value: version.id}))}
 							/>
 						</Form.Item>
 						<Form.Item label="Status" className="shrink-0 basis-56">
@@ -333,7 +328,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						<p className="text-xl font-semibold text-gray">Comments</p>
 						<div className="relative grow">
 							<Comments
-								storyMapStateId={meta.id}
+								storyMapStateId={meta.storyMapStateId}
 								parentId={storyId}
 								flagged={story.ethicsColumn !== null}
 								onFlag={() => {

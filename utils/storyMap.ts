@@ -4,8 +4,8 @@ import type {Version} from "~/types/db/Versions"
 
 export type EpicWithId = Epic & {id: Id}
 
-export const getEpics = (storyMapState: WithDocumentData<StoryMapState>): EpicWithId[] => {
-	const epics = Object.entries(storyMapState.items)
+export const getEpics = (storyMapItems: StoryMapState[`items`]): EpicWithId[] => {
+	const epics = Object.entries(storyMapItems)
 		.filter(([, item]) => item?.type === `epic`)
 		.map(([id, item]) => ({id, ...item})) as Array<Epic & {id: Id}>
 	return epics
@@ -16,8 +16,8 @@ export const sortEpics = <T extends Epic>(epics: T[]): T[] =>
 
 export type FeatureWithId = Feature & {id: Id}
 
-export const getFeatures = (storyMapState: WithDocumentData<StoryMapState>): FeatureWithId[] => {
-	const features = Object.entries(storyMapState.items)
+export const getFeatures = (storyMapItems: StoryMapState[`items`]): FeatureWithId[] => {
+	const features = Object.entries(storyMapItems)
 		.filter(([, item]) => item?.type === `feature`)
 		.map(([id, item]) => ({id, ...item})) as Array<Feature & {id: Id}>
 	return features
@@ -29,8 +29,8 @@ export const sortFeatures = <T extends Feature>(features: T[]): T[] =>
 
 export type StoryWithId = Story & {id: Id}
 
-export const getStories = (storyMapState: WithDocumentData<StoryMapState>): StoryWithId[] => {
-	const stories = Object.entries(storyMapState.items)
+export const getStories = (storyMapItems: StoryMapState[`items`]): StoryWithId[] => {
+	const stories = Object.entries(storyMapItems)
 		.filter(([, item]) => item?.type === `story`)
 		.map(([id, item]) => ({id, ...item})) as Array<Story & {id: Id}>
 	return stories

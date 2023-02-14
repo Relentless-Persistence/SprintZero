@@ -1,7 +1,7 @@
 "use client"
 
 import {Button} from "antd"
-import {addDoc, collection, doc, setDoc} from "firebase/firestore"
+import {addDoc, collection, doc, serverTimestamp, setDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
@@ -9,6 +9,7 @@ import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import invariant from "tiny-invariant"
 
+import type {WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
@@ -41,12 +42,8 @@ const ProductSetupPage: FC = () => {
 
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
 
-		const storyMapStateId = (
-			await addDoc(collection(db, `StoryMapStates`), {
-				items: {},
-				productId: slug,
-			} satisfies StoryMapState)
-		).id as Id
+		const newData: WithFieldValue<StoryMapState> = {items: {}, updatedAt: serverTimestamp(), productId: slug}
+		const storyMapStateId = (await addDoc(collection(db, `StoryMapStates`), newData)).id as Id
 
 		const finalData = ProductSchema.parse({
 			...data,

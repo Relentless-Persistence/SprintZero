@@ -1,7 +1,5 @@
 import clsx from "clsx"
-import {collection, documentId, query, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {StoryMapMeta} from "./meta"
 import type {DragInfo} from "./types"
@@ -10,8 +8,6 @@ import type {Id} from "~/types"
 
 import {elementRegistry} from "./globals"
 import StoryDrawer from "./StoryDrawer"
-import {VersionConverter} from "~/types/db/Versions"
-import {db} from "~/utils/firebase"
 
 export type StoryProps = {
 	meta: StoryMapMeta
@@ -35,13 +31,7 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-	const [versions] = useCollectionData(
-		query(
-			collection(db, `StoryMapStates`, meta.id, `Versions`),
-			where(documentId(), `==`, story.versionId),
-		).withConverter(VersionConverter),
-	)
-	const version = versions?.[0]
+	const version = meta.allVersions.find((version) => version.id === story.versionId)
 
 	return (
 		// Don't delete this wrapper div. Epics and features require a .parentElement lookup for drag-and-drop offset, so
@@ -49,7 +39,7 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 		<div>
 			<div
 				className={clsx(
-					`flex touch-none select-none items-center gap-1 overflow-hidden rounded border-2 border-[#103001] bg-white pr-1 transition-transform hover:scale-105 active:cursor-grabbing`,
+					`flex touch-none select-none items-center gap-1 overflow-hidden rounded border border-[#103001] bg-white pr-1 active:cursor-grabbing`,
 					inert ? `cursor-grabbing` : `cursor-grab`,
 					dragInfo.itemBeingDraggedId === storyId && !inert && `invisible`,
 				)}

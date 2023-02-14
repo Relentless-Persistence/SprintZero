@@ -1,6 +1,6 @@
 "use client"
 
-import {MenuOutlined, PlusOutlined, RedoOutlined, UndoOutlined} from "@ant-design/icons"
+import {MenuOutlined, PlusOutlined} from "@ant-design/icons"
 import {FloatButton} from "antd"
 import {collection, doc} from "firebase/firestore"
 import {motion} from "framer-motion"
@@ -14,6 +14,7 @@ import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
 import VersionList from "./storyMap/VersionList"
 import {ProductConverter} from "~/types/db/Products"
+import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -21,6 +22,12 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const Dashboard: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+
+	const [storyMapState] = useDocumentData(
+		activeProduct
+			? doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
+			: undefined,
+	)
 
 	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__` | undefined>(undefined)
 	const [newVesionInputValue, setNewVesionInputValue] = useState<string | undefined>(undefined)
@@ -40,8 +47,12 @@ const Dashboard: FC = () => {
 
 				<div className="relative w-full grow">
 					<motion.div layoutScroll className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2">
-						{activeProduct !== undefined && currentVersionId !== undefined && (
-							<StoryMap activeProduct={activeProduct} currentVersionId={currentVersionId} />
+						{activeProduct !== undefined && storyMapState && currentVersionId !== undefined && (
+							<StoryMap
+								activeProduct={activeProduct}
+								storyMapState={storyMapState}
+								currentVersionId={currentVersionId}
+							/>
 						)}
 					</motion.div>
 				</div>
@@ -64,8 +75,6 @@ const Dashboard: FC = () => {
 				icon={<MenuOutlined />}
 				className="right-36 bottom-8"
 			>
-				<FloatButton icon={<RedoOutlined />} />
-				<FloatButton icon={<UndoOutlined />} />
 				<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />
 			</FloatButton.Group>
 		</div>

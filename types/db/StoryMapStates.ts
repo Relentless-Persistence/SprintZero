@@ -1,7 +1,7 @@
 import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter, idSchema, serverTimestampSchema} from "~/types"
 
 export const EpicSchema = z.object({
 	type: z.literal(`epic`),
@@ -74,12 +74,12 @@ export type Story = z.infer<typeof StorySchema>
 
 export const StoryMapStateSchema = z.object({
 	items: z.record(idSchema, z.discriminatedUnion(`type`, [EpicSchema, FeatureSchema, StorySchema])),
+	updatedAt: serverTimestampSchema,
 
 	productId: idSchema,
 })
 
 export type StoryMapState = z.infer<typeof StoryMapStateSchema>
-
 export const StoryMapStateConverter = genConverter(StoryMapStateSchema)
 
 export const sprintColumns = {

@@ -1,19 +1,14 @@
 import {CopyOutlined, FileOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {collection} from "firebase/firestore"
-import {useEffect, useRef, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useEffect, useRef} from "react"
 
 import type {StoryMapMeta} from "./meta"
 import type {DragInfo} from "./types"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import FeatureDrawer from "./FeatureDrawer"
 import {elementRegistry} from "./globals"
 import Story from "./Story"
-import {VersionConverter} from "~/types/db/Versions"
-import {db} from "~/utils/firebase"
 
 export type FeatureProps = {
 	meta: StoryMapMeta
@@ -35,12 +30,6 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 		}
 	}, [featureId, inert])
 
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
-	const [versions] = useCollectionData(
-		collection(db, `StoryMapStates`, meta.id, `Versions`).withConverter(VersionConverter),
-	)
-
 	const stories = feature.childrenIds
 		.map((id) => meta.stories.find((story) => story.id === id)!)
 		.filter((story) => {
@@ -54,14 +43,12 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 		>
 			<div
 				className={clsx(
-					`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border-2 border-current bg-white px-2 py-1 font-medium text-[#006378] transition-transform hover:scale-105 active:cursor-grabbing`,
+					`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#006378] active:cursor-grabbing`,
 					inert ? `cursor-grabbing` : `cursor-grab`,
 				)}
 				ref={contentRef}
 			>
-				<button type="button" onClick={() => setIsDrawerOpen(true)} onPointerDownCapture={(e) => e.stopPropagation()}>
-					<CopyOutlined />
-				</button>
+				<CopyOutlined />
 				<p>{feature.name}</p>
 			</div>
 
@@ -75,7 +62,7 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 					onClick={() => {
 						if (meta.currentVersionId !== `__ALL_VERSIONS__`) meta.addStory({parentId: featureId}).catch(console.error)
 					}}
-					className="flex items-center gap-2 rounded border-2 border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001] transition-colors hover:bg-[#f2fbfe]"
+					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#103001]"
 				>
 					<FileOutlined />
 					<span>Add story</span>
@@ -83,11 +70,10 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 			)}
 
 			{stories.length > 0 && (
-				<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-[#0273b3] p-3">
-					{versions &&
-						stories.map((story) => (
-							<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
-						))}
+				<div className="flex flex-col items-start gap-3 rounded-lg border border-[#0273b3] bg-[#f0f2f5] p-3">
+					{stories.map((story) => (
+						<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
+					))}
 
 					{meta.currentVersionId !== `__ALL_VERSIONS__` && (
 						<button
@@ -96,7 +82,7 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 								if (meta.currentVersionId !== `__ALL_VERSIONS__`)
 									meta.addStory({parentId: featureId}).catch(console.error)
 							}}
-							className="flex w-full items-center justify-center gap-2 rounded border-2 border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001] transition-colors hover:bg-[#f2fbfe]"
+							className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001]"
 						>
 							<FileOutlined />
 							<span>Add story</span>
@@ -104,8 +90,6 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 					)}
 				</div>
 			)}
-
-			<FeatureDrawer meta={meta} featureId={featureId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
 		</div>
 	)
 }

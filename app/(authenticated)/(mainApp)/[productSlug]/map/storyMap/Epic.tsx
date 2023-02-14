@@ -1,13 +1,12 @@
 import {CopyOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {useEffect, useRef, useState} from "react"
+import {useEffect, useRef} from "react"
 
 import type {StoryMapMeta} from "./meta"
 import type {DragInfo} from "./types"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import EpicDrawer from "./EpicDrawer"
 import Feature from "./Feature"
 import {elementRegistry} from "./globals"
 
@@ -31,8 +30,6 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 		}
 	}, [epicId, inert])
 
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
 	return (
 		<div
 			className={clsx(
@@ -43,14 +40,12 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 		>
 			<div
 				className={clsx(
-					`flex touch-none select-none items-center gap-2 rounded border-2 border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] transition-transform hover:scale-105 active:cursor-grabbing`,
+					`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] active:cursor-grabbing`,
 					inert ? `cursor-grabbing` : `cursor-grab`,
 				)}
 				ref={contentRef}
 			>
-				<button type="button" onClick={() => setIsDrawerOpen(true)} onPointerDownCapture={(e) => e.stopPropagation()}>
-					<ReadOutlined />
-				</button>
+				<ReadOutlined />
 				<p>{epic.name}</p>
 			</div>
 
@@ -105,14 +100,12 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 					onClick={() => {
 						meta.addFeature({parentId: epicId}).catch(console.error)
 					}}
-					className="flex items-center gap-2 rounded border-2 border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378] transition-colors hover:bg-[#f2fbfe]"
+					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378]"
 				>
 					<CopyOutlined />
 					<span>Add feature</span>
 				</button>
 			)}
-
-			<EpicDrawer meta={meta} epicId={epicId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
 		</div>
 	)
 }
