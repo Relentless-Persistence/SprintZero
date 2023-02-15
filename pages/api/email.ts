@@ -1,9 +1,9 @@
 import {google} from "googleapis"
-// import nodemailer from "nodemailer"
+import nodemailer from "nodemailer"
 
 const OAuth2 = google.auth.OAuth2
 
-import type {NextApiHandler, NextApiRequest,NextApiResponse} from "next"
+import type {NextApiHandler, NextApiRequest, NextApiResponse} from "next"
 
 const OAuth2_client = new OAuth2(
 	process.env.NEXT_PUBLIC_GOOGLE_CLIENTID,
@@ -14,31 +14,32 @@ OAuth2_client.setCredentials({
 	refresh_token: process.env.NEXT_PUBLIC_GOOGLE_REFRESHTOKEN,
 })
 
-// interface MailOption {
-// 	to: string
-// 	from: string
-// 	subject: string
-// 	text?: string
-// 	html: string
-// }
+interface MailOption {
+	to: string
+	from: string
+	subject: string
+	text?: string
+	html: string
+}
 
 
 const handler: NextApiHandler = (req: NextApiRequest, res: NextApiResponse) => {
-	// const accessToken = await OAuth2_client.getAccessToken()
+	const accessToken = await OAuth2_client.getAccessToken()
 
-	res.send(`working on it`)
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	const {to, from, subject, text = ``, html}: MailOption = req.body
 
-	// const transporter = nodemailer.createTransport({
-	// 	service: `gmail`,
-	// 	auth: {
-	// 		type: `OAuth2`,
-	// 		user: `no-reply@sprintzero.app`,
-	// 		clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENTID,
-	// 		clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENTSECRET,
-	// 		refreshToken: process.env.NEXT_PUBLIC_GOOGLE_REFRESHTOKEN,
-	// 		accessToken,
-	// 	},
-	// })
+	const transporter = nodemailer.createTransport({
+		service: `gmail`,
+		auth: {
+			type: `OAuth2`,
+			user: `no-reply@sprintzero.app`,
+			clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENTID,
+			clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENTSECRET,
+			refreshToken: process.env.NEXT_PUBLIC_GOOGLE_REFRESHTOKEN,
+			accessToken,
+		},
+	})
 	
 
 	// const mail_options = {
@@ -49,25 +50,24 @@ const handler: NextApiHandler = (req: NextApiRequest, res: NextApiResponse) => {
 	// }
 
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	// const {to, from, subject, text = ``, html}: MailOption = req.body
+	
 
-	// try {
-	// 	await transporter.verify()
-	// 	// console.log(`Server is ready to take our messages`)
+	try {
+		await transporter.verify()
+		// console.log(`Server is ready to take our messages`)
 
-	// 	// const info = await transporter.sendMail({
-	// 	// 	from,
-	// 	// 	to,
-	// 	// 	subject,
-	// 	// 	text,
-	// 	// 	html,
-	// 	// })
-	// 	res.status(200).send({message: `Email sent.`})
-	// } catch (error) {
-	// 	console.error(error)
-	// 	res.status(500).send({message: `Email not sent! Something went wrong.`})
-	// }
+		// const info = await transporter.sendMail({
+		// 	from,
+		// 	to,
+		// 	subject,
+		// 	text,
+		// 	html,
+		// })
+		res.status(200).send({message: `Email sent.`})
+	} catch (error) {
+		console.error(error)
+		res.status(500).send({message: `Email not sent! Something went wrong.`})
+	}
 }
 
 export default handler
