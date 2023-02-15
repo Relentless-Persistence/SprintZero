@@ -20,6 +20,10 @@ button.ant-btn-link {
 	color: #4a801e;
 }
 
+button.ant-switch {
+	background-color: rgba(0, 0, 0, 0.25);
+}
+
 ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 	background-color: transparent;
 }
@@ -60,4 +64,13 @@ li {
 
 .ant-float-btn-default {
 	background-color: white;
+}
+
+.ant-tabs-right > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+	padding-right: 0px;
+	height: 100%;
+}
+
+.ant-tabs-content.ant-tabs-content-right {
+	height: 100%;
 }

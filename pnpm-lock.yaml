@@ -4,19 +4,19 @@ specifiers:
   '@ant-design/icons': 5.0.1
   '@hookform/resolvers': 2.9.11
   '@playwright/test': 1.30.0
-  '@tanstack/eslint-plugin-query': 4.24.7
+  '@tanstack/eslint-plugin-query': 4.24.8
   '@tanstack/react-query': 4.24.6
   '@types/diff': 5.0.2
   '@types/lodash': 4.14.191
   '@types/node': 18.13.0
   '@types/nodemailer': 6.4.7
   '@types/react': 18.0.28
-  '@types/react-dom': 18.0.10
+  '@types/react-dom': 18.0.11
   '@typescript-eslint/eslint-plugin': 5.52.0
   '@typescript-eslint/parser': 5.52.0
   antd: 5.2.1
   autoprefixer: 10.4.13
-  axios: 1.3.2
+  axios: 1.3.3
   clsx: 1.2.1
   dayjs: 1.11.7
   diff: 5.1.0
@@ -27,7 +27,7 @@ specifiers:
   eslint-plugin-react: 7.32.2
   eslint-plugin-react-hooks: 4.6.0
   firebase: 9.17.1
-  framer-motion: 9.0.2
+  framer-motion: 9.0.3
   immer: 9.0.19
   jotai: 2.0.1
   lodash: 4.17.21
@@ -37,7 +37,7 @@ specifiers:
   openai: 3.1.0
   postcss: 8.4.21
   prettier: 2.8.4
-  prettier-plugin-tailwindcss: 0.2.2
+  prettier-plugin-tailwindcss: 0.2.3
   react: 18.2.0
   react-dom: 18.2.0
   react-firebase-hooks: 5.1.1
@@ -56,19 +56,19 @@ dependencies:
   '@ant-design/icons': 5.0.1_biqbaboplfbrettd7655fr4n2y
   '@hookform/resolvers': 2.9.11_react-hook-form@7.43.1
   '@playwright/test': 1.30.0
-  '@tanstack/eslint-plugin-query': 4.24.7
+  '@tanstack/eslint-plugin-query': 4.24.8
   '@tanstack/react-query': 4.24.6_biqbaboplfbrettd7655fr4n2y
   '@types/diff': 5.0.2
   '@types/lodash': 4.14.191
   '@types/node': 18.13.0
   '@types/nodemailer': 6.4.7
   '@types/react': 18.0.28
-  '@types/react-dom': 18.0.10
+  '@types/react-dom': 18.0.11
   '@typescript-eslint/eslint-plugin': 5.52.0_6cfvjsbua5ptj65675bqcn6oza
   '@typescript-eslint/parser': 5.52.0_7kw3g6rralp5ps6mg3uyzz6azm
   antd: 5.2.1_biqbaboplfbrettd7655fr4n2y
   autoprefixer: 10.4.13_postcss@8.4.21
-  axios: 1.3.2
+  axios: 1.3.3
   clsx: 1.2.1
   dayjs: 1.11.7
   diff: 5.1.0
@@ -79,7 +79,7 @@ dependencies:
   eslint-plugin-react: 7.32.2_eslint@8.34.0
   eslint-plugin-react-hooks: 4.6.0_eslint@8.34.0
   firebase: 9.17.1
-  framer-motion: 9.0.2_biqbaboplfbrettd7655fr4n2y
+  framer-motion: 9.0.3_biqbaboplfbrettd7655fr4n2y
   immer: 9.0.19
   jotai: 2.0.1_react@18.2.0
   lodash: 4.17.21
@@ -89,7 +89,7 @@ dependencies:
   openai: 3.1.0
   postcss: 8.4.21
   prettier: 2.8.4
-  prettier-plugin-tailwindcss: 0.2.2_prettier@2.8.4
+  prettier-plugin-tailwindcss: 0.2.3_prettier@2.8.4
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-firebase-hooks: 5.1.1_aqcelxavj7bzvzjrob2hajgybq
@@ -1065,8 +1065,8 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@tanstack/eslint-plugin-query/4.24.7:
-    resolution: {integrity: sha512-61Z+cc/g6pJxin2sasIUYeNoF6aeb+HhG7fHPTR9ei/QMJxJN0uIfV/LMBDTMJC2wjPrRQsz2Wu/RQPkQfHlGg==}
+  /@tanstack/eslint-plugin-query/4.24.8:
+    resolution: {integrity: sha512-0ND7PSwsceAhuI+acdGiEK1D+LvP/EYESwtxAGhQ0yYLUPB6xAWHiytXokQcL5PgHMpiqe1+NWcRSH/U3NFtrA==}
     dev: false
 
   /@tanstack/query-core/4.24.6:
@@ -1129,8 +1129,8 @@ packages:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
     dev: false
 
-  /@types/react-dom/18.0.10:
-    resolution: {integrity: sha512-E42GW/JA4Qv15wQdqJq8DL4JhNpB3prJgjgapN3qJT9K2zO5IIAQh4VXvCEDupoqAwnz0cY4RlXeC/ajX5SFHg==}
+  /@types/react-dom/18.0.11:
+    resolution: {integrity: sha512-O38bPbI2CWtgw/OoQoY+BRelw7uysmXbWvw3nLWO21H1HSh+GOlqPuXshJfjmpNlKiiSDG9cc1JZAaMmVdcTlw==}
     dependencies:
       '@types/react': 18.0.28
     dev: false
@@ -1517,8 +1517,8 @@ packages:
       - debug
     dev: false
 
-  /axios/1.3.2:
-    resolution: {integrity: sha512-1M3O703bYqYuPhbHeya5bnhpYVsDDRyQSabNja04mZtboLNSuZ4YrltestrLXfHgmzua4TpUqRiVKbiQuo2epw==}
+  /axios/1.3.3:
+    resolution: {integrity: sha512-eYq77dYIFS77AQlhzEL937yUBSepBfPIe8FcgEDN35vMNZKMrs81pgnyrQpwfy4NF4b4XWX1Zgx7yX+25w8QJA==}
     dependencies:
       follow-redirects: 1.15.2
       form-data: 4.0.0
@@ -2449,8 +2449,8 @@ packages:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: false
 
-  /framer-motion/9.0.2_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-n7ZdIUBrT1xklowQNRQ6/h54+3ysmz422CP0rrhjE1X2tshiJy0WWQ7tv6y/fcOSQd23htNA9vvbUFLYMQ5lEQ==}
+  /framer-motion/9.0.3_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-QcMWXcwvBmInzFpkIgtLx8VQ/+H9+EhiHVgnx6zsOWTGmcvzFqkrw6SLTZn5fKejCaf3RznqkshhxXipBpe9ig==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -3512,10 +3512,11 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: false
 
-  /prettier-plugin-tailwindcss/0.2.2_prettier@2.8.4:
-    resolution: {integrity: sha512-5RjUbWRe305pUpc48MosoIp6uxZvZxrM6GyOgsbGLTce+ehePKNm7ziW2dLG2air9aXbGuXlHVSQQw4Lbosq3w==}
+  /prettier-plugin-tailwindcss/0.2.3_prettier@2.8.4:
+    resolution: {integrity: sha512-s2N5Dh7Ao5KTV1mao5ZBnn8EKtUcDPJEkGViZIjI0Ij9TTI5zgTz4IHOxW33jOdjHKa8CSjM88scelUiC5TNRQ==}
     engines: {node: '>=12.17.0'}
     peerDependencies:
+      '@ianvs/prettier-plugin-sort-imports': '*'
       '@prettier/plugin-php': '*'
       '@prettier/plugin-pug': '*'
       '@shopify/prettier-plugin-liquid': '*'
@@ -3532,6 +3533,8 @@ packages:
       prettier-plugin-svelte: '*'
       prettier-plugin-twig-melody: '*'
     peerDependenciesMeta:
+      '@ianvs/prettier-plugin-sort-imports':
+        optional: true
       '@prettier/plugin-php':
         optional: true
       '@prettier/plugin-pug':
