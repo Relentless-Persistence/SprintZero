@@ -2,12 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#__next {
+	height: 100%;
+}
+
 button.ant-btn-default {
 	background-color: white;
 }
 
 button.ant-btn-primary {
 	background-color: #4a801e;
+}
+
+button.ant-btn-link {
+	color: #4a801e;
 }
 
 ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
@@ -38,6 +48,10 @@ li {
 
 .ant-tabs-right > .ant-tabs-nav {
 	max-width: 100%;
+}
+
+.ant-tabs-right .ant-tabs-content-holder {
+	width: 0px;
 }
 
 .ant-tabs-tab-btn {

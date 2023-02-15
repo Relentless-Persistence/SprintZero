@@ -48,9 +48,9 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => onEditStart()} className="text-green">
+					<Button size="small" onClick={() => onEditStart()}>
 						Edit
-					</button>
+					</Button>
 				)
 			}
 		>

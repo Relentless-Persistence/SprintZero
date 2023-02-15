@@ -21,16 +21,27 @@ export const ProductSchema = z.object({
 	// Kickoff info
 	problemStatement: z.string(),
 	personas: z.array(z.object({id: z.string(), text: z.string()})),
-	successMetrics: z.array(z.object({id: z.string(), text: z.string()})),
-	businessPriorities: z.array(z.object({id: z.string(), text: z.string()})),
+	businessOutcomes: z.array(z.object({id: z.string(), text: z.string()})),
+	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),
+	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
+	marketLeaders: z.array(z.object({id: z.string(), text: z.string()})),
 
 	// Accessibility info
-	accessibilityMissionStatements: z.object({
-		auditory: z.string(),
-		cognitive: z.string(),
-		physical: z.string(),
-		speech: z.string(),
-		visual: z.string(),
+	accessibility: z.object({
+		auditory: z.tuple([z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean()]),
+		cognitive: z.tuple([z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean()]),
+		physical: z.tuple([z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean()]),
+		speech: z.tuple([z.boolean(), z.boolean()]),
+		visual: z.tuple([
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+		]),
 	}),
 
 	// Vision info

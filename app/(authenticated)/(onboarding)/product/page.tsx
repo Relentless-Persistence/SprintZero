@@ -53,12 +53,12 @@ const ProductSetupPage: FC = () => {
 			personas: [],
 			successMetrics: [],
 			businessPriorities: [],
-			accessibilityMissionStatements: {
-				auditory: ``,
-				cognitive: ``,
-				physical: ``,
-				speech: ``,
-				visual: ``,
+			accessibility: {
+				auditory: [false, false, false, false, false],
+				cognitive: [false, false, false, false, false, false],
+				physical: [false, false, false, false, false],
+				speech: [false, false],
+				visual: [false, false, false, false, false, false, false, false],
 			},
 			productType: `mobile`,
 			valueProposition: ``,

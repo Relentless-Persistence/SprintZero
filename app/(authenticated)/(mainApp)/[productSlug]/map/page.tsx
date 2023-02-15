@@ -39,8 +39,8 @@ const Dashboard: FC = () => {
 	)
 
 	return (
-		<div className="grid h-full grid-cols-[1fr_6rem]">
-			<div className="flex flex-col gap-8">
+		<div className="grid h-full grid-cols-[1fr_fit-content(6rem)]">
+			<div className="relative flex flex-col gap-8">
 				{currentVersionId && (
 					<StoryMapHeader versionName={versions?.find((version) => version.id === currentVersionId)?.name} />
 				)}
@@ -56,6 +56,16 @@ const Dashboard: FC = () => {
 						)}
 					</motion.div>
 				</div>
+
+				<FloatButton.Group
+					trigger="click"
+					type="primary"
+					shape="square"
+					icon={<MenuOutlined />}
+					className="absolute right-12 bottom-8"
+				>
+					<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />
+				</FloatButton.Group>
 			</div>
 
 			{activeProduct && (
@@ -67,16 +77,6 @@ const Dashboard: FC = () => {
 					storyMapStateId={activeProduct.storyMapStateId}
 				/>
 			)}
-
-			<FloatButton.Group
-				trigger="click"
-				type="primary"
-				shape="square"
-				icon={<MenuOutlined />}
-				className="right-36 bottom-8"
-			>
-				<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />
-			</FloatButton.Group>
 		</div>
 	)
 }

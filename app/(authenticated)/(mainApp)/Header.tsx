@@ -31,30 +31,28 @@ const Header: FC = () => {
 
 	return (
 		<>
-			<Layout.Header style={{paddingInline: `unset`}}>
-				<div className="bg-pine flex h-full items-center gap-8 px-[17.45px]">
-					<Image src="/images/logo_beta.png" alt="SprintZero logo" width={178} height={42} priority />
+			<Layout.Header className="flex items-center gap-8 !px-4">
+				<Image src="/images/logo_beta.png" alt="SprintZero logo" width={178} height={42} priority />
 
-					<Menu
-						theme="dark"
-						mode="horizontal"
-						selectedKeys={[activeProduct?.id ?? ``]}
-						items={allProducts?.map((product) => ({
-							key: product.id,
-							label: (
-								<LinkTo href={`/${product.id}/map`} className="relative">
-									{product.name}
-								</LinkTo>
-							),
-						}))}
-						className="grow [&>.ant-menu-item-selected]:shadow-[inset_0px_-4px_0px_0px_#73c92d] [&>.ant-menu-item]:cursor-default"
-						style={{background: `transparent`}}
-					/>
+				<Menu
+					theme="dark"
+					mode="horizontal"
+					selectedKeys={[activeProduct?.id ?? ``]}
+					items={allProducts?.map((product) => ({
+						key: product.id,
+						label: (
+							<LinkTo href={`/${product.id}/map`} className="relative">
+								{product.name}
+							</LinkTo>
+						),
+					}))}
+					className="grow [&>.ant-menu-item-selected]:shadow-[inset_0px_-4px_0px_0px_#73c92d] [&>.ant-menu-item]:cursor-default"
+					style={{background: `transparent`}}
+				/>
 
-					<button type="button" onClick={() => setIsSettingsOpen(true)}>
-						<Avatar src={user.photoURL} className="border-2 border-green" />
-					</button>
-				</div>
+				<button type="button" onClick={() => setIsSettingsOpen(true)}>
+					<Avatar src={user.photoURL} className="border-2 border-green" />
+				</button>
 			</Layout.Header>
 
 			<Drawer

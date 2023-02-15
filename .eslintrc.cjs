@@ -31,7 +31,7 @@ module.exports = {
 		"no-control-regex": `off`,
 		"no-empty": [`warn`, {allowEmptyCatch: true}],
 		"no-mixed-spaces-and-tabs": [`warn`, `smart-tabs`],
-		"no-nested-ternary": `warn`,
+		// "no-nested-ternary": `warn`,
 		"no-param-reassign": `error`,
 		"no-unused-expressions": [`warn`, {enforceForJSX: true}],
 		"no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
