@@ -4,7 +4,7 @@ import {FireOutlined} from "@ant-design/icons"
 import {Breadcrumb, Dropdown, Input, Segmented} from "antd"
 import {collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Product} from "~/types/db/Products"
@@ -16,7 +16,7 @@ import {useUser} from "~/utils/useUser"
 
 const ConfigSettingsPage: FC = () => {
 	const user = useUser()
-	const [allProducts] = useCollectionData(
+	const [allProducts] = useCollection(
 		user
 			? query(collection(db, `Products`), where(`members.${user.id}.type`, `==`, `editor`)).withConverter(
 					ProductConverter,
@@ -24,29 +24,29 @@ const ConfigSettingsPage: FC = () => {
 			: undefined,
 	)
 	// Technically the user can be a part of multiple products, but this page is only designed for one for now.
-	const firstProduct = allProducts?.[0]
+	const firstProduct = allProducts?.docs[0]
 
-	const [title, setTitle] = useState(firstProduct?.name)
+	const [title, setTitle] = useState(firstProduct?.data().name)
 	useEffect(() => {
-		setTitle(firstProduct?.name)
-	}, [firstProduct?.name])
+		setTitle(firstProduct?.data().name)
+	}, [firstProduct])
 
-	const [cadence, setCadence] = useState(firstProduct?.cadence)
+	const [cadence, setCadence] = useState(firstProduct?.data().cadence)
 	useEffect(() => {
-		setCadence(firstProduct?.cadence)
-	}, [firstProduct?.cadence])
+		setCadence(firstProduct?.data().cadence)
+	}, [firstProduct])
 
-	const [gate, setGate] = useState(firstProduct?.sprintStartDayOfWeek)
+	const [gate, setGate] = useState(firstProduct?.data().sprintStartDayOfWeek)
 	useEffect(() => {
-		setGate(firstProduct?.sprintStartDayOfWeek)
-	}, [firstProduct?.sprintStartDayOfWeek])
+		setGate(firstProduct?.data().sprintStartDayOfWeek)
+	}, [firstProduct])
 
 	const [effortCost, setEffortCost] = useState(
-		typeof firstProduct?.effortCost === `number` ? String(firstProduct.effortCost) : ``,
+		typeof firstProduct?.data().effortCost === `number` ? String(firstProduct.data().effortCost) : ``,
 	)
 	useEffect(() => {
-		setEffortCost(typeof firstProduct?.effortCost === `number` ? String(firstProduct.effortCost) : ``)
-	}, [firstProduct?.effortCost])
+		setEffortCost(typeof firstProduct?.data().effortCost === `number` ? String(firstProduct.data().effortCost) : ``)
+	}, [firstProduct])
 
 	return (
 		<div className="flex flex-col gap-6 px-12 py-8">

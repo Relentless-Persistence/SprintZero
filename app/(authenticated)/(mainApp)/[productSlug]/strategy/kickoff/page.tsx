@@ -11,7 +11,7 @@ import type {Product} from "~/types/db/Products"
 
 import EditButtons from "./EditButtons"
 import ProblemStatementCard from "./ProblemStatementCard"
-import TextListEditor from "../../../../../../components/TextListEditor"
+import TextListEditor from "~/components/TextListEditor"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"

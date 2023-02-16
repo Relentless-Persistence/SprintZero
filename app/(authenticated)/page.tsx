@@ -4,7 +4,7 @@ import {collection, query, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
-import {useCollectionDataOnce} from "react-firebase-hooks/firestore"
+import {useCollectionOnce} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
 import type {FC} from "react"
@@ -17,7 +17,7 @@ const HomePage: FC = () => {
 	const [user] = useAuthState(auth)
 	invariant(user, `User must be logged in.`)
 
-	const [products, loading] = useCollectionDataOnce(
+	const [products, loading] = useCollectionOnce(
 		query(collection(db, `Products`), where(`members.${user.uid}.type`, `==`, `editor`)).withConverter(
 			ProductConverter,
 		),
@@ -26,7 +26,7 @@ const HomePage: FC = () => {
 	useEffect(() => {
 		if (!products || loading) return
 
-		const firstProduct = products[0]
+		const firstProduct = products.docs[0]
 		if (firstProduct) router.replace(`/${firstProduct.id}/map`)
 		else router.replace(`/product`)
 	}, [loading, products, router])

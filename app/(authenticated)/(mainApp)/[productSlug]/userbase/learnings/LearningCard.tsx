@@ -4,7 +4,7 @@ import {useForm} from "react-hook-form"
 
 import type {FC} from "react"
 import type {z} from "zod"
-import type {WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {Learning} from "~/types/db/Learnings"
 
 import RhfInput from "~/components/rhf/RhfInput"
@@ -18,25 +18,26 @@ const formSchema = LearningSchema.pick({status: true, text: true, title: true})
 type FormInputs = z.infer<typeof formSchema>
 
 export type LearningCardProps = {
-	item: Partial<WithDocumentData<Learning>>
+	learningId?: Id
+	initialData: Partial<Learning>
 	isEditing: boolean
 	onEditStart?: () => void
 	onEditEnd: () => void
 }
 
-const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, onEditEnd}) => {
+const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEditing, onEditStart, onEditEnd}) => {
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
 		defaultValues: {
-			status: item.status,
-			text: item.text ?? ``,
-			title: item.title ?? ``,
+			status: initialData.status,
+			text: initialData.text ?? ``,
+			title: initialData.title ?? ``,
 		},
 	})
 
 	const activeProductId = useActiveProductId()
 	const onSubmit = handleSubmit(async (data) => {
-		if (item.id) await updateDoc(doc(db, `Learnings`, item.id), data satisfies Partial<Learning>)
+		if (learningId) await updateDoc(doc(db, `Learnings`, learningId), data satisfies Partial<Learning>)
 		else await addDoc(collection(db, `Learnings`), {...data, productId: activeProductId} satisfies Learning)
 		onEditEnd()
 	})
@@ -44,7 +45,7 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 	return (
 		<Card
 			type="inner"
-			title={isEditing ? <RhfInput size="small" control={control} name="title" className="mr-4" /> : item.title}
+			title={isEditing ? <RhfInput size="small" control={control} name="title" className="mr-4" /> : initialData.title}
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
@@ -81,11 +82,11 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 						block
 					/>
 					<RhfStretchyTextArea control={control} name="text" minHeight="4rem" />
-					{item.id && (
+					{learningId && (
 						<Button
 							danger
 							onClick={() => {
-								deleteDoc(doc(db, `Learnings`, item.id!)).catch(console.error)
+								deleteDoc(doc(db, `Learnings`, learningId)).catch(console.error)
 							}}
 							className="w-full"
 						>
@@ -94,7 +95,7 @@ const LearningItemCard: FC<LearningCardProps> = ({item, isEditing, onEditStart, 
 					)}
 				</form>
 			) : (
-				<p className="min-w-0">{item.text}</p>
+				<p className="min-w-0">{initialData.text}</p>
 			)}
 		</Card>
 	)

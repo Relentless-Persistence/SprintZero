@@ -33,7 +33,7 @@ const TeamSettingsPage: FC = () => {
 					.filter(([, info]) => info?.type === currentTab)
 					.map(([id]) => ({
 						queryKey: [`user`, id],
-						queryFn: async () => (await getDoc(doc(db, `Users`, id).withConverter(UserConverter))).data(),
+						queryFn: async () => await getDoc(doc(db, `Users`, id).withConverter(UserConverter)),
 					}))
 			: [],
 	})
@@ -56,10 +56,10 @@ const TeamSettingsPage: FC = () => {
 							<div className="flex flex-col gap-4">
 								{members.map(
 									({data: member}) =>
-										member && (
+										member?.exists() && (
 											<div key={member.id} className="flex flex-col gap-1 border border-[#d9d9d9] bg-white px-6 py-4">
-												<p className="font-semibold">{member.name}</p>
-												<p>{member.email}</p>
+												<p className="font-semibold">{member.data().name}</p>
+												<p>{member.data().email}</p>
 											</div>
 										),
 								)}
@@ -73,10 +73,10 @@ const TeamSettingsPage: FC = () => {
 							<div className="flex flex-col gap-4">
 								{members.map(
 									({data: member}) =>
-										member && (
+										member?.exists() && (
 											<div key={member.id} className="flex flex-col gap-1 border border-[#d9d9d9] bg-white px-6 py-4">
-												<p className="font-semibold">{member.name}</p>
-												<p>{member.email}</p>
+												<p className="font-semibold">{member.data().name}</p>
+												<p>{member.data().email}</p>
 											</div>
 										),
 								)}

@@ -1,13 +1,12 @@
 import {ReadOutlined} from "@ant-design/icons"
-import {Timestamp, collection, deleteField, serverTimestamp, updateDoc, writeBatch} from "firebase/firestore"
+import {Timestamp, deleteField, serverTimestamp, updateDoc, writeBatch} from "firebase/firestore"
 import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {DragInfo} from "./types"
-import type {WithFieldValue} from "firebase/firestore"
+import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {
 	Epic as EpicType,
@@ -15,33 +14,30 @@ import type {
 	StoryMapState,
 	Story as StoryType,
 } from "~/types/db/StoryMapStates"
+import type {Version} from "~/types/db/Versions"
 
 import Epic from "./Epic"
 import Feature from "./Feature"
 import {elementRegistry, layerBoundaries} from "./globals"
 import {useGenMeta} from "./meta"
 import Story from "./Story"
-import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 import {avg} from "~/utils/math"
 import {sortFeatures} from "~/utils/storyMap"
 
 export type StoryMapProps = {
-	activeProduct: WithDocumentData<Product>
-	storyMapState: WithDocumentData<StoryMapState>
+	activeProduct: QueryDocumentSnapshot<Product>
+	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	allVersions: QuerySnapshot<Version>
 	currentVersionId: Id | `__ALL_VERSIONS__`
 }
 
-const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, currentVersionId}) => {
-	const [versions] = useCollectionData(
-		collection(db, `StoryMapStates`, activeProduct.storyMapStateId, `Versions`).withConverter(VersionConverter),
-	)
-
+const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions, currentVersionId}) => {
 	const meta = useGenMeta({
-		storyMapStateId: activeProduct.storyMapStateId,
-		storyMapItems: storyMapState.items,
+		storyMapStateId: activeProduct.data().storyMapStateId,
+		storyMapItems: storyMapState.data().items,
 		storyMapStateRef: storyMapState.ref,
-		allVersions: versions ?? [],
+		allVersions,
 		currentVersionId,
 	})
 
@@ -92,7 +88,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, currentVersi
 		if (dragInfo.itemBeingDraggedId === undefined) return
 
 		if (operationCompleteCondition.current) {
-			const isOperationComplete = operationCompleteCondition.current(storyMapState.items)
+			const isOperationComplete = operationCompleteCondition.current(storyMapState.data().items)
 			if (isOperationComplete) operationCompleteCondition.current = undefined
 			else return
 		}
@@ -101,7 +97,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, currentVersi
 		const y = dragInfo.mousePos[1].get()
 
 		// All the logic for moving items around are in this switch statement
-		switch (storyMapState.items[dragInfo.itemBeingDraggedId]!.type) {
+		switch (storyMapState.data().items[dragInfo.itemBeingDraggedId]!.type) {
 			case `epic`: {
 				if (y <= layerBoundaries[0]) {
 					// Reorder epics
@@ -168,7 +164,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, currentVersi
 					const itemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
 					let parentId: Id
 					let featureIndex: number
-					if (storyMapState.items[itemId]!.type === `epic`) {
+					if (storyMapState.data().items[itemId]!.type === `epic`) {
 						parentId = itemId
 						const epic = meta.epics.find((epic) => epic.id === itemId)!
 						featureIndex = epic.childrenIds.length
@@ -537,7 +533,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, currentVersi
 					const itemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
 					let parentId: Id
 					let featureIndex: number
-					if (storyMapState.items[itemId]!.type === `epic`) {
+					if (storyMapState.data().items[itemId]!.type === `epic`) {
 						parentId = itemId
 						const epic = meta.epics.find((epic) => epic.id === itemId)!
 						featureIndex = epic.childrenIds.length
@@ -554,7 +550,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, currentVersi
 					const nextFeatureUserValue =
 						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex])?.userValue ?? 1
 
-					const itemBeingDragged = storyMapState.items[dragInfo.itemBeingDraggedId] as StoryType
+					const itemBeingDragged = storyMapState.data().items[dragInfo.itemBeingDraggedId] as StoryType
 					const data: WithFieldValue<Pick<StoryMapState, `updatedAt`> & {[key: `items.${Id}.`]: FeatureType}> = {
 						[`items.${dragInfo.itemBeingDraggedId}`]: {
 							type: `feature` as const,
@@ -619,7 +615,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, currentVersi
 				}}
 			>
 				{(() => {
-					const item = Object.entries(storyMapState.items).find(([id]) => id === dragInfo.itemBeingDraggedId)
+					const item = Object.entries(storyMapState.data().items).find(([id]) => id === dragInfo.itemBeingDraggedId)
 					switch (item?.[1]!.type) {
 						case `epic`:
 							return <Epic meta={meta} dragInfo={dragInfo} epicId={item[0] as Id} inert />

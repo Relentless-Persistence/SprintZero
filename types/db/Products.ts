@@ -22,9 +22,9 @@ export const ProductSchema = z.object({
 	problemStatement: z.string(),
 	personas: z.array(z.object({id: z.string(), text: z.string()})),
 	businessOutcomes: z.array(z.object({id: z.string(), text: z.string()})),
-	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),
-	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
 	marketLeaders: z.array(z.object({id: z.string(), text: z.string()})),
+	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
+	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),
 
 	// Accessibility info
 	accessibility: z.object({

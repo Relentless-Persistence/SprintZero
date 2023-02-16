@@ -4,7 +4,7 @@ import {CheckOutlined} from "@ant-design/icons"
 import {Breadcrumb, Card, Switch, Tabs} from "antd"
 import {doc, updateDoc} from "firebase/firestore"
 import produce from "immer"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocument} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
@@ -17,7 +17,7 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const AccessibilityPage: FC = () => {
 	const activeProductId = useActiveProductId()
 
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	return (
 		<Tabs
@@ -47,7 +47,7 @@ const AccessibilityPage: FC = () => {
 								</span>
 							</p>
 
-							{activeProduct && (
+							{activeProduct?.exists() && (
 								<Masonry
 									breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 									className="flex gap-8"
@@ -59,12 +59,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.auditory[0]}
+												checked={activeProduct.data().accessibility.auditory[0]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.auditory`]: produce(activeProduct.accessibility.auditory, (draft) => {
-															draft[0] = checked
-														}),
+														[`accessibility.auditory`]: produce(
+															activeProduct.data().accessibility.auditory,
+															(draft) => {
+																draft[0] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -80,12 +83,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.auditory[1]}
+												checked={activeProduct.data().accessibility.auditory[1]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.auditory`]: produce(activeProduct.accessibility.auditory, (draft) => {
-															draft[1] = checked
-														}),
+														[`accessibility.auditory`]: produce(
+															activeProduct.data().accessibility.auditory,
+															(draft) => {
+																draft[1] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -99,12 +105,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.auditory[2]}
+												checked={activeProduct.data().accessibility.auditory[2]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.auditory`]: produce(activeProduct.accessibility.auditory, (draft) => {
-															draft[2] = checked
-														}),
+														[`accessibility.auditory`]: produce(
+															activeProduct.data().accessibility.auditory,
+															(draft) => {
+																draft[2] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -118,12 +127,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.auditory[3]}
+												checked={activeProduct.data().accessibility.auditory[3]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.auditory`]: produce(activeProduct.accessibility.auditory, (draft) => {
-															draft[3] = checked
-														}),
+														[`accessibility.auditory`]: produce(
+															activeProduct.data().accessibility.auditory,
+															(draft) => {
+																draft[3] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -137,12 +149,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.auditory[4]}
+												checked={activeProduct.data().accessibility.auditory[4]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.auditory`]: produce(activeProduct.accessibility.auditory, (draft) => {
-															draft[4] = checked
-														}),
+														[`accessibility.auditory`]: produce(
+															activeProduct.data().accessibility.auditory,
+															(draft) => {
+																draft[4] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -179,7 +194,7 @@ const AccessibilityPage: FC = () => {
 								</span>
 							</p>
 
-							{activeProduct && (
+							{activeProduct?.exists() && (
 								<Masonry
 									breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 									className="flex gap-8"
@@ -191,12 +206,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.cognitive[0]}
+												checked={activeProduct.data().accessibility.cognitive[0]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.cognitive`]: produce(activeProduct.accessibility.cognitive, (draft) => {
-															draft[0] = checked
-														}),
+														[`accessibility.cognitive`]: produce(
+															activeProduct.data().accessibility.cognitive,
+															(draft) => {
+																draft[0] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -210,12 +228,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.cognitive[1]}
+												checked={activeProduct.data().accessibility.cognitive[1]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.cognitive`]: produce(activeProduct.accessibility.cognitive, (draft) => {
-															draft[1] = checked
-														}),
+														[`accessibility.cognitive`]: produce(
+															activeProduct.data().accessibility.cognitive,
+															(draft) => {
+																draft[1] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -231,12 +252,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.cognitive[2]}
+												checked={activeProduct.data().accessibility.cognitive[2]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.cognitive`]: produce(activeProduct.accessibility.cognitive, (draft) => {
-															draft[2] = checked
-														}),
+														[`accessibility.cognitive`]: produce(
+															activeProduct.data().accessibility.cognitive,
+															(draft) => {
+																draft[2] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -252,12 +276,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.cognitive[3]}
+												checked={activeProduct.data().accessibility.cognitive[3]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.cognitive`]: produce(activeProduct.accessibility.cognitive, (draft) => {
-															draft[3] = checked
-														}),
+														[`accessibility.cognitive`]: produce(
+															activeProduct.data().accessibility.cognitive,
+															(draft) => {
+																draft[3] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -271,12 +298,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.cognitive[4]}
+												checked={activeProduct.data().accessibility.cognitive[4]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.cognitive`]: produce(activeProduct.accessibility.cognitive, (draft) => {
-															draft[4] = checked
-														}),
+														[`accessibility.cognitive`]: produce(
+															activeProduct.data().accessibility.cognitive,
+															(draft) => {
+																draft[4] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -292,12 +322,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.cognitive[5]}
+												checked={activeProduct.data().accessibility.cognitive[5]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.cognitive`]: produce(activeProduct.accessibility.cognitive, (draft) => {
-															draft[5] = checked
-														}),
+														[`accessibility.cognitive`]: produce(
+															activeProduct.data().accessibility.cognitive,
+															(draft) => {
+																draft[5] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -333,7 +366,7 @@ const AccessibilityPage: FC = () => {
 								</span>
 							</p>
 
-							{activeProduct && (
+							{activeProduct?.exists() && (
 								<Masonry
 									breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 									className="flex gap-8"
@@ -345,12 +378,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.physical[0]}
+												checked={activeProduct.data().accessibility.physical[0]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.physical`]: produce(activeProduct.accessibility.physical, (draft) => {
-															draft[0] = checked
-														}),
+														[`accessibility.physical`]: produce(
+															activeProduct.data().accessibility.physical,
+															(draft) => {
+																draft[0] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -364,12 +400,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.physical[1]}
+												checked={activeProduct.data().accessibility.physical[1]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.physical`]: produce(activeProduct.accessibility.physical, (draft) => {
-															draft[1] = checked
-														}),
+														[`accessibility.physical`]: produce(
+															activeProduct.data().accessibility.physical,
+															(draft) => {
+																draft[1] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -383,12 +422,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.physical[2]}
+												checked={activeProduct.data().accessibility.physical[2]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.physical`]: produce(activeProduct.accessibility.physical, (draft) => {
-															draft[2] = checked
-														}),
+														[`accessibility.physical`]: produce(
+															activeProduct.data().accessibility.physical,
+															(draft) => {
+																draft[2] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -402,12 +444,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.physical[3]}
+												checked={activeProduct.data().accessibility.physical[3]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.physical`]: produce(activeProduct.accessibility.physical, (draft) => {
-															draft[3] = checked
-														}),
+														[`accessibility.physical`]: produce(
+															activeProduct.data().accessibility.physical,
+															(draft) => {
+																draft[3] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -421,12 +466,15 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.physical[4]}
+												checked={activeProduct.data().accessibility.physical[4]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.physical`]: produce(activeProduct.accessibility.physical, (draft) => {
-															draft[4] = checked
-														}),
+														[`accessibility.physical`]: produce(
+															activeProduct.data().accessibility.physical,
+															(draft) => {
+																draft[4] = checked
+															},
+														),
 													}).catch(console.error)
 												}}
 											/>
@@ -461,7 +509,7 @@ const AccessibilityPage: FC = () => {
 								</span>
 							</p>
 
-							{activeProduct && (
+							{activeProduct?.exists() && (
 								<Masonry
 									breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 									className="flex gap-8"
@@ -473,10 +521,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.speech[0]}
+												checked={activeProduct.data().accessibility.speech[0]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.speech`]: produce(activeProduct.accessibility.speech, (draft) => {
+														[`accessibility.speech`]: produce(activeProduct.data().accessibility.speech, (draft) => {
 															draft[0] = checked
 														}),
 													}).catch(console.error)
@@ -492,10 +540,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.speech[1]}
+												checked={activeProduct.data().accessibility.speech[1]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.speech`]: produce(activeProduct.accessibility.speech, (draft) => {
+														[`accessibility.speech`]: produce(activeProduct.data().accessibility.speech, (draft) => {
 															draft[1] = checked
 														}),
 													}).catch(console.error)
@@ -534,7 +582,7 @@ const AccessibilityPage: FC = () => {
 								</span>
 							</p>
 
-							{activeProduct && (
+							{activeProduct?.exists() && (
 								<Masonry
 									breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
 									className="flex gap-8"
@@ -546,10 +594,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[0]}
+												checked={activeProduct.data().accessibility.visual[0]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[0] = checked
 														}),
 													}).catch(console.error)
@@ -567,10 +615,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[1]}
+												checked={activeProduct.data().accessibility.visual[1]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[1] = checked
 														}),
 													}).catch(console.error)
@@ -586,10 +634,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[2]}
+												checked={activeProduct.data().accessibility.visual[2]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[2] = checked
 														}),
 													}).catch(console.error)
@@ -605,10 +653,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[3]}
+												checked={activeProduct.data().accessibility.visual[3]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[3] = checked
 														}),
 													}).catch(console.error)
@@ -624,10 +672,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[4]}
+												checked={activeProduct.data().accessibility.visual[4]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[4] = checked
 														}),
 													}).catch(console.error)
@@ -643,10 +691,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[5]}
+												checked={activeProduct.data().accessibility.visual[5]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[5] = checked
 														}),
 													}).catch(console.error)
@@ -664,10 +712,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[6]}
+												checked={activeProduct.data().accessibility.visual[6]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[6] = checked
 														}),
 													}).catch(console.error)
@@ -686,10 +734,10 @@ const AccessibilityPage: FC = () => {
 										extra={
 											<Switch
 												checkedChildren={<CheckOutlined />}
-												checked={activeProduct.accessibility.visual[7]}
+												checked={activeProduct.data().accessibility.visual[7]}
 												onChange={(checked) => {
 													updateDoc(activeProduct.ref, {
-														[`accessibility.visual`]: produce(activeProduct.accessibility.visual, (draft) => {
+														[`accessibility.visual`]: produce(activeProduct.data().accessibility.visual, (draft) => {
 															draft[7] = checked
 														}),
 													}).catch(console.error)

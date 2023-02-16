@@ -5,7 +5,7 @@ import {FloatButton} from "antd"
 import {collection, doc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {useState} from "react"
-import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -19,22 +19,24 @@ import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const Dashboard: FC = () => {
+const StoryMapPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
-	const [storyMapState] = useDocumentData(
-		activeProduct
-			? doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
+	const [storyMapState] = useDocument(
+		activeProduct?.exists()
+			? doc(db, `StoryMapStates`, activeProduct.data().storyMapStateId).withConverter(StoryMapStateConverter)
 			: undefined,
 	)
 
 	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__` | undefined>(undefined)
 	const [newVesionInputValue, setNewVesionInputValue] = useState<string | undefined>(undefined)
 
-	const [versions] = useCollectionData(
-		activeProduct
-			? collection(db, `StoryMapStates`, activeProduct.storyMapStateId, `Versions`).withConverter(VersionConverter)
+	const [versions] = useCollection(
+		activeProduct?.exists()
+			? collection(db, `StoryMapStates`, activeProduct.data().storyMapStateId, `Versions`).withConverter(
+					VersionConverter,
+			  )
 			: undefined,
 	)
 
@@ -42,15 +44,18 @@ const Dashboard: FC = () => {
 		<div className="grid h-full grid-cols-[1fr_fit-content(6rem)]">
 			<div className="relative flex flex-col gap-8">
 				{currentVersionId && (
-					<StoryMapHeader versionName={versions?.find((version) => version.id === currentVersionId)?.name} />
+					<StoryMapHeader
+						versionName={versions?.docs.find((version) => version.id === currentVersionId)?.data().name}
+					/>
 				)}
 
 				<div className="relative w-full grow">
 					<motion.div layoutScroll className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2">
-						{activeProduct !== undefined && storyMapState && currentVersionId !== undefined && (
+						{activeProduct?.exists() && storyMapState?.exists() && currentVersionId !== undefined && versions && (
 							<StoryMap
 								activeProduct={activeProduct}
 								storyMapState={storyMapState}
+								allVersions={versions}
 								currentVersionId={currentVersionId}
 							/>
 						)}
@@ -68,17 +73,18 @@ const Dashboard: FC = () => {
 				</FloatButton.Group>
 			</div>
 
-			{activeProduct && (
+			{activeProduct?.exists() && versions && (
 				<VersionList
+					allVersions={versions}
 					currentVersionId={currentVersionId}
 					setCurrentVersionId={setCurrentVersionId}
 					newVersionInputValue={newVesionInputValue}
 					setNewVersionInputValue={setNewVesionInputValue}
-					storyMapStateId={activeProduct.storyMapStateId}
+					storyMapStateId={activeProduct.data().storyMapStateId}
 				/>
 			)}
 		</div>
 	)
 }
 
-export default Dashboard
+export default StoryMapPage

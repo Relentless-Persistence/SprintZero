@@ -5,7 +5,7 @@ import dayjs from "dayjs"
 import {doc} from "firebase/firestore"
 import {groupBy} from "lodash"
 import {useEffect, useMemo, useRef, useState} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocument} from "react-firebase-hooks/firestore"
 
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
@@ -26,22 +26,22 @@ const findPreviousOccurenceOfDayOfWeek = (date: Dayjs, dayOfWeek: number) => {
 
 const SprintPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-	const [storyMapState] = useDocumentData(
-		activeProduct
-			? doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
+	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const [storyMapState] = useDocument(
+		activeProduct?.exists()
+			? doc(db, `StoryMapStates`, activeProduct.data().storyMapStateId).withConverter(StoryMapStateConverter)
 			: undefined,
 	)
 
-	const stories = storyMapState ? getStories(storyMapState) : []
+	const stories = storyMapState?.exists() ? getStories(storyMapState.data()) : []
 	const oldestStoryDate = stories.reduce((oldestDate, story) => {
 		const storyDate = dayjs(story.createdAt.toDate())
 		if (storyDate.isBefore(oldestDate)) return storyDate
 		else return oldestDate
 	}, dayjs(`9999-12-31`))
 
-	const firstSprintStartDate = activeProduct
-		? findPreviousOccurenceOfDayOfWeek(oldestStoryDate, activeProduct.sprintStartDayOfWeek)
+	const firstSprintStartDate = activeProduct?.exists()
+		? findPreviousOccurenceOfDayOfWeek(oldestStoryDate, activeProduct.data().sprintStartDayOfWeek)
 		: undefined
 
 	const sprints = useMemo(() => {
@@ -95,10 +95,10 @@ const SprintPage: FC = () => {
 				</div>
 			</div>
 
-			{activeProduct && (
+			{activeProduct?.exists() && (
 				<div className="flex w-full grow overflow-x-auto pl-12 pb-8">
 					<div className="grid h-full grid-cols-[repeat(12,14rem)] gap-4">
-						{storyMapState &&
+						{storyMapState?.exists() &&
 							Object.entries(sprintColumns).map(([id, title]) => (
 								<SprintColumn
 									key={id}

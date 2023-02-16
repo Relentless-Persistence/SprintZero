@@ -227,7 +227,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							<RhfSelect
 								control={control}
 								name="versionId"
-								options={meta.allVersions.map((version) => ({label: version.name, value: version.id}))}
+								options={meta.allVersions.docs.map((version) => ({label: version.data().name, value: version.id}))}
 							/>
 						</Form.Item>
 						<Form.Item label="Status" className="shrink-0 basis-56">

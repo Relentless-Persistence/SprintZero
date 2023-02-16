@@ -5,10 +5,11 @@ import {Avatar, Breadcrumb, Button, Card, Checkbox, Tabs} from "antd"
 import clsx from "clsx"
 import {addDoc, collection, doc, getDoc, query, setDoc, where} from "firebase/firestore"
 import {useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
+import type {Id} from "~/types"
 import type {RetrospectiveItem} from "~/types/db/RetrospectiveItems"
 
 import RetrospectiveDrawer from "./RetrospectiveDrawer"
@@ -23,7 +24,7 @@ const RetrospectivePage: FC = () => {
 	const user = useUser()
 
 	const activeProductId = useActiveProductId()
-	const [retrospectiveItems, loading] = useCollectionData(
+	const [retrospectiveItems, loading] = useCollection(
 		query(collection(db, `RetrospectiveItems`), where(`productId`, `==`, activeProductId)).withConverter(
 			RetrospectiveItemConverter,
 		),
@@ -32,17 +33,17 @@ const RetrospectivePage: FC = () => {
 	const [currentTab, setCurrentTab] = useState<`enjoyable` | `puzzling` | `frustrating`>(`enjoyable`)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-	const itemsForCurrentTab = retrospectiveItems?.filter((item) => item.type === currentTab) ?? []
+	const itemsForCurrentTab = retrospectiveItems?.docs.filter((item) => item.data().type === currentTab) ?? []
 
 	const usersData = useQueries({
 		queries: itemsForCurrentTab.map((item) => ({
-			queryKey: [`user`, item.userId],
-			queryFn: async () => (await getDoc(doc(db, `Users`, item.userId).withConverter(UserConverter))).data(),
+			queryKey: [`user`, item.data().userId],
+			queryFn: async () => await getDoc(doc(db, `Users`, item.data().userId).withConverter(UserConverter)),
 		})),
 	})
 
-	const usersOwnItem = itemsForCurrentTab.find((item) => item.userId === user?.id)
-	const userFirst = itemsForCurrentTab.filter((item) => item.userId !== user?.id)
+	const usersOwnItem = itemsForCurrentTab.find((item) => item.data().userId === user?.id)
+	const userFirst = itemsForCurrentTab.filter((item) => item.data().userId !== user?.id)
 	if (usersOwnItem) userFirst.unshift(usersOwnItem)
 
 	return (
@@ -73,17 +74,17 @@ const RetrospectivePage: FC = () => {
 								key={item.id}
 								type="inner"
 								title={(() => {
-									const user = usersData.find((user) => user.data?.id === item.userId)?.data
+									const user = usersData.find((user) => user.data?.id === item.data().userId)?.data
 
 									return (
 										<div className="my-4 flex items-center gap-4">
-											<Avatar src={user?.avatar} size="large" />
-											<p>{user?.name}</p>
+											<Avatar src={user?.data()?.avatar} size="large" />
+											<p>{user?.data()?.name}</p>
 										</div>
 									)
 								})()}
 								extra={
-									item.userId === user?.id ? (
+									item.data().userId === user?.id ? (
 										<button type="button" onClick={() => setIsDrawerOpen(true)} className="text-green">
 											Edit
 										</button>
@@ -92,13 +93,13 @@ const RetrospectivePage: FC = () => {
 							>
 								<div className="flex flex-col gap-4">
 									<div className="flex flex-col gap-2">
-										<p className="text-xl font-semibold text-gray">{item.title}</p>
-										<p className="italic">{item.description}</p>
+										<p className="text-xl font-semibold text-gray">{item.data().title}</p>
+										<p className="italic">{item.data().description}</p>
 									</div>
 									<div className="flex flex-col gap-2">
 										<p className="text-xl font-semibold text-gray">Proposed Actions</p>
 										<ul>
-											{item.proposedActions.map((action) => (
+											{item.data().proposedActions.map((action) => (
 												<li key={action.id}>
 													<Checkbox
 														checked={action.checked}
@@ -131,7 +132,7 @@ const RetrospectivePage: FC = () => {
 			{!loading && isDrawerOpen && (
 				<RetrospectiveDrawer
 					initialValues={
-						usersOwnItem ?? {
+						usersOwnItem?.data() ?? {
 							description: ``,
 							proposedActions: [],
 							title: ``,
@@ -143,7 +144,7 @@ const RetrospectivePage: FC = () => {
 						const data: RetrospectiveItem = {
 							...values,
 							productId: activeProductId,
-							userId: user!.id,
+							userId: user!.id as Id,
 						}
 						if (usersOwnItem) {
 							await setDoc(doc(db, `RetrospectiveItems`, usersOwnItem.id), data)

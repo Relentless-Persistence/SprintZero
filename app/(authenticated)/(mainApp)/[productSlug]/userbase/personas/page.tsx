@@ -3,9 +3,10 @@
 import {Breadcrumb, Input, Tabs} from "antd"
 import {addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
+import type {Id} from "~/types"
 import type {Persona} from "~/types/db/Personas"
 
 import EditableListCard from "~/app/(authenticated)/(mainApp)/[productSlug]/userbase/personas/EditableListCard"
@@ -31,14 +32,14 @@ const PersonasPage: FC = () => {
 		| undefined
 	>(undefined)
 
-	const [personas] = useCollectionData(
+	const [personas] = useCollection(
 		query(collection(db, `Personas`), where(`productId`, `==`, activeProductId)).withConverter(PersonaConverter),
 	)
 
 	const hasSetDefaultPersona = useRef(false)
 	useEffect(() => {
-		if (personas?.[0] && !hasSetDefaultPersona.current) {
-			setActiveTab(personas[0].id)
+		if (personas?.docs[0] && !hasSetDefaultPersona.current) {
+			setActiveTab(personas.docs[0].id)
 			hasSetDefaultPersona.current = true
 		}
 	}, [personas])
@@ -52,9 +53,9 @@ const PersonasPage: FC = () => {
 				const items = []
 				if (personas) {
 					items.push(
-						...personas.map((persona) => ({
+						...personas.docs.map((persona) => ({
 							key: persona.id,
-							label: persona.name,
+							label: persona.data().name,
 							children: (
 								<div className="flex h-full flex-col overflow-auto">
 									<div className="sticky top-0 z-10 bg-[#f0f2f5] px-12 pt-8 pb-6">
@@ -70,7 +71,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `goals`}
 												onEditStart={() => setIsEditingCard(`goals`)}
 												title="Goals"
-												list={persona.goals}
+												list={persona.data().goals}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {goals: list} satisfies Partial<Persona>)
@@ -81,7 +82,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `interactions`}
 												onEditStart={() => setIsEditingCard(`interactions`)}
 												title="Interactions"
-												list={persona.interactions}
+												list={persona.data().interactions}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {
@@ -94,7 +95,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `tasks`}
 												onEditStart={() => setIsEditingCard(`tasks`)}
 												title="Tasks"
-												list={persona.tasks}
+												list={persona.data().tasks}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {tasks: list} satisfies Partial<Persona>)
@@ -105,7 +106,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `responsibilities`}
 												onEditStart={() => setIsEditingCard(`responsibilities`)}
 												title="Responsibilities"
-												list={persona.responsibilities}
+												list={persona.data().responsibilities}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {
@@ -118,7 +119,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `priorities`}
 												onEditStart={() => setIsEditingCard(`priorities`)}
 												title="Priorities"
-												list={persona.priorities}
+												list={persona.data().priorities}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {
@@ -131,7 +132,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `frustrations`}
 												onEditStart={() => setIsEditingCard(`frustrations`)}
 												title="Frustrations"
-												list={persona.frustrations}
+												list={persona.data().frustrations}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {
@@ -144,7 +145,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `changes`}
 												onEditStart={() => setIsEditingCard(`changes`)}
 												title="Changes"
-												list={persona.changes}
+												list={persona.data().changes}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {changes: list} satisfies Partial<Persona>)
@@ -155,10 +156,10 @@ const PersonasPage: FC = () => {
 										<div className="flex flex-col gap-4">
 											<PersonaDescriptionCard
 												productId={activeProductId}
-												personaName={persona.name}
-												personaId={persona.id}
-												personaPrevQnA={persona.prevQnA}
-												text={persona.description}
+												personaName={persona.data().name}
+												personaId={persona.id as Id}
+												personaPrevQnA={persona.data().prevQnA}
+												text={persona.data().description}
 												isEditing={isEditingCard === `description`}
 												onEditStart={() => setIsEditingCard(`description`)}
 												onEditEnd={() => setIsEditingCard(undefined)}
@@ -167,7 +168,7 @@ const PersonasPage: FC = () => {
 												isEditing={isEditingCard === `dayInTheLife`}
 												onEditStart={() => setIsEditingCard(`dayInTheLife`)}
 												title="A Day in the Life"
-												list={persona.dayInTheLife}
+												list={persona.data().dayInTheLife}
 												onCancel={() => setIsEditingCard(undefined)}
 												onCommit={async (title, list) => {
 													await updateDoc(doc(db, `Personas`, persona.id), {

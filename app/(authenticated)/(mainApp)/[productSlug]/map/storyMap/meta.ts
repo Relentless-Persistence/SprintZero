@@ -2,9 +2,9 @@ import {Timestamp, setDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 
-import type {DocumentReference} from "firebase/firestore"
+import type {DocumentReference, QuerySnapshot} from "firebase/firestore"
 import type {SetRequired} from "type-fest"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
@@ -15,7 +15,7 @@ export type UseGenMetaVars = {
 	storyMapStateId: Id
 	storyMapItems: StoryMapState[`items`]
 	storyMapStateRef: DocumentReference<StoryMapState>
-	allVersions: Array<WithDocumentData<Version>>
+	allVersions: QuerySnapshot<Version>
 	currentVersionId: Id | `__ALL_VERSIONS__`
 }
 

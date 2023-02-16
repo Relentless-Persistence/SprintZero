@@ -1,4 +1,5 @@
-import type {Id, WithDocumentData} from "~/types"
+import type {QuerySnapshot} from "firebase/firestore"
+import type {Id} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
@@ -37,11 +38,11 @@ export const getStories = (storyMapItems: StoryMapState[`items`]): StoryWithId[]
 }
 
 // Assumes all stories are siblings
-export const sortStories = (stories: StoryWithId[], allVersions: Array<WithDocumentData<Version>>): StoryWithId[] =>
+export const sortStories = (stories: StoryWithId[], allVersions: QuerySnapshot<Version>): StoryWithId[] =>
 	stories
 		.sort((a, b) => a.name.localeCompare(b.name))
 		.sort((a, b) => {
-			const aVersion = allVersions.find((version) => version.id === a.versionId)
-			const bVersion = allVersions.find((version) => version.id === b.versionId)
-			return aVersion && bVersion ? aVersion.name.localeCompare(bVersion.name) : 0
+			const aVersion = allVersions.docs.find((version) => version.id === a.versionId)
+			const bVersion = allVersions.docs.find((version) => version.id === b.versionId)
+			return aVersion?.exists() && bVersion?.exists() ? aVersion.data().name.localeCompare(bVersion.data().name) : 0
 		})

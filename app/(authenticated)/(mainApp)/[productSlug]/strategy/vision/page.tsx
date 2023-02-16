@@ -40,7 +40,7 @@ const VisionsPage: FC = () => {
 		queries:
 			activeProduct?.updates.map((update) => ({
 				queryKey: [`user`, update.userId],
-				queryFn: async () => (await getDoc(doc(db, `Users`, update.userId).withConverter(UserConverter))).data(),
+				queryFn: async () => await getDoc(doc(db, `Users`, update.userId).withConverter(UserConverter)),
 			})) ?? [],
 	})
 
@@ -155,7 +155,7 @@ const VisionsPage: FC = () => {
 										<p className="font-mono">{dayjs(update.timestamp.toDate()).fromNow()}</p>
 										<p className="text-xs">
 											<span className="text-[#1890ff]">
-												@{usersData.find((user) => user.data?.id === update.userId)?.data?.name}
+												@{usersData.find((user) => user.data?.id === update.userId)?.data?.data()?.name}
 											</span>
 											{` `}
 											{update.text.split(`"`).map((text, i) =>

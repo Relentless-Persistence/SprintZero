@@ -20,7 +20,7 @@ import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {ProductSchema} from "~/types/db/Products"
+import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 
 const numSlides = 4
@@ -45,14 +45,16 @@ const ProductSetupPage: FC = () => {
 		const newData: WithFieldValue<StoryMapState> = {items: {}, updatedAt: serverTimestamp(), productId: slug}
 		const storyMapStateId = (await addDoc(collection(db, `StoryMapStates`), newData)).id as Id
 
-		const finalData = ProductSchema.parse({
+		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
 			storyMapStateId,
 			members: {[user.uid as Id]: {type: `editor`}},
 			problemStatement: ``,
 			personas: [],
-			successMetrics: [],
-			businessPriorities: [],
+			businessOutcomes: [],
+			marketLeaders: [],
+			potentialRisks: [],
+			userPriorities: [],
 			accessibility: {
 				auditory: [false, false, false, false, false],
 				cognitive: [false, false, false, false, false, false],
@@ -65,8 +67,7 @@ const ProductSetupPage: FC = () => {
 			features: [],
 			finalVision: ``,
 			updates: [],
-		} satisfies Product)
-		await setDoc(doc(db, `Products`, slug), finalData)
+		})
 
 		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), {
 			name: `1.0`,

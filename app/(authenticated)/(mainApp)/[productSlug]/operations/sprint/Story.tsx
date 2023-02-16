@@ -1,7 +1,8 @@
 import {useState} from "react"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
@@ -9,14 +10,14 @@ import StoryDrawer from "./StoryDrawer"
 import {getFeatures, getStories} from "~/utils/storyMap"
 
 export type StoryProps = {
-	activeProduct: WithDocumentData<Product>
-	storyMapState: WithDocumentData<StoryMapState>
+	activeProduct: QueryDocumentSnapshot<Product>
+	storyMapState: QueryDocumentSnapshot<StoryMapState>
 	storyId: Id
 }
 
 const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId}) => {
-	const story = getStories(storyMapState).find((story) => story.id === storyId)!
-	const featureName = getFeatures(storyMapState).find((feature) => feature.id === story.parentId)!.name
+	const story = getStories(storyMapState.data()).find((story) => story.id === storyId)!
+	const featureName = getFeatures(storyMapState.data()).find((feature) => feature.id === story.parentId)!.name
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	return (

@@ -7,8 +7,9 @@ import produce from "immer"
 import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
@@ -20,12 +21,12 @@ const debouncedSetStoryMapState = debounce(async (id: Id, data: StoryMapState) =
 }, 100)
 
 export type EpicProps = {
-	storyMapState: WithDocumentData<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapState>
 	epicId: Id
 }
 
 const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
-	const epics = getEpics(storyMapState)
+	const epics = getEpics(storyMapState.data())
 	const epic = epics.find((e) => e.id === epicId)!
 
 	const x = useMotionValue(epic.effort)
@@ -39,13 +40,13 @@ const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
 	const moveEpic = async (x: number, y: number) => {
-		const newStoryMapState = produce(storyMapState, (state) => {
+		const newStoryMapState = produce(storyMapState.data(), (state) => {
 			const epics = getEpics(state)
 			const newEpic = epics.find((e) => e.id === epic.id)!
 			newEpic.effort = x
 			newEpic.userValue = y
 		})
-		await debouncedSetStoryMapState(newStoryMapState.id, newStoryMapState)
+		await debouncedSetStoryMapState(storyMapState.id as Id, newStoryMapState)
 	}
 
 	return (

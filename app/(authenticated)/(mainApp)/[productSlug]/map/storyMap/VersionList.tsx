@@ -3,16 +3,16 @@
 import {Input, Tabs} from "antd"
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
 import {useEffect} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
 
+import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Version} from "~/types/db/Versions"
 
-import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 
 export type VersionListProps = {
+	allVersions: QuerySnapshot<Version>
 	currentVersionId: Id | `__ALL_VERSIONS__` | undefined
 	setCurrentVersionId: (id: Id | `__ALL_VERSIONS__`) => void
 	newVersionInputValue: string | undefined
@@ -21,18 +21,17 @@ export type VersionListProps = {
 }
 
 const VersionList: FC<VersionListProps> = ({
+	allVersions,
 	currentVersionId,
 	setCurrentVersionId,
 	newVersionInputValue,
 	setNewVersionInputValue,
 	storyMapStateId,
 }) => {
-	const [versions] = useCollectionData(
-		query(collection(db, `StoryMapStates`, storyMapStateId, `Versions`)).withConverter(VersionConverter),
-	)
 	useEffect(() => {
-		if (currentVersionId === undefined && versions?.[0]) setCurrentVersionId(versions[0].id)
-	}, [currentVersionId, setCurrentVersionId, versions])
+		if (currentVersionId === undefined && allVersions.docs[0]?.exists())
+			setCurrentVersionId(allVersions.docs[0].id as Id)
+	}, [currentVersionId, setCurrentVersionId, allVersions.docs])
 
 	const addVersion = async (): Promise<void> => {
 		if (!newVersionInputValue) throw new Error(`Version name is required.`)
@@ -56,11 +55,11 @@ const VersionList: FC<VersionListProps> = ({
 				if (key !== `__NEW_VERSION__`) setCurrentVersionId(key as Id)
 			}}
 			activeKey={currentVersionId}
-			items={(versions ?? [])
-				.sort((a, b) => a.name.localeCompare(b.name))
+			items={allVersions.docs
+				.sort((a, b) => a.data().name.localeCompare(b.data().name))
 				.map((version) => ({
 					key: version.id as Id | string,
-					label: <p className="overflow-hidden truncate">{version.name}</p>,
+					label: <p className="overflow-hidden truncate">{version.data().name}</p>,
 				}))
 				.concat([
 					{

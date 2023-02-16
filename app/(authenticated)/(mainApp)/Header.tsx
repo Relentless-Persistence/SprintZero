@@ -4,7 +4,7 @@ import {collection, doc, query, where} from "firebase/firestore"
 import Image from "next/image"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
-import {useCollectionDataOnce, useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollectionOnce, useDocument} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
 import type {FC} from "react"
@@ -17,11 +17,11 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const Header: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const [user] = useAuthState(auth)
 	invariant(user, `User state not loaded`)
-	const [allProducts] = useCollectionDataOnce(
+	const [allProducts] = useCollectionOnce(
 		query(collection(db, `Products`), where(`members.${user.uid}.type`, `==`, `editor`)).withConverter(
 			ProductConverter,
 		),
@@ -38,11 +38,11 @@ const Header: FC = () => {
 					theme="dark"
 					mode="horizontal"
 					selectedKeys={[activeProduct?.id ?? ``]}
-					items={allProducts?.map((product) => ({
+					items={allProducts?.docs.map((product) => ({
 						key: product.id,
 						label: (
 							<LinkTo href={`/${product.id}/map`} className="relative">
-								{product.name}
+								{product.data().name}
 							</LinkTo>
 						),
 					}))}

@@ -7,8 +7,9 @@ import produce from "immer"
 import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "../globals"
@@ -20,12 +21,12 @@ const debouncedSetStoryMapState = debounce(async (id: Id, data: StoryMapState) =
 }, 100)
 
 export type FeatureProps = {
-	storyMapState: WithDocumentData<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapState>
 	featureId: Id
 }
 
 const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
-	const features = getFeatures(storyMapState)
+	const features = getFeatures(storyMapState.data())
 	const feature = features.find(({id}) => id === featureId)!
 
 	const x = useMotionValue(feature.effort)
@@ -39,13 +40,13 @@ const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
 	const moveFeature = async (x: number, y: number) => {
-		const newStoryMapState = produce(storyMapState, (state) => {
+		const newStoryMapState = produce(storyMapState.data(), (state) => {
 			const features = getFeatures(state)
 			const newFeature = features.find(({id}) => id === feature.id)!
 			newFeature.effort = x
 			newFeature.userValue = y
 		})
-		await debouncedSetStoryMapState(newStoryMapState.id, newStoryMapState)
+		await debouncedSetStoryMapState(storyMapState.id as Id, newStoryMapState)
 	}
 
 	return (

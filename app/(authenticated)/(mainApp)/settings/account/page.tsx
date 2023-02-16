@@ -21,14 +21,14 @@ const AccountSettingsPage: FC = () => {
 					<p className="text-lg font-semibold">Personal Details</p>
 					<div className="grid grid-cols-[auto_1fr] items-center gap-4">
 						<p>Full Name:</p>
-						<Input disabled value={user?.name} />
+						<Input disabled value={user?.data().name} />
 						<p>Linked Account:</p>
-						<Input disabled value={user?.email} />
+						<Input disabled value={user?.data().email} />
 					</div>
 				</div>
 				<div className="flex flex-col gap-4">
 					<p className="text-lg font-semibold">Avatar</p>
-					<Avatar src={user?.avatar} className="h-20 w-20" />
+					<Avatar src={user?.data().avatar} className="h-20 w-20" />
 				</div>
 			</div>
 		</div>

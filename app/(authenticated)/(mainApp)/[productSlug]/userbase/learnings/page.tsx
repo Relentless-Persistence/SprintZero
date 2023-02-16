@@ -3,7 +3,7 @@
 import {Breadcrumb, Button, Tabs} from "antd"
 import {collection, query, where} from "firebase/firestore"
 import {useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
@@ -24,7 +24,7 @@ const LearningsPage: FC = () => {
 	const [currentTab, setCurrentTab] = useState<keyof typeof tabNames>(`validated`)
 
 	const activeProductId = useActiveProductId()
-	const [learnings] = useCollectionData(
+	const [learnings] = useCollection(
 		query(collection(db, `Learnings`), where(`productId`, `==`, activeProductId)).withConverter(LearningConverter),
 	)
 	const [activeLearning, setActiveLearning] = useState<Id | `new` | undefined>(undefined)
@@ -47,20 +47,25 @@ const LearningsPage: FC = () => {
 					className="flex gap-8"
 					columnClassName="bg-clip-padding flex flex-col gap-8"
 				>
-					{learnings
-						?.filter((learning) => learning.status === currentTab)
+					{learnings?.docs
+						.filter((learning) => learning.data().status === currentTab)
 						.map((learning) => (
 							<LearningItemCard
 								key={learning.id}
-								item={learning}
+								learningId={learning.id as Id}
+								initialData={learning.data()}
 								isEditing={activeLearning === learning.id}
-								onEditStart={() => setActiveLearning(learning.id)}
+								onEditStart={() => setActiveLearning(learning.id as Id)}
 								onEditEnd={() => setActiveLearning(undefined)}
 							/>
 						))}
 
 					{activeLearning === `new` && (
-						<LearningItemCard item={{status: currentTab}} isEditing onEditEnd={() => setActiveLearning(undefined)} />
+						<LearningItemCard
+							initialData={{status: currentTab}}
+							isEditing
+							onEditEnd={() => setActiveLearning(undefined)}
+						/>
 					)}
 				</Masonry>
 			</div>

@@ -1,8 +1,8 @@
 import {Card} from "antd"
 import dayjs from "dayjs"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
@@ -13,12 +13,12 @@ export type SprintColumnProps = {
 	id: string
 	title: string
 	sprintStartDate: string
-	activeProduct: WithDocumentData<Product>
-	storyMapState: WithDocumentData<StoryMapState>
+	activeProduct: QueryDocumentSnapshot<Product>
+	storyMapState: QueryDocumentSnapshot<StoryMapState>
 }
 
 const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, activeProduct, storyMapState}) => {
-	const stories = getStories(storyMapState)
+	const stories = getStories(storyMapState.data())
 
 	return (
 		<Card type="inner" title={title}>

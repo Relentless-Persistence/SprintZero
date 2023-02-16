@@ -1,15 +1,14 @@
 "use client"
 
-import {AimOutlined} from "@ant-design/icons"
-import {Breadcrumb, Button, Empty, Input, Tabs} from "antd"
-import {addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
+import {AimOutlined, PlusOutlined} from "@ant-design/icons"
+import {Breadcrumb, Empty, FloatButton, Input, Tabs} from "antd"
+import {collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {Objective} from "~/types/db/Objectives"
 
 import ObjectiveCard from "./ObjectiveCard"
 import {ObjectiveConverter} from "~/types/db/Objectives"
@@ -19,17 +18,17 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const ObjectivesPage: FC = () => {
 	const activeProductId = useActiveProductId()
 
-	const [objectives] = useCollectionData(
+	const [objectives] = useCollection(
 		query(collection(db, `Objectives`), where(`productId`, `==`, activeProductId)).withConverter(ObjectiveConverter),
 	)
 
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<Id | `empty`>(`empty`)
-	const currentObjective = objectives?.find((objective) => objective.id === currentObjectiveId)
+	const currentObjective = objectives?.docs.find((objective) => objective.id === currentObjectiveId)
 
 	const hasSetDefaultObjective = useRef(false)
 	useEffect(() => {
 		if (hasSetDefaultObjective.current || !objectives) return
-		if (objectives.length > 0) setCurrentObjectiveId(objectives[0]!.id)
+		if (objectives.docs.length > 0) setCurrentObjectiveId(objectives.docs[0]!.id as Id)
 		hasSetDefaultObjective.current = true
 	}, [objectives])
 
@@ -38,33 +37,28 @@ const ObjectivesPage: FC = () => {
 
 	useEffect(() => {
 		if (!currentObjective) return
-		setStatement(currentObjective.statement)
+		setStatement(currentObjective.data().statement)
 	}, [currentObjective])
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
-			<div className="flex w-full flex-col gap-6 overflow-auto px-12 py-8">
-				<div className="flex items-center justify-between">
-					<Breadcrumb>
-						<Breadcrumb.Item>Strategy</Breadcrumb.Item>
-						<Breadcrumb.Item>Objectives</Breadcrumb.Item>
-						<Breadcrumb.Item>{currentObjective?.name}</Breadcrumb.Item>
-					</Breadcrumb>
-
-					<Button className="bg-white" onClick={() => setActiveResultId(`new`)}>
-						Add New
-					</Button>
-				</div>
+			<div className="relative flex w-full flex-col gap-6 overflow-auto px-12 py-8">
+				<Breadcrumb>
+					<Breadcrumb.Item>Strategy</Breadcrumb.Item>
+					<Breadcrumb.Item>Objectives</Breadcrumb.Item>
+					<Breadcrumb.Item>{currentObjective?.data().name}</Breadcrumb.Item>
+				</Breadcrumb>
 
 				{currentObjective && (
 					<Input
 						addonBefore={<AimOutlined />}
+						placeholder="Objective"
 						value={statement}
 						onChange={(e) => {
 							setStatement(e.target.value)
-							updateDoc(doc(db, `Objectives`, currentObjective.id), {
+							updateDoc(doc(db, `Objectives`, currentObjective.id).withConverter(ObjectiveConverter), {
 								statement,
-							} satisfies Partial<Objective>).catch(console.error)
+							}).catch(console.error)
 						}}
 					/>
 				)}
@@ -75,7 +69,7 @@ const ObjectivesPage: FC = () => {
 						className="flex gap-8"
 						columnClassName="bg-clip-padding flex flex-col gap-8"
 					>
-						{currentObjective.results.map((result) => (
+						{currentObjective.data().results.map((result) => (
 							<ObjectiveCard
 								key={result.id}
 								objective={currentObjective}
@@ -97,7 +91,7 @@ const ObjectivesPage: FC = () => {
 					</Masonry>
 				)}
 
-				{currentObjective?.results.length === 0 && activeResultId === undefined && (
+				{currentObjective?.data().results.length === 0 && activeResultId === undefined && (
 					<div className="grid grow place-items-center">
 						<div
 							style={{
@@ -109,34 +103,23 @@ const ObjectivesPage: FC = () => {
 						</div>
 					</div>
 				)}
+
+				<FloatButton
+					shape="square"
+					icon={<PlusOutlined className="text-green" />}
+					onClick={() => setActiveResultId(`new`)}
+					className="absolute right-12 bottom-8"
+				/>
 			</div>
 
 			<Tabs
 				tabPosition="right"
 				activeKey={currentObjectiveId}
-				onChange={(key: Id | `new`) => {
-					if (key === `new`) {
-						addDoc(collection(db, `Objectives`), {
-							name: String(objectives!.length + 1).padStart(3, `0`),
-							results: [],
-							statement: ``,
-							productId: activeProductId,
-						} satisfies Objective)
-							.then((ref) => {
-								setCurrentObjectiveId(ref.id as Id)
-							})
-							.catch(console.error)
-					} else {
-						setCurrentObjectiveId(key)
-						setStatement(objectives?.find((objective) => objective.id === key)?.statement || ``)
-					}
+				onChange={(key: Id) => {
+					setCurrentObjectiveId(key)
+					setStatement(objectives?.docs.find((objective) => objective.id === key)?.data().statement || ``)
 				}}
-				items={[
-					...(objectives?.map((objective) => ({key: objective.id, label: objective.name})) ?? [
-						{key: `empty`, label: ``},
-					]),
-					{key: `new`, label: `Add`},
-				]}
+				items={objectives?.docs.map((objective) => ({key: objective.id, label: objective.data().name}))}
 			/>
 		</div>
 	)

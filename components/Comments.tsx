@@ -4,7 +4,7 @@ import {Avatar, Button, Input} from "antd"
 import {addDoc, collection, doc, getDoc, query, where} from "firebase/firestore"
 import {uniq} from "lodash"
 import {useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
@@ -32,25 +32,25 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 		const data: Comment = {
 			text: commentDraft,
 			type: `code`,
-			authorId: user!.id,
+			authorId: user!.id as Id,
 			parentId,
 		}
 		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Comments`), data)
 		setCommentDraft(``)
 	}
 
-	const [comments] = useCollectionData(
+	const [comments] = useCollection(
 		query(
 			collection(db, `StoryMapStates`, storyMapStateId, `Comments`),
 			where(`Comments.parentId`, `==`, parentId),
 		).withConverter(CommentConverter),
 	)
 
-	const commentAuthorIds = uniq(comments?.map((comment) => comment.authorId))
+	const commentAuthorIds = uniq(comments?.docs.map((comment) => comment.data().authorId))
 	const commentAuthors = useQueries({
 		queries: commentAuthorIds.map((userId) => ({
 			queryKey: [`user`, userId],
-			queryFn: async () => (await getDoc(doc(db, `Users`, userId).withConverter(UserConverter))).data(),
+			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
 		})),
 	})
 
@@ -58,17 +58,17 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 		<div className="absolute inset-0 flex flex-col">
 			<div className="flex grow flex-col-reverse overflow-auto">
 				<div className="flex flex-col gap-4">
-					{comments?.length === 0 ? (
+					{comments?.docs.length === 0 ? (
 						<p className="italic text-laurel">Nothing here yet</p>
 					) : (
-						comments?.map((comment) => {
-							const author = commentAuthors.find((author) => author.data?.id === comment.authorId)
+						comments?.docs.map((comment) => {
+							const author = commentAuthors.find((author) => author.data?.id === comment.data().authorId)?.data
 							return (
 								<div key={comment.id} className="flex gap-2">
-									<Avatar src={author?.data?.avatar} />
+									<Avatar src={author?.data()?.avatar} />
 									<div className="flex flex-col gap-1">
-										<p className="text-xs text-laurel">{author?.data?.name}</p>
-										<p>{comment.text}</p>
+										<p className="text-xs text-laurel">{author?.data()?.name}</p>
+										<p>{comment.data().text}</p>
 									</div>
 								</div>
 							)
