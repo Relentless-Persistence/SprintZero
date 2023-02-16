@@ -1,3 +1,4 @@
+import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
 import {genConverter, idSchema, serverTimestampSchema} from "~/types"
@@ -18,6 +19,7 @@ const schemas = {
 			checked: z.boolean(),
 		}),
 	),
+	createdAt: z.instanceof(Timestamp),
 	description: z.string(),
 	designLink: z.string().url().nullable(),
 	effort: z.number().min(0).max(1),
@@ -68,6 +70,7 @@ export const EpicSchema = z.object({
 	acceptanceCriteria: schemas.acceptanceCriteria.nullable(),
 	branchName: schemas.branchName.nullable(),
 	bugs: schemas.bugs.nullable(),
+	createdAt: schemas.createdAt.nullable(),
 	designLink: schemas.designLink.nullable(),
 	ethicsApproved: schemas.ethicsApproved.nullable(),
 	ethicsColumn: schemas.ethicsColumn.nullable(),
@@ -78,7 +81,7 @@ export const EpicSchema = z.object({
 	updatedAt: schemas.updatedAt.nullable(),
 	parentId: schemas.parentId.nullable(),
 	versionId: schemas.versionId.nullable(),
-})
+} satisfies Record<keyof typeof schemas | `type`, unknown>)
 export type Epic = z.infer<typeof EpicSchema>
 
 export const FeatureSchema = z.object({
@@ -95,6 +98,7 @@ export const FeatureSchema = z.object({
 	acceptanceCriteria: schemas.acceptanceCriteria.nullable(),
 	branchName: schemas.branchName.nullable(),
 	bugs: schemas.bugs.nullable(),
+	createdAt: schemas.createdAt.nullable(),
 	designLink: schemas.designLink.nullable(),
 	ethicsApproved: schemas.ethicsApproved.nullable(),
 	ethicsColumn: schemas.ethicsColumn.nullable(),
@@ -105,7 +109,7 @@ export const FeatureSchema = z.object({
 	updatedAt: schemas.updatedAt.nullable(),
 	keeperIds: schemas.keeperIds.nullable(),
 	versionId: schemas.versionId.nullable(),
-})
+} satisfies Record<keyof typeof schemas | `type`, unknown>)
 export type Feature = z.infer<typeof FeatureSchema>
 
 export const StorySchema = z.object({
@@ -114,6 +118,7 @@ export const StorySchema = z.object({
 	acceptanceCriteria: schemas.acceptanceCriteria,
 	branchName: schemas.branchName,
 	bugs: schemas.bugs,
+	createdAt: schemas.createdAt,
 	description: schemas.description,
 	designLink: schemas.designLink,
 	ethicsApproved: schemas.ethicsApproved,
@@ -132,7 +137,7 @@ export const StorySchema = z.object({
 	effort: schemas.effort.nullable(),
 	userValue: schemas.userValue.nullable(),
 	keeperIds: schemas.keeperIds.nullable(),
-})
+} satisfies Record<keyof typeof schemas | `type`, unknown>)
 export type Story = z.infer<typeof StorySchema>
 
 export const StoryMapStateSchema = z.object({

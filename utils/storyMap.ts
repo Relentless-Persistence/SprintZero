@@ -46,3 +46,28 @@ export const sortStories = (stories: StoryWithId[], allVersions: QuerySnapshot<V
 			const bVersion = allVersions.docs.find((version) => version.id === b.versionId)
 			return aVersion?.exists() && bVersion?.exists() ? aVersion.data().name.localeCompare(bVersion.data().name) : 0
 		})
+
+export const getStoryMapShape = (
+	storyMapItems: StoryMapState[`items`],
+	allVersions: QuerySnapshot<Version>,
+): Array<{id: Id; children: Array<{id: Id; children: Array<{id: Id}>}>}> => {
+	const epics = sortEpics(getEpics(storyMapItems))
+	const features = sortFeatures(getFeatures(storyMapItems))
+	const stories = sortStories(getStories(storyMapItems), allVersions)
+
+	const storyMapShape = epics.map((epic) => {
+		const epicFeatures = features.filter((feature) => feature.parentId === epic.id)
+		return {
+			id: epic.id,
+			children: epicFeatures.map((feature) => {
+				const featureStories = stories.filter((story) => story.parentId === feature.id)
+				return {
+					id: feature.id,
+					children: featureStories.map((story) => ({id: story.id})),
+				}
+			}),
+		}
+	})
+
+	return storyMapShape
+}

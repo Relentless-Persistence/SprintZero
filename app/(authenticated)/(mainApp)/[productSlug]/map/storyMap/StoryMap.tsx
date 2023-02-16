@@ -1,5 +1,6 @@
-import {ReadOutlined} from "@ant-design/icons"
-import {deleteField, serverTimestamp, updateDoc, writeBatch} from "firebase/firestore"
+import {CopyOutlined, FileOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
+import clsx from "clsx"
+import {Timestamp, deleteField, serverTimestamp, updateDoc, writeBatch} from "firebase/firestore"
 import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
@@ -435,6 +436,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 							acceptanceCriteria: featureBeingDragged.acceptanceCriteria ?? [],
 							branchName: featureBeingDragged.branchName,
 							bugs: featureBeingDragged.bugs ?? [],
+							createdAt: Timestamp.now(),
 							designLink: featureBeingDragged.designLink,
 							ethicsApproved: featureBeingDragged.ethicsApproved,
 							ethicsColumn: featureBeingDragged.ethicsColumn,
@@ -585,7 +587,134 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 			onPanEnd={onPanEnd}
 		>
 			{meta.epics.map((epic) => (
-				<Epic key={epic.id} meta={meta} dragInfo={dragInfo} epicId={epic.id} />
+				<div
+					key={epic.id}
+					className={clsx(`grid justify-items-center gap-x-6`, dragInfo.itemBeingDraggedId === epic.id && `invisible`)}
+					style={{gridTemplateColumns: `repeat(${epic.childrenIds.length}, auto)`}}
+				>
+					<Epic meta={meta} epicId={epic.id} />
+
+					{/* Pad out the remaining columns in row 1 */}
+					{Array(Math.max(epic.childrenIds.length - 1, 0))
+						.fill(undefined)
+						.map((_, i) => (
+							<div key={`row1-${i}`} />
+						))}
+
+					{/* Pad out the beginning columns in row 2 */}
+					{Array(Math.max(epic.childrenIds.length, 1))
+						.fill(undefined)
+						.map((_, i) => (
+							<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1.5rem)]">
+								{/* Top */}
+								{i === 0 && (
+									<div className="absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 border border-[#d0d0d0]" />
+								)}
+								{/* Right */}
+								{i < epic.childrenIds.length - 1 && (
+									<div className="absolute left-1/2 top-1/2 h-px w-1/2 -translate-y-1/2 border border-[#d0d0d0]" />
+								)}
+								{/* Bottom */}
+								<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-[#d0d0d0]" />
+								{/* Left */}
+								{i > 0 && (
+									<div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-[#d0d0d0]" />
+								)}
+
+								{i === epic.childrenIds.length - 1 && epic.childrenIds.length > 0 && (
+									<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+										<button
+											type="button"
+											onClick={() => {
+												meta.addFeature({parentId: epic.id}).catch(console.error)
+											}}
+											className="grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white"
+										>
+											<PlusOutlined />
+										</button>
+									</div>
+								)}
+							</div>
+						))}
+
+					{epic.childrenIds
+						.map((id) => meta.features.find((feature) => id === feature.id)!)
+						.map((feature) => {
+							const stories = feature.childrenIds
+								.map((id) => meta.stories.find((story) => story.id === id)!)
+								.filter((story) => {
+									if (meta.currentVersionId === `__ALL_VERSIONS__`) return true
+									return story.versionId === meta.currentVersionId
+								})
+
+							return (
+								<div
+									key={feature.id}
+									className={clsx(
+										`flex flex-col items-center`,
+										dragInfo.itemBeingDraggedId === feature.id && `invisible`,
+									)}
+								>
+									<Feature meta={meta} featureId={feature.id} />
+
+									{(meta.currentVersionId !== `__ALL_VERSIONS__` || feature.childrenIds.length > 0) && (
+										<div className="h-8 w-px border border-[#d0d0d0]" />
+									)}
+
+									{stories.length === 0 && meta.currentVersionId !== `__ALL_VERSIONS__` && (
+										<button
+											type="button"
+											onClick={() => {
+												if (meta.currentVersionId !== `__ALL_VERSIONS__`)
+													meta.addStory({parentId: feature.id}).catch(console.error)
+											}}
+											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#103001]"
+										>
+											<FileOutlined />
+											<span>Add story</span>
+										</button>
+									)}
+
+									{stories.length > 0 && (
+										<div className="flex flex-col items-start gap-3 rounded-lg border border-[#0273b3] bg-[#f0f2f5] p-3">
+											{stories.map((story) => (
+												<div key={story.id} className={clsx(dragInfo.itemBeingDraggedId === story.id && `invisible`)}>
+													<Story meta={meta} storyId={story.id} />
+												</div>
+											))}
+
+											{meta.currentVersionId !== `__ALL_VERSIONS__` && (
+												<button
+													type="button"
+													onClick={() => {
+														if (meta.currentVersionId !== `__ALL_VERSIONS__`)
+															meta.addStory({parentId: feature.id}).catch(console.error)
+													}}
+													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001]"
+												>
+													<FileOutlined />
+													<span>Add story</span>
+												</button>
+											)}
+										</div>
+									)}
+								</div>
+							)
+						})}
+
+					{epic.childrenIds.length === 0 && (
+						<button
+							type="button"
+							onClick={() => {
+								meta.addFeature({parentId: epic.id}).catch(console.error)
+							}}
+							className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378]"
+						>
+							<CopyOutlined />
+							<span>Add feature</span>
+						</button>
+					)}
+				</div>
 			))}
 
 			<button
@@ -600,6 +729,7 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 				<span>Add epic</span>
 			</button>
 
+			{/* Surrogate parent for story map items as they're being dragged (the real item in the tree is made invisible) */}
 			<motion.div
 				className="fixed top-0 left-0 z-20 cursor-grabbing"
 				style={{
@@ -611,11 +741,11 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 					const item = Object.entries(storyMapState.data().items).find(([id]) => id === dragInfo.itemBeingDraggedId)
 					switch (item?.[1]!.type) {
 						case `epic`:
-							return <Epic meta={meta} dragInfo={dragInfo} epicId={item[0] as Id} inert />
+							return <Epic meta={meta} epicId={item[0] as Id} inert />
 						case `feature`:
-							return <Feature meta={meta} dragInfo={dragInfo} featureId={item[0] as Id} inert />
+							return <Feature meta={meta} featureId={item[0] as Id} inert />
 						case `story`:
-							return <Story meta={meta} dragInfo={dragInfo} storyId={item[0] as Id} inert />
+							return <Story meta={meta} storyId={item[0] as Id} inert />
 					}
 				})()}
 			</motion.div>
