@@ -19,11 +19,12 @@ import {useUser} from "~/utils/useUser"
 export type CommentsProps = {
 	storyMapStateId: Id
 	parentId: string
+	commentType: `code` | `design`
 	flagged?: boolean
 	onFlag?: () => Promisable<void>
 }
 
-const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag}) => {
+const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, flagged, onFlag}) => {
 	const user = useUser()
 	const [commentDraft, setCommentDraft] = useState(``)
 
@@ -31,7 +32,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 		e.preventDefault()
 		const data: Comment = {
 			text: commentDraft,
-			type: `code`,
+			type: commentType,
 			authorId: user!.id as Id,
 			parentId,
 		}
@@ -42,7 +43,8 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, flagged, onFlag
 	const [comments] = useCollection(
 		query(
 			collection(db, `StoryMapStates`, storyMapStateId, `Comments`),
-			where(`Comments.parentId`, `==`, parentId),
+			where(`parentId`, `==`, parentId),
+			where(`type`, `==`, commentType),
 		).withConverter(CommentConverter),
 	)
 

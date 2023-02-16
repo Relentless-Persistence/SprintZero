@@ -35,7 +35,7 @@ const SprintPage: FC = () => {
 
 	const stories = storyMapState?.exists() ? getStories(storyMapState.data()) : []
 	const oldestStoryDate = stories.reduce((oldestDate, story) => {
-		const storyDate = dayjs(story.createdAt.toDate())
+		const storyDate = dayjs(story.createdAt?.toDate())
 		if (storyDate.isBefore(oldestDate)) return storyDate
 		else return oldestDate
 	}, dayjs(`9999-12-31`))

@@ -8,7 +8,7 @@ import {
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Button, Checkbox, Drawer, Form, Input, Tag} from "antd"
+import {Button, Checkbox, Drawer, Form, Input, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import {doc} from "firebase/firestore"
 import produce from "immer"
@@ -54,8 +54,10 @@ export type StoryDrawerProps = {
 
 const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
-	const [newAcceptanceCriterion, setNewAcceptanceCriterion] = useState(``)
+	const [newAcceptanceCriterionInput, setNewAcceptanceCriterionInput] = useState(``)
+	const [newBugInput, setNewBugInput] = useState(``)
 	const story = meta.stories.find((story) => story.id === storyId)!
+	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
 	const [description, setDescription] = useState(story.description)
 	useEffect(() => {
@@ -85,12 +87,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	})
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
-		const newAcceptanceCriteria = produce(story.acceptanceCriteria, (draft) => {
-			const index = draft.findIndex((criterion) => criterion.id === id)
-			draft[index]!.checked = checked
-		})
 		await meta.updateStory(story.id, {
-			acceptanceCriteria: newAcceptanceCriteria,
+			acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
+				const index = draft.findIndex((criterion) => criterion.id === id)
+				draft[index]!.checked = checked
+			}),
 		})
 	}
 
@@ -98,8 +99,23 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 		await meta.updateStory(story.id, {
 			acceptanceCriteria: [
 				...story.acceptanceCriteria,
-				{id: nanoid() as Id, name: newAcceptanceCriterion, checked: false},
+				{id: nanoid() as Id, name: newAcceptanceCriterionInput, checked: false},
 			],
+		})
+	}
+
+	const toggleBug = async (id: string, checked: boolean) => {
+		await meta.updateStory(story.id, {
+			bugs: produce(story.bugs, (draft) => {
+				const index = draft.findIndex((bug) => bug.id === id)
+				draft[index]!.checked = checked
+			}),
+		})
+	}
+
+	const addBug = async () => {
+		await meta.updateStory(story.id, {
+			bugs: [...story.bugs, {id: nanoid() as Id, name: newBugInput, checked: false}],
 		})
 	}
 
@@ -121,25 +137,21 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							</Button>
 						) : (
 							<div className="relative">
-								<div>
-									<Tag color="#585858" icon={<NumberOutlined />}>
-										{story.points} point{story.points === 1 ? `` : `s`}
-									</Tag>
-									<Tag
-										color={typeof product?.effortCost === `number` ? `#585858` : `#f5f5f5`}
-										icon={<DollarOutlined />}
-										className={clsx(
-											typeof product?.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
-										)}
-									>
-										{dollarFormat((product?.effortCost ?? 0) * story.points)}
-									</Tag>
-									<Tag color="#585858" icon={<FlagOutlined />}>
-										{sprintColumns[story.sprintColumn]}
-									</Tag>
-								</div>
+								<Tag color="#585858" icon={<NumberOutlined />}>
+									{story.points} point{story.points === 1 ? `` : `s`}
+								</Tag>
+								<Tag
+									color={typeof product?.effortCost === `number` ? `#585858` : `#f5f5f5`}
+									icon={<DollarOutlined />}
+									className={clsx(typeof product?.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`)}
+								>
+									{dollarFormat((product?.effortCost ?? 0) * story.points)}
+								</Tag>
+								<Tag color="#585858" icon={<FlagOutlined />}>
+									{sprintColumns[story.sprintColumn]}
+								</Tag>
 
-								<div className="absolute left-96 top-0">
+								<div className="absolute left-1/2 top-0 -translate-x-1/2">
 									<Tag
 										color={story.branchName ? `#0958d9` : `#f5f5f5`}
 										icon={<CodeOutlined />}
@@ -185,9 +197,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						</>
 					) : (
 						<>
-							<button type="button" onClick={() => setEditMode(true)} className="ml-1 text-sm text-[#1677ff]">
-								Edit
-							</button>
+							<Button onClick={() => setEditMode(true)}>Edit</Button>
 							<button type="button" onClick={() => onClose()}>
 								<CloseOutlined />
 							</button>
@@ -268,7 +278,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					{/* Left column */}
 					<div className="flex h-full min-h-0 flex-col gap-6">
 						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
-							<p className="text-xl font-semibold text-gray">Story</p>
+							<p className="text-lg font-medium text-gray">Story</p>
 							<Input.TextArea
 								rows={4}
 								value={description}
@@ -284,53 +294,93 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							/>
 						</div>
 
-						<div className="flex min-h-0 flex-1 flex-col gap-2">
-							<p className="text-xl font-semibold text-gray">Acceptance Criteria</p>
-							<div className="flex min-h-0 flex-1 flex-col flex-wrap gap-2 overflow-x-auto p-0.5">
-								{story.acceptanceCriteria.map((criterion) => (
-									<Checkbox
-										key={criterion.id}
-										checked={criterion.checked}
-										onChange={(e) => {
-											toggleAcceptanceCriterion(criterion.id, e.target.checked).catch(console.error)
-										}}
-										style={{marginLeft: `0px`}}
-									>
-										{criterion.name}
-									</Checkbox>
-								))}
-								<form
-									onSubmit={(e) => {
-										e.preventDefault()
-										addAcceptanceCriterion()
-											.then(() => {
-												setNewAcceptanceCriterion(``)
-											})
-											.catch(console.error)
-									}}
-								>
+						<div className="grid min-h-0 grow basis-0 grid-cols-2 gap-8">
+							<div className="flex min-h-0 flex-col gap-2">
+								<p className="text-lg font-medium text-gray">Acceptance Criteria</p>
+								<div className="flex flex-col gap-2 overflow-auto p-0.5">
+									{story.acceptanceCriteria.map((criterion) => (
+										<Checkbox
+											key={criterion.id}
+											checked={criterion.checked}
+											onChange={(e) => {
+												toggleAcceptanceCriterion(criterion.id, e.target.checked).catch(console.error)
+											}}
+											style={{marginLeft: `0px`}}
+										>
+											{criterion.name}
+										</Checkbox>
+									))}
 									<Input
 										size="small"
 										placeholder="Add item"
-										value={newAcceptanceCriterion}
-										onChange={(e) => setNewAcceptanceCriterion(e.target.value)}
+										value={newAcceptanceCriterionInput}
+										onChange={(e) => setNewAcceptanceCriterionInput(e.target.value)}
+										onPressEnter={() => {
+											addAcceptanceCriterion()
+												.then(() => {
+													setNewAcceptanceCriterionInput(``)
+												})
+												.catch(console.error)
+										}}
 										className="w-40"
 									/>
+								</div>
+							</div>
 
-									<input type="submit" hidden />
-								</form>
+							<div className="flex min-h-0 flex-col gap-2 overflow-auto">
+								<p className="text-lg font-medium text-gray">Bugs</p>
+								<div className="flex flex-col gap-2 overflow-auto p-0.5">
+									{story.bugs.map((bug) => (
+										<Checkbox
+											key={bug.id}
+											checked={bug.checked}
+											onChange={(e) => {
+												toggleBug(bug.id, e.target.checked).catch(console.error)
+											}}
+											className="w-full [&_span:last-child]:grow [&_span:last-child]:basis-0 [&_span:last-child]:truncate"
+										>
+											{bug.name}
+										</Checkbox>
+									))}
+									<Input
+										size="small"
+										placeholder="Add item"
+										value={newBugInput}
+										onChange={(e) => setNewBugInput(e.target.value)}
+										onPressEnter={() => {
+											addBug()
+												.then(() => {
+													setNewBugInput(``)
+												})
+												.catch(console.error)
+										}}
+										className="w-40"
+									/>
+								</div>
 							</div>
 						</div>
 					</div>
 
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
-						<p className="text-xl font-semibold text-gray">Comments</p>
+						<div className="flex items-center justify-between">
+							<p className="text-lg font-medium text-gray">Comments</p>
+							<Segmented
+								size="small"
+								value={commentType}
+								onChange={(value) => setCommentType(value as `code` | `design`)}
+								options={[
+									{label: `Design`, icon: <BlockOutlined />, value: `design`},
+									{label: `Code`, icon: <CodeOutlined />, value: `code`},
+								]}
+							/>
+						</div>
 						<div className="relative grow">
 							<Comments
 								storyMapStateId={meta.storyMapStateId}
 								parentId={storyId}
 								flagged={story.ethicsColumn !== null}
+								commentType={commentType}
 								onFlag={() => {
 									meta
 										.updateStory(story.id, {

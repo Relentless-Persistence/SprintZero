@@ -1,4 +1,4 @@
-import {Timestamp, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
+import {Timestamp, serverTimestamp, updateDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 
@@ -74,7 +74,7 @@ export const useGenMeta = ({
 
 		epics: epicsWithExtra,
 		addEpic: async (data: Partial<Epic>) => {
-			const newData: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					const lastEpic =
 						epics.length > 0
@@ -90,29 +90,27 @@ export const useGenMeta = ({
 						...data,
 					}
 				}),
-			}
-			await setDoc(storyMapStateRef, newData)
+				updatedAt: serverTimestamp(),
+			})
 		},
 		updateEpic: async (epicId: Id, data: Partial<Epic>) => {
-			const newData: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					draft[epicId] = {...(draft[epicId] as Epic), ...data}
 				}),
-			}
-			await setDoc(storyMapStateRef, newData)
+			})
 		},
 		deleteEpic: async (epicId: Id) => {
-			const data: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					delete draft[epicId]
 				}),
-			}
-			await setDoc(storyMapStateRef, data)
+			})
 		},
 
 		features: featuresWithExtra,
 		addFeature: async (data: SetRequired<Partial<Feature>, `parentId`>) => {
-			const newData: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					const lastFeature =
 						features.length > 0
@@ -127,24 +125,22 @@ export const useGenMeta = ({
 						...data,
 					}
 				}),
-			}
-			await setDoc(storyMapStateRef, newData)
+				updatedAt: serverTimestamp(),
+			})
 		},
 		updateFeature: async (featureId: Id, data: Partial<Feature>) => {
-			const newData: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					draft[featureId] = {...(draft[featureId] as Feature), ...data}
 				}),
-			}
-			await setDoc(storyMapStateRef, newData)
+			})
 		},
 		deleteFeature: async (featureId: Id) => {
-			const data: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					delete draft[featureId]
 				}),
-			}
-			await setDoc(storyMapStateRef, data)
+			})
 		},
 
 		stories: storiesWithExtra,
@@ -156,6 +152,7 @@ export const useGenMeta = ({
 						type: `story`,
 						acceptanceCriteria: [],
 						branchName: null,
+						bugs: [],
 						createdAt: Timestamp.now(),
 						description: ``,
 						designLink: null,
@@ -174,20 +171,18 @@ export const useGenMeta = ({
 			})
 		},
 		updateStory: async (storyId: Id, data: Partial<Story>) => {
-			const newData: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					draft[storyId] = {...(draft[storyId] as Story), ...data}
 				}),
-			}
-			await setDoc(storyMapStateRef, newData)
+			})
 		},
 		deleteStory: async (storyId: Id) => {
-			const data: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					delete draft[storyId]
 				}),
-			}
-			await setDoc(storyMapStateRef, data)
+			})
 		},
 	}
 }
