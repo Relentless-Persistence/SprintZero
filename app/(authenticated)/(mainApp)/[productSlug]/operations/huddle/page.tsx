@@ -13,11 +13,13 @@ import type {WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {Huddle} from "~/types/db/Huddles"
 
+import FunCard from "./FunCard"
 import {HuddleConverter} from "~/types/db/Huddles"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+
 
 const tabs = [
 	{key: `0`, label: `Today`},
@@ -66,6 +68,9 @@ const HuddlePage: FC = () => {
 				</Breadcrumb>
 
 				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col gap-4">
+
+					<FunCard />
+
 					{usersData.map(({data: user}, i) => {
 						const huddleItemToday = huddles?.find(
 							(huddle) => huddle.userId === user?.id && huddle.date === formattedDateToday,
