@@ -63,6 +63,7 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 							setLocalStoryName(e.target.value)
 							meta.updateEpic(story.id, {name: e.target.value}).catch(console.error)
 						}}
+						onPointerDownCapture={(e) => e.stopPropagation()}
 					/>
 				</div>
 			</div>

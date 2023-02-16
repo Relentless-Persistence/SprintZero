@@ -57,6 +57,7 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 							setLocalEpicName(e.target.value)
 							meta.updateEpic(epic.id, {name: e.target.value}).catch(console.error)
 						}}
+						onPointerDownCapture={(e) => e.stopPropagation()}
 					/>
 				</div>
 			</div>

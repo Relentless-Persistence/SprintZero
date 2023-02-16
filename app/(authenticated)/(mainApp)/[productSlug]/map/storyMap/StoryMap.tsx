@@ -1,5 +1,5 @@
 import {ReadOutlined} from "@ant-design/icons"
-import {Timestamp, deleteField, serverTimestamp, updateDoc, writeBatch} from "firebase/firestore"
+import {deleteField, serverTimestamp, updateDoc, writeBatch} from "firebase/firestore"
 import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
@@ -184,10 +184,9 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 					const itemBeingDragged = meta.epics.find((epic) => epic.id === dragInfo.itemBeingDraggedId)!
 					const data: WithFieldValue<Pick<StoryMapState, `updatedAt`> & {[key: `items.${Id}.`]: FeatureType}> = {
 						[`items.${dragInfo.itemBeingDraggedId}`]: {
+							...itemBeingDragged,
 							type: `feature` as const,
-							description: itemBeingDragged.description,
 							effort: 0.5,
-							name: itemBeingDragged.name,
 							userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
 							parentId,
 						},
@@ -239,12 +238,11 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 					const itemBeingDragged = meta.features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
 					const data: WithFieldValue<Pick<StoryMapState, `updatedAt`> & {[key: `items.${Id}.`]: EpicType}> = {
 						[`items.${dragInfo.itemBeingDraggedId}`]: {
+							...itemBeingDragged,
 							type: `epic` as const,
-							description: itemBeingDragged.description,
 							effort: 0.5,
-							name: itemBeingDragged.name,
 							userValue: avg(prevEpicUserValue, nextEpicUserValue),
-							keeperIds: [],
+							keeperIds: itemBeingDragged.keeperIds ?? [],
 						},
 						updatedAt: serverTimestamp(),
 					}
@@ -256,15 +254,15 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 					}
 					const batch = writeBatch(db)
 					batch.update(storyMapState.ref, data)
+					// Move child stories to feature level
 					itemBeingDragged.childrenIds
 						.map((storyId) => meta.stories.find((story) => story.id === storyId)!)
 						.forEach((story, i) => {
 							const data: {[key: `items.${Id}.`]: FeatureType} = {
 								[`items.${story.id}`]: {
+									...story,
 									type: `feature` as const,
-									description: story.description,
 									effort: 0.5,
-									name: story.name,
 									userValue: (i + 1) / (itemBeingDragged.childrenIds.length + 1),
 									parentId: id,
 								},
@@ -301,10 +299,8 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 							const prevFeatureUserValue = siblings.at(-1)?.userValue ?? 0
 							const data: WithFieldValue<Pick<StoryMapState, `updatedAt`> & {[key: `items.${Id}.`]: FeatureType}> = {
 								[`items.${dragInfo.itemBeingDraggedId}`]: {
-									type: `feature` as const,
-									description: currentFeature.description,
+									...currentFeature,
 									effort: 0.5,
-									name: currentFeature.name,
 									userValue: avg(prevFeatureUserValue, 1),
 									parentId: newParent.id,
 								},
@@ -331,10 +327,8 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 							const nextFeatureUserValue = siblings[currentFeature.position]?.userValue ?? 1
 							const data: WithFieldValue<Pick<StoryMapState, `updatedAt`> & {[key: `items.${Id}.`]: FeatureType}> = {
 								[`items.${dragInfo.itemBeingDraggedId}`]: {
-									type: `feature` as const,
-									description: currentFeature.description,
+									...currentFeature,
 									effort: 0.5,
-									name: currentFeature.name,
 									userValue: avg(nextFeatureUserValue, 0),
 									parentId: newParent.id,
 								},
@@ -436,22 +430,21 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 					const featureBeingDragged = meta.features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
 					const data: WithFieldValue<Pick<StoryMapState, `updatedAt`> & {[key: `items.${Id}.`]: StoryType}> = {
 						[`items.${dragInfo.itemBeingDraggedId}`]: {
+							...featureBeingDragged,
 							type: `story` as const,
-							acceptanceCriteria: [],
-							branchName: null,
-							bugs: [],
-							createdAt: Timestamp.now(),
-							description: featureBeingDragged.description,
-							designLink: null,
-							ethicsApproved: null,
-							ethicsColumn: null,
-							ethicsVotes: [],
-							name: featureBeingDragged.name,
-							pageLink: null,
-							points: 0,
-							sprintColumn: `productBacklog` as const,
+							acceptanceCriteria: featureBeingDragged.acceptanceCriteria ?? [],
+							branchName: featureBeingDragged.branchName,
+							bugs: featureBeingDragged.bugs ?? [],
+							designLink: featureBeingDragged.designLink,
+							ethicsApproved: featureBeingDragged.ethicsApproved,
+							ethicsColumn: featureBeingDragged.ethicsColumn,
+							ethicsVotes: featureBeingDragged.ethicsVotes ?? [],
+							pageLink: featureBeingDragged.pageLink,
+							points: featureBeingDragged.points ?? 0,
+							sprintColumn: featureBeingDragged.sprintColumn ?? (`productBacklog` as const),
+							updatedAt: serverTimestamp(),
 							parentId: hoveringFeature.id,
-							versionId: currentVersionId,
+							versionId: featureBeingDragged.versionId ?? currentVersionId,
 						},
 						updatedAt: serverTimestamp(),
 					}
@@ -554,10 +547,9 @@ const StoryMap: FC<StoryMapProps> = ({activeProduct, storyMapState, allVersions,
 					const itemBeingDragged = storyMapState.data().items[dragInfo.itemBeingDraggedId] as StoryType
 					const data: WithFieldValue<Pick<StoryMapState, `updatedAt`> & {[key: `items.${Id}.`]: FeatureType}> = {
 						[`items.${dragInfo.itemBeingDraggedId}`]: {
+							...itemBeingDragged,
 							type: `feature` as const,
-							description: itemBeingDragged.description,
 							effort: 0.5,
-							name: itemBeingDragged.name,
 							userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
 							parentId,
 						},

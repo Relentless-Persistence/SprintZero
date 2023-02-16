@@ -60,6 +60,7 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 							setLocalFeatureName(e.target.value)
 							meta.updateEpic(feature.id, {name: e.target.value}).catch(console.error)
 						}}
+						onPointerDownCapture={(e) => e.stopPropagation()}
 					/>
 				</div>
 			</div>
