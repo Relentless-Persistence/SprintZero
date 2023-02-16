@@ -8,7 +8,7 @@ import {
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Button, Checkbox, Drawer, Form, Input, Tag} from "antd"
+import {Button, Checkbox, Drawer, Form, Input, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import {collection, setDoc} from "firebase/firestore"
 import produce from "immer"
@@ -60,6 +60,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 	const [newAcceptanceCriterion, setNewAcceptanceCriterion] = useState(``)
 	const story = getStories(storyMapState.data()).find((story) => story.id === storyId)!
 	const [description, setDescription] = useState(story.description)
+	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
 	useEffect(() => {
 		setDescription(story.description)
@@ -339,11 +340,23 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
-						<p className="text-xl font-semibold text-gray">Comments</p>
+						<div className="flex items-center justify-between">
+							<p className="text-xl font-semibold text-gray">Comments</p>
+							<Segmented
+								size="small"
+								value={commentType}
+								onChange={(value) => setCommentType(value as `code` | `design`)}
+								options={[
+									{label: `Design`, icon: <BlockOutlined />, value: `design`},
+									{label: `Code`, icon: <CodeOutlined />, value: `code`},
+								]}
+							/>
+						</div>
 						<div className="relative grow">
 							<Comments
 								storyMapStateId={storyMapState.id as Id}
 								parentId={storyId}
+								commentType={commentType}
 								flagged={story.ethicsColumn !== null}
 								onFlag={async () => {
 									const newData = produce(storyMapState.data(), (draft) => {

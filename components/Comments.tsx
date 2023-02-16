@@ -67,7 +67,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 							const author = commentAuthors.find((author) => author.data?.id === comment.data().authorId)?.data
 							return (
 								<div key={comment.id} className="flex gap-2">
-									<Avatar src={author?.data()?.avatar} />
+									<Avatar shape="square" src={author?.data()?.avatar} className="border border-[#d6d7d9]" />
 									<div className="flex flex-col gap-1">
 										<p className="text-xs text-laurel">{author?.data()?.name}</p>
 										<p>{comment.data().text}</p>
@@ -82,31 +82,34 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 				onSubmit={(e) => {
 					handleSubmit(e).catch(console.error)
 				}}
-				className="mt-4 flex flex-col gap-4"
+				className="mt-4 flex gap-2"
 			>
-				<Input value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} />
-				<div className="flex gap-2">
-					<Button
-						htmlType="submit"
-						icon={<SendOutlined />}
-						disabled={commentDraft.length === 0}
-						className="flex items-center"
-					>
-						Post
-					</Button>
-					{flagged !== undefined && onFlag && (
+				<Avatar shape="square" src={user?.data().avatar} className="border border-[#d6d7d9]" />
+				<div className="flex grow flex-col gap-2">
+					<Input value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} />
+					<div className="flex justify-between gap-2">
 						<Button
-							icon={<FlagOutlined />}
-							danger
-							disabled={flagged}
-							onClick={() => {
-								if (!flagged) Promise.resolve(onFlag()).catch(console.error)
-							}}
+							htmlType="submit"
+							icon={<SendOutlined />}
+							disabled={commentDraft.length === 0}
 							className="flex items-center"
 						>
-							{flagged ? `Flagged` : `Flag`}
+							Post
 						</Button>
-					)}
+						{flagged !== undefined && onFlag && (
+							<Button
+								icon={<FlagOutlined />}
+								danger
+								disabled={flagged}
+								onClick={() => {
+									if (!flagged) Promise.resolve(onFlag()).catch(console.error)
+								}}
+								className="flex items-center"
+							>
+								{flagged ? `Flagged` : `Flag`}
+							</Button>
+						)}
+					</div>
 				</div>
 			</form>
 		</div>
