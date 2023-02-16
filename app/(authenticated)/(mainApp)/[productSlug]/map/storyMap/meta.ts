@@ -1,4 +1,4 @@
-import {Timestamp, setDoc} from "firebase/firestore"
+import {Timestamp, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 
@@ -150,7 +150,7 @@ export const useGenMeta = ({
 		stories: storiesWithExtra,
 		addStory: async (data: SetRequired<Partial<Story>, `parentId`>) => {
 			if (currentVersionId === `__ALL_VERSIONS__`) return
-			const newData: Partial<StoryMapState> = {
+			await updateDoc(storyMapStateRef, {
 				items: produce(storyMapItems, (draft) => {
 					draft[nanoid() as Id] = {
 						type: `story`,
@@ -170,8 +170,8 @@ export const useGenMeta = ({
 						...data,
 					}
 				}),
-			}
-			await setDoc(storyMapStateRef, newData)
+				updatedAt: serverTimestamp(),
+			})
 		},
 		updateStory: async (storyId: Id, data: Partial<Story>) => {
 			const newData: Partial<StoryMapState> = {
