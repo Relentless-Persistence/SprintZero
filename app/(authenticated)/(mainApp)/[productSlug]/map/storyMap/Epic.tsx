@@ -1,6 +1,6 @@
 import {CopyOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {useEffect, useRef} from "react"
+import {useEffect, useRef, useState} from "react"
 
 import type {StoryMapMeta} from "./meta"
 import type {DragInfo} from "./types"
@@ -30,6 +30,8 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 		}
 	}, [epicId, inert])
 
+	const [localEpicName, setLocalEpicName] = useState(epic.name)
+
 	return (
 		<div
 			className={clsx(
@@ -46,7 +48,17 @@ const Epic: FC<EpicProps> = ({meta, dragInfo, epicId, inert = false}) => {
 				ref={contentRef}
 			>
 				<ReadOutlined />
-				<p>{epic.name}</p>
+				<div className="relative min-w-[1rem]">
+					<p>{localEpicName || `_`}</p>
+					<input
+						value={localEpicName}
+						className="absolute inset-0"
+						onChange={(e) => {
+							setLocalEpicName(e.target.value)
+							meta.updateEpic(epic.id, {name: e.target.value}).catch(console.error)
+						}}
+					/>
+				</div>
 			</div>
 
 			{/* Pad out the remaining columns in row 1 */}

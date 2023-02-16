@@ -19,11 +19,11 @@ export const ProductSchema = z.object({
 	storyMapStateId: idSchema,
 
 	// Kickoff info
-	problemStatement: z.string(),
-	personas: z.array(z.object({id: z.string(), text: z.string()})),
 	businessOutcomes: z.array(z.object({id: z.string(), text: z.string()})),
 	marketLeaders: z.array(z.object({id: z.string(), text: z.string()})),
+	personas: z.array(z.object({id: z.string(), text: z.string()})),
 	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
+	problemStatement: z.string(),
 	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),
 
 	// Accessibility info
@@ -61,10 +61,3 @@ export const ProductSchema = z.object({
 
 export type Product = z.infer<typeof ProductSchema>
 export const ProductConverter = genConverter(ProductSchema)
-
-export const kickoffSections = {
-	problemStatement: `Problem Statement`,
-	personas: `Personas`,
-	successMetrics: `Success Metrics`,
-	businessPriorities: `Business Priorities`,
-}

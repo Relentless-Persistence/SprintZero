@@ -29,9 +29,10 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 		}
 	}, [story.id, inert])
 
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
 	const version = meta.allVersions.docs.find((version) => version.id === story.versionId)
+
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const [localStoryName, setLocalStoryName] = useState(story.name)
 
 	return (
 		// Don't delete this wrapper div. Epics and features require a .parentElement lookup for drag-and-drop offset, so
@@ -51,10 +52,18 @@ const Story: FC<StoryProps> = ({meta, dragInfo, storyId, inert = false}) => {
 					onPointerDownCapture={(e) => e.stopPropagation()}
 					className="border-r border-[#103001] bg-[#f5f5f5] p-2 text-[0.6rem]"
 				>
-					<p className="leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
+					<p className="max-h-8 truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 				</button>
-				<div className="mx-auto px-2 font-medium text-black">
-					<p>{story.name}</p>
+				<div className="relative mx-auto min-w-[1rem] font-medium text-black">
+					<p className="mx-1">{localStoryName || `_`}</p>
+					<input
+						value={localStoryName}
+						className="absolute inset-0 mx-1"
+						onChange={(e) => {
+							setLocalStoryName(e.target.value)
+							meta.updateEpic(story.id, {name: e.target.value}).catch(console.error)
+						}}
+					/>
 				</div>
 			</div>
 

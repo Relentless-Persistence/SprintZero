@@ -1,6 +1,6 @@
 import {CopyOutlined, FileOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {useEffect, useRef} from "react"
+import {useEffect, useRef, useState} from "react"
 
 import type {StoryMapMeta} from "./meta"
 import type {DragInfo} from "./types"
@@ -37,6 +37,8 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 			return story.versionId === meta.currentVersionId
 		})
 
+	const [localFeatureName, setLocalFeatureName] = useState(feature.name)
+
 	return (
 		<div
 			className={clsx(`flex flex-col items-center`, dragInfo.itemBeingDraggedId === featureId && !inert && `invisible`)}
@@ -49,7 +51,17 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 				ref={contentRef}
 			>
 				<CopyOutlined />
-				<p>{feature.name}</p>
+				<div className="relative min-w-[1rem]">
+					<p>{localFeatureName || `_`}</p>
+					<input
+						value={localFeatureName}
+						className="absolute inset-0"
+						onChange={(e) => {
+							setLocalFeatureName(e.target.value)
+							meta.updateEpic(feature.id, {name: e.target.value}).catch(console.error)
+						}}
+					/>
+				</div>
 			</div>
 
 			{(meta.currentVersionId !== `__ALL_VERSIONS__` || feature.childrenIds.length > 0) && (
