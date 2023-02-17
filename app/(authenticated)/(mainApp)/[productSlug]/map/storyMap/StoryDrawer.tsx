@@ -32,6 +32,7 @@ import {StorySchema, sprintColumns} from "~/types/db/StoryMapStates"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
+import {deleteItem, updateItem} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const formSchema = StorySchema.pick({
@@ -82,41 +83,61 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
-		await meta.updateStory(story.id, data)
+		await updateItem(meta.storyMapState, story.id, data, meta.allVersions)
 		setEditMode(false)
 	})
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
-		await meta.updateStory(story.id, {
-			acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
-				const index = draft.findIndex((criterion) => criterion.id === id)
-				draft[index]!.checked = checked
-			}),
-		})
+		await updateItem(
+			meta.storyMapState,
+			story.id,
+			{
+				acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
+					const index = draft.findIndex((criterion) => criterion.id === id)
+					draft[index]!.checked = checked
+				}),
+			},
+			meta.allVersions,
+		)
 	}
 
 	const addAcceptanceCriterion = async () => {
-		await meta.updateStory(story.id, {
-			acceptanceCriteria: [
-				...story.acceptanceCriteria,
-				{id: nanoid() as Id, name: newAcceptanceCriterionInput, checked: false},
-			],
-		})
+		await updateItem(
+			meta.storyMapState,
+			story.id,
+			{
+				acceptanceCriteria: [
+					...story.acceptanceCriteria,
+					{id: nanoid() as Id, name: newAcceptanceCriterionInput, checked: false},
+				],
+			},
+			meta.allVersions,
+		)
 	}
 
 	const toggleBug = async (id: string, checked: boolean) => {
-		await meta.updateStory(story.id, {
-			bugs: produce(story.bugs, (draft) => {
-				const index = draft.findIndex((bug) => bug.id === id)
-				draft[index]!.checked = checked
-			}),
-		})
+		await updateItem(
+			meta.storyMapState,
+			story.id,
+			{
+				bugs: produce(story.bugs, (draft) => {
+					const index = draft.findIndex((bug) => bug.id === id)
+					draft[index]!.checked = checked
+				}),
+			},
+			meta.allVersions,
+		)
 	}
 
 	const addBug = async () => {
-		await meta.updateStory(story.id, {
-			bugs: [...story.bugs, {id: nanoid() as Id, name: newBugInput, checked: false}],
-		})
+		await updateItem(
+			meta.storyMapState,
+			story.id,
+			{
+				bugs: [...story.bugs, {id: nanoid() as Id, name: newBugInput, checked: false}],
+			},
+			meta.allVersions,
+		)
 	}
 
 	return (
@@ -130,7 +151,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								type="primary"
 								danger
 								onClick={() => {
-									meta.deleteStory(story.id).catch(console.error)
+									deleteItem(meta.storyMapState, story.id).catch(console.error)
 								}}
 							>
 								Delete
@@ -284,11 +305,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)
-									meta
-										.updateStory(story.id, {
+									updateItem(
+										meta.storyMapState,
+										story.id,
+										{
 											description: e.target.value,
-										})
-										.catch(console.error)
+										},
+										meta.allVersions,
+									).catch(console.error)
 								}}
 								className="max-h-[calc(100%-2.25rem)]"
 							/>
@@ -377,16 +401,19 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						</div>
 						<div className="relative grow">
 							<Comments
-								storyMapStateId={meta.storyMapStateId}
+								storyMapStateId={meta.storyMapState.id as Id}
 								parentId={storyId}
 								flagged={story.ethicsColumn !== null}
 								commentType={commentType}
 								onFlag={() => {
-									meta
-										.updateStory(story.id, {
+									updateItem(
+										meta.storyMapState,
+										story.id,
+										{
 											ethicsColumn: `identified`,
-										})
-										.catch(console.error)
+										},
+										meta.allVersions,
+									).catch(console.error)
 								}}
 							/>
 						</div>

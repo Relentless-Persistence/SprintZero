@@ -7,6 +7,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import {elementRegistry} from "./globals"
+import {updateItem} from "~/utils/storyMap"
 
 export type EpicProps = {
 	meta: StoryMapMeta
@@ -45,7 +46,7 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false}) => {
 					className="absolute inset-0"
 					onChange={(e) => {
 						setLocalEpicName(e.target.value)
-						meta.updateEpic(epic.id, {name: e.target.value}).catch(console.error)
+						updateItem(meta.storyMapState, epic.id, {name: e.target.value}, meta.allVersions).catch(console.error)
 					}}
 					onPointerDownCapture={(e) => e.stopPropagation()}
 				/>

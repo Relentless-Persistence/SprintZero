@@ -144,6 +144,7 @@ export const StoryMapStateSchema = z.object({
 	items: z.record(idSchema, z.discriminatedUnion(`type`, [EpicSchema, FeatureSchema, StorySchema])),
 	updatedAt: serverTimestampSchema,
 
+	currentHistoryId: idSchema,
 	productId: idSchema,
 })
 

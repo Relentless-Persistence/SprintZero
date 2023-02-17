@@ -7,6 +7,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import {elementRegistry} from "./globals"
+import {updateItem} from "~/utils/storyMap"
 
 export type FeatureProps = {
 	meta: StoryMapMeta
@@ -45,7 +46,7 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false}) => {
 					className="absolute inset-0"
 					onChange={(e) => {
 						setLocalFeatureName(e.target.value)
-						meta.updateEpic(feature.id, {name: e.target.value}).catch(console.error)
+						updateItem(meta.storyMapState, feature.id, {name: e.target.value}, meta.allVersions).catch(console.error)
 					}}
 					onPointerDownCapture={(e) => e.stopPropagation()}
 				/>

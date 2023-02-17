@@ -1,10 +1,11 @@
-// Story map position histories
+// Story map item histories
 
 import {z} from "zod"
 
 import {genConverter, idSchema, serverTimestampSchema} from ".."
 
-export const PositionHistorySchema = z.object({
+export const HistorySchema = z.object({
+	future: z.boolean(),
 	items: z.record(
 		idSchema,
 		z.discriminatedUnion(`type`, [
@@ -37,5 +38,5 @@ export const PositionHistorySchema = z.object({
 	timestamp: serverTimestampSchema,
 })
 
-export type PositionHistory = z.infer<typeof PositionHistorySchema>
-export const PositionHistoryConverter = genConverter(PositionHistorySchema)
+export type History = z.infer<typeof HistorySchema>
+export const HistoryConverter = genConverter(HistorySchema)

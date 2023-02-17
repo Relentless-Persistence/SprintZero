@@ -7,6 +7,7 @@ import type {Id} from "~/types"
 
 import {elementRegistry} from "./globals"
 import StoryDrawer from "./StoryDrawer"
+import {updateItem} from "~/utils/storyMap"
 
 export type StoryProps = {
 	meta: StoryMapMeta
@@ -55,7 +56,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
 					className="absolute inset-0 mx-1"
 					onChange={(e) => {
 						setLocalStoryName(e.target.value)
-						meta.updateEpic(story.id, {name: e.target.value}).catch(console.error)
+						updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(console.error)
 					}}
 					onPointerDownCapture={(e) => e.stopPropagation()}
 				/>

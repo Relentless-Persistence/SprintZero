@@ -96,13 +96,13 @@ const TasksPage: FC = () => {
 						if (editingTask === `new`) {
 							await addDoc(collection(db, `Tasks`), {
 								...data,
-								dueDate: Timestamp.fromDate(data.dueDate.toDate()),
+								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
 								productId: activeProductId,
 							} satisfies Task)
 						} else {
 							await updateDoc(doc(db, `Tasks`, editingTask), {
 								...data,
-								dueDate: Timestamp.fromDate(data.dueDate.toDate()),
+								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
 							} satisfies Partial<Task>)
 						}
 						setEditingTask(undefined)

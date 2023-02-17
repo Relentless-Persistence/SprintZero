@@ -9,18 +9,18 @@ import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import invariant from "tiny-invariant"
 
-import type {WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
 
 import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
+import {HistoryConverter} from "~/types/db/Histories"
 import {ProductConverter} from "~/types/db/Products"
+import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
+import {VersionConverter} from "~/types/db/Versions"
 import {auth, db} from "~/utils/firebase"
 
 const numSlides = 4
@@ -42,12 +42,25 @@ const ProductSetupPage: FC = () => {
 
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
 
-		const newData: WithFieldValue<StoryMapState> = {items: {}, updatedAt: serverTimestamp(), productId: slug}
-		const storyMapStateId = (await addDoc(collection(db, `StoryMapStates`), newData)).id as Id
+		const storyMapStateDoc = doc(db, `StoryMapStates`, nanoid()).withConverter(StoryMapStateConverter)
+		const positionHistoryDoc = await addDoc(
+			collection(db, `StoryMapStates`, storyMapStateDoc.id, `Histories`).withConverter(HistoryConverter),
+			{
+				future: false,
+				items: {},
+				timestamp: serverTimestamp(),
+			},
+		)
+		await setDoc(storyMapStateDoc, {
+			items: {},
+			updatedAt: serverTimestamp(),
+			currentHistoryId: positionHistoryDoc.id as Id,
+			productId: slug,
+		})
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
-			storyMapStateId,
+			storyMapStateId: storyMapStateDoc.id as Id,
 			members: {[user.uid as Id]: {type: `editor`}},
 			problemStatement: ``,
 			personas: [],
@@ -69,9 +82,9 @@ const ProductSetupPage: FC = () => {
 			updates: [],
 		})
 
-		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), {
+		await addDoc(collection(db, `StoryMapStates`, storyMapStateDoc.id, `Versions`).withConverter(VersionConverter), {
 			name: `1.0`,
-		} satisfies Version)
+		})
 
 		router.push(`/${slug}/map`)
 	}
