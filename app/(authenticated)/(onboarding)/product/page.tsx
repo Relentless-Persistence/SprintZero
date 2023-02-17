@@ -1,7 +1,7 @@
 "use client"
 
 import {Button} from "antd"
-import {addDoc, collection, doc, serverTimestamp, setDoc} from "firebase/firestore"
+import {addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
@@ -42,25 +42,27 @@ const ProductSetupPage: FC = () => {
 
 		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
 
-		const storyMapStateDoc = doc(db, `StoryMapStates`, nanoid()).withConverter(StoryMapStateConverter)
-		const positionHistoryDoc = await addDoc(
-			collection(db, `StoryMapStates`, storyMapStateDoc.id, `Histories`).withConverter(HistoryConverter),
+		const storyMapState = await addDoc(collection(db, `StoryMapStates`).withConverter(StoryMapStateConverter), {
+			items: {},
+			updatedAt: serverTimestamp(),
+			currentHistoryId: `` as Id,
+			productId: slug,
+		})
+		const positionHistory = await addDoc(
+			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
 			{
 				future: false,
 				items: {},
 				timestamp: serverTimestamp(),
 			},
 		)
-		await setDoc(storyMapStateDoc, {
-			items: {},
-			updatedAt: serverTimestamp(),
-			currentHistoryId: positionHistoryDoc.id as Id,
-			productId: slug,
+		await updateDoc(storyMapState, {
+			currentHistoryId: positionHistory.id as Id,
 		})
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
-			storyMapStateId: storyMapStateDoc.id as Id,
+			storyMapStateId: storyMapState.id as Id,
 			members: {[user.uid as Id]: {type: `editor`}},
 			problemStatement: ``,
 			personas: [],
@@ -82,7 +84,7 @@ const ProductSetupPage: FC = () => {
 			updates: [],
 		})
 
-		await addDoc(collection(db, `StoryMapStates`, storyMapStateDoc.id, `Versions`).withConverter(VersionConverter), {
+		await addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter), {
 			name: `1.0`,
 		})
 
