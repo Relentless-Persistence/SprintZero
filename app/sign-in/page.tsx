@@ -92,10 +92,9 @@ const SignInPage: FC = () => {
 				router.push(`/tos`)
 			} else {
 				const {docs: products} = await getDocs(
-					query(
-						collection(db, `Products`),
-						where(`Products.members.${res.user.uid}.type`, `==`, `editor`),
-					).withConverter(ProductConverter),
+					query(collection(db, `Products`), where(`members.${res.user.uid}.type`, `==`, `editor`)).withConverter(
+						ProductConverter,
+					),
 				)
 				if (products.length === 0) router.push(`/product`)
 				else router.push(`/${products[0]!.id}/map`)
