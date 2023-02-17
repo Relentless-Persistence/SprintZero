@@ -48,17 +48,6 @@ const ProductSetupPage: FC = () => {
 			currentHistoryId: `` as Id,
 			productId: slug,
 		})
-		const positionHistory = await addDoc(
-			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-			{
-				future: false,
-				items: {},
-				timestamp: serverTimestamp(),
-			},
-		)
-		await updateDoc(storyMapState, {
-			currentHistoryId: positionHistory.id as Id,
-		})
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
@@ -84,6 +73,17 @@ const ProductSetupPage: FC = () => {
 			updates: [],
 		})
 
+		const positionHistory = await addDoc(
+			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+			{
+				future: false,
+				items: {},
+				timestamp: serverTimestamp(),
+			},
+		)
+		await updateDoc(storyMapState, {
+			currentHistoryId: positionHistory.id as Id,
+		})
 		await addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter), {
 			name: `1.0`,
 		})

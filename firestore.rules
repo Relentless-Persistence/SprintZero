@@ -105,7 +105,7 @@ service cloud.firestore {
       }
 
       match /Histories/{historyId} {
-        allow read, create, delete:
+        allow read, write:
           if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)
       }
 

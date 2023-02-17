@@ -130,7 +130,7 @@ const StoryMapPage: FC = () => {
 							}}
 						/>
 					</Tooltip>
-					<Tooltip placement="left" title="undo">
+					<Tooltip placement="left" title="Undo">
 						<FloatButton
 							icon={<UndoOutlined />}
 							onClick={() => {
