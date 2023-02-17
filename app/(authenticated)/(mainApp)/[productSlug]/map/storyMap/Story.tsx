@@ -32,6 +32,9 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const [localStoryName, setLocalStoryName] = useState(story.name)
+	useEffect(() => {
+		setLocalStoryName(story.name)
+	}, [story.name])
 
 	return (
 		<div

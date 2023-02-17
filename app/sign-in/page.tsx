@@ -2,14 +2,7 @@
 
 import {AppleFilled, GithubOutlined} from "@ant-design/icons"
 import {notification} from "antd"
-import {
-	AuthCredential,
-	OAuthProvider,
-	linkWithCredential,
-	sendEmailVerification,
-	signInWithPopup,
-	signOut,
-} from "firebase/auth"
+import {OAuthProvider, linkWithCredential, sendEmailVerification, signInWithPopup, signOut} from "firebase/auth"
 import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter} from "next/navigation"

@@ -29,6 +29,9 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false}) => {
 	}, [epicId, inert])
 
 	const [localEpicName, setLocalEpicName] = useState(epic.name)
+	useEffect(() => {
+		setLocalEpicName(epic.name)
+	}, [epic.name])
 
 	return (
 		<div

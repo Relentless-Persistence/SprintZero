@@ -29,6 +29,9 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false}) => {
 	}, [featureId, inert])
 
 	const [localFeatureName, setLocalFeatureName] = useState(feature.name)
+	useEffect(() => {
+		setLocalFeatureName(feature.name)
+	}, [feature.name])
 
 	return (
 		<div
