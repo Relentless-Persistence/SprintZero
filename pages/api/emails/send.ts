@@ -14,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 		return res.status(405).json({message: "Method not allowed"})
 	}
 
-	const {to, from, subject, body} = req.body
+	const {to, from, subject, body}: EmailRequest = req.body
 
 	let emailPassword: string
 	if (from === process.env.EMAIL_FROM_NO_REPLY) {
