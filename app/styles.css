@@ -78,3 +78,8 @@ li {
 .ant-form-item {
 	margin-bottom: 0px;
 }
+
+button.ant-btn-link {
+	padding: unset;
+	height: auto;
+}
