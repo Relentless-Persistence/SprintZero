@@ -1,5 +1,5 @@
 import {NotificationOutlined} from "@ant-design/icons"
-import {Avatar, Button, Card, DatePicker} from "antd"
+import {Avatar, Button, Card, DatePicker, Skeleton} from "antd"
 import axios from "axios"
 // import dayjs from "dayjs"
 import Image from "next/image"
@@ -9,10 +9,25 @@ import {z} from "zod"
 import type {DatePickerProps} from "antd"
 import type {FC} from "react"
 
+interface Result {
+	results: {
+		songs: {
+			data: Song[]
+		}
+	}
+}
+
+interface Song {
+	attributes: {
+		url: string
+	}
+}
+
 const FunCard: FC = () => {
 	const [date, setDate] = useState(``)
 	const [clues, setClues] = useState<string[] | null>(null)
 	const [songUrl, setSongUrl] = useState<string>(``)
+	const [showSong, setShowSong] = useState<boolean>(false)
 
 	const dateFormat = `YYYY-MM-DD`
 
@@ -53,16 +68,21 @@ const FunCard: FC = () => {
 	}
 
 	const getSong = async (songString: string) => {
-    const newString = songString.trimStart().replace(/'/g, '"').replace(/(\w+:)|"|{|}/g, '').trim()
-    const obj = newString
-			.split(",")
-			.map((s) => s.trim().replace(/ /g, "+"))
-			.join("+")
-    
+		const newString = songString
+			.trimStart()
+			.replace(/'/g, `"`)
+			.replace(/(\w+:)|"|{|}/g, ``)
+			.trim()
+		const obj = newString
+			.split(`,`)
+			.map((s) => s.trim().replace(/ /g, `+`))
+			.join(`+`)
 
-		const res = await axios.post(`/api/fetchSong`, {song: obj})
-    const oldUrl = res.data.results.songs.data[0].attributes.url
-    const domainIndex = oldUrl.indexOf("music.apple.com")
+		const res = await axios.post<Result>(`/api/fetchSong`, {
+			song: obj,
+		})
+		const oldUrl = res.data.results.songs.data[0].attributes.url
+		const domainIndex = oldUrl.indexOf(`music.apple.com`)
 		const newUrl = `https://embed.${oldUrl.slice(domainIndex)}`
 		setSongUrl(newUrl)
 	}
@@ -107,7 +127,7 @@ const FunCard: FC = () => {
 					</Button>
 					<div className="space-x-2 text-right">
 						<span>Reset</span>
-						<Button size="small" onClick={getSongString}>
+						<Button size="small" onClick={() => getSongString}>
 							Submit
 						</Button>
 					</div>
@@ -117,24 +137,32 @@ const FunCard: FC = () => {
 			<div className="mt-4 space-y-2">
 				<p className="font-semibold">Clues</p>
 
-				<ol className="w-full list-decimal space-y-1 pl-4">
-					{clues && clues.map((clue: string, i: number) => <li key={i}>{clue}</li>)}
-				</ol>
+				{clues && clues.length > 0 ? (
+					<ol className="w-full list-decimal space-y-1 pl-4">
+						{clues.map((clue: string, i: number) => (
+							<li key={i}>{clue}</li>
+						))}
+					</ol>
+				) : (
+					<Skeleton />
+				)}
 			</div>
 
 			<div className="mt-4 space-y-2">
 				<p className="font-semibold">Answer</p>
 				<div>
-					{/* <audio controls className="w-full" src={songUrl} /> */}
-          <iframe
-					allow="autoplay *; encrypted-media *;"
-					height="450"
-					style={{width: `100%`, maxWidth: `660px`, background: `transparent`}}
-					sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-					src={songUrl}
-				></iframe>
+					{showSong ? (
+						<iframe
+							allow="autoplay *; encrypted-media *;"
+							height="450"
+							style={{width: `100%`, maxWidth: `660px`, background: `transparent`}}
+							sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+							src={songUrl}
+						></iframe>
+					) : (
+						<Button disabled={songUrl === ``} onClick={() => setShowSong(true)}>Reveal</Button>
+					)}
 				</div>
-				
 			</div>
 		</Card>
 	)

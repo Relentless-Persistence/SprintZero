@@ -1,28 +1,28 @@
 import axios from "axios"
 import jwt from "jsonwebtoken"
-import {z} from "zod"
 
 import type {NextApiHandler, NextApiRequest, NextApiResponse} from "next"
 
-const privateKey = process.env.NEXT_PUBLIC_APPLE_MUSIC_KIT_PRIVATE_KEY?.replace(/\\n/g, "\n")
+const privateKey = process.env.NEXT_PUBLIC_APPLE_MUSIC_KIT_PRIVATE_KEY?.replace(/\\n/g, `\n`) || ``
 const teamId = process.env.NEXT_PUBLIC_APPLE_TEAM_ID
 const keyId  = process.env.NEXT_PUBLIC_APPLE_KEY_ID
 
-
-const token = jwt.sign({}, privateKey, {
-	algorithm: "ES256",
-	expiresIn: "180d",
+const token: string = jwt.sign({}, privateKey, {
+	algorithm: `ES256`,
+	expiresIn: `180d`,
 	issuer: teamId,
 	header: {
-		alg: "ES256",
+		alg: `ES256`,
 		kid: keyId,
 	},
 })
 
-const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-	const {song} = req.body;
+interface SongRequest {
+  song: string;
+}
 
-  console.log(song)
+const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+	const {song} = req.body as SongRequest
 
   const url = `https://api.music.apple.com/v1/catalog/us/search?types=songs&term=${song}`
 
@@ -32,7 +32,6 @@ const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse
     }
   })
   .then(response => {
-    console.log(response.data)
 		res.status(200).json(response.data)
 	})
   .catch((error) => {
