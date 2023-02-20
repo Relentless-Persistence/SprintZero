@@ -1,4 +1,17 @@
-import {Timestamp, addDoc, collection, deleteField, getDoc, serverTimestamp, updateDoc} from "firebase/firestore"
+import {
+	Timestamp,
+	addDoc,
+	collection,
+	deleteDoc,
+	deleteField,
+	documentId,
+	getDoc,
+	getDocs,
+	query,
+	serverTimestamp,
+	updateDoc,
+	where,
+} from "firebase/firestore"
 import {debounce} from "lodash"
 import {nanoid} from "nanoid"
 
@@ -16,15 +29,28 @@ import {HistoryConverter} from "~/types/db/Histories"
 const addHistoryEntry = debounce(async (storyMapState: QueryDocumentSnapshot<StoryMapState>) => {
 	const newItems = await getDoc(storyMapState.ref)
 	if (!newItems.exists()) throw new Error(`Failed to add epic`)
-	const ref = await addDoc(
-		collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-		{
-			future: false,
-			items: newItems.data().items,
-			timestamp: serverTimestamp(),
-		},
-	)
-	await updateDoc(storyMapState.ref, {currentHistoryId: ref.id as Id})
+	await Promise.all([
+		(async () => {
+			const ref = await addDoc(
+				collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+				{
+					future: false,
+					items: newItems.data().items,
+					timestamp: serverTimestamp(),
+				},
+			)
+			await updateDoc(storyMapState.ref, {currentHistoryId: ref.id as Id})
+		})(),
+		(async () => {
+			const futureHistories = await getDocs(
+				query(
+					collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+					where(`future`, `==`, true),
+				),
+			)
+			await Promise.all(futureHistories.docs.map((doc) => deleteDoc(doc.ref)))
+		})(),
+	])
 }, 1000)
 
 export const updateItem = async (
@@ -56,6 +82,13 @@ export const deleteItem = async (storyMapState: QueryDocumentSnapshot<StoryMapSt
 		updatedAt: serverTimestamp(),
 	}
 	await updateDoc(storyMapState.ref, data)
+	const histories = await getDocs(
+		query(
+			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+			where(documentId(), `==`, storyMapState.data().currentHistoryId),
+		),
+	)
+	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
 	await addHistoryEntry(storyMapState)
 }
 
@@ -95,6 +128,14 @@ export const addEpic = async (
 		updatedAt: serverTimestamp(),
 	}
 	await updateDoc(storyMapState.ref, newData)
+
+	const histories = await getDocs(
+		query(
+			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+			where(documentId(), `==`, storyMapState.data().currentHistoryId),
+		),
+	)
+	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
 	await addHistoryEntry(storyMapState)
 }
 
@@ -145,6 +186,14 @@ export const addFeature = async (
 		updatedAt: serverTimestamp(),
 	}
 	await updateDoc(storyMapState.ref, newData)
+
+	const histories = await getDocs(
+		query(
+			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+			where(documentId(), `==`, storyMapState.data().currentHistoryId),
+		),
+	)
+	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
 	await addHistoryEntry(storyMapState)
 }
 
@@ -195,6 +244,14 @@ export const addStory = async (
 		updatedAt: serverTimestamp(),
 	}
 	await updateDoc(storyMapState.ref, newData)
+
+	const histories = await getDocs(
+		query(
+			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+			where(documentId(), `==`, storyMapState.data().currentHistoryId),
+		),
+	)
+	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
 	await addHistoryEntry(storyMapState)
 }
 
@@ -208,7 +265,7 @@ export const getStories = (storyMapItems: History[`items`]): Array<Story & {id: 
 // Assumes all stories are siblings
 export const sortStories = <T extends Story>(stories: T[], allVersions: QuerySnapshot<Version>): T[] =>
 	stories
-		.sort((a, b) => a.name.localeCompare(b.name))
+		.sort((a, b) => a.createdAt.toMillis() - b.createdAt.toMillis())
 		.sort((a, b) => {
 			const aVersion = allVersions.docs.find((version) => version.id === a.versionId)
 			const bVersion = allVersions.docs.find((version) => version.id === b.versionId)

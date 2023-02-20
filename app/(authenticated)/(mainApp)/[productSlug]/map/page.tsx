@@ -2,15 +2,15 @@
 
 import {MenuOutlined, PlusOutlined, RedoOutlined, UndoOutlined} from "@ant-design/icons"
 import {FloatButton, Tooltip} from "antd"
+import clsx from "clsx"
 import {collection, doc, orderBy, query, serverTimestamp, writeBatch} from "firebase/firestore"
 import {motion} from "framer-motion"
-import produce from "immer"
 import {useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {Epic, Feature, Story} from "~/types/db/StoryMapStates"
+import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryMap from "./storyMap/StoryMap"
 import StoryMapHeader from "./storyMap/StoryMapHeader"
@@ -57,21 +57,21 @@ const StoryMapPage: FC = () => {
 		const nextHistory = histories.docs.findLast((history) => history.data().future === true)
 		if (!nextHistory) return
 
+		const newItems: StoryMapState[`items`] = {}
+		for (const [id, value] of Object.entries(nextHistory.data().items)) {
+			newItems[id as Id] = {
+				...storyMapState.data().items[id as Id],
+				...HistorySchema.shape.items.element.parse(value),
+			} as Epic | Feature | Story
+		}
+
 		const batch = writeBatch(db)
 		batch.update(storyMapState.ref, {
 			currentHistoryId: nextHistory.id as Id,
-			items: produce(storyMapState.data().items, (draft) => {
-				for (const [id, value] of Object.entries(nextHistory.data().items)) {
-					draft[id as Id] = {...draft[id as Id], ...HistorySchema.shape.items.element.parse(value)} as
-						| Epic
-						| Feature
-						| Story
-				}
-			}),
+			items: newItems,
 			updatedAt: serverTimestamp(),
 		})
-		const currentHistory = histories.docs.find((history) => history.id === storyMapState.data().currentHistoryId)!
-		batch.update(currentHistory.ref, {
+		batch.update(nextHistory.ref, {
 			future: false,
 		})
 		await batch.commit()
@@ -84,17 +84,18 @@ const StoryMapPage: FC = () => {
 		)
 		if (!lastHistory) return
 
+		const newItems: StoryMapState[`items`] = {}
+		for (const [id, value] of Object.entries(lastHistory.data().items)) {
+			newItems[id as Id] = {
+				...storyMapState.data().items[id as Id],
+				...HistorySchema.shape.items.element.parse(value),
+			} as Epic | Feature | Story
+		}
+
 		const batch = writeBatch(db)
 		batch.update(storyMapState.ref, {
 			currentHistoryId: lastHistory.id as Id,
-			items: produce(storyMapState.data().items, (draft) => {
-				for (const [id, value] of Object.entries(lastHistory.data().items)) {
-					draft[id as Id] = {...draft[id as Id], ...HistorySchema.shape.items.element.parse(value)} as
-						| Epic
-						| Feature
-						| Story
-				}
-			}),
+			items: newItems,
 			updatedAt: serverTimestamp(),
 		})
 		const currentHistory = histories.docs.find((history) => history.id === storyMapState.data().currentHistoryId)!
@@ -103,6 +104,11 @@ const StoryMapPage: FC = () => {
 		})
 		await batch.commit()
 	}
+
+	const canRedo = histories?.docs.findLast((history) => history.data().future === true)
+	const canUndo = histories?.docs.find(
+		(history) => history.data().future === false && history.id !== storyMapState?.data()?.currentHistoryId,
+	)
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_6rem]">
@@ -124,7 +130,8 @@ const StoryMapPage: FC = () => {
 				<FloatButton.Group trigger="click" icon={<MenuOutlined />} className="absolute right-12 bottom-8">
 					<Tooltip placement="left" title="Redo">
 						<FloatButton
-							icon={<RedoOutlined />}
+							icon={<RedoOutlined className={clsx(`transition-colors`, !canRedo && `text-laurel`)} />}
+							className={clsx(!canRedo && `cursor-default`)}
 							onClick={() => {
 								redo().catch(console.error)
 							}}
@@ -132,7 +139,8 @@ const StoryMapPage: FC = () => {
 					</Tooltip>
 					<Tooltip placement="left" title="Undo">
 						<FloatButton
-							icon={<UndoOutlined />}
+							icon={<UndoOutlined className={clsx(`transition-colors`, !canUndo && `text-laurel`)} />}
+							className={clsx(!canUndo && `cursor-default`)}
 							onClick={() => {
 								undo().catch(console.error)
 							}}
