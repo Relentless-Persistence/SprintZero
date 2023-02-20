@@ -67,7 +67,7 @@ const HuddlePage: FC = () => {
 					<Breadcrumb.Item>Huddle</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col gap-4">
+				<div className="ml-12 grid grow auto-cols-[340px] grid-flow-col gap-4">
 
 					<FunCard />
 
