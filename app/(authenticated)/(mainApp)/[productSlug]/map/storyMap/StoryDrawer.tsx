@@ -206,7 +206,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 			}
 			placement="bottom"
 			closable={false}
-			height={500}
+			height={434}
 			extra={
 				<div className="flex items-center gap-4">
 					{editMode ? (
@@ -301,7 +301,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
 							<p className="text-lg font-medium text-gray">Story</p>
 							<Input.TextArea
-								rows={4}
+								rows={3}
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)

@@ -74,3 +74,7 @@ li {
 .ant-tabs-content.ant-tabs-content-right {
 	height: 100%;
 }
+
+.ant-form-item {
+	margin-bottom: 0px;
+}
