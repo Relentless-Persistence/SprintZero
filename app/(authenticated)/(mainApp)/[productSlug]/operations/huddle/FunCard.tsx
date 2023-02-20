@@ -1,12 +1,11 @@
 import {NotificationOutlined} from "@ant-design/icons"
 import {Avatar, Button, Card, DatePicker, Skeleton} from "antd"
 import axios from "axios"
-// import dayjs from "dayjs"
+import dayjs from "dayjs"
 import Image from "next/image"
 import {useState} from "react"
 import {z} from "zod"
 
-import type {DatePickerProps} from "antd"
 import type {FC} from "react"
 
 interface Result {
@@ -24,32 +23,35 @@ interface Song {
 }
 
 const FunCard: FC = () => {
-	const [date, setDate] = useState(``)
+	const [date, setDate] = useState<dayjs.Dayjs | null>(dayjs())
 	const [clues, setClues] = useState<string[] | null>(null)
-	const [songUrl, setSongUrl] = useState<string>(``)
-	const [showSong, setShowSong] = useState<boolean>(false)
-	const [loading, setLoading] = useState<boolean>(false)
+	const [songUrl, setSongUrl] = useState(``)
+	const [showSong, setShowSong] = useState(false)
+	const [loading, setLoading] = useState(false)
 
 	const dateFormat = `YYYY-MM-DD`
 
-	const onChange: DatePickerProps["onChange"] = (date, dateString) => {
-		setDate(dateString)
-	}
-
 	const generateRandomDate = () => {
 		const currentYear = new Date().getFullYear()
-		const randomYear = Math.floor(Math.random() * (currentYear - 1920 + 1) + 1920)
+		const randomYear = Math.floor(Math.random() * (currentYear - 1960 + 1) + 1960)
 		const randomMonth = Math.floor(Math.random() * 12)
 		const randomDay = Math.floor(Math.random() * new Date(randomYear, randomMonth + 1, 0).getDate() + 1)
 		const randomDate = new Date(randomYear, randomMonth, randomDay)
 
 		// Output the random date in ISO format
-		setDate(randomDate.toISOString().substring(0, 10))
+		setDate(dayjs(randomDate))
 	}
 
 	const getSongString = async () => {
 		setLoading(true)
-		const gptQuestion = `respond as an object {song, artist} the billboard artist and song of the #1 song in the United States on ${date}`
+
+		if (date === null) {
+			return
+		}
+
+		const formattedDate = date.format(`YYYY-MM-DD`)
+
+		const gptQuestion = `respond as an object {song, artist} the billboard artist and song of the #1 song in the United States on ${formattedDate}`
 		const res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
 
 		const {response} = z.object({response: z.string()}).parse(res.data)
@@ -90,7 +92,7 @@ const FunCard: FC = () => {
 	}
 
 	const onReset = () => {
-		setDate(``)
+		setDate(null)
 		setClues(null)
 		setSongUrl(``)
 		setShowSong(false)
@@ -98,7 +100,7 @@ const FunCard: FC = () => {
 
 	return (
 		<Card
-			className="flex flex-col justify-between"
+			className=""
 			size="small"
 			type="inner"
 			style={{minWidth: `340px`}}
@@ -120,8 +122,8 @@ const FunCard: FC = () => {
 			<div className="space-y-2">
 				<p className="font-semibold">Pick any date prior to today</p>
 				<DatePicker
-					// value={date}
-					onChange={onChange}
+					value={date}
+					onChange={(date) => setDate(date)}
 					format={dateFormat}
 					className="w-full"
 					placeholder="1982-02-13"
@@ -138,10 +140,16 @@ const FunCard: FC = () => {
 						Randomize
 					</Button>
 					<div className="space-x-2 text-right">
-						<Button type="link" disabled={date === ``} onClick={onReset}>
+						<Button type="link" disabled={date === null} onClick={onReset}>
 							Reset
 						</Button>
-						<Button size="small" onClick={getSongString} disabled={date === ``}>
+						<Button
+							size="small"
+							onClick={() => {
+								getSongString().catch(console.error)
+							}}
+							disabled={date === null}
+						>
 							Submit
 						</Button>
 					</div>
