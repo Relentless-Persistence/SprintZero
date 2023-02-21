@@ -32,7 +32,7 @@ const TosPage: FC = () => {
 		<div className="flex h-full flex-col gap-8">
 			<div>
 				<h1 className="text-3xl font-semibold">Let&apos;s Get Started!</h1>
-				<p className="text-lg text-gray">
+				<p className="text-xl text-gray">
 					To create an account, please agree to below{` `}
 					<LinkTo href="https://www.sprintzero.app/terms" className="font-medium text-blue">
 						Terms of Service
@@ -62,7 +62,7 @@ const TosPage: FC = () => {
 
 			<div className="flex items-center justify-end gap-4">
 				<Button className="bg-white" onClick={() => router.push(`/sign-out`)}>
-					Reject
+					Cancel
 				</Button>
 				<Button
 					type="primary"
@@ -73,7 +73,7 @@ const TosPage: FC = () => {
 					}}
 					className="bg-[#4a801d]"
 				>
-					Accept
+					Continue
 				</Button>
 			</div>
 		</div>
