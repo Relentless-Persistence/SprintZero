@@ -49,9 +49,8 @@ const FunCard: FC = () => {
 			return
 		}
 
-		const formattedDate = date.format(`YYYY-MM-DD`)
-
-		const gptQuestion = `respond as an object {song, artist} the billboard artist and song of the #1 song in the United States on ${formattedDate}`
+		const formattedDate = date.format(`MMMM D, YYYY`)
+		const gptQuestion = `What was the #1 song on the Billboard Top 100 list on ${formattedDate}? Give in the format "Artist - name".`
 		const res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
 
 		const {response} = z.object({response: z.string()}).parse(res.data)
@@ -62,12 +61,14 @@ const FunCard: FC = () => {
 	}
 
 	const getClues = async (song: string) => {
-		const gptQuestion = `respond using only an array, list 3 clues for this song ${song}, make the clues descriptive and no numbering or listing styles and in an array`
-
+		const gptQuestion = `I'm playing a song guessing game. Generate three clues for the song "${song}" . Make sure no names or song/album titles are used in any of the clues.`
 		const res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
 
 		const {response} = z.object({response: z.string()}).parse(res.data)
-		const newClues: string[] = JSON.parse(response) as string[]
+		const newClues: string[] = response
+			.split(`\n`)
+			.map((s) => s.replace(/^[0-9]+\. */, ``))
+			.filter((s) => s !== ``)
 		setClues(newClues)
 	}
 
