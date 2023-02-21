@@ -23,13 +23,13 @@ interface Song {
 }
 
 const FunCard: FC = () => {
-	const [date, setDate] = useState<dayjs.Dayjs | null>(dayjs())
+	const [date, setDate] = useState<dayjs.Dayjs | null>(null)
 	const [clues, setClues] = useState<string[] | null>(null)
 	const [songUrl, setSongUrl] = useState(``)
 	const [showSong, setShowSong] = useState(false)
 	const [loading, setLoading] = useState(false)
 
-	const dateFormat = `YYYY-MM-DD`
+	const dateFormat = `MMMM DD, YYYY`
 
 	const generateRandomDate = () => {
 		const currentYear = new Date().getFullYear()
@@ -62,7 +62,7 @@ const FunCard: FC = () => {
 	}
 
 	const getClues = async (song: string) => {
-		const gptQuestion = `respond using only an array, list 3 clues for this song ${song}`
+		const gptQuestion = `respond using only an array, list 3 clues for this song ${song}, make the clues descriptive and no numbering or listing styles and in an array`
 
 		const res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
 
