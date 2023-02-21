@@ -11,7 +11,18 @@ import {
 } from "@ant-design/icons"
 import {FloatButton, Tooltip} from "antd"
 import clsx from "clsx"
-import {collection, deleteDoc, doc, orderBy, query, serverTimestamp, where, writeBatch} from "firebase/firestore"
+import dayjs from "dayjs"
+import {
+	Timestamp,
+	collection,
+	deleteDoc,
+	doc,
+	orderBy,
+	query,
+	serverTimestamp,
+	where,
+	writeBatch,
+} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {useRef, useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
@@ -124,12 +135,15 @@ const StoryMapPage: FC = () => {
 
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
+	let lastUpdated: Timestamp | undefined = undefined
+	if (storyMapState?.data().updatedAt instanceof Timestamp) lastUpdated = storyMapState.data().updatedAt as Timestamp
 	return (
 		<div className="grid h-full grid-cols-[1fr_6rem]">
 			<div className="relative flex flex-col gap-8">
 				{currentVersionId && (
 					<StoryMapHeader
 						versionName={versions?.docs.find((version) => version.id === currentVersionId)?.data().name}
+						lastUpdated={lastUpdated ? dayjs(lastUpdated.toMillis()) : undefined}
 					/>
 				)}
 

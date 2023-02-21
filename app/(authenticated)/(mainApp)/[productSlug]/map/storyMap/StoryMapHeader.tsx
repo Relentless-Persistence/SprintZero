@@ -1,18 +1,27 @@
 import {Breadcrumb} from "antd"
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 
+import type {Dayjs} from "dayjs"
 import type {FC} from "react"
+
+dayjs.extend(relativeTime)
 
 export type StoryMapHeaderProps = {
 	versionName?: string
+	lastUpdated: Dayjs | undefined
 }
 
-const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName}) => {
+const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName, lastUpdated}) => {
 	return (
 		<div className="flex flex-col gap-8">
-			<Breadcrumb className="px-12 pt-8">
-				<Breadcrumb.Item>Story Map</Breadcrumb.Item>
-				<Breadcrumb.Item>{versionName}</Breadcrumb.Item>
-			</Breadcrumb>
+			<div className="flex items-center justify-between gap-4 px-12 pt-8">
+				<Breadcrumb>
+					<Breadcrumb.Item>Story Map</Breadcrumb.Item>
+					<Breadcrumb.Item>{versionName}</Breadcrumb.Item>
+				</Breadcrumb>
+				<p className="text-sm italic text-gray">Last updated {lastUpdated?.fromNow()}</p>
+			</div>
 			<div className="px-12 text-gray">
 				<svg className="h-3 w-full">
 					<svg viewBox="-16 -12 132 124" width="10" height="100%" preserveAspectRatio="none">
