@@ -1,8 +1,8 @@
 "use client"
 
 import {Breadcrumb, Card} from "antd"
-import {doc} from "firebase/firestore"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {collection, doc, query, where} from "firebase/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
@@ -15,13 +15,14 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const EthicsPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-	const [storyMapState] = useDocumentData(
-		activeProduct
-			? doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter)
-			: undefined,
+	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
-	const stories = storyMapState ? getStories(storyMapState) : []
+	const storyMapState = storyMapStates?.docs[0]
+	const stories = storyMapState ? getStories(storyMapState.data()) : []
 
 	return (
 		<>
@@ -42,8 +43,8 @@ const EthicsPage: FC = () => {
 				<div className="grid w-full grow grid-cols-3 gap-6">
 					<Card title="Identified">
 						<div className="flex flex-col gap-4">
-							{activeProduct &&
-								storyMapState &&
+							{activeProduct?.exists() &&
+								storyMapState?.exists() &&
 								stories
 									.filter((story) => story.ethicsColumn === `identified`)
 									.map((story) => (
@@ -58,8 +59,8 @@ const EthicsPage: FC = () => {
 					</Card>
 					<Card title="Under Review">
 						<div className="flex flex-col gap-4">
-							{activeProduct &&
-								storyMapState &&
+							{activeProduct?.exists() &&
+								storyMapState?.exists() &&
 								stories
 									.filter((story) => story.ethicsColumn === `underReview`)
 									.map((story) => (
@@ -74,8 +75,8 @@ const EthicsPage: FC = () => {
 					</Card>
 					<Card title="Adjudicated">
 						<div className="flex flex-col gap-4">
-							{activeProduct &&
-								storyMapState &&
+							{activeProduct?.exists() &&
+								storyMapState?.exists() &&
 								stories
 									.filter((story) => story.ethicsColumn === `adjudicated`)
 									.map((story) => (

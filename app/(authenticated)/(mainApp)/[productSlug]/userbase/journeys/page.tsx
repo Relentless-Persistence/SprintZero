@@ -4,7 +4,7 @@ import {Breadcrumb, Button, Tabs} from "antd"
 import clsx from "clsx"
 import {addDoc, collection, deleteDoc, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -18,17 +18,17 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const JourneysPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [journeys, loading] = useCollectionData(
+	const [journeys, loading] = useCollection(
 		query(collection(db, `Journeys`), where(`productId`, `==`, activeProductId)).withConverter(JourneyConverter),
 	)
 
 	const [activeJourney, setActiveJourney] = useState<Id | `new` | undefined>(undefined)
 	useEffect(() => {
-		if (!loading) setActiveJourney(!journeys || journeys.length === 0 ? `new` : journeys[0]!.id)
+		if (!loading) setActiveJourney(!journeys || journeys.docs.length === 0 ? `new` : (journeys.docs[0]!.id as Id))
 	}, [journeys, loading])
-	const journey = journeys?.find((journey) => journey.id === activeJourney)
+	const journey = journeys?.docs.find((journey) => journey.id === activeJourney)
 
-	const [journeyEvents] = useCollectionData(
+	const [journeyEvents] = useCollection(
 		activeJourney !== undefined && activeJourney !== `new`
 			? collection(db, `Journeys`, activeJourney, `JourneyEvents`).withConverter(JourneyEventConverter)
 			: undefined,
@@ -38,7 +38,10 @@ const JourneysPage: FC = () => {
 
 	if (activeJourney === `new`)
 		return (
-			<AddJourneyPage onCancel={() => setActiveJourney(journeys?.[0]?.id)} onFinish={(id) => setActiveJourney(id)} />
+			<AddJourneyPage
+				onCancel={() => setActiveJourney(journeys?.docs[0]?.id as Id)}
+				onFinish={(id) => setActiveJourney(id)}
+			/>
 		)
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
@@ -56,18 +59,18 @@ const JourneysPage: FC = () => {
 					{/* Blobs */}
 					<div className="pointer-events-none absolute top-[2.125rem] bottom-[2.125rem] left-6 right-1/2">
 						{journey &&
-							journeyEvents?.map((event) => (
+							journeyEvents?.docs.map((event) => (
 								<div
 									key={event.id}
 									className={clsx(
 										`absolute right-0 rounded-l-[100%_50%]`,
-										event.emotion === `frustrated` && `bg-[#ff4d4f]`,
-										event.emotion === `delighted` && `bg-[#009cd5]`,
+										event.data().emotion === `frustrated` && `bg-[#ff4d4f]`,
+										event.data().emotion === `delighted` && `bg-[#009cd5]`,
 									)}
 									style={{
-										width: `${event.emotionLevel}%`,
-										height: `${((event.end - event.start) / journey.duration) * 100}%`,
-										top: `${(event.start / journey.duration) * 100}%`,
+										width: `${event.data().emotionLevel}%`,
+										height: `${((event.data().end - event.data().start) / journey.data().duration) * 100}%`,
+										top: `${(event.data().start / journey.data().duration) * 100}%`,
 									}}
 								/>
 							))}
@@ -83,14 +86,14 @@ const JourneysPage: FC = () => {
 					<div className="absolute left-1/2 top-7 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-laurel bg-[#f0f2f5]" />
 					{journey && (
 						<p className="absolute left-1/2 top-[2.125rem] ml-3 -translate-y-1/2 text-xs">
-							{durationUnits[journey.durationUnit]} 0
+							{durationUnits[journey.data().durationUnit]} 0
 						</p>
 					)}
 					<div className="absolute top-0 left-1/2 my-10 h-[calc(100%-5rem)] w-0.5 -translate-x-1/2 bg-laurel" />
 					<div className="absolute left-1/2 bottom-7 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-laurel bg-[#f0f2f5]" />
 					{journey && (
 						<p className="absolute left-1/2 bottom-[2.125rem] ml-3 translate-y-1/2 text-xs">
-							{durationUnits[journey.durationUnit]} {journey.duration}
+							{durationUnits[journey.data().durationUnit]} {journey.data().duration}
 						</p>
 					)}
 					<p className="absolute left-1/2 bottom-0 -translate-x-1/2 font-semibold text-[#a6ae9d]">Finish</p>
@@ -110,16 +113,16 @@ const JourneysPage: FC = () => {
 					{/* Event labels */}
 					<div className="pointer-events-none absolute top-[2.125rem] bottom-[2.125rem] right-0 left-1/2">
 						{journey &&
-							journeyEvents?.map((event) => (
+							journeyEvents?.docs.map((event) => (
 								<div
 									key={event.id}
 									className="pointer-events-auto absolute flex w-full -translate-y-1/2 items-center gap-1"
-									style={{top: `${((event.start + event.end) / 2 / journey.duration) * 100}%`}}
+									style={{top: `${((event.data().start + event.data().end) / 2 / journey.data().duration) * 100}%`}}
 								>
 									<div className="h-3 w-3 shrink-0 -translate-x-1/2 rounded-full border-2 border-laurel bg-[#f0f2f5]" />
 									<div className="min-w-0 flex-1">
-										<p className="font-semibold">{event.subject}</p>
-										<p className="font-light">{event.description}</p>
+										<p className="font-semibold">{event.data().subject}</p>
+										<p className="font-light">{event.data().description}</p>
 									</div>
 								</div>
 							))}
@@ -132,8 +135,8 @@ const JourneysPage: FC = () => {
 					tabPosition="right"
 					activeKey={activeJourney}
 					onChange={(key) => setActiveJourney(key as Id | `new`)}
-					items={journeys
-						.map((journey) => ({key: journey.id as Id | `new`, label: journey.name}))
+					items={journeys.docs
+						.map((journey) => ({key: journey.id as Id | `new`, label: journey.data().name}))
 						.concat({key: `new`, label: `Add`})}
 				/>
 			)}

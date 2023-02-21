@@ -3,7 +3,6 @@ import {z} from "zod"
 import {genConverter, idSchema} from "~/types"
 
 export const PersonaSchema = z.object({
-	prevQnA: z.string(),
 	changes: z.array(
 		z.object({
 			id: z.string(),

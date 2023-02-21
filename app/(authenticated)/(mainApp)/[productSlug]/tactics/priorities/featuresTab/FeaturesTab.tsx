@@ -1,12 +1,13 @@
 "use client"
 
 import {Breadcrumb, Select} from "antd"
-import {doc} from "firebase/firestore"
+import {collection, query, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 
 import Feature from "./Feature"
@@ -17,17 +18,20 @@ import {db} from "~/utils/firebase"
 import {getEpics, getFeatures} from "~/utils/storyMap"
 
 export type FeaturesTabProps = {
-	activeProduct: WithDocumentData<Product>
+	activeProduct: QueryDocumentSnapshot<Product>
 }
 
 const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 	const [selectedEpic, setSelectedEpic] = useState<Id | undefined>(undefined)
-	const [storyMapState] = useDocumentData(
-		doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProduct.id)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
+	const storyMapState = storyMapStates?.docs[0]
 
-	const epics = storyMapState ? getEpics(storyMapState) : []
-	const features = storyMapState ? getFeatures(storyMapState) : []
+	const epics = storyMapState ? getEpics(storyMapState.data()) : []
+	const features = storyMapState ? getFeatures(storyMapState.data()) : []
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
@@ -86,7 +90,7 @@ const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
 						{selectedEpic &&
-							storyMapState &&
+							storyMapState?.exists() &&
 							features
 								.filter((feature) => feature.parentId === selectedEpic)
 								.map((feature) => <Feature key={feature.id} featureId={feature.id} storyMapState={storyMapState} />)}

@@ -104,6 +104,11 @@ service cloud.firestore {
           if resource.data.authorId == request.auth.uid
       }
 
+      match /Histories/{historyId} {
+        allow read, write:
+          if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)
+      }
+
       match /Versions/{versionId} {
         allow read, write:
           if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)

@@ -2,7 +2,7 @@
 
 import {Tabs} from "antd"
 import {doc} from "firebase/firestore"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
@@ -14,9 +14,9 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const PrioritiesPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
-	if (!activeProduct) return null
+	if (!activeProduct?.exists()) return null
 	return (
 		<div className="h-full">
 			<Tabs

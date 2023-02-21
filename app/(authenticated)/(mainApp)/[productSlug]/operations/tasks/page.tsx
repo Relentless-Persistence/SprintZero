@@ -4,7 +4,7 @@ import {Breadcrumb, Button, Tabs} from "antd"
 import dayjs from "dayjs"
 import {Timestamp, addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {ComponentProps, FC} from "react"
 import type {Id} from "~/types"
@@ -21,7 +21,7 @@ const TasksPage: FC = () => {
 	const [editingTask, setEditingTask] = useState<Id | `new` | undefined>(undefined)
 
 	const activeProductId = useActiveProductId()
-	const [tasks, loading] = useCollectionData(
+	const [tasks, loading] = useCollection(
 		query(collection(db, `Tasks`), where(`productId`, `==`, activeProductId)).withConverter(TaskConverter),
 	)
 
@@ -83,10 +83,10 @@ const TasksPage: FC = () => {
 								title: ``,
 							}
 						} else {
-							const task = tasks!.find((task) => task.id === editingTask)!
+							const task = tasks!.docs.find((task) => task.id === editingTask)!
 							initialValues = {
-								...task,
-								dueDate: dayjs(task.dueDate.toDate()),
+								...task.data(),
+								dueDate: dayjs(task.data().dueDate.toDate()),
 							}
 						}
 						return initialValues
@@ -96,13 +96,13 @@ const TasksPage: FC = () => {
 						if (editingTask === `new`) {
 							await addDoc(collection(db, `Tasks`), {
 								...data,
-								dueDate: Timestamp.fromDate(data.dueDate.toDate()),
+								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
 								productId: activeProductId,
 							} satisfies Task)
 						} else {
 							await updateDoc(doc(db, `Tasks`, editingTask), {
 								...data,
-								dueDate: Timestamp.fromDate(data.dueDate.toDate()),
+								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
 							} satisfies Partial<Task>)
 						}
 						setEditingTask(undefined)

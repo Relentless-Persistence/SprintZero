@@ -1,10 +1,11 @@
 import {Button, Drawer} from "antd"
 import {useForm} from "react-hook-form"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {z} from "zod"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {Journey} from "~/types/db/Journeys"
 
 import RhfInput from "~/components/rhf/RhfInput"
@@ -26,7 +27,7 @@ const formSchema = JourneyEventSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type EventDrawerProps = {
-	journey: WithDocumentData<Journey>
+	journey: QueryDocumentSnapshot<Journey>
 	activeEvent: Id | `new` | undefined
 	onClose: () => void
 	onCommit: (event: FormInputs) => Promisable<void>
@@ -40,7 +41,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 			description: ``,
 			emotion: `frustrated`,
 			emotionLevel: 50,
-			end: journey.duration,
+			end: journey.data().duration,
 			start: 0,
 			subject: ``,
 		},
@@ -112,11 +113,11 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 								<RhfSelect
 									control={control}
 									name="start"
-									options={Array(journey.duration)
+									options={Array(journey.data().duration)
 										.fill(undefined)
 										.map((_, i) => ({
 											value: i,
-											label: `${durationUnits[journey.durationUnit]} ${i + 1}`,
+											label: `${durationUnits[journey.data().durationUnit]} ${i + 1}`,
 											disabled: i > end - 1,
 										}))}
 									className="w-full"
@@ -127,11 +128,11 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 								<RhfSelect
 									control={control}
 									name="end"
-									options={Array(journey.duration)
+									options={Array(journey.data().duration)
 										.fill(undefined)
 										.map((_, i) => ({
 											value: i + 1,
-											label: `${durationUnits[journey.durationUnit]} ${i + 1}`,
+											label: `${durationUnits[journey.data().durationUnit]} ${i + 1}`,
 											disabled: i < start,
 										}))}
 									className="w-full"

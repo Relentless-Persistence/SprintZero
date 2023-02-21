@@ -7,6 +7,7 @@ export const ProductSchema = z.object({
 	// General product info
 	cadence: z.number(),
 	effortCost: z.number().nullable(),
+	effortCostCurrencySymbol: z.enum([`dollar`, `euro`, `pound`, `yen`, `rupee`]).nullable(),
 	sprintStartDayOfWeek: z.number().int().min(0).max(6),
 	members: z.record(
 		idSchema,
@@ -16,21 +17,29 @@ export const ProductSchema = z.object({
 	),
 	name: z.string().min(1),
 
-	storyMapStateId: idSchema,
-
 	// Kickoff info
+	businessOutcomes: z.array(z.object({id: z.string(), text: z.string()})),
+	marketLeaders: z.array(z.object({id: z.string(), text: z.string()})),
+	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
 	problemStatement: z.string(),
-	personas: z.array(z.object({id: z.string(), text: z.string()})),
-	successMetrics: z.array(z.object({id: z.string(), text: z.string()})),
-	businessPriorities: z.array(z.object({id: z.string(), text: z.string()})),
+	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),
 
 	// Accessibility info
-	accessibilityMissionStatements: z.object({
-		auditory: z.string(),
-		cognitive: z.string(),
-		physical: z.string(),
-		speech: z.string(),
-		visual: z.string(),
+	accessibility: z.object({
+		auditory: z.tuple([z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean()]),
+		cognitive: z.tuple([z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean()]),
+		physical: z.tuple([z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean()]),
+		speech: z.tuple([z.boolean(), z.boolean()]),
+		visual: z.tuple([
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+		]),
 	}),
 
 	// Vision info
@@ -50,10 +59,3 @@ export const ProductSchema = z.object({
 
 export type Product = z.infer<typeof ProductSchema>
 export const ProductConverter = genConverter(ProductSchema)
-
-export const kickoffSections = {
-	problemStatement: `Problem Statement`,
-	personas: `Personas`,
-	successMetrics: `Success Metrics`,
-	businessPriorities: `Business Priorities`,
-}

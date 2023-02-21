@@ -8,6 +8,7 @@ import {useState} from "react"
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
+import LinkTo from "~/components/LinkTo"
 import {termsOfService} from "~/components/terms"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
@@ -28,30 +29,40 @@ const TosPage: FC = () => {
 	}
 
 	return (
-		<div className="flex flex-col gap-8">
-			<div className="flex flex-col gap-2">
-				<h1 className="text-3xl">Let&apos;s Get Started!</h1>
+		<div className="flex h-full flex-col gap-8">
+			<div>
+				<h1 className="text-3xl font-semibold">Let&apos;s Get Started!</h1>
 				<p className="text-xl text-gray">
-					Thanks for choosing SprintZero to build your next product experience! Start by reviewing and accepting our
-					terms of service.
+					To create an account, please agree to below{` `}
+					<LinkTo href="https://www.sprintzero.app/terms" className="font-medium text-blue">
+						Terms of Service
+					</LinkTo>
+					{` `}
+					and{` `}
+					<LinkTo href="https://www.sprintzero.app/privacy" className="font-medium text-blue">
+						Privacy Policy
+					</LinkTo>
+					:
 				</p>
 			</div>
 
-			<Input.TextArea
-				size="large"
-				readOnly
-				rows={15}
-				value={termsOfService}
-				className="resize-none bg-[#eceef1] font-mono text-sm text-black"
-			/>
+			<div className="flex grow flex-col gap-4">
+				<Input.TextArea
+					size="large"
+					readOnly
+					rows={15}
+					value={termsOfService}
+					className="grow !resize-none bg-[#eceef1] font-mono text-sm text-black"
+				/>
 
-			<Checkbox checked={agree} onChange={() => setAgree((agree) => !agree)}>
-				By checking this box you agree to our Terms of Service and Privacy Policy.
-			</Checkbox>
+				<Checkbox checked={agree} onChange={() => setAgree((agree) => !agree)}>
+					By checking this box you agree to our Terms of Service and Privacy Policy.
+				</Checkbox>
+			</div>
 
 			<div className="flex items-center justify-end gap-4">
 				<Button className="bg-white" onClick={() => router.push(`/sign-out`)}>
-					Reject
+					Cancel
 				</Button>
 				<Button
 					type="primary"
@@ -62,7 +73,7 @@ const TosPage: FC = () => {
 					}}
 					className="bg-[#4a801d]"
 				>
-					Accept
+					Continue
 				</Button>
 			</div>
 		</div>

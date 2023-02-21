@@ -8,18 +8,19 @@ import {
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Button, Checkbox, Drawer, Form, Input, Tag} from "antd"
+import {Button, Checkbox, Drawer, Form, Input, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import {collection, setDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Id, WithDocumentData} from "~/types"
+import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {Story, StoryMapState} from "~/types/db/StoryMapStates"
 
@@ -47,8 +48,8 @@ const formSchema = StorySchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
-	activeProduct: WithDocumentData<Product>
-	storyMapState: WithDocumentData<StoryMapState>
+	activeProduct: QueryDocumentSnapshot<Product>
+	storyMapState: QueryDocumentSnapshot<StoryMapState>
 	storyId: Id
 	isOpen: boolean
 	onClose: () => void
@@ -57,8 +58,9 @@ export type StoryDrawerProps = {
 const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyId, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
 	const [newAcceptanceCriterion, setNewAcceptanceCriterion] = useState(``)
-	const story = getStories(storyMapState).find((story) => story.id === storyId)!
+	const story = getStories(storyMapState.data()).find((story) => story.id === storyId)!
 	const [description, setDescription] = useState(story.description)
+	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
 	useEffect(() => {
 		setDescription(story.description)
@@ -79,14 +81,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
-		const newData = produce(storyMapState, (draft) => {
+		const newData = produce(storyMapState.data(), (draft) => {
 			draft.items[storyId] = {...(draft.items[storyId] as Story), ...data}
 		})
 		await setDoc(storyMapState.ref, newData)
 		setEditMode(false)
 	})
 
-	const [versions] = useCollectionData(
+	const [versions] = useCollection(
 		collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter),
 	)
 
@@ -95,14 +97,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 			const index = draft.findIndex((criterion) => criterion.id === id)
 			draft[index]!.checked = checked
 		})
-		const newData = produce(storyMapState, (draft) => {
+		const newData = produce(storyMapState.data(), (draft) => {
 			draft.items[storyId] = {...(draft.items[storyId] as Story), acceptanceCriteria: newAcceptanceCriteria}
 		})
 		await setDoc(storyMapState.ref, newData)
 	}
 
 	const addAcceptanceCriterion = async () => {
-		const newData = produce(storyMapState, (draft) => {
+		const newData = produce(storyMapState.data(), (draft) => {
 			draft.items[storyId] = {
 				...(draft.items[storyId] as Story),
 				acceptanceCriteria: [
@@ -125,7 +127,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 								type="primary"
 								danger
 								onClick={() => {
-									const data = produce(storyMapState, (draft) => {
+									const data = produce(storyMapState.data(), (draft) => {
 										delete draft.items[storyId]
 									})
 									setDoc(storyMapState.ref, data).catch(console.error)
@@ -140,13 +142,13 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 										{story.points} point{story.points === 1 ? `` : `s`}
 									</Tag>
 									<Tag
-										color={typeof activeProduct.effortCost === `number` ? `#585858` : `#f5f5f5`}
+										color={typeof activeProduct.data().effortCost === `number` ? `#585858` : `#f5f5f5`}
 										icon={<DollarOutlined />}
 										className={clsx(
-											typeof activeProduct.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
+											typeof activeProduct.data().effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
 										)}
 									>
-										{dollarFormat((activeProduct.effortCost ?? 0) * story.points)}
+										{dollarFormat((activeProduct.data().effortCost ?? 0) * story.points)}
 									</Tag>
 									<Tag color="#585858" icon={<FlagOutlined />}>
 										{sprintColumns[story.sprintColumn]}
@@ -241,7 +243,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 							<RhfSelect
 								control={control}
 								name="versionId"
-								options={versions?.map((version) => ({label: version.name, value: version.id}))}
+								options={versions?.docs.map((version) => ({label: version.data().name, value: version.id}))}
 							/>
 						</Form.Item>
 						<Form.Item label="Status" className="shrink-0 basis-56">
@@ -288,7 +290,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)
-									const newData = produce(storyMapState, (draft) => {
+									const newData = produce(storyMapState.data(), (draft) => {
 										draft.items[storyId] = {...(draft.items[storyId] as Story), description: e.target.value}
 									})
 									setDoc(storyMapState.ref, newData).catch(console.error)
@@ -338,14 +340,26 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
-						<p className="text-xl font-semibold text-gray">Comments</p>
+						<div className="flex items-center justify-between">
+							<p className="text-xl font-semibold text-gray">Comments</p>
+							<Segmented
+								size="small"
+								value={commentType}
+								onChange={(value) => setCommentType(value as `code` | `design`)}
+								options={[
+									{label: `Design`, icon: <BlockOutlined />, value: `design`},
+									{label: `Code`, icon: <CodeOutlined />, value: `code`},
+								]}
+							/>
+						</div>
 						<div className="relative grow">
 							<Comments
-								storyMapStateId={storyMapState.id}
+								storyMapStateId={storyMapState.id as Id}
 								parentId={storyId}
+								commentType={commentType}
 								flagged={story.ethicsColumn !== null}
 								onFlag={async () => {
-									const newData = produce(storyMapState, (draft) => {
+									const newData = produce(storyMapState.data(), (draft) => {
 										draft.items[storyId] = {...(draft.items[storyId] as Story), ethicsColumn: `identified`}
 									})
 									await setDoc(storyMapState.ref, newData)

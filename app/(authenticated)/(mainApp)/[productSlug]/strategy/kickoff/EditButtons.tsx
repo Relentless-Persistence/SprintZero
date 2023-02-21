@@ -35,9 +35,9 @@ const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, o
 		)
 	} else {
 		return (
-			<button type="button" className="text-green" onClick={() => onEditStart()}>
+			<Button size="small" onClick={() => onEditStart()}>
 				Edit
-			</button>
+			</Button>
 		)
 	}
 }

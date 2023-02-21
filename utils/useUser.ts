@@ -1,24 +1,24 @@
 import {doc, setDoc} from "firebase/firestore"
 import {useAuthState} from "react-firebase-hooks/auth"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocument} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
-import type {WithDocumentData} from "~/types"
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {User} from "~/types/db/Users"
 
 import {auth, db} from "./firebase"
 import {UserConverter} from "~/types/db/Users"
 
-export const useUser = (): WithDocumentData<User> | undefined => {
+export const useUser = (): QueryDocumentSnapshot<User> | undefined => {
 	const [user] = useAuthState(auth)
 	invariant(user, `User is not logged in`)
 
-	const [dbUser, loading] = useDocumentData(doc(db, `Users`, user.uid).withConverter(UserConverter))
+	const [dbUser, loading] = useDocument(doc(db, `Users`, user.uid).withConverter(UserConverter))
 
 	if (loading) {
 		return undefined
 	} else {
-		if (dbUser) {
+		if (dbUser?.exists()) {
 			return dbUser
 		} else {
 			invariant(user.email, `User has no email`)

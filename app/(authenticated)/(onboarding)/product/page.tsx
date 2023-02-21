@@ -1,7 +1,7 @@
 "use client"
 
 import {Button} from "antd"
-import {addDoc, collection, doc, setDoc} from "firebase/firestore"
+import {addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
@@ -12,19 +12,27 @@ import invariant from "tiny-invariant"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
 
 import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {ProductSchema} from "~/types/db/Products"
+import {HistoryConverter} from "~/types/db/Histories"
+import {ProductConverter} from "~/types/db/Products"
+import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
+import {VersionConverter} from "~/types/db/Versions"
 import {auth, db} from "~/utils/firebase"
 
 const numSlides = 4
 
-type FormInputs = Pick<Product, `cadence` | `effortCost` | `name` | `sprintStartDayOfWeek`>
+type FormInputs = Pick<
+	Product,
+	`cadence` | `effortCost` | `effortCostCurrencySymbol` | `name` | `sprintStartDayOfWeek`
+> & {
+	email1: string | null
+	email2: string | null
+	email3: string | null
+}
 
 const ProductSetupPage: FC = () => {
 	const [user] = useAuthState(auth)
@@ -35,53 +43,69 @@ const ProductSetupPage: FC = () => {
 	const [hasSubmitted, setHasSubmitted] = useState(false)
 
 	const router = useRouter()
-	const submitForm = async (data: FormInputs) => {
+	const submitForm = async (_data: FormInputs) => {
 		if (hasSubmitted) return
 		setHasSubmitted(true)
 
-		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
+		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
 
-		const storyMapStateId = (
-			await addDoc(collection(db, `StoryMapStates`), {
-				items: {},
-				productId: slug,
-			} satisfies StoryMapState)
-		).id as Id
+		const storyMapState = await addDoc(collection(db, `StoryMapStates`).withConverter(StoryMapStateConverter), {
+			items: {},
+			updatedAt: serverTimestamp(),
+			currentHistoryId: `` as Id,
+			productId: slug,
+		})
 
-		const finalData = ProductSchema.parse({
+		const {email1, email2, email3, ...data} = _data
+		const members = {[user.uid as Id]: {type: `editor`} as const}
+		if (email1) members[email1] = {type: `editor`} as const
+		if (email2) members[email2] = {type: `editor`} as const
+		if (email3) members[email3] = {type: `editor`} as const
+
+		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
-			storyMapStateId,
-			members: {[user.uid as Id]: {type: `editor`}},
+			members,
 			problemStatement: ``,
-			personas: [],
-			successMetrics: [],
-			businessPriorities: [],
-			accessibilityMissionStatements: {
-				auditory: ``,
-				cognitive: ``,
-				physical: ``,
-				speech: ``,
-				visual: ``,
+			businessOutcomes: [],
+			marketLeaders: [],
+			potentialRisks: [],
+			userPriorities: [],
+			accessibility: {
+				auditory: [false, false, false, false, false],
+				cognitive: [false, false, false, false, false, false],
+				physical: [false, false, false, false, false],
+				speech: [false, false],
+				visual: [false, false, false, false, false, false, false, false],
 			},
 			productType: `mobile`,
 			valueProposition: ``,
 			features: [],
 			finalVision: ``,
 			updates: [],
-		} satisfies Product)
-		await setDoc(doc(db, `Products`, slug), finalData)
+		})
 
-		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), {
+		const positionHistory = await addDoc(
+			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+			{
+				future: false,
+				items: {},
+				timestamp: serverTimestamp(),
+			},
+		)
+		await updateDoc(storyMapState, {
+			currentHistoryId: positionHistory.id as Id,
+		})
+		await addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter), {
 			name: `1.0`,
-		} satisfies Version)
+		})
 
 		router.push(`/${slug}/map`)
 	}
 
 	return (
-		<div className="flex grow flex-col gap-8">
-			<div className="flex flex-col gap-2">
-				<h1 className="text-3xl">Product Configuration</h1>
+		<div className="flex h-full flex-col gap-8">
+			<div>
+				<h1 className="text-3xl font-semibold">Product Configuration</h1>
 				<h2 className="text-xl text-gray">
 					Almost time to start building! We just require a few data points before we can begin
 				</h2>
@@ -89,7 +113,7 @@ const ProductSetupPage: FC = () => {
 			<div className="flex w-full grow items-center">
 				<div className="shrink-0 basis-[calc(50%-12rem)]" />
 				<motion.div
-					className="flex h-full max-h-[30rem] w-max gap-24"
+					className="flex h-fit w-max gap-24"
 					animate={{x: `calc(-${currentSlide} * 30rem)`}}
 					transition={{duration: 0.3, ease: [0.65, 0, 0.35, 1]}}
 				>

@@ -1,12 +1,12 @@
 "use client"
 
 import {Breadcrumb} from "antd"
-import {doc} from "firebase/firestore"
+import {collection, query, where} from "firebase/firestore"
 import {useEffect, useRef} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
 import type {Product} from "~/types/db/Products"
 
 import Epic from "./Epic"
@@ -17,15 +17,18 @@ import {db} from "~/utils/firebase"
 import {getEpics} from "~/utils/storyMap"
 
 export type EpicsTabProps = {
-	activeProduct: WithDocumentData<Product>
+	activeProduct: QueryDocumentSnapshot<Product>
 }
 
 const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
-	const [storyMapState] = useDocumentData(
-		doc(db, `StoryMapStates`, activeProduct.storyMapStateId).withConverter(StoryMapStateConverter),
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProduct.id)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
+	const storyMapState = storyMapStates?.docs[0]
 
-	const epics = storyMapState ? getEpics(storyMapState) : []
+	const epics = storyMapState ? getEpics(storyMapState.data()) : []
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
@@ -75,7 +78,7 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 			<div className="relative grow">
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
-						{storyMapState &&
+						{storyMapState?.exists() &&
 							epics.map((epic) => <Epic key={epic.id} epicId={epic.id} storyMapState={storyMapState} />)}
 					</PrioritiesMatrix>
 				</div>

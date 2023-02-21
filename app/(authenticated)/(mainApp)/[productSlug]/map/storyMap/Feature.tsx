@@ -1,28 +1,21 @@
-import {CopyOutlined, FileOutlined} from "@ant-design/icons"
+import {CopyOutlined, MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {collection} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {StoryMapMeta} from "./meta"
-import type {DragInfo} from "./types"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import FeatureDrawer from "./FeatureDrawer"
 import {elementRegistry} from "./globals"
-import Story from "./Story"
-import {VersionConverter} from "~/types/db/Versions"
-import {db} from "~/utils/firebase"
+import {updateItem} from "~/utils/storyMap"
 
 export type FeatureProps = {
 	meta: StoryMapMeta
-	dragInfo: DragInfo
 	featureId: Id
 	inert?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) => {
+const Feature: FC<FeatureProps> = ({meta, featureId, inert = false}) => {
 	const feature = meta.features.find((feature) => feature.id === featureId)!
 
 	const contentRef = useRef<HTMLDivElement>(null)
@@ -35,77 +28,45 @@ const Feature: FC<FeatureProps> = ({meta, dragInfo, featureId, inert = false}) =
 		}
 	}, [featureId, inert])
 
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
-	const [versions] = useCollectionData(
-		collection(db, `StoryMapStates`, meta.id, `Versions`).withConverter(VersionConverter),
-	)
-
-	const stories = feature.childrenIds
-		.map((id) => meta.stories.find((story) => story.id === id)!)
-		.filter((story) => {
-			if (meta.currentVersionId === `__ALL_VERSIONS__`) return true
-			return story.versionId === meta.currentVersionId
-		})
+	const [localFeatureName, setLocalFeatureName] = useState(feature.name)
+	useEffect(() => {
+		setLocalFeatureName(feature.name)
+	}, [feature.name])
 
 	return (
 		<div
-			className={clsx(`flex flex-col items-center`, dragInfo.itemBeingDraggedId === featureId && !inert && `invisible`)}
-		>
-			<div
-				className={clsx(
-					`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border-2 border-current bg-white px-2 py-1 font-medium text-[#006378] transition-transform hover:scale-105 active:cursor-grabbing`,
-					inert ? `cursor-grabbing` : `cursor-grab`,
-				)}
-				ref={contentRef}
-			>
-				<button type="button" onClick={() => setIsDrawerOpen(true)} onPointerDownCapture={(e) => e.stopPropagation()}>
-					<CopyOutlined />
-				</button>
-				<p>{feature.name}</p>
-			</div>
-
-			{(meta.currentVersionId !== `__ALL_VERSIONS__` || feature.childrenIds.length > 0) && (
-				<div className="h-8 w-px border border-[#d0d0d0]" />
+			className={clsx(
+				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium`,
+				inert && `cursor-grabbing`,
+				meta.editMode ? `text-[#ff4d4f]` : `cursor-grab text-[#006378] active:cursor-grabbing`,
 			)}
-
-			{stories.length === 0 && meta.currentVersionId !== `__ALL_VERSIONS__` && (
+			ref={contentRef}
+		>
+			{meta.editMode ? (
 				<button
 					type="button"
 					onClick={() => {
-						if (meta.currentVersionId !== `__ALL_VERSIONS__`) meta.addStory({parentId: featureId}).catch(console.error)
+						meta.markForDeletion(featureId)
+						feature.childrenIds.forEach((storyId) => meta.markForDeletion(storyId))
 					}}
-					className="flex items-center gap-2 rounded border-2 border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001] transition-colors hover:bg-[#f2fbfe]"
 				>
-					<FileOutlined />
-					<span>Add story</span>
+					<MinusCircleOutlined />
 				</button>
+			) : (
+				<CopyOutlined />
 			)}
-
-			{stories.length > 0 && (
-				<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-[#0273b3] p-3">
-					{versions &&
-						stories.map((story) => (
-							<Story key={story.id} meta={meta} dragInfo={dragInfo} storyId={story.id} inert={inert} />
-						))}
-
-					{meta.currentVersionId !== `__ALL_VERSIONS__` && (
-						<button
-							type="button"
-							onClick={() => {
-								if (meta.currentVersionId !== `__ALL_VERSIONS__`)
-									meta.addStory({parentId: featureId}).catch(console.error)
-							}}
-							className="flex w-full items-center justify-center gap-2 rounded border-2 border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001] transition-colors hover:bg-[#f2fbfe]"
-						>
-							<FileOutlined />
-							<span>Add story</span>
-						</button>
-					)}
-				</div>
-			)}
-
-			<FeatureDrawer meta={meta} featureId={featureId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+			<div className="relative min-w-[1rem]">
+				<p>{localFeatureName || `_`}</p>
+				<input
+					value={localFeatureName}
+					className="absolute inset-0"
+					onChange={(e) => {
+						setLocalFeatureName(e.target.value)
+						updateItem(meta.storyMapState, feature.id, {name: e.target.value}, meta.allVersions).catch(console.error)
+					}}
+					onPointerDownCapture={(e) => e.stopPropagation()}
+				/>
+			</div>
 		</div>
 	)
 }

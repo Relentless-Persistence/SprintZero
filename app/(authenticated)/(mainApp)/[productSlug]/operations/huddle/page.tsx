@@ -7,19 +7,19 @@ import {addDoc, arrayUnion, collection, doc, getDoc, query, updateDoc, where} fr
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
-import {useCollectionData, useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection, useDocumentData} from "react-firebase-hooks/firestore"
 
-import type {WithFieldValue} from "firebase/firestore"
+import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
+import type {Id} from "~/types"
 import type {Huddle} from "~/types/db/Huddles"
+import type {User} from "~/types/db/Users"
 
-import FunCard from "./FunCard"
 import {HuddleConverter} from "~/types/db/Huddles"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
-
 
 const tabs = [
 	{key: `0`, label: `Today`},
@@ -43,7 +43,7 @@ const HuddlePage: FC = () => {
 	const date = currentTab === `30` ? dayjs().subtract(1, `month`) : dayjs().subtract(Number(currentTab), `day`)
 	const formattedDateToday = dayjs(date).format(`YYYY-MM-DD`)
 	const formattedDateYesterday = dayjs(date).subtract(1, `day`).format(`YYYY-MM-DD`)
-	const [huddles] = useCollectionData(
+	const [huddles] = useCollection(
 		query(
 			collection(db, `Products`, activeProductId, `Huddles`),
 			where(`date`, `in`, [formattedDateToday, formattedDateYesterday]),
@@ -54,7 +54,7 @@ const HuddlePage: FC = () => {
 		queries: activeProduct
 			? Object.keys(activeProduct.members).map((userId) => ({
 					queryKey: [`user`, userId],
-					queryFn: async () => (await getDoc(doc(db, `Users`, userId).withConverter(UserConverter))).data(),
+					queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
 			  }))
 			: [],
 	})
@@ -67,201 +67,201 @@ const HuddlePage: FC = () => {
 					<Breadcrumb.Item>Huddle</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<div className="ml-12 grid grow auto-cols-[340px] grid-flow-col gap-4">
+				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col gap-4">
+					{usersData
+						.map((data) => data.data)
+						.filter((data): data is QueryDocumentSnapshot<User> => data?.exists() ?? false)
+						.map((user) => {
+							const huddleItemToday = huddles?.docs.find(
+								(huddle) => huddle.data().userId === user.id && huddle.data().date === formattedDateToday,
+							)
+							const huddleItemYesterday = huddles?.docs.find(
+								(huddle) => huddle.data().userId === user.id && huddle.data().date === formattedDateYesterday,
+							)
 
-					<FunCard />
-
-					{usersData.map(({data: user}, i) => {
-						const huddleItemToday = huddles?.find(
-							(huddle) => huddle.userId === user?.id && huddle.date === formattedDateToday,
-						)
-						const huddleItemYesterday = huddles?.find(
-							(huddle) => huddle.userId === user?.id && huddle.date === formattedDateYesterday,
-						)
-
-						return (
-							<Card
-								key={user?.id ?? i}
-								title={
-									<div className="my-4 flex items-center gap-4">
-										<Avatar src={user?.avatar} size="large" />
-										<p>{user?.name}</p>
-									</div>
-								}
-							>
-								<div className="flex flex-col gap-4">
-									<div className="flex flex-col gap-1">
-										<p className="text-lg font-semibold text-gray">Blockers</p>
-										<ul className="flex flex-col gap-1">
-											{huddleItemToday?.blockers.map((blocker) => (
-												<li key={blocker.id}>
-													<Checkbox
-														checked={blocker.checked}
-														onChange={(e) => {
-															updateDoc(
-																doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id),
-																produce(huddleItemToday, (draft) => {
-																	draft.blockers.find(({id}) => id === blocker.id)!.checked = e.target.checked
-																}),
-															).catch(console.error)
-														}}
-													>
-														{blocker.name}
+							return (
+								<Card
+									key={user.id}
+									title={
+										<div className="my-4 flex items-center gap-4">
+											<Avatar src={user.data().avatar} size="large" />
+											<p>{user.data().name}</p>
+										</div>
+									}
+								>
+									<div className="flex flex-col gap-4">
+										<div className="flex flex-col gap-1">
+											<p className="text-lg font-semibold text-gray">Blockers</p>
+											<ul className="flex flex-col gap-1">
+												{huddleItemToday?.data().blockers.map((blocker) => (
+													<li key={blocker.id}>
+														<Checkbox
+															checked={blocker.checked}
+															onChange={(e) => {
+																updateDoc(
+																	doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id),
+																	produce(huddleItemToday.data(), (draft) => {
+																		draft.blockers.find(({id}) => id === blocker.id)!.checked = e.target.checked
+																	}),
+																).catch(console.error)
+															}}
+														>
+															{blocker.name}
+														</Checkbox>
+													</li>
+												))}
+												<li>
+													<Checkbox disabled>
+														<Input
+															placeholder="Add new"
+															size="small"
+															value={newBlockerText}
+															onChange={(e) => setNewBlockerText(e.currentTarget.value)}
+															onKeyDown={(e) => {
+																if (e.key === `Enter`) {
+																	if (huddleItemToday) {
+																		updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id), {
+																			blockers: arrayUnion({
+																				id: nanoid(),
+																				checked: false,
+																				name: newBlockerText,
+																			} satisfies Huddle[`blockers`][number]),
+																		} satisfies WithFieldValue<Partial<Huddle>>)
+																			.then(() => setNewBlockerText(``))
+																			.catch(console.error)
+																	} else {
+																		addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
+																			blockers: [{id: nanoid(), checked: false, name: newBlockerText}],
+																			date: formattedDateToday,
+																			tasks: [],
+																			userId: user.id as Id,
+																		} satisfies Huddle)
+																			.then(() => setNewBlockerText(``))
+																			.catch(console.error)
+																	}
+																}
+															}}
+														/>
 													</Checkbox>
 												</li>
-											))}
-											<li>
-												<Checkbox disabled>
-													<Input
-														placeholder="Add new"
-														size="small"
-														value={newBlockerText}
-														onChange={(e) => setNewBlockerText(e.currentTarget.value)}
-														onKeyDown={(e) => {
-															if (e.key === `Enter`) {
-																if (huddleItemToday) {
-																	updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id), {
-																		blockers: arrayUnion({
-																			id: nanoid(),
-																			checked: false,
-																			name: newBlockerText,
-																		} satisfies Huddle[`blockers`][number]),
-																	} satisfies WithFieldValue<Partial<Huddle>>)
-																		.then(() => setNewBlockerText(``))
-																		.catch(console.error)
-																} else {
-																	addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
-																		blockers: [{id: nanoid(), checked: false, name: newBlockerText}],
-																		date: formattedDateToday,
-																		tasks: [],
-																		userId: user!.id,
-																	} satisfies Huddle)
-																		.then(() => setNewBlockerText(``))
-																		.catch(console.error)
+											</ul>
+										</div>
+										<div className="flex flex-col gap-1">
+											<p className="text-lg font-semibold text-gray">Today</p>
+											<ul className="flex flex-col gap-1">
+												{huddleItemToday?.data().tasks.map((task) => (
+													<li key={task.id}>
+														<Checkbox
+															checked={task.checked}
+															onChange={(e) => {
+																updateDoc(
+																	doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id),
+																	produce(huddleItemToday.data(), (draft) => {
+																		draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
+																	}),
+																).catch(console.error)
+															}}
+														>
+															{task.name}
+														</Checkbox>
+													</li>
+												))}
+												<li>
+													<Checkbox disabled>
+														<Input
+															placeholder="Add new"
+															size="small"
+															value={newTaskTodayText}
+															onChange={(e) => setNewTaskTodayText(e.currentTarget.value)}
+															onKeyDown={(e) => {
+																if (e.key === `Enter`) {
+																	if (huddleItemToday) {
+																		updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id), {
+																			tasks: arrayUnion({
+																				id: nanoid(),
+																				checked: false,
+																				name: newTaskTodayText,
+																			} satisfies Huddle[`tasks`][number]),
+																		} satisfies WithFieldValue<Partial<Huddle>>)
+																			.then(() => setNewTaskTodayText(``))
+																			.catch(console.error)
+																	} else {
+																		addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
+																			blockers: [],
+																			date: formattedDateToday,
+																			tasks: [{id: nanoid(), checked: false, name: newTaskTodayText}],
+																			userId: user.id as Id,
+																		} satisfies Huddle)
+																			.then(() => setNewTaskTodayText(``))
+																			.catch(console.error)
+																	}
 																}
-															}
-														}}
-													/>
-												</Checkbox>
-											</li>
-										</ul>
-									</div>
-									<div className="flex flex-col gap-1">
-										<p className="text-lg font-semibold text-gray">Today</p>
-										<ul className="flex flex-col gap-1">
-											{huddleItemToday?.tasks.map((task) => (
-												<li key={task.id}>
-													<Checkbox
-														checked={task.checked}
-														onChange={(e) => {
-															updateDoc(
-																doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id),
-																produce(huddleItemToday, (draft) => {
-																	draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
-																}),
-															).catch(console.error)
-														}}
-													>
-														{task.name}
+															}}
+														/>
 													</Checkbox>
 												</li>
-											))}
-											<li>
-												<Checkbox disabled>
-													<Input
-														placeholder="Add new"
-														size="small"
-														value={newTaskTodayText}
-														onChange={(e) => setNewTaskTodayText(e.currentTarget.value)}
-														onKeyDown={(e) => {
-															if (e.key === `Enter`) {
-																if (huddleItemToday) {
-																	updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemToday.id), {
-																		tasks: arrayUnion({
-																			id: nanoid(),
-																			checked: false,
-																			name: newTaskTodayText,
-																		} satisfies Huddle[`tasks`][number]),
-																	} satisfies WithFieldValue<Partial<Huddle>>)
-																		.then(() => setNewTaskTodayText(``))
-																		.catch(console.error)
-																} else {
-																	addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
-																		blockers: [],
-																		date: formattedDateToday,
-																		tasks: [{id: nanoid(), checked: false, name: newTaskTodayText}],
-																		userId: user!.id,
-																	} satisfies Huddle)
-																		.then(() => setNewTaskTodayText(``))
-																		.catch(console.error)
+											</ul>
+										</div>
+										<div className="flex flex-col gap-1">
+											<p className="text-lg font-semibold text-gray">Yesterday</p>
+											<ul className="flex flex-col gap-1">
+												{huddleItemYesterday?.data().tasks.map((task) => (
+													<li key={task.id}>
+														<Checkbox
+															checked={task.checked}
+															onChange={(e) => {
+																updateDoc(
+																	doc(db, `Products`, activeProductId, `Huddles`, huddleItemYesterday.id),
+																	produce(huddleItemYesterday.data(), (draft) => {
+																		draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
+																	}),
+																).catch(console.error)
+															}}
+														>
+															{task.name}
+														</Checkbox>
+													</li>
+												))}
+												<li>
+													<Checkbox disabled>
+														<Input
+															placeholder="Add new"
+															size="small"
+															value={newTaskYesterdayText}
+															onChange={(e) => setNewTaskYesterdayText(e.currentTarget.value)}
+															onKeyDown={(e) => {
+																if (e.key === `Enter`) {
+																	if (huddleItemYesterday) {
+																		updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemYesterday.id), {
+																			tasks: arrayUnion({
+																				id: nanoid(),
+																				checked: false,
+																				name: newTaskYesterdayText,
+																			} satisfies Huddle[`tasks`][number]),
+																		} satisfies WithFieldValue<Partial<Huddle>>)
+																			.then(() => setNewTaskYesterdayText(``))
+																			.catch(console.error)
+																	} else {
+																		addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
+																			blockers: [],
+																			date: formattedDateYesterday,
+																			tasks: [{id: nanoid(), checked: false, name: newTaskYesterdayText}],
+																			userId: user.id as Id,
+																		} satisfies Huddle)
+																			.then(() => setNewTaskYesterdayText(``))
+																			.catch(console.error)
+																	}
 																}
-															}
-														}}
-													/>
-												</Checkbox>
-											</li>
-										</ul>
-									</div>
-									<div className="flex flex-col gap-1">
-										<p className="text-lg font-semibold text-gray">Yesterday</p>
-										<ul className="flex flex-col gap-1">
-											{huddleItemYesterday?.tasks.map((task) => (
-												<li key={task.id}>
-													<Checkbox
-														checked={task.checked}
-														onChange={(e) => {
-															updateDoc(
-																doc(db, `Products`, activeProductId, `Huddles`, huddleItemYesterday.id),
-																produce(huddleItemYesterday, (draft) => {
-																	draft.tasks.find(({id}) => id === task.id)!.checked = e.target.checked
-																}),
-															).catch(console.error)
-														}}
-													>
-														{task.name}
+															}}
+														/>
 													</Checkbox>
 												</li>
-											))}
-											<li>
-												<Checkbox disabled>
-													<Input
-														placeholder="Add new"
-														size="small"
-														value={newTaskYesterdayText}
-														onChange={(e) => setNewTaskYesterdayText(e.currentTarget.value)}
-														onKeyDown={(e) => {
-															if (e.key === `Enter`) {
-																if (huddleItemYesterday) {
-																	updateDoc(doc(db, `Products`, activeProductId, `Huddles`, huddleItemYesterday.id), {
-																		tasks: arrayUnion({
-																			id: nanoid(),
-																			checked: false,
-																			name: newTaskYesterdayText,
-																		} satisfies Huddle[`tasks`][number]),
-																	} satisfies WithFieldValue<Partial<Huddle>>)
-																		.then(() => setNewTaskYesterdayText(``))
-																		.catch(console.error)
-																} else {
-																	addDoc(collection(db, `Products`, activeProductId, `Huddles`), {
-																		blockers: [],
-																		date: formattedDateYesterday,
-																		tasks: [{id: nanoid(), checked: false, name: newTaskYesterdayText}],
-																		userId: user!.id,
-																	} satisfies Huddle)
-																		.then(() => setNewTaskYesterdayText(``))
-																		.catch(console.error)
-																}
-															}
-														}}
-													/>
-												</Checkbox>
-											</li>
-										</ul>
+											</ul>
+										</div>
 									</div>
-								</div>
-							</Card>
-						)
-					})}
+								</Card>
+							)
+						})}
 
 					{/* Spacer */}
 					<div className="w-8" />

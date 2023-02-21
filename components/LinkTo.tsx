@@ -21,32 +21,18 @@ const LinkTo = (
 	if (!href) return <>{children}</>
 
 	const isInternalLink = href.startsWith(`/`) || href.startsWith(`#`) || /^https?:\/\/web\.sprintzero\.app/.test(href)
-	if (isInternalLink) {
-		return (
-			<Link
-				{...props}
-				href={href}
-				target={openInNewTab ? `_blank` : `_self`}
-				ref={ref}
-				rel={noFollow ? `nofollow` : ``}
-				className={className}
-			>
-				{children}
-			</Link>
-		)
-	} else {
-		return (
-			<a
-				{...props}
-				href={href}
-				target={openInNewTab ? `_blank` : `_self`}
-				rel="noreferrer nofollow"
-				className={className}
-			>
-				{children}
-			</a>
-		)
-	}
+	return (
+		<Link
+			{...props}
+			href={href}
+			target={openInNewTab ? `_blank` : `_self`}
+			ref={ref}
+			rel={isInternalLink ? (noFollow ? `nofollow` : ``) : `noreferrer nofollow`}
+			className={className}
+		>
+			{children}
+		</Link>
+	)
 }
 
 export default forwardRef(LinkTo)

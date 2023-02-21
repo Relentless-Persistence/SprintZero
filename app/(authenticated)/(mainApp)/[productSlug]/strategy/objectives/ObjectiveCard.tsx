@@ -4,16 +4,16 @@ import produce from "immer"
 import {nanoid} from "nanoid"
 import {useState} from "react"
 
-import type {WithFieldValue} from "firebase/firestore"
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {WithDocumentData} from "~/types"
 import type {Objective} from "~/types/db/Objectives"
 
 import StretchyTextArea from "~/components/StretchyTextArea"
+import {ObjectiveConverter} from "~/types/db/Objectives"
 import {db} from "~/utils/firebase"
 
 export type ObjectiveCardProps = {
-	objective: WithDocumentData<Objective>
+	objective: QueryDocumentSnapshot<Objective>
 	resultId?: string
 	isEditing: boolean
 	onEditStart?: () => void
@@ -21,7 +21,7 @@ export type ObjectiveCardProps = {
 }
 
 const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, onEditStart, onEditEnd}) => {
-	const result = objective.results.find((item) => item.id === resultId)
+	const result = objective.data().results.find((item) => item.id === resultId)
 	const [titleDraft, setTitleDraft] = useState(result?.name ?? ``)
 	const [textDraft, setTextDraft] = useState(result?.text ?? ``)
 
@@ -30,7 +30,13 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 			type="inner"
 			title={
 				isEditing ? (
-					<Input size="small" value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} className="mr-4" />
+					<Input
+						size="small"
+						value={titleDraft}
+						autoFocus
+						onChange={(e) => setTitleDraft(e.target.value)}
+						className="mr-4"
+					/>
 				) : (
 					result?.name
 				)
@@ -47,23 +53,24 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 							className="bg-green"
 							onClick={() => {
 								if (result) {
-									const results = produce(objective.results, (draft) => {
+									const results = produce(objective.data().results, (draft) => {
 										const index = draft.findIndex((item) => item.id === result.id)
 										draft[index]!.name = titleDraft
 										draft[index]!.text = textDraft
 									})
-									updateDoc(doc(db, `Objectives`, objective.id), {results} satisfies Partial<Objective>).catch(
+									updateDoc(doc(db, `Objectives`, objective.id).withConverter(ObjectiveConverter), {results}).catch(
 										console.error,
 									)
 								} else {
-									updateDoc(doc(db, `Objectives`, objective.id), {
+									updateDoc(doc(db, `Objectives`, objective.id).withConverter(ObjectiveConverter), {
 										results: arrayUnion({
 											id: nanoid(),
 											name: titleDraft,
 											text: textDraft,
-										} satisfies Objective["results"][number]),
-									} satisfies WithFieldValue<Partial<Objective>>).catch(console.error)
+										} satisfies Objective[`results`][number]),
+									}).catch(console.error)
 								}
+								onEditEnd()
 							}}
 						>
 							Done

@@ -1,17 +1,13 @@
-import {zodResolver} from "@hookform/resolvers/zod"
-import {Form} from "antd"
-import clsx from "clsx"
-import {useEffect} from "react"
-import {useForm, useWatch} from "react-hook-form"
-import {z} from "zod"
+import {Button} from "antd"
+import {useEffect, useState} from "react"
 
 import type {FC} from "react"
+import type {z} from "zod"
 
 import SlideContainer from "./SlideContainer"
+import {ProductSchema} from "~/types/db/Products"
 
-const formSchema = z.object({
-	sprintStartDayOfWeek: z.enum([`0`, `1`, `2`, `3`, `4`, `5`, `6`]),
-})
+const formSchema = ProductSchema.pick({sprintStartDayOfWeek: true})
 type FormInputs = z.infer<typeof formSchema>
 
 export type Slide3Props = {
@@ -22,18 +18,11 @@ export type Slide3Props = {
 
 const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	const isActive = currentSlide === 2
-	const {register, formState, handleSubmit, control} = useForm<FormInputs>({
-		mode: `onChange`,
-		resolver: zodResolver(formSchema),
-	})
-
-	const onSubmit = handleSubmit((data) => onComplete({sprintStartDayOfWeek: parseInt(data.sprintStartDayOfWeek)}))
+	const [selection, setSelection] = useState<FormInputs[`sprintStartDayOfWeek`] | undefined>(undefined)
 
 	useEffect(() => {
-		if (isActive) setCanProceed(formState.isValid)
-	}, [isActive, formState.isValid, setCanProceed])
-
-	const sprintStartDayOfWeek = useWatch({control, name: `sprintStartDayOfWeek`})
+		if (isActive) setCanProceed(selection !== undefined)
+	}, [isActive, selection, setCanProceed])
 
 	return (
 		<SlideContainer isActive={isActive}>
@@ -43,152 +32,32 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					<p>Which day would you like to begin your sprints?</p>
 				</div>
 
-				<Form
+				<form
 					id={isActive ? `current-slide` : ``}
-					onFinish={() => {
-						onSubmit().catch(console.error)
+					onSubmit={(e) => {
+						e.preventDefault()
+						onComplete({sprintStartDayOfWeek: selection!})
 					}}
+					className="flex w-64 flex-col justify-items-center gap-4"
 				>
-					<Form.Item>
-						<div className="flex flex-col gap-4">
-							<input
-								type="radio"
-								{...register(`sprintStartDayOfWeek`)}
-								value="1"
-								hidden
-								id="gate-monday"
-								className="appearance-none"
-							/>
-							<label
-								htmlFor="gate-monday"
-								className={clsx(
-									`w-32 border px-3 py-1 text-center transition-colors`,
-									sprintStartDayOfWeek === `1`
-										? `border-green bg-green text-white shadow-md`
-										: `border-[#d9d9d9] bg-white shadow-sm`,
-								)}
-							>
-								Monday
-							</label>
-							<input
-								type="radio"
-								{...register(`sprintStartDayOfWeek`)}
-								value="2"
-								hidden
-								id="gate-tuesday"
-								className="appearance-none"
-							/>
-							<label
-								htmlFor="gate-tuesday"
-								className={clsx(
-									`w-32 border px-3 py-1 text-center transition-colors`,
-									sprintStartDayOfWeek === `2`
-										? `border-green bg-green text-white shadow-md`
-										: `border-[#d9d9d9] bg-white shadow-sm`,
-								)}
-							>
-								Tuesday
-							</label>
-							<input
-								type="radio"
-								{...register(`sprintStartDayOfWeek`)}
-								value="3"
-								hidden
-								id="gate-wednesday"
-								className="appearance-none"
-							/>
-							<label
-								htmlFor="gate-wednesday"
-								className={clsx(
-									`w-32 border px-3 py-1 text-center transition-colors`,
-									sprintStartDayOfWeek === `3`
-										? `border-green bg-green text-white shadow-md`
-										: `border-[#d9d9d9] bg-white shadow-sm`,
-								)}
-							>
-								Wednesday
-							</label>
-							<input
-								type="radio"
-								{...register(`sprintStartDayOfWeek`)}
-								value="4"
-								hidden
-								id="gate-thursday"
-								className="appearance-none"
-							/>
-							<label
-								htmlFor="gate-thursday"
-								className={clsx(
-									`w-32 border px-3 py-1 text-center transition-colors`,
-									sprintStartDayOfWeek === `4`
-										? `border-green bg-green text-white shadow-md`
-										: `border-[#d9d9d9] bg-white shadow-sm`,
-								)}
-							>
-								Thursday
-							</label>
-							<input
-								type="radio"
-								{...register(`sprintStartDayOfWeek`)}
-								value="5"
-								hidden
-								id="gate-friday"
-								className="appearance-none"
-							/>
-							<label
-								htmlFor="gate-friday"
-								className={clsx(
-									`w-32 border px-3 py-1 text-center transition-colors`,
-									sprintStartDayOfWeek === `5`
-										? `border-green bg-green text-white shadow-md`
-										: `border-[#d9d9d9] bg-white shadow-sm`,
-								)}
-							>
-								Friday
-							</label>
-							<input
-								type="radio"
-								{...register(`sprintStartDayOfWeek`)}
-								value="6"
-								hidden
-								id="gate-saturday"
-								className="appearance-none"
-							/>
-							<label
-								htmlFor="gate-saturday"
-								className={clsx(
-									`w-32 border px-3 py-1 text-center transition-colors`,
-									sprintStartDayOfWeek === `6`
-										? `border-green bg-green text-white shadow-md`
-										: `border-[#d9d9d9] bg-white shadow-sm`,
-								)}
-							>
-								Saturday
-							</label>
-							<input
-								type="radio"
-								{...register(`sprintStartDayOfWeek`)}
-								value="0"
-								hidden
-								id="gate-sunday"
-								className="appearance-none"
-							/>
-							<label
-								htmlFor="gate-sunday"
-								className={clsx(
-									`w-32 border px-3 py-1 text-center transition-colors`,
-									sprintStartDayOfWeek === `0`
-										? `border-green bg-green text-white shadow-md`
-										: `border-[#d9d9d9] bg-white shadow-sm`,
-								)}
-							>
-								Sunday
-							</label>
-						</div>
-					</Form.Item>
+					<Button onClick={() => setSelection(1)} type={selection === 1 ? `primary` : `default`}>
+						Monday
+					</Button>
+					<Button onClick={() => setSelection(2)} type={selection === 2 ? `primary` : `default`}>
+						Tuesday
+					</Button>
+					<Button onClick={() => setSelection(3)} type={selection === 3 ? `primary` : `default`}>
+						Wednesday
+					</Button>
+					<Button onClick={() => setSelection(4)} type={selection === 4 ? `primary` : `default`}>
+						Thursday
+					</Button>
+					<Button onClick={() => setSelection(5)} type={selection === 5 ? `primary` : `default`}>
+						Friday
+					</Button>
 
 					<input type="submit" hidden />
-				</Form>
+				</form>
 			</div>
 		</SlideContainer>
 	)

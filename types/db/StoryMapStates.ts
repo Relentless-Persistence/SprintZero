@@ -1,35 +1,9 @@
 import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter, idSchema, serverTimestampSchema} from "~/types"
 
-export const EpicSchema = z.object({
-	type: z.literal(`epic`),
-
-	description: z.string(),
-	effort: z.number().min(0).max(1),
-	name: z.string(),
-	userValue: z.number().min(0).max(1),
-
-	keeperIds: z.array(idSchema),
-})
-export type Epic = z.infer<typeof EpicSchema>
-
-export const FeatureSchema = z.object({
-	type: z.literal(`feature`),
-
-	description: z.string(),
-	effort: z.number().min(0).max(1),
-	name: z.string(),
-	userValue: z.number().min(0).max(1),
-
-	parentId: idSchema,
-})
-export type Feature = z.infer<typeof FeatureSchema>
-
-export const StorySchema = z.object({
-	type: z.literal(`story`),
-
+const schemas = {
 	acceptanceCriteria: z.array(
 		z.object({
 			id: idSchema,
@@ -38,9 +12,17 @@ export const StorySchema = z.object({
 		}),
 	),
 	branchName: z.string().nullable(),
+	bugs: z.array(
+		z.object({
+			id: idSchema,
+			name: z.string(),
+			checked: z.boolean(),
+		}),
+	),
 	createdAt: z.instanceof(Timestamp),
 	description: z.string(),
 	designLink: z.string().url().nullable(),
+	effort: z.number().min(0).max(1),
 	ethicsApproved: z.boolean().nullable(),
 	ethicsColumn: z.enum([`identified`, `underReview`, `adjudicated`]).nullable(),
 	ethicsVotes: z.array(
@@ -66,20 +48,107 @@ export const StorySchema = z.object({
 		`productionQueue`,
 		`shipped`,
 	]),
+	updatedAt: serverTimestampSchema,
+	userValue: z.number().min(0).max(1),
 
+	keeperIds: z.array(idSchema),
 	parentId: idSchema,
 	versionId: idSchema,
-})
+}
+
+export const EpicSchema = z.object({
+	type: z.literal(`epic`),
+
+	description: schemas.description,
+	effort: schemas.effort,
+	name: schemas.name,
+	userValue: schemas.userValue,
+
+	keeperIds: schemas.keeperIds,
+
+	// Fields from other item types
+	acceptanceCriteria: schemas.acceptanceCriteria.nullable(),
+	branchName: schemas.branchName.nullable(),
+	bugs: schemas.bugs.nullable(),
+	createdAt: schemas.createdAt.nullable(),
+	designLink: schemas.designLink.nullable(),
+	ethicsApproved: schemas.ethicsApproved.nullable(),
+	ethicsColumn: schemas.ethicsColumn.nullable(),
+	ethicsVotes: schemas.ethicsVotes.nullable(),
+	pageLink: schemas.pageLink.nullable(),
+	points: schemas.points.nullable(),
+	sprintColumn: schemas.sprintColumn.nullable(),
+	updatedAt: schemas.updatedAt.nullable(),
+	parentId: schemas.parentId.nullable(),
+	versionId: schemas.versionId.nullable(),
+} satisfies Record<keyof typeof schemas | `type`, unknown>)
+export type Epic = z.infer<typeof EpicSchema>
+
+export const FeatureSchema = z.object({
+	type: z.literal(`feature`),
+
+	description: schemas.description,
+	effort: schemas.effort,
+	name: schemas.name,
+	userValue: schemas.userValue,
+
+	parentId: schemas.parentId,
+
+	// Fields from other item types
+	acceptanceCriteria: schemas.acceptanceCriteria.nullable(),
+	branchName: schemas.branchName.nullable(),
+	bugs: schemas.bugs.nullable(),
+	createdAt: schemas.createdAt.nullable(),
+	designLink: schemas.designLink.nullable(),
+	ethicsApproved: schemas.ethicsApproved.nullable(),
+	ethicsColumn: schemas.ethicsColumn.nullable(),
+	ethicsVotes: schemas.ethicsVotes.nullable(),
+	pageLink: schemas.pageLink.nullable(),
+	points: schemas.points.nullable(),
+	sprintColumn: schemas.sprintColumn.nullable(),
+	updatedAt: schemas.updatedAt.nullable(),
+	keeperIds: schemas.keeperIds.nullable(),
+	versionId: schemas.versionId.nullable(),
+} satisfies Record<keyof typeof schemas | `type`, unknown>)
+export type Feature = z.infer<typeof FeatureSchema>
+
+export const StorySchema = z.object({
+	type: z.literal(`story`),
+
+	acceptanceCriteria: schemas.acceptanceCriteria,
+	branchName: schemas.branchName,
+	bugs: schemas.bugs,
+	createdAt: schemas.createdAt,
+	description: schemas.description,
+	designLink: schemas.designLink,
+	ethicsApproved: schemas.ethicsApproved,
+	ethicsColumn: schemas.ethicsColumn,
+	ethicsVotes: schemas.ethicsVotes,
+	name: schemas.name,
+	pageLink: schemas.pageLink,
+	points: schemas.points,
+	sprintColumn: schemas.sprintColumn,
+	updatedAt: schemas.updatedAt,
+
+	parentId: schemas.parentId,
+	versionId: schemas.versionId,
+
+	// Fields from other item types
+	effort: schemas.effort.nullable(),
+	userValue: schemas.userValue.nullable(),
+	keeperIds: schemas.keeperIds.nullable(),
+} satisfies Record<keyof typeof schemas | `type`, unknown>)
 export type Story = z.infer<typeof StorySchema>
 
 export const StoryMapStateSchema = z.object({
 	items: z.record(idSchema, z.discriminatedUnion(`type`, [EpicSchema, FeatureSchema, StorySchema])),
+	updatedAt: serverTimestampSchema,
 
+	currentHistoryId: idSchema,
 	productId: idSchema,
 })
 
 export type StoryMapState = z.infer<typeof StoryMapStateSchema>
-
 export const StoryMapStateConverter = genConverter(StoryMapStateSchema)
 
 export const sprintColumns = {

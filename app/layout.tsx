@@ -32,7 +32,7 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 			<ConfigProvider theme={{token: {colorPrimary: `#4a801d`}}}>
 				<html lang="en" className="h-full">
 					<head></head>
-					<body className="h-full bg-[#f0f2f5] text-sm">{children}</body>
+					<body className="h-full bg-[#f0f2f5] text-base">{children}</body>
 				</html>
 			</ConfigProvider>
 		</QueryClientProvider>

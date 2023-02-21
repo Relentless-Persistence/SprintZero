@@ -2,12 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#__next {
+	height: 100%;
+}
+
 button.ant-btn-default {
 	background-color: white;
 }
 
 button.ant-btn-primary {
 	background-color: #4a801e;
+}
+
+button.ant-btn-link {
+	color: #4a801e;
+}
+
+button.ant-switch {
+	background-color: rgba(0, 0, 0, 0.25);
 }
 
 ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
@@ -40,10 +54,32 @@ li {
 	max-width: 100%;
 }
 
+.ant-tabs-right .ant-tabs-content-holder {
+	width: 0px;
+}
+
 .ant-tabs-tab-btn {
 	max-width: 100%;
 }
 
 .ant-float-btn-default {
 	background-color: white;
+}
+
+.ant-tabs-right > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+	padding-right: 0px;
+	height: 100%;
+}
+
+.ant-tabs-content.ant-tabs-content-right {
+	height: 100%;
+}
+
+.ant-form-item {
+	margin-bottom: 0px;
+}
+
+button.ant-btn-link {
+	padding: unset;
+	height: auto;
 }
