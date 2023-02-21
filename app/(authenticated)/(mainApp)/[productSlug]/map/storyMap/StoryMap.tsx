@@ -611,7 +611,7 @@ const StoryMap: FC<StoryMapProps> = ({
 						))}
 
 					{/* Pad out the beginning columns in row 2 */}
-					{Array(Math.max(epic.childrenIds.length, 1))
+					{Array(Math.max(epic.childrenIds.length, editMode ? 0 : 1))
 						.fill(undefined)
 						.map((_, i) => (
 							<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1.5rem)]">
