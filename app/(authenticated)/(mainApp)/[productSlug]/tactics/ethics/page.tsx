@@ -1,8 +1,8 @@
 "use client"
 
 import {Breadcrumb, Card} from "antd"
-import {doc} from "firebase/firestore"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {collection, doc, query, where} from "firebase/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
@@ -16,12 +16,13 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 const EthicsPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-	const [storyMapState] = useDocument(
-		activeProduct?.exists()
-			? doc(db, `StoryMapStates`, activeProduct.data().storyMapStateId).withConverter(StoryMapStateConverter)
-			: undefined,
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
-	const stories = storyMapState?.exists() ? getStories(storyMapState.data()) : []
+	const storyMapState = storyMapStates?.docs[0]
+	const stories = storyMapState ? getStories(storyMapState.data()) : []
 
 	return (
 		<>

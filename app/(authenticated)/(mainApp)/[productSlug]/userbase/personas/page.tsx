@@ -6,7 +6,6 @@ import {useEffect, useRef, useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {Persona} from "~/types/db/Personas"
 
 import EditableListCard from "~/app/(authenticated)/(mainApp)/[productSlug]/userbase/personas/EditableListCard"
@@ -155,14 +154,14 @@ const PersonasPage: FC = () => {
 										</div>
 										<div className="flex flex-col gap-4">
 											<PersonaDescriptionCard
-												productId={activeProductId}
-												personaName={persona.data().name}
-												personaId={persona.id as Id}
-												personaPrevQnA={persona.data().prevQnA}
-												text={persona.data().description}
-												isEditing={isEditingCard === `description`}
-												onEditStart={() => setIsEditingCard(`description`)}
-												onEditEnd={() => setIsEditingCard(undefined)}
+											// productId={activeProductId}
+											// personaName={persona.data().name}
+											// personaId={persona.id as Id}
+											// personaPrevQnA={persona.data().prevQnA}
+											// text={persona.data().description}
+											// isEditing={isEditingCard === `description`}
+											// onEditStart={() => setIsEditingCard(`description`)}
+											// onEditEnd={() => setIsEditingCard(undefined)}
 											/>
 											<EditableListCard
 												isEditing={isEditingCard === `dayInTheLife`}
@@ -206,7 +205,6 @@ const PersonasPage: FC = () => {
 											responsibilities: [],
 											tasks: [],
 											productId: activeProductId,
-											prevQnA: ``,
 										} satisfies Persona)
 											.then((ref) => {
 												setActiveTab(ref.id)

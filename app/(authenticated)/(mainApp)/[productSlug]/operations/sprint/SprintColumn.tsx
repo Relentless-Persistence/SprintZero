@@ -27,8 +27,8 @@ const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, active
 					.filter((story) => story.sprintColumn === id)
 					.filter(
 						(story) =>
-							dayjs(story.createdAt?.toDate()).isAfter(sprintStartDate) &&
-							dayjs(story.createdAt?.toDate()).isBefore(dayjs(sprintStartDate).add(1, `week`)),
+							dayjs(story.createdAt.toDate()).isAfter(sprintStartDate) &&
+							dayjs(story.createdAt.toDate()).isBefore(dayjs(sprintStartDate).add(1, `week`)),
 					)
 					.map((story) => (
 						<Story key={story.id} activeProduct={activeProduct} storyMapState={storyMapState} storyId={story.id} />

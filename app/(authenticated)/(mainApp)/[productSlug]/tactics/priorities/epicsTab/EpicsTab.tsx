@@ -1,9 +1,9 @@
 "use client"
 
 import {Breadcrumb} from "antd"
-import {doc} from "firebase/firestore"
+import {collection, query, where} from "firebase/firestore"
 import {useEffect, useRef} from "react"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
@@ -21,11 +21,14 @@ export type EpicsTabProps = {
 }
 
 const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
-	const [storyMapState] = useDocument(
-		doc(db, `StoryMapStates`, activeProduct.data().storyMapStateId).withConverter(StoryMapStateConverter),
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProduct.id)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
+	const storyMapState = storyMapStates?.docs[0]
 
-	const epics = storyMapState?.exists() ? getEpics(storyMapState.data()) : []
+	const epics = storyMapState ? getEpics(storyMapState.data()) : []
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {

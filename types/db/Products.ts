@@ -17,12 +17,9 @@ export const ProductSchema = z.object({
 	),
 	name: z.string().min(1),
 
-	storyMapStateId: idSchema,
-
 	// Kickoff info
 	businessOutcomes: z.array(z.object({id: z.string(), text: z.string()})),
 	marketLeaders: z.array(z.object({id: z.string(), text: z.string()})),
-	personas: z.array(z.object({id: z.string(), text: z.string()})),
 	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
 	problemStatement: z.string(),
 	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),

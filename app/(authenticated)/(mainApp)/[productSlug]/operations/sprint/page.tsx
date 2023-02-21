@@ -2,10 +2,10 @@
 
 import {Breadcrumb, Select} from "antd"
 import dayjs from "dayjs"
-import {doc} from "firebase/firestore"
+import {collection, doc, query, where} from "firebase/firestore"
 import {groupBy} from "lodash"
 import {useEffect, useMemo, useRef, useState} from "react"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
@@ -27,13 +27,14 @@ const findPreviousOccurenceOfDayOfWeek = (date: Dayjs, dayOfWeek: number) => {
 const SprintPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-	const [storyMapState] = useDocument(
-		activeProduct?.exists()
-			? doc(db, `StoryMapStates`, activeProduct.data().storyMapStateId).withConverter(StoryMapStateConverter)
-			: undefined,
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
+	const storyMapState = storyMapStates?.docs[0]
 
-	const stories = storyMapState?.exists() ? getStories(storyMapState.data()) : []
+	const stories = storyMapState ? getStories(storyMapState.data()) : []
 	const oldestStoryDate = stories.reduce((oldestDate, story) => {
 		const storyDate = dayjs(story.createdAt.toDate())
 		if (storyDate.isBefore(oldestDate)) return storyDate
@@ -98,7 +99,7 @@ const SprintPage: FC = () => {
 			{activeProduct?.exists() && (
 				<div className="flex w-full grow overflow-x-auto pl-12 pb-8">
 					<div className="grid h-full grid-cols-[repeat(12,14rem)] gap-4">
-						{storyMapState?.exists() &&
+						{storyMapState &&
 							Object.entries(sprintColumns).map(([id, title]) => (
 								<SprintColumn
 									key={id}

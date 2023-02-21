@@ -10,6 +10,7 @@ import type {FC} from "react"
 import type {Product} from "~/types/db/Products"
 
 import EditButtons from "./EditButtons"
+import PersonasImpactedCard from "./PersonasImpactedCard"
 import ProblemStatementCard from "./ProblemStatementCard"
 import TextListEditor from "~/components/TextListEditor"
 import {ProductConverter} from "~/types/db/Products"
@@ -53,39 +54,7 @@ const KickoffPage: FC = () => {
 					/>
 				)}
 
-				<Card
-					type="inner"
-					title="Personas Impacted"
-					extra={
-						<EditButtons
-							onEditStart={() => {
-								setTextListState(activeProduct!.personas)
-								setEditingSection(`personas`)
-							}}
-							onEditEnd={() => {
-								setTextListState([])
-								setEditingSection(undefined)
-							}}
-							isEditing={editingSection === `personas`}
-							onCommit={async () => {
-								const data: Partial<Product> = {
-									personas: textListState.filter((item) => item.text !== ``),
-								}
-								await updateDoc(doc(db, `Products`, activeProductId), data)
-							}}
-						/>
-					}
-				>
-					{editingSection === `personas` ? (
-						<TextListEditor textList={textListState} onChange={setTextListState} />
-					) : (
-						<ol className="list-decimal pl-4">
-							{activeProduct?.personas.map((item) => (
-								<li key={item.id}>{item.text}</li>
-							))}
-						</ol>
-					)}
-				</Card>
+				<PersonasImpactedCard isEditing={editingSection === `personas`} />
 
 				<Card
 					type="inner"

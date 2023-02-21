@@ -3,7 +3,7 @@
 import {MenuOutlined, PlusOutlined, RedoOutlined, UndoOutlined} from "@ant-design/icons"
 import {FloatButton, Tooltip} from "antd"
 import clsx from "clsx"
-import {collection, doc, orderBy, query, serverTimestamp, writeBatch} from "firebase/firestore"
+import {collection, doc, orderBy, query, serverTimestamp, where, writeBatch} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
@@ -26,20 +26,19 @@ const StoryMapPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
-	const [storyMapState] = useDocument(
-		activeProduct?.exists()
-			? doc(db, `StoryMapStates`, activeProduct.data().storyMapStateId).withConverter(StoryMapStateConverter)
-			: undefined,
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
+	const storyMapState = storyMapStates?.docs[0]
 
 	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__` | undefined>(undefined)
 	const [newVesionInputValue, setNewVesionInputValue] = useState<string | undefined>(undefined)
 
 	const [versions] = useCollection(
-		activeProduct?.exists()
-			? collection(db, `StoryMapStates`, activeProduct.data().storyMapStateId, `Versions`).withConverter(
-					VersionConverter,
-			  )
+		storyMapState
+			? collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter)
 			: undefined,
 	)
 
@@ -152,14 +151,14 @@ const StoryMapPage: FC = () => {
 				</FloatButton.Group>
 			</div>
 
-			{activeProduct?.exists() && versions && (
+			{activeProduct?.exists() && storyMapState && versions && (
 				<VersionList
 					allVersions={versions}
 					currentVersionId={currentVersionId}
 					setCurrentVersionId={setCurrentVersionId}
 					newVersionInputValue={newVesionInputValue}
 					setNewVersionInputValue={setNewVesionInputValue}
-					storyMapStateId={activeProduct.data().storyMapStateId}
+					storyMapStateId={storyMapState.id as Id}
 				/>
 			)}
 		</div>

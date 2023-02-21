@@ -1,9 +1,9 @@
 "use client"
 
 import {Breadcrumb, Select} from "antd"
-import {doc} from "firebase/firestore"
+import {collection, query, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
@@ -23,12 +23,15 @@ export type FeaturesTabProps = {
 
 const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 	const [selectedEpic, setSelectedEpic] = useState<Id | undefined>(undefined)
-	const [storyMapState] = useDocument(
-		doc(db, `StoryMapStates`, activeProduct.data().storyMapStateId).withConverter(StoryMapStateConverter),
+	const [storyMapStates] = useCollection(
+		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProduct.id)).withConverter(
+			StoryMapStateConverter,
+		),
 	)
+	const storyMapState = storyMapStates?.docs[0]
 
-	const epics = storyMapState?.exists() ? getEpics(storyMapState.data()) : []
-	const features = storyMapState?.exists() ? getFeatures(storyMapState.data()) : []
+	const epics = storyMapState ? getEpics(storyMapState.data()) : []
+	const features = storyMapState ? getFeatures(storyMapState.data()) : []
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {

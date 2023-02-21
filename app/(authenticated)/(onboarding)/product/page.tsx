@@ -64,10 +64,8 @@ const ProductSetupPage: FC = () => {
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
-			storyMapStateId: storyMapState.id as Id,
 			members,
 			problemStatement: ``,
-			personas: [],
 			businessOutcomes: [],
 			marketLeaders: [],
 			potentialRisks: [],
