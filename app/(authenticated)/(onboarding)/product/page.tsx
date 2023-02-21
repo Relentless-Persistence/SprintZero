@@ -25,7 +25,14 @@ import {auth, db} from "~/utils/firebase"
 
 const numSlides = 4
 
-type FormInputs = Pick<Product, `cadence` | `effortCost` | `name` | `sprintStartDayOfWeek`>
+type FormInputs = Pick<
+	Product,
+	`cadence` | `effortCost` | `effortCostCurrencySymbol` | `name` | `sprintStartDayOfWeek`
+> & {
+	email1: string | null
+	email2: string | null
+	email3: string | null
+}
 
 const ProductSetupPage: FC = () => {
 	const [user] = useAuthState(auth)
@@ -36,11 +43,11 @@ const ProductSetupPage: FC = () => {
 	const [hasSubmitted, setHasSubmitted] = useState(false)
 
 	const router = useRouter()
-	const submitForm = async (data: FormInputs) => {
+	const submitForm = async (_data: FormInputs) => {
 		if (hasSubmitted) return
 		setHasSubmitted(true)
 
-		const slug = `${data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
+		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
 
 		const storyMapState = await addDoc(collection(db, `StoryMapStates`).withConverter(StoryMapStateConverter), {
 			items: {},
@@ -49,10 +56,16 @@ const ProductSetupPage: FC = () => {
 			productId: slug,
 		})
 
+		const {email1, email2, email3, ...data} = _data
+		const members = {[user.uid as Id]: {type: `editor`} as const}
+		if (email1) members[email1] = {type: `editor`} as const
+		if (email2) members[email2] = {type: `editor`} as const
+		if (email3) members[email3] = {type: `editor`} as const
+
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
 			storyMapStateId: storyMapState.id as Id,
-			members: {[user.uid as Id]: {type: `editor`}},
+			members,
 			problemStatement: ``,
 			personas: [],
 			businessOutcomes: [],
@@ -92,9 +105,9 @@ const ProductSetupPage: FC = () => {
 	}
 
 	return (
-		<div className="flex grow flex-col gap-8">
-			<div className="flex flex-col gap-2">
-				<h1 className="text-3xl">Product Configuration</h1>
+		<div className="flex h-full flex-col gap-8">
+			<div>
+				<h1 className="text-3xl font-semibold">Product Configuration</h1>
 				<h2 className="text-xl text-gray">
 					Almost time to start building! We just require a few data points before we can begin
 				</h2>
@@ -102,7 +115,7 @@ const ProductSetupPage: FC = () => {
 			<div className="flex w-full grow items-center">
 				<div className="shrink-0 basis-[calc(50%-12rem)]" />
 				<motion.div
-					className="flex h-full max-h-[30rem] w-max gap-24"
+					className="flex h-fit w-max gap-24"
 					animate={{x: `calc(-${currentSlide} * 30rem)`}}
 					transition={{duration: 0.3, ease: [0.65, 0, 0.35, 1]}}
 				>

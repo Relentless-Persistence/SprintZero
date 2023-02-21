@@ -28,7 +28,7 @@ const formatAsCurrency = (str: string) => {
 		const [dollars, cents] = newStr.split(`.`)
 		newStr = `${dollars ?? ``}.${cents?.slice(0, 2) ?? ``}`
 	}
-	return `$${newStr}`
+	return newStr
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

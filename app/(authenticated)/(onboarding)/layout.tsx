@@ -17,7 +17,7 @@ const OnboardingLayout: FC<OnboardingLayoutProps> = ({children}) => {
 
 	return (
 		<div className="h-full w-full overflow-x-hidden">
-			<div className="mx-auto flex h-full max-w-5xl flex-col gap-8 p-8">
+			<div className="mx-auto flex h-full max-w-5xl flex-col gap-6 p-8">
 				<div className="flex items-center justify-between gap-4">
 					<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={238} height={56} priority />
 					<div className="flex min-w-0 flex-1 flex-col items-end gap-1">

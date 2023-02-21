@@ -9,12 +9,14 @@ import type {Promisable} from "type-fest"
 
 import SlideContainer from "./SlideContainer"
 import RhfInput from "~/components/rhf/RhfInput"
+import RhfSelect from "~/components/rhf/RhfSelect"
+import {ProductSchema} from "~/types/db/Products"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 
-const formSchema = z.object({
+const formSchema = ProductSchema.pick({effortCostCurrencySymbol: true}).extend({
 	effortCost: z
 		.string()
-		.regex(/^\$([0-9],?)+(\.[0-9]?[0-9]?)?$/, `Invalid format.`)
+		.regex(/^([0-9],?)+(\.[0-9]?[0-9]?)?$/, `Invalid format.`)
 		.nullable(),
 })
 type FormInputs = z.infer<typeof formSchema>
@@ -22,7 +24,7 @@ type FormInputs = z.infer<typeof formSchema>
 type Slide4Props = {
 	currentSlide: number
 	setCanProceed: (canProceed: boolean) => void
-	onComplete: (data: {effortCost: number | null}) => Promisable<void>
+	onComplete: (data: Pick<FormInputs, `effortCostCurrencySymbol`> & {effortCost: number | null}) => Promisable<void>
 }
 
 const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
@@ -32,11 +34,15 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			effortCost: null,
+			effortCostCurrencySymbol: `dollar`,
 		},
 	})
 
 	const onSubmit = handleSubmit((data) =>
-		onComplete({effortCost: data.effortCost ? parseFloat(data.effortCost.slice(1)) : null}),
+		onComplete({
+			effortCost: data.effortCost ? parseFloat(data.effortCost.slice(1)) : null,
+			effortCostCurrencySymbol: data.effortCostCurrencySymbol,
+		}),
 	)
 
 	useEffect(() => {
@@ -54,18 +60,38 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 				<Form
 					id={isActive ? `current-slide` : ``}
 					layout="vertical"
+					requiredMark="optional"
 					onFinish={() => {
 						onSubmit().catch(console.error)
 					}}
 				>
 					<Form.Item
-						extra="Optional"
-						required
+						label="Amount"
 						hasFeedback
 						validateStatus={formValidateStatus(getFieldState(`effortCost`, formState))}
 						help={formState.errors.effortCost?.message}
+						className="w-64"
 					>
-						<RhfInput number="currency" placeholder="$0.00" htmlSize={20} control={control} name="effortCost" />
+						<RhfInput
+							number="currency"
+							placeholder="0.00"
+							htmlSize={20}
+							control={control}
+							name="effortCost"
+							addonAfter={
+								<RhfSelect
+									control={control}
+									name="effortCostCurrencySymbol"
+									options={[
+										{label: `$`, value: `dollar`},
+										{label: `£`, value: `pound`},
+										{label: `€`, value: `euro`},
+										{label: `¥`, value: `yen`},
+										{label: `₹`, value: `rupee`},
+									]}
+								/>
+							}
+						/>
 					</Form.Item>
 
 					<input type="submit" hidden />
