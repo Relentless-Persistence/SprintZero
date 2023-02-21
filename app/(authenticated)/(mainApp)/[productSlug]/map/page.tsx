@@ -1,9 +1,17 @@
 "use client"
 
-import {MenuOutlined, PlusOutlined, RedoOutlined, UndoOutlined} from "@ant-design/icons"
+import {
+	CheckOutlined,
+	CloseOutlined,
+	EditOutlined,
+	MenuOutlined,
+	PlusOutlined,
+	RedoOutlined,
+	UndoOutlined,
+} from "@ant-design/icons"
 import {FloatButton, Tooltip} from "antd"
 import clsx from "clsx"
-import {collection, doc, orderBy, query, serverTimestamp, where, writeBatch} from "firebase/firestore"
+import {collection, deleteDoc, doc, orderBy, query, serverTimestamp, where, writeBatch} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
@@ -20,6 +28,7 @@ import {ProductConverter} from "~/types/db/Products"
 import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
+import {deleteItem} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMapPage: FC = () => {
@@ -41,6 +50,10 @@ const StoryMapPage: FC = () => {
 			? collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter)
 			: undefined,
 	)
+
+	const [editMode, setEditMode] = useState(false)
+	const [itemsToBeDeleted, setItemsToBeDeleted] = useState<Id[]>([])
+	const [versionsToBeDeleted, setVersionsToBeDeleted] = useState<Id[]>([])
 
 	const [histories] = useCollection(
 		storyMapState?.exists()
@@ -121,34 +134,74 @@ const StoryMapPage: FC = () => {
 				<div className="relative w-full grow">
 					<motion.div layoutScroll className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2">
 						{activeProduct?.exists() && storyMapState?.exists() && currentVersionId !== undefined && versions && (
-							<StoryMap storyMapState={storyMapState} allVersions={versions} currentVersionId={currentVersionId} />
+							<StoryMap
+								storyMapState={storyMapState}
+								allVersions={versions}
+								currentVersionId={currentVersionId}
+								editMode={editMode}
+								itemsToBeDeleted={itemsToBeDeleted}
+								setItemsToBeDeleted={setItemsToBeDeleted}
+							/>
 						)}
 					</motion.div>
 				</div>
 
-				<FloatButton.Group trigger="click" icon={<MenuOutlined />} className="absolute right-12 bottom-8">
-					<Tooltip placement="left" title="Redo">
-						<FloatButton
-							icon={<RedoOutlined className={clsx(`transition-colors`, !canRedo && `text-laurel`)} />}
-							className={clsx(!canRedo && `cursor-default`)}
-							onClick={() => {
-								redo().catch(console.error)
-							}}
-						/>
-					</Tooltip>
-					<Tooltip placement="left" title="Undo">
-						<FloatButton
-							icon={<UndoOutlined className={clsx(`transition-colors`, !canUndo && `text-laurel`)} />}
-							className={clsx(!canUndo && `cursor-default`)}
-							onClick={() => {
-								undo().catch(console.error)
-							}}
-						/>
-					</Tooltip>
-					<Tooltip placement="left" title="Add Release">
-						<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />
-					</Tooltip>
-				</FloatButton.Group>
+				{editMode ? (
+					<FloatButton.Group className="absolute right-12 bottom-8">
+						<Tooltip placement="left" title="Cancel">
+							<FloatButton
+								icon={<CloseOutlined />}
+								onClick={() => {
+									setEditMode(false)
+									setItemsToBeDeleted([])
+									setVersionsToBeDeleted([])
+								}}
+							/>
+						</Tooltip>
+						<Tooltip placement="left" title="Save">
+							<FloatButton
+								icon={<CheckOutlined />}
+								type="primary"
+								onClick={() => {
+									setEditMode(false)
+									itemsToBeDeleted.forEach((id) => {
+										deleteItem(storyMapState!, id).catch(console.error)
+									})
+									versionsToBeDeleted.forEach((id) => {
+										deleteDoc(doc(db, `StoryMapStates`, storyMapState!.id, `Versions`, id)).catch(console.error)
+									})
+								}}
+							/>
+						</Tooltip>
+					</FloatButton.Group>
+				) : (
+					<FloatButton.Group trigger="click" icon={<MenuOutlined />} className="absolute right-12 bottom-8">
+						<Tooltip placement="left" title="Redo">
+							<FloatButton
+								icon={<RedoOutlined className={clsx(`transition-colors`, !canRedo && `text-laurel`)} />}
+								className={clsx(!canRedo && `cursor-default`)}
+								onClick={() => {
+									redo().catch(console.error)
+								}}
+							/>
+						</Tooltip>
+						<Tooltip placement="left" title="Undo">
+							<FloatButton
+								icon={<UndoOutlined className={clsx(`transition-colors`, !canUndo && `text-laurel`)} />}
+								className={clsx(!canUndo && `cursor-default`)}
+								onClick={() => {
+									undo().catch(console.error)
+								}}
+							/>
+						</Tooltip>
+						<Tooltip placement="left" title="Add Release">
+							<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />
+						</Tooltip>
+						<Tooltip placement="left" title="Edit">
+							<FloatButton icon={<EditOutlined />} onClick={() => setEditMode(true)} />
+						</Tooltip>
+					</FloatButton.Group>
+				)}
 			</div>
 
 			{activeProduct?.exists() && storyMapState && versions && (
@@ -158,7 +211,11 @@ const StoryMapPage: FC = () => {
 					setCurrentVersionId={setCurrentVersionId}
 					newVersionInputValue={newVesionInputValue}
 					setNewVersionInputValue={setNewVesionInputValue}
-					storyMapStateId={storyMapState.id as Id}
+					storyMapState={storyMapState}
+					editMode={editMode}
+					setItemsToBeDeleted={setItemsToBeDeleted}
+					versionsToBeDeleted={versionsToBeDeleted}
+					setVersionsToBeDeleted={setVersionsToBeDeleted}
 				/>
 			)}
 		</div>

@@ -1,12 +1,15 @@
 "use client"
 
+import {MinusCircleOutlined} from "@ant-design/icons"
 import {Input, Tabs} from "antd"
+import clsx from "clsx"
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
 import {useEffect} from "react"
 
-import type {QuerySnapshot} from "firebase/firestore"
-import type {FC} from "react"
+import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
+import type {Dispatch, FC, SetStateAction} from "react"
 import type {Id} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
 import {db} from "~/utils/firebase"
@@ -17,7 +20,11 @@ export type VersionListProps = {
 	setCurrentVersionId: (id: Id | `__ALL_VERSIONS__`) => void
 	newVersionInputValue: string | undefined
 	setNewVersionInputValue: (value: string | undefined) => void
-	storyMapStateId: Id
+	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	editMode: boolean
+	setItemsToBeDeleted: Dispatch<SetStateAction<Id[]>>
+	versionsToBeDeleted: Id[]
+	setVersionsToBeDeleted: Dispatch<SetStateAction<Id[]>>
 }
 
 const VersionList: FC<VersionListProps> = ({
@@ -26,7 +33,11 @@ const VersionList: FC<VersionListProps> = ({
 	setCurrentVersionId,
 	newVersionInputValue,
 	setNewVersionInputValue,
-	storyMapStateId,
+	storyMapState,
+	editMode,
+	setItemsToBeDeleted,
+	versionsToBeDeleted,
+	setVersionsToBeDeleted,
 }) => {
 	useEffect(() => {
 		if (currentVersionId === undefined && allVersions.docs[0]?.exists())
@@ -37,7 +48,10 @@ const VersionList: FC<VersionListProps> = ({
 		if (!newVersionInputValue) throw new Error(`Version name is required.`)
 		const existingDoc = (
 			await getDocs(
-				query(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), where(`name`, `==`, newVersionInputValue)),
+				query(
+					collection(db, `StoryMapStates`, storyMapState.id, `Versions`),
+					where(`name`, `==`, newVersionInputValue),
+				),
 			)
 		).docs[0]
 		if (existingDoc) throw new Error(`Version already exists.`)
@@ -45,7 +59,7 @@ const VersionList: FC<VersionListProps> = ({
 		const data: Version = {
 			name: newVersionInputValue,
 		}
-		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Versions`), data)
+		await addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`), data)
 	}
 
 	return (
@@ -56,15 +70,42 @@ const VersionList: FC<VersionListProps> = ({
 			}}
 			activeKey={currentVersionId}
 			items={allVersions.docs
+				.filter((version) => !versionsToBeDeleted.includes(version.id as Id))
 				.sort((a, b) => a.data().name.localeCompare(b.data().name))
 				.map((version) => ({
 					key: version.id as Id | string,
-					label: <p className="overflow-hidden truncate">{version.data().name}</p>,
+					label: (
+						<div className="flex w-full justify-between gap-1">
+							<p className="overflow-hidden truncate">{version.data().name}</p>
+							{editMode && (
+								<button
+									type="button"
+									onClick={(e) => {
+										e.stopPropagation()
+										if (currentVersionId === version.id) setCurrentVersionId(`__ALL_VERSIONS__`)
+										setVersionsToBeDeleted((versions) => [...versions, version.id as Id])
+										const itemsWithVersion = Object.entries(storyMapState.data().items)
+											.filter(([, item]) => item?.versionId === version.id)
+											.map(([id]) => id)
+										itemsWithVersion.forEach((id) => {
+											setItemsToBeDeleted((items) => [...items, id as Id])
+										})
+									}}
+								>
+									<MinusCircleOutlined className="!mr-0" />
+								</button>
+							)}
+						</div>
+					),
 				}))
 				.concat([
 					{
 						key: `__ALL_VERSIONS__`,
-						label: <p>All</p>,
+						label: (
+							<p data-all className="text-left">
+								All
+							</p>
+						),
 					},
 				])
 				.concat(
@@ -93,7 +134,10 @@ const VersionList: FC<VersionListProps> = ({
 						  ]
 						: [],
 				)}
-			className="h-full min-w-0"
+			className={clsx(
+				`h-full min-w-0 [&>.ant-tabs-nav]:w-full [&_.ant-tabs-tab-btn]:w-full`,
+				editMode && `[&_.ant-tabs-tab-btn>*:not([data-all])]:text-[#ff4d4f]`,
+			)}
 		/>
 	)
 }

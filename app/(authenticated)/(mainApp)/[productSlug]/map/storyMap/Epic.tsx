@@ -1,4 +1,4 @@
-import {ReadOutlined} from "@ant-design/icons"
+import {MinusCircleOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
 import {useEffect, useRef, useState} from "react"
 
@@ -36,12 +36,29 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false}) => {
 	return (
 		<div
 			className={clsx(
-				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] active:cursor-grabbing`,
-				inert ? `cursor-grabbing` : `cursor-grab`,
+				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium`,
+				inert && `cursor-grabbing`,
+				meta.editMode ? `text-[#ff4d4f]` : `cursor-grab text-[#4f2dc8] active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
-			<ReadOutlined />
+			{meta.editMode ? (
+				<button
+					type="button"
+					onClick={() => {
+						meta.markForDeletion(epicId)
+						epic.childrenIds.forEach((featureId) => {
+							meta.markForDeletion(featureId)
+							const storyIds = meta.features.find((feature) => feature.id === featureId)!.childrenIds
+							storyIds.forEach((storyId) => meta.markForDeletion(storyId))
+						})
+					}}
+				>
+					<MinusCircleOutlined />
+				</button>
+			) : (
+				<ReadOutlined />
+			)}
 			<div className="relative min-w-[1rem]">
 				<p>{localEpicName || `_`}</p>
 				<input

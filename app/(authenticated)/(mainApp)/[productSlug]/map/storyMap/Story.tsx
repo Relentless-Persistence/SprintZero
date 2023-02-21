@@ -1,3 +1,4 @@
+import {MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
 import {useEffect, useRef, useState} from "react"
 
@@ -39,8 +40,9 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
 	return (
 		<div
 			className={clsx(
-				`flex touch-none select-none items-center gap-1 overflow-hidden rounded border border-[#103001] bg-white pr-1 active:cursor-grabbing`,
-				inert ? `cursor-grabbing` : `cursor-grab`,
+				`flex touch-none select-none items-center gap-1 overflow-hidden rounded border border-current bg-white pr-1`,
+				inert && `cursor-grabbing`,
+				meta.editMode ? `text-[#ff4d4f]` : `cursor-grab border-[#103001] active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
@@ -48,11 +50,11 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
 				type="button"
 				onClick={() => setIsDrawerOpen(true)}
 				onPointerDownCapture={(e) => e.stopPropagation()}
-				className="border-r border-[#103001] bg-[#f5f5f5] p-2 text-[0.6rem]"
+				className={clsx(`border-r border-current p-2 text-[0.6rem]`, meta.editMode ? `bg-[#fff1f0]` : `bg-[#f5f5f5]`)}
 			>
 				<p className="max-h-8 truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 			</button>
-			<div className="relative mx-auto min-w-[1rem] font-medium text-black">
+			<div className="relative mx-auto min-w-[1rem] font-medium">
 				<p className="mx-1">{localStoryName || `_`}</p>
 				<input
 					value={localStoryName}
@@ -64,6 +66,11 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
 					onPointerDownCapture={(e) => e.stopPropagation()}
 				/>
 			</div>
+			{meta.editMode && (
+				<button type="button" onClick={() => meta.markForDeletion(storyId)}>
+					<MinusCircleOutlined className="mr-1" />
+				</button>
+			)}
 
 			<StoryDrawer meta={meta} storyId={storyId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
 		</div>

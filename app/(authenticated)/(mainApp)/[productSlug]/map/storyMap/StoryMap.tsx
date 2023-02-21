@@ -6,7 +6,7 @@ import {useEffect, useRef, useState} from "react"
 
 import type {DragInfo} from "./types"
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
-import type {FC} from "react"
+import type {Dispatch, FC, SetStateAction} from "react"
 import type {Id} from "~/types"
 import type {StoryMapState, Story as StoryType} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
@@ -23,13 +23,26 @@ export type StoryMapProps = {
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
 	allVersions: QuerySnapshot<Version>
 	currentVersionId: Id | `__ALL_VERSIONS__`
+	editMode: boolean
+	itemsToBeDeleted: Id[]
+	setItemsToBeDeleted: Dispatch<SetStateAction<Id[]>>
 }
 
-const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersionId}) => {
+const StoryMap: FC<StoryMapProps> = ({
+	storyMapState,
+	allVersions,
+	currentVersionId,
+	editMode,
+	itemsToBeDeleted,
+	setItemsToBeDeleted,
+}) => {
 	const meta = useGenMeta({
 		storyMapState,
 		allVersions,
 		currentVersionId,
+		editMode,
+		itemsToBeDeleted,
+		setItemsToBeDeleted,
 	})
 
 	const [dragInfo, setDragInfo] = useState<DragInfo>({
@@ -53,21 +66,21 @@ const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersion
 		}
 	}, [dragInfo.mousePos])
 
-	const onPanStart = (event: MouseEvent | TouchEvent | PointerEvent) => {
-		const entry = Object.entries(elementRegistry).find(([, element]) => element?.contains(event.target as Node))
+	const pointerDownTarget = useRef<HTMLElement | null>(null)
+	const onPanStart = () => {
+		const entry = Object.entries(elementRegistry).find(([, element]) => element?.contains(pointerDownTarget.current))
 		if (!entry || !entry[1]) return
 		const [id, element] = entry
-		const container = element.parentElement!
 		setDragInfo((prev) => ({
 			...prev,
 			itemBeingDraggedId: id as Id,
 			offsetToTopLeft: [
-				prev.mousePos[0].get() - container.getBoundingClientRect().left,
-				prev.mousePos[1].get() - container.getBoundingClientRect().top,
+				prev.mousePos[0].get() - element.getBoundingClientRect().left,
+				prev.mousePos[1].get() - element.getBoundingClientRect().top,
 			],
 			offsetToMiddle: [
-				container.getBoundingClientRect().left + container.offsetWidth / 2 - prev.mousePos[0].get(),
-				container.getBoundingClientRect().top + container.offsetHeight / 2 - prev.mousePos[1].get(),
+				element.getBoundingClientRect().left + element.offsetWidth / 2 - prev.mousePos[0].get(),
+				element.getBoundingClientRect().top + element.offsetHeight / 2 - prev.mousePos[1].get(),
 			],
 		}))
 	}
@@ -556,9 +569,20 @@ const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersion
 	return (
 		<motion.div
 			className="relative z-10 flex w-max items-start gap-8"
-			onPanStart={onPanStart}
+			onPointerDown={(e) => {
+				pointerDownTarget.current = e.target as HTMLElement
+			}}
+			onPointerUp={() => {
+				pointerDownTarget.current = null
+			}}
+			onPointerCancel={() => {
+				pointerDownTarget.current = null
+			}}
+			onPanStart={() => {
+				if (!editMode) onPanStart()
+			}}
 			onPan={() => {
-				onPan().catch(console.error)
+				if (!editMode) onPan().catch(console.error)
 			}}
 			onPanEnd={onPanEnd}
 		>
@@ -597,7 +621,7 @@ const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersion
 									<div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-[#d0d0d0]" />
 								)}
 
-								{i === epic.childrenIds.length - 1 && epic.childrenIds.length > 0 && (
+								{i === epic.childrenIds.length - 1 && epic.childrenIds.length > 0 && !editMode && (
 									<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 										<button
 											type="button"
@@ -633,11 +657,11 @@ const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersion
 								>
 									<Feature meta={meta} featureId={feature.id} />
 
-									{(meta.currentVersionId !== `__ALL_VERSIONS__` || feature.childrenIds.length > 0) && (
+									{((meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode) || feature.childrenIds.length > 0) && (
 										<div className="h-8 w-px border border-[#d0d0d0]" />
 									)}
 
-									{stories.length === 0 && meta.currentVersionId !== `__ALL_VERSIONS__` && (
+									{stories.length === 0 && meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode && (
 										<button
 											type="button"
 											onClick={() => {
@@ -659,7 +683,7 @@ const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersion
 												</div>
 											))}
 
-											{meta.currentVersionId !== `__ALL_VERSIONS__` && (
+											{meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode && (
 												<button
 													type="button"
 													onClick={() => {
@@ -678,7 +702,7 @@ const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersion
 							)
 						})}
 
-					{epic.childrenIds.length === 0 && (
+					{epic.childrenIds.length === 0 && !editMode && (
 						<button
 							type="button"
 							onClick={() => {
@@ -693,17 +717,19 @@ const StoryMap: FC<StoryMapProps> = ({storyMapState, allVersions, currentVersion
 				</div>
 			))}
 
-			<button
-				type="button"
-				onClick={() => {
-					addEpic(storyMapState, {}).catch(console.error)
-				}}
-				className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8]"
-				data-testid="add-epic"
-			>
-				<ReadOutlined />
-				<span>Add epic</span>
-			</button>
+			{!editMode && (
+				<button
+					type="button"
+					onClick={() => {
+						addEpic(storyMapState, {}).catch(console.error)
+					}}
+					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8]"
+					data-testid="add-epic"
+				>
+					<ReadOutlined />
+					<span>Add epic</span>
+				</button>
+			)}
 
 			{/* Surrogate parent for story map items as they're being dragged (the real item in the tree is made invisible) */}
 			<motion.div

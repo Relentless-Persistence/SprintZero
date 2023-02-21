@@ -37,7 +37,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName}) => {
 						/>
 					</svg>
 				</svg>
-				<div className="mt-2 flex justify-between text-xs">
+				<div className="mt-2 flex justify-between text-sm">
 					<p>Highest value</p>
 					<p>Lowest value</p>
 				</div>

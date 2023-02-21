@@ -1,4 +1,4 @@
-import {CopyOutlined} from "@ant-design/icons"
+import {CopyOutlined, MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
 import {useEffect, useRef, useState} from "react"
 
@@ -36,12 +36,25 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false}) => {
 	return (
 		<div
 			className={clsx(
-				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#006378] active:cursor-grabbing`,
-				inert ? `cursor-grabbing` : `cursor-grab`,
+				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium`,
+				inert && `cursor-grabbing`,
+				meta.editMode ? `text-[#ff4d4f]` : `cursor-grab text-[#006378] active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
-			<CopyOutlined />
+			{meta.editMode ? (
+				<button
+					type="button"
+					onClick={() => {
+						meta.markForDeletion(featureId)
+						feature.childrenIds.forEach((storyId) => meta.markForDeletion(storyId))
+					}}
+				>
+					<MinusCircleOutlined />
+				</button>
+			) : (
+				<CopyOutlined />
+			)}
 			<div className="relative min-w-[1rem]">
 				<p>{localFeatureName || `_`}</p>
 				<input
