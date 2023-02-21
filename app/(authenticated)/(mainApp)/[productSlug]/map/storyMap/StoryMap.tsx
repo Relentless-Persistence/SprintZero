@@ -1,7 +1,7 @@
 import {CopyOutlined, FileOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
 import {Timestamp, serverTimestamp} from "firebase/firestore"
-import {motion, useMotionValue, useTransform} from "framer-motion"
+import {motion, useAnimationFrame, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
 import type {DragInfo} from "./types"
@@ -26,6 +26,7 @@ export type StoryMapProps = {
 	editMode: boolean
 	itemsToBeDeleted: Id[]
 	setItemsToBeDeleted: Dispatch<SetStateAction<Id[]>>
+	onScroll: (amt: number) => void
 }
 
 const StoryMap: FC<StoryMapProps> = ({
@@ -35,6 +36,7 @@ const StoryMap: FC<StoryMapProps> = ({
 	editMode,
 	itemsToBeDeleted,
 	setItemsToBeDeleted,
+	onScroll,
 }) => {
 	const meta = useGenMeta({
 		storyMapState,
@@ -565,6 +567,13 @@ const StoryMap: FC<StoryMapProps> = ({
 			itemBeingDraggedId: undefined,
 		}))
 	}
+
+	useAnimationFrame(() => {
+		if (!dragInfo.itemBeingDraggedId) return
+		const x = dragInfo.mousePos[0].get()
+		if (x < 248) onScroll(Math.max(-10, -(248 - x) / 10))
+		else if (x > window.innerWidth - 144) onScroll(Math.min(10, (x - window.innerWidth + 144) / 10))
+	})
 
 	return (
 		<motion.div

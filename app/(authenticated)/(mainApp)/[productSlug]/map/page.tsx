@@ -13,7 +13,7 @@ import {FloatButton, Tooltip} from "antd"
 import clsx from "clsx"
 import {collection, deleteDoc, doc, orderBy, query, serverTimestamp, where, writeBatch} from "firebase/firestore"
 import {motion} from "framer-motion"
-import {useState} from "react"
+import {useRef, useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -122,6 +122,8 @@ const StoryMapPage: FC = () => {
 		(history) => history.data().future === false && history.id !== storyMapState?.data()?.currentHistoryId,
 	)
 
+	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+
 	return (
 		<div className="grid h-full grid-cols-[1fr_6rem]">
 			<div className="relative flex flex-col gap-8">
@@ -132,7 +134,11 @@ const StoryMapPage: FC = () => {
 				)}
 
 				<div className="relative w-full grow">
-					<motion.div layoutScroll className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2">
+					<motion.div
+						layoutScroll
+						className="absolute inset-0 overflow-x-auto px-12 pb-8 pt-2"
+						ref={scrollContainerRef}
+					>
 						{activeProduct?.exists() && storyMapState?.exists() && currentVersionId !== undefined && versions && (
 							<StoryMap
 								storyMapState={storyMapState}
@@ -141,6 +147,10 @@ const StoryMapPage: FC = () => {
 								editMode={editMode}
 								itemsToBeDeleted={itemsToBeDeleted}
 								setItemsToBeDeleted={setItemsToBeDeleted}
+								onScroll={(amt) => {
+									if (!scrollContainerRef.current) return
+									scrollContainerRef.current.scrollLeft += amt
+								}}
 							/>
 						)}
 					</motion.div>
