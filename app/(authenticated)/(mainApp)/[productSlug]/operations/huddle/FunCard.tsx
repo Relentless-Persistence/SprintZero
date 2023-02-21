@@ -50,7 +50,7 @@ const FunCard: FC = () => {
 		}
 
 		const formattedDate = date.format(`MMMM D, YYYY`)
-		const gptQuestion = `What was the #1 song on the Billboard Top 100 list on ${formattedDate}? Give in the format "Artist - name".`
+		const gptQuestion = `What was the #1 song on the Billboard Top 100 list on ${formattedDate}? Give in the format "Song name - Artist".`
 		const res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
 
 		const {response} = z.object({response: z.string()}).parse(res.data)
@@ -73,18 +73,9 @@ const FunCard: FC = () => {
 	}
 
 	const getSong = async (songString: string) => {
-		const newString = songString
-			.trimStart()
-			.replace(/'/g, `"`)
-			.replace(/(\w+:)|"|{|}/g, ``)
-			.trim()
-		const obj = newString
-			.split(`,`)
-			.map((s) => s.trim().replace(/ /g, `+`))
-			.join(`+`)
-
+		const newString = songString.replace(/^"/, ``).replace(/"$/, ``)
 		const res = await axios.post<Result>(`/api/fetchSong`, {
-			song: encodeURIComponent(obj),
+			song: encodeURIComponent(newString),
 		})
 		const oldUrl = res.data.results.songs.data[0].attributes.url
 		const domainIndex = oldUrl.indexOf(`music.apple.com`)
