@@ -15,6 +15,7 @@ import type {Id} from "~/types"
 import type {Huddle} from "~/types/db/Huddles"
 import type {User} from "~/types/db/Users"
 
+import FunCard from "./FunCard"
 import {HuddleConverter} from "~/types/db/Huddles"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
@@ -67,7 +68,9 @@ const HuddlePage: FC = () => {
 					<Breadcrumb.Item>Huddle</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col gap-4">
+				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col grid-cols-[20rem] gap-4">
+					<FunCard />
+
 					{usersData
 						.map((data) => data.data)
 						.filter((data): data is QueryDocumentSnapshot<User> => data?.exists() ?? false)

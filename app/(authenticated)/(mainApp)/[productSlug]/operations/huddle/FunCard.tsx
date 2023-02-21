@@ -83,7 +83,7 @@ const FunCard: FC = () => {
 			.join(`+`)
 
 		const res = await axios.post<Result>(`/api/fetchSong`, {
-			song: obj,
+			song: encodeURIComponent(obj),
 		})
 		const oldUrl = res.data.results.songs.data[0].attributes.url
 		const domainIndex = oldUrl.indexOf(`music.apple.com`)
@@ -103,7 +103,6 @@ const FunCard: FC = () => {
 			className=""
 			size="small"
 			type="inner"
-			style={{minWidth: `340px`}}
 			title={
 				<div className="my-4 flex items-center gap-4">
 					<Avatar
