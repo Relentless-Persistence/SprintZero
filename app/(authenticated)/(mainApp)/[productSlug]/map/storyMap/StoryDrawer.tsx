@@ -6,6 +6,7 @@ import {
 	FlagOutlined,
 	LinkOutlined,
 	NumberOutlined,
+	UserOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useQueries} from "@tanstack/react-query"
@@ -219,6 +220,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								</Tag>
 								<Tag color="#585858" icon={<FlagOutlined />}>
 									{sprintColumns[story.sprintColumn]}
+								</Tag>
+								<Tag color="#585858" icon={<UserOutlined />}>
+									{story.peopleIds.length}
 								</Tag>
 
 								<div className="absolute left-1/2 top-0 -translate-x-1/2">

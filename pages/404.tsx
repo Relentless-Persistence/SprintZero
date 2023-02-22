@@ -7,7 +7,6 @@ import {useAuthState} from "react-firebase-hooks/auth"
 import type {FC} from "react"
 
 import SettingsMenu from "~/app/(authenticated)/(mainApp)/SettingsMenu"
-import LinkTo from "~/components/LinkTo"
 import {auth} from "~/utils/firebase"
 
 const Error404Page: FC = () => {
@@ -25,18 +24,14 @@ const Error404Page: FC = () => {
 			<Layout.Content className="grid place-items-center">
 				<Result
 					status="404"
-					title="404"
-					subTitle="Sorry, the page you visited does not exist."
+					title="Error 404: Page not found"
+					subTitle="We're sorry, but the page you are trying to access cannot be found. Please check the URL and try again. If you continue to experience this issue, please contact our support team for assistance at support@sprintzero.app."
 					extra={
-						<div className="flex justify-center gap-4">
-							<Button type="primary" onClick={() => history.back()}>
-								Go back
-							</Button>
-							<LinkTo href="/">
-								<Button>Exit</Button>
-							</LinkTo>
-						</div>
+						<Button type="primary" onClick={() => history.back()}>
+							Go back
+						</Button>
 					}
+					className="max-w-2xl"
 				/>
 			</Layout.Content>
 

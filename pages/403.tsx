@@ -25,18 +25,14 @@ const Error403Page: FC = () => {
 			<Layout.Content className="grid place-items-center">
 				<Result
 					status="403"
-					title="403"
-					subTitle="Sorry, you are not authorized to access this page."
+					title="Error 403: Forbidden"
+					subTitle="We apologize, but you do not have permission to access the requested resource. This may be due to insufficient privileges or authentication issues. Please contact support@sprintzero.app if you believe this to be an error or if you require access to this resource."
 					extra={
-						<div className="flex justify-center gap-4">
-							<Button type="primary" onClick={() => history.back()}>
-								Go back
-							</Button>
-							<LinkTo href="/">
-								<Button>Exit</Button>
-							</LinkTo>
-						</div>
+						<Button type="primary" onClick={() => history.back()}>
+							Go back
+						</Button>
 					}
+					className="max-w-2xl"
 				/>
 			</Layout.Content>
 
