@@ -52,6 +52,11 @@ service cloud.firestore {
 
       allow create:
       	if request.auth != null
+
+      match /Results/{resultId} {
+        allow read, write:
+          if isEditorOnProduct(get(/databases/$(database)/documents/Objectives/$(objectiveId)).data.productId)
+      }
     }
 
     match /Personas/{personaId} {

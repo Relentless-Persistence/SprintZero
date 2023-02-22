@@ -18,6 +18,7 @@ import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
 import {HistoryConverter} from "~/types/db/Histories"
+import {ObjectiveConverter} from "~/types/db/Objectives"
 import {ProductConverter} from "~/types/db/Products"
 import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
@@ -84,20 +85,49 @@ const ProductSetupPage: FC = () => {
 			updates: [],
 		})
 
-		const positionHistory = await addDoc(
-			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-			{
-				future: false,
-				items: {},
-				timestamp: serverTimestamp(),
-			},
-		)
-		await updateDoc(storyMapState, {
-			currentHistoryId: positionHistory.id as Id,
-		})
-		await addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter), {
-			name: `1.0`,
-		})
+		await Promise.all([
+			(async () => {
+				const positionHistory = await addDoc(
+					collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
+					{
+						future: false,
+						items: {},
+						timestamp: serverTimestamp(),
+					},
+				)
+				await updateDoc(storyMapState, {
+					currentHistoryId: positionHistory.id as Id,
+				})
+			})(),
+			addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter), {
+				name: `1.0`,
+			}),
+			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+				name: `001`,
+				statement: ``,
+				productId: slug,
+			}),
+			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+				name: `002`,
+				statement: ``,
+				productId: slug,
+			}),
+			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+				name: `003`,
+				statement: ``,
+				productId: slug,
+			}),
+			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+				name: `004`,
+				statement: ``,
+				productId: slug,
+			}),
+			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+				name: `005`,
+				statement: ``,
+				productId: slug,
+			}),
+		])
 
 		router.push(`/${slug}/map`)
 	}
@@ -146,7 +176,10 @@ const ProductSetupPage: FC = () => {
 						setCanProceed={setCanProceed}
 						onComplete={(data) => {
 							setFormData((cur) => ({...cur, ...data}))
-							submitForm({...formData, ...data} as FormInputs).catch(console.error)
+							submitForm({...formData, ...data} as FormInputs).catch((err) => {
+								setHasSubmitted(false)
+								console.error(err)
+							})
 						}}
 					/>
 				</motion.div>

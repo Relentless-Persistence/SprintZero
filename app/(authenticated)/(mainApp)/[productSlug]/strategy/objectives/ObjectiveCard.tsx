@@ -1,29 +1,27 @@
 import {Button, Card, Input} from "antd"
-import {arrayUnion, doc, updateDoc} from "firebase/firestore"
-import produce from "immer"
-import {nanoid} from "nanoid"
+import {Timestamp, addDoc, collection, updateDoc} from "firebase/firestore"
 import {useState} from "react"
 
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Objective} from "~/types/db/Objectives"
+import type {Id} from "~/types"
+import type {Result} from "~/types/db/Results"
 
 import StretchyTextArea from "~/components/StretchyTextArea"
-import {ObjectiveConverter} from "~/types/db/Objectives"
+import {ResultConverter} from "~/types/db/Results"
 import {db} from "~/utils/firebase"
 
 export type ObjectiveCardProps = {
-	objective: QueryDocumentSnapshot<Objective>
-	resultId?: string
+	objectiveId: Id
+	result?: QueryDocumentSnapshot<Result>
 	isEditing: boolean
 	onEditStart?: () => void
 	onEditEnd: () => void
 }
 
-const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, onEditStart, onEditEnd}) => {
-	const result = objective.data().results.find((item) => item.id === resultId)
-	const [titleDraft, setTitleDraft] = useState(result?.name ?? ``)
-	const [textDraft, setTextDraft] = useState(result?.text ?? ``)
+const ObjectiveCard: FC<ObjectiveCardProps> = ({objectiveId, result, isEditing, onEditStart, onEditEnd}) => {
+	const [titleDraft, setTitleDraft] = useState(result?.data().name ?? ``)
+	const [textDraft, setTextDraft] = useState(result?.data().text ?? ``)
 
 	return (
 		<Card
@@ -38,7 +36,7 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 						className="mr-4"
 					/>
 				) : (
-					result?.name
+					result?.data().name
 				)
 			}
 			extra={
@@ -53,21 +51,15 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objective, resultId, isEditing, 
 							className="bg-green"
 							onClick={() => {
 								if (result) {
-									const results = produce(objective.data().results, (draft) => {
-										const index = draft.findIndex((item) => item.id === result.id)
-										draft[index]!.name = titleDraft
-										draft[index]!.text = textDraft
-									})
-									updateDoc(doc(db, `Objectives`, objective.id).withConverter(ObjectiveConverter), {results}).catch(
-										console.error,
-									)
+									updateDoc(result.ref, {
+										name: titleDraft,
+										text: textDraft,
+									}).catch(console.error)
 								} else {
-									updateDoc(doc(db, `Objectives`, objective.id).withConverter(ObjectiveConverter), {
-										results: arrayUnion({
-											id: nanoid(),
-											name: titleDraft,
-											text: textDraft,
-										} satisfies Objective[`results`][number]),
+									addDoc(collection(db, `Objectives`, objectiveId, `Results`).withConverter(ResultConverter), {
+										createdAt: Timestamp.now(),
+										name: titleDraft,
+										text: textDraft,
 									}).catch(console.error)
 								}
 								onEditEnd()
