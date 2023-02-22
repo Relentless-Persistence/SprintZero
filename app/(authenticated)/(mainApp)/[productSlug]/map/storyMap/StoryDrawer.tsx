@@ -8,10 +8,11 @@ import {
 	NumberOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
+import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Form, Input, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
-import {Timestamp, doc} from "firebase/firestore"
+import {Timestamp, doc, getDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
@@ -20,9 +21,11 @@ import {useForm} from "react-hook-form"
 import {useInterval} from "react-use"
 
 import type {StoryMapMeta} from "./meta"
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
 import type {Id} from "~/types"
+import type {User} from "~/types/db/Users"
 
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
@@ -40,11 +43,12 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const formSchema = StorySchema.pick({
 	branchName: true,
+	designEffort: true,
 	designLink: true,
-	name: true,
+	engineeringEffort: true,
 	pageLink: true,
-	points: true,
 	sprintColumn: true,
+	peopleIds: true,
 	versionId: true,
 })
 type FormInputs = z.infer<typeof formSchema>
@@ -83,15 +87,22 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	const activeProductId = useActiveProductId()
 	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
+	const teamMembers = useQueries({
+		queries: Object.keys(product?.members ?? {}).map((userId) => ({
+			queryKey: [`user`, userId],
+			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
+		})),
+	})
+
 	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			branchName: story.branchName,
 			designLink: story.designLink,
-			name: story.name,
+			designEffort: story.designEffort,
+			engineeringEffort: story.engineeringEffort,
 			pageLink: story.pageLink,
-			points: story.points,
 			sprintColumn: story.sprintColumn,
 			versionId: story.versionId,
 		},
@@ -155,6 +166,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 		)
 	}
 
+	const totalEffort = story.designEffort + story.engineeringEffort
+
 	return (
 		<Drawer
 			title={
@@ -195,14 +208,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						<div>
 							<div className="relative">
 								<Tag color="#585858" icon={<NumberOutlined />}>
-									{story.points} point{story.points === 1 ? `` : `s`}
+									{totalEffort} point{totalEffort === 1 ? `` : `s`}
 								</Tag>
 								<Tag
 									color={typeof product?.effortCost === `number` ? `#585858` : `#f5f5f5`}
 									icon={<DollarOutlined />}
 									className={clsx(typeof product?.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`)}
 								>
-									{dollarFormat((product?.effortCost ?? 0) * story.points)}
+									{dollarFormat((product?.effortCost ?? 0) * totalEffort)}
 								</Tag>
 								<Tag color="#585858" icon={<FlagOutlined />}>
 									{sprintColumns[story.sprintColumn]}
@@ -275,29 +288,31 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					}}
 				>
 					<div className="flex gap-8">
-						<Form.Item
-							label="Title"
-							hasFeedback
-							validateStatus={formValidateStatus(getFieldState(`name`, formState))}
-							className="grow"
-						>
-							<RhfInput control={control} name="name" />
+						<Form.Item label={<span className="font-semibold">Team members</span>} className="grow">
+							<RhfSelect
+								control={control}
+								name="peopleIds"
+								mode="multiple"
+								options={teamMembers
+									.map(({data: memberDoc}) => memberDoc)
+									.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
+									.map((user) => ({label: user.data().name, value: user.id}))}
+							/>
 						</Form.Item>
-						<Form.Item
-							label="Effort Estimate"
-							hasFeedback
-							validateStatus={formValidateStatus(getFieldState(`points`, formState))}
-						>
-							<RhfSegmented control={control} name="points" options={[1, 2, 3, 5, 8, 13]} />
+						<Form.Item label={<span className="font-semibold">Design</span>}>
+							<RhfSegmented control={control} name="designEffort" options={[1, 2, 3, 5, 8, 13]} />
 						</Form.Item>
-						<Form.Item label="Version" className="shrink-0 basis-20">
+						<Form.Item label={<span className="font-semibold">Engineering</span>}>
+							<RhfSegmented control={control} name="engineeringEffort" options={[1, 2, 3, 5, 8, 13]} />
+						</Form.Item>
+						<Form.Item label={<span className="font-semibold">Version</span>} className="shrink-0 basis-20">
 							<RhfSelect
 								control={control}
 								name="versionId"
 								options={meta.allVersions.docs.map((version) => ({label: version.data().name, value: version.id}))}
 							/>
 						</Form.Item>
-						<Form.Item label="Status" className="shrink-0 basis-56">
+						<Form.Item label={<span className="font-semibold">Status</span>} className="shrink-0 basis-56">
 							<RhfSelect
 								control={control}
 								name="sprintColumn"
@@ -331,9 +346,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					</Form.Item>
 				</Form>
 			) : (
-				<div className="grid h-full grid-cols-2 gap-8">
+				<div className="grid h-full grid-cols-2 gap-6">
 					{/* Left column */}
-					<div className="flex h-full min-h-0 flex-col gap-6">
+					<div className="flex h-full min-h-0 flex-col gap-4">
 						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
 							<p className="text-lg font-medium text-gray">Story</p>
 							<Input.TextArea
@@ -350,11 +365,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 										meta.allVersions,
 									).catch(console.error)
 								}}
-								className="max-h-[calc(100%-2.25rem)]"
+								className="max-h-[calc(100%-2rem)]"
 							/>
 						</div>
 
-						<div className="grid min-h-0 grow basis-0 grid-cols-2 gap-8">
+						<div className="grid min-h-0 grow basis-0 grid-cols-2 gap-6">
 							<div className="flex min-h-0 flex-col gap-2">
 								<p className="text-lg font-medium text-gray">Acceptance Criteria</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">

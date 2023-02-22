@@ -38,10 +38,11 @@ import {getStories} from "~/utils/storyMap"
 
 const formSchema = StorySchema.pick({
 	branchName: true,
+	designEffort: true,
 	designLink: true,
+	engineeringEffort: true,
 	name: true,
 	pageLink: true,
-	points: true,
 	sprintColumn: true,
 	versionId: true,
 })
@@ -71,13 +72,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			branchName: story.branchName,
+			designEffort: story.designEffort,
 			designLink: story.designLink,
+			engineeringEffort: story.engineeringEffort,
 			name: story.name,
 			pageLink: story.pageLink,
-			points: story.points,
 			sprintColumn: story.sprintColumn,
 			versionId: story.versionId,
-		},
+		} satisfies FormInputs,
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
@@ -116,6 +118,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 		await setDoc(storyMapState.ref, newData)
 	}
 
+	const totalEffort = story.designEffort + story.engineeringEffort
+
 	return (
 		<Drawer
 			title={
@@ -139,7 +143,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 							<div className="relative">
 								<div>
 									<Tag color="#585858" icon={<NumberOutlined />}>
-										{story.points} point{story.points === 1 ? `` : `s`}
+										{totalEffort} point{totalEffort === 1 ? `` : `s`}
 									</Tag>
 									<Tag
 										color={typeof activeProduct.data().effortCost === `number` ? `#585858` : `#f5f5f5`}
@@ -148,7 +152,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 											typeof activeProduct.data().effortCost !== `number` && `border !border-current !text-[#d9d9d9]`,
 										)}
 									>
-										{dollarFormat((activeProduct.data().effortCost ?? 0) * story.points)}
+										{dollarFormat((activeProduct.data().effortCost ?? 0) * totalEffort)}
 									</Tag>
 									<Tag color="#585858" icon={<FlagOutlined />}>
 										{sprintColumns[story.sprintColumn]}
@@ -232,13 +236,13 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 						>
 							<RhfInput control={control} name="name" />
 						</Form.Item>
-						<Form.Item
+						{/* <Form.Item
 							label="Effort Estimate"
 							hasFeedback
 							validateStatus={formValidateStatus(getFieldState(`points`, formState))}
 						>
 							<RhfSegmented control={control} name="points" options={[1, 2, 3, 5, 8, 13]} />
-						</Form.Item>
+						</Form.Item> */}
 						<Form.Item label="Version">
 							<RhfSelect
 								control={control}
