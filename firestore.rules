@@ -56,7 +56,7 @@ service cloud.firestore {
 
     match /Personas/{personaId} {
     	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
+      	if resource == null || isEditorOnProduct(resource.data.productId)
 
       allow create:
       	if request.auth != null

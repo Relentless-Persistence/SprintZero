@@ -1,18 +1,18 @@
 "use client"
 
 import {Breadcrumb, Card} from "antd"
-import {doc, updateDoc} from "firebase/firestore"
+import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc, where} from "firebase/firestore"
 import {useState} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection, useDocumentData} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
 import type {Product} from "~/types/db/Products"
 
 import EditButtons from "./EditButtons"
-import PersonasImpactedCard from "./PersonasImpactedCard"
 import ProblemStatementCard from "./ProblemStatementCard"
 import TextListEditor from "~/components/TextListEditor"
+import {PersonaConverter} from "~/types/db/Personas"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -31,6 +31,14 @@ const KickoffPage: FC = () => {
 	>(undefined)
 
 	const [textListState, setTextListState] = useState<Array<{id: string; text: string}>>([])
+
+	const [personas] = useCollection(
+		query(
+			collection(db, `Personas`),
+			where(`productId`, `==`, activeProductId),
+			orderBy(`createdAt`, `asc`),
+		).withConverter(PersonaConverter),
+	)
 
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
@@ -54,7 +62,57 @@ const KickoffPage: FC = () => {
 					/>
 				)}
 
-				<PersonasImpactedCard isEditing={editingSection === `personas`} />
+				<Card
+					type="inner"
+					title="Personas Impacted"
+					extra={
+						<EditButtons
+							onEditStart={() => {
+								setTextListState(personas?.docs.map((doc) => ({id: doc.id, text: doc.data().name})) ?? [])
+								setEditingSection(`personas`)
+							}}
+							onEditEnd={() => {
+								setTextListState([])
+								setEditingSection(undefined)
+							}}
+							isEditing={editingSection === `personas`}
+							onCommit={async () => {
+								await Promise.all(
+									textListState
+										.filter((item) => item.text !== ``)
+										.map(async (item) => {
+											const existingDoc = getDoc(doc(db, `Personas`, item.id))
+											if ((await existingDoc).exists()) return
+											await setDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
+												changes: [],
+												createdAt: Timestamp.now(),
+												dayInTheLife: [],
+												description: ``,
+												frustrations: [],
+												goals: [],
+												interactions: [],
+												name: item.text,
+												priorities: [],
+												responsibilities: [],
+												tasks: [],
+												productId: activeProductId,
+											})
+										}),
+								)
+							}}
+						/>
+					}
+				>
+					{editingSection === `personas` ? (
+						<TextListEditor textList={textListState} onChange={setTextListState} maxItems={5} />
+					) : (
+						<ol className="list-decimal pl-4">
+							{personas?.docs.map((item) => (
+								<li key={item.id}>{item.data().name}</li>
+							))}
+						</ol>
+					)}
+				</Card>
 
 				<Card
 					type="inner"

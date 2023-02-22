@@ -7,7 +7,6 @@ import {useAuthState} from "react-firebase-hooks/auth"
 import type {FC} from "react"
 
 import SettingsMenu from "~/app/(authenticated)/(mainApp)/SettingsMenu"
-import LinkTo from "~/components/LinkTo"
 import {auth} from "~/utils/firebase"
 
 const Error403Page: FC = () => {

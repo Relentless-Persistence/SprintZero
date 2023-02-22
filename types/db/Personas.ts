@@ -1,3 +1,4 @@
+import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
 import {genConverter, idSchema} from "~/types"
@@ -9,6 +10,7 @@ export const PersonaSchema = z.object({
 			text: z.string(),
 		}),
 	),
+	createdAt: z.instanceof(Timestamp),
 	dayInTheLife: z.array(
 		z.object({
 			id: z.string(),

@@ -10,10 +10,11 @@ export type TextListEditorProps = {
 	textList: Array<{id: string; text: string}>
 	onChange: Dispatch<SetStateAction<Array<{id: string; text: string}>>>
 	onBlur?: () => void
+	maxItems?: number
 }
 
 const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorProps> = (
-	{textList, onChange, onBlur},
+	{textList, onChange, onBlur, maxItems},
 	ref,
 ) => {
 	useEffect(() => {
@@ -69,7 +70,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 								: undefined
 						}
 					/>
-					{i === textList.length - 1 && (
+					{i === textList.length - 1 && textList.length < (maxItems ?? Infinity) && (
 						<Button
 							onClick={() => {
 								const newId = nanoid()
