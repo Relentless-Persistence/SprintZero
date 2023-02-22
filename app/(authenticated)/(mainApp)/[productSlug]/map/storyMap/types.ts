@@ -7,15 +7,3 @@ export type DragInfo = {
 	offsetToTopLeft: [number, number]
 	offsetToMiddle: [number, number]
 }
-
-export type StoryMapLocation = {
-	epic: number
-	feature: number
-	story: number
-}
-
-export type StoryMapTargetLocation = {
-	epic: number
-	feature: number | undefined
-	story: number | undefined
-}

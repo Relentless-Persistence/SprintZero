@@ -10,12 +10,14 @@ import {
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Button, Checkbox, Drawer, Form, Input, Segmented, Tag} from "antd"
 import clsx from "clsx"
-import {doc} from "firebase/firestore"
+import dayjs from "dayjs"
+import {Timestamp, doc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocument, useDocumentData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
+import {useInterval} from "react-use"
 
 import type {StoryMapMeta} from "./meta"
 import type {FC} from "react"
@@ -29,6 +31,7 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {ProductConverter} from "~/types/db/Products"
 import {StorySchema, sprintColumns} from "~/types/db/StoryMapStates"
+import {UserConverter} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
@@ -59,6 +62,18 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	const [newBugInput, setNewBugInput] = useState(``)
 	const story = meta.stories.find((story) => story.id === storyId)!
 	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
+
+	const [localStoryName, setLocalStoryName] = useState(story.name)
+	useEffect(() => {
+		setLocalStoryName(story.name)
+	}, [story.name])
+
+	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
+	useInterval(() => {
+		if (story.updatedAt instanceof Timestamp) setLastModifiedText(dayjs(story.updatedAt.toMillis()).fromNow())
+	}, 1000)
+
+	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.updatedAtUserId).withConverter(UserConverter))
 
 	const [description, setDescription] = useState(story.description)
 	useEffect(() => {
@@ -143,20 +158,41 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	return (
 		<Drawer
 			title={
-				<div className="flex h-14 flex-col justify-center gap-1">
-					{!editMode && <p>{story.name}</p>}
-					<div>
-						{editMode ? (
-							<Button
-								type="primary"
-								danger
-								onClick={() => {
-									deleteItem(meta.storyMapState, story.id).catch(console.error)
-								}}
-							>
-								Delete
-							</Button>
-						) : (
+				editMode ? (
+					<div className="flex h-14 items-center">
+						<Button
+							type="primary"
+							danger
+							onClick={() => {
+								deleteItem(meta.storyMapState, story.id).catch(console.error)
+							}}
+						>
+							Delete
+						</Button>
+					</div>
+				) : (
+					<div className="flex h-14 flex-col justify-center gap-1">
+						<div className="flex items-end gap-2">
+							<div className="relative w-fit min-w-[1rem]">
+								<p>{localStoryName || `_`}</p>
+								<input
+									value={localStoryName}
+									className="absolute inset-0"
+									onChange={(e) => {
+										setLocalStoryName(e.target.value)
+										updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(
+											console.error,
+										)
+									}}
+								/>
+							</div>
+							{lastModifiedText && lastModifiedUser?.exists() && (
+								<p className="text-sm font-normal text-gray">
+									Last modified {lastModifiedText} by {lastModifiedUser.data().name}
+								</p>
+							)}
+						</div>
+						<div>
 							<div className="relative">
 								<Tag color="#585858" icon={<NumberOutlined />}>
 									{story.points} point{story.points === 1 ? `` : `s`}
@@ -200,9 +236,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 									</LinkTo>
 								</div>
 							</div>
-						)}
+						</div>
 					</div>
-				</div>
+				)
 			}
 			placement="bottom"
 			closable={false}

@@ -5,7 +5,7 @@ import Image from "next/image"
 
 import type {FC} from "react"
 
-import {privacyStatement} from "~/components/privacy"
+import {privacyPolicy} from "~/components/privacy"
 
 const PrivacyPage: FC = () => {
 	return (
@@ -20,7 +20,7 @@ const PrivacyPage: FC = () => {
 						size="large"
 						readOnly
 						rows={20}
-						value={privacyStatement}
+						value={privacyPolicy}
 						className="!resize-none bg-[#eceef1] font-mono text-sm text-black"
 					/>
 				</div>

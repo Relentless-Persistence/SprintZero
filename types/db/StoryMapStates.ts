@@ -53,6 +53,7 @@ const schemas = {
 
 	keeperIds: z.array(idSchema),
 	parentId: idSchema,
+	updatedAtUserId: idSchema,
 	versionId: idSchema,
 }
 
@@ -80,6 +81,7 @@ export const EpicSchema = z.object({
 	sprintColumn: schemas.sprintColumn.nullable(),
 	updatedAt: schemas.updatedAt.nullable(),
 	parentId: schemas.parentId.nullable(),
+	updatedAtUserId: schemas.updatedAtUserId.nullable(),
 	versionId: schemas.versionId.nullable(),
 } satisfies Record<keyof typeof schemas | `type`, unknown>)
 export type Epic = z.infer<typeof EpicSchema>
@@ -108,6 +110,7 @@ export const FeatureSchema = z.object({
 	sprintColumn: schemas.sprintColumn.nullable(),
 	updatedAt: schemas.updatedAt.nullable(),
 	keeperIds: schemas.keeperIds.nullable(),
+	updatedAtUserId: schemas.updatedAtUserId.nullable(),
 	versionId: schemas.versionId.nullable(),
 } satisfies Record<keyof typeof schemas | `type`, unknown>)
 export type Feature = z.infer<typeof FeatureSchema>
@@ -131,6 +134,7 @@ export const StorySchema = z.object({
 	updatedAt: schemas.updatedAt,
 
 	parentId: schemas.parentId,
+	updatedAtUserId: schemas.updatedAtUserId,
 	versionId: schemas.versionId,
 
 	// Fields from other item types

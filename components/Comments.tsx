@@ -1,7 +1,7 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Input} from "antd"
-import {addDoc, collection, doc, getDoc, query, where} from "firebase/firestore"
+import {addDoc, collection, doc, getDoc, orderBy, query, serverTimestamp, where} from "firebase/firestore"
 import {uniq} from "lodash"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
@@ -18,7 +18,7 @@ import {useUser} from "~/utils/useUser"
 
 export type CommentsProps = {
 	storyMapStateId: Id
-	parentId: string
+	parentId: Id
 	commentType: `code` | `design`
 	flagged?: boolean
 	onFlag?: () => Promisable<void>
@@ -31,6 +31,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		const data: Comment = {
+			createdAt: serverTimestamp(),
 			text: commentDraft,
 			type: commentType,
 			authorId: user!.id as Id,
@@ -45,6 +46,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 			collection(db, `StoryMapStates`, storyMapStateId, `Comments`),
 			where(`parentId`, `==`, parentId),
 			where(`type`, `==`, commentType),
+			orderBy(`createdAt`, `asc`),
 		).withConverter(CommentConverter),
 	)
 

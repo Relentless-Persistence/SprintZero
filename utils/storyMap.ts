@@ -122,6 +122,7 @@ export const addEpic = async (
 			sprintColumn: null,
 			updatedAt: null,
 			parentId: null,
+			updatedAtUserId: null,
 			versionId: null,
 			...data,
 		},
@@ -180,6 +181,7 @@ export const addFeature = async (
 			sprintColumn: null,
 			updatedAt: null,
 			keeperIds: null,
+			updatedAtUserId: null,
 			versionId: null,
 			...data,
 		},
@@ -211,6 +213,7 @@ export const sortFeatures = <T extends Feature>(features: T[]): T[] =>
 export const addStory = async (
 	storyMapState: QueryDocumentSnapshot<StoryMapState>,
 	currentVersionId: Id | `__ALL_VERSIONS__`,
+	userId: Id,
 	data: SetRequired<Partial<Story>, `parentId`>,
 ): Promise<void> => {
 	if (currentVersionId === `__ALL_VERSIONS__`) return
@@ -234,6 +237,7 @@ export const addStory = async (
 			points: 1,
 			sprintColumn: `productBacklog` as const,
 			updatedAt: Timestamp.now(),
+			updatedAtUserId: userId,
 			versionId: currentVersionId,
 
 			effort: null,

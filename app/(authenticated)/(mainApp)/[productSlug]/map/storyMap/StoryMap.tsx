@@ -18,6 +18,7 @@ import {useGenMeta} from "./meta"
 import Story from "./Story"
 import {avg} from "~/utils/math"
 import {addEpic, addFeature, addStory, deleteItem, sortFeatures, updateItem} from "~/utils/storyMap"
+import {useUser} from "~/utils/useUser"
 
 export type StoryMapProps = {
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
@@ -38,6 +39,7 @@ const StoryMap: FC<StoryMapProps> = ({
 	setItemsToBeDeleted,
 	onScroll,
 }) => {
+	const user = useUser()
 	const meta = useGenMeta({
 		storyMapState,
 		allVersions,
@@ -446,6 +448,7 @@ const StoryMap: FC<StoryMapProps> = ({
 								sprintColumn: featureBeingDragged.sprintColumn ?? (`productBacklog` as const),
 								updatedAt: serverTimestamp(),
 								parentId: hoveringFeature.id,
+								updatedAtUserId: user!.id as Id,
 								versionId: featureBeingDragged.versionId ?? currentVersionId,
 							},
 							allVersions,
@@ -674,8 +677,10 @@ const StoryMap: FC<StoryMapProps> = ({
 										<button
 											type="button"
 											onClick={() => {
-												if (meta.currentVersionId !== `__ALL_VERSIONS__`)
-													addStory(storyMapState, currentVersionId, {parentId: feature.id}).catch(console.error)
+												if (meta.currentVersionId !== `__ALL_VERSIONS__` && user)
+													addStory(storyMapState, currentVersionId, user.id as Id, {parentId: feature.id}).catch(
+														console.error,
+													)
 											}}
 											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#103001]"
 										>
@@ -685,7 +690,7 @@ const StoryMap: FC<StoryMapProps> = ({
 									)}
 
 									{stories.length > 0 && (
-										<div className="flex flex-col items-start gap-3 rounded-lg border border-[#0273b3] bg-[#f0f2f5] p-3">
+										<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-[#d0d0d0] bg-[#f0f2f5] p-3">
 											{stories.map((story) => (
 												<div key={story.id} className={clsx(dragInfo.itemBeingDraggedId === story.id && `invisible`)}>
 													<Story meta={meta} storyId={story.id} />
@@ -696,8 +701,10 @@ const StoryMap: FC<StoryMapProps> = ({
 												<button
 													type="button"
 													onClick={() => {
-														if (meta.currentVersionId !== `__ALL_VERSIONS__`)
-															addStory(storyMapState, currentVersionId, {parentId: feature.id}).catch(console.error)
+														if (meta.currentVersionId !== `__ALL_VERSIONS__` && user)
+															addStory(storyMapState, currentVersionId, user.id as Id, {parentId: feature.id}).catch(
+																console.error,
+															)
 													}}
 													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001]"
 												>

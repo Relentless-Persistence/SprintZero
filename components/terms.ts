@@ -1,16 +1,18 @@
-export const termsOfService = `SprintZero ("Software") is a software product owned and operated by Relentless Persistence Inc. ("we," "us," or "our"). These terms and conditions ("Terms") govern your access to and use of the Software. By accessing or using the Software, you agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use the Software.
+export const termsOfService = `Terms of Service
+
+SprintZero ("Software") is a software product owned and operated by Relentless Persistence Inc. ("we," "us," or "our"). These terms and conditions ("Terms") govern your access to and use of the Software. By accessing or using the Software, you agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use the Software.
 
 License
 Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to access and use the Software for your personal or internal business use. You may not use the Software for any other purpose, or allow any third party to access or use the Software, without our prior written consent.
 
 Use Restrictions
 You may not (and may not allow any third party to):
+• Modify, adapt, or hack the Software or otherwise attempt to gain unauthorized access to the Software or its related systems or networks.
+• Use the Software to send spam or otherwise duplicative or unsolicited messages.
+• Use the Software to store or transmit any malicious code, including viruses, worms, or Trojan horses.
+• Use the Software to store or transmit any personal data or sensitive information without complying with all applicable laws and regulations, including any applicable data protection laws.
+• Use the Software in any way that could interfere with, disrupt, or negatively affect the Software or the servers or networks that host the Software.
 
-Modify, adapt, or hack the Software or otherwise attempt to gain unauthorized access to the Software or its related systems or networks.
-Use the Software to send spam or otherwise duplicative or unsolicited messages.
-Use the Software to store or transmit any malicious code, including viruses, worms, or Trojan horses.
-Use the Software to store or transmit any personal data or sensitive information without complying with all applicable laws and regulations, including any applicable data protection laws.
-Use the Software in any way that could interfere with, disrupt, or negatively affect the Software or the servers or networks that host the Software.
 Intellectual Property
 The Software and all content and materials included on or within the Software, including but not limited to text, graphics, logos, images, and software, are the property of us or our licensors and are protected by copyright and other intellectual property laws. You may not use any content or materials on the Software for any commercial purpose without our prior written consent.
 

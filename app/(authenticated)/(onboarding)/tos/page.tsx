@@ -9,6 +9,7 @@ import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
 import LinkTo from "~/components/LinkTo"
+import {privacyPolicy} from "~/components/privacy"
 import {termsOfService} from "~/components/terms"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
@@ -51,7 +52,7 @@ const TosPage: FC = () => {
 					size="large"
 					readOnly
 					rows={15}
-					value={termsOfService}
+					value={termsOfService + `\n\n\n` + privacyPolicy}
 					className="grow !resize-none bg-[#eceef1] font-mono text-sm text-black"
 				/>
 

@@ -17,7 +17,7 @@
 		"incremental": true,
 		"strictNullChecks": true,
 		"baseUrl": ".",
-		"noUncheckedIndexedAccess": false,
+		"noUncheckedIndexedAccess": true,
 		"paths": {
 			"~/*": ["./*"]
 		},
