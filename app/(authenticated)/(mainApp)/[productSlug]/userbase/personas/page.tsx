@@ -1,7 +1,7 @@
 "use client"
 
 import {Breadcrumb, Input, Tabs} from "antd"
-import {addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
+import {Timestamp, addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
@@ -193,8 +193,9 @@ const PersonasPage: FC = () => {
 								onChange={(e) => setNewPersonaInput(e.target.value)}
 								onKeyDown={(e) => {
 									if (e.key === `Enter`) {
-										addDoc(collection(db, `Personas`), {
+										addDoc(collection(db, `Personas`).withConverter(PersonaConverter), {
 											changes: [],
+											createdAt: Timestamp.now(),
 											dayInTheLife: [],
 											description: ``,
 											frustrations: [],
@@ -205,7 +206,7 @@ const PersonasPage: FC = () => {
 											responsibilities: [],
 											tasks: [],
 											productId: activeProductId,
-										} satisfies Persona)
+										})
 											.then((ref) => {
 												setActiveTab(ref.id)
 												setNewPersonaInput(undefined)
