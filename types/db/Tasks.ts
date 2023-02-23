@@ -11,10 +11,11 @@ export const TaskSchema = z.object({
 			name: z.string(),
 		}),
 	),
-	board: z.enum([`backlog`, `doing`, `review`, `done`]),
+	status: z.enum([`backlog`, `doing`, `review`, `done`]),
 	description: z.string(),
 	dueDate: z.instanceof(Timestamp),
 	title: z.string(),
+	board: z.string(),
 
 	productId: idSchema,
 })

@@ -22,7 +22,11 @@ const TasksPage: FC = () => {
 
 	const activeProductId = useActiveProductId()
 	const [tasks, loading] = useCollection(
-		query(collection(db, `Tasks`), where(`productId`, `==`, activeProductId)).withConverter(TaskConverter),
+		query(
+			collection(db, `Tasks`),
+			where(`productId`, `==`, activeProductId),
+			where(`board`, `==`, activeBoard),
+		).withConverter(TaskConverter),
 	)
 
 	return (
@@ -77,10 +81,11 @@ const TasksPage: FC = () => {
 						if (editingTask === `new`) {
 							initialValues = {
 								actions: [],
-								board: `backlog`,
+								status: `backlog`,
 								description: ``,
 								dueDate: dayjs(),
 								title: ``,
+								board: activeBoard,
 							}
 						} else {
 							const task = tasks!.docs.find((task) => task.id === editingTask)!

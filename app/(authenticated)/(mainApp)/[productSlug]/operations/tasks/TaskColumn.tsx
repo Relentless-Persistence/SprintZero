@@ -18,7 +18,7 @@ const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 		<Card type="inner" title={title}>
 			<div className="flex flex-col gap-4">
 				{tasks.docs
-					.filter((task) => task.data().board === id)
+					.filter((task) => task.data().status === id)
 					.map((task) => (
 						<button
 							key={task.id}
