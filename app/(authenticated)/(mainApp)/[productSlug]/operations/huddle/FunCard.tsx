@@ -1,5 +1,5 @@
 import {AppleFilled, NotificationOutlined, SettingOutlined} from "@ant-design/icons"
-import {Avatar, Button, Card, DatePicker, Dropdown, Empty} from "antd"
+import {Avatar, Button, Card, DatePicker, Dropdown, Empty, Skeleton} from "antd"
 import axios from "axios"
 import dayjs from "dayjs"
 import Image from "next/image"
@@ -10,6 +10,7 @@ import type {MenuProps} from "antd"
 import type {FC} from "react"
 
 import SpotifyIcon from "./SpotifyIcon"
+
 interface AppleResult {
 	results: {
 		songs: {
@@ -42,6 +43,7 @@ const FunCard: FC = () => {
 	const [songClient, setSongClient] = useState(`apple`)
 	const [songUrl, setSongUrl] = useState(``)
 	const [showSong, setShowSong] = useState(false)
+	const [loading, setLoading] = useState(false)
 
 	const dateFormat = `MMMM DD, YYYY`
 
@@ -77,10 +79,9 @@ const FunCard: FC = () => {
 	]
 
 	const generateRandomDate = () => {
-		const currentYear = new Date().getFullYear()
-		const randomYear = Math.floor(Math.random() * (currentYear - 1960 + 1) + 1960)
+		const randomYear = Math.floor(Math.random() * (2022 - 1960) + 1960)
 		const randomMonth = Math.floor(Math.random() * 12)
-		const randomDay = Math.floor(Math.random() * new Date(randomYear, randomMonth + 1, 0).getDate() + 1)
+		const randomDay = Math.floor(Math.random() * (new Date(randomYear, randomMonth + 1, 0).getDate() - 1 + 1) + 1)
 		const randomDate = new Date(randomYear, randomMonth, randomDay)
 
 		// Output the random date in ISO format
@@ -88,6 +89,7 @@ const FunCard: FC = () => {
 	}
 
 	const getSongString = async () => {
+		setLoading(true)
 		if (date === null) {
 			return
 		}
@@ -144,6 +146,7 @@ const FunCard: FC = () => {
 		setClues(null)
 		setSongUrl(``)
 		setShowSong(false)
+		setLoading(false)
 	}
 
 	return (
@@ -170,6 +173,7 @@ const FunCard: FC = () => {
 						items,
 					}}
 					trigger={[`click`]}
+					placement="bottomRight"
 				>
 					<SettingOutlined />
 				</Dropdown>
@@ -177,7 +181,7 @@ const FunCard: FC = () => {
 		>
 			<div className="flex flex-col">
 				<div className="space-y-2">
-					<p className="font-semibold">Pick any date prior to today</p>
+					<p className="font-semibold">Pick any date prior to December 31, 2021</p>
 					<DatePicker
 						value={date}
 						onChange={(date) => setDate(date)}
@@ -219,9 +223,13 @@ const FunCard: FC = () => {
 					{clues && clues.length > 0 ? (
 						<ol className="w-full list-decimal space-y-1 pl-4">
 							{clues.map((clue: string, i: number) => (
-								<li key={i}>{clue}</li>
+								<li key={i} className="text-[16px]">
+									{clue}
+								</li>
 							))}
 						</ol>
+					) : loading ? (
+						<Skeleton active />
 					) : (
 						<div className="flex h-[226px] items-center justify-center">
 							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
