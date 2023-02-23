@@ -1,5 +1,3 @@
-"use client"
-
 import {Breadcrumb} from "antd"
 import {collection, query, where} from "firebase/firestore"
 import {useEffect, useRef} from "react"
@@ -10,8 +8,8 @@ import type {FC} from "react"
 import type {Product} from "~/types/db/Products"
 
 import Epic from "./Epic"
-import {matrixRect, pointerLocation} from "../globals"
-import PrioritiesMatrix from "../PrioritiesMatrix"
+import {matrixRect, pointerLocation} from "./globals"
+import PrioritiesMatrix from "./PrioritiesMatrix"
 import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {db} from "~/utils/firebase"
 import {getEpics} from "~/utils/storyMap"

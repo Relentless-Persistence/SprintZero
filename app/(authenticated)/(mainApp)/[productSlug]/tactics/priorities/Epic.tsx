@@ -1,5 +1,3 @@
-"use client"
-
 import {ReadOutlined} from "@ant-design/icons"
 import {doc, setDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
@@ -12,7 +10,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {matrixRect} from "../globals"
+import {matrixRect} from "./globals"
 import {db} from "~/utils/firebase"
 import {getEpics} from "~/utils/storyMap"
 

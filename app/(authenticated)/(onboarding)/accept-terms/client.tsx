@@ -14,7 +14,7 @@ import {termsOfService} from "~/components/terms"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
 
-const TosPage: FC = () => {
+const AcceptTermsClientPage: FC = () => {
 	const router = useRouter()
 	const [agree, setAgree] = useState(false)
 	const user = useUser()
@@ -81,4 +81,4 @@ const TosPage: FC = () => {
 	)
 }
 
-export default TosPage
+export default AcceptTermsClientPage

@@ -33,7 +33,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
 
-import StoryMap from "./storyMap/StoryMap"
+import StoryMap from "./StoryMap"
 import StoryMapHeader from "./StoryMapHeader"
 import VersionList from "./VersionList"
 import {HistoryConverter, HistorySchema} from "~/types/db/Histories"

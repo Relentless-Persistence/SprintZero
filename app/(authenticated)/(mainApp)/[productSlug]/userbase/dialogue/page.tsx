@@ -1,13 +1,14 @@
-"use client"
-
+import type {Metadata} from "next"
 import type {FC} from "react"
 
-export const metadata = {
+import DialogueClientPage from "./client"
+
+export const metadata: Metadata = {
 	title: `Dialogue | SprintZero`,
 }
 
 const DialoguePage: FC = () => {
-	return <div></div>
+	return <DialogueClientPage />
 }
 
 export default DialoguePage

@@ -12,7 +12,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import {matrixRect} from "../globals"
+import {matrixRect} from "./globals"
 import {db} from "~/utils/firebase"
 import {getFeatures} from "~/utils/storyMap"
 

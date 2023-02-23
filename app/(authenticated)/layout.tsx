@@ -28,8 +28,8 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
 		}
 		getDoc(doc(db, `Users`, user.uid).withConverter(UserConverter))
 			.then((dbUser) => {
-				if (!dbUser.data()?.hasAcceptedTos && pathname !== `/tos`) {
-					router.replace(`/tos`)
+				if (!dbUser.data()?.hasAcceptedTos && pathname !== `/accept-terms`) {
+					router.replace(`/accept-terms`)
 					return
 				}
 				setUserCanAccessApp(true)
