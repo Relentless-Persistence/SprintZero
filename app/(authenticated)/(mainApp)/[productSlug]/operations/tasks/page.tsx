@@ -103,6 +103,7 @@ const TasksPage: FC = () => {
 								...data,
 								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
 								productId: activeProductId,
+								board: activeBoard,
 							} satisfies Task)
 						} else {
 							await updateDoc(doc(db, `Tasks`, editingTask), {
