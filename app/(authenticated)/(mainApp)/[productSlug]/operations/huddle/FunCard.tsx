@@ -1,18 +1,26 @@
-import {NotificationOutlined} from "@ant-design/icons"
-import {Avatar, Button, Card, DatePicker, Skeleton} from "antd"
+import {AppleFilled, NotificationOutlined, SettingOutlined} from "@ant-design/icons"
+import {Avatar, Button, Card, DatePicker, Dropdown, Empty} from "antd"
 import axios from "axios"
 import dayjs from "dayjs"
 import Image from "next/image"
 import {useState} from "react"
 import {z} from "zod"
 
+import type {MenuProps} from "antd"
 import type {FC} from "react"
 
-interface Result {
+import SpotifyIcon from "./SpotifyIcon"
+interface AppleResult {
 	results: {
 		songs: {
 			data: Song[]
 		}
+	}
+}
+
+interface SpotifyResult {
+	tracks: {
+		items: SpotifySong[]
 	}
 }
 
@@ -22,14 +30,51 @@ interface Song {
 	}
 }
 
+interface SpotifySong {
+	external_urls: {
+		spotify: string
+	}
+}
+
 const FunCard: FC = () => {
 	const [date, setDate] = useState<dayjs.Dayjs | null>(null)
 	const [clues, setClues] = useState<string[] | null>(null)
+	const [songClient, setSongClient] = useState(`apple`)
 	const [songUrl, setSongUrl] = useState(``)
 	const [showSong, setShowSong] = useState(false)
-	const [loading, setLoading] = useState(false)
 
 	const dateFormat = `MMMM DD, YYYY`
+
+	const items: MenuProps["items"] = [
+		{
+			key: `1`,
+			label: (
+				<div
+					className="flex items-center space-x-[8px]"
+					onClick={() => {
+						onReset()
+						setSongClient(`apple`)
+					}}
+				>
+					<AppleFilled style={{color: `rgba(0, 0, 0, 0.45)`}} /> <span>Apple Music</span>
+				</div>
+			),
+		},
+		{
+			key: `2`,
+			label: (
+				<div
+					className="flex items-center space-x-[6px]"
+					onClick={() => {
+						onReset()
+						setSongClient(`spotify`)
+					}}
+				>
+					<SpotifyIcon /> <span>Spotify</span>
+				</div>
+			),
+		},
+	]
 
 	const generateRandomDate = () => {
 		const currentYear = new Date().getFullYear()
@@ -43,8 +88,6 @@ const FunCard: FC = () => {
 	}
 
 	const getSongString = async () => {
-		setLoading(true)
-
 		if (date === null) {
 			return
 		}
@@ -56,7 +99,6 @@ const FunCard: FC = () => {
 		const {response} = z.object({response: z.string()}).parse(res.data)
 
 		await getClues(response)
-		setLoading(false)
 		await getSong(response)
 	}
 
@@ -74,14 +116,27 @@ const FunCard: FC = () => {
 
 	const getSong = async (songString: string) => {
 		const newString = songString.replace(/^"/, ``).replace(/"$/, ``)
-		const res = await axios.post<Result>(`/api/fetchSong`, {
-			song: encodeURIComponent(newString),
-		})
-		const oldUrl = res.data.results.songs.data[0]?.attributes.url
-		if (!oldUrl) return
-		const domainIndex = oldUrl.indexOf(`music.apple.com`)
-		const newUrl = `https://embed.${oldUrl.slice(domainIndex)}`
-		setSongUrl(newUrl)
+
+		if (songClient === `apple`) {
+			const res = await axios.post<AppleResult>(`/api/songs/fetchAppleSong`, {
+				song: encodeURIComponent(newString),
+			})
+			const oldUrl = res.data.results.songs.data[0]?.attributes.url
+			if (!oldUrl) return
+			const domainIndex = oldUrl.indexOf(`music.apple.com`)
+			const newUrl = `https://embed.${oldUrl.slice(domainIndex)}`
+			setSongUrl(newUrl)
+		} else {
+			const res = await axios.post<SpotifyResult>(`/api/songs/fetchSpotifySong`, {
+				song: encodeURIComponent(newString),
+			})
+
+			const oldUrl = res.data.tracks.items[0]?.external_urls.spotify
+			if (!oldUrl) return
+			const trackId = oldUrl.slice(oldUrl.lastIndexOf(`/`) + 1)
+			const newUrl = `https://open.spotify.com/embed/track/${trackId}?utm_source=generator`
+			setSongUrl(newUrl)
+		}
 	}
 
 	const onReset = () => {
@@ -93,7 +148,6 @@ const FunCard: FC = () => {
 
 	return (
 		<Card
-			className=""
 			size="small"
 			type="inner"
 			title={
@@ -110,74 +164,99 @@ const FunCard: FC = () => {
 					</div>
 				</div>
 			}
+			extra={
+				<Dropdown
+					menu={{
+						items,
+					}}
+					trigger={[`click`]}
+				>
+					<SettingOutlined />
+				</Dropdown>
+			}
 		>
-			<div className="space-y-2">
-				<p className="font-semibold">Pick any date prior to today</p>
-				<DatePicker
-					value={date}
-					onChange={(date) => setDate(date)}
-					format={dateFormat}
-					className="w-full"
-					placeholder="1982-02-13"
-				/>
+			<div className="flex flex-col">
+				<div className="space-y-2">
+					<p className="font-semibold">Pick any date prior to today</p>
+					<DatePicker
+						value={date}
+						onChange={(date) => setDate(date)}
+						format={dateFormat}
+						className="w-full"
+						placeholder="1982-02-13"
+					/>
 
-				<div className="flex items-center justify-between">
-					<Button
-						size="small"
-						style={{width: `113px`}}
-						icon={<Image src="/images/shuffle.svg" alt="shuffle" width={16} height={16} />}
-						className="flex items-center justify-between"
-						onClick={generateRandomDate}
-					>
-						Randomize
-					</Button>
-					<div className="space-x-2 text-right">
-						<Button type="link" disabled={date === null} onClick={onReset}>
-							Reset
-						</Button>
+					<div className="flex items-center justify-between">
 						<Button
 							size="small"
-							onClick={() => {
-								getSongString().catch(console.error)
-							}}
-							disabled={date === null}
+							style={{width: `113px`}}
+							icon={<Image src="/images/shuffle.svg" alt="shuffle" width={16} height={16} />}
+							className="flex items-center justify-between"
+							onClick={generateRandomDate}
 						>
-							Submit
+							Randomize
 						</Button>
+						<div className="space-x-2 text-right">
+							<Button type="link" disabled={date === null} onClick={onReset}>
+								Reset
+							</Button>
+							<Button
+								size="small"
+								onClick={() => {
+									getSongString().catch(console.error)
+								}}
+								disabled={date === null}
+							>
+								Submit
+							</Button>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div className="mt-4 space-y-2">
-				<p className="font-semibold">Clues</p>
+				<div className="mt-4 min-h-[226px] space-y-2">
+					<p className="font-semibold">Clues</p>
 
-				{clues && clues.length > 0 ? (
-					<ol className="w-full list-decimal space-y-1 pl-4">
-						{clues.map((clue: string, i: number) => (
-							<li key={i}>{clue}</li>
-						))}
-					</ol>
-				) : (
-					<Skeleton active={loading} />
-				)}
-			</div>
-
-			<div className="mt-4 space-y-3">
-				<p className="font-semibold">Answer</p>
-				<div>
-					{showSong ? (
-						<iframe
-							allow="autoplay *; encrypted-media *;"
-							height="190"
-							style={{width: `100%`, maxWidth: `660px`, background: `transparent`}}
-							sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-							src={songUrl}
-						></iframe>
+					{clues && clues.length > 0 ? (
+						<ol className="w-full list-decimal space-y-1 pl-4">
+							{clues.map((clue: string, i: number) => (
+								<li key={i}>{clue}</li>
+							))}
+						</ol>
 					) : (
-						<Button block disabled={songUrl === ``} onClick={() => setShowSong(true)}>
-							Reveal
-						</Button>
+						<div className="flex h-[226px] items-center justify-center">
+							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
+						</div>
 					)}
+				</div>
+
+				<div className="mt-4 w-full space-y-3">
+					<p className="font-semibold">Answer</p>
+					<div className="">
+						{showSong ? (
+							songClient === `apple` ? (
+								<iframe
+									allow="autoplay *; encrypted-media *;"
+									height="192"
+									style={{width: `100%`, maxWidth: `660px`, background: `transparent`}}
+									sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+									src={songUrl}
+								></iframe>
+							) : (
+								<iframe
+									style={{borderRadius: `12px`}}
+									src={songUrl}
+									width="100%"
+									height="112"
+									allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+									loading="lazy"
+								></iframe>
+							)
+						) : (
+							<Button block disabled={songUrl === ``} onClick={() => setShowSong(true)}>
+								Reveal
+							</Button>
+						)}
+					</div>
 				</div>
 			</div>
 		</Card>
