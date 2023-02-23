@@ -1,9 +1,8 @@
-import type {Metadata} from "next"
 import type {FC} from "react"
 
 import DialogueClientPage from "./client"
 
-export const metadata: Metadata = {
+export const metadata = {
 	title: `Dialogue | SprintZero`,
 }
 

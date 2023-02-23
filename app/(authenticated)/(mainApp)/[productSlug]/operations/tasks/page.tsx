@@ -1,9 +1,8 @@
-import type {Metadata} from "next"
 import type {FC} from "react"
 
 import TasksClientPage from "./client"
 
-export const metadata: Metadata = {
+export const metadata = {
 	title: `Tasks | SprintZero`,
 }
 
