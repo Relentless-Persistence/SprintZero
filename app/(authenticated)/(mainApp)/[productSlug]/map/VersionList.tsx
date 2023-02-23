@@ -2,7 +2,6 @@
 
 import {MinusCircleOutlined} from "@ant-design/icons"
 import {Input, Tabs} from "antd"
-import clsx from "clsx"
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
 import {useEffect} from "react"
 
@@ -92,7 +91,7 @@ const VersionList: FC<VersionListProps> = ({
 										})
 									}}
 								>
-									<MinusCircleOutlined className="!mr-0" />
+									<MinusCircleOutlined className="!mr-0 text-[#ff4d4f]" />
 								</button>
 							)}
 						</div>
@@ -127,6 +126,9 @@ const VersionList: FC<VersionListProps> = ({
 														})
 														.catch(console.error)
 											}}
+											onKeyDown={(e) => {
+												if (e.key === `Escape`) setNewVersionInputValue(undefined)
+											}}
 											className="-mx-2 -my-2 w-[calc(100%+1rem)]"
 										/>
 									),
@@ -134,10 +136,7 @@ const VersionList: FC<VersionListProps> = ({
 						  ]
 						: [],
 				)}
-			className={clsx(
-				`h-full min-w-0 [&>.ant-tabs-nav]:w-full [&_.ant-tabs-tab-btn]:w-full`,
-				editMode && `[&_.ant-tabs-tab-btn>*:not([data-all])]:text-[#ff4d4f]`,
-			)}
+			className="h-full min-w-0 [&>.ant-tabs-nav]:w-full [&_.ant-tabs-tab-btn]:w-full"
 		/>
 	)
 }

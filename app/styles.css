@@ -83,3 +83,8 @@ button.ant-btn-link {
 	padding: unset;
 	height: auto;
 }
+
+input {
+	outline-color: rgb(28 42 5 / 30%);
+	outline-offset: 1px;
+}

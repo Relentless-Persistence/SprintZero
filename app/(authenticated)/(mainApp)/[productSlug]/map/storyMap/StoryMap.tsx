@@ -439,9 +439,9 @@ const StoryMap: FC<StoryMapProps> = ({
 								branchName: featureBeingDragged.branchName,
 								bugs: featureBeingDragged.bugs ?? [],
 								createdAt: Timestamp.now(),
-								designEffort: featureBeingDragged.designEffort ?? 0,
+								designEffort: featureBeingDragged.designEffort ?? 1,
 								designLink: featureBeingDragged.designLink,
-								engineeringEffort: featureBeingDragged.engineeringEffort ?? 0,
+								engineeringEffort: featureBeingDragged.engineeringEffort ?? 1,
 								ethicsApproved: featureBeingDragged.ethicsApproved,
 								ethicsColumn: featureBeingDragged.ethicsColumn,
 								ethicsVotes: featureBeingDragged.ethicsVotes ?? [],
@@ -580,6 +580,11 @@ const StoryMap: FC<StoryMapProps> = ({
 		else if (x > window.innerWidth - 144) onScroll(Math.min(10, (x - window.innerWidth + 144) / 10))
 	})
 
+	const [isInitialRender, setIsInitialRender] = useState(true)
+	useEffect(() => {
+		setIsInitialRender(false)
+	}, [])
+
 	return (
 		<motion.div
 			className="relative z-10 flex w-max items-start gap-8"
@@ -606,7 +611,7 @@ const StoryMap: FC<StoryMapProps> = ({
 					className={clsx(`grid justify-items-center gap-x-6`, dragInfo.itemBeingDraggedId === epic.id && `invisible`)}
 					style={{gridTemplateColumns: `repeat(${epic.childrenIds.length}, auto)`}}
 				>
-					<Epic meta={meta} epicId={epic.id} />
+					<Epic meta={meta} epicId={epic.id} isInitialRender={isInitialRender} />
 
 					{/* Pad out the remaining columns in row 1 */}
 					{Array(Math.max(epic.childrenIds.length - 1, 0))
@@ -669,7 +674,7 @@ const StoryMap: FC<StoryMapProps> = ({
 										dragInfo.itemBeingDraggedId === feature.id && `invisible`,
 									)}
 								>
-									<Feature meta={meta} featureId={feature.id} />
+									<Feature meta={meta} featureId={feature.id} isInitialRender={isInitialRender} />
 
 									{((meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode) || feature.childrenIds.length > 0) && (
 										<div className="h-8 w-px border border-[#d0d0d0]" />
@@ -684,7 +689,7 @@ const StoryMap: FC<StoryMapProps> = ({
 														console.error,
 													)
 											}}
-											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#103001]"
+											className="flex items-center gap-2 rounded border border-dashed border-[#d9d9d9] bg-white px-2 py-1 font-medium"
 										>
 											<FileOutlined />
 											<span>Add story</span>
@@ -695,7 +700,7 @@ const StoryMap: FC<StoryMapProps> = ({
 										<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-[#d0d0d0] bg-[#f0f2f5] p-3">
 											{stories.map((story) => (
 												<div key={story.id} className={clsx(dragInfo.itemBeingDraggedId === story.id && `invisible`)}>
-													<Story meta={meta} storyId={story.id} />
+													<Story meta={meta} storyId={story.id} isInitialRender={isInitialRender} />
 												</div>
 											))}
 
@@ -708,7 +713,7 @@ const StoryMap: FC<StoryMapProps> = ({
 																console.error,
 															)
 													}}
-													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-[currentColor] bg-white px-2 py-1 font-medium text-[#103001]"
+													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-[#d9d9d9] bg-white px-2 py-1 font-medium"
 												>
 													<FileOutlined />
 													<span>Add story</span>

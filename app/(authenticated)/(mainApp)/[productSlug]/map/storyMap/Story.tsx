@@ -14,9 +14,10 @@ export type StoryProps = {
 	meta: StoryMapMeta
 	storyId: Id
 	inert?: boolean
+	isInitialRender?: boolean
 }
 
-const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
+const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) => {
 	const story = meta.stories.find((story) => story.id === storyId)!
 
 	const contentRef = useRef<HTMLDivElement>(null)
@@ -37,12 +38,14 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
 		setLocalStoryName(story.name)
 	}, [story.name])
 
+	const [hasBlurred, setHasBlurred] = useState(isInitialRender)
+
 	return (
 		<div
 			className={clsx(
-				`flex touch-none select-none items-center gap-1 overflow-hidden rounded border border-current bg-white pr-1`,
+				`flex touch-none select-none items-center gap-1 overflow-hidden rounded border border-[#d9d9d9] bg-white pr-1 font-medium`,
 				inert && `cursor-grabbing`,
-				meta.editMode ? `text-[#ff4d4f]` : `cursor-grab border-[#103001] active:cursor-grabbing`,
+				!meta.editMode && `cursor-grab  active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
@@ -50,25 +53,34 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false}) => {
 				type="button"
 				onClick={() => setIsDrawerOpen(true)}
 				onPointerDownCapture={(e) => e.stopPropagation()}
-				className={clsx(`border-r border-current p-2 text-[0.6rem]`, meta.editMode ? `bg-[#fff1f0]` : `bg-[#f5f5f5]`)}
+				className="border-r border-[#d9d9d9] bg-[#f5f5f5] p-2 text-[0.6rem]"
 			>
 				<p className="max-h-8 truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 			</button>
-			<div className="relative mx-auto min-w-[1rem] font-medium">
-				<p className="mx-1">{localStoryName || `_`}</p>
-				<input
-					value={localStoryName}
-					className="absolute inset-0 mx-1"
-					onChange={(e) => {
-						setLocalStoryName(e.target.value)
-						updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(console.error)
-					}}
-					onPointerDownCapture={(e) => e.stopPropagation()}
-				/>
-			</div>
+			{(hasBlurred || inert) && !meta.editMode ? (
+				<p className="mx-1">{localStoryName}</p>
+			) : (
+				<div className="relative mx-auto min-w-[1rem]">
+					<p className="mx-1">{localStoryName || `_`}</p>
+					<input
+						value={localStoryName}
+						autoFocus={!isInitialRender && !meta.editMode}
+						onBlur={() => setHasBlurred(true)}
+						onKeyDown={(e) => {
+							if (e.key === `Enter`) setHasBlurred(true)
+						}}
+						className="absolute inset-0 mx-1"
+						onChange={(e) => {
+							setLocalStoryName(e.target.value)
+							updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(console.error)
+						}}
+						onPointerDownCapture={(e) => e.stopPropagation()}
+					/>
+				</div>
+			)}
 			{meta.editMode && (
 				<button type="button" onClick={() => meta.markForDeletion(storyId)}>
-					<MinusCircleOutlined className="mr-1" />
+					<MinusCircleOutlined className="mr-1 text-[#ff4d4f]" />
 				</button>
 			)}
 

@@ -13,9 +13,10 @@ export type EpicProps = {
 	meta: StoryMapMeta
 	epicId: Id
 	inert?: boolean
+	isInitialRender?: boolean
 }
 
-const Epic: FC<EpicProps> = ({meta, epicId, inert = false}) => {
+const Epic: FC<EpicProps> = ({meta, epicId, inert = false, isInitialRender = false}) => {
 	const epic = meta.epics.find((epic) => epic.id === epicId)!
 
 	const contentRef = useRef<HTMLDivElement>(null)
@@ -33,16 +34,40 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false}) => {
 		setLocalEpicName(epic.name)
 	}, [epic.name])
 
+	const [hasBlurred, setHasBlurred] = useState(isInitialRender)
+
 	return (
 		<div
 			className={clsx(
-				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium`,
+				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#4f2dc8]`,
 				inert && `cursor-grabbing`,
-				meta.editMode ? `text-[#ff4d4f]` : `cursor-grab text-[#4f2dc8] active:cursor-grabbing`,
+				!meta.editMode && `cursor-grab active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
-			{meta.editMode ? (
+			<ReadOutlined />
+			{(hasBlurred || inert) && !meta.editMode ? (
+				<p>{localEpicName}</p>
+			) : (
+				<div className="relative min-w-[1rem]">
+					<p>{localEpicName || `_`}</p>
+					<input
+						value={localEpicName}
+						autoFocus={!isInitialRender && !meta.editMode}
+						onBlur={() => setHasBlurred(true)}
+						onKeyDown={(e) => {
+							if (e.key === `Enter`) setHasBlurred(true)
+						}}
+						className="absolute inset-0"
+						onChange={(e) => {
+							setLocalEpicName(e.target.value)
+							updateItem(meta.storyMapState, epic.id, {name: e.target.value}, meta.allVersions).catch(console.error)
+						}}
+						onPointerDownCapture={(e) => e.stopPropagation()}
+					/>
+				</div>
+			)}
+			{meta.editMode && (
 				<button
 					type="button"
 					onClick={() => {
@@ -54,23 +79,9 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false}) => {
 						})
 					}}
 				>
-					<MinusCircleOutlined />
+					<MinusCircleOutlined className="text-sm text-[#ff4d4f]" />
 				</button>
-			) : (
-				<ReadOutlined />
 			)}
-			<div className="relative min-w-[1rem]">
-				<p>{localEpicName || `_`}</p>
-				<input
-					value={localEpicName}
-					className="absolute inset-0"
-					onChange={(e) => {
-						setLocalEpicName(e.target.value)
-						updateItem(meta.storyMapState, epic.id, {name: e.target.value}, meta.allVersions).catch(console.error)
-					}}
-					onPointerDownCapture={(e) => e.stopPropagation()}
-				/>
-			</div>
 		</div>
 	)
 }
