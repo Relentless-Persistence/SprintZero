@@ -1,10 +1,12 @@
 "use client"
 
 import {Button} from "antd"
+import axios from "axios"
 import {addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
+import {type} from "os"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import invariant from "tiny-invariant"
@@ -35,6 +37,14 @@ type FormInputs = Pick<
 	email3: string | null
 }
 
+type EmailRequest = {
+	to: string
+	from: string
+	subject: string
+	body: string
+	attachments?: string[]
+}
+
 const ProductSetupPage: FC = () => {
 	const [user] = useAuthState(auth)
 	invariant(user, `User must be logged in`)
@@ -44,6 +54,31 @@ const ProductSetupPage: FC = () => {
 	const [hasSubmitted, setHasSubmitted] = useState(false)
 
 	const router = useRouter()
+
+	const sendEmailInvites = async (recipients: (string | null)[]) => {
+		const from = `no-reply@sprintzero.app`
+		const subject = `You are invited to join SprintZero`
+		const body = `Dummy invite email text. If you've received this email, it means the email inivite is now working when onboarding.`
+
+		for (const recipient of recipients) {
+			if (!recipient) continue
+
+			const payload: EmailRequest = {
+				to: recipient,
+				from,
+				subject: `${subject}`,
+				body: `${body}`,
+			}
+
+			try {
+				await axios.post(`/api/emails/send`, payload)
+				console.log(`Email sent successfully to ${recipient}!`)
+			} catch (error) {
+				console.error(`Error sending email to ${recipient}:`, error)
+			}
+		}
+	}
+
 	const submitForm = async (_data: FormInputs) => {
 		if (hasSubmitted) return
 		setHasSubmitted(true)
@@ -128,6 +163,8 @@ const ProductSetupPage: FC = () => {
 				productId: slug,
 			}),
 		])
+
+		sendEmailInvites([email1, email2, email3])
 
 		router.push(`/${slug}/map`)
 	}
