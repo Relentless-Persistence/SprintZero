@@ -14,6 +14,8 @@ steps:
       - "APPLE_KEY_ID=${_APPLE_KEY_ID}"
       - "APPLE_TEAM_ID=${_APPLE_TEAM_ID}"
       - "OPENAI_API_KEY=${_OPENAI_API_KEY}"
+      - "SPOTIFY_CLIENT_ID=${_SPOTIFY_CLIENT_ID}"
+      - "SPOTIFY_CLIENT_SECRET=${_SPOTIFY_CLIENT_SECRET}"
   - name: "gcr.io/kaniko-project/executor:latest"
     args:
       - --destination=gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA
