@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useQueries} from "@tanstack/react-query"
-import {Button, Checkbox, Drawer, Form, Input, Segmented, Tag} from "antd"
+import {Avatar, Button, Checkbox, Drawer, Form, Input, Popover, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import {Timestamp, doc, getDoc} from "firebase/firestore"
@@ -95,7 +95,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 		})),
 	})
 
-	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
+	const {control, handleSubmit, getFieldState, formState, reset} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -221,9 +221,29 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								<Tag color="#585858" icon={<FlagOutlined />}>
 									{sprintColumns[story.sprintColumn]}
 								</Tag>
-								<Tag color="#585858" icon={<UserOutlined />}>
-									{story.peopleIds.length}
-								</Tag>
+								<Popover
+									placement="bottom"
+									content={
+										<div className="flex flex-col gap-2">
+											{story.peopleIds
+												.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
+												.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
+												.map((user) => (
+													<div
+														key={user.id}
+														className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2 text-[#545454]"
+													>
+														<Avatar src={user.data().avatar} shape="square" size="small" />
+														{user.data().name}
+													</div>
+												))}
+										</div>
+									}
+								>
+									<Tag color="#585858" icon={<UserOutlined />} className="text-sm">
+										{story.peopleIds.length}
+									</Tag>
+								</Popover>
 
 								<div className="absolute left-1/2 top-0 -translate-x-1/2">
 									<Tag
@@ -264,7 +284,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 				<div className="flex items-center gap-4">
 					{editMode ? (
 						<>
-							<Button onClick={() => setEditMode(false)}>Cancel</Button>
+							<Button
+								onClick={() => {
+									setEditMode(false)
+									reset()
+								}}
+							>
+								Cancel
+							</Button>
 							<Button type="primary" htmlType="submit" form="story-form" className="bg-green">
 								Done
 							</Button>
