@@ -12,6 +12,10 @@ import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
+export const metadata = {
+	title: `Priorities | SprintZero`,
+}
+
 const PrioritiesPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))

@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 import {Breadcrumb, Card} from "antd"
 import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc, where} from "firebase/firestore"
@@ -16,6 +16,10 @@ import {PersonaConverter} from "~/types/db/Personas"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+
+export const metadata = {
+	title: `Kickoff | SprintZero`,
+}
 
 const KickoffPage: FC = () => {
 	const activeProductId = useActiveProductId()

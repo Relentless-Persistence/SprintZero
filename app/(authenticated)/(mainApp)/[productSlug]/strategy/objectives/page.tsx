@@ -17,6 +17,10 @@ import {ResultConverter} from "~/types/db/Results"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
+export const metadata = {
+	title: `Objectives | SprintZero`,
+}
+
 const ObjectivesPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<Id | undefined>(undefined)

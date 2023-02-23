@@ -16,6 +16,10 @@ import {TaskConverter} from "~/types/db/Tasks"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
+export const metadata = {
+	title: `Tasks | SprintZero`,
+}
+
 const TasksPage: FC = () => {
 	const [activeBoard, setActiveBoard] = useState(`0`)
 	const [editingTask, setEditingTask] = useState<Id | `new` | undefined>(undefined)

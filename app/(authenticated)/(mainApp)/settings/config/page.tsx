@@ -14,6 +14,10 @@ import {db} from "~/utils/firebase"
 import roundToNearest from "~/utils/roundToNearest"
 import {useUser} from "~/utils/useUser"
 
+export const metadata = {
+	title: `Config Settings | SprintZero`,
+}
+
 const ConfigSettingsPage: FC = () => {
 	const user = useUser()
 	const [allProducts] = useCollection(

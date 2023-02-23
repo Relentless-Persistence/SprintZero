@@ -6,6 +6,10 @@ import type {FC} from "react"
 
 import {useUser} from "~/utils/useUser"
 
+export const metadata = {
+	title: `Account Settings | SprintZero`,
+}
+
 const AccountSettingsPage: FC = () => {
 	const user = useUser()
 

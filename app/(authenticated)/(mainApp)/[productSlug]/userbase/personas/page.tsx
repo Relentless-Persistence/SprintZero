@@ -14,6 +14,10 @@ import {PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
+export const metadata = {
+	title: `Personas | SprintZero`,
+}
+
 const PersonasPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeTab, setActiveTab] = useState(`add`)

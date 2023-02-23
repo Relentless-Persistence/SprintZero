@@ -22,15 +22,9 @@ import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const tabs = [
-	{key: `0`, label: `Today`},
-	{key: `1`, label: `Yesterday`},
-	{key: `2`, label: `2 days ago`},
-	{key: `3`, label: `3 days ago`},
-	{key: `7`, label: `1 week ago`},
-	{key: `14`, label: `2 weeks ago`},
-	{key: `30`, label: `1 month ago`},
-] as const
+export const metadata = {
+	title: `Huddle | SprintZero`,
+}
 
 const HuddlePage: FC = () => {
 	const activeProductId = useActiveProductId()
@@ -282,3 +276,13 @@ const HuddlePage: FC = () => {
 }
 
 export default HuddlePage
+
+const tabs = [
+	{key: `0`, label: `Today`},
+	{key: `1`, label: `Yesterday`},
+	{key: `2`, label: `2 days ago`},
+	{key: `3`, label: `3 days ago`},
+	{key: `7`, label: `1 week ago`},
+	{key: `14`, label: `2 weeks ago`},
+	{key: `30`, label: `1 month ago`},
+] as const

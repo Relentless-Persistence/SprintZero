@@ -14,11 +14,9 @@ import {LearningConverter} from "~/types/db/Learnings"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const tabNames = {
-	validated: `Validated`,
-	assumed: `Assumed`,
-	disproven: `Disproven`,
-} as const
+export const metadata = {
+	title: `Learnings | SprintZero`,
+}
 
 const LearningsPage: FC = () => {
 	const [currentTab, setCurrentTab] = useState<keyof typeof tabNames>(`validated`)
@@ -81,3 +79,9 @@ const LearningsPage: FC = () => {
 }
 
 export default LearningsPage
+
+const tabNames = {
+	validated: `Validated`,
+	assumed: `Assumed`,
+	disproven: `Disproven`,
+} as const

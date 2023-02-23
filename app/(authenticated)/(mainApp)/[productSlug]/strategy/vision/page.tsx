@@ -26,6 +26,10 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
 
+export const metadata = {
+	title: `Vision | SprintZero`,
+}
+
 const VisionsPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))

@@ -13,6 +13,10 @@ import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
 
+export const metadata = {
+	title: `Team Settings | SprintZero`,
+}
+
 const TeamSettingsPage: FC = () => {
 	const user = useUser()
 	const [allProducts] = useCollectionData(

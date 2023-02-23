@@ -17,11 +17,8 @@ import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const findPreviousOccurenceOfDayOfWeek = (date: Dayjs, dayOfWeek: number) => {
-	const currentDay = date.day()
-	const daysUntilTarget = (currentDay - dayOfWeek + 7) % 7
-	const previousOccurence = date.subtract(daysUntilTarget, `day`)
-	return previousOccurence.startOf(`day`)
+export const metadata = {
+	title: `Sprint | SprintZero`,
 }
 
 const SprintPage: FC = () => {
@@ -121,3 +118,10 @@ const SprintPage: FC = () => {
 }
 
 export default SprintPage
+
+const findPreviousOccurenceOfDayOfWeek = (date: Dayjs, dayOfWeek: number) => {
+	const currentDay = date.day()
+	const daysUntilTarget = (currentDay - dayOfWeek + 7) % 7
+	const previousOccurence = date.subtract(daysUntilTarget, `day`)
+	return previousOccurence.startOf(`day`)
+}

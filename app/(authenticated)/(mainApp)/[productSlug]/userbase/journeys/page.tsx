@@ -16,6 +16,10 @@ import {JourneyConverter, durationUnits} from "~/types/db/Journeys"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
+export const metadata = {
+	title: `Journeys | SprintZero`,
+}
+
 const JourneysPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [journeys, loading] = useCollection(

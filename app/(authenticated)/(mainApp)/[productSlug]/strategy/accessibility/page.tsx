@@ -14,6 +14,10 @@ import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
+export const metadata = {
+	title: `Accessibility | SprintZero`,
+}
+
 const AccessibilityPage: FC = () => {
 	const activeProductId = useActiveProductId()
 

@@ -13,6 +13,10 @@ import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
+export const metadata = {
+	title: `Ethics | SprintZero`,
+}
+
 const EthicsPage: FC = () => {
 	const activeProductId = useActiveProductId()
 	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))

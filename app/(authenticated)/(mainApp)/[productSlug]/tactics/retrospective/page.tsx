@@ -20,6 +20,10 @@ import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
 
+export const metadata = {
+	title: `Retrospective | SprintZero`,
+}
+
 const RetrospectivePage: FC = () => {
 	const user = useUser()
 
