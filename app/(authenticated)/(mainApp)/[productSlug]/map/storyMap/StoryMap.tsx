@@ -689,7 +689,7 @@ const StoryMap: FC<StoryMapProps> = ({
 														console.error,
 													)
 											}}
-											className="flex items-center gap-2 rounded border border-dashed border-[#d9d9d9] bg-white px-2 py-1 font-medium"
+											className="flex items-center gap-2 rounded border border-dashed border-gray bg-white px-2 py-1 font-medium"
 										>
 											<FileOutlined />
 											<span>Add story</span>
@@ -713,7 +713,7 @@ const StoryMap: FC<StoryMapProps> = ({
 																console.error,
 															)
 													}}
-													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-[#d9d9d9] bg-white px-2 py-1 font-medium"
+													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-gray bg-white px-2 py-1 font-medium"
 												>
 													<FileOutlined />
 													<span>Add story</span>

@@ -26,7 +26,7 @@ import {db} from "./firebase"
 import {avg} from "./math"
 import {HistoryConverter} from "~/types/db/Histories"
 
-const addHistoryEntry = debounce(async (storyMapState: QueryDocumentSnapshot<StoryMapState>) => {
+export const addHistoryEntry = debounce(async (storyMapState: QueryDocumentSnapshot<StoryMapState>) => {
 	const newItems = await getDoc(storyMapState.ref)
 	if (!newItems.exists()) throw new Error(`Failed to add epic`)
 	await Promise.all([

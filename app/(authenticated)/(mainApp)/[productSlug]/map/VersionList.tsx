@@ -5,12 +5,13 @@ import {Input, Tabs} from "antd"
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
 import {useEffect} from "react"
 
-import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
+import type {DocumentReference, QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {Dispatch, FC, SetStateAction} from "react"
 import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
+import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 
 export type VersionListProps = {
@@ -43,7 +44,7 @@ const VersionList: FC<VersionListProps> = ({
 			setCurrentVersionId(allVersions.docs[0].id as Id)
 	}, [currentVersionId, setCurrentVersionId, allVersions.docs])
 
-	const addVersion = async (): Promise<void> => {
+	const addVersion = async (): Promise<DocumentReference<Version>> => {
 		if (!newVersionInputValue) throw new Error(`Version name is required.`)
 		const existingDoc = (
 			await getDocs(
@@ -58,7 +59,10 @@ const VersionList: FC<VersionListProps> = ({
 		const data: Version = {
 			name: newVersionInputValue,
 		}
-		await addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`), data)
+		return await addDoc(
+			collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter),
+			data,
+		)
 	}
 
 	return (
@@ -121,8 +125,9 @@ const VersionList: FC<VersionListProps> = ({
 											onPressEnter={() => {
 												if (newVersionInputValue)
 													addVersion()
-														.then(() => {
+														.then((doc) => {
 															setNewVersionInputValue(undefined)
+															setCurrentVersionId(doc.id as Id)
 														})
 														.catch(console.error)
 											}}

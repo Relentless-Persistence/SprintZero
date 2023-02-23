@@ -17,6 +17,8 @@ import {
 	collection,
 	deleteDoc,
 	doc,
+	documentId,
+	getDocs,
 	orderBy,
 	query,
 	serverTimestamp,
@@ -39,7 +41,7 @@ import {ProductConverter} from "~/types/db/Products"
 import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
-import {deleteItem} from "~/utils/storyMap"
+import {addHistoryEntry, deleteItem} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMapPage: FC = () => {
@@ -82,10 +84,11 @@ const StoryMapPage: FC = () => {
 
 		const newItems: StoryMapState[`items`] = {}
 		for (const [id, value] of Object.entries(nextHistory.data().items)) {
-			newItems[id as Id] = {
-				...storyMapState.data().items[id as Id],
-				...HistorySchema.shape.items.element.parse(value),
-			} as Epic | Feature | Story
+			if (storyMapState.data().items[id as Id])
+				newItems[id as Id] = {
+					...storyMapState.data().items[id as Id],
+					...HistorySchema.shape.items.element.parse(value),
+				} as Epic | Feature | Story
 		}
 
 		const batch = writeBatch(db)
@@ -109,10 +112,11 @@ const StoryMapPage: FC = () => {
 
 		const newItems: StoryMapState[`items`] = {}
 		for (const [id, value] of Object.entries(lastHistory.data().items)) {
-			newItems[id as Id] = {
-				...storyMapState.data().items[id as Id],
-				...HistorySchema.shape.items.element.parse(value),
-			} as Epic | Feature | Story
+			if (storyMapState.data().items[id as Id])
+				newItems[id as Id] = {
+					...storyMapState.data().items[id as Id],
+					...HistorySchema.shape.items.element.parse(value),
+				} as Epic | Feature | Story
 		}
 
 		const batch = writeBatch(db)
@@ -187,13 +191,29 @@ const StoryMapPage: FC = () => {
 								icon={<CheckOutlined />}
 								type="primary"
 								onClick={() => {
-									setEditMode(false)
-									itemsToBeDeleted.forEach((id) => {
-										deleteItem(storyMapState!, id).catch(console.error)
-									})
-									versionsToBeDeleted.forEach((id) => {
-										deleteDoc(doc(db, `StoryMapStates`, storyMapState!.id, `Versions`, id)).catch(console.error)
-									})
+									Promise.all([
+										itemsToBeDeleted.map((id) => deleteItem(storyMapState!, id)),
+										versionsToBeDeleted.map((id) =>
+											deleteDoc(doc(db, `StoryMapStates`, storyMapState!.id, `Versions`, id)),
+										),
+										(async () => {
+											if (!storyMapState?.exists()) return
+											const histories = await getDocs(
+												query(
+													collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(
+														HistoryConverter,
+													),
+													where(documentId(), `==`, storyMapState.data().currentHistoryId),
+												),
+											)
+											await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
+											await addHistoryEntry(storyMapState)
+										})(),
+									])
+										.then(() => {
+											setEditMode(false)
+										})
+										.catch(console.error)
 								}}
 							/>
 						</Tooltip>
