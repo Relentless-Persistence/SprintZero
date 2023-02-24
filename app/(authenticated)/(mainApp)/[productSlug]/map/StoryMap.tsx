@@ -1,6 +1,6 @@
 import {CopyOutlined, FileOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {Timestamp, serverTimestamp} from "firebase/firestore"
+import {Timestamp} from "firebase/firestore"
 import {motion, useAnimationFrame, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
@@ -446,8 +446,8 @@ const StoryMap: FC<StoryMapProps> = ({
 								ethicsColumn: featureBeingDragged.ethicsColumn,
 								ethicsVotes: featureBeingDragged.ethicsVotes ?? [],
 								pageLink: featureBeingDragged.pageLink,
-								sprintColumn: featureBeingDragged.sprintColumn ?? (`productBacklog` as const),
-								updatedAt: serverTimestamp(),
+								sprintColumn: featureBeingDragged.sprintColumn ?? (`releaseBacklog` as const),
+								updatedAt: Timestamp.now(),
 								parentId: hoveringFeature.id,
 								peopleIds: featureBeingDragged.peopleIds ?? [],
 								updatedAtUserId: user!.id as Id,

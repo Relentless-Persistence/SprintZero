@@ -6,6 +6,7 @@ import {genConverter, idSchema} from "~/types"
 export const ProductSchema = z.object({
 	// General product info
 	cadence: z.number(),
+	createdAt: z.instanceof(Timestamp),
 	effortCost: z.number().nullable(),
 	effortCostCurrencySymbol: z.enum([`dollar`, `euro`, `pound`, `yen`, `rupee`]).nullable(),
 	sprintStartDayOfWeek: z.number().int().min(0).max(6),

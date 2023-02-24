@@ -59,7 +59,7 @@ export const updateItem = async (
 	data: Partial<WithFieldValue<Epic>> | Partial<WithFieldValue<Feature>> | Partial<WithFieldValue<Story>>,
 	allVersions: QuerySnapshot<Version>,
 ): Promise<void> => {
-	const newData: WithFieldValue<Partial<StoryMapState> & {[key: `items.${Id}.`]: Epic | Feature | Story}> = {
+	const newData: WithFieldValue<Partial<StoryMapState>> = {
 		[`items.${id}`]: {...storyMapState.data().items[id], ...data} as Epic | Feature | Story,
 		updatedAt: serverTimestamp(),
 	}
@@ -77,7 +77,7 @@ export const updateItem = async (
 }
 
 export const deleteItem = async (storyMapState: QueryDocumentSnapshot<StoryMapState>, id: Id): Promise<void> => {
-	const data: WithFieldValue<Partial<StoryMapState> & {[key: `items.${Id}.`]: Epic | Feature | Story}> = {
+	const data: WithFieldValue<Partial<StoryMapState>> = {
 		[`items.${id}`]: deleteField(),
 		updatedAt: serverTimestamp(),
 	}
@@ -100,7 +100,7 @@ export const addEpic = async (
 	const lastEpic =
 		epics.length > 0 ? epics.reduce((acc, cur) => (cur.userValue > acc.userValue ? cur : acc), epics[0]!) : undefined
 
-	const newData: WithFieldValue<Partial<StoryMapState> & {[key: `items.${Id}.`]: Epic}> = {
+	const newData: WithFieldValue<Partial<StoryMapState>> = {
 		[`items.${nanoid()}`]: {
 			type: `epic` as const,
 			description: ``,
@@ -162,7 +162,7 @@ export const addFeature = async (
 			? features.reduce((acc, cur) => (cur.userValue > acc.userValue ? cur : acc), features[0]!)
 			: undefined
 
-	const newData: WithFieldValue<Partial<StoryMapState> & {[key: `items.${Id}.`]: Feature}> = {
+	const newData: WithFieldValue<Partial<StoryMapState>> = {
 		[`items.${nanoid()}`]: {
 			type: `feature` as const,
 			description: ``,
@@ -224,7 +224,7 @@ export const addStory = async (
 
 	const stories = getStories(storyMapState.data().items)
 
-	const newData: WithFieldValue<Partial<StoryMapState> & {[key: `items.${Id}.`]: Story}> = {
+	const newData: WithFieldValue<Partial<StoryMapState>> = {
 		[`items.${nanoid()}`]: {
 			type: `story` as const,
 			acceptanceCriteria: [],
@@ -240,7 +240,7 @@ export const addStory = async (
 			ethicsVotes: [],
 			name: `Story ${stories.length + 1}`,
 			pageLink: null,
-			sprintColumn: `productBacklog` as const,
+			sprintColumn: `releaseBacklog` as const,
 			updatedAt: Timestamp.now(),
 			peopleIds: [],
 			updatedAtUserId: userId,

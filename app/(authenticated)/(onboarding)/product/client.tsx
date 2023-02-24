@@ -76,6 +76,7 @@ const ProductSetupClientPage: FC = () => {
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
+			createdAt: Timestamp.now(),
 			members,
 			problemStatement: ``,
 			businessOutcomes: [],

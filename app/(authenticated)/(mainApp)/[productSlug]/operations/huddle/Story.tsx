@@ -1,4 +1,4 @@
-import {CloseOutlined, ReadOutlined} from "@ant-design/icons"
+import {CloseOutlined, CopyOutlined, ReadOutlined} from "@ant-design/icons"
 import {Tag} from "antd"
 
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
@@ -34,7 +34,7 @@ const Story: FC<StoryProps> = ({storyMapState, versions, storyId, onRemove}) => 
 						<Tag color="#f9f0ff" icon={<ReadOutlined />} className="!border-current !text-[#722ed1]">
 							{epic[1]!.name}
 						</Tag>
-						<Tag color="#e6fffb" icon={<ReadOutlined />} className="!border-current !text-[#006d75]">
+						<Tag color="#e6fffb" icon={<CopyOutlined />} className="!border-current !text-[#006d75]">
 							{feature[1]!.name}
 						</Tag>
 					</div>

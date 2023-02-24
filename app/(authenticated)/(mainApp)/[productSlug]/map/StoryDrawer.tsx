@@ -13,7 +13,8 @@ import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Checkbox, Drawer, Form, Input, Popover, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
-import {Timestamp, doc, getDoc} from "firebase/firestore"
+import relativeTime from "dayjs/plugin/relativeTime"
+import {doc, getDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
@@ -41,6 +42,8 @@ import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {deleteItem, updateItem} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+
+dayjs.extend(relativeTime)
 
 const formSchema = StorySchema.pick({
 	branchName: true,
@@ -75,7 +78,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
-		if (story.updatedAt instanceof Timestamp) setLastModifiedText(dayjs(story.updatedAt.toMillis()).fromNow())
+		setLastModifiedText(dayjs(story.updatedAt.toMillis()).fromNow())
 	}, 1000)
 
 	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.updatedAtUserId).withConverter(UserConverter))
@@ -105,6 +108,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 			engineeringEffort: story.engineeringEffort,
 			pageLink: story.pageLink,
 			sprintColumn: story.sprintColumn,
+			peopleIds: story.peopleIds,
 			versionId: story.versionId,
 		},
 	})
@@ -169,6 +173,16 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 
 	const totalEffort = story.designEffort + story.engineeringEffort
 
+	const peoplePopoverItems = story.peopleIds
+		.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
+		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
+		.map((user) => (
+			<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
+				<Avatar src={user.data().avatar} shape="square" size="small" />
+				{user.data().name}
+			</div>
+		))
+
 	return (
 		<Drawer
 			title={
@@ -207,7 +221,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							)}
 						</div>
 						<div>
-							<div className="relative">
+							<div className="relative flex gap-1">
 								<Tag color="#585858" icon={<NumberOutlined />}>
 									{totalEffort} point{totalEffort === 1 ? `` : `s`}
 								</Tag>
@@ -225,15 +239,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 									placement="bottom"
 									content={
 										<div className="-m-1 flex flex-col gap-2">
-											{story.peopleIds
-												.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
-												.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
-												.map((user) => (
-													<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
-														<Avatar src={user.data().avatar} shape="square" size="small" />
-														{user.data().name}
-													</div>
-												))}
+											{peoplePopoverItems.length > 0 ? (
+												peoplePopoverItems
+											) : (
+												<p className="italic text-textTertiary">No people assigned to this story.</p>
+											)}
 										</div>
 									}
 								>
@@ -242,7 +252,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 									</Tag>
 								</Popover>
 
-								<div className="absolute left-1/2 top-0 -translate-x-1/2">
+								<div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
 									<Tag
 										color={story.branchName ? `#0958d9` : `#f5f5f5`}
 										icon={<CodeOutlined />}

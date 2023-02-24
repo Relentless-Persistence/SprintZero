@@ -1,38 +1,39 @@
 import {Card} from "antd"
-import dayjs from "dayjs"
+import {sortBy} from "lodash"
 
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
+import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
 import Story from "./Story"
 import {getStories} from "~/utils/storyMap"
+import {useUser} from "~/utils/useUser"
 
 export type SprintColumnProps = {
-	id: string
+	columnName: string
 	title: string
-	sprintStartDate: string
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
 	allVersions: QuerySnapshot<Version>
+	myStoriesOnly: boolean
 }
 
-const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, storyMapState, allVersions}) => {
-	const stories = getStories(storyMapState.data())
+const SprintColumn: FC<SprintColumnProps> = ({columnName, title, storyMapState, allVersions, myStoriesOnly}) => {
+	const user = useUser()
+	const stories = sortBy(
+		getStories(storyMapState.data().items)
+			.filter((story) => story.sprintColumn === columnName)
+			.filter((story) => (myStoriesOnly && user ? story.peopleIds.includes(user.id as Id) : true)),
+		[(el) => el.updatedAt.toMillis()],
+	)
 
 	return (
-		<Card type="inner" title={title}>
+		<Card type="inner" title={title} extra={stories.length}>
 			<div className="flex flex-col gap-4">
-				{stories
-					.filter((story) => story.sprintColumn === id)
-					.filter(
-						(story) =>
-							dayjs(story.createdAt.toDate()).isAfter(sprintStartDate) &&
-							dayjs(story.createdAt.toDate()).isBefore(dayjs(sprintStartDate).add(1, `week`)),
-					)
-					.map((story) => (
-						<Story key={story.id} storyMapState={storyMapState} allVersions={allVersions} storyId={story.id} />
-					))}
+				{stories.map((story) => (
+					<Story key={story.id} storyMapState={storyMapState} allVersions={allVersions} storyId={story.id} />
+				))}
 			</div>
 		</Card>
 	)
