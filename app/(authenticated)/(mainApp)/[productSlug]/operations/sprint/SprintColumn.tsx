@@ -16,14 +16,23 @@ export type SprintColumnProps = {
 	title: string
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
 	allVersions: QuerySnapshot<Version>
+	currentVersionId: Id | `__ALL_VERSIONS__`
 	myStoriesOnly: boolean
 }
 
-const SprintColumn: FC<SprintColumnProps> = ({columnName, title, storyMapState, allVersions, myStoriesOnly}) => {
+const SprintColumn: FC<SprintColumnProps> = ({
+	columnName,
+	title,
+	storyMapState,
+	allVersions,
+	currentVersionId,
+	myStoriesOnly,
+}) => {
 	const user = useUser()
 	const stories = sortBy(
 		getStories(storyMapState.data().items)
 			.filter((story) => story.sprintColumn === columnName)
+			.filter((story) => (currentVersionId === `__ALL_VERSIONS__` ? true : story.versionId === currentVersionId))
 			.filter((story) => (myStoriesOnly && user ? story.peopleIds.includes(user.id as Id) : true)),
 		[(el) => el.updatedAt.toMillis()],
 	)

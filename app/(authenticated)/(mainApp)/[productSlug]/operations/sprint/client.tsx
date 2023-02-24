@@ -10,9 +10,8 @@ import {
 import {Breadcrumb, Select, Switch, Tabs, Tag} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {collection, doc, query, where} from "firebase/firestore"
-import {groupBy} from "lodash"
-import {useEffect, useMemo, useRef, useState} from "react"
+import {collection, doc, orderBy, query, where} from "firebase/firestore"
+import {useMemo, useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {Dayjs} from "dayjs"
@@ -24,7 +23,6 @@ import {ProductConverter} from "~/types/db/Products"
 import {StoryMapStateConverter, sprintColumns} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
-import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
@@ -64,18 +62,13 @@ const SprintClientPage: FC = () => {
 
 	const [versions] = useCollection(
 		storyMapState
-			? collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter)
+			? query(collection(db, `StoryMapStates`, storyMapState.id, `Versions`), orderBy(`name`, `asc`)).withConverter(
+					VersionConverter,
+			  )
 			: undefined,
 	)
 
-	const [currentVersionId, setCurrentVersionId] = useState<Id | undefined>(undefined)
-	const hasSetInitialVersion = useRef(false)
-	useEffect(() => {
-		if (versions?.docs[0] && !hasSetInitialVersion.current) {
-			setCurrentVersionId(versions.docs[0].id as Id)
-			hasSetInitialVersion.current = true
-		}
-	}, [versions])
+	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__`>(`__ALL_VERSIONS__`)
 
 	return (
 		<div className="flex h-full flex-col gap-4">
@@ -94,15 +87,20 @@ const SprintClientPage: FC = () => {
 						<label className="flex items-center gap-2">
 							My stories only <Switch checked={myStoriesOnly} onChange={(value) => setMyStoriesOnly(value)} />
 						</label>
-						<Select
-							value={currentVersionId}
-							onChange={(value) => setCurrentVersionId(value)}
-							options={versions?.docs.map((version) => ({
-								label: `Version ${version.data().name}`,
-								value: version.id,
-							}))}
-							className="w-40"
-						/>
+						{versions && (
+							<Select
+								value={currentVersionId}
+								onChange={(value) => setCurrentVersionId(value)}
+								options={[
+									{label: `All versions`, value: `__ALL_VERSIONS__`},
+									...versions.docs.map((version) => ({
+										label: `Version ${version.data().name}`,
+										value: version.id,
+									})),
+								]}
+								className="w-40"
+							/>
+						)}
 					</div>
 				</div>
 			</div>
@@ -129,6 +127,7 @@ const SprintClientPage: FC = () => {
 												title={title}
 												storyMapState={storyMapState}
 												allVersions={versions}
+												currentVersionId={currentVersionId}
 												myStoriesOnly={myStoriesOnly}
 											/>
 										))}
