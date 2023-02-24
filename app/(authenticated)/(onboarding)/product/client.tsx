@@ -2,7 +2,7 @@
 
 import {Button} from "antd"
 import axios from "axios"
-import {addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
+import {Timestamp, addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
@@ -73,9 +73,6 @@ const ProductSetupClientPage: FC = () => {
 
 		const {email1, email2, email3, ...data} = _data
 		const members = {[user.uid as Id]: {type: `editor`} as const}
-		if (email1) members[email1] = {type: `editor`} as const
-		if (email2) members[email2] = {type: `editor`} as const
-		if (email3) members[email3] = {type: `editor`} as const
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
@@ -97,7 +94,14 @@ const ProductSetupClientPage: FC = () => {
 			features: [],
 			finalVision: ``,
 			updates: [],
-			huddles: {},
+			huddles: {
+				[user.uid]: {
+					updatedAt: Timestamp.now(),
+					blockerStoryIds: [],
+					todayStoryIds: [],
+					yesterdayStoryIds: [],
+				},
+			},
 		})
 
 		await Promise.all([

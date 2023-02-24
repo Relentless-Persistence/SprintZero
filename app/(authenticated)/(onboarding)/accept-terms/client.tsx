@@ -9,6 +9,7 @@ import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
 import LinkTo from "~/components/LinkTo"
+import {nda} from "~/components/nda"
 import {privacyPolicy} from "~/components/privacy"
 import {termsOfService} from "~/components/terms"
 import {db} from "~/utils/firebase"
@@ -38,12 +39,11 @@ const AcceptTermsClientPage: FC = () => {
 					<LinkTo href="https://www.sprintzero.app/terms" className="font-medium text-info">
 						Terms of Service
 					</LinkTo>
-					{` `}
-					and{` `}
+					{` `},{` `}
 					<LinkTo href="https://www.sprintzero.app/privacy" className="font-medium text-info">
 						Privacy Policy
 					</LinkTo>
-					:
+					{` `}& Non-Disclosure Agreement
 				</p>
 			</div>
 
@@ -52,7 +52,7 @@ const AcceptTermsClientPage: FC = () => {
 					size="large"
 					readOnly
 					rows={15}
-					value={termsOfService + `\n\n\n` + privacyPolicy}
+					value={termsOfService + `\n\n\n` + privacyPolicy + `\n\n\n` + nda}
 					className="grow !resize-none bg-[#eceef1] font-mono text-sm text-text"
 				/>
 

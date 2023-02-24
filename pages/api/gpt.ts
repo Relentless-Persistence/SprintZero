@@ -14,7 +14,7 @@ const handler: NextApiHandler = async (req, res) => {
 		const response = await openai.createCompletion({
 			model: `text-davinci-003`,
 			prompt,
-			temperature: 0.7,
+			temperature: 0.8,
 			max_tokens: 3000,
 			top_p: 0.8,
 			frequency_penalty: 1,

@@ -88,11 +88,14 @@ module.exports = {
 			bgSpotlight: token.colorBgSpotlight,
 			bgMask: token.colorBgMask,
 		},
+		flex: {
+			1: `1 1 0px`,
+		},
 		fontFamily: {
 			mono: [`monospace`],
 		},
 		fontSize: {
-			xs: `0.65rem`,
+			xs: `0.625rem`,
 			sm: `0.75rem`,
 			base: `0.875rem`,
 			lg: `1rem`,

@@ -214,7 +214,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								<Tag
 									color={typeof product?.effortCost === `number` ? `#585858` : `#f5f5f5`}
 									icon={<DollarOutlined />}
-									className={clsx(typeof product?.effortCost !== `number` && `border !border-current !text-[#d9d9d9]`)}
+									className={clsx(typeof product?.effortCost !== `number` && `!border-current !text-[#d9d9d9]`)}
 								>
 									{dollarFormat((product?.effortCost ?? 0) * totalEffort)}
 								</Tag>
