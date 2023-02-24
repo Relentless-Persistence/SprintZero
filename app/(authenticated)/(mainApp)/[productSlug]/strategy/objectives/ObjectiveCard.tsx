@@ -48,7 +48,6 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objectiveId, result, isEditing, 
 						<Button
 							size="small"
 							type="primary"
-							className="bg-green"
 							onClick={() => {
 								if (result) {
 									updateDoc(result.ref, {
@@ -69,9 +68,9 @@ const ObjectiveCard: FC<ObjectiveCardProps> = ({objectiveId, result, isEditing, 
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => onEditStart?.()} className="text-green">
+					<Button type="link" onClick={() => onEditStart?.()}>
 						Edit
-					</button>
+					</Button>
 				)
 			}
 		>

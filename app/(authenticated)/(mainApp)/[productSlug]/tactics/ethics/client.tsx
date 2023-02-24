@@ -27,8 +27,8 @@ const EthicsClientPage: FC = () => {
 	return (
 		<>
 			{stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
-				<div className="absolute z-10 h-full w-full bg-black/20">
-					<p className="absolute bottom-12 right-12 border border-[#ffa39e] bg-[#fff1f0] px-4 py-2">
+				<div className="absolute z-10 h-full w-full bg-bgMask">
+					<p className="absolute bottom-12 right-12 border border-errorBorder bg-errorBg px-4 py-2">
 						No elements present; flag a user story to populate
 					</p>
 				</div>

@@ -21,7 +21,7 @@ const TermsClientPage: FC = () => {
 						readOnly
 						rows={20}
 						value={termsOfService}
-						className="!resize-none bg-[#eceef1] font-mono text-sm text-black"
+						className="!resize-none bg-[#eceef1] font-mono text-sm text-text"
 					/>
 				</div>
 			</div>

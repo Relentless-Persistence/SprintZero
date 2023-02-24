@@ -627,18 +627,16 @@ const StoryMap: FC<StoryMapProps> = ({
 							<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1.5rem)]">
 								{/* Top */}
 								{i === 0 && (
-									<div className="absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 border border-[#d0d0d0]" />
+									<div className="absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 border border-border" />
 								)}
 								{/* Right */}
 								{i < epic.childrenIds.length - 1 && (
-									<div className="absolute left-1/2 top-1/2 h-px w-1/2 -translate-y-1/2 border border-[#d0d0d0]" />
+									<div className="absolute left-1/2 top-1/2 h-px w-1/2 -translate-y-1/2 border border-border" />
 								)}
 								{/* Bottom */}
-								<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-[#d0d0d0]" />
+								<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-border" />
 								{/* Left */}
-								{i > 0 && (
-									<div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-[#d0d0d0]" />
-								)}
+								{i > 0 && <div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-border" />}
 
 								{i === epic.childrenIds.length - 1 && epic.childrenIds.length > 0 && !editMode && (
 									<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -647,7 +645,7 @@ const StoryMap: FC<StoryMapProps> = ({
 											onClick={() => {
 												addFeature(storyMapState, {parentId: epic.id}).catch(console.error)
 											}}
-											className="grid h-4 w-4 place-items-center rounded-full bg-green text-[0.6rem] text-white"
+											className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[0.6rem] text-white"
 										>
 											<PlusOutlined />
 										</button>
@@ -677,7 +675,7 @@ const StoryMap: FC<StoryMapProps> = ({
 									<Feature meta={meta} featureId={feature.id} isInitialRender={isInitialRender} />
 
 									{((meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode) || feature.childrenIds.length > 0) && (
-										<div className="h-8 w-px border border-[#d0d0d0]" />
+										<div className="h-8 w-px border border-border" />
 									)}
 
 									{stories.length === 0 && meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode && (
@@ -689,7 +687,7 @@ const StoryMap: FC<StoryMapProps> = ({
 														console.error,
 													)
 											}}
-											className="flex items-center gap-2 rounded border border-dashed border-gray bg-white px-2 py-1 font-medium"
+											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101]"
 										>
 											<FileOutlined />
 											<span>Add story</span>
@@ -697,7 +695,7 @@ const StoryMap: FC<StoryMapProps> = ({
 									)}
 
 									{stories.length > 0 && (
-										<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-[#d0d0d0] bg-[#f0f2f5] p-3">
+										<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-border p-3">
 											{stories.map((story) => (
 												<div key={story.id} className={clsx(dragInfo.itemBeingDraggedId === story.id && `invisible`)}>
 													<Story meta={meta} storyId={story.id} isInitialRender={isInitialRender} />
@@ -713,7 +711,7 @@ const StoryMap: FC<StoryMapProps> = ({
 																console.error,
 															)
 													}}
-													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-gray bg-white px-2 py-1 font-medium"
+													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101]"
 												>
 													<FileOutlined />
 													<span>Add story</span>

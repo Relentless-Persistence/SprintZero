@@ -27,9 +27,9 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName, lastUpdated}) => 
 					<Breadcrumb.Item>Story Map</Breadcrumb.Item>
 					<Breadcrumb.Item>{versionName}</Breadcrumb.Item>
 				</Breadcrumb>
-				{lastUpdatedText && <p className="text-sm italic text-gray">Last updated {lastUpdatedText}</p>}
+				{lastUpdatedText && <p className="text-sm italic text-textTertiary">Last updated {lastUpdatedText}</p>}
 			</div>
-			<div className="px-12 text-gray">
+			<div className="px-12 text-textSecondary">
 				<svg className="h-3 w-full">
 					<svg viewBox="-16 -12 132 124" width="10" height="100%" preserveAspectRatio="none">
 						<path

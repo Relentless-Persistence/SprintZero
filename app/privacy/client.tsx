@@ -21,7 +21,7 @@ const PrivacyClientPage: FC = () => {
 						readOnly
 						rows={20}
 						value={privacyPolicy}
-						className="!resize-none bg-[#eceef1] font-mono text-sm text-black"
+						className="!resize-none bg-[#eceef1] font-mono text-sm text-text"
 					/>
 				</div>
 			</div>

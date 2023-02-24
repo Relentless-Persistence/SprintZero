@@ -39,7 +39,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 						}
 						className="!inline-flex w-16 shrink-0 grow-0 basis-16 items-center"
 					>
-						<MinusCircleOutlined className="text-[#c82d73]" />
+						<MinusCircleOutlined />
 						{i + 1}.
 					</Button>
 					<Input
@@ -78,7 +78,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 								onChange((state) => [...state, {id: newId, text: ``}])
 							}}
 						>
-							<PlusCircleOutlined className="align-middle text-[#009c7e]" />
+							<PlusCircleOutlined className="align-middle" />
 						</Button>
 					)}
 				</Input.Group>

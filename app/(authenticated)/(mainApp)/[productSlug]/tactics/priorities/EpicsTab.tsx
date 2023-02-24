@@ -68,7 +68,7 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 				<Breadcrumb.Item>Epics</Breadcrumb.Item>
 			</Breadcrumb>
 
-			<p className="text-laurel">
+			<p className="text-textTertiary">
 				Assess the practicality of proposed items to objectively and rationally uncover strengths and weaknesses,
 				opportunities and threats, the resources required to carry through, and ultimately the prospects for success
 			</p>

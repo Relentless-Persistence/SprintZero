@@ -13,6 +13,7 @@ import type {FC} from "react"
 import SprintColumn from "./SprintColumn"
 import {ProductConverter} from "~/types/db/Products"
 import {StoryMapStateConverter, sprintColumns} from "~/types/db/StoryMapStates"
+import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -61,6 +62,12 @@ const SprintClientPage: FC = () => {
 		}
 	}, [sprints])
 
+	const [allVersions] = useCollection(
+		storyMapState
+			? collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter)
+			: undefined,
+	)
+
 	return (
 		<div className="flex h-full flex-col gap-6">
 			<div className="mx-12 mt-8 flex justify-between">
@@ -93,14 +100,15 @@ const SprintClientPage: FC = () => {
 				<div className="flex w-full grow overflow-x-auto pl-12 pb-8">
 					<div className="grid h-full grid-cols-[repeat(12,14rem)] gap-4">
 						{storyMapState &&
+							allVersions &&
 							Object.entries(sprintColumns).map(([id, title]) => (
 								<SprintColumn
 									key={id}
 									id={id}
 									title={title}
 									sprintStartDate={currentSprint}
-									activeProduct={activeProduct}
 									storyMapState={storyMapState}
+									allVersions={allVersions}
 								/>
 							))}
 					</div>

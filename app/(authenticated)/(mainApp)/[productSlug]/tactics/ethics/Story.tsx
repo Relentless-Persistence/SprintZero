@@ -26,16 +26,14 @@ const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId}) => {
 			<button
 				type="button"
 				onClick={() => setIsDrawerOpen(true)}
-				className="flex w-full items-center justify-between gap-2 border border-laurel bg-[#fafafa] px-4 py-3 text-left"
+				className="flex w-full items-center justify-between gap-2 border px-4 py-3 text-left"
 			>
 				<div className="flex flex-col gap-1">
 					<p className="font-medium">{story.name}</p>
-					<p className="inline-block border border-[#aee383] bg-[#e1f4d1] px-1 py-0.5 text-xs text-[#315613]">
-						{featureName}
-					</p>
+					<p className="inline-block border px-1 py-0.5 text-xs">{featureName}</p>
 				</div>
-				{story.ethicsApproved === true && <LikeFilled className="text-xl text-[#54a31c]" />}
-				{story.ethicsApproved === false && <DislikeFilled className="text-xl text-[#fa541c]" />}
+				{story.ethicsApproved === true && <LikeFilled className="text-xl text-success" />}
+				{story.ethicsApproved === false && <DislikeFilled className="text-xl text-error" />}
 			</button>
 
 			<StoryDrawer

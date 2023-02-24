@@ -75,7 +75,7 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 						feature.childrenIds.forEach((storyId) => meta.markForDeletion(storyId))
 					}}
 				>
-					<MinusCircleOutlined className="text-sm text-[#ff4d4f]" />
+					<MinusCircleOutlined className="text-sm text-error" />
 				</button>
 			)}
 		</div>

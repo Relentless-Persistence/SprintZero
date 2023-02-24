@@ -48,7 +48,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 			<div className="flex flex-col items-center gap-4">
 				<div className="flex flex-col items-center">
 					<h3 className="text-2xl font-semibold">Details</h3>
-					<p className="text-gray">Please provide information below</p>
+					<p className="text-textTertiary">Please provide information below</p>
 				</div>
 
 				<Form

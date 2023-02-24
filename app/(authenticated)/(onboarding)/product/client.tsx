@@ -52,7 +52,6 @@ const ProductSetupClientPage: FC = () => {
 
 			try {
 				await axios.post(`/api/emails/send`, payload)
-				console.log(`Email sent successfully to ${recipient}!`)
 			} catch (error) {
 				console.error(`Error sending email to ${recipient}:`, error)
 			}
@@ -98,6 +97,7 @@ const ProductSetupClientPage: FC = () => {
 			features: [],
 			finalVision: ``,
 			updates: [],
+			huddles: {},
 		})
 
 		await Promise.all([
@@ -153,7 +153,7 @@ const ProductSetupClientPage: FC = () => {
 		<div className="flex h-full flex-col gap-8">
 			<div>
 				<h1 className="text-3xl font-semibold">Product Configuration</h1>
-				<h2 className="text-xl text-gray">
+				<h2 className="text-xl text-textSecondary">
 					Almost time to start building! We just require a few data points before we can begin
 				</h2>
 			</div>
@@ -213,7 +213,6 @@ const ProductSetupClientPage: FC = () => {
 						form="current-slide"
 						loading={hasSubmitted}
 						disabled={!canProceed}
-						className="bg-green"
 					>
 						Start
 					</Button>
@@ -223,7 +222,6 @@ const ProductSetupClientPage: FC = () => {
 						htmlType="submit"
 						form="current-slide"
 						disabled={currentSlide === numSlides - 1 || !canProceed || hasSubmitted}
-						className="bg-green"
 					>
 						Next
 					</Button>

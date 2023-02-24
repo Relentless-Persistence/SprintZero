@@ -30,6 +30,9 @@ const securityHeaders = [
 ]
 
 module.exports = {
+	experimental: {
+		appDir: true,
+	},
 	headers() {
 		return [
 			{
@@ -42,8 +45,26 @@ module.exports = {
 	images: {
 		domains: [`firebasestorage.googleapis.com`],
 	},
-	experimental: {
-		appDir: true,
-	},
 	output: `standalone`,
+	webpack: (config) => ({
+		...config,
+		module: {
+			...config.module,
+			rules: [
+				...config.module.rules,
+				{
+					test: /\.svg$/,
+					issuer: /\.[jt]sx?$/,
+					use: [
+						{
+							loader: `@svgr/webpack`,
+							options: {
+								icon: true,
+							},
+						},
+					],
+				},
+			],
+		},
+	}),
 }

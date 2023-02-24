@@ -20,7 +20,6 @@ const EditButtons: FC<EditButtonsProps> = ({onEditStart, onEditEnd, isEditing, o
 				<Button
 					type="primary"
 					size="small"
-					className="bg-green"
 					onClick={() => {
 						Promise.resolve(onCommit())
 							.then(() => {

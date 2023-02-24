@@ -186,7 +186,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					</div>
 				) : (
 					<div className="flex h-14 flex-col justify-center gap-1">
-						<div className="flex items-end gap-2">
+						<div className="flex items-end gap-4">
 							<div className="relative w-fit min-w-[1rem]">
 								<p>{localStoryName || `_`}</p>
 								<input
@@ -201,7 +201,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								/>
 							</div>
 							{lastModifiedText && lastModifiedUser?.exists() && (
-								<p className="text-sm font-normal text-gray">
+								<p className="text-sm font-normal text-textTertiary">
 									Last modified {lastModifiedText} by {lastModifiedUser.data().name}
 								</p>
 							)}
@@ -224,15 +224,12 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								<Popover
 									placement="bottom"
 									content={
-										<div className="flex flex-col gap-2">
+										<div className="-m-1 flex flex-col gap-2">
 											{story.peopleIds
 												.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
 												.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 												.map((user) => (
-													<div
-														key={user.id}
-														className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2 text-[#545454]"
-													>
+													<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
 														<Avatar src={user.data().avatar} shape="square" size="small" />
 														{user.data().name}
 													</div>
@@ -292,7 +289,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							>
 								Cancel
 							</Button>
-							<Button type="primary" htmlType="submit" form="story-form" className="bg-green">
+							<Button type="primary" htmlType="submit" form="story-form">
 								Done
 							</Button>
 						</>
@@ -381,7 +378,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					{/* Left column */}
 					<div className="flex h-full min-h-0 flex-col gap-4">
 						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
-							<p className="text-lg font-medium text-gray">Story</p>
+							<p className="text-lg font-semibold">Story</p>
 							<Input.TextArea
 								rows={3}
 								value={description}
@@ -402,7 +399,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 
 						<div className="grid min-h-0 grow basis-0 grid-cols-2 gap-6">
 							<div className="flex min-h-0 flex-col gap-2">
-								<p className="text-lg font-medium text-gray">Acceptance Criteria</p>
+								<p className="text-lg font-semibold">Acceptance Criteria</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
 									{story.acceptanceCriteria.map((criterion) => (
 										<Checkbox
@@ -434,7 +431,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							</div>
 
 							<div className="flex min-h-0 flex-col gap-2 overflow-auto">
-								<p className="text-lg font-medium text-gray">Bugs</p>
+								<p className="text-lg font-semibold">Bugs</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
 									{story.bugs.map((bug) => (
 										<Checkbox
@@ -470,7 +467,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
 						<div className="flex items-center justify-between">
-							<p className="text-lg font-medium text-gray">Comments</p>
+							<p className="text-lg font-semibold">Comments</p>
 							<Segmented
 								size="small"
 								value={commentType}

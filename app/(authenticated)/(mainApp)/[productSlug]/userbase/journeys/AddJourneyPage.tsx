@@ -59,10 +59,10 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 				>
 					<div className="flex flex-col gap-4">
 						<h1 className="text-2xl font-semibold">Create Journey</h1>
-						<Form.Item label={<span className="text-gray">Please provide a name:</span>}>
+						<Form.Item label="Please provide a name:">
 							<RhfInput control={control} name="name" placeholder="Name" />
 						</Form.Item>
-						<Form.Item label={<span className="text-gray">How long does this take end-to-end?</span>}>
+						<Form.Item label="How long does this take end-to-end?">
 							<div className="flex gap-4">
 								<RhfInput number="integer" control={control} name="duration" />
 								<RhfSelect

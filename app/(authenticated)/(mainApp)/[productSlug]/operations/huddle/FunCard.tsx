@@ -1,98 +1,40 @@
 import {AppleFilled, NotificationOutlined, SettingOutlined} from "@ant-design/icons"
-import {Avatar, Button, Card, DatePicker, Dropdown, Empty, Skeleton} from "antd"
+import {Button, Card, DatePicker, Dropdown, Empty} from "antd"
 import axios from "axios"
 import dayjs from "dayjs"
-import Image from "next/image"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import isBetween from "dayjs/plugin/isBetween"
+import {random} from "lodash"
 import {useState} from "react"
 import {z} from "zod"
 
-import type {MenuProps} from "antd"
+import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
-import SpotifyIcon from "./SpotifyIcon"
+import ShuffleIcon from "~/public/images/shuffle.svg"
+import SpotifyIcon from "~/public/images/spotify-icon.svg"
 
-interface AppleResult {
-	results: {
-		songs: {
-			data: Song[]
-		}
-	}
-}
-
-interface SpotifyResult {
-	tracks: {
-		items: SpotifySong[]
-	}
-}
-
-interface Song {
-	attributes: {
-		url: string
-	}
-}
-
-interface SpotifySong {
-	external_urls: {
-		spotify: string
-	}
-}
+dayjs.extend(customParseFormat)
+dayjs.extend(isBetween)
 
 const FunCard: FC = () => {
-	const [date, setDate] = useState<dayjs.Dayjs | null>(null)
+	const [date, setDate] = useState<Dayjs | null>(dayjs(`1982-11-19`, `YYYY-MM-DD`))
 	const [clues, setClues] = useState<string[] | null>(null)
-	const [songClient, setSongClient] = useState(`apple`)
+	const [musicClient, setMusicClient] = useState<`apple` | `spotify`>(`apple`)
 	const [songUrl, setSongUrl] = useState(``)
 	const [showSong, setShowSong] = useState(false)
-	const [loading, setLoading] = useState(false)
-
-	const dateFormat = `MMMM DD, YYYY`
-
-	const items: MenuProps["items"] = [
-		{
-			key: `1`,
-			label: (
-				<div
-					className="flex items-center space-x-[8px]"
-					onClick={() => {
-						onReset()
-						setSongClient(`apple`)
-					}}
-				>
-					<AppleFilled style={{color: `rgba(0, 0, 0, 0.45)`}} /> <span>Apple Music</span>
-				</div>
-			),
-		},
-		{
-			key: `2`,
-			label: (
-				<div
-					className="flex items-center space-x-[6px]"
-					onClick={() => {
-						onReset()
-						setSongClient(`spotify`)
-					}}
-				>
-					<SpotifyIcon /> <span>Spotify</span>
-				</div>
-			),
-		},
-	]
 
 	const generateRandomDate = () => {
-		const randomYear = Math.floor(Math.random() * (2022 - 1960) + 1960)
-		const randomMonth = Math.floor(Math.random() * 12)
-		const randomDay = Math.floor(Math.random() * (new Date(randomYear, randomMonth + 1, 0).getDate() - 1 + 1) + 1)
-		const randomDate = new Date(randomYear, randomMonth, randomDay)
+		const randomYear = random(1960, 2020)
+		const randomMonth = random(0, 11)
+		const randomDate = random(1, dayjs(`${randomYear}-${randomMonth + 1}`).daysInMonth())
 
 		// Output the random date in ISO format
-		setDate(dayjs(randomDate))
+		setDate(dayjs(`${randomYear}-${randomMonth}-${randomDate}`, `MMMM D, YYYY`))
 	}
 
 	const getSongString = async () => {
-		setLoading(true)
-		if (date === null) {
-			return
-		}
+		if (!date) return
 
 		const formattedDate = date.format(`MMMM D, YYYY`)
 		const gptQuestion = `What was the #1 song on the Billboard Top 100 list on ${formattedDate}? Give in the format "Artist - Song name".`
@@ -119,7 +61,7 @@ const FunCard: FC = () => {
 	const getSong = async (songString: string) => {
 		const newString = songString.replace(/^"/, ``).replace(/"$/, ``)
 
-		if (songClient === `apple`) {
+		if (musicClient === `apple`) {
 			const res = await axios.post<AppleResult>(`/api/songs/fetchAppleSong`, {
 				song: encodeURIComponent(newString),
 			})
@@ -146,56 +88,83 @@ const FunCard: FC = () => {
 		setClues(null)
 		setSongUrl(``)
 		setShowSong(false)
-		setLoading(false)
 	}
 
 	return (
 		<Card
-			size="small"
 			type="inner"
+			className="flex flex-col [&>.ant-card-body]:grow"
 			title={
-				<div className="my-4 flex items-center gap-4">
-					<Avatar
-						shape="square"
-						icon={<NotificationOutlined style={{color: `rgba(0, 0, 0, 0.45)`}} />}
-						size="large"
-						style={{backgroundColor: `#DDE3D5`, border: `1px solid #A7C983`}}
-					/>
+				<div className="flex items-center gap-4 py-4">
+					<div className="grid h-10 w-10 place-items-center rounded-md border border-primary bg-primaryBg">
+						<NotificationOutlined className="text-xl" />
+					</div>
 					<div>
 						<p>Fun Board</p>
-						<p className="text-[rgba(0, 0, 0, 0.45)] text-xs font-light">#1 song on this day in history</p>
+						<p className="text-sm font-normal text-textTertiary">#1 song on this day in history</p>
 					</div>
 				</div>
 			}
 			extra={
 				<Dropdown
-					menu={{
-						items,
-					}}
 					trigger={[`click`]}
 					placement="bottomRight"
+					menu={{
+						selectable: true,
+						selectedKeys: [musicClient],
+						items: [
+							{
+								key: `apple`,
+								label: (
+									<div
+										className="flex items-center gap-2"
+										onClick={() => {
+											onReset()
+											setMusicClient(`apple`)
+										}}
+									>
+										<AppleFilled />
+										<span>Apple Music</span>
+									</div>
+								),
+							},
+							{
+								key: `spotify`,
+								label: (
+									<div
+										className="flex items-center gap-2"
+										onClick={() => {
+											onReset()
+											setMusicClient(`spotify`)
+										}}
+									>
+										<SpotifyIcon /> <span>Spotify</span>
+									</div>
+								),
+							},
+						],
+					}}
 				>
-					<SettingOutlined />
+					<SettingOutlined className="text-lg" />
 				</Dropdown>
 			}
 		>
-			<div className="flex flex-col">
-				<div className="space-y-2">
-					<p className="font-semibold">Pick any date prior to December 31, 2021</p>
+			<div className="flex h-full flex-col gap-4">
+				<div className="flex flex-col gap-2">
+					<p className="font-semibold">Pick any date prior to January 1, 2021</p>
 					<DatePicker
 						value={date}
-						onChange={(date) => setDate(date)}
-						format={dateFormat}
+						format="MMMM D, YYYY"
+						disabledDate={(date) => !date.isBetween(`1960-01-01`, `2020-12-31`, undefined, `[]`)}
 						className="w-full"
-						placeholder="1982-02-13"
+						onChange={(date) => setDate(date)}
 					/>
 
 					<div className="flex items-center justify-between">
 						<Button
 							size="small"
-							style={{width: `113px`}}
-							icon={<Image src="/images/shuffle.svg" alt="shuffle" width={16} height={16} />}
-							className="flex items-center justify-between"
+							icon={<ShuffleIcon />}
+							className="flex items-center gap-2"
 							onClick={generateRandomDate}
 						>
 							Randomize
@@ -217,31 +186,24 @@ const FunCard: FC = () => {
 					</div>
 				</div>
 
-				<div className="mt-4 min-h-[226px] space-y-2">
+				<div className="flex grow flex-col gap-2">
 					<p className="font-semibold">Clues</p>
-
 					{clues && clues.length > 0 ? (
 						<ol className="w-full list-decimal space-y-1 pl-4">
 							{clues.map((clue: string, i: number) => (
-								<li key={i} className="text-[16px]">
-									{clue}
-								</li>
+								<li key={i}>{clue}</li>
 							))}
 						</ol>
-					) : loading ? (
-						<Skeleton active />
 					) : (
-						<div className="flex h-[226px] items-center justify-center">
-							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
-						</div>
+						<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
 					)}
 				</div>
 
-				<div className="mt-4 w-full space-y-3">
+				<div className="flex flex-col gap-2">
 					<p className="font-semibold">Answer</p>
-					<div className="">
+					<div>
 						{showSong ? (
-							songClient === `apple` ? (
+							musicClient === `apple` ? (
 								<iframe
 									allow="autoplay *; encrypted-media *;"
 									height="192"
@@ -272,3 +234,25 @@ const FunCard: FC = () => {
 }
 
 export default FunCard
+
+type AppleResult = {
+	results: {
+		songs: {
+			data: Array<{
+				attributes: {
+					url: string
+				}
+			}>
+		}
+	}
+}
+
+type SpotifyResult = {
+	tracks: {
+		items: Array<{
+			external_urls: {
+				spotify: string
+			}
+		}>
+	}
+}

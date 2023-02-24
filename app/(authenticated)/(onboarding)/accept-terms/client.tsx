@@ -33,14 +33,14 @@ const AcceptTermsClientPage: FC = () => {
 		<div className="flex h-full flex-col gap-8">
 			<div>
 				<h1 className="text-3xl font-semibold">Let&apos;s Get Started!</h1>
-				<p className="text-xl text-gray">
+				<p className="text-xl text-textSecondary">
 					To create an account, please agree to below{` `}
-					<LinkTo href="https://www.sprintzero.app/terms" className="font-medium text-blue">
+					<LinkTo href="https://www.sprintzero.app/terms" className="font-medium text-info">
 						Terms of Service
 					</LinkTo>
 					{` `}
 					and{` `}
-					<LinkTo href="https://www.sprintzero.app/privacy" className="font-medium text-blue">
+					<LinkTo href="https://www.sprintzero.app/privacy" className="font-medium text-info">
 						Privacy Policy
 					</LinkTo>
 					:
@@ -53,7 +53,7 @@ const AcceptTermsClientPage: FC = () => {
 					readOnly
 					rows={15}
 					value={termsOfService + `\n\n\n` + privacyPolicy}
-					className="grow !resize-none bg-[#eceef1] font-mono text-sm text-black"
+					className="grow !resize-none bg-[#eceef1] font-mono text-sm text-text"
 				/>
 
 				<Checkbox checked={agree} onChange={() => setAgree((agree) => !agree)}>
@@ -72,7 +72,6 @@ const AcceptTermsClientPage: FC = () => {
 					onClick={() => {
 						onAccept().catch(console.error)
 					}}
-					className="bg-[#4a801d]"
 				>
 					Continue
 				</Button>

@@ -47,7 +47,6 @@ const EditableListCard: FC<EditableListCardProps> = ({
 						<Button
 							size="small"
 							type="primary"
-							className="bg-green"
 							onClick={() => {
 								Promise.resolve(
 									onCommit(
@@ -61,9 +60,9 @@ const EditableListCard: FC<EditableListCardProps> = ({
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => onEditStart()} className="text-green">
+					<Button type="link" onClick={() => onEditStart()}>
 						Edit
-					</button>
+					</Button>
 				)
 			}
 		>

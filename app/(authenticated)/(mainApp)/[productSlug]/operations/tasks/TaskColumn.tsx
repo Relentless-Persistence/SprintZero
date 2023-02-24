@@ -24,10 +24,10 @@ const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 							key={task.id}
 							type="button"
 							onClick={() => onEdit(task.id as Id)}
-							className="flex w-full flex-col gap-1 border border-laurel bg-[#fafafa] px-4 py-2 text-left"
+							className="flex w-full flex-col gap-1 border px-4 py-2 text-left"
 						>
 							<p className="font-medium">{task.data().title}</p>
-							<p className="inline-block border border-[#aee383] bg-[#e1f4d1] px-1 py-0.5 text-xs text-[#315613]">
+							<p className="inline-block border px-1 py-0.5 text-xs">
 								{dayjs(task.data().dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}
 							</p>
 						</button>

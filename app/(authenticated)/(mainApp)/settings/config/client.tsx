@@ -132,7 +132,9 @@ const ConfigSettingsClientPage: FC = () => {
 				<div className="mt-32 flex flex-col gap-2">
 					<div>
 						<p>Erase All Data</p>
-						<p className="text-sm text-gray">This action will erase all stored data and start over from scratch.</p>
+						<p className="text-sm text-textTertiary">
+							This action will erase all stored data and start over from scratch.
+						</p>
 					</div>
 					<Dropdown.Button
 						icon={<FireOutlined className="relative -top-[2.5px] text-xs" />}

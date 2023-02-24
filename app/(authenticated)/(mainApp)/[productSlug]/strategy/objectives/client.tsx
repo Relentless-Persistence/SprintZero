@@ -138,7 +138,7 @@ const ObjectivesClientPage: FC = () => {
 
 				<FloatButton
 					shape="square"
-					icon={<PlusOutlined className="text-green" />}
+					icon={<PlusOutlined className="text-primary" />}
 					onClick={() => setActiveResultId(`new`)}
 					className="absolute right-12 bottom-8"
 				/>

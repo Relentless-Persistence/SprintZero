@@ -53,7 +53,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 				type="button"
 				onClick={() => setIsDrawerOpen(true)}
 				onPointerDownCapture={(e) => e.stopPropagation()}
-				className="border-r border-[#d9d9d9] bg-[#f5f5f5] p-2 text-[0.6rem]"
+				className="border-r border-[#d9d9d9] bg-[#f1f2f5] p-2 text-[0.6rem]"
 			>
 				<p className="max-h-8 truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 			</button>
@@ -80,7 +80,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 			)}
 			{meta.editMode && (
 				<button type="button" onClick={() => meta.markForDeletion(storyId)}>
-					<MinusCircleOutlined className="mr-1 text-[#ff4d4f]" />
+					<MinusCircleOutlined className="mr-1 text-error" />
 				</button>
 			)}
 

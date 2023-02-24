@@ -57,7 +57,7 @@ const PersonasClientPage: FC = () => {
 							label: persona.data().name,
 							children: (
 								<div className="flex h-full flex-col overflow-auto">
-									<div className="sticky top-0 z-10 bg-[#f0f2f5] px-12 pt-8 pb-6">
+									<div className="sticky top-0 z-10 bg-bgLayout px-12 pt-8 pb-6">
 										<Breadcrumb>
 											<Breadcrumb.Item>Userbase</Breadcrumb.Item>
 											<Breadcrumb.Item>Personas</Breadcrumb.Item>

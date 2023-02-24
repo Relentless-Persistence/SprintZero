@@ -55,6 +55,18 @@ export const ProductSchema = z.object({
 			timestamp: z.instanceof(Timestamp),
 		}),
 	),
+
+	// Huddle info
+	huddles: z.record(
+		idSchema,
+		z.object({
+			updatedAt: z.instanceof(Timestamp),
+
+			blockerStoryIds: z.array(idSchema),
+			todayStoryIds: z.array(idSchema),
+			yesterdayStoryIds: z.array(idSchema),
+		}),
+	),
 })
 
 export type Product = z.infer<typeof ProductSchema>

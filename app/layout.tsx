@@ -29,10 +29,10 @@ export type RootLayoutProps = {
 const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<ConfigProvider theme={{token: {colorPrimary: `#4a801d`}}}>
+			<ConfigProvider theme={{token: {colorPrimary: `#4a801d`, colorPrimaryBg: `#e8f3da`}}}>
 				<html lang="en" className="h-full">
 					<head></head>
-					<body className="h-full bg-[#f0f2f5] text-base">{children}</body>
+					<body className="h-full bg-bgLayout text-base text-text">{children}</body>
 				</html>
 			</ConfigProvider>
 		</QueryClientProvider>

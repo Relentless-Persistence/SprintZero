@@ -95,7 +95,6 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = () =>
 				// 			<Button
 				// 				size="small"
 				// 				type="primary"
-				// 				className="bg-green"
 				// 				onClick={async () =>
 				// 					(await updateDoc(doc(db, Personas._, personaId), {
 				// 						description: text,
@@ -106,9 +105,9 @@ const PersonaDescriptionCard: FC<PersonaDescriptionCardProps> = () =>
 				// 			</Button>
 				// 		</div>
 				// 	) : (
-				// 		<button type="button" onClick={() => onEditStart()} className="text-green">
+				// 		<Button type="link" onClick={() => onEditStart()}>
 				// 			Edit
-				// 		</button>
+				// 		</Button>
 				// 	)
 				// }
 			>

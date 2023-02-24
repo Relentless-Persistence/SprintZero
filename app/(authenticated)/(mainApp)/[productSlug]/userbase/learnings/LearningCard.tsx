@@ -57,9 +57,9 @@ const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEdi
 						</Button>
 					</div>
 				) : (
-					<button type="button" onClick={() => onEditStart?.()} className="text-green">
+					<Button type="link" onClick={() => onEditStart?.()}>
 						Edit
-					</button>
+					</Button>
 				)
 			}
 		>

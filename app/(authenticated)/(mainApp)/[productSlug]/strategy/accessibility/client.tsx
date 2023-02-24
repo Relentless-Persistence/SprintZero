@@ -34,13 +34,13 @@ const AccessibilityClientPage: FC = () => {
 								<Breadcrumb.Item>Auditory</Breadcrumb.Item>
 							</Breadcrumb>
 
-							<p className="text-gray">
+							<p className="text-textSecondary">
 								Auditory disabilities range from mild or moderate hearing loss in one or both ears (&quot;hard of
 								hearing&quot;) to substantial and uncorrectable hearing loss in both ears (&quot;deafness&quot;). Some
 								people with auditory disabilities can hear sounds but sometimes not sufficiently to understand all
 								speech, especially when there is background noise. This can include people using hearing aids. To learn
 								more visit{` `}
-								<span className="font-semibold text-[#2d73c8]">
+								<span className="font-semibold text-info">
 									<LinkTo href="https://www.w3.org/WAI/standards-guidelines/wcag/glance/" openInNewTab>
 										WCAG 2.1 at a Glance
 									</LinkTo>
@@ -181,13 +181,13 @@ const AccessibilityClientPage: FC = () => {
 								<Breadcrumb.Item>Cognitive</Breadcrumb.Item>
 							</Breadcrumb>
 
-							<p className="text-gray">
+							<p className="text-textSecondary">
 								Cognitive, learning, and neurological disabilities involve neurodiversity and neurological disorders, as
 								well as behavioral and mental health disorders that are not necessarily neurological. They may affect
 								any part of the nervous system and impact how well people hear, move, see, speak, and understand
 								information. Cognitive, learning, and neurological disabilities do not necessarily affect the
 								intelligence of a person. To learn more visit{` `}
-								<span className="font-semibold text-[#2d73c8]">
+								<span className="font-semibold text-info">
 									<LinkTo href="https://www.w3.org/WAI/standards-guidelines/wcag/glance/" openInNewTab>
 										WCAG 2.1 at a Glance
 									</LinkTo>
@@ -354,12 +354,12 @@ const AccessibilityClientPage: FC = () => {
 								<Breadcrumb.Item>Physical</Breadcrumb.Item>
 							</Breadcrumb>
 
-							<p className="text-gray">
+							<p className="text-textSecondary">
 								Physical disabilities (sometimes called &quot;motor disabilities&quot;) include weakness and limitations
 								of muscular control (such as involuntary movements including tremors, lack of coordination, or
 								paralysis), limitations of sensation, joint disorders (such as arthritis), pain that impedes movement,
 								and missing limbs. To learn more visit{` `}
-								<span className="font-semibold text-[#2d73c8]">
+								<span className="font-semibold text-info">
 									<LinkTo href="https://www.w3.org/WAI/standards-guidelines/wcag/glance/" openInNewTab>
 										WCAG 2.1 at a Glance
 									</LinkTo>
@@ -498,11 +498,11 @@ const AccessibilityClientPage: FC = () => {
 								<Breadcrumb.Item>Speech</Breadcrumb.Item>
 							</Breadcrumb>
 
-							<p className="text-gray">
+							<p className="text-textSecondary">
 								Speech disabilities include difficulty producing speech that is recognizable by others or by voice
 								recognition software. For example, the loudness or clarity of someone&apos;s voice might be difficult to
 								understand. To learn more visit{` `}
-								<span className="font-semibold text-[#2d73c8]">
+								<span className="font-semibold text-info">
 									<LinkTo href="https://www.w3.org/WAI/standards-guidelines/wcag/glance/" openInNewTab>
 										WCAG 2.1 at a Glance
 									</LinkTo>
@@ -569,13 +569,13 @@ const AccessibilityClientPage: FC = () => {
 								<Breadcrumb.Item>Visual</Breadcrumb.Item>
 							</Breadcrumb>
 
-							<p className="text-gray">
+							<p className="text-textSecondary">
 								Visual disabilities range from mild or moderate vision loss in one or both eyes (&quot;low vision&quot;)
 								to substantial and uncorrectable vision loss in both eyes (&quot;blindness&quot;). Some people have
 								reduced or lack of sensitivity to certain colors (&quot;color blindness&quot;), or increased sensitivity
 								to bright colors. These variations in perception of colors and brightness can be independent of the
 								visual acuity. To learn more visit{` `}
-								<span className="font-semibold text-[#2d73c8]">
+								<span className="font-semibold text-info">
 									<LinkTo href="https://www.w3.org/WAI/standards-guidelines/wcag/glance/" openInNewTab>
 										WCAG 2.1 at a Glance
 									</LinkTo>

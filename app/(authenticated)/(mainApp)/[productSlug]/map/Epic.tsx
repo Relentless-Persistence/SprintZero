@@ -79,7 +79,7 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false, isInitialRender = fal
 						})
 					}}
 				>
-					<MinusCircleOutlined className="text-sm text-[#ff4d4f]" />
+					<MinusCircleOutlined className="text-sm text-error" />
 				</button>
 			)}
 		</div>

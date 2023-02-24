@@ -42,7 +42,7 @@ const KickoffClientPage: FC = () => {
 
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
-			<Breadcrumb className="sticky top-0 z-10 bg-[#f0f2f5] pt-8 pb-6">
+			<Breadcrumb className="sticky top-0 z-10 bg-bgLayout pt-8 pb-6">
 				<Breadcrumb.Item>Strategy</Breadcrumb.Item>
 				<Breadcrumb.Item>Kickoff</Breadcrumb.Item>
 			</Breadcrumb>

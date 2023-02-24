@@ -63,7 +63,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 			<div className="flex grow flex-col-reverse overflow-auto">
 				<div className="flex flex-col gap-4">
 					{comments?.docs.length === 0 ? (
-						<p className="italic text-laurel">Nothing here yet</p>
+						<p className="italic text-textTertiary">Nothing here yet</p>
 					) : (
 						comments?.docs.map((comment) => {
 							const author = commentAuthors.find((author) => author.data?.id === comment.data().authorId)?.data
@@ -71,7 +71,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 								<div key={comment.id} className="flex gap-2">
 									<Avatar shape="square" src={author?.data()?.avatar} className="border border-[#d6d7d9]" />
 									<div className="flex flex-col gap-1">
-										<p className="text-xs text-laurel">{author?.data()?.name}</p>
+										<p className="text-xs text-textTertiary">{author?.data()?.name}</p>
 										<p>{comment.data().text}</p>
 									</div>
 								</div>

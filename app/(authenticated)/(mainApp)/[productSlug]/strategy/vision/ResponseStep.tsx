@@ -25,7 +25,7 @@ const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFin
 		<div className="flex w-full flex-col gap-6">
 			<div className="flex flex-col gap-2">
 				<p className="text-xl font-semibold">ChatGPT Response</p>
-				<p className="text-sm text-laurel">This is what we got back</p>
+				<p className="text-sm text-textTertiary">This is what we got back</p>
 			</div>
 
 			<Card
@@ -57,7 +57,7 @@ const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFin
 				>
 					Redo
 				</Button>
-				<Button type="primary" disabled={!gptResponse} onClick={() => onFinish()} className="bg-green">
+				<Button type="primary" disabled={!gptResponse} onClick={() => onFinish()}>
 					Accept
 				</Button>
 			</Space>

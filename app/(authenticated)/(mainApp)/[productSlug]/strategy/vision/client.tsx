@@ -57,13 +57,13 @@ const VisionsClientPage: FC = () => {
 						<div className="flex flex-col gap-2">
 							<h1 className="text-4xl font-semibold">Product Vision</h1>
 							{editMode && (
-								<h2 className="text-laurel">
+								<h2 className="text-textTertiary">
 									We leverage OpenAI&apos;s GPT Models to assist. Fill in below to get started.
 								</h2>
 							)}
 						</div>
 
-						<Button className="bg-white hover:text-black" disabled={editMode} onClick={() => setEditMode(true)}>
+						<Button disabled={editMode} onClick={() => setEditMode(true)}>
 							Edit
 						</Button>
 					</div>
@@ -125,10 +125,7 @@ const VisionsClientPage: FC = () => {
 							/>
 						)}
 						{!editMode && activeProduct?.finalVision && (
-							<Card
-								className="border border-[#d9d9d9]"
-								style={{boxShadow: `0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)`}}
-							>
+							<Card style={{boxShadow: `0px 4px 4px rgba(0, 0, 0, 0.08), 1px -4px 4px rgba(0, 0, 0, 0.06)`}}>
 								<p>{activeProduct.finalVision}</p>
 							</Card>
 						)}
@@ -141,7 +138,7 @@ const VisionsClientPage: FC = () => {
 				</div>
 
 				<div className="flex flex-col items-start gap-4">
-					<Tag color="#eefcd9" className="border !border-[#d3dec1] text-xs !text-black">
+					<Tag color="#eefcd9" className="border !border-[#d3dec1] text-xs !text-text">
 						Changelog
 					</Tag>
 
@@ -154,7 +151,7 @@ const VisionsClientPage: FC = () => {
 									<div className="flex flex-col gap-1">
 										<p className="font-mono">{dayjs(update.timestamp.toDate()).fromNow()}</p>
 										<p className="text-xs">
-											<span className="text-[#1890ff]">
+											<span className="text-info">
 												@{usersData.find((user) => user.data?.id === update.userId)?.data?.data()?.name}
 											</span>
 											{` `}

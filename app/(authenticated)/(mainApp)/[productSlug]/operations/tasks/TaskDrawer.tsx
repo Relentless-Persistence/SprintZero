@@ -55,7 +55,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 					>
 						Cancel
 					</Button>
-					<Button size="small" type="primary" htmlType="submit" form="task-form" className="bg-green">
+					<Button size="small" type="primary" htmlType="submit" form="task-form">
 						Done
 					</Button>
 				</div>
@@ -75,12 +75,12 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 				{/* Column 1 */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
-						<p className="text-xl font-semibold text-gray">Title</p>
+						<p className="text-lg font-semibold">Title</p>
 						<RhfInput control={control} name="title" />
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="text-xl font-semibold text-gray">Description</p>
+						<p className="text-lg font-semibold">Description</p>
 						<RhfTextArea control={control} name="description" />
 					</div>
 				</div>
@@ -88,12 +88,12 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 				{/* Column 2 */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
-						<p className="text-xl font-semibold text-gray">Due</p>
+						<p className="text-lg font-semibold">Due</p>
 						<RhfDateTimePicker control={control} name="dueDate" />
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="text-xl font-semibold text-gray">Actions</p>
+						<p className="text-lg font-semibold">Actions</p>
 						{actions.map((action, i) => (
 							<RhfCheckbox key={action.id} control={control} name={`actions.${i}.checked`}>
 								{action.name}

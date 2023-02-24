@@ -85,19 +85,19 @@ const RetrospectiveClientPage: FC = () => {
 								})()}
 								extra={
 									item.data().userId === user?.id ? (
-										<button type="button" onClick={() => setIsDrawerOpen(true)} className="text-green">
+										<Button type="link" onClick={() => setIsDrawerOpen(true)}>
 											Edit
-										</button>
+										</Button>
 									) : undefined
 								}
 							>
 								<div className="flex flex-col gap-4">
 									<div className="flex flex-col gap-2">
-										<p className="text-xl font-semibold text-gray">{item.data().title}</p>
+										<p className="text-lg font-semibold">{item.data().title}</p>
 										<p className="italic">{item.data().description}</p>
 									</div>
 									<div className="flex flex-col gap-2">
-										<p className="text-xl font-semibold text-gray">Proposed Actions</p>
+										<p className="text-lg font-semibold">Proposed Actions</p>
 										<ul>
 											{item.data().proposedActions.map((action) => (
 												<li key={action.id}>

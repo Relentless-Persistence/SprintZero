@@ -65,7 +65,7 @@ const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
 				y.set(newY)
 				moveEpic(newX, newY).catch(console.error)
 			}}
-			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-[#4f2dc8] bg-white px-2 py-1 text-[#4f2dc8]"
+			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-current bg-white px-2 py-1 text-[#4f2dc8]"
 			style={{top: useMotionTemplate`calc(${y}% * 100)`, left: useMotionTemplate`calc(${x}% * 100)`}}
 			ref={ref}
 		>

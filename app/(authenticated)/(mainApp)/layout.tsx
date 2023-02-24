@@ -15,7 +15,7 @@ const MainAppLayout: FC<MainAppLayoutProps> = ({children}) => {
 	return (
 		<Layout className="h-full">
 			<Header />
-			<Layout className="bg-[#f0f2f5]" style={{flexDirection: `row`}}>
+			<Layout style={{flexDirection: `row`}}>
 				<Layout.Sider theme="light">
 					<SideMenu />
 				</Layout.Sider>

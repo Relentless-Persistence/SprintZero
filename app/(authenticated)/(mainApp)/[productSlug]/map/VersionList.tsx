@@ -95,7 +95,7 @@ const VersionList: FC<VersionListProps> = ({
 										})
 									}}
 								>
-									<MinusCircleOutlined className="!mr-0 text-[#ff4d4f]" />
+									<MinusCircleOutlined className="!mr-0 text-error" />
 								</button>
 							)}
 						</div>

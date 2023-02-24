@@ -28,7 +28,6 @@ import type {Story, StoryMapState} from "~/types/db/StoryMapStates"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
-import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {StorySchema, sprintColumns} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
@@ -270,7 +269,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 							{story.ethicsApproved === null ? (
 								<>
 									<div>
-										<p className="text-xl font-semibold">Adjudication Response</p>
+										<p className="text-lg font-semibold">Adjudication Response</p>
 										<p className="text-xs">
 											Do you think this would provide value and reaffirm the commitment to our users?
 										</p>
@@ -287,14 +286,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 								</>
 							) : (
 								<>
-									<p className="text-xl font-semibold">Adjudication Response</p>
+									<p className="text-lg font-semibold">Adjudication Response</p>
 									{story.ethicsApproved ? (
-										<div className="inline-flex items-center gap-2 bg-[#90d855] py-2 px-4">
+										<div className="inline-flex items-center gap-2 bg-successBg py-2 px-4">
 											<LikeOutlined />
 											Allowed
 										</div>
 									) : (
-										<div className="inline-flex items-center gap-2 bg-[#ffa39e] py-2 px-4">
+										<div className="inline-flex items-center gap-2 bg-errorBg py-2 px-4">
 											<DislikeOutlined />
 											Rejected
 										</div>
@@ -303,7 +302,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 							)}
 						</div>
 						<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
-							<p className="text-xl font-semibold text-gray">Story</p>
+							<p className="text-lg font-semibold">Story</p>
 							<Input.TextArea
 								rows={4}
 								value={description}
@@ -322,7 +321,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
 						<div className="flex items-center justify-between">
-							<p className="text-xl font-semibold text-gray">Comments</p>
+							<p className="text-lg font-semibold">Comments</p>
 							<Segmented
 								size="small"
 								value={commentType}

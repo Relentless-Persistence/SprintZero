@@ -24,16 +24,16 @@ const OnboardingLayout: FC<OnboardingLayoutProps> = ({children}) => {
 						<div className="flex w-full flex-1 items-center gap-3">
 							<div className="min-w-0 flex-1 text-end">
 								<p>{user?.data().name}</p>
-								<p className="truncate text-sm text-gray">{user?.data().email}</p>
+								<p className="truncate text-sm text-textTertiary">{user?.data().email}</p>
 							</div>
 							<Avatar
 								src={user?.data().avatar}
 								size={48}
 								alt="Avatar"
-								className="shrink-0 basis-auto border border-[#a7c983]"
+								className="shrink-0 basis-auto border border-primary"
 							/>
 						</div>
-						<LinkTo href="/sign-out" className="text-sm text-blue">
+						<LinkTo href="/sign-out" className="text-sm text-info">
 							Sign out
 						</LinkTo>
 					</div>

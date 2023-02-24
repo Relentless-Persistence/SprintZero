@@ -119,7 +119,7 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 		<div className="flex w-full flex-col gap-6">
 			<div className="flex flex-col gap-2">
 				<p className="text-xl font-semibold">Statement</p>
-				<p className="text-sm text-laurel">What&apos;s this thing gonna be?</p>
+				<p className="text-sm text-textTertiary">What&apos;s this thing gonna be?</p>
 			</div>
 
 			<Card
@@ -172,7 +172,6 @@ const StatementStep: FC<BuildStatementProps> = ({onFinish}) => {
 					loading={status === `submitted`}
 					disabled={status === `finished`}
 					form="statement-form"
-					className="bg-green"
 				>
 					Submit
 				</Button>

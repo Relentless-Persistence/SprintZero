@@ -98,18 +98,18 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 				<div className="grid h-full grid-cols-3 gap-8">
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-col gap-2">
-							<p className="text-lg font-semibold text-gray">Subject</p>
+							<p className="text-lg font-semibold">Subject</p>
 							<RhfInput control={control} name="subject" />
 						</div>
 						<div className="flex grow flex-col gap-2">
-							<p className="text-lg font-semibold text-gray">Description</p>
+							<p className="text-lg font-semibold">Description</p>
 							<RhfTextArea control={control} name="description" className="grow !resize-none" />
 						</div>
 					</div>
 					<div className="flex flex-col gap-4">
 						<div className="grid grid-cols-2 gap-4">
 							<div className="flex flex-col gap-2">
-								<p className="text-lg font-semibold text-gray">Start</p>
+								<p className="text-lg font-semibold">Start</p>
 								<RhfSelect
 									control={control}
 									name="start"
@@ -124,7 +124,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<p className="text-lg font-semibold text-gray">End</p>
+								<p className="text-lg font-semibold">End</p>
 								<RhfSelect
 									control={control}
 									name="end"
@@ -140,7 +140,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 							</div>
 						</div>
 						<div className="flex flex-col items-start gap-2">
-							<p className="text-lg font-semibold text-gray">Emotion</p>
+							<p className="text-lg font-semibold">Emotion</p>
 							<RhfSegmented
 								control={control}
 								name="emotion"
@@ -151,7 +151,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 							/>
 						</div>
 						<div className="flex flex-col gap-2">
-							<p className="text-lg font-semibold text-gray">Level</p>
+							<p className="text-lg font-semibold">Level</p>
 							<RhfSlider
 								control={control}
 								name="emotionLevel"
@@ -163,7 +163,7 @@ const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCom
 					</div>
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-col gap-2">
-							<p className="text-lg font-semibold text-gray">Participants</p>
+							<p className="text-lg font-semibold">Participants</p>
 						</div>
 					</div>
 				</div>

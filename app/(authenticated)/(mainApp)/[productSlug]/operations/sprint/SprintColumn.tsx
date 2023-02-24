@@ -1,10 +1,10 @@
 import {Card} from "antd"
 import dayjs from "dayjs"
 
-import type {QueryDocumentSnapshot} from "firebase/firestore"
+import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
+import type {Version} from "~/types/db/Versions"
 
 import Story from "./Story"
 import {getStories} from "~/utils/storyMap"
@@ -13,11 +13,11 @@ export type SprintColumnProps = {
 	id: string
 	title: string
 	sprintStartDate: string
-	activeProduct: QueryDocumentSnapshot<Product>
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	allVersions: QuerySnapshot<Version>
 }
 
-const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, activeProduct, storyMapState}) => {
+const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, storyMapState, allVersions}) => {
 	const stories = getStories(storyMapState.data())
 
 	return (
@@ -31,7 +31,7 @@ const SprintColumn: FC<SprintColumnProps> = ({id, title, sprintStartDate, active
 							dayjs(story.createdAt.toDate()).isBefore(dayjs(sprintStartDate).add(1, `week`)),
 					)
 					.map((story) => (
-						<Story key={story.id} activeProduct={activeProduct} storyMapState={storyMapState} storyId={story.id} />
+						<Story key={story.id} storyMapState={storyMapState} allVersions={allVersions} storyId={story.id} />
 					))}
 			</div>
 		</Card>

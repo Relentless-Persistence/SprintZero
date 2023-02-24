@@ -77,26 +77,26 @@ const JourneysClientPage: FC = () => {
 					</div>
 
 					{/* Horizontal axis */}
-					<div className="absolute top-[2.125rem] left-6 w-[calc(50%-1.825rem)] border-t border-dashed border-laurel" />
-					<p className="absolute top-10 left-6 text-xs text-laurel">High</p>
-					<p className="absolute top-10 right-1/2 mr-2 text-xs text-laurel">Low</p>
+					<div className="absolute top-[2.125rem] left-6 w-[calc(50%-1.825rem)] border-t border-dashed border-textTertiary" />
+					<p className="absolute top-10 left-6 text-xs text-textTertiary">High</p>
+					<p className="absolute top-10 right-1/2 mr-2 text-xs text-textTertiary">Low</p>
 
 					{/* Vertical axis */}
-					<p className="absolute left-1/2 -translate-x-1/2 font-semibold text-[#a6ae9d]">Start</p>
-					<div className="absolute left-1/2 top-7 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-laurel bg-[#f0f2f5]" />
+					<p className="absolute left-1/2 -translate-x-1/2 font-semibold text-textTertiary">Start</p>
+					<div className="absolute left-1/2 top-7 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-textTertiary bg-bgLayout" />
 					{journey && (
 						<p className="absolute left-1/2 top-[2.125rem] ml-3 -translate-y-1/2 text-xs">
 							{durationUnits[journey.data().durationUnit]} 0
 						</p>
 					)}
-					<div className="absolute top-0 left-1/2 my-10 h-[calc(100%-5rem)] w-0.5 -translate-x-1/2 bg-laurel" />
-					<div className="absolute left-1/2 bottom-7 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-laurel bg-[#f0f2f5]" />
+					<div className="bg-laurel absolute top-0 left-1/2 my-10 h-[calc(100%-5rem)] w-0.5 -translate-x-1/2" />
+					<div className="absolute left-1/2 bottom-7 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-textTertiary bg-bgLayout" />
 					{journey && (
 						<p className="absolute left-1/2 bottom-[2.125rem] ml-3 translate-y-1/2 text-xs">
 							{durationUnits[journey.data().durationUnit]} {journey.data().duration}
 						</p>
 					)}
-					<p className="absolute left-1/2 bottom-0 -translate-x-1/2 font-semibold text-[#a6ae9d]">Finish</p>
+					<p className="absolute left-1/2 bottom-0 -translate-x-1/2 font-semibold text-textTertiary">Finish</p>
 
 					{/* Legend */}
 					<div className="absolute top-1/2 left-0 flex origin-top -translate-x-1/2 -rotate-90 gap-8">
@@ -119,7 +119,7 @@ const JourneysClientPage: FC = () => {
 									className="pointer-events-auto absolute flex w-full -translate-y-1/2 items-center gap-1"
 									style={{top: `${((event.data().start + event.data().end) / 2 / journey.data().duration) * 100}%`}}
 								>
-									<div className="h-3 w-3 shrink-0 -translate-x-1/2 rounded-full border-2 border-laurel bg-[#f0f2f5]" />
+									<div className="h-3 w-3 shrink-0 -translate-x-1/2 rounded-full border-2 border-textTertiary bg-bgLayout" />
 									<div className="min-w-0 flex-1">
 										<p className="font-semibold">{event.data().subject}</p>
 										<p className="font-light">{event.data().description}</p>

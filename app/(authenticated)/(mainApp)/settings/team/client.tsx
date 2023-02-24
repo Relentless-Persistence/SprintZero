@@ -57,7 +57,7 @@ const TeamSettingsClientPage: FC = () => {
 								{members.map(
 									({data: member}) =>
 										member?.exists() && (
-											<div key={member.id} className="flex flex-col gap-1 border border-[#d9d9d9] bg-white px-6 py-4">
+											<div key={member.id} className="flex flex-col gap-1 border border-border bg-white px-6 py-4">
 												<p className="font-semibold">{member.data().name}</p>
 												<p>{member.data().email}</p>
 											</div>
@@ -74,7 +74,7 @@ const TeamSettingsClientPage: FC = () => {
 								{members.map(
 									({data: member}) =>
 										member?.exists() && (
-											<div key={member.id} className="flex flex-col gap-1 border border-[#d9d9d9] bg-white px-6 py-4">
+											<div key={member.id} className="flex flex-col gap-1 border border-border bg-white px-6 py-4">
 												<p className="font-semibold">{member.data().name}</p>
 												<p>{member.data().email}</p>
 											</div>

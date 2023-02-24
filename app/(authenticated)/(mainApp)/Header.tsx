@@ -31,7 +31,7 @@ const Header: FC = () => {
 
 	return (
 		<>
-			<Layout.Header className="flex items-center gap-8 !px-4">
+			<Layout.Header className="flex items-center gap-8 !bg-[#161e12] !px-4">
 				<Image src="/images/logo_beta.png" alt="SprintZero logo" width={178} height={42} priority />
 
 				<Menu
@@ -51,7 +51,7 @@ const Header: FC = () => {
 				/>
 
 				<button type="button" onClick={() => setIsSettingsOpen(true)}>
-					<Avatar src={user.photoURL} className="border-2 border-green" />
+					<Avatar src={user.photoURL} className="border-2 border-primary" />
 				</button>
 			</Layout.Header>
 

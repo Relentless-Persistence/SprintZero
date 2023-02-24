@@ -158,7 +158,7 @@ const SignInClientPage: FC = () => {
 				<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={238} height={56} priority />
 				<div className="mt-6">
 					<h1 className="text-3xl font-semibold">Authenticate Yourself Before You Wreck Yourself</h1>
-					<p className="text-xl text-gray">Select a provider below to create an account</p>
+					<p className="text-xl text-textSecondary">Select a provider below to create an account</p>
 				</div>
 
 				<div className="flex grow flex-col items-center justify-center gap-4">

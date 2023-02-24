@@ -33,7 +33,6 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 						<Button
 							size="small"
 							type="primary"
-							className="bg-green"
 							onClick={() => {
 								updateDoc(doc(db, `Products`, activeProductId), {
 									problemStatement: textDraft,

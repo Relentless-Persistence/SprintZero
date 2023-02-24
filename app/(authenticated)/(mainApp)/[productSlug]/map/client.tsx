@@ -222,7 +222,7 @@ const StoryMapClientPage: FC = () => {
 					<FloatButton.Group trigger="click" icon={<MenuOutlined />} className="absolute right-12 bottom-8">
 						<Tooltip placement="left" title="Redo">
 							<FloatButton
-								icon={<RedoOutlined className={clsx(`transition-colors`, !canRedo && `text-laurel`)} />}
+								icon={<RedoOutlined className={clsx(`transition-colors`, !canRedo && `text-textTertiary`)} />}
 								className={clsx(!canRedo && `cursor-default`)}
 								onClick={() => {
 									redo().catch(console.error)
@@ -231,7 +231,7 @@ const StoryMapClientPage: FC = () => {
 						</Tooltip>
 						<Tooltip placement="left" title="Undo">
 							<FloatButton
-								icon={<UndoOutlined className={clsx(`transition-colors`, !canUndo && `text-laurel`)} />}
+								icon={<UndoOutlined className={clsx(`transition-colors`, !canUndo && `text-textTertiary`)} />}
 								className={clsx(!canUndo && `cursor-default`)}
 								onClick={() => {
 									undo().catch(console.error)
