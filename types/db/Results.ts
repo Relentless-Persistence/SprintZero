@@ -6,7 +6,6 @@ import {z} from "zod"
 import {genConverter} from "~/types"
 
 export const ResultSchema = z.object({
-	name: z.string(),
 	createdAt: z.instanceof(Timestamp),
 	text: z.string(),
 })

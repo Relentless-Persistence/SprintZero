@@ -28,6 +28,7 @@ const ObjectivesClientPage: FC = () => {
 			orderBy(`name`, `asc`),
 		).withConverter(ObjectiveConverter),
 	)
+
 	const hasSetInitialObjective = useRef(false)
 	useEffect(() => {
 		if (hasSetInitialObjective.current || !objectives) return
@@ -99,7 +100,7 @@ const ObjectivesClientPage: FC = () => {
 						columnClassName="bg-clip-padding flex flex-col gap-8"
 					>
 						{results?.docs.map(
-							(result) =>
+							(result, index) =>
 								currentObjective?.exists() && (
 									<ObjectiveCard
 										key={result.id}
@@ -108,6 +109,7 @@ const ObjectivesClientPage: FC = () => {
 										isEditing={result.id === activeResultId}
 										onEditStart={() => setActiveResultId(result.id)}
 										onEditEnd={() => setActiveResultId(undefined)}
+										index={index + 1}
 									/>
 								),
 						)}
@@ -118,6 +120,7 @@ const ObjectivesClientPage: FC = () => {
 								objectiveId={currentObjective.id as Id}
 								onEditStart={() => setActiveResultId(`new`)}
 								onEditEnd={() => setActiveResultId(undefined)}
+								index={undefined}
 							/>
 						)}
 					</Masonry>
