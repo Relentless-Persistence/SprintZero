@@ -2,10 +2,12 @@
 
 import {Button} from "antd"
 import axios from "axios"
+import crypto from "crypto"
 import {Timestamp, addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
+import querystring from "querystring"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import invariant from "tiny-invariant"
@@ -20,6 +22,7 @@ import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
 import {HistoryConverter} from "~/types/db/Histories"
 import {ObjectiveConverter} from "~/types/db/Objectives"
+import {ProductInviteConverter} from "~/types/db/ProductInvites"
 import {ProductConverter} from "~/types/db/Products"
 import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
@@ -34,29 +37,6 @@ const ProductSetupClientPage: FC = () => {
 	const [hasSubmitted, setHasSubmitted] = useState(false)
 
 	const router = useRouter()
-
-	const sendEmailInvites = async (recipients: (string | null)[]) => {
-		const from = `no-reply@sprintzero.app`
-		const subject = `You are invited to join SprintZero`
-		const body = `Dummy invite email text. If you've received this email, it means the email inivite is now working when onboarding.`
-
-		for (const recipient of recipients) {
-			if (!recipient) continue
-
-			const payload: EmailRequest = {
-				to: recipient,
-				from,
-				subject: `${subject}`,
-				body: `${body}`,
-			}
-
-			try {
-				await axios.post(`/api/emails/send`, payload)
-			} catch (error) {
-				console.error(`Error sending email to ${recipient}:`, error)
-			}
-		}
-	}
 
 	const submitForm = async (_data: FormInputs) => {
 		if (hasSubmitted) return
@@ -149,7 +129,39 @@ const ProductSetupClientPage: FC = () => {
 			}),
 		])
 
-		await sendEmailInvites([email1, email2, email3])
+		//const productID = slug
+
+		const from = `no-reply@sprintzero.app`
+		const subject = `SprintZero | Member Invite`
+
+		for (const recipient of [email1, email2, email3]) {
+			if (!recipient) continue
+
+			const inviteToken = crypto.randomBytes(16).toString(`hex`)
+			const queryParams = querystring.stringify({
+				invite_token: inviteToken,
+			})
+			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
+			const body = `<b>${user.displayName}</b> has invited you to join the product <b>"${formData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`
+
+			setDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter), {
+				productId: slug,
+				userEmail: recipient,
+			})
+
+			const payload: EmailRequest = {
+				to: recipient,
+				from,
+				subject: `${subject}`,
+				body: `${body}`,
+			}
+
+			try {
+				await axios.post(`/api/emails/send`, payload)
+			} catch (error) {
+				console.error(`Error sending email to ${recipient}:`, error)
+			}
+		}
 
 		router.push(`/${slug}/map`)
 	}

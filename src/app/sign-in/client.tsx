@@ -13,17 +13,21 @@ import {
 	signInWithPopup,
 	signOut,
 } from "firebase/auth"
-import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
+import {collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where} from "firebase/firestore"
 import Image from "next/image"
-import {useRouter} from "next/navigation"
+import {useRouter, useSearchParams} from "next/navigation"
 import {useEffect, useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 import {z} from "zod"
 
 import type {AuthProvider, UserCredential} from "firebase/auth"
+import type {WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
+import type {Id} from "~/types"
+import type {Product} from "~/types/db/Products"
 import type {User} from "~/types/db/Users"
 
+import {ProductInviteConverter} from "~/types/db/ProductInvites"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {
@@ -37,42 +41,114 @@ import {
 
 const SignInClientPage: FC = () => {
 	const router = useRouter()
+	const searchParams = useSearchParams()
+
+	const inviteToken = searchParams.get(`invite_token`)
+	console.log(`This is router query`, inviteToken)
+	//const {invite_token} = router.query
+	//const inviteToken = invite_token
+	console.log(inviteToken)
+
 	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
+	const [userInvite, setUserInvite] = useState({})
+	const [tokenExists, setTokenExists] = useState(false)
 
 	useEffect(() => {
+		checkInviteToken(inviteToken).then()
+
 		if (user?.uid && !hasSignedIn) router.replace(`/`)
 	}, [hasSignedIn, router, user?.uid])
+
+	// If no invite token is provided, redirect to the homepage
+
+	async function checkInviteToken(inviteToken: string): Promise<void> {
+		console.log(`invite token: `, inviteToken)
+		// Get the ProductInvites table from Firestore
+		const invite = (await getDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter))).data()
+
+		// Check if the invite token exists and is not used
+		//if (inviteSnap.exists && !inviteSnap.data().isUsed) {
+		if (invite) {
+			// // Check if the invite has expired
+			// const expiryDate = snapshot.data().expiryDate.toDate()
+			// const currentDate = new Date()
+			// if (expiryDate > currentDate) {
+			// 	return true
+			// }
+
+			//await markInviteAsUsed(inviteToken)
+			notification.success({message: `Welcome. Please log to in to proceed.`})
+
+			console.log(`token exists`)
+			setTokenExists(true)
+			setUserInvite({
+				userEmail: invite.userEmail,
+				productId: invite.productId,
+				token: inviteToken,
+			})
+		} else {
+			console.log(`token does not exists`)
+		}
+	}
 
 	const processUser = async (credential: UserCredential) => {
 		if (!credential.user.email) throw new Error(`No email address found for user.`)
 		if (!credential.user.displayName) throw new Error(`No display name found for user.`)
 
-		const isRpEmail = /@relentlesspersistenceinc\.com$/.test(credential.user.email)
-		if (isRpEmail) {
-			setHasSignedIn(true)
-			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
+		setHasSignedIn(true)
+		notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 
-			if (auth.currentUser && !auth.currentUser.emailVerified) {
-				await sendEmailVerification(auth.currentUser).then(() => {
-					notification.success({
-						message: `Email Verification`,
-						description: `Please check your email to verify your account.`,
-						placement: `bottomRight`,
-					})
+		if (auth.currentUser && !auth.currentUser.emailVerified) {
+			await sendEmailVerification(auth.currentUser).then(() => {
+				notification.success({
+					message: `Email Verification`,
+					description: `Please check your email to verify your account.`,
+					placement: `bottomRight`,
 				})
-			}
+			})
+		}
 
-			const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
-			const isNewUser = !user
+		const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
+		const isNewUser = !user
 
-			if (isNewUser) {
+		if (isNewUser) {
+			// if user is coming with an invite token
+			console.log(`You are a new user`)
+			if (!tokenExists) {
+				notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
+				await signOut(auth)
+			} else if (tokenExists && userInvite.userEmail != credential.user.email) {
+				notification.error({message: `Sorry, you do not have a valid invite.`})
+				await signOut(auth)
+			} else if (tokenExists && userInvite.userEmail === credential.user.email) {
+				notification.error({message: `You have a valid invite.`})
 				await setDoc(doc(db, `Users`, credential.user.uid), {
 					avatar: credential.user.photoURL,
 					email: credential.user.email,
 					hasAcceptedTos: false,
 					name: credential.user.displayName,
 				} satisfies User)
+
+				console.log(`I am now addin you to product as a member:`, userInvite.productId, userInvite.token)
+
+				// const data: WithFieldValue<Product> = {
+				// 	[`${credential.user.uid}`]: {type: `editor`},
+				// }
+
+				// const data: WithFieldValue<Product> = {
+				// 	[`${credential.user.uid}`]: {type: `editor`},
+				// }
+
+				const data = {type: `editor`}
+
+				//const memberData = {type: "editor"}
+				//const members = {members.[credential.user.uid as Id]: {type: `editor`}}
+				const productRef = doc(db, `Products`, userInvite.productId).withConverter(ProductConverter)
+				await updateDoc(productRef, {
+					[`members.${credential.user.uid}`]: data,
+				})
+
 				router.push(`/accept-terms`)
 				// eslint-disable-next-line no-negated-condition
 			} else if (!user.hasAcceptedTos) {
@@ -87,9 +163,22 @@ const SignInClientPage: FC = () => {
 				if (products.length === 0) router.push(`/product`)
 				else router.push(`/${products[0]!.id}/map`)
 			}
+			// if user somehow landed on the login page and tried to log in - only for Beta
+			else {
+				notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
+				await signOut(auth)
+			}
+			// eslint-disable-next-line no-negated-condition
+		} else if (!user.hasAcceptedTos) {
+			router.push(`/accept-terms`)
 		} else {
-			notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
-			await signOut(auth)
+			const {docs: products} = await getDocs(
+				query(collection(db, `Products`), where(`members.${credential.user.uid}.type`, `==`, `editor`)).withConverter(
+					ProductConverter,
+				),
+			)
+			if (products.length === 0) router.push(`/product`)
+			else router.push(`/${products[0]!.id}/map`)
 		}
 	}
 
