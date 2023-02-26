@@ -40,6 +40,11 @@ import {
 	microsoftAuthProvider,
 } from "~/utils/firebase"
 
+interface ProductInvite {
+	productId: string
+	userEmail: string
+}
+
 const SignInClientPage: FC = () => {
 	const router = useRouter()
 
@@ -50,13 +55,13 @@ const SignInClientPage: FC = () => {
 	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
 	const [userInvite, setUserInvite] = useState({})
+	const [isBetaUser, setIsBetaUser] = useState(false)
 	const [hasValidToken, setHasValidToken] = useState(false)
 
 	useEffect(() => {
 		if (user?.uid && !hasSignedIn) router.replace(`/`)
 
 		// issue: this is called twice during loading
-
 		inviteToken &&
 			validateInviteToken(inviteToken)
 				.then()
@@ -67,14 +72,39 @@ const SignInClientPage: FC = () => {
 
 	// If no invite token is provided, redirect to the homepage
 
+	const getProductInvite = async (inviteToken: string): Promise<ProductInvite | null> => {
+		try {
+			const response = await axios.get(`/api/get-product-invite`, {
+				params: {
+					inviteToken,
+				},
+			})
+			const data = response.data
+
+			const inviteData: ProductInvite = {
+				productId: data.productId,
+				userEmail: data.userEmail,
+			}
+			return inviteData
+		} catch (error) {
+			console.error(error)
+			return null
+		}
+	}
+
 	async function validateInviteToken(inviteToken: string | null): Promise<void> {
 		// Get the ProductInvites table from Firestore
-		const invite = (await getDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter))).data()
+		// map user to a product using admin SDK
+
+		//const invite = (await getDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter))).data()
 
 		// Check if the invite token exists and is not used
-		//if (inviteSnap.exists && !inviteSnap.data().isUsed) {
-		if (invite) {
-			// // Check if the invite has expired
+		// if (inviteSnap.exists && !inviteSnap.data().isUsed) {
+		const invite = await getProductInvite(inviteToken)
+		console.log(`I received this invite object:`, invite)
+		if (invite?.productId) {
+			console.log(`checking if invite exists`, invite)
+			// Check if the invite has expired
 			// const expiryDate = snapshot.data().expiryDate.toDate()
 			// const currentDate = new Date()
 			// if (expiryDate > currentDate) {
@@ -114,8 +144,18 @@ const SignInClientPage: FC = () => {
 		const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
 		const isNewUser = !user
 
+		if()
+		//setIsBetaUser(checkBetaUser)(user?.email)
 		if (isNewUser) {
 			// if user is coming with an invite token
+			// if(betaUser)
+			// {
+
+			// temp code beta user sign-in
+
+			// notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
+			// router.push(`/accept-terms`)
+			// }
 			if (hasValidToken && userInvite.userEmail != credential.user.email) {
 				notification.error({message: `Sorry, you do not have a valid invite.`})
 				//await signOut(auth)
