@@ -95,9 +95,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 		if (isLoaded) init()
 	}, [isLoaded, init])
 
-	const [selectedLocation, setSelectedLocation] = useState<string | undefined>(
-		participant?.data().location ?? undefined,
-	)
+	const [placeId, setPlaceId] = useState<string | undefined>(undefined)
 	const [wikipediaLink, setWikipediaLink] = useState<string | undefined>(undefined)
 	const handleLocationSelect = useCallback(
 		async (address: string) => {
@@ -107,7 +105,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 			const results = await getGeocode({address})
 			const result = results[0]
 			if (result) {
-				setSelectedLocation(result.place_id)
+				setPlaceId(result.place_id)
 				const res = await axios.get<MediaWikiSearchApiResponse>(`https://en.wikipedia.org/w/api.php`, {
 					params: {
 						action: `query`,
@@ -354,14 +352,14 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 								))}
 						</RhfAutoComplete>
 						<div className="grid grow place-items-center overflow-hidden rounded-md border border-primaryBorder bg-primaryBg">
-							{selectedLocation ? (
+							{placeId ? (
 								<iframe
 									loading="lazy"
 									allowFullScreen
 									referrerPolicy="no-referrer-when-downgrade"
 									src={`https://www.google.com/maps/embed/v1/place?key=${
 										process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ``
-									}&q=place_id:${selectedLocation}`}
+									}&q=place_id:${placeId}`}
 									className="h-full w-full"
 								/>
 							) : (
