@@ -1,18 +1,19 @@
 "use client"
 
-import {useLoadScript} from "@react-google-maps/api"
+import {useJsApiLoader} from "@react-google-maps/api"
+import {useMemo} from "react"
 
 import type {FC} from "react"
 
 import Places from "./Places"
 
 const Google: FC = () => {
-	const {isLoaded} = useLoadScript({
-		googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API || ``,
-		libraries: [`places`],
+	const {isLoaded} = useJsApiLoader({
+		googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ``,
+		libraries: useMemo(() => [`places`], []),
 	})
 
-	if (!isLoaded) return <div>Loading...</div>
+	if (!isLoaded) return <p>Loading...</p>
 
 	return (
 		<div>

@@ -1,6 +1,6 @@
 const {theme} = require(`antd`)
 
-const token = {...theme.defaultAlgorithm({...theme.defaultSeed, colorPrimary: `#54a31c`}), colorPrimaryBg: `#e8f3da`}
+const token = {...theme.defaultAlgorithm({...theme.defaultSeed, colorPrimary: `#54a31c`})}
 
 module.exports = {
 	content: [`./pages/**/*.{js,ts,jsx,tsx}`, `./components/**/*.{js,ts,jsx,tsx}`, `./app/**/*.{js,jsx,ts,tsx}`],

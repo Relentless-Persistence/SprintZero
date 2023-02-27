@@ -59,6 +59,14 @@ service cloud.firestore {
       }
     }
 
+    match /Participants/{participantId} {
+    	allow read, update, delete:
+      	if isEditorOnProduct(resource.data.productId)
+
+      allow create:
+      	if request.auth != null
+    }
+
     match /Personas/{personaId} {
     	allow read, update, delete:
       	if resource == null || isEditorOnProduct(resource.data.productId)

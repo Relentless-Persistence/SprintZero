@@ -185,6 +185,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 
 	return (
 		<Drawer
+			placement="bottom"
+			closable={false}
+			height={434}
+			open={isOpen}
+			onClose={() => onClose()}
 			title={
 				editMode ? (
 					<div className="flex h-14 items-center">
@@ -284,9 +289,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					</div>
 				)
 			}
-			placement="bottom"
-			closable={false}
-			height={434}
 			extra={
 				<div className="flex items-center gap-4">
 					{editMode ? (
@@ -313,8 +315,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					)}
 				</div>
 			}
-			open={isOpen}
-			onClose={() => onClose()}
 		>
 			{editMode ? (
 				<Form
