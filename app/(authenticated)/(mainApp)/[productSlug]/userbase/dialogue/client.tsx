@@ -23,7 +23,7 @@ const DialogueClientPage: FC = () => {
 	const [activeParticipant, setActiveParticipant] = useState<Id | `new` | undefined>(undefined)
 
 	const activeProductId = useActiveProductId()
-	const [participants, participantsLoading] = useCollection(
+	const [participants] = useCollection(
 		query(collection(db, `Participants`), where(`productId`, `==`, activeProductId)).withConverter(
 			ParticipantConverter,
 		),

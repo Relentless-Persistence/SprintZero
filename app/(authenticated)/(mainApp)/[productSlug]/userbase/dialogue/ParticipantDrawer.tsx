@@ -144,7 +144,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 		} else if (participant) {
 			await updateDoc(participant.ref, {...data, updatedAt: Timestamp.now()})
 		}
-		setIsEditing(false)
+		onClose()
 	})
 
 	const [lastUpdatedAtUser] = useDocument(
