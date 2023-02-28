@@ -6,7 +6,7 @@ import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {FC} from "react"
 
-import SettingsMenu from "~/app/(authenticated)/(mainApp)/SettingsMenu"
+import SettingsMenu from "~/app/(authenticated)/[productSlug]/SettingsMenu"
 import {auth} from "~/utils/firebase"
 
 const Error404Page: FC = () => {

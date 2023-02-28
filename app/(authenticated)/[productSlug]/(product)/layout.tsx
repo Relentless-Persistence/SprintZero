@@ -1,5 +1,6 @@
 "use client"
 
+import {Layout} from "antd"
 import {doc} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
@@ -9,6 +10,7 @@ import invariant from "tiny-invariant"
 
 import type {FC, ReactNode} from "react"
 
+import SideMenu from "./SideMenu"
 import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -30,7 +32,14 @@ const DashboardLayout: FC<DashboardLayoutProps> = ({children}) => {
 	}, [loading, product, router])
 
 	if (loading || !product) return null
-	return <>{children}</>
+	return (
+		<>
+			<Layout.Sider theme="light">
+				<SideMenu />
+			</Layout.Sider>
+			<Layout.Content className="relative">{children}</Layout.Content>
+		</>
+	)
 }
 
 export default DashboardLayout

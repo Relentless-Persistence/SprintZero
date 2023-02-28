@@ -8,8 +8,8 @@ import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 import type {Version} from "~/types/db/Versions"
 
-import {useGenMeta} from "~/app/(authenticated)/(mainApp)/[productSlug]/map/meta"
-import StoryDrawer from "~/app/(authenticated)/(mainApp)/[productSlug]/map/StoryDrawer"
+import {useGenMeta} from "~/app/(authenticated)/[productSlug]/(product)/map/meta"
+import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/map/StoryDrawer"
 import {getStories} from "~/utils/storyMap"
 
 export type StoryProps = {

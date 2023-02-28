@@ -12,6 +12,14 @@ button.ant-btn-default {
 	background-color: white;
 }
 
+button.ant-btn-primary {
+	background-color: theme(colors.primary);
+}
+
+button.ant-switch {
+	background-color: theme(colors.textQuaternary);
+}
+
 ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 	background-color: transparent;
 }

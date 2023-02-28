@@ -8,7 +8,7 @@ import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
-import StoryDrawer from "~/app/(authenticated)/(mainApp)/[productSlug]/tactics/ethics/StoryDrawer"
+import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/tactics/ethics/StoryDrawer"
 import {getStories} from "~/utils/storyMap"
 
 export type StoryProps = {
