@@ -14,7 +14,7 @@ import {db} from "~/utils/firebase"
 import roundToNearest from "~/utils/roundToNearest"
 import {useUser} from "~/utils/useUser"
 
-const ConfigSettingsClientPage: FC = () => {
+const ConfigurationSettingsClientPage: FC = () => {
 	const user = useUser()
 	const [allProducts] = useCollection(
 		user
@@ -160,4 +160,4 @@ const ConfigSettingsClientPage: FC = () => {
 	)
 }
 
-export default ConfigSettingsClientPage
+export default ConfigurationSettingsClientPage

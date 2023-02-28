@@ -18,7 +18,7 @@ const AccountSettingsClientPage: FC = () => {
 
 			<div className="flex gap-8">
 				<div className="flex grow flex-col gap-4">
-					<p className="text-lg font-semibold">Personal Details</p>
+					<p className="text-2xl font-semibold">Account Details</p>
 					<div className="grid grid-cols-[auto_1fr] items-center gap-4">
 						<p>Full Name:</p>
 						<Input disabled value={user?.data().name} />
