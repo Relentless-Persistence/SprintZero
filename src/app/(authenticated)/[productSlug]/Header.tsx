@@ -11,6 +11,7 @@ import type {FC} from "react"
 import LinkTo from "~/components/LinkTo"
 import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
+import {useSetTheme, useTheme} from "~/utils/ThemeContext"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import MoonIcon from "~public/images/moon-icon.svg"
 import SunIcon from "~public/images/sun-icon.svg"
@@ -29,6 +30,8 @@ const Header: FC = () => {
 	)
 
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+	const theme = useTheme()
+	const setTheme = useSetTheme()
 
 	return (
 		<Layout.Header className="flex items-center gap-8 !bg-[#161e12] !px-4">
@@ -62,7 +65,9 @@ const Header: FC = () => {
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Theme</p>
 							<Segmented
 								block
+								value={theme}
 								onChange={(theme) => {
+									setTheme(theme as `light` | `dark`)
 									document.cookie = `theme=${theme};path=/`
 								}}
 								options={[

@@ -84,3 +84,151 @@ input {
 :where(a, p, span) {
 	line-height: 1;
 }
+
+@layer base {
+	html.light {
+		--color-primary-bg: 221 227 213;
+		--color-primary-bg-hover: 196 214 174;
+		--color-primary-border: 167 201 131;
+		--color-primary-border-hover: 139 189 92;
+		--color-primary-hover: 111 176 58;
+		--color-primary: 84 163 28;
+		--color-primary-active: 57 125 15;
+		--color-primary-text-hover: 111 176 58;
+		--color-primary-text: 84 163 28;
+		--color-primary-text-active: 57 125 15;
+
+		--color-success-bg: 246 255 237;
+		--color-success-bg-hover: 217 247 190;
+		--color-success-border: 183 235 143;
+		--color-success-border-hover: 149 222 100;
+		--color-success-hover: 149 222 100;
+		--color-success: 82 196 26;
+		--color-success-active: 56 158 13;
+		--color-success-text-hover: 115 209 61;
+		--color-success-text: 82 196 26;
+		--color-success-text-active: 56 158 13;
+
+		--color-warning-bg: 255 251 230;
+		--color-warning-bg-hover: 255 241 184;
+		--color-warning-border: 255 229 143;
+		--color-warning-border-hover: 255 214 102;
+		--color-warning-hover: 255 214 102;
+		--color-warning: 250 173 20;
+		--color-warning-active: 212 136 6;
+		--color-warning-text-hover: 255 197 61;
+		--color-warning-text: 250 173 20;
+		--color-warning-text-active: 212 136 6;
+
+		--color-error-bg: 255 242 240;
+		--color-error-bg-hover: 255 241 240;
+		--color-error-border: 255 204 199;
+		--color-error-border-hover: 255 163 158;
+		--color-error-hover: 255 120 117;
+		--color-error: 255 77 79;
+		--color-error-active: 217 54 62;
+		--color-error-text-hover: 255 120 117;
+		--color-error-text: 255 77 79;
+		--color-error-text-active: 217 54 62;
+
+		--color-info-bg: 230 244 255;
+		--color-info-bg-hover: 186 224 255;
+		--color-info-border: 145 202 255;
+		--color-info-border-hover: 105 177 255;
+		--color-info-hover: 105 177 255;
+		--color-info: 22 119 255;
+		--color-info-active: 9 88 217;
+		--color-info-text-hover: 64 150 255;
+		--color-info-text: 22 119 255;
+		--color-info-text-active: 9 88 217;
+
+		--color-text: rgb(0 0 0 / 0.88);
+		--color-text-secondary: rgb(0 0 0 / 0.65);
+		--color-text-tertiary: rgb(0 0 0 / 0.45);
+		--color-text-quaternary: rgb(0 0 0 / 0.25);
+		--color-border: 217 217 217;
+		--color-border-secondary: 240 240 240;
+		--color-fill: rgb(0 0 0 / 0.15);
+		--color-fill-secondary: rgb(0 0 0 / 0.06);
+		--color-fill-tertiary: rgb(0 0 0 / 0.04);
+		--color-fill-quaternary: rgb(0 0 0 / 0.02);
+		--color-bg-container: 255 255 255;
+		--color-bg-elevated: 255 255 255;
+		--color-bg-layout: 245 245 245;
+		--color-bg-spotlight: rgb(0 0 0 / 0.85);
+		--color-bg-mask: rgb(0 0 0 / 0.45);
+	}
+
+	html.dark {
+		--color-primary-bg: 22 30 18;
+		--color-primary-bg-hover: 29 46 19;
+		--color-primary-border: 39 63 22;
+		--color-primary-border-hover: 49 84 24;
+		--color-primary-hover: 102 160 54;
+		--color-primary: 74 142 27;
+		--color-primary-active: 62 113 25;
+		--color-primary-text-hover: 102 160 54;
+		--color-primary-text: 74 142 27;
+		--color-primary-text-active: 62 113 25;
+
+		--color-success-bg: 22 35 18;
+		--color-success-bg-hover: 29 55 18;
+		--color-success-border: 39 73 22;
+		--color-success-border-hover: 48 99 23;
+		--color-success-hover: 48 99 23;
+		--color-success: 73 170 25;
+		--color-success-active: 62 134 24;
+		--color-success-text-hover: 106 190 57;
+		--color-success-text: 73 170 25;
+		--color-success-text-active: 62 134 24;
+
+		--color-warning-bg: 43 33 17;
+		--color-warning-bg-hover: 68 49 17;
+		--color-warning-border: 89 66 20;
+		--color-warning-border-hover: 124 89 20;
+		--color-warning-hover: 124 89 20;
+		--color-warning: 216 150 20;
+		--color-warning-active: 170 119 20;
+		--color-warning-text-hover: 232 179 57;
+		--color-warning-text: 216 150 20;
+		--color-warning-text-active: 170 119 20;
+
+		--color-error-bg: 44 22 24;
+		--color-error-bg-hover: 69 29 31;
+		--color-error-border: 91 37 38;
+		--color-error-border-hover: 126 46 47;
+		--color-error-hover: 232 110 107;
+		--color-error: 220 68 70;
+		--color-error-active: 173 57 58;
+		--color-error-text-hover: 232 110 107;
+		--color-error-text: 220 68 70;
+		--color-error-text-active: 173 57 58;
+
+		--color-info-bg: 17 26 44;
+		--color-info-bg-hover: 17 37 69;
+		--color-info-border: 21 50 91;
+		--color-info-border-hover: 21 65 126;
+		--color-info-hover: 21 65 126;
+		--color-info: 22 104 220;
+		--color-info-active: 21 84 173;
+		--color-info-text-hover: 60 137 232;
+		--color-info-text: 22 104 220;
+		--color-info-text-active: 21 84 173;
+
+		--color-text: rgb(255 255 255 / 0.85);
+		--color-text-secondary: rgb(255 255 255 / 0.65);
+		--color-text-tertiary: rgb(255 255 255 / 0.45);
+		--color-text-quaternary: rgb(255 255 255 / 0.25);
+		--color-border: 66 66 66;
+		--color-border-secondary: 48 48 48;
+		--color-fill: rgb(255 255 255 / 0.18);
+		--color-fill-secondary: rgb(255 255 255 / 0.12);
+		--color-fill-tertiary: rgb(255 255 255 / 0.08);
+		--color-fill-quaternary: rgb(255 255 255 / 0.04);
+		--color-bg-container: 20 20 20;
+		--color-bg-elevated: 31 31 31;
+		--color-bg-layout: 0 0 0;
+		--color-bg-spotlight: 66 66 66;
+		--color-bg-mask: rgb(0 0 0 / 0.45);
+	}
+}

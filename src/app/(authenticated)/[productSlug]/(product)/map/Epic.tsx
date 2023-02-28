@@ -39,7 +39,7 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false, isInitialRender = fal
 	return (
 		<div
 			className={clsx(
-				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#4f2dc8]`,
+				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] dark:bg-black`,
 				inert && `cursor-grabbing`,
 				!meta.editMode && `cursor-grab active:cursor-grabbing`,
 			)}
@@ -58,7 +58,7 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false, isInitialRender = fal
 						onKeyDown={(e) => {
 							if (e.key === `Enter`) setHasBlurred(true)
 						}}
-						className="absolute inset-0"
+						className="absolute inset-0 bg-transparent"
 						onChange={(e) => {
 							setLocalEpicName(e.target.value)
 							updateItem(meta.storyMapState, epic.id, {name: e.target.value}, meta.allVersions).catch(console.error)

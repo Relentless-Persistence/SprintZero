@@ -687,7 +687,7 @@ const StoryMap: FC<StoryMapProps> = ({
 														console.error,
 													)
 											}}
-											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101]"
+											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101] dark:bg-black"
 										>
 											<FileOutlined />
 											<span className="my-1">Add story</span>
@@ -711,7 +711,7 @@ const StoryMap: FC<StoryMapProps> = ({
 																console.error,
 															)
 													}}
-													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101]"
+													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101] dark:bg-black"
 												>
 													<FileOutlined />
 													<span className="my-1">Add story</span>
@@ -729,7 +729,7 @@ const StoryMap: FC<StoryMapProps> = ({
 							onClick={() => {
 								addFeature(storyMapState, {parentId: epic.id}).catch(console.error)
 							}}
-							className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378]"
+							className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378] dark:bg-black"
 						>
 							<CopyOutlined />
 							<span className="my-1">Add feature</span>
@@ -744,7 +744,7 @@ const StoryMap: FC<StoryMapProps> = ({
 					onClick={() => {
 						addEpic(storyMapState, {}).catch(console.error)
 					}}
-					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8]"
+					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] dark:bg-black"
 					data-testid="add-epic"
 				>
 					<ReadOutlined />

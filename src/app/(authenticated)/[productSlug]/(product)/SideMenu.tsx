@@ -125,6 +125,7 @@ const SideMenu: FC = () => {
 			onOpenChange={(openKeys) => setOpenKey(openKeys.find((key) => key !== openKey))}
 			selectedKeys={[pathname?.replace(/^\/[^/]+\//, ``) ?? ``]}
 			items={items}
+			className="h-full"
 		/>
 	)
 }

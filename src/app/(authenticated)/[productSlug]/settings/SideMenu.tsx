@@ -47,6 +47,7 @@ const SideMenu: FC = () => {
 				(items.find((item) => item?.key === pathname?.split(`/`).at(-1))?.key as string | undefined) ?? ``,
 			]}
 			items={items}
+			className="h-full"
 		/>
 	)
 }
