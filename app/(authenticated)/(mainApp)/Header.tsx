@@ -46,7 +46,7 @@ const Header: FC = () => {
 							</LinkTo>
 						),
 					}))}
-					className="grow [&>.ant-menu-item-selected]:shadow-[inset_0px_-4px_0px_0px_#73c92d] [&>.ant-menu-item]:cursor-default"
+					className="grow [&>.ant-menu-item-selected]:shadow-[inset_0px_-4px_0px_0px_theme(colors.primary)] [&>.ant-menu-item]:cursor-default"
 					style={{background: `transparent`}}
 				/>
 
