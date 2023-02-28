@@ -26,7 +26,7 @@ const schemas = {
 	effort: z.number().min(0).max(1),
 	engineeringEffort: z.number().min(1),
 	ethicsApproved: z.boolean().nullable(),
-	ethicsColumn: z.enum([`identified`, `underReview`, `adjudicated`]).nullable(),
+	ethicsColumn: z.enum([`underReview`, `adjudicated`]).nullable(),
 	ethicsVotes: z.array(
 		z.object({
 			userId: idSchema,

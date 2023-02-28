@@ -1,7 +1,9 @@
 "use client"
 
-import {Breadcrumb, Card} from "antd"
+import {CloseOutlined, DislikeOutlined, FilterOutlined, LikeOutlined} from "@ant-design/icons"
+import {Breadcrumb, Button, Card, Dropdown, Tag} from "antd"
 import {collection, doc, query, where} from "firebase/firestore"
+import {useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -22,16 +24,16 @@ const EthicsClientPage: FC = () => {
 		),
 	)
 	const storyMapState = storyMapStates?.docs[0]
-	const stories = storyMapState ? getStories(storyMapState.data()) : []
+	const stories = storyMapState ? getStories(storyMapState.data().items) : []
+
+	const [filter, setFilter] = useState<`approved` | `rejected` | `all`>(`all`)
 
 	return (
 		<>
 			{stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
-				<div className="absolute z-10 h-full w-full bg-bgMask">
-					<p className="absolute bottom-12 right-12 border border-errorBorder bg-errorBg px-4 py-2">
-						No elements present; flag a user story to populate
-					</p>
-				</div>
+				<p className="absolute bottom-12 right-12 z-10 border border-errorBorder bg-errorBg px-4 py-2">
+					No elements present; flag a user story to populate
+				</p>
 			)}
 
 			<div className="flex h-full flex-col gap-6 px-12 py-8">
@@ -40,24 +42,11 @@ const EthicsClientPage: FC = () => {
 					<Breadcrumb.Item>Ethics</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<div className="grid w-full grow grid-cols-3 gap-6">
-					<Card title="Identified">
-						<div className="flex flex-col gap-4">
-							{activeProduct?.exists() &&
-								storyMapState?.exists() &&
-								stories
-									.filter((story) => story.ethicsColumn === `identified`)
-									.map((story) => (
-										<Story
-											key={story.id}
-											activeProduct={activeProduct}
-											storyMapState={storyMapState}
-											storyId={story.id}
-										/>
-									))}
-						</div>
-					</Card>
-					<Card title="Under Review">
+				<div className="grid w-full grow grid-cols-2 gap-6">
+					<Card
+						title="Under Review"
+						extra={<p>{stories.filter((story) => story.ethicsColumn === `underReview`).length}</p>}
+					>
 						<div className="flex flex-col gap-4">
 							{activeProduct?.exists() &&
 								storyMapState?.exists() &&
@@ -73,12 +62,49 @@ const EthicsClientPage: FC = () => {
 									))}
 						</div>
 					</Card>
-					<Card title="Adjudicated">
+					<Card
+						title="Adjudicated"
+						extra={
+							<div className="flex gap-1">
+								{filter === `approved` && (
+									<button type="button" onClick={() => setFilter(`all`)}>
+										<Tag icon={<LikeOutlined />} color="green">
+											Approved <CloseOutlined className="ml-0.5" />
+										</Tag>
+									</button>
+								)}
+								{filter === `rejected` && (
+									<button type="button" onClick={() => setFilter(`all`)}>
+										<Tag icon={<DislikeOutlined />} color="red">
+											Rejected <CloseOutlined className="ml-0.5" />
+										</Tag>
+									</button>
+								)}
+								<Dropdown
+									trigger={[`click`]}
+									menu={{
+										items: [
+											{label: `Approved`, key: `approved`, onClick: () => setFilter(`approved`)},
+											{label: `Rejected`, key: `rejected`, onClick: () => setFilter(`rejected`)},
+											{label: `All`, key: `all`, onClick: () => setFilter(`all`)},
+										],
+										selectable: true,
+										defaultSelectedKeys: [`all`],
+									}}
+								>
+									<Button size="small" icon={<FilterOutlined />} className="flex items-center">
+										Filter
+									</Button>
+								</Dropdown>
+							</div>
+						}
+					>
 						<div className="flex flex-col gap-4">
 							{activeProduct?.exists() &&
 								storyMapState?.exists() &&
 								stories
 									.filter((story) => story.ethicsColumn === `adjudicated`)
+									.filter((story) => filter === `all` || (filter === `approved` && story.ethicsApproved))
 									.map((story) => (
 										<Story
 											key={story.id}

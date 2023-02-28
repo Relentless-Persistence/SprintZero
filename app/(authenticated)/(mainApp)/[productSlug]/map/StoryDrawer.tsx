@@ -495,14 +495,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								flagged={story.ethicsColumn !== null}
 								commentType={commentType}
 								onFlag={() => {
-									updateItem(
-										meta.storyMapState,
-										story.id,
-										{
-											ethicsColumn: `identified`,
-										},
-										meta.allVersions,
-									).catch(console.error)
+									updateItem(meta.storyMapState, story.id, {ethicsColumn: `underReview`}, meta.allVersions).catch(
+										console.error,
+									)
 								}}
 							/>
 						</div>
