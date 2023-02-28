@@ -26,12 +26,12 @@ import ParticipantEditForm from "./ParticipantEditForm"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import EarIcon from "~/public/images/ear-icon.svg"
 import {ParticipantSchema, statuses, timings} from "~/types/db/Participants"
 import {PersonaConverter} from "~/types/db/Personas"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+import EarIcon from "~public/images/ear-icon.svg"
 
 dayjs.extend(relativeTime)
 

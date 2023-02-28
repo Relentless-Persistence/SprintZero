@@ -59,9 +59,9 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 			</button>
 			<div className="flex items-center gap-2 px-2">
 				{(hasBlurred || inert) && !meta.editMode ? (
-					<p>{localStoryName}</p>
+					<p className="my-1 h-[1em]">{localStoryName}</p>
 				) : (
-					<div className="relative mx-auto min-w-[1rem]">
+					<div className="relative my-1 mx-auto min-w-[1rem]">
 						<p>{localStoryName || `_`}</p>
 						<input
 							value={localStoryName}

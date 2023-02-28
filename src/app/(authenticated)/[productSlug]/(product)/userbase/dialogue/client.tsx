@@ -12,12 +12,12 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import ParticipantDrawer from "./ParticipantDrawer"
-import EarIcon from "~/public/images/ear-icon.svg"
 import {ParticipantConverter} from "~/types/db/Participants"
 import {PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
+import EarIcon from "~public/images/ear-icon.svg"
 
 const DialogueClientPage: FC = () => {
 	const user = useUser()

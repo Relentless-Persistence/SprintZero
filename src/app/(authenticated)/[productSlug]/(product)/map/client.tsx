@@ -175,7 +175,7 @@ const StoryMapClientPage: FC = () => {
 				</div>
 
 				{editMode ? (
-					<FloatButton.Group className="absolute right-12 bottom-8">
+					<FloatButton.Group key="edit" className="absolute right-12 bottom-8">
 						<Tooltip placement="left" title="Cancel">
 							<FloatButton
 								icon={<CloseOutlined />}
@@ -219,7 +219,12 @@ const StoryMapClientPage: FC = () => {
 						</Tooltip>
 					</FloatButton.Group>
 				) : (
-					<FloatButton.Group trigger="click" icon={<MenuOutlined />} className="absolute right-12 bottom-8">
+					<FloatButton.Group
+						key="toolbelt"
+						trigger="click"
+						icon={<MenuOutlined />}
+						className="absolute right-12 bottom-8"
+					>
 						<Tooltip placement="left" title="Redo">
 							<FloatButton
 								icon={<RedoOutlined className={clsx(`transition-colors`, !canRedo && `text-textTertiary`)} />}

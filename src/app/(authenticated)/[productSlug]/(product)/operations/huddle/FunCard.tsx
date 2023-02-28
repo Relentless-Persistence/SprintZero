@@ -10,8 +10,8 @@ import {z} from "zod"
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
-import ShuffleIcon from "~/public/images/shuffle.svg"
-import SpotifyIcon from "~/public/images/spotify-icon.svg"
+import ShuffleIcon from "~public/images/shuffle.svg"
+import SpotifyIcon from "~public/images/spotify-icon.svg"
 
 dayjs.extend(isBetween)
 

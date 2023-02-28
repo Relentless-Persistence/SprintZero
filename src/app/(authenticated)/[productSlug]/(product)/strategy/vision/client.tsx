@@ -142,12 +142,12 @@ const VisionsClientPage: FC = () => {
 						Changelog
 					</Tag>
 
-					<Timeline>
-						{!activeProduct?.updates || activeProduct.updates.length === 0 ? (
-							<Timeline.Item color="#54a31c">No Changes Yet</Timeline.Item>
-						) : (
-							activeProduct.updates.map((update, i) => (
-								<Timeline.Item color="#54a31c" key={i}>
+					{!activeProduct?.updates || activeProduct.updates.length === 0 ? (
+						<p className="italic text-textTertiary">No changes yet</p>
+					) : (
+						<Timeline
+							items={activeProduct.updates.map((update) => ({
+								children: (
 									<div className="flex flex-col gap-1">
 										<p className="font-mono">{dayjs(update.timestamp.toDate()).fromNow()}</p>
 										<p className="text-xs">
@@ -166,10 +166,10 @@ const VisionsClientPage: FC = () => {
 											)}
 										</p>
 									</div>
-								</Timeline.Item>
-							))
-						)}
-					</Timeline>
+								),
+							}))}
+						/>
+					)}
 				</div>
 			</div>
 		</div>

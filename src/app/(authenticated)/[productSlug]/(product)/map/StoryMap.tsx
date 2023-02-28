@@ -690,7 +690,7 @@ const StoryMap: FC<StoryMapProps> = ({
 											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101]"
 										>
 											<FileOutlined />
-											<span>Add story</span>
+											<span className="my-1">Add story</span>
 										</button>
 									)}
 
@@ -714,7 +714,7 @@ const StoryMap: FC<StoryMapProps> = ({
 													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101]"
 												>
 													<FileOutlined />
-													<span>Add story</span>
+													<span className="my-1">Add story</span>
 												</button>
 											)}
 										</div>
@@ -732,7 +732,7 @@ const StoryMap: FC<StoryMapProps> = ({
 							className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378]"
 						>
 							<CopyOutlined />
-							<span>Add feature</span>
+							<span className="my-1">Add feature</span>
 						</button>
 					)}
 				</div>
@@ -748,7 +748,7 @@ const StoryMap: FC<StoryMapProps> = ({
 					data-testid="add-epic"
 				>
 					<ReadOutlined />
-					<span>Add epic</span>
+					<span className="my-1">Add epic</span>
 				</button>
 			)}
 

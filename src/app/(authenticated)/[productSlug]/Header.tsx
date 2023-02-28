@@ -9,11 +9,11 @@ import {useCollectionOnce, useDocument} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 
 import LinkTo from "~/components/LinkTo"
-import MoonIcon from "~/public/images/moon-icon.svg"
-import SunIcon from "~/public/images/sun-icon.svg"
 import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+import MoonIcon from "~public/images/moon-icon.svg"
+import SunIcon from "~public/images/sun-icon.svg"
 
 const Header: FC = () => {
 	const activeProductId = useActiveProductId()
@@ -55,12 +55,16 @@ const Header: FC = () => {
 				arrow={false}
 				open={isPopoverOpen}
 				onOpenChange={setIsPopoverOpen}
+				overlayClassName="pr-2 pt-4"
 				content={
 					<div className="flex w-48 flex-col gap-4">
 						<div className="flex flex-col gap-2">
-							<p className="border-b border-border font-semibold text-textTertiary">Theme</p>
+							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Theme</p>
 							<Segmented
 								block
+								onChange={(theme) => {
+									document.cookie = `theme=${theme};path=/`
+								}}
 								options={[
 									{icon: <SunIcon className="inline-block" />, label: `Light`, value: `light`},
 									{icon: <MoonIcon className="inline-block" />, label: `Dark`, value: `dark`},
@@ -68,7 +72,7 @@ const Header: FC = () => {
 							/>
 						</div>
 						<div className="flex flex-col gap-2">
-							<p className="border-b border-border font-semibold text-textTertiary">Settings</p>
+							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Settings</p>
 							<Menu
 								className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
 								items={[

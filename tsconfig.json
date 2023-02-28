@@ -19,7 +19,8 @@
 		"baseUrl": ".",
 		"noUncheckedIndexedAccess": true,
 		"paths": {
-			"~/*": ["./*"]
+			"~/*": ["./src/*"],
+			"~public/*": ["./public/*"]
 		},
 		"plugins": [
 			{

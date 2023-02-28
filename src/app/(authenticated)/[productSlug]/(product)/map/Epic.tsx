@@ -1,4 +1,4 @@
-import {CopyOutlined, MinusCircleOutlined} from "@ant-design/icons"
+import {MinusCircleOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
 import {useEffect, useRef, useState} from "react"
 
@@ -9,50 +9,50 @@ import type {Id} from "~/types"
 import {elementRegistry} from "./globals"
 import {updateItem} from "~/utils/storyMap"
 
-export type FeatureProps = {
+export type EpicProps = {
 	meta: StoryMapMeta
-	featureId: Id
+	epicId: Id
 	inert?: boolean
 	isInitialRender?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRender = false}) => {
-	const feature = meta.features.find((feature) => feature.id === featureId)!
+const Epic: FC<EpicProps> = ({meta, epicId, inert = false, isInitialRender = false}) => {
+	const epic = meta.epics.find((epic) => epic.id === epicId)!
 
 	const contentRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
 		if (inert || !contentRef.current) return
-		elementRegistry[featureId] = contentRef.current
+		elementRegistry[epicId] = contentRef.current
 		return () => {
 			if (!contentRef.current) return
-			elementRegistry[featureId] = contentRef.current // eslint-disable-line react-hooks/exhaustive-deps
+			elementRegistry[epicId] = contentRef.current // eslint-disable-line react-hooks/exhaustive-deps
 		}
-	}, [featureId, inert])
+	}, [epicId, inert])
 
-	const [localFeatureName, setLocalFeatureName] = useState(feature.name)
+	const [localEpicName, setLocalEpicName] = useState(epic.name)
 	useEffect(() => {
-		setLocalFeatureName(feature.name)
-	}, [feature.name])
+		setLocalEpicName(epic.name)
+	}, [epic.name])
 
 	const [hasBlurred, setHasBlurred] = useState(isInitialRender)
 
 	return (
 		<div
 			className={clsx(
-				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#006378]`,
+				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#4f2dc8]`,
 				inert && `cursor-grabbing`,
 				!meta.editMode && `cursor-grab active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
-			<CopyOutlined />
+			<ReadOutlined />
 			{(hasBlurred || inert) && !meta.editMode ? (
-				<p>{localFeatureName}</p>
+				<p className="my-1 h-[1em]">{localEpicName}</p>
 			) : (
-				<div className="relative min-w-[1rem]">
-					<p>{localFeatureName || `_`}</p>
+				<div className="relative my-1 min-w-[1rem]">
+					<p>{localEpicName || `_`}</p>
 					<input
-						value={localFeatureName}
+						value={localEpicName}
 						autoFocus={!isInitialRender && !meta.editMode}
 						onBlur={() => setHasBlurred(true)}
 						onKeyDown={(e) => {
@@ -60,8 +60,8 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 						}}
 						className="absolute inset-0"
 						onChange={(e) => {
-							setLocalFeatureName(e.target.value)
-							updateItem(meta.storyMapState, feature.id, {name: e.target.value}, meta.allVersions).catch(console.error)
+							setLocalEpicName(e.target.value)
+							updateItem(meta.storyMapState, epic.id, {name: e.target.value}, meta.allVersions).catch(console.error)
 						}}
 						onPointerDownCapture={(e) => e.stopPropagation()}
 					/>
@@ -71,8 +71,12 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 				<button
 					type="button"
 					onClick={() => {
-						meta.markForDeletion(featureId)
-						feature.childrenIds.forEach((storyId) => meta.markForDeletion(storyId))
+						meta.markForDeletion(epicId)
+						epic.childrenIds.forEach((featureId) => {
+							meta.markForDeletion(featureId)
+							const storyIds = meta.features.find((feature) => feature.id === featureId)!.childrenIds
+							storyIds.forEach((storyId) => meta.markForDeletion(storyId))
+						})
 					}}
 				>
 					<MinusCircleOutlined className="text-sm text-error" />
@@ -82,4 +86,4 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 	)
 }
 
-export default Feature
+export default Epic

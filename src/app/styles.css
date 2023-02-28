@@ -80,3 +80,7 @@ input {
 .ant-tag {
 	margin-inline-end: unset;
 }
+
+:where(a, p, span) {
+	line-height: 1;
+}
