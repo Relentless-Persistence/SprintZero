@@ -60,7 +60,10 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Input
 			{...props}
-			onChange={(e) => field.onChange(format(e.target.value))}
+			onChange={(e) => {
+				field.onChange(format(e.target.value))
+				props.onChange?.(e)
+			}}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}

@@ -26,7 +26,10 @@ const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Input.TextArea
 			{...props}
-			onChange={(e) => field.onChange(e.target.value)}
+			onChange={(e) => {
+				field.onChange(e.target.value)
+				props.onChange?.(e)
+			}}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}

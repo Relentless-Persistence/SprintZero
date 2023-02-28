@@ -27,7 +27,10 @@ const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Select
 			{...props}
-			onChange={(value) => field.onChange(value)}
+			onChange={(value, option) => {
+				field.onChange(value)
+				props.onChange?.(value, option)
+			}}
 			onBlur={field.onBlur}
 			value={field.value}
 			ref={(v) => field.ref(v)}

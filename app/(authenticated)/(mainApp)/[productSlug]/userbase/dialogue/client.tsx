@@ -3,7 +3,7 @@
 import {EyeOutlined, PhoneOutlined, PlusOutlined, UserOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Button, Card, FloatButton, Tabs, Tag} from "antd"
-import {collection, doc, getDoc, query, where} from "firebase/firestore"
+import {Timestamp, addDoc, collection, doc, getDoc, query, where} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
@@ -17,10 +17,12 @@ import {ParticipantConverter} from "~/types/db/Participants"
 import {PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useUser} from "~/utils/useUser"
 
 const DialogueClientPage: FC = () => {
+	const user = useUser()
 	const [currentTab, setCurrentTab] = useState<(typeof tabs)[number][0]>(`identified`)
-	const [activeParticipant, setActiveParticipant] = useState<Id | `new` | undefined>(undefined)
+	const [activeParticipant, setActiveParticipant] = useState<Id | undefined>(undefined)
 
 	const activeProductId = useActiveProductId()
 	const [participants] = useCollection(
@@ -137,7 +139,34 @@ const DialogueClientPage: FC = () => {
 				<FloatButton
 					icon={<PlusOutlined className="text-primary" />}
 					tooltip="Add Participant"
-					onClick={() => setActiveParticipant(`new`)}
+					onClick={() => {
+						addDoc(collection(db, `Participants`).withConverter(ParticipantConverter), {
+							availability: [],
+							disabilities: {
+								auditory: false,
+								cognitive: false,
+								physical: false,
+								speech: false,
+								visual: false,
+							},
+							email: null,
+							location: ``,
+							name: `New Participant`,
+							phoneNumber: ``,
+							status: `identified`,
+							timing: null,
+							title: null,
+							transcript: ``,
+							updatedAt: Timestamp.now(),
+							personaIds: [],
+							productId: activeProductId,
+							updatedAtUserId: user!.id as Id,
+						})
+							.then((docRef) => {
+								setActiveParticipant(docRef.id as Id)
+							})
+							.catch(console.error)
+					}}
 					className="absolute bottom-8 right-12"
 				/>
 			</div>
