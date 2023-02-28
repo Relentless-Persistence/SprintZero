@@ -38,7 +38,7 @@ service cloud.firestore {
       }
     }
 
-    match /Learnings/{learningId} {
+    match /Insights/{insightId} {
     	allow read, update, delete:
       	if isEditorOnProduct(resource.data.productId)
 

@@ -5,27 +5,27 @@ import {useForm} from "react-hook-form"
 import type {FC} from "react"
 import type {z} from "zod"
 import type {Id} from "~/types"
-import type {Learning} from "~/types/db/Learnings"
+import type {Insight} from "~/types/db/Insights"
 
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
-import {LearningSchema} from "~/types/db/Learnings"
+import {InsightSchema} from "~/types/db/Insights"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const formSchema = LearningSchema.pick({status: true, text: true, title: true})
+const formSchema = InsightSchema.pick({status: true, text: true, title: true})
 type FormInputs = z.infer<typeof formSchema>
 
-export type LearningCardProps = {
-	learningId?: Id
-	initialData: Partial<Learning>
+export type InsightCardProps = {
+	insightId?: Id
+	initialData: Partial<Insight>
 	isEditing: boolean
 	onEditStart?: () => void
 	onEditEnd: () => void
 }
 
-const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEditing, onEditStart, onEditEnd}) => {
+const InsightItemCard: FC<InsightCardProps> = ({insightId, initialData, isEditing, onEditStart, onEditEnd}) => {
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
 		defaultValues: {
@@ -37,8 +37,8 @@ const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEdi
 
 	const activeProductId = useActiveProductId()
 	const onSubmit = handleSubmit(async (data) => {
-		if (learningId) await updateDoc(doc(db, `Learnings`, learningId), data satisfies Partial<Learning>)
-		else await addDoc(collection(db, `Learnings`), {...data, productId: activeProductId} satisfies Learning)
+		if (insightId) await updateDoc(doc(db, `Insights`, insightId), data satisfies Partial<Insight>)
+		else await addDoc(collection(db, `Insights`), {...data, productId: activeProductId} satisfies Insight)
 		onEditEnd()
 	})
 
@@ -52,7 +52,7 @@ const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEdi
 						<Button size="small" onClick={() => onEditEnd()}>
 							Cancel
 						</Button>
-						<Button size="small" type="primary" htmlType="submit" form="learning-form">
+						<Button size="small" type="primary" htmlType="submit" form="insight-form">
 							Done
 						</Button>
 					</div>
@@ -65,7 +65,7 @@ const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEdi
 		>
 			{isEditing ? (
 				<form
-					id="learning-form"
+					id="insight-form"
 					onSubmit={(e) => {
 						onSubmit(e).catch(console.error)
 					}}
@@ -82,11 +82,11 @@ const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEdi
 						block
 					/>
 					<RhfStretchyTextArea control={control} name="text" minHeight="4rem" />
-					{learningId && (
+					{insightId && (
 						<Button
 							danger
 							onClick={() => {
-								deleteDoc(doc(db, `Learnings`, learningId)).catch(console.error)
+								deleteDoc(doc(db, `Insights`, insightId)).catch(console.error)
 							}}
 							className="w-full"
 						>
@@ -101,4 +101,4 @@ const LearningItemCard: FC<LearningCardProps> = ({learningId, initialData, isEdi
 	)
 }
 
-export default LearningItemCard
+export default InsightItemCard

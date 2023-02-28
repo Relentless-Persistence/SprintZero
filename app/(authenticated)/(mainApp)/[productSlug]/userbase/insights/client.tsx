@@ -9,19 +9,19 @@ import Masonry from "react-masonry-css"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import LearningItemCard from "./LearningCard"
-import {LearningConverter} from "~/types/db/Learnings"
+import InsightItemCard from "./InsightCard"
+import {InsightConverter} from "~/types/db/Insights"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const LearningsClientPage: FC = () => {
+const InsightsClientPage: FC = () => {
 	const [currentTab, setCurrentTab] = useState<keyof typeof tabNames>(`validated`)
 
 	const activeProductId = useActiveProductId()
-	const [learnings] = useCollection(
-		query(collection(db, `Learnings`), where(`productId`, `==`, activeProductId)).withConverter(LearningConverter),
+	const [insights] = useCollection(
+		query(collection(db, `Insights`), where(`productId`, `==`, activeProductId)).withConverter(InsightConverter),
 	)
-	const [activeLearning, setActiveLearning] = useState<Id | `new` | undefined>(undefined)
+	const [activeInsight, setActiveInsight] = useState<Id | `new` | undefined>(undefined)
 
 	return (
 		<div className="grid grid-cols-[1fr_max-content]">
@@ -29,11 +29,11 @@ const LearningsClientPage: FC = () => {
 				<div className="flex justify-between">
 					<Breadcrumb>
 						<Breadcrumb.Item>Userbase</Breadcrumb.Item>
-						<Breadcrumb.Item>Learnings</Breadcrumb.Item>
+						<Breadcrumb.Item>Insights</Breadcrumb.Item>
 						<Breadcrumb.Item>{tabNames[currentTab]}</Breadcrumb.Item>
 					</Breadcrumb>
 
-					<Button onClick={() => setActiveLearning(`new`)}>Add New</Button>
+					<Button onClick={() => setActiveInsight(`new`)}>Add New</Button>
 				</div>
 
 				<Masonry
@@ -41,24 +41,24 @@ const LearningsClientPage: FC = () => {
 					className="flex gap-8"
 					columnClassName="bg-clip-padding flex flex-col gap-8"
 				>
-					{learnings?.docs
-						.filter((learning) => learning.data().status === currentTab)
-						.map((learning) => (
-							<LearningItemCard
-								key={learning.id}
-								learningId={learning.id as Id}
-								initialData={learning.data()}
-								isEditing={activeLearning === learning.id}
-								onEditStart={() => setActiveLearning(learning.id as Id)}
-								onEditEnd={() => setActiveLearning(undefined)}
+					{insights?.docs
+						.filter((insight) => insight.data().status === currentTab)
+						.map((insight) => (
+							<InsightItemCard
+								key={insight.id}
+								insightId={insight.id as Id}
+								initialData={insight.data()}
+								isEditing={activeInsight === insight.id}
+								onEditStart={() => setActiveInsight(insight.id as Id)}
+								onEditEnd={() => setActiveInsight(undefined)}
 							/>
 						))}
 
-					{activeLearning === `new` && (
-						<LearningItemCard
+					{activeInsight === `new` && (
+						<InsightItemCard
 							initialData={{status: currentTab}}
 							isEditing
-							onEditEnd={() => setActiveLearning(undefined)}
+							onEditEnd={() => setActiveInsight(undefined)}
 						/>
 					)}
 				</Masonry>
@@ -74,7 +74,7 @@ const LearningsClientPage: FC = () => {
 	)
 }
 
-export default LearningsClientPage
+export default InsightsClientPage
 
 const tabNames = {
 	validated: `Validated`,

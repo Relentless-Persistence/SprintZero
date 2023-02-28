@@ -29,12 +29,12 @@ const getItems = (activeProductId: Id) => [
 		label: `Strategy`,
 		children: [
 			{
-				key: `strategy/kickoff`,
-				label: <LinkTo href={`/${activeProductId}/strategy/kickoff`}>Kickoff</LinkTo>,
-			},
-			{
 				key: `strategy/accessibility`,
 				label: <LinkTo href={`/${activeProductId}/strategy/accessibility`}>Accessibility</LinkTo>,
+			},
+			{
+				key: `strategy/kickoff`,
+				label: <LinkTo href={`/${activeProductId}/strategy/kickoff`}>Kickoff</LinkTo>,
 			},
 			{
 				key: `strategy/objectives`,
@@ -59,10 +59,6 @@ const getItems = (activeProductId: Id) => [
 				key: `tactics/priorities`,
 				label: <LinkTo href={`/${activeProductId}/tactics/priorities`}>Priorities</LinkTo>,
 			},
-			{
-				key: `tactics/retrospective`,
-				label: <LinkTo href={`/${activeProductId}/tactics/retrospective`}>Retrospective</LinkTo>,
-			},
 		],
 	},
 	{
@@ -73,6 +69,10 @@ const getItems = (activeProductId: Id) => [
 			{
 				key: `operations/huddle`,
 				label: <LinkTo href={`/${activeProductId}/operations/huddle`}>Huddle</LinkTo>,
+			},
+			{
+				key: `tactics/retrospective`,
+				label: <LinkTo href={`/${activeProductId}/tactics/retrospective`}>Retrospective</LinkTo>,
 			},
 			{
 				key: `operations/sprint`,
@@ -98,8 +98,8 @@ const getItems = (activeProductId: Id) => [
 				label: <LinkTo href={`/${activeProductId}/userbase/journeys`}>Journeys</LinkTo>,
 			},
 			{
-				key: `userbase/learnings`,
-				label: <LinkTo href={`/${activeProductId}/userbase/learnings`}>Learnings</LinkTo>,
+				key: `userbase/insights`,
+				label: <LinkTo href={`/${activeProductId}/userbase/insights`}>Insights</LinkTo>,
 			},
 			{
 				key: `userbase/personas`,
