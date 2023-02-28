@@ -29,30 +29,26 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName, lastUpdated}) => 
 				</Breadcrumb>
 				{lastUpdatedText && <p className="text-sm italic text-textTertiary">Last updated {lastUpdatedText}</p>}
 			</div>
-			<div className="px-12 text-textSecondary">
-				<svg className="h-3 w-full">
-					<svg viewBox="-16 -12 132 124" width="10" height="100%" preserveAspectRatio="none">
+			<div className="px-12 text-[#595959]">
+				<div className="relative h-3 w-full">
+					<svg viewBox="-16 -12 132 124" preserveAspectRatio="none" className="absolute top-0 left-0 h-full w-2">
 						<path
 							d="M 100 0 L 0 50 L 100 100"
 							vectorEffect="non-scaling-stroke"
 							className="fill-none stroke-current stroke-[1.5] [stroke-linecap:round] [stroke-linejoin:round]"
 						/>
 					</svg>
-					<line
-						x1="2px"
-						y1="50%"
-						x2="calc(100% - 2px)"
-						y2="50%"
-						className="stroke-current stroke-[1.5] [stroke-dasharray:6_2]"
-					/>
-					<svg viewBox="-16 -12 132 124" x="calc(100% - 10px)" width="10" height="100%" preserveAspectRatio="none">
+					<svg className="absolute top-0 left-0.5 h-full w-[calc(100%-4px)]">
+						<line x1="0%" y1="50%" x2="100%" y2="50%" className="stroke-current stroke-[1.5] [stroke-dasharray:6_2]" />
+					</svg>
+					<svg viewBox="-16 -12 132 124" preserveAspectRatio="none" className="absolute right-0 top-0 h-full w-2">
 						<path
 							d="M 0 0 L 100 50 L 0 100"
 							vectorEffect="non-scaling-stroke"
 							className="fill-none stroke-current stroke-[1.5] [stroke-linecap:round] [stroke-linejoin:round]"
 						/>
 					</svg>
-				</svg>
+				</div>
 				<div className="mt-2 flex justify-between text-sm">
 					<p>Highest value</p>
 					<p>Lowest value</p>

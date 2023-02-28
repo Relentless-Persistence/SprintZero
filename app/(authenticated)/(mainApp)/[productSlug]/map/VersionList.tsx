@@ -1,7 +1,7 @@
 "use client"
 
 import {MinusCircleOutlined} from "@ant-design/icons"
-import {Input, Tabs} from "antd"
+import {Button, Input, Tabs} from "antd"
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
 import {useEffect} from "react"
 
@@ -117,25 +117,33 @@ const VersionList: FC<VersionListProps> = ({
 								{
 									key: `__NEW_VERSION__`,
 									label: (
-										<Input
-											size="small"
-											autoFocus
-											value={newVersionInputValue}
-											onChange={(e) => setNewVersionInputValue(e.target.value)}
-											onPressEnter={() => {
-												if (newVersionInputValue)
-													addVersion()
-														.then((doc) => {
-															setNewVersionInputValue(undefined)
-															setCurrentVersionId(doc.id as Id)
-														})
-														.catch(console.error)
-											}}
-											onKeyDown={(e) => {
-												if (e.key === `Escape`) setNewVersionInputValue(undefined)
-											}}
-											className="-mx-2 -my-2 w-[calc(100%+1rem)]"
-										/>
+										<Input.Group compact className="-mx-2 -my-2 w-[calc(100%+1rem)]">
+											<Input
+												size="small"
+												autoFocus
+												value={newVersionInputValue}
+												onChange={(e) => setNewVersionInputValue(e.target.value)}
+												onPressEnter={() => {
+													if (newVersionInputValue)
+														addVersion()
+															.then((doc) => {
+																setNewVersionInputValue(undefined)
+																setCurrentVersionId(doc.id as Id)
+															})
+															.catch(console.error)
+												}}
+												onKeyDown={(e) => {
+													if (e.key === `Escape`) setNewVersionInputValue(undefined)
+												}}
+												className="!w-12"
+											/>
+											<Button
+												size="small"
+												icon={<MinusCircleOutlined className="!mr-0" />}
+												onClick={() => setNewVersionInputValue(undefined)}
+												className="!inline-grid place-items-center !text-xs"
+											/>
+										</Input.Group>
 									),
 								},
 						  ]

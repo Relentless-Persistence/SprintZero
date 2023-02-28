@@ -55,7 +55,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 				onPointerDownCapture={(e) => e.stopPropagation()}
 				className="border-r border-[#d9d9d9] bg-[#f1f2f5] p-2 text-xs"
 			>
-				<p className="max-h-8 truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
+				<p className="max-h-8 w-[1em] truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 			</button>
 			<div className="flex items-center gap-2 px-2">
 				{(hasBlurred || inert) && !meta.editMode ? (
