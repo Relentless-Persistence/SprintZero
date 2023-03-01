@@ -43,7 +43,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 	return (
 		<div
 			className={clsx(
-				`flex touch-none select-none items-center overflow-hidden rounded border border-[#d9d9d9] bg-white font-medium dark:bg-black`,
+				`flex touch-none select-none items-center overflow-hidden rounded border border-[#d9d9d9] bg-white font-medium dark:border-[#757575] dark:bg-black`,
 				inert && `cursor-grabbing`,
 				!meta.editMode && `cursor-grab  active:cursor-grabbing`,
 			)}
@@ -53,7 +53,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 				type="button"
 				onClick={() => setIsDrawerOpen(true)}
 				onPointerDownCapture={(e) => e.stopPropagation()}
-				className="border-r border-[#d9d9d9] bg-[#f1f2f5] p-2 text-xs dark:bg-[#333333]"
+				className="border-r border-[#d9d9d9] bg-[#f1f2f5] p-2 text-xs dark:border-[#757575] dark:bg-[#333333]"
 			>
 				<p className="max-h-8 w-[1em] truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 			</button>
@@ -70,7 +70,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 							onKeyDown={(e) => {
 								if (e.key === `Enter`) setHasBlurred(true)
 							}}
-							className="absolute inset-0 bg-transparent"
+							className="absolute inset-0 rounded-sm bg-transparent focus:outline focus:outline-offset-1 focus:outline-primaryHover"
 							onChange={(e) => {
 								setLocalStoryName(e.target.value)
 								updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(console.error)

@@ -39,7 +39,7 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 	return (
 		<div
 			className={clsx(
-				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#006378] dark:bg-black`,
+				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#006378] dark:bg-black dark:text-[#00a2c4]`,
 				inert && `cursor-grabbing`,
 				!meta.editMode && `cursor-grab active:cursor-grabbing`,
 			)}
@@ -58,7 +58,7 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 						onKeyDown={(e) => {
 							if (e.key === `Enter`) setHasBlurred(true)
 						}}
-						className="absolute inset-0 bg-transparent"
+						className="absolute inset-0 rounded-sm bg-transparent focus:outline focus:outline-offset-1 focus:outline-primaryHover"
 						onChange={(e) => {
 							setLocalFeatureName(e.target.value)
 							updateItem(meta.storyMapState, feature.id, {name: e.target.value}, meta.allVersions).catch(console.error)

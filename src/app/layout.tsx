@@ -29,7 +29,7 @@ const RootLayout: FC<RootLayoutProps> = ({children}) => {
 	return (
 		<html lang="en" className={clsx(`h-full`, theme)}>
 			<head></head>
-			<body className="h-full bg-bgLayout text-base text-text">
+			<body className="h-full bg-bgLayout text-base leading-none text-text">
 				<RootProviders theme={theme}>{children}</RootProviders>
 			</body>
 		</html>

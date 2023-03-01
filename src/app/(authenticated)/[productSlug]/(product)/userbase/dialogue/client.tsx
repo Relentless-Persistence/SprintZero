@@ -52,9 +52,9 @@ const DialogueClientPage: FC = () => {
 				</Breadcrumb>
 
 				<Masonry
-					breakpointCols={{1000: 1, 1300: 2, 1600: 3}}
+					breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
 					className="flex gap-8"
-					columnClassName="bg-clip-padding flex flex-col gap-8"
+					columnClassName="flex flex-col gap-8"
 				>
 					{participants?.docs
 						.filter((participant) => participant.data().status === currentTab)

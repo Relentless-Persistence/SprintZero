@@ -9,7 +9,7 @@ body,
 }
 
 button.ant-btn-default {
-	background-color: white;
+	background-color: theme(colors.bgContainer);
 }
 
 button.ant-btn-primary {
@@ -72,22 +72,8 @@ button.ant-btn-link {
 	height: auto;
 }
 
-input {
-	outline-color: theme(colors.primaryBorder);
-	outline-offset: 1px;
-}
-
 .ant-tag {
 	margin-inline-end: unset;
-}
-
-:where(a, p, span) {
-	line-height: 1;
-}
-
-.ant-menu-title-content,
-.ant-select-selection-item-content {
-	line-height: 1.5;
 }
 
 @layer base {

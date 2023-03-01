@@ -41,6 +41,7 @@ import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {deleteItem, updateItem} from "~/utils/storyMap"
+import {useTheme} from "~/utils/ThemeContext"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
@@ -185,6 +186,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 			</div>
 		))
 
+	const theme = useTheme()
+
 	return (
 		<Drawer
 			placement="bottom"
@@ -212,7 +215,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								<p>{localStoryName || `_`}</p>
 								<input
 									value={localStoryName}
-									className="absolute inset-0"
+									className="absolute inset-0 bg-transparent"
 									onChange={(e) => {
 										setLocalStoryName(e.target.value)
 										updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(
@@ -233,9 +236,13 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 									{totalEffort} point{totalEffort === 1 ? `` : `s`}
 								</Tag>
 								<Tag
-									color={typeof product?.effortCost === `number` ? `#585858` : `#f5f5f5`}
+									color={
+										typeof product?.effortCost === `number` ? `#585858` : theme === `light` ? `#f5f5f5` : `#333333`
+									}
 									icon={<DollarOutlined />}
-									className={clsx(typeof product?.effortCost !== `number` && `!border-current !text-[#d9d9d9]`)}
+									className={clsx(
+										typeof product?.effortCost !== `number` && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
+									)}
 								>
 									{dollarFormat((product?.effortCost ?? 0) * totalEffort)}
 								</Tag>
@@ -261,26 +268,27 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 
 								<div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
 									<Tag
-										color={story.branchName ? `#0958d9` : `#f5f5f5`}
+										color={story.branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 										icon={<CodeOutlined />}
-										style={story.branchName ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+										className={clsx(!story.branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 									>
 										{story.branchName ?? `No branch`}
 									</Tag>
 									<LinkTo href={story.designLink} openInNewTab>
 										<Tag
-											color={story.designLink ? `#0958d9` : `#f5f5f5`}
+											color={story.designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<BlockOutlined />}
-											style={story.designLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+											className={clsx(!story.designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 										>
 											Design
 										</Tag>
 									</LinkTo>
 									<LinkTo href={story.pageLink} openInNewTab>
 										<Tag
-											color={story.pageLink ? `#0958d9` : `#f5f5f5`}
+											color={story.pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<LinkOutlined />}
 											style={story.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+											className={clsx(!story.pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 										>
 											Page
 										</Tag>

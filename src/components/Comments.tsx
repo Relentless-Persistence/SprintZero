@@ -63,13 +63,13 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 			<div className="flex grow flex-col-reverse overflow-auto">
 				<div className="flex flex-col gap-4">
 					{comments?.docs.length === 0 ? (
-						<p className="italic text-textTertiary">Nothing here yet</p>
+						<p className="italic leading-normal text-textTertiary">Nothing here yet</p>
 					) : (
 						comments?.docs.map((comment) => {
 							const author = commentAuthors.find((author) => author.data?.id === comment.data().authorId)?.data
 							return (
 								<div key={comment.id} className="flex gap-2">
-									<Avatar shape="square" src={author?.data()?.avatar} className="border border-[#d6d7d9]" />
+									<Avatar shape="square" src={author?.data()?.avatar} className="border border-border" />
 									<div className="flex min-w-0 flex-1 flex-col gap-1">
 										<p className="text-sm text-textTertiary">{author?.data()?.name}</p>
 										<p className="leading-normal">{comment.data().text}</p>
@@ -86,7 +86,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 				}}
 				className="mt-4 flex gap-2"
 			>
-				<Avatar shape="square" src={user?.data().avatar} className="border border-[#d6d7d9]" />
+				<Avatar shape="square" src={user?.data().avatar} className="border border-border" />
 				<div className="flex grow flex-col gap-2">
 					<Input value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} />
 					<div className="flex justify-between gap-2">

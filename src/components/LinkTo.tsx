@@ -18,7 +18,8 @@ const LinkTo = (
 	{href, openInNewTab = false, children, noFollow, className, ...props}: Props,
 	ref: ForwardedRef<HTMLAnchorElement>,
 ): ReactElement | null => {
-	if (!href) return <p className={className}>{children}</p>
+	if (!href && typeof children === `string`) return <span className={className}>{children}</span>
+	if (!href) return <>{children}</>
 
 	const isInternalLink = href.startsWith(`/`) || href.startsWith(`#`) || /^https?:\/\/web\.sprintzero\.app/.test(href)
 	return (
