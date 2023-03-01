@@ -42,6 +42,7 @@
 		"eslint-plugin-react": "7.32.2",
 		"eslint-plugin-react-hooks": "4.6.0",
 		"firebase": "9.17.1",
+		"firebase-admin": "11.5.0",
 		"framer-motion": "10.0.1",
 		"googleapis": "111.0.0",
 		"immer": "9.0.19",

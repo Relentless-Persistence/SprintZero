@@ -2,6 +2,7 @@
 
 import {AppleFilled, AppstoreFilled, GithubOutlined, GoogleOutlined} from "@ant-design/icons"
 import {notification} from "antd"
+import axios from "axios"
 import {FirebaseError} from "firebase/app"
 import {
 	GithubAuthProvider,
@@ -115,14 +116,11 @@ const SignInClientPage: FC = () => {
 		if (isNewUser) {
 			// if user is coming with an invite token
 			console.log(`You are a new user`)
-			if (!tokenExists) {
-				notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
-				await signOut(auth)
-			} else if (tokenExists && userInvite.userEmail != credential.user.email) {
+			if (tokenExists && userInvite.userEmail != credential.user.email) {
 				notification.error({message: `Sorry, you do not have a valid invite.`})
 				await signOut(auth)
 			} else if (tokenExists && userInvite.userEmail === credential.user.email) {
-				notification.error({message: `You have a valid invite.`})
+				notification.success({message: `You have a valid invite.`})
 				await setDoc(doc(db, `Users`, credential.user.uid), {
 					avatar: credential.user.photoURL,
 					email: credential.user.email,
@@ -132,22 +130,25 @@ const SignInClientPage: FC = () => {
 
 				console.log(`I am now addin you to product as a member:`, userInvite.productId, userInvite.token)
 
-				// const data: WithFieldValue<Product> = {
-				// 	[`${credential.user.uid}`]: {type: `editor`},
-				// }
+				// const data = {type: `editor`}
 
-				// const data: WithFieldValue<Product> = {
-				// 	[`${credential.user.uid}`]: {type: `editor`},
-				// }
+				// //const memberData = {type: "editor"}
+				// //const members = {members.[credential.user.uid as Id]: {type: `editor`}}
+				// const productRef = doc(db, `Products`, userInvite.productId).withConverter(ProductConverter)
+				// await updateDoc(productRef, {
+				// 	[`members.${credential.user.uid}`]: data,
+				// })
 
-				const data = {type: `editor`}
-
-				//const memberData = {type: "editor"}
-				//const members = {members.[credential.user.uid as Id]: {type: `editor`}}
-				const productRef = doc(db, `Products`, userInvite.productId).withConverter(ProductConverter)
-				await updateDoc(productRef, {
-					[`members.${credential.user.uid}`]: data,
-				})
+				try {
+					const res = await axios.post(`/api/map-user-to-product`, {
+						productId: userInvite.productId,
+						userId: credential.user.uid,
+						role: `editor`,
+					})
+					console.log(`User added to product members with role:`, res.data.role)
+				} catch (error) {
+					console.error(`Failed to add user to product members:`, error)
+				}
 
 				router.push(`/accept-terms`)
 				// eslint-disable-next-line no-negated-condition
