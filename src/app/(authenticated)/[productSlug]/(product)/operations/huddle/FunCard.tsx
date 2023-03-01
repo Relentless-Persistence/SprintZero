@@ -150,6 +150,7 @@ const FunCard: FC = () => {
 					<DatePicker
 						value={date}
 						format="MMMM D, YYYY"
+						defaultPickerValue={dayjs(`2020-01-01`)}
 						disabledDate={(date) => !date.isBetween(`1960-01-01`, `2020-12-31`, undefined, `[]`)}
 						className="w-full"
 						onChange={(date) => setDate(date)}
@@ -166,7 +167,7 @@ const FunCard: FC = () => {
 							Randomize
 						</Button>
 						<div className="space-x-2 text-right">
-							<Button type="link" disabled={date === null} onClick={onReset}>
+							<Button type="text" size="small" disabled={date === null} onClick={onReset}>
 								Reset
 							</Button>
 							<Button

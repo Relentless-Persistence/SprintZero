@@ -38,13 +38,13 @@ const RetrospectiveClientPage: FC = () => {
 	const [includeArchived, setIncludeArchived] = useState(false)
 	const activeItem = retrospectiveItems?.docs.find((item) => item.id === activeItemId)
 
-	const itemsForCurrentTab = retrospectiveItems?.docs.filter((item) => item.data().type === currentTab) ?? []
-
 	const usersData = useQueries({
-		queries: itemsForCurrentTab.map((item) => ({
-			queryKey: [`user`, item.data().userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, item.data().userId).withConverter(UserConverter)),
-		})),
+		queries: retrospectiveItems
+			? retrospectiveItems.docs.map((item) => ({
+					queryKey: [`user`, item.data().userId],
+					queryFn: async () => await getDoc(doc(db, `Users`, item.data().userId).withConverter(UserConverter)),
+			  }))
+			: [],
 	})
 
 	return (
@@ -73,7 +73,8 @@ const RetrospectiveClientPage: FC = () => {
 						columnClassName="flex flex-col gap-8"
 					>
 						{retrospectiveItems.docs
-							.filter((item) => !includeArchived || !item.data().archived)
+							.filter((item) => item.data().type === currentTab)
+							.filter((item) => includeArchived || !item.data().archived)
 							.map((item) => (
 								<Card
 									key={item.id}
@@ -135,6 +136,7 @@ const RetrospectiveClientPage: FC = () => {
 
 			{!loading && activeItemId && (
 				<RetrospectiveDrawer
+					activeItemId={activeItemId}
 					initialValues={
 						(activeItemId === `new` ? undefined : activeItem?.data()) ?? {
 							description: ``,
@@ -145,6 +147,7 @@ const RetrospectiveClientPage: FC = () => {
 					}
 					onCancel={() => setActiveItemId(undefined)}
 					onArchive={async () => {
+						setActiveItemId(undefined)
 						await updateDoc(activeItem!.ref, {archived: true})
 					}}
 					onCommit={async (values) => {
