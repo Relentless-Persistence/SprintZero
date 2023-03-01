@@ -18,7 +18,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 	const user = useUser()
 	const [allProducts] = useCollection(
 		user
-			? query(collection(db, `Products`), where(`members.${user.id}.type`, `==`, `editor`)).withConverter(
+			? query(collection(db, `Products`), where(`members.${user.id}.type`, `in`, [`owner`, `editor`])).withConverter(
 					ProductConverter,
 			  )
 			: undefined,

@@ -72,7 +72,7 @@ const ProductSetupClientPage: FC = () => {
 		})
 
 		const {email1, email2, email3, ...data} = _data
-		const members = {[user.uid as Id]: {type: `editor`} as const}
+		const members = {[user.uid as Id]: {type: `owner`} as const}
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,

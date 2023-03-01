@@ -81,7 +81,7 @@ const ResultCard: FC<ResultCardProps> = ({objectiveId, result, index, isEditing,
 						</Button>
 					</div>
 				) : (
-					<Button type="link" className="text-primary" onClick={() => onEditStart?.()}>
+					<Button type="text" size="small" className="text-primary" onClick={() => onEditStart?.()}>
 						Edit
 					</Button>
 				)

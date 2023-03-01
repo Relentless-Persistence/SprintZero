@@ -28,7 +28,7 @@ const HeaderDoNotUse: FC = () => {
 	const [user] = useAuthState(auth)
 	const [allProducts] = useCollectionOnce(
 		user
-			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `==`, `editor`)).withConverter(
+			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `in`, [`owner`, `editor`])).withConverter(
 					ProductConverter,
 			  )
 			: undefined,

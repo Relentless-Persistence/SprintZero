@@ -1,7 +1,7 @@
 "use client"
 
 import {CloseOutlined, DislikeOutlined, FilterOutlined, LikeOutlined} from "@ant-design/icons"
-import {Breadcrumb, Button, Card, Dropdown, Tag} from "antd"
+import {Alert, Breadcrumb, Button, Card, Dropdown, Tag} from "antd"
 import {collection, doc, query, where} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
@@ -31,9 +31,12 @@ const EthicsClientPage: FC = () => {
 	return (
 		<>
 			{stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
-				<p className="absolute bottom-12 right-12 z-10 border border-errorBorder bg-errorBg px-4 py-2">
-					No elements present; flag a user story to populate
-				</p>
+				<Alert
+					type="error"
+					showIcon
+					message="No elements present; flag a user story to populate"
+					className="absolute bottom-8 right-12 z-10"
+				/>
 			)}
 
 			<div className="flex h-full flex-col gap-6 px-12 py-8">

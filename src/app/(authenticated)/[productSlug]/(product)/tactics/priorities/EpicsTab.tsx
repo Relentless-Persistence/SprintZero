@@ -61,19 +61,19 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 	}, [])
 
 	return (
-		<div className="flex h-full flex-col gap-6 px-12 py-8">
+		<div className="flex h-full flex-col px-12 py-8">
 			<Breadcrumb>
 				<Breadcrumb.Item>Tactics</Breadcrumb.Item>
 				<Breadcrumb.Item>Priorities</Breadcrumb.Item>
 				<Breadcrumb.Item>Epics</Breadcrumb.Item>
 			</Breadcrumb>
 
-			<p className="text-textTertiary">
+			<p className="mt-2 text-textTertiary">
 				Assess the practicality of proposed items to objectively and rationally uncover strengths and weaknesses,
 				opportunities and threats, the resources required to carry through, and ultimately the prospects for success
 			</p>
 
-			<div className="relative grow">
+			<div className="relative mt-6 grow">
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
 						{storyMapState?.exists() &&

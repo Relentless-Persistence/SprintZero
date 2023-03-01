@@ -17,7 +17,7 @@ const HomePage: FC = () => {
 
 	const [products, loading] = useCollectionOnce(
 		user
-			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `==`, `editor`)).withConverter(
+			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `in`, [`owner`, `editor`])).withConverter(
 					ProductConverter,
 			  )
 			: undefined,

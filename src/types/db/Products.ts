@@ -13,7 +13,7 @@ export const ProductSchema = z.object({
 	members: z.record(
 		idSchema,
 		z.object({
-			type: z.enum([`editor`, `viewer`]),
+			type: z.enum([`owner`, `editor`, `viewer`]),
 		}),
 	),
 	name: z.string().min(1),

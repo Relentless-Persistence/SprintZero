@@ -23,7 +23,7 @@ const Header: FC = () => {
 	const [user] = useAuthState(auth)
 	const [allProducts] = useCollectionOnce(
 		user
-			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `==`, `editor`)).withConverter(
+			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `in`, [`owner`, `editor`])).withConverter(
 					ProductConverter,
 			  )
 			: undefined,
@@ -78,42 +78,51 @@ const Header: FC = () => {
 						</div>
 						<div className="flex flex-col gap-2">
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Settings</p>
-							<Menu
-								className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
-								items={[
-									{
-										key: `account`,
-										icon: <IdcardOutlined />,
-										label: <LinkTo href={`/${activeProductId}/settings/account`}>Account</LinkTo>,
-										onClick: () => setIsPopoverOpen(false),
-									},
-									{
-										key: `configuration`,
-										icon: <SettingOutlined />,
-										label: <LinkTo href={`/${activeProductId}/settings/configuration`}>Configuration</LinkTo>,
-										onClick: () => setIsPopoverOpen(false),
-									},
-									{
-										key: `team`,
-										icon: <TeamOutlined />,
-										label: <LinkTo href={`/${activeProductId}/settings/team`}>Team</LinkTo>,
-										onClick: () => setIsPopoverOpen(false),
-									},
-									{type: `divider`, className: `mx-3`},
-									{
-										key: `support`,
-										icon: <CustomerServiceOutlined />,
-										label: <LinkTo href="https://www.sprintzero.app/contact">Support</LinkTo>,
-										onClick: () => setIsPopoverOpen(false),
-									},
-									{
-										key: `sign-out`,
-										icon: <LogoutOutlined />,
-										label: <LinkTo href="/sign-out">Sign out</LinkTo>,
-										onClick: () => setIsPopoverOpen(false),
-									},
-								]}
-							/>
+							{activeProduct?.exists() && (
+								<Menu
+									className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 bg-bgElevated [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
+									items={[
+										...(Object.entries(activeProduct.data().members).find(([userId]) => userId === user?.uid)?.[1]
+											?.type === `owner`
+											? ([
+													{
+														key: `account`,
+														icon: <IdcardOutlined />,
+														label: <LinkTo href={`/${activeProductId}/settings/account`}>Account</LinkTo>,
+														onClick: () => setIsPopoverOpen(false),
+													},
+													{
+														key: `configuration`,
+														icon: <SettingOutlined />,
+														label: <LinkTo href={`/${activeProductId}/settings/configuration`}>Configuration</LinkTo>,
+														onClick: () => setIsPopoverOpen(false),
+													},
+													{
+														key: `team`,
+														icon: <TeamOutlined />,
+														label: <LinkTo href={`/${activeProductId}/settings/team`}>Team</LinkTo>,
+														onClick: () => setIsPopoverOpen(false),
+													},
+													{type: `divider`, className: `mx-3`},
+											  ] as const)
+											: []),
+										...[
+											{
+												key: `support`,
+												icon: <CustomerServiceOutlined />,
+												label: <LinkTo href="https://www.sprintzero.app/contact">Support</LinkTo>,
+												onClick: () => setIsPopoverOpen(false),
+											},
+											{
+												key: `sign-out`,
+												icon: <LogoutOutlined />,
+												label: <LinkTo href="/sign-out">Sign out</LinkTo>,
+												onClick: () => setIsPopoverOpen(false),
+											},
+										],
+									]}
+								/>
+							)}
 						</div>
 						<p className="text-end text-sm text-textTertiary">v0.45</p>
 					</div>

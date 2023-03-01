@@ -79,9 +79,10 @@ const SignInClientPage: FC = () => {
 				router.push(`/accept-terms`)
 			} else {
 				const {docs: products} = await getDocs(
-					query(collection(db, `Products`), where(`members.${credential.user.uid}.type`, `==`, `editor`)).withConverter(
-						ProductConverter,
-					),
+					query(
+						collection(db, `Products`),
+						where(`members.${credential.user.uid}.type`, `in`, [`owner`, `editor`]),
+					).withConverter(ProductConverter),
 				)
 				if (products.length === 0) router.push(`/product`)
 				else router.push(`/${products[0]!.id}/map`)

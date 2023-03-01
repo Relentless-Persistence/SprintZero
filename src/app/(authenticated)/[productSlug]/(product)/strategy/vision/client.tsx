@@ -3,7 +3,8 @@
 import {ClockCircleOutlined, DesktopOutlined, LayoutOutlined, MobileOutlined, TabletOutlined} from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useQueries} from "@tanstack/react-query"
-import {Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline} from "antd"
+import {Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline, notification} from "antd"
+import axios from "axios"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {diffArrays} from "diff"
@@ -17,7 +18,6 @@ import {z} from "zod"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import {generateProductVision} from "./getGptResponse"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
@@ -84,6 +84,30 @@ const VisionsClientPage: FC = () => {
 				queryFn: async () => await getDoc(doc(db, `Users`, update.userId).withConverter(UserConverter)),
 			})) ?? [],
 	})
+
+	type ProductVisionInput = {
+		productType: string
+		valueProposition: string
+		features: string[]
+	}
+
+	const generateProductVision = async ({productType, valueProposition, features}: ProductVisionInput) => {
+		const gptQuestion = `Write a product vision for a ${productType} app. Its goal is to: ${valueProposition}. The app has the following features: ${features.join(
+			`, `,
+		)}.`
+
+		let gptResponse = ``
+		try {
+			const _res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
+			const {response: res} = z.object({response: z.string()}).parse(_res.data)
+			gptResponse = res.trimStart()
+		} catch (error) {
+			console.error(error)
+			notification.error({message: `Something went wrong!`})
+		}
+
+		return gptResponse
+	}
 
 	return (
 		<div className="grid h-full grid-cols-[2fr_16rem] gap-8">
@@ -249,7 +273,7 @@ const VisionsClientPage: FC = () => {
 														<div className="flex justify-end gap-4">
 															<Button
 																type="text"
-																disabled={!activeProduct?.finalVision}
+																disabled={!activeProduct?.finalVision || currentStep !== 3}
 																onClick={() => setEditMode(false)}
 															>
 																Cancel
@@ -287,7 +311,7 @@ const VisionsClientPage: FC = () => {
 														<div className="flex justify-end gap-4">
 															<Button
 																type="text"
-																disabled={!activeProduct?.finalVision}
+																disabled={!activeProduct?.finalVision || currentStep !== 4}
 																onClick={() => setEditMode(false)}
 															>
 																Cancel
@@ -299,7 +323,6 @@ const VisionsClientPage: FC = () => {
 																		if (!activeProduct) return
 
 																		const operations: string[] = []
-																		const updates = [...activeProduct.updates]
 
 																		if (activeProduct.productType !== data.productType)
 																			operations.push(`changed the product type to ${data.productType}`)
@@ -328,18 +351,20 @@ const VisionsClientPage: FC = () => {
 																			if (additionsText) operations.push(additionsText)
 																		}
 																		const operationsText = listToSentence(operations).concat(`.`)
-																		if (operations.length > 0)
-																			updates.push({
-																				id: nanoid(),
-																				userId: user!.id as Id,
-																				text: operationsText,
-																				timestamp: Timestamp.now(),
-																			})
+
+																		const updates = [...activeProduct.updates]
 																		if (activeProduct.finalVision === ``) {
 																			updates.push({
 																				id: nanoid(),
 																				userId: user!.id as Id,
 																				text: `created the product vision.`,
+																				timestamp: Timestamp.now(),
+																			})
+																		} else if (operations.length > 0) {
+																			updates.push({
+																				id: nanoid(),
+																				userId: user!.id as Id,
+																				text: operationsText,
 																				timestamp: Timestamp.now(),
 																			})
 																		}
@@ -382,6 +407,7 @@ const VisionsClientPage: FC = () => {
 												valueProposition: activeProduct.valueProposition ?? ``,
 												features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
 											})
+											setCurrentStep(0)
 											setEditMode(true)
 										}}
 									>

@@ -66,7 +66,7 @@ const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 	}, [])
 
 	return (
-		<div className="flex h-full flex-col gap-6 px-12 py-8">
+		<div className="flex h-full flex-col px-12 py-8">
 			<div className="flex justify-between">
 				<Breadcrumb>
 					<Breadcrumb.Item>Tactics</Breadcrumb.Item>
@@ -74,19 +74,21 @@ const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 					<Breadcrumb.Item>Features</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<Select
-					placeholder="Select an epic"
-					options={epics.map((epic) => ({value: epic.id, label: epic.name}))}
-					onChange={(value) => setSelectedEpic(value as Id)}
-				/>
+				<div className="h-0">
+					<Select
+						placeholder="Select an epic"
+						options={epics.map((epic) => ({value: epic.id, label: epic.name}))}
+						onChange={(value) => setSelectedEpic(value as Id)}
+					/>
+				</div>
 			</div>
 
-			<p className="text-textTertiary">
+			<p className="mt-2 text-textTertiary">
 				Assess the practicality of proposed items to objectively and rationally uncover strengths and weaknesses,
 				opportunities and threats, the resources required to carry through, and ultimately the prospects for success
 			</p>
 
-			<div className="relative grow">
+			<div className="relative mt-6 grow">
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
 						{selectedEpic &&
