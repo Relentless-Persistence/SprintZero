@@ -26,7 +26,7 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 	)
 	const storyMapState = storyMapStates?.docs[0]
 
-	const epics = storyMapState ? getEpics(storyMapState.data()) : []
+	const epics = storyMapState ? getEpics(storyMapState.data().items) : []
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {

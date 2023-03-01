@@ -1,7 +1,7 @@
 "use client"
 
 import {CopyOutlined} from "@ant-design/icons"
-import {doc, setDoc} from "firebase/firestore"
+import {Timestamp, updateDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import produce from "immer"
 import {clamp, debounce} from "lodash"
@@ -13,12 +13,7 @@ import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "./globals"
-import {db} from "~/utils/firebase"
 import {getFeatures} from "~/utils/storyMap"
-
-const debouncedSetStoryMapState = debounce(async (id: Id, data: StoryMapState) => {
-	await setDoc(doc(db, `StoryMapStates`, id), data)
-}, 100)
 
 export type FeatureProps = {
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
@@ -26,7 +21,7 @@ export type FeatureProps = {
 }
 
 const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
-	const features = getFeatures(storyMapState.data())
+	const features = getFeatures(storyMapState.data().items)
 	const feature = features.find(({id}) => id === featureId)!
 
 	const x = useMotionValue(feature.effort)
@@ -40,13 +35,12 @@ const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
 	const moveFeature = async (x: number, y: number) => {
-		const newStoryMapState = produce(storyMapState.data(), (state) => {
-			const features = getFeatures(state)
-			const newFeature = features.find(({id}) => id === feature.id)!
+		const items = produce(storyMapState.data().items, (draft) => {
+			const newFeature = Object.entries(draft).find(([id]) => id === feature.id)![1]!
 			newFeature.effort = x
 			newFeature.userValue = y
 		})
-		await debouncedSetStoryMapState(storyMapState.id as Id, newStoryMapState)
+		await debouncedSetStoryMapStateItems(storyMapState, items)
 	}
 
 	return (
@@ -67,7 +61,7 @@ const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
 				y.set(newY)
 				moveFeature(newX, newY).catch(console.error)
 			}}
-			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-current bg-white px-2 py-1 text-[#006378]"
+			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-current bg-bgContainer px-2 py-1 text-[#006378] dark:text-[#00a2c4]"
 			style={{top: useMotionTemplate`calc(${y}% * 100)`, left: useMotionTemplate`calc(${x}% * 100)`}}
 			ref={ref}
 		>
@@ -78,3 +72,13 @@ const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
 }
 
 export default Feature
+
+const debouncedSetStoryMapStateItems = debounce(
+	async (storyMapState: QueryDocumentSnapshot<StoryMapState>, data: StoryMapState[`items`]) => {
+		await updateDoc(storyMapState.ref, {
+			items: data,
+			updatedAt: Timestamp.now(),
+		})
+	},
+	100,
+)

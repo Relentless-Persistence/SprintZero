@@ -1,5 +1,5 @@
 import {ReadOutlined} from "@ant-design/icons"
-import {doc, setDoc} from "firebase/firestore"
+import {Timestamp, updateDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import produce from "immer"
 import {clamp, debounce} from "lodash"
@@ -11,12 +11,7 @@ import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {matrixRect} from "./globals"
-import {db} from "~/utils/firebase"
 import {getEpics} from "~/utils/storyMap"
-
-const debouncedSetStoryMapState = debounce(async (id: Id, data: StoryMapState) => {
-	await setDoc(doc(db, `StoryMapStates`, id), data)
-}, 100)
 
 export type EpicProps = {
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
@@ -24,7 +19,7 @@ export type EpicProps = {
 }
 
 const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
-	const epics = getEpics(storyMapState.data())
+	const epics = getEpics(storyMapState.data().items)
 	const epic = epics.find((e) => e.id === epicId)!
 
 	const x = useMotionValue(epic.effort)
@@ -38,13 +33,12 @@ const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
 	const moveEpic = async (x: number, y: number) => {
-		const newStoryMapState = produce(storyMapState.data(), (state) => {
-			const epics = getEpics(state)
-			const newEpic = epics.find((e) => e.id === epic.id)!
+		const items = produce(storyMapState.data().items, (draft) => {
+			const newEpic = Object.entries(draft).find(([id]) => id === epic.id)![1]!
 			newEpic.effort = x
 			newEpic.userValue = y
 		})
-		await debouncedSetStoryMapState(storyMapState.id as Id, newStoryMapState)
+		await debouncedSetStoryMapStateItems(storyMapState, items)
 	}
 
 	return (
@@ -65,7 +59,7 @@ const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
 				y.set(newY)
 				moveEpic(newX, newY).catch(console.error)
 			}}
-			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-current bg-white px-2 py-1 text-[#4f2dc8]"
+			className="absolute flex min-w-[4rem] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none select-none items-center gap-2 rounded-md border border-current bg-bgContainer px-2 py-1 text-[#4f2dc8] dark:text-[#6b44f8]"
 			style={{top: useMotionTemplate`calc(${y}% * 100)`, left: useMotionTemplate`calc(${x}% * 100)`}}
 			ref={ref}
 		>
@@ -76,3 +70,13 @@ const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
 }
 
 export default Epic
+
+const debouncedSetStoryMapStateItems = debounce(
+	async (storyMapState: QueryDocumentSnapshot<StoryMapState>, data: StoryMapState[`items`]) => {
+		await updateDoc(storyMapState.ref, {
+			items: data,
+			updatedAt: Timestamp.now(),
+		})
+	},
+	100,
+)

@@ -39,7 +39,7 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false, isInitialRender = fal
 	return (
 		<div
 			className={clsx(
-				`flex touch-none select-none items-center gap-2 rounded border border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] dark:bg-black dark:text-[#6b44f8]`,
+				`flex touch-none select-none items-center gap-2 rounded border border-current bg-bgContainer px-2 py-1 font-medium text-[#4f2dc8] dark:text-[#6b44f8]`,
 				inert && `cursor-grabbing`,
 				!meta.editMode && `cursor-grab active:cursor-grabbing`,
 			)}
