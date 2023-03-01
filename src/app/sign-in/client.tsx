@@ -50,7 +50,7 @@ const SignInClientPage: FC = () => {
 	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
 	const [userInvite, setUserInvite] = useState({})
-	const [tokenExists, setTokenExists] = useState(false)
+	const [hasValidToken, setHasValidToken] = useState(false)
 
 	useEffect(() => {
 		if (user?.uid && !hasSignedIn) router.replace(`/`)
@@ -81,7 +81,7 @@ const SignInClientPage: FC = () => {
 			// 	return true
 			// }
 
-			setTokenExists(true)
+			setHasValidToken(true)
 			setUserInvite({
 				userEmail: invite.userEmail,
 				productId: invite.productId,
@@ -89,7 +89,7 @@ const SignInClientPage: FC = () => {
 			})
 
 			//await markInviteAsUsed(inviteToken)
-			notification.success({message: `Welcome! Please log in with the email where you received the invite.`})
+			!user && notification.success({message: `Welcome! Please log in with the email where you received the invite.`})
 		} else {
 			console.log(`Invite token does not exist. Do nothing.`)
 		}
@@ -100,7 +100,6 @@ const SignInClientPage: FC = () => {
 		if (!credential.user.displayName) throw new Error(`No display name found for user.`)
 
 		setHasSignedIn(true)
-		notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 
 		if (auth.currentUser && !auth.currentUser.emailVerified) {
 			await sendEmailVerification(auth.currentUser).then(() => {
@@ -117,12 +116,10 @@ const SignInClientPage: FC = () => {
 
 		if (isNewUser) {
 			// if user is coming with an invite token
-			console.log(`You are a new user`)
-			if (tokenExists && userInvite.userEmail != credential.user.email) {
+			if (hasValidToken && userInvite.userEmail != credential.user.email) {
 				notification.error({message: `Sorry, you do not have a valid invite.`})
-				await signOut(auth)
-			} else if (tokenExists && userInvite.userEmail === credential.user.email) {
-				notification.success({message: `You have a valid invite.`})
+				//await signOut(auth)
+			} else if (hasValidToken && userInvite.userEmail === credential.user.email) {
 				await setDoc(doc(db, `Users`, credential.user.uid), {
 					avatar: credential.user.photoURL,
 					email: credential.user.email,
@@ -130,28 +127,20 @@ const SignInClientPage: FC = () => {
 					name: credential.user.displayName,
 				} satisfies User)
 
-				console.log(`I am now addin you to product as a member:`, userInvite.productId, userInvite.token)
-
-				// const data = {type: `editor`}
-
-				// //const memberData = {type: "editor"}
-				// //const members = {members.[credential.user.uid as Id]: {type: `editor`}}
-				// const productRef = doc(db, `Products`, userInvite.productId).withConverter(ProductConverter)
-				// await updateDoc(productRef, {
-				// 	[`members.${credential.user.uid}`]: data,
-				// })
-
+				// map user to a product using admin SDK
 				try {
-					const res = await axios.post(`/api/map-user-to-product`, {
+					await axios.post(`/api/map-user-to-product`, {
 						productId: userInvite.productId,
 						userId: credential.user.uid,
 						role: `editor`,
 					})
-					console.log(`User added to product members with role:`, res.data.role)
 				} catch (error) {
-					console.error(`Failed to add user to product members:`, error)
+					// implement logging
+					notification.error({message: `Error occured when processing your invite. Please try again.`})
+					await signOut(auth)
 				}
 
+				notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 				router.push(`/accept-terms`)
 				// eslint-disable-next-line no-negated-condition
 			} else if (!user.hasAcceptedTos) {
@@ -173,8 +162,10 @@ const SignInClientPage: FC = () => {
 			}
 			// eslint-disable-next-line no-negated-condition
 		} else if (!user.hasAcceptedTos) {
+			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 			router.push(`/accept-terms`)
 		} else {
+			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 			const {docs: products} = await getDocs(
 				query(collection(db, `Products`), where(`members.${credential.user.uid}.type`, `==`, `editor`)).withConverter(
 					ProductConverter,
