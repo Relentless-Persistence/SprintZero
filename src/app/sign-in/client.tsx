@@ -55,7 +55,6 @@ const SignInClientPage: FC = () => {
 	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
 	const [userInvite, setUserInvite] = useState({})
-	const [isBetaUser, setIsBetaUser] = useState(false)
 	const [hasValidToken, setHasValidToken] = useState(false)
 
 	useEffect(() => {
@@ -90,6 +89,13 @@ const SignInClientPage: FC = () => {
 			console.error(error)
 			return null
 		}
+	}
+
+	async function checkBetaUser(email?: string): Promise<boolean> {
+		const betaUsers: string[] = [`adil.gurban@gmail.com`, `abc@example.com`]
+		console.log(`checking beta user email`, email)
+		if (email && betaUsers.includes(email)) return true
+		else return false
 	}
 
 	async function validateInviteToken(inviteToken: string | null): Promise<void> {
@@ -144,8 +150,20 @@ const SignInClientPage: FC = () => {
 		const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
 		const isNewUser = !user
 
-		//setIsBetaUser(checkBetaUser)(user?.email)
-		if (isNewUser) {
+		const isBetaUser = await checkBetaUser(credential.user.email)
+
+		if (isBetaUser) {
+			// use Firebase Admin SDK - Auth
+			await setDoc(doc(db, `Users`, credential.user.uid), {
+				avatar: credential.user.photoURL,
+				email: credential.user.email,
+				hasAcceptedTos: false,
+				name: credential.user.displayName,
+			} satisfies User)
+
+			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
+			router.push(`/accept-terms`)
+		} else if (isNewUser) {
 			// if user is coming with an invite token
 			// if(betaUser)
 			// {
@@ -159,15 +177,12 @@ const SignInClientPage: FC = () => {
 				notification.error({message: `Sorry, you do not have a valid invite.`})
 				//await signOut(auth)
 			} else if (hasValidToken && userInvite.userEmail === credential.user.email) {
-				notification.success({message: `You have a valid invite.`})
 				await setDoc(doc(db, `Users`, credential.user.uid), {
 					avatar: credential.user.photoURL,
 					email: credential.user.email,
 					hasAcceptedTos: false,
 					name: credential.user.displayName,
 				} satisfies User)
-
-				console.log(`I am now addin you to product as a member:`, userInvite.productId, userInvite.token)
 
 				// const data = {type: `editor`}
 
@@ -192,6 +207,7 @@ const SignInClientPage: FC = () => {
 				notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 				router.push(`/accept-terms`)
 				// eslint-disable-next-line no-negated-condition
+				// this step might be redundant
 			} else if (!user.hasAcceptedTos) {
 				router.push(`/accept-terms`)
 			}
