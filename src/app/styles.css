@@ -85,6 +85,11 @@ input {
 	line-height: 1;
 }
 
+.ant-menu-title-content,
+.ant-select-selection-item-content {
+	line-height: 1.5;
+}
+
 @layer base {
 	html.light {
 		--color-primary-bg: 221 227 213;

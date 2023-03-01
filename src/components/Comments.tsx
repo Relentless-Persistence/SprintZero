@@ -70,9 +70,9 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 							return (
 								<div key={comment.id} className="flex gap-2">
 									<Avatar shape="square" src={author?.data()?.avatar} className="border border-[#d6d7d9]" />
-									<div className="flex flex-col gap-1">
-										<p className="text-xs text-textTertiary">{author?.data()?.name}</p>
-										<p>{comment.data().text}</p>
+									<div className="flex min-w-0 flex-1 flex-col gap-1">
+										<p className="text-sm text-textTertiary">{author?.data()?.name}</p>
+										<p className="leading-normal">{comment.data().text}</p>
 									</div>
 								</div>
 							)

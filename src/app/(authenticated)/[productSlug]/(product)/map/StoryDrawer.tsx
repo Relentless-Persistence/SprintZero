@@ -133,6 +133,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	}
 
 	const addAcceptanceCriterion = async () => {
+		if (!newAcceptanceCriterionInput) return
 		await updateItem(
 			meta.storyMapState,
 			story.id,
@@ -161,6 +162,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 	}
 
 	const addBug = async () => {
+		if (!newBugInput) return
 		await updateItem(
 			meta.storyMapState,
 			story.id,
@@ -204,7 +206,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						</Button>
 					</div>
 				) : (
-					<div className="flex h-14 flex-col justify-center gap-1">
+					<div className="flex h-14 flex-col justify-center gap-2">
 						<div className="flex items-end gap-4">
 							<div className="relative w-fit min-w-[1rem]">
 								<p>{localStoryName || `_`}</p>
@@ -296,7 +298,16 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							<Button
 								onClick={() => {
 									setEditMode(false)
-									reset()
+									reset({
+										branchName: story.branchName,
+										designLink: story.designLink,
+										designEffort: story.designEffort,
+										engineeringEffort: story.engineeringEffort,
+										pageLink: story.pageLink,
+										sprintColumn: story.sprintColumn,
+										peopleIds: story.peopleIds,
+										versionId: story.versionId,
+									})
 								}}
 							>
 								Cancel
