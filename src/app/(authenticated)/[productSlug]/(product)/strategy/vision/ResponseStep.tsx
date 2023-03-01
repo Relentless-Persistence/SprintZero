@@ -24,17 +24,11 @@ const ResponseStep: FC<ResponseStepProps> = ({gptResponse, setGptResponse, onFin
 	return (
 		<div className="flex w-full flex-col gap-6">
 			<div className="flex flex-col gap-2">
-				<p className="text-xl font-semibold">ChatGPT Response</p>
+				<p className="text-xl font-semibold">GPT-3 Response</p>
 				<p className="text-sm text-textTertiary">This is what we got back</p>
 			</div>
 
-			<Card
-				style={{
-					boxShadow: `0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)`,
-				}}
-			>
-				{gptResponse ? <p>{gptResponse}</p> : <Skeleton active />}
-			</Card>
+			<Card>{gptResponse ? <p>{gptResponse}</p> : <Skeleton active />}</Card>
 			<Space className="flex justify-end">
 				<Button
 					className="bg-white"

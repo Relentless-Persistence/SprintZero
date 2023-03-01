@@ -45,8 +45,11 @@ export const ProductSchema = z.object({
 
 	// Vision info
 	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]),
-	valueProposition: z.string(),
-	features: z.array(z.object({id: z.string(), text: z.string()})),
+	valueProposition: z.string({invalid_type_error: `Required`}).min(1, `Required`).nullable(),
+	features: z
+		.array(z.object({id: idSchema, text: z.string().min(1, `Required`)}))
+		.min(1, `Required`)
+		.nullable(),
 	finalVision: z.string(),
 	updates: z.array(
 		z.object({

@@ -1,3 +1,4 @@
+import type {InputStatus} from "antd/es/_util/statusUtils"
 import type {FieldError} from "react-hook-form"
 
 export const formValidateStatus = ({
@@ -8,8 +9,8 @@ export const formValidateStatus = ({
 	invalid: boolean
 	isDirty: boolean
 	error?: FieldError
-}): "" | "error" | "success" | "warning" | "validating" | undefined => {
+}): InputStatus | undefined => {
 	if (invalid || error) return `error`
 	if (!isDirty) return undefined
-	return `success`
+	return ``
 }

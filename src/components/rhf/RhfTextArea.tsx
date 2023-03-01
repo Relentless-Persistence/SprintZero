@@ -1,6 +1,7 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <TextArea /> otherwise. */
 
 import {Input} from "antd"
+import {AnimatePresence, motion} from "framer-motion"
 import {useController} from "react-hook-form"
 
 import type {TextAreaProps as AntdTextAreaProps} from "antd/es/input"
@@ -21,20 +22,38 @@ const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	defaultValue,
 	...props
 }: RhfTextAreaProps<TFieldValues>): ReactElement | null => {
-	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
+	const {
+		field,
+		fieldState: {error},
+	} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	return (
-		<Input.TextArea
-			{...props}
-			onChange={(e) => {
-				field.onChange(e.target.value)
-				props.onChange?.(e)
-			}}
-			onBlur={field.onBlur}
-			value={field.value}
-			name={field.name}
-			ref={(v) => field.ref(v?.resizableTextArea)}
-		/>
+		<div>
+			<Input.TextArea
+				{...props}
+				onChange={(e) => {
+					field.onChange(e.target.value)
+					props.onChange?.(e)
+				}}
+				onBlur={field.onBlur}
+				value={field.value}
+				name={field.name}
+				status={error ? `error` : undefined}
+				ref={(v) => field.ref(v?.resizableTextArea)}
+			/>
+			<AnimatePresence>
+				{error && (
+					<motion.p
+						initial={{height: `0px`}}
+						animate={{height: `auto`}}
+						exit={{height: `0px`}}
+						className="overflow-hidden text-error"
+					>
+						{error.message}
+					</motion.p>
+				)}
+			</AnimatePresence>
+		</div>
 	)
 }
 

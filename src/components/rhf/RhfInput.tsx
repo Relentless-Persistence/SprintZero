@@ -1,6 +1,7 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <Input /> otherwise. */
 
 import {Input} from "antd"
+import {AnimatePresence, motion} from "framer-motion"
 import {useController} from "react-hook-form"
 
 import type {InputProps as AntdInputProps} from "antd"
@@ -47,7 +48,10 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 	number,
 	...props
 }: RhfInputProps<TFieldValues>): ReactElement | null => {
-	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
+	const {
+		field,
+		fieldState: {error},
+	} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	const format = (str: string) => {
 		if (str.length === 0) return null
@@ -58,17 +62,32 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 	}
 
 	return (
-		<Input
-			{...props}
-			onChange={(e) => {
-				field.onChange(format(e.target.value))
-				props.onChange?.(e)
-			}}
-			onBlur={field.onBlur}
-			value={field.value}
-			name={field.name}
-			ref={(v) => field.ref(v?.input)}
-		/>
+		<div>
+			<Input
+				{...props}
+				onChange={(e) => {
+					field.onChange(format(e.target.value))
+					props.onChange?.(e)
+				}}
+				onBlur={field.onBlur}
+				value={field.value}
+				name={field.name}
+				status={error ? `error` : undefined}
+				ref={(v) => field.ref(v?.input)}
+			/>
+			<AnimatePresence>
+				{error && (
+					<motion.p
+						initial={{height: `0px`}}
+						animate={{height: `auto`}}
+						exit={{height: `0px`}}
+						className="overflow-hidden text-error"
+					>
+						{error.message}
+					</motion.p>
+				)}
+			</AnimatePresence>
+		</div>
 	)
 }
 
