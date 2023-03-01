@@ -11,7 +11,7 @@ import {useDebounce} from "react-use"
 import type {FC} from "react"
 import type {Id} from "~/types"
 
-import ObjectiveCard from "./ObjectiveCard"
+import ResultCard from "./ResultCard"
 import {ObjectiveConverter} from "~/types/db/Objectives"
 import {ResultConverter} from "~/types/db/Results"
 import {db} from "~/utils/firebase"
@@ -102,25 +102,24 @@ const ObjectivesClientPage: FC = () => {
 						{results?.docs.map(
 							(result, index) =>
 								currentObjective?.exists() && (
-									<ObjectiveCard
+									<ResultCard
 										key={result.id}
 										objectiveId={currentObjective.id as Id}
 										result={result}
+										index={index}
 										isEditing={result.id === activeResultId}
 										onEditStart={() => setActiveResultId(result.id)}
 										onEditEnd={() => setActiveResultId(undefined)}
-										index={index + 1}
 									/>
 								),
 						)}
 
 						{activeResultId === `new` && currentObjective && (
-							<ObjectiveCard
+							<ResultCard
 								isEditing
 								objectiveId={currentObjective.id as Id}
 								onEditStart={() => setActiveResultId(`new`)}
 								onEditEnd={() => setActiveResultId(undefined)}
-								index={undefined}
 							/>
 						)}
 					</Masonry>
@@ -128,19 +127,11 @@ const ObjectivesClientPage: FC = () => {
 
 				{results?.docs.length === 0 && activeResultId === undefined && (
 					<div className="grid grow place-items-center">
-						<div
-							style={{
-								boxShadow: `0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)`,
-							}}
-							className="rounded-md bg-white px-20 py-4"
-						>
-							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-						</div>
+						<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
 					</div>
 				)}
 
 				<FloatButton
-					shape="square"
 					icon={<PlusOutlined className="text-primary" />}
 					onClick={() => setActiveResultId(`new`)}
 					className="absolute right-12 bottom-8"

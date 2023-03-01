@@ -7,7 +7,7 @@ import {genConverter} from "~/types"
 
 export const ResultSchema = z.object({
 	createdAt: z.instanceof(Timestamp),
-	text: z.string(),
+	text: z.string().min(1, `Required`),
 })
 
 export type Result = z.infer<typeof ResultSchema>

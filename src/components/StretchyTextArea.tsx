@@ -15,10 +15,10 @@ const StretchyTextArea: ForwardRefRenderFunction<HTMLTextAreaElement, StretchyTe
 ) => {
 	return (
 		<div className="relative">
-			<p className="py-[4px] px-[11px]" style={{minHeight}}>
+			<p className="py-[5px] px-[12px]" style={{minHeight}}>
 				{props.value.replace(/\n(?!\n)$/m, `\nfiller`) || `filler`}
 			</p>
-			<div className="absolute inset-0 grid place-items-stretch">
+			<div className="absolute inset-0 grid place-items-stretch [&>span>textarea]:bg-transparent [&>span]:absolute [&>span]:inset-0">
 				<Input.TextArea {...props} style={{resize: `none`, ...style}} ref={ref} />
 			</div>
 		</div>
