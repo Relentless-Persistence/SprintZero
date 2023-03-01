@@ -1,3 +1,4 @@
+import {zodResolver} from "@hookform/resolvers/zod"
 import {Button, Drawer, Input} from "antd"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
@@ -5,15 +6,16 @@ import {useFieldArray, useForm} from "react-hook-form"
 
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
-import type {RetrospectiveItem} from "~/types/db/RetrospectiveItems"
+import type {z} from "zod"
 
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import {retrospectiveTabs} from "~/types/db/RetrospectiveItems"
+import {RetrospectiveItemSchema, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
 
-type FormInputs = Omit<RetrospectiveItem, `productId` | `userId`>
+const formSchema = RetrospectiveItemSchema.omit({productId: true, userId: true})
+type FormInputs = z.infer<typeof formSchema>
 
 export type RetrospectiveDrawerProps = {
 	initialValues: FormInputs
@@ -27,6 +29,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
+		resolver: zodResolver(formSchema),
 		defaultValues: initialValues,
 	})
 
@@ -47,7 +50,6 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 			extra={
 				<div className="flex items-center gap-2">
 					<Button
-						size="small"
 						onClick={() => {
 							setIsOpen(false)
 							setTimeout(onCancel, 300)
@@ -55,12 +57,12 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 					>
 						Cancel
 					</Button>
-					<Button size="small" type="primary" htmlType="submit" form="retrospective-form">
+					<Button type="primary" htmlType="submit" form="retrospective-form">
 						Done
 					</Button>
 				</div>
 			}
-			height={500}
+			height={400}
 			open={isOpen}
 			closable={false}
 			maskClosable={false}
@@ -76,7 +78,7 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex gap-4">
 						<div className="flex grow flex-col gap-2">
-							<p className="text-lg font-semibold">Title</p>
+							<p className="text-lg font-semibold">Subject</p>
 							<RhfInput control={control} name="title" />
 						</div>
 
@@ -85,14 +87,19 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 							<RhfSegmented
 								control={control}
 								name="type"
-								options={Object.entries(retrospectiveTabs).map(([value, label]) => ({label, value}))}
+								options={retrospectiveTabs.map(([value, label, Icon]) => ({label, value, icon: <Icon />}))}
 							/>
 						</div>
 					</div>
 
 					<div className="flex grow flex-col gap-2">
 						<p className="text-lg font-semibold">Description</p>
-						<RhfTextArea control={control} name="description" className="grow !resize-none" />
+						<RhfTextArea
+							control={control}
+							name="description"
+							wrapperClassName="grow"
+							className="!h-full !resize-none"
+						/>
 					</div>
 				</div>
 

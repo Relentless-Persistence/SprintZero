@@ -12,7 +12,9 @@ import type {SetRequired} from "type-fest"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
 export type RhfTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<AntdTextAreaProps, `ref`> &
-	SetRequired<UseControllerProps<TFieldValues>, `control`>
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
+		wrapperClassName?: string
+	}
 
 const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	control,
@@ -20,6 +22,7 @@ const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	rules,
 	shouldUnregister,
 	defaultValue,
+	wrapperClassName,
 	...props
 }: RhfTextAreaProps<TFieldValues>): ReactElement | null => {
 	const {
@@ -28,7 +31,7 @@ const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	return (
-		<div>
+		<div className={wrapperClassName}>
 			<Input.TextArea
 				{...props}
 				onChange={(e) => {
