@@ -42,13 +42,10 @@ import {
 
 const SignInClientPage: FC = () => {
 	const router = useRouter()
-	const searchParams = useSearchParams()
 
+	// get invite token from sign-in URL
+	const searchParams = useSearchParams()
 	const inviteToken = searchParams.get(`invite_token`)
-	console.log(`This is router query`, inviteToken)
-	//const {invite_token} = router.query
-	//const inviteToken = invite_token
-	console.log(inviteToken)
 
 	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
@@ -56,15 +53,21 @@ const SignInClientPage: FC = () => {
 	const [tokenExists, setTokenExists] = useState(false)
 
 	useEffect(() => {
-		checkInviteToken(inviteToken).then()
-
 		if (user?.uid && !hasSignedIn) router.replace(`/`)
+
+		// issue: this is called twice during loading
+
+		inviteToken &&
+			validateInviteToken(inviteToken)
+				.then()
+				.catch((error) => {
+					// implement logging
+				})
 	}, [hasSignedIn, router, user?.uid])
 
 	// If no invite token is provided, redirect to the homepage
 
-	async function checkInviteToken(inviteToken: string): Promise<void> {
-		console.log(`invite token: `, inviteToken)
+	async function validateInviteToken(inviteToken: string | null): Promise<void> {
 		// Get the ProductInvites table from Firestore
 		const invite = (await getDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter))).data()
 
@@ -78,18 +81,17 @@ const SignInClientPage: FC = () => {
 			// 	return true
 			// }
 
-			//await markInviteAsUsed(inviteToken)
-			notification.success({message: `Welcome. Please log to in to proceed.`})
-
-			console.log(`token exists`)
 			setTokenExists(true)
 			setUserInvite({
 				userEmail: invite.userEmail,
 				productId: invite.productId,
 				token: inviteToken,
 			})
+
+			//await markInviteAsUsed(inviteToken)
+			notification.success({message: `Welcome! Please log in with the email where you received the invite.`})
 		} else {
-			console.log(`token does not exists`)
+			console.log(`Invite token does not exist. Do nothing.`)
 		}
 	}
 
