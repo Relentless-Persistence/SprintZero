@@ -71,8 +71,8 @@ const getItems = (activeProductId: Id) => [
 				label: <LinkTo href={`/${activeProductId}/operations/huddle`}>Huddle</LinkTo>,
 			},
 			{
-				key: `tactics/retrospective`,
-				label: <LinkTo href={`/${activeProductId}/tactics/retrospective`}>Retrospective</LinkTo>,
+				key: `operations/retrospective`,
+				label: <LinkTo href={`/${activeProductId}/operations/retrospective`}>Retrospective</LinkTo>,
 			},
 			{
 				key: `operations/sprint`,
