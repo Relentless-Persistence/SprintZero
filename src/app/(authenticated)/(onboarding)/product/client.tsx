@@ -91,8 +91,8 @@ const ProductSetupClientPage: FC = () => {
 				visual: [false, false, false, false, false, false, false, false],
 			},
 			productType: `mobile`,
-			valueProposition: ``,
-			features: [],
+			valueProposition: null,
+			features: null,
 			finalVision: ``,
 			updates: [],
 			huddles: {
@@ -156,7 +156,7 @@ const ProductSetupClientPage: FC = () => {
 
 	return (
 		<div className="flex h-full flex-col gap-8">
-			<div>
+			<div className="flex flex-col gap-2">
 				<h1 className="text-3xl font-semibold">Product Configuration</h1>
 				<h2 className="text-xl text-textSecondary">
 					Almost time to start building! We just require a few data points before we can begin

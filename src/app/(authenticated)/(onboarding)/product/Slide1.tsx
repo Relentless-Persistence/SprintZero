@@ -46,7 +46,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	return (
 		<SlideContainer isActive={isActive}>
 			<div className="flex flex-col items-center gap-4">
-				<div className="flex flex-col items-center">
+				<div className="flex flex-col items-center gap-2">
 					<h3 className="text-2xl font-semibold">Details</h3>
 					<p className="text-textTertiary">Please provide information below</p>
 				</div>
