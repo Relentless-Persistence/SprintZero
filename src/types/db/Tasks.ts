@@ -4,19 +4,20 @@ import {z} from "zod"
 import {genConverter, idSchema} from "~/types"
 
 export const TaskSchema = z.object({
-	actions: z.array(
+	board: z.string(),
+	dueDate: z.instanceof(Timestamp),
+	notes: z.string(),
+	status: z.enum([`todo`, `inProgress`, `review`, `done`]),
+	subtasks: z.array(
 		z.object({
 			id: z.string(),
 			checked: z.boolean(),
 			name: z.string(),
 		}),
 	),
-	status: z.enum([`backlog`, `doing`, `review`, `done`]),
-	description: z.string(),
-	dueDate: z.instanceof(Timestamp),
 	title: z.string(),
-	board: z.string(),
 
+	assigneeIds: z.array(idSchema),
 	productId: idSchema,
 })
 

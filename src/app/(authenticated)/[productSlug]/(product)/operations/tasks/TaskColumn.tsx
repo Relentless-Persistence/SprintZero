@@ -1,4 +1,4 @@
-import {Card} from "antd"
+import {Button, Card, Tag} from "antd"
 import dayjs from "dayjs"
 
 import type {QuerySnapshot} from "firebase/firestore"
@@ -15,22 +15,23 @@ export type TaskColumnProps = {
 
 const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 	return (
-		<Card type="inner" title={title}>
+		<Card title={title}>
 			<div className="flex flex-col gap-4">
 				{tasks.docs
 					.filter((task) => task.data().status === id)
 					.map((task) => (
-						<button
+						<Card
 							key={task.id}
-							type="button"
-							onClick={() => onEdit(task.id as Id)}
-							className="flex w-full flex-col gap-1 border px-4 py-2 text-left"
+							type="inner"
+							title={task.data().title}
+							extra={
+								<Button size="small" onClick={() => onEdit(task.id as Id)}>
+									Edit
+								</Button>
+							}
 						>
-							<p className="font-medium">{task.data().title}</p>
-							<p className="inline-block border px-1 py-0.5 text-xs">
-								{dayjs(task.data().dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}
-							</p>
-						</button>
+							<Tag>{dayjs(task.data().dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}</Tag>
+						</Card>
 					))}
 			</div>
 		</Card>

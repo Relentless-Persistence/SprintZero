@@ -11,6 +11,7 @@ import type {Task} from "~/types/db/Tasks"
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfDateTimePicker from "~/components/rhf/RhfDateTimePicker"
 import RhfInput from "~/components/rhf/RhfInput"
+import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 
 type FormInputs = Omit<Task, `productId` | `dueDate`> & {dueDate: Dayjs}
@@ -30,7 +31,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 		defaultValues: initialValues,
 	})
 
-	const {fields: actions, append: newAction} = useFieldArray({control, name: `actions`})
+	const {fields: subtasks, append: newSubtask} = useFieldArray({control, name: `subtasks`})
 	const [newActionInput, setNewActionInput] = useState(``)
 
 	const onSubmit = handleSubmit((data) => {
@@ -47,7 +48,6 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 			extra={
 				<div className="flex items-center gap-2">
 					<Button
-						size="small"
 						onClick={() => {
 							setIsOpen(false)
 							setTimeout(onCancel, 300)
@@ -55,12 +55,12 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 					>
 						Cancel
 					</Button>
-					<Button size="small" type="primary" htmlType="submit" form="task-form">
+					<Button type="primary" htmlType="submit" form="task-form">
 						Done
 					</Button>
 				</div>
 			}
-			height={500}
+			height={400}
 			open={isOpen}
 			closable={false}
 			maskClosable={false}
@@ -80,22 +80,27 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="text-lg font-semibold">Description</p>
-						<RhfTextArea control={control} name="description" />
+						<p className="text-lg font-semibold">Notes</p>
+						<RhfTextArea control={control} name="notes" />
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<p className="text-lg font-semibold">Assign</p>
+						<RhfSelect control={control} name="assigneeIds" mode="multiple" />
 					</div>
 				</div>
 
 				{/* Column 2 */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
-						<p className="text-lg font-semibold">Due</p>
+						<p className="text-lg font-semibold">Due Date / Time</p>
 						<RhfDateTimePicker control={control} name="dueDate" />
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="text-lg font-semibold">Actions</p>
-						{actions.map((action, i) => (
-							<RhfCheckbox key={action.id} control={control} name={`actions.${i}.checked`}>
+						<p className="text-lg font-semibold">Subtasks</p>
+						{subtasks.map((action, i) => (
+							<RhfCheckbox key={action.id} control={control} name={`subtasks.${i}.checked`}>
 								{action.name}
 							</RhfCheckbox>
 						))}
@@ -108,7 +113,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 								onKeyDown={(e) => {
 									if (e.key === `Enter`) {
 										e.preventDefault()
-										newAction({
+										newSubtask({
 											id: nanoid(),
 											checked: false,
 											name: newActionInput,

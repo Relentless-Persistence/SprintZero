@@ -1,6 +1,7 @@
 "use client"
 
-import {Breadcrumb, Button, Tabs} from "antd"
+import {PlusOutlined} from "@ant-design/icons"
+import {Breadcrumb, FloatButton, Tabs} from "antd"
 import dayjs from "dayjs"
 import {Timestamp, addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useState} from "react"
@@ -17,7 +18,7 @@ import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const TasksClientPage: FC = () => {
-	const [activeBoard, setActiveBoard] = useState(`0`)
+	const [activeBoard, setActiveBoard] = useState(`one`)
 	const [editingTask, setEditingTask] = useState<Id | `new` | undefined>(undefined)
 
 	const activeProductId = useActiveProductId()
@@ -31,26 +32,20 @@ const TasksClientPage: FC = () => {
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
-			<div className="flex h-full w-full flex-col overflow-auto pb-8">
+			<div className="relative flex h-full w-full flex-col overflow-auto pb-8">
 				<div className="sticky left-0 flex w-full justify-between px-12 py-8">
 					<Breadcrumb>
 						<Breadcrumb.Item>Operations</Breadcrumb.Item>
 						<Breadcrumb.Item>Tasks</Breadcrumb.Item>
-						<Breadcrumb.Item>Board {activeBoard}</Breadcrumb.Item>
+						<Breadcrumb.Item className="capitalize">{activeBoard}</Breadcrumb.Item>
 					</Breadcrumb>
-
-					<div>
-						<Button className="bg-white" onClick={() => setEditingTask(`new`)}>
-							Add New
-						</Button>
-					</div>
 				</div>
 
 				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col gap-4">
 					{tasks && (
 						<>
-							<TaskColumn id="backlog" title="Backlog" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
-							<TaskColumn id="doing" title="Doing" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
+							<TaskColumn id="todo" title="To Do" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
+							<TaskColumn id="inProgress" title="In Progress" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
 							<TaskColumn id="review" title="Review" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
 							<TaskColumn id="done" title="Done" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
 						</>
@@ -59,6 +54,13 @@ const TasksClientPage: FC = () => {
 					{/* Spacer */}
 					<div className="w-8" />
 				</div>
+
+				<FloatButton
+					icon={<PlusOutlined />}
+					tooltip="Add Item"
+					onClick={() => setEditingTask(`new`)}
+					className="absolute bottom-8 right-12"
+				/>
 			</div>
 
 			<Tabs
@@ -66,11 +68,11 @@ const TasksClientPage: FC = () => {
 				activeKey={activeBoard}
 				onChange={(key) => setActiveBoard(key)}
 				items={[
-					{key: `0`, label: `Board 0`},
-					{key: `1`, label: `Board 1`},
-					{key: `2`, label: `Board 2`},
-					{key: `3`, label: `Board 3`},
-					{key: `4`, label: `Board 4`},
+					{key: `one`, label: `One`},
+					{key: `two`, label: `Two`},
+					{key: `three`, label: `Three`},
+					{key: `four`, label: `Four`},
+					{key: `five`, label: `Five`},
 				]}
 			/>
 
@@ -80,12 +82,13 @@ const TasksClientPage: FC = () => {
 						let initialValues: ComponentProps<typeof TaskDrawer>["initialValues"]
 						if (editingTask === `new`) {
 							initialValues = {
-								actions: [],
-								status: `backlog`,
-								description: ``,
-								dueDate: dayjs(),
-								title: ``,
 								board: activeBoard,
+								dueDate: dayjs(),
+								notes: ``,
+								status: `todo`,
+								subtasks: [],
+								title: ``,
+								assigneeIds: [],
 							}
 						} else {
 							const task = tasks!.docs.find((task) => task.id === editingTask)!
