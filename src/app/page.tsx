@@ -24,7 +24,7 @@ const HomePage: FC = () => {
 	)
 
 	useEffect(() => {
-		if (!userLoading && !user) router.replace(`/login`)
+		if (!userLoading && !user) router.replace(`/sign-in`)
 		if (!products || loading) return
 
 		const firstProduct = products.docs[0]

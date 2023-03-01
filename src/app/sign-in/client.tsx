@@ -159,7 +159,7 @@ const SignInClientPage: FC = () => {
 		<div className="h-full w-full px-12">
 			<div className="mx-auto flex h-full max-w-5xl flex-col py-8">
 				<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={238} height={56} priority />
-				<div className="mt-6">
+				<div className="mt-6 flex flex-col gap-2">
 					<h1 className="text-3xl font-semibold">Authenticate Yourself Before You Wreck Yourself</h1>
 					<p className="text-xl text-textSecondary">Select a provider below to create an account</p>
 				</div>
@@ -167,7 +167,7 @@ const SignInClientPage: FC = () => {
 				<div className="flex grow flex-col items-center justify-center gap-4">
 					<button
 						type="button"
-						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-black bg-white text-xl font-medium"
+						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
 						onClick={() => {
 							handleOnClick(appleAuthProvider).catch(console.error)
 						}}
@@ -178,7 +178,7 @@ const SignInClientPage: FC = () => {
 					</button>
 					<button
 						type="button"
-						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-black bg-white text-xl font-medium"
+						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
 						onClick={() => {
 							handleOnClick(googleAuthProvider).catch(console.error)
 						}}
@@ -190,7 +190,7 @@ const SignInClientPage: FC = () => {
 
 					<button
 						type="button"
-						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-black bg-white text-xl font-medium"
+						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
 						onClick={() => {
 							handleOnClick(githubAuthProvider).catch(console.error)
 						}}
@@ -202,7 +202,7 @@ const SignInClientPage: FC = () => {
 
 					<button
 						type="button"
-						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-black bg-white text-xl font-medium"
+						className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
 						onClick={() => {
 							handleOnClick(microsoftAuthProvider).catch(console.error)
 						}}
