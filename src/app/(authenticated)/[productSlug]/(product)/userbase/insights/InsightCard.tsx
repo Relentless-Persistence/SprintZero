@@ -1,3 +1,4 @@
+import {DislikeOutlined, LikeOutlined, QuestionCircleOutlined} from "@ant-design/icons"
 import {Button, Card} from "antd"
 import {addDoc, collection, deleteDoc, doc, updateDoc} from "firebase/firestore"
 import {useForm} from "react-hook-form"
@@ -57,7 +58,7 @@ const InsightItemCard: FC<InsightCardProps> = ({insightId, initialData, isEditin
 						</Button>
 					</div>
 				) : (
-					<Button type="link" onClick={() => onEditStart?.()}>
+					<Button type="text" onClick={() => onEditStart?.()}>
 						Edit
 					</Button>
 				)
@@ -71,17 +72,17 @@ const InsightItemCard: FC<InsightCardProps> = ({insightId, initialData, isEditin
 					}}
 					className="flex flex-col gap-4"
 				>
+					<RhfStretchyTextArea control={control} name="text" minHeight="4rem" />
 					<RhfSegmented
 						control={control}
 						name="status"
 						options={[
-							{label: `Validated`, value: `validated`},
-							{label: `Assumed`, value: `assumed`},
-							{label: `Disproven`, value: `disproven`},
+							{label: `Validated`, value: `validated`, icon: <LikeOutlined />},
+							{label: `Assumed`, value: `assumed`, icon: <QuestionCircleOutlined />},
+							{label: `Disproven`, value: `disproven`, icon: <DislikeOutlined />},
 						]}
 						block
 					/>
-					<RhfStretchyTextArea control={control} name="text" minHeight="4rem" />
 					{insightId && (
 						<Button
 							danger
