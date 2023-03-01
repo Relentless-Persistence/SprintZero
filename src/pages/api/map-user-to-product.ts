@@ -1,5 +1,3 @@
-import {collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where} from "firebase/firestore"
-
 import type {NextApiHandler} from "next"
 
 import {dbAdmin} from "utils/firebase-admin"
@@ -18,8 +16,9 @@ const handler: NextApiHandler = async (req, res) => {
 	const {productId, userId, role} = req.body as AddMemberRequest
 
 	try {
-		const productRef = doc(dbAdmin, `Products`, productId).withConverter(ProductConverter)
-		await updateDoc(productRef, {
+		//const productRef = doc(dbAdmin, `Products`, productId).withConverter(ProductConverter)
+		const productRef = dbAdmin.collection(`Products`).doc(productId).withConverter(ProductConverter)
+		await productRef.update({
 			[`members.${userId}`]: {type: role},
 		})
 

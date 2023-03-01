@@ -1,4 +1,4 @@
-const admin = require(`firebase-admin`)
+import admin from "firebase-admin"
 
 const serviceAccount = require(`../keys/firebase-admin-sa-key.json`)
 if (!admin.apps.length) {
