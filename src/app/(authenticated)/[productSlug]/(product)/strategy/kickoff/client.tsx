@@ -1,17 +1,16 @@
 "use client"
 
-import {Breadcrumb, Card} from "antd"
+import {Breadcrumb} from "antd"
 import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc, where} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection, useDocumentData} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
+import type {Id} from "~/types"
 
-import EditButtons from "./EditButtons"
-import ProblemStatementCard from "./ProblemStatementCard"
-import TextListEditor from "~/components/TextListEditor"
+import EditableTextCard from "./EditableTextCard"
+import EditableTextListCard from "./EditableTextListCard"
 import {PersonaConverter} from "~/types/db/Personas"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
@@ -30,8 +29,6 @@ const KickoffClientPage: FC = () => {
 		| undefined
 	>(undefined)
 
-	const [textListState, setTextListState] = useState<Array<{id: string; text: string}>>([])
-
 	const [personas] = useCollection(
 		query(
 			collection(db, `Personas`),
@@ -46,209 +43,111 @@ const KickoffClientPage: FC = () => {
 				<Breadcrumb.Item>Strategy</Breadcrumb.Item>
 				<Breadcrumb.Item>Kickoff</Breadcrumb.Item>
 			</Breadcrumb>
+
 			<Masonry
 				breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
 				className="flex gap-8"
 				columnClassName="flex flex-col gap-8"
 			>
-				{activeProduct && (
-					<ProblemStatementCard
-						text={activeProduct.problemStatement}
-						isEditing={editingSection === `problemStatement`}
-						onEditStart={() => {
-							setEditingSection(`problemStatement`)
-						}}
-						onEditEnd={() => setEditingSection(undefined)}
-					/>
-				)}
+				<EditableTextCard
+					title="Problem Statement"
+					text={activeProduct?.problemStatement ?? ``}
+					isEditing={editingSection === `problemStatement`}
+					onEditStart={() => setEditingSection(`problemStatement`)}
+					onEditEnd={() => setEditingSection(undefined)}
+					onCommit={async (text) => {
+						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+							problemStatement: text,
+						})
+					}}
+				/>
 
-				<Card
-					type="inner"
-					title="Personas Impacted"
-					extra={
-						<EditButtons
-							onEditStart={() => {
-								setTextListState(personas?.docs.map((doc) => ({id: doc.id, text: doc.data().name})) ?? [])
-								setEditingSection(`personas`)
-							}}
-							onEditEnd={() => {
-								setTextListState([])
-								setEditingSection(undefined)
-							}}
-							isEditing={editingSection === `personas`}
-							onCommit={async () => {
-								await Promise.all(
-									textListState
-										.filter((item) => item.text !== ``)
-										.map(async (item) => {
-											const existingDoc = getDoc(doc(db, `Personas`, item.id))
-											if ((await existingDoc).exists()) return
-											await setDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
-												changes: [],
-												createdAt: Timestamp.now(),
-												dayInTheLife: [],
-												description: ``,
-												frustrations: [],
-												goals: [],
-												interactions: [],
-												name: item.text,
-												priorities: [],
-												responsibilities: [],
-												tasks: [],
-												productId: activeProductId,
-											})
-										}),
-								)
-							}}
-						/>
-					}
-				>
-					{editingSection === `personas` ? (
-						<TextListEditor textList={textListState} onChange={setTextListState} maxItems={5} />
-					) : (
-						<ol className="list-decimal pl-4">
-							{personas?.docs.map((item) => (
-								<li key={item.id}>{item.data().name}</li>
-							))}
-						</ol>
-					)}
-				</Card>
+				<EditableTextListCard
+					title="Personas"
+					textList={personas?.docs.map((doc) => ({id: doc.id as Id, text: doc.data().name})) ?? []}
+					isEditing={editingSection === `personas`}
+					onEditStart={() => setEditingSection(`personas`)}
+					onEditEnd={() => setEditingSection(undefined)}
+					onCommit={async (textList) => {
+						await Promise.all(
+							textList.map(async (item) => {
+								const existingDoc = getDoc(doc(db, `Personas`, item.id))
+								if ((await existingDoc).exists()) {
+									await updateDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
+										name: item.text,
+									})
+								} else {
+									await setDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
+										changes: [],
+										createdAt: Timestamp.now(),
+										dayInTheLife: [],
+										description: ``,
+										frustrations: [],
+										goals: [],
+										interactions: [],
+										name: item.text,
+										priorities: [],
+										responsibilities: [],
+										tasks: [],
+										productId: activeProductId,
+									})
+								}
+							}),
+						)
+					}}
+				/>
 
-				<Card
-					type="inner"
+				<EditableTextListCard
 					title="Business Outcomes"
-					extra={
-						<EditButtons
-							onEditStart={() => {
-								setTextListState(activeProduct!.businessOutcomes)
-								setEditingSection(`businessOutcomes`)
-							}}
-							onEditEnd={() => {
-								setTextListState([])
-								setEditingSection(undefined)
-							}}
-							isEditing={editingSection === `businessOutcomes`}
-							onCommit={async () => {
-								const data: Partial<Product> = {
-									businessOutcomes: textListState.filter((item) => item.text !== ``),
-								}
-								await updateDoc(doc(db, `Products`, activeProductId), data)
-							}}
-						/>
-					}
-				>
-					{editingSection === `businessOutcomes` ? (
-						<TextListEditor textList={textListState} onChange={setTextListState} />
-					) : (
-						<ol className="list-decimal pl-4">
-							{activeProduct?.businessOutcomes.map((item) => (
-								<li key={item.id}>{item.text}</li>
-							))}
-						</ol>
-					)}
-				</Card>
+					textList={activeProduct?.businessOutcomes}
+					isEditing={editingSection === `businessOutcomes`}
+					onEditStart={() => setEditingSection(`businessOutcomes`)}
+					onEditEnd={() => setEditingSection(undefined)}
+					onCommit={async (textList) => {
+						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+							businessOutcomes: textList,
+						})
+					}}
+				/>
 
-				<Card
-					type="inner"
+				<EditableTextListCard
 					title="User Priorities"
-					extra={
-						<EditButtons
-							onEditStart={() => {
-								setTextListState(activeProduct!.userPriorities)
-								setEditingSection(`userPriorities`)
-							}}
-							onEditEnd={() => {
-								setTextListState([])
-								setEditingSection(undefined)
-							}}
-							isEditing={editingSection === `userPriorities`}
-							onCommit={async () => {
-								const data: Partial<Product> = {
-									userPriorities: textListState.filter((item) => item.text !== ``),
-								}
-								await updateDoc(doc(db, `Products`, activeProductId), data)
-							}}
-						/>
-					}
-				>
-					{editingSection === `userPriorities` ? (
-						<TextListEditor textList={textListState} onChange={setTextListState} />
-					) : (
-						<ol className="list-decimal pl-4">
-							{activeProduct?.userPriorities.map((item) => (
-								<li key={item.id}>{item.text}</li>
-							))}
-						</ol>
-					)}
-				</Card>
+					textList={activeProduct?.userPriorities}
+					isEditing={editingSection === `userPriorities`}
+					onEditStart={() => setEditingSection(`userPriorities`)}
+					onEditEnd={() => setEditingSection(undefined)}
+					onCommit={async (textList) => {
+						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+							userPriorities: textList,
+						})
+					}}
+				/>
 
-				<Card
-					type="inner"
+				<EditableTextListCard
 					title="Potential Risks"
-					extra={
-						<EditButtons
-							onEditStart={() => {
-								setTextListState(activeProduct!.potentialRisks)
-								setEditingSection(`potentialRisks`)
-							}}
-							onEditEnd={() => {
-								setTextListState([])
-								setEditingSection(undefined)
-							}}
-							isEditing={editingSection === `potentialRisks`}
-							onCommit={async () => {
-								const data: Partial<Product> = {
-									potentialRisks: textListState.filter((item) => item.text !== ``),
-								}
-								await updateDoc(doc(db, `Products`, activeProductId), data)
-							}}
-						/>
-					}
-				>
-					{editingSection === `potentialRisks` ? (
-						<TextListEditor textList={textListState} onChange={setTextListState} />
-					) : (
-						<ol className="list-decimal pl-4">
-							{activeProduct?.potentialRisks.map((item) => (
-								<li key={item.id}>{item.text}</li>
-							))}
-						</ol>
-					)}
-				</Card>
+					textList={activeProduct?.potentialRisks}
+					isEditing={editingSection === `potentialRisks`}
+					onEditStart={() => setEditingSection(`potentialRisks`)}
+					onEditEnd={() => setEditingSection(undefined)}
+					onCommit={async (textList) => {
+						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+							potentialRisks: textList,
+						})
+					}}
+				/>
 
-				<Card
-					type="inner"
+				<EditableTextListCard
 					title="Market Leaders"
-					extra={
-						<EditButtons
-							onEditStart={() => {
-								setTextListState(activeProduct!.marketLeaders)
-								setEditingSection(`marketLeaders`)
-							}}
-							onEditEnd={() => {
-								setTextListState([])
-								setEditingSection(undefined)
-							}}
-							isEditing={editingSection === `marketLeaders`}
-							onCommit={async () => {
-								const data: Partial<Product> = {
-									marketLeaders: textListState.filter((item) => item.text !== ``),
-								}
-								await updateDoc(doc(db, `Products`, activeProductId), data)
-							}}
-						/>
-					}
-				>
-					{editingSection === `marketLeaders` ? (
-						<TextListEditor textList={textListState} onChange={setTextListState} />
-					) : (
-						<ol className="list-decimal pl-4">
-							{activeProduct?.marketLeaders.map((item) => (
-								<li key={item.id}>{item.text}</li>
-							))}
-						</ol>
-					)}
-				</Card>
+					textList={activeProduct?.marketLeaders}
+					isEditing={editingSection === `marketLeaders`}
+					onEditStart={() => setEditingSection(`marketLeaders`)}
+					onEditEnd={() => setEditingSection(undefined)}
+					onCommit={async (textList) => {
+						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+							marketLeaders: textList,
+						})
+					}}
+				/>
 			</Masonry>
 		</div>
 	)

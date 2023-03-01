@@ -1,29 +1,27 @@
-import {Button, Card} from "antd"
-import {doc, updateDoc} from "firebase/firestore"
+import {Button, Card, Empty} from "antd"
 import {useState} from "react"
 
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
+import type {Promisable} from "type-fest"
 
 import StretchyTextArea from "~/components/StretchyTextArea"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
-export type ProblemStatementCardProps = {
-	text: string
+export type EditableTextCardProps = {
+	title: string
+	text: string | undefined
 	isEditing: boolean
 	onEditStart: () => void
 	onEditEnd: () => void
+	onCommit: (text: string) => Promisable<void>
 }
 
-const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, onEditStart, onEditEnd}) => {
-	const activeProductId = useActiveProductId()
-	const [textDraft, setTextDraft] = useState(text)
+const EditableTextCard: FC<EditableTextCardProps> = ({title, text, isEditing, onEditStart, onEditEnd, onCommit}) => {
+	const [textDraft, setTextDraft] = useState(text ?? ``)
 
 	return (
 		<Card
 			type="inner"
-			title="Problem Statement"
+			title={title}
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
@@ -34,9 +32,7 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 							size="small"
 							type="primary"
 							onClick={() => {
-								updateDoc(doc(db, `Products`, activeProductId), {
-									problemStatement: textDraft,
-								} satisfies Partial<Product>)
+								Promise.resolve(onCommit(textDraft))
 									.then(() => {
 										onEditEnd()
 									})
@@ -47,7 +43,13 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 						</Button>
 					</div>
 				) : (
-					<Button size="small" onClick={() => onEditStart()}>
+					<Button
+						size="small"
+						onClick={() => {
+							setTextDraft(text ?? ``)
+							onEditStart()
+						}}
+					>
 						Edit
 					</Button>
 				)
@@ -55,11 +57,13 @@ const ProblemStatementCard: FC<ProblemStatementCardProps> = ({text, isEditing, o
 		>
 			{isEditing ? (
 				<StretchyTextArea value={textDraft} onChange={(e) => setTextDraft(e.target.value)} />
+			) : text ? (
+				<p className="min-w-0">{text}</p>
 			) : (
-				<p className="min-w-0">{textDraft}</p>
+				<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
 			)}
 		</Card>
 	)
 }
 
-export default ProblemStatementCard
+export default EditableTextCard

@@ -19,11 +19,11 @@ export const ProductSchema = z.object({
 	name: z.string().min(1),
 
 	// Kickoff info
-	businessOutcomes: z.array(z.object({id: z.string(), text: z.string()})),
-	marketLeaders: z.array(z.object({id: z.string(), text: z.string()})),
-	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
+	businessOutcomes: z.array(z.object({id: idSchema, text: z.string()})),
+	marketLeaders: z.array(z.object({id: idSchema, text: z.string()})),
+	potentialRisks: z.array(z.object({id: idSchema, text: z.string()})),
 	problemStatement: z.string(),
-	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),
+	userPriorities: z.array(z.object({id: idSchema, text: z.string()})),
 
 	// Accessibility info
 	accessibility: z.object({
