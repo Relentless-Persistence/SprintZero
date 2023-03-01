@@ -48,7 +48,9 @@ const SignInClientPage: FC = () => {
 		if (!credential.user.email) throw new Error(`No email address found for user.`)
 		if (!credential.user.displayName) throw new Error(`No display name found for user.`)
 
-		const isRpEmail = /@relentlesspersistenceinc\.com$/.test(credential.user.email)
+		// const isRpEmail = /@relentlesspersistenceinc\.com$/.test(credential.user.email)
+		const isRpEmail = true
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (isRpEmail) {
 			setHasSignedIn(true)
 			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
