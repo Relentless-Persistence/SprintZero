@@ -1,6 +1,7 @@
 import {initializeApp} from "firebase/app"
 import {GithubAuthProvider, GoogleAuthProvider, OAuthProvider, getAuth} from "firebase/auth"
 import {connectFirestoreEmulator, getFirestore} from "firebase/firestore"
+import admin from "firebase-admin"
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY,
@@ -15,6 +16,7 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+// export const dBa = admin.firestore()
 if (process.env.NODE_ENV === `development` && process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT !== undefined)
 	connectFirestoreEmulator(db, `localhost`, parseInt(process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT))
 
