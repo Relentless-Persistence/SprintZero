@@ -160,6 +160,12 @@ const SignInClientPage: FC = () => {
 				notification.error({message: `Sorry, you do not have a valid invite.`})
 				//await signOut(auth)
 			} else if (hasValidToken && userInvite.userEmail === credential.user.email) {
+			console.log(`You are a new user`)
+			if (tokenExists && userInvite.userEmail != credential.user.email) {
+				notification.error({message: `Sorry, you do not have a valid invite.`})
+				await signOut(auth)
+			} else if (tokenExists && userInvite.userEmail === credential.user.email) {
+				notification.success({message: `You have a valid invite.`})
 				await setDoc(doc(db, `Users`, credential.user.uid), {
 					avatar: credential.user.photoURL,
 					email: credential.user.email,
@@ -167,17 +173,26 @@ const SignInClientPage: FC = () => {
 					name: credential.user.displayName,
 				} satisfies User)
 
-				// map user to a product using admin SDK
+				console.log(`I am now addin you to product as a member:`, userInvite.productId, userInvite.token)
+
+				// const data = {type: `editor`}
+
+				// //const memberData = {type: "editor"}
+				// //const members = {members.[credential.user.uid as Id]: {type: `editor`}}
+				// const productRef = doc(db, `Products`, userInvite.productId).withConverter(ProductConverter)
+				// await updateDoc(productRef, {
+				// 	[`members.${credential.user.uid}`]: data,
+				// })
+
 				try {
-					await axios.post(`/api/map-user-to-product`, {
+					const res = await axios.post(`/api/map-user-to-product`, {
 						productId: userInvite.productId,
 						userId: credential.user.uid,
 						role: `editor`,
 					})
+					console.log(`User added to product members with role:`, res.data.role)
 				} catch (error) {
-					// implement logging
-					notification.error({message: `Error occured when processing your invite. Please try again.`})
-					await signOut(auth)
+					console.error(`Failed to add user to product members:`, error)
 				}
 
 				notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
