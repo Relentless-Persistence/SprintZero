@@ -1,14 +1,9 @@
 import {collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where} from "firebase/firestore"
-import admin from "firebase-admin"
 
 import type {NextApiHandler} from "next"
 
+import {dbAdmin} from "utils/firebase-admin"
 import {ProductConverter} from "~/types/db/Products"
-let serviceAccount = require(`../../keys/firebase-admin-sa-key.json`)
-
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-})
 
 // You can now use Firestore with the authenticated admin user
 //const firestore = admin.firestore()

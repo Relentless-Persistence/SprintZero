@@ -12,36 +12,28 @@ const handler: NextApiHandler = async (req, res) => {
 
 	try {
 		console.log(`logging invite token received on the API`, inviteToken.inviteToken)
-		const productUnviteRef = dbAdmin.collection(`ProductInvites`).doc(inviteToken.inviteToken)
-		const inviteObj = productUnviteRef
-			.get()
-			.then((doc) => {
-				if (doc.exists) {
-					console.log(`Document data:`, doc.data())
-					const data = doc.data()
-					const invite: ProductInvite = {
-						productId: data.productId,
-						userEmail: data.userEmail,
-					}
-					return invite
-				} else {
-					// doc.data() will be undefined in this case
-					console.log(`No such document!`)
-					return null
-				}
-			})
-			.catch((error) => {
-				console.log(`Error getting document:`, error)
-			})
+		const productInviteRef = dbAdmin.collection(`ProductInvites`).doc(inviteToken.inviteToken)
+		const doc = await productInviteRef.get()
 
-		return res.status(200).json({
-			productId: inviteObj.productId,
-			userEmail: inviteObj.userEmail,
-		})
+		if (doc.exists) {
+			console.log(`Document data:`, doc.data())
+			const data = doc.data()
+			const invite: ProductInvite = {
+				productId: data.productId,
+				userEmail: data.userEmail,
+			}
+			res.status(200).json({
+				productId: invite.productId,
+				userEmail: invite.userEmail,
+			})
+		} else {
+			// doc.data() will be undefined in this case
+			console.log(`No such document!`)
+			res.status(401).json({message: `Internal Server Error`})
+		}
 	} catch (error) {
 		console.error(error)
-		//return null;
-		return res.status(500).json({message: `Internal Server Error`})
+		res.status(500).json({message: `Internal Server Error`})
 	}
 }
 

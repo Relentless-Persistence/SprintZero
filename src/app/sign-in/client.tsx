@@ -50,7 +50,7 @@ const SignInClientPage: FC = () => {
 
 	// get invite token from sign-in URL
 	const searchParams = useSearchParams()
-	const inviteToken = searchParams.get(`invite_token`)
+	const inviteToken = searchParams?.get(`invite_token`)
 
 	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
@@ -144,7 +144,6 @@ const SignInClientPage: FC = () => {
 		const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
 		const isNewUser = !user
 
-		if()
 		//setIsBetaUser(checkBetaUser)(user?.email)
 		if (isNewUser) {
 			// if user is coming with an invite token
@@ -160,11 +159,6 @@ const SignInClientPage: FC = () => {
 				notification.error({message: `Sorry, you do not have a valid invite.`})
 				//await signOut(auth)
 			} else if (hasValidToken && userInvite.userEmail === credential.user.email) {
-			console.log(`You are a new user`)
-			if (tokenExists && userInvite.userEmail != credential.user.email) {
-				notification.error({message: `Sorry, you do not have a valid invite.`})
-				await signOut(auth)
-			} else if (tokenExists && userInvite.userEmail === credential.user.email) {
 				notification.success({message: `You have a valid invite.`})
 				await setDoc(doc(db, `Users`, credential.user.uid), {
 					avatar: credential.user.photoURL,
@@ -200,15 +194,6 @@ const SignInClientPage: FC = () => {
 				// eslint-disable-next-line no-negated-condition
 			} else if (!user.hasAcceptedTos) {
 				router.push(`/accept-terms`)
-			} else {
-				const {docs: products} = await getDocs(
-					query(
-						collection(db, `Products`),
-						where(`members.${credential.user.uid}.type`, `in`, [`owner`, `editor`]),
-					).withConverter(ProductConverter),
-				)
-				if (products.length === 0) router.push(`/product`)
-				else router.push(`/${products[0]!.id}/map`)
 			}
 			// if user somehow landed on the login page and tried to log in - only for Beta
 			else {
@@ -222,9 +207,10 @@ const SignInClientPage: FC = () => {
 		} else {
 			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 			const {docs: products} = await getDocs(
-				query(collection(db, `Products`), where(`members.${credential.user.uid}.type`, `==`, `editor`)).withConverter(
-					ProductConverter,
-				),
+				query(
+					collection(db, `Products`),
+					where(`members.${credential.user.uid}.type`, `in`, [`owner`, `editor`]),
+				).withConverter(ProductConverter),
 			)
 			if (products.length === 0) router.push(`/product`)
 			else router.push(`/${products[0]!.id}/map`)
