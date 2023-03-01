@@ -14,16 +14,17 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import {RetrospectiveItemSchema, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
 
-const formSchema = RetrospectiveItemSchema.omit({productId: true, userId: true})
+const formSchema = RetrospectiveItemSchema.pick({description: true, proposedActions: true, title: true, type: true})
 type FormInputs = z.infer<typeof formSchema>
 
 export type RetrospectiveDrawerProps = {
 	initialValues: FormInputs
 	onCancel: () => void
+	onArchive: () => Promisable<void>
 	onCommit: (values: FormInputs) => Promisable<void>
 }
 
-const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCancel, onCommit}) => {
+const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCancel, onArchive, onCommit}) => {
 	const [isOpen, setIsOpen] = useState(false)
 	useEffect(() => setIsOpen(true), [])
 
@@ -45,7 +46,15 @@ const RetrospectiveDrawer: FC<RetrospectiveDrawerProps> = ({initialValues, onCan
 
 	return (
 		<Drawer
-			title="Retrospective Item"
+			title={
+				<Button
+					onClick={() => {
+						Promise.resolve(onArchive()).catch(console.error)
+					}}
+				>
+					Archive
+				</Button>
+			}
 			placement="bottom"
 			extra={
 				<div className="flex items-center gap-2">

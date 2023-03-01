@@ -3,7 +3,9 @@
 import {PlusOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Button, Card, Empty, FloatButton, Switch, Tabs, Tag} from "antd"
-import {addDoc, collection, doc, getDoc, query, setDoc, where} from "firebase/firestore"
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+import {Timestamp, addDoc, collection, doc, getDoc, query, updateDoc, where} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
@@ -19,6 +21,8 @@ import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
 
+dayjs.extend(relativeTime)
+
 const RetrospectiveClientPage: FC = () => {
 	const user = useUser()
 
@@ -30,7 +34,9 @@ const RetrospectiveClientPage: FC = () => {
 	)
 
 	const [currentTab, setCurrentTab] = useState<`enjoyable` | `puzzling` | `frustrating`>(`enjoyable`)
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const [activeItemId, setActiveItemId] = useState<Id | `new` | undefined>(undefined)
+	const [includeArchived, setIncludeArchived] = useState(false)
+	const activeItem = retrospectiveItems?.docs.find((item) => item.id === activeItemId)
 
 	const itemsForCurrentTab = retrospectiveItems?.docs.filter((item) => item.data().type === currentTab) ?? []
 
@@ -40,10 +46,6 @@ const RetrospectiveClientPage: FC = () => {
 			queryFn: async () => await getDoc(doc(db, `Users`, item.data().userId).withConverter(UserConverter)),
 		})),
 	})
-
-	const usersOwnItem = itemsForCurrentTab.find((item) => item.data().userId === user?.id)
-	const userFirst = itemsForCurrentTab.filter((item) => item.data().userId !== user?.id)
-	if (usersOwnItem) userFirst.unshift(usersOwnItem)
 
 	return (
 		<div className="flex h-full items-start justify-between">
@@ -58,46 +60,56 @@ const RetrospectiveClientPage: FC = () => {
 
 						<div className="flex items-center gap-2">
 							<p className="text-sm">Include archived items</p>
-							<Switch />
+							<Switch checked={includeArchived} onChange={(checked) => setIncludeArchived(checked)} />
 						</div>
 					</div>
 					<p>Which aspects have team members had fun with?</p>
 				</div>
 
-				{userFirst.length > 0 ? (
+				{retrospectiveItems && retrospectiveItems.docs.length > 0 ? (
 					<Masonry
 						breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
 						className="flex gap-8"
 						columnClassName="flex flex-col gap-8"
 					>
-						{userFirst.map((item) => (
-							<Card
-								key={item.id}
-								type="inner"
-								title={(() => {
-									const user = usersData.find((user) => user.data?.id === item.data().userId)?.data
+						{retrospectiveItems.docs
+							.filter((item) => !includeArchived || !item.data().archived)
+							.map((item) => (
+								<Card
+									key={item.id}
+									type="inner"
+									title={(() => {
+										const user = usersData.find((user) => user.data?.id === item.data().userId)?.data
 
-									return (
-										<div className="my-4 flex items-center gap-4">
-											<Avatar src={user?.data()?.avatar} shape="square" size="large" />
-											<p>{user?.data()?.name}</p>
-										</div>
-									)
-								})()}
-								extra={
-									item.data().userId === user?.id ? (
-										<Button size="small" onClick={() => setIsDrawerOpen(true)}>
-											Edit
-										</Button>
-									) : undefined
-								}
-							>
-								<div className="flex flex-col items-start gap-2">
-									<Tag>{item.data().proposedActions.length} proposed actions</Tag>
-									<p>{item.data().description}</p>
-								</div>
-							</Card>
-						))}
+										return (
+											<div className="my-4 flex items-center gap-4">
+												<Avatar src={user?.data()?.avatar} shape="square" size="large" />
+												<div className="flex flex-col">
+													<p>{user?.data()?.name}</p>
+													<p className="font-normal text-textTertiary">
+														Created {dayjs(item.data().createdAt.toMillis()).fromNow()}
+													</p>
+												</div>
+											</div>
+										)
+									})()}
+									extra={
+										item.data().userId === user?.id ? (
+											<Button size="small" onClick={() => setActiveItemId(item.id as Id)}>
+												Edit
+											</Button>
+										) : undefined
+									}
+								>
+									<div className="flex flex-col items-start gap-2">
+										<Tag>
+											{item.data().proposedActions.length} proposed action
+											{item.data().proposedActions.length === 1 ? `` : `s`}
+										</Tag>
+										<p>{item.data().description}</p>
+									</div>
+								</Card>
+							))}
 					</Masonry>
 				) : (
 					<div className="grid h-full place-items-center">
@@ -108,7 +120,7 @@ const RetrospectiveClientPage: FC = () => {
 				<FloatButton
 					icon={<PlusOutlined />}
 					tooltip="Add Item"
-					onClick={() => setIsDrawerOpen(true)}
+					onClick={() => setActiveItemId(`new`)}
 					className="absolute bottom-8 right-12 text-primary"
 				/>
 			</div>
@@ -121,29 +133,34 @@ const RetrospectiveClientPage: FC = () => {
 				items={retrospectiveTabs.map(([key, label]) => ({key, label}))}
 			/>
 
-			{!loading && isDrawerOpen && (
+			{!loading && activeItemId && (
 				<RetrospectiveDrawer
 					initialValues={
-						usersOwnItem?.data() ?? {
+						(activeItemId === `new` ? undefined : activeItem?.data()) ?? {
 							description: ``,
 							proposedActions: [],
 							title: ``,
 							type: currentTab,
 						}
 					}
-					onCancel={() => setIsDrawerOpen(false)}
+					onCancel={() => setActiveItemId(undefined)}
+					onArchive={async () => {
+						await updateDoc(activeItem!.ref, {archived: true})
+					}}
 					onCommit={async (values) => {
 						const data: RetrospectiveItem = {
 							...values,
+							archived: false,
+							createdAt: Timestamp.now(),
 							productId: activeProductId,
 							userId: user!.id as Id,
 						}
-						if (usersOwnItem) {
-							await setDoc(doc(db, `RetrospectiveItems`, usersOwnItem.id), data)
+						if (activeItemId === `new`) {
+							await addDoc(collection(db, `RetrospectiveItems`).withConverter(RetrospectiveItemConverter), data)
 						} else {
-							await addDoc(collection(db, `RetrospectiveItems`), data)
+							await updateDoc(activeItem!.ref, data)
 						}
-						setIsDrawerOpen(false)
+						setActiveItemId(undefined)
 					}}
 				/>
 			)}
