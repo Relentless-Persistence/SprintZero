@@ -6,12 +6,18 @@ import {useController} from "react-hook-form"
 import type {RadioGroupProps as AntdRadioGroupProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
-import type {SetRequired} from "type-fest"
+import type {Promisable, SetRequired, SetReturnType} from "type-fest"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
-export type RhfRadioGroupProps<TFieldValues extends FieldValues> = Omit<AntdRadioGroupProps, `ref` | `defaultValue`> &
-	SetRequired<UseControllerProps<TFieldValues>, `control`>
+type OnChange = Exclude<AntdRadioGroupProps[`onChange`], undefined>
+export type RhfRadioGroupProps<TFieldValues extends FieldValues> = Omit<
+	AntdRadioGroupProps,
+	`ref` | `defaultValue` | `onChange`
+> &
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
+		onChange?: SetReturnType<OnChange, Promisable<ReturnType<OnChange>>> | undefined
+	}
 
 const RhfRadioGroup = <TFieldValues extends FieldValues = FieldValues>({
 	control,
@@ -19,6 +25,7 @@ const RhfRadioGroup = <TFieldValues extends FieldValues = FieldValues>({
 	rules,
 	shouldUnregister,
 	defaultValue,
+	onChange,
 	...props
 }: RhfRadioGroupProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
@@ -26,7 +33,10 @@ const RhfRadioGroup = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Radio.Group
 			{...props}
-			onChange={(e) => field.onChange(e.target.value)}
+			onChange={(e) => {
+				field.onChange(e.target.value)
+				onChange && Promise.resolve(onChange(e)).catch(console.error)
+			}}
 			value={field.value}
 			name={field.name}
 			ref={(v) => field.ref(v)}

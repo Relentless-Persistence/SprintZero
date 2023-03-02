@@ -7,7 +7,7 @@ import {useController} from "react-hook-form"
 import type {InputProps as AntdInputProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
-import type {SetRequired} from "type-fest"
+import type {Promisable, SetRequired, SetReturnType} from "type-fest"
 
 const formatAsNumber = (str: string) => {
 	let newStr = str.replace(/[^0-9.]/g, ``)
@@ -34,9 +34,14 @@ const formatAsCurrency = (str: string) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
-export type RhfInputProps<TFieldValues extends FieldValues> = Omit<AntdInputProps, `ref`> &
+type OnChange = Exclude<AntdInputProps[`onChange`], undefined>
+export type RhfInputProps<TFieldValues extends FieldValues> = Omit<
+	AntdInputProps,
+	`ref` | `defaultValue` | `onChange`
+> &
 	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
 		number?: boolean | `integer` | `currency`
+		onChange?: SetReturnType<OnChange, Promisable<ReturnType<OnChange>>> | undefined
 	}
 
 const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
@@ -46,6 +51,7 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 	shouldUnregister,
 	defaultValue,
 	number,
+	onChange,
 	...props
 }: RhfInputProps<TFieldValues>): ReactElement | null => {
 	const {
@@ -67,7 +73,7 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 				{...props}
 				onChange={(e) => {
 					field.onChange(format(e.target.value))
-					props.onChange?.(e)
+					onChange && Promise.resolve(onChange(e)).catch(console.error)
 				}}
 				onBlur={field.onBlur}
 				value={field.value}

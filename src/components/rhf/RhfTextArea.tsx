@@ -7,13 +7,18 @@ import {useController} from "react-hook-form"
 import type {TextAreaProps as AntdTextAreaProps} from "antd/es/input"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
-import type {SetRequired} from "type-fest"
+import type {Promisable, SetRequired, SetReturnType} from "type-fest"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
-export type RhfTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<AntdTextAreaProps, `ref`> &
+type OnChange = Exclude<AntdTextAreaProps[`onChange`], undefined>
+export type RhfTextAreaProps<TFieldValues extends FieldValues = FieldValues> = Omit<
+	AntdTextAreaProps,
+	`ref` | `defaultValue` | `onChange`
+> &
 	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
 		wrapperClassName?: string
+		onChange?: SetReturnType<OnChange, Promisable<ReturnType<OnChange>>> | undefined
 	}
 
 const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
@@ -23,6 +28,7 @@ const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 	shouldUnregister,
 	defaultValue,
 	wrapperClassName,
+	onChange,
 	...props
 }: RhfTextAreaProps<TFieldValues>): ReactElement | null => {
 	const {
@@ -36,7 +42,7 @@ const RhfTextArea = <TFieldValues extends FieldValues = FieldValues>({
 				{...props}
 				onChange={(e) => {
 					field.onChange(e.target.value)
-					props.onChange?.(e)
+					onChange && Promise.resolve(onChange(e)).catch(console.error)
 				}}
 				onBlur={field.onBlur}
 				value={field.value}

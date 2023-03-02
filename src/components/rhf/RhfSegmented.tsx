@@ -6,12 +6,18 @@ import {useController} from "react-hook-form"
 import type {SegmentedProps as AntdSegmentedProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
-import type {SetRequired} from "type-fest"
+import type {Promisable, SetRequired, SetReturnType} from "type-fest"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
-export type RhfSegmentedProps<TFieldValues extends FieldValues> = Omit<AntdSegmentedProps, `ref`> &
-	SetRequired<UseControllerProps<TFieldValues>, `control`>
+type OnChange = Exclude<AntdSegmentedProps[`onChange`], undefined>
+export type RhfSegmentedProps<TFieldValues extends FieldValues> = Omit<
+	AntdSegmentedProps,
+	`ref` | `defaultValue` | `onChange`
+> &
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
+		onChange?: SetReturnType<OnChange, Promisable<ReturnType<OnChange>>> | undefined
+	}
 
 const RhfSegmented = <TFieldValues extends FieldValues = FieldValues>({
 	control,
@@ -19,6 +25,7 @@ const RhfSegmented = <TFieldValues extends FieldValues = FieldValues>({
 	rules,
 	shouldUnregister,
 	defaultValue,
+	onChange,
 	...props
 }: RhfSegmentedProps<TFieldValues>): ReactElement | null => {
 	const {field} = useController({control, name, rules, shouldUnregister, defaultValue})
@@ -26,7 +33,10 @@ const RhfSegmented = <TFieldValues extends FieldValues = FieldValues>({
 	return (
 		<Segmented
 			{...props}
-			onChange={(value) => field.onChange(value)}
+			onChange={(value) => {
+				field.onChange(value)
+				onChange && Promise.resolve(onChange(value)).catch(console.error)
+			}}
 			onBlur={field.onBlur}
 			value={field.value}
 			name={field.name}

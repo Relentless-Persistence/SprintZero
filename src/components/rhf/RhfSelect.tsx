@@ -6,12 +6,18 @@ import {useController} from "react-hook-form"
 import type {SelectProps as AntdSelectProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
-import type {SetRequired} from "type-fest"
+import type {Promisable, SetRequired, SetReturnType} from "type-fest"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
-export type RhfSelectProps<TFieldValues extends FieldValues> = Omit<AntdSelectProps, `ref`> &
-	SetRequired<UseControllerProps<TFieldValues>, `control`>
+type OnChange = Exclude<AntdSelectProps[`onChange`], undefined>
+export type RhfSelectProps<TFieldValues extends FieldValues> = Omit<
+	AntdSelectProps,
+	`ref` | `defaultValue` | `onChange`
+> &
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
+		onChange?: SetReturnType<OnChange, Promisable<ReturnType<OnChange>>> | undefined
+	}
 
 const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	control,
@@ -19,6 +25,7 @@ const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	rules,
 	shouldUnregister,
 	defaultValue,
+	onChange,
 	...props
 }: RhfSelectProps<TFieldValues>): ReactElement | null => {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -29,7 +36,7 @@ const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 			{...props}
 			onChange={(value, option) => {
 				field.onChange(value)
-				props.onChange?.(value, option)
+				onChange && Promise.resolve(onChange(value, option)).catch(console.error)
 			}}
 			onBlur={field.onBlur}
 			value={field.value}

@@ -3,25 +3,34 @@ import {useController} from "react-hook-form"
 import type {TextListEditorProps} from "../TextListEditor"
 import type {ReactElement} from "react"
 import type {FieldErrors, UseControllerProps} from "react-hook-form"
-import type {SetRequired} from "type-fest"
+import type {Promisable, SetRequired, SetReturnType} from "type-fest"
 
 import TextListEditor from "../TextListEditor"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
+type OnChange = Exclude<TextListEditorProps[`onChange`], undefined>
 export type RhfTextListEditorProps<TFieldValues extends FieldValues> = Omit<
 	TextListEditorProps,
-	`textList` | `onChange`
+	`textList` | `ref` | `onChange`
 > &
-	SetRequired<UseControllerProps<TFieldValues>, `control`>
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
+		onChange?: SetReturnType<OnChange, Promisable<ReturnType<OnChange>>> | undefined
+	}
 
-const RhfTextListEditor = <TFieldValues extends FieldValues = FieldValues>(
-	props: RhfTextListEditorProps<TFieldValues>,
-): ReactElement | null => {
+const RhfTextListEditor = <TFieldValues extends FieldValues = FieldValues>({
+	control,
+	name,
+	rules,
+	shouldUnregister,
+	defaultValue,
+	onChange,
+	...props
+}: RhfTextListEditorProps<TFieldValues>): ReactElement | null => {
 	const {
 		field,
 		fieldState: {error},
-	} = useController(props)
+	} = useController({control, name, rules, shouldUnregister, defaultValue})
 
 	return (
 		<TextListEditor
@@ -30,6 +39,7 @@ const RhfTextListEditor = <TFieldValues extends FieldValues = FieldValues>(
 			onChange={(list) => {
 				if (typeof list === `function`) field.onChange(list(field.value))
 				else field.onChange(list)
+				onChange && Promise.resolve(onChange(list)).catch(console.error)
 			}}
 			onBlur={field.onBlur}
 			errors={error as unknown as FieldErrors<Array<{text: string}>>}

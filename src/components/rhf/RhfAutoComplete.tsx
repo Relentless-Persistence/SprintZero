@@ -6,15 +6,18 @@ import {useController} from "react-hook-form"
 import type {AutoCompleteProps as AntdAutoCompleteProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
-import type {SetRequired} from "type-fest"
+import type {Promisable, SetRequired, SetReturnType} from "type-fest"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FieldValues = Record<string, any>
+type OnChange = Exclude<AntdAutoCompleteProps[`onChange`], undefined>
 export type RhfAutoCompleteProps<TFieldValues extends FieldValues> = Omit<
 	AntdAutoCompleteProps,
-	`ref` | `defaultValue`
+	`ref` | `defaultValue` | `onChange`
 > &
-	SetRequired<UseControllerProps<TFieldValues>, `control`>
+	SetRequired<UseControllerProps<TFieldValues>, `control`> & {
+		onChange?: SetReturnType<OnChange, Promisable<ReturnType<OnChange>>> | undefined
+	}
 
 const RhfAutoComplete = <TFieldValues extends FieldValues = FieldValues>({
 	control,
@@ -32,7 +35,7 @@ const RhfAutoComplete = <TFieldValues extends FieldValues = FieldValues>({
 			{...props}
 			onChange={(value, option) => {
 				field.onChange(value)
-				onChange?.(value, option)
+				onChange && Promise.resolve(onChange(value, option)).catch(console.error)
 			}}
 			value={field.value}
 			ref={(v) => field.ref(v)}
