@@ -1,6 +1,6 @@
 "use client"
 
-import {FireFilled, FireOutlined} from "@ant-design/icons"
+import {FireFilled} from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Breadcrumb, Card, Dropdown} from "antd"
 import {doc, updateDoc} from "firebase/firestore"
@@ -77,7 +77,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 				<Breadcrumb.Item>Configuration</Breadcrumb.Item>
 			</Breadcrumb>
 
-			<p className="text-xl font-semibold">Configuration</p>
+			<p className="text-xl font-semibold">Product Configuration</p>
 
 			<Card className="w-fit">
 				<form className="flex flex-col items-start gap-4">
@@ -94,7 +94,9 @@ const ConfigurationSettingsClientPage: FC = () => {
 					</label>
 
 					<label className="flex flex-col gap-1">
-						<span className="font-semibold">Cadence (Weeks)</span>
+						<span className="font-semibold">
+							Cadence <span className="font-normal text-textTertiary">(Weeks)</span>
+						</span>
 						<RhfSegmented
 							control={control}
 							name="cadence"
