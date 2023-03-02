@@ -1,7 +1,6 @@
-import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, idSchema, serverTimestampSchema} from "~/types"
+import {genConverter, idSchema, serverTimestampSchema, timestampSchema} from "~/types"
 
 const schemas = {
 	acceptanceCriteria: z.array(
@@ -19,7 +18,7 @@ const schemas = {
 			checked: z.boolean(),
 		}),
 	),
-	createdAt: z.instanceof(Timestamp),
+	createdAt: timestampSchema,
 	description: z.string(),
 	designEffort: z.number().min(1),
 	designLink: z.string().url().nullable(),
@@ -51,7 +50,7 @@ const schemas = {
 		`readyToShip`,
 		`shipped`,
 	]),
-	updatedAt: z.instanceof(Timestamp),
+	updatedAt: timestampSchema,
 	userValue: z.number().min(0).max(1),
 
 	keeperIds: z.array(idSchema),

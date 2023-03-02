@@ -1,12 +1,11 @@
-import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter, idSchema, timestampSchema} from "~/types"
 
 export const ProductSchema = z.object({
 	// General product info
 	cadence: z.number(),
-	createdAt: z.instanceof(Timestamp),
+	createdAt: timestampSchema,
 	effortCost: z.number().nullable(),
 	effortCostCurrencySymbol: z.enum([`dollar`, `euro`, `pound`, `yen`, `rupee`]).nullable(),
 	sprintStartDayOfWeek: z.number().int().min(0).max(6),
@@ -56,7 +55,7 @@ export const ProductSchema = z.object({
 			id: z.string(),
 			userId: idSchema,
 			text: z.string(),
-			timestamp: z.instanceof(Timestamp),
+			timestamp: timestampSchema,
 		}),
 	),
 
@@ -64,7 +63,7 @@ export const ProductSchema = z.object({
 	huddles: z.record(
 		idSchema,
 		z.object({
-			updatedAt: z.instanceof(Timestamp),
+			updatedAt: timestampSchema,
 
 			blockerStoryIds: z.array(idSchema),
 			todayStoryIds: z.array(idSchema),

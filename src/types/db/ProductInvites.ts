@@ -3,8 +3,9 @@ import {z} from "zod"
 import {genConverter, idSchema} from "~/types"
 
 export const ProductInviteSchema = z.object({
+	email: z.string(),
+
 	productId: idSchema,
-	userEmail: z.string(),
 })
 
 export type ProductInvite = z.infer<typeof ProductInviteSchema>

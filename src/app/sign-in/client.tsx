@@ -1,8 +1,7 @@
 "use client"
 
 import {AppleFilled, AppstoreFilled, GithubOutlined, GoogleOutlined} from "@ant-design/icons"
-import {notification} from "antd"
-import axios from "axios"
+import {Alert, notification} from "antd"
 import {FirebaseError} from "firebase/app"
 import {
 	GithubAuthProvider,
@@ -14,23 +13,22 @@ import {
 	signInWithPopup,
 	signOut,
 } from "firebase/auth"
-import {collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where} from "firebase/firestore"
+import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter, useSearchParams} from "next/navigation"
 import {useEffect, useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
+import {useDocument} from "react-firebase-hooks/firestore"
 import {z} from "zod"
 
 import type {AuthProvider, UserCredential} from "firebase/auth"
-import type {WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
-import type {Product} from "~/types/db/Products"
 import type {User} from "~/types/db/Users"
 
 import {ProductInviteConverter} from "~/types/db/ProductInvites"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
+import {betaUsers} from "~/utils/betaUserList"
 import {
 	appleAuthProvider,
 	auth,
@@ -39,97 +37,27 @@ import {
 	googleAuthProvider,
 	microsoftAuthProvider,
 } from "~/utils/firebase"
-
-interface ProductInvite {
-	productId: string
-	userEmail: string
-}
+import {trpc} from "~/utils/trpc"
 
 const SignInClientPage: FC = () => {
 	const router = useRouter()
-
-	// get invite token from sign-in URL
-	const searchParams = useSearchParams()
-	const inviteToken = searchParams?.get(`invite_token`)
-
 	const [user] = useAuthState(auth)
 	const [hasSignedIn, setHasSignedIn] = useState(false)
-	const [userInvite, setUserInvite] = useState({})
-	const [hasValidToken, setHasValidToken] = useState(false)
 
+	// If the user is already signed in, redirect them to the home page
 	useEffect(() => {
 		if (user?.uid && !hasSignedIn) router.replace(`/`)
-
-		// issue: this is called twice during loading
-		inviteToken &&
-			validateInviteToken(inviteToken)
-				.then()
-				.catch((error) => {
-					// implement logging
-				})
 	}, [hasSignedIn, router, user?.uid])
 
-	// If no invite token is provided, redirect to the homepage
+	const searchParams = useSearchParams()
+	const inviteToken = searchParams?.get(`invite_token`)
+	const [productInvite] = useDocument(
+		inviteToken ? doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter) : undefined,
+	)
+	const productName = trpc.getProductInviteInfo.useQuery({inviteToken: inviteToken!}, {enabled: !!inviteToken}).data
+		?.productName
 
-	const getProductInvite = async (inviteToken: string): Promise<ProductInvite | null> => {
-		try {
-			const response = await axios.get(`/api/get-product-invite`, {
-				params: {
-					inviteToken,
-				},
-			})
-			const data = response.data
-
-			const inviteData: ProductInvite = {
-				productId: data.productId,
-				userEmail: data.userEmail,
-			}
-			return inviteData
-		} catch (error) {
-			console.error(error)
-			return null
-		}
-	}
-
-	async function checkBetaUser(email?: string): Promise<boolean> {
-		const betaUsers: string[] = [`adil.gurban@gmail.com`, `abc@example.com`]
-		console.log(`checking beta user email`, email)
-		if (email && betaUsers.includes(email)) return true
-		else return false
-	}
-
-	async function validateInviteToken(inviteToken: string | null): Promise<void> {
-		// Get the ProductInvites table from Firestore
-		// map user to a product using admin SDK
-
-		//const invite = (await getDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter))).data()
-
-		// Check if the invite token exists and is not used
-		// if (inviteSnap.exists && !inviteSnap.data().isUsed) {
-		const invite = await getProductInvite(inviteToken)
-		console.log(`I received this invite object:`, invite)
-		if (invite?.productId) {
-			console.log(`checking if invite exists`, invite)
-			// Check if the invite has expired
-			// const expiryDate = snapshot.data().expiryDate.toDate()
-			// const currentDate = new Date()
-			// if (expiryDate > currentDate) {
-			// 	return true
-			// }
-
-			setHasValidToken(true)
-			setUserInvite({
-				userEmail: invite.userEmail,
-				productId: invite.productId,
-				token: inviteToken,
-			})
-
-			//await markInviteAsUsed(inviteToken)
-			!user && notification.success({message: `Welcome! Please log in with the email where you received the invite.`})
-		} else {
-			console.log(`Invite token does not exist. Do nothing.`)
-		}
-	}
+	const putUserOnProduct = trpc.putUserOnProduct.useMutation()
 
 	const processUser = async (credential: UserCredential) => {
 		if (!credential.user.email) throw new Error(`No email address found for user.`)
@@ -137,99 +65,54 @@ const SignInClientPage: FC = () => {
 
 		setHasSignedIn(true)
 
-		if (auth.currentUser && !auth.currentUser.emailVerified) {
-			await sendEmailVerification(auth.currentUser).then(() => {
-				notification.success({
-					message: `Email Verification`,
-					description: `Please check your email to verify your account.`,
-					placement: `bottomRight`,
-				})
-			})
-		}
-
-		const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
-		const isNewUser = !user
-
-		const isBetaUser = await checkBetaUser(credential.user.email)
-
+		const isBetaUser = betaUsers.includes(credential.user.email)
 		if (isBetaUser) {
-			// use Firebase Admin SDK - Auth
-			await setDoc(doc(db, `Users`, credential.user.uid), {
-				avatar: credential.user.photoURL,
-				email: credential.user.email,
-				hasAcceptedTos: false,
-				name: credential.user.displayName,
-			} satisfies User)
-
+			setHasSignedIn(true)
 			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
-			router.push(`/accept-terms`)
-		} else if (isNewUser) {
-			// if user is coming with an invite token
-			// if(betaUser)
-			// {
 
-			// temp code beta user sign-in
+			// Ask to verify email if not already verified
+			if (auth.currentUser && !auth.currentUser.emailVerified) {
+				await sendEmailVerification(auth.currentUser).then(() => {
+					notification.success({
+						message: `Email Verification`,
+						description: `Please check your email to verify your account.`,
+						placement: `bottomRight`,
+					})
+				})
+			}
 
-			// notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
-			// router.push(`/accept-terms`)
-			// }
-			if (hasValidToken && userInvite.userEmail != credential.user.email) {
-				notification.error({message: `Sorry, you do not have a valid invite.`})
-				//await signOut(auth)
-			} else if (hasValidToken && userInvite.userEmail === credential.user.email) {
+			const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
+			const isNewUser = !user
+
+			if (typeof inviteToken === `string`)
+				await putUserOnProduct.mutateAsync({
+					userId: credential.user.uid,
+					inviteToken,
+				})
+
+			if (isNewUser) {
 				await setDoc(doc(db, `Users`, credential.user.uid), {
 					avatar: credential.user.photoURL,
 					email: credential.user.email,
 					hasAcceptedTos: false,
 					name: credential.user.displayName,
 				} satisfies User)
-
-				// const data = {type: `editor`}
-
-				// //const memberData = {type: "editor"}
-				// //const members = {members.[credential.user.uid as Id]: {type: `editor`}}
-				// const productRef = doc(db, `Products`, userInvite.productId).withConverter(ProductConverter)
-				// await updateDoc(productRef, {
-				// 	[`members.${credential.user.uid}`]: data,
-				// })
-
-				try {
-					const res = await axios.post(`/api/map-user-to-product`, {
-						productId: userInvite.productId,
-						userId: credential.user.uid,
-						role: `editor`,
-					})
-					console.log(`User added to product members with role:`, res.data.role)
-				} catch (error) {
-					console.error(`Failed to add user to product members:`, error)
-				}
-
-				notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
 				router.push(`/accept-terms`)
-				// eslint-disable-next-line no-negated-condition
-				// this step might be redundant
 			} else if (!user.hasAcceptedTos) {
 				router.push(`/accept-terms`)
+			} else {
+				const {docs: products} = await getDocs(
+					query(
+						collection(db, `Products`),
+						where(`members.${credential.user.uid}.type`, `in`, [`owner`, `editor`]),
+					).withConverter(ProductConverter),
+				)
+				if (products.length === 0) router.push(`/product`)
+				else router.push(`/${products[0]!.id}/map`)
 			}
-			// if user somehow landed on the login page and tried to log in - only for Beta
-			else {
-				notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
-				await signOut(auth)
-			}
-			// eslint-disable-next-line no-negated-condition
-		} else if (!user.hasAcceptedTos) {
-			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
-			router.push(`/accept-terms`)
 		} else {
-			notification.success({message: `Successfully logged in. Redirecting...`, placement: `bottomRight`})
-			const {docs: products} = await getDocs(
-				query(
-					collection(db, `Products`),
-					where(`members.${credential.user.uid}.type`, `in`, [`owner`, `editor`]),
-				).withConverter(ProductConverter),
-			)
-			if (products.length === 0) router.push(`/product`)
-			else router.push(`/${products[0]!.id}/map`)
+			notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
+			await signOut(auth)
 		}
 	}
 
@@ -351,6 +234,17 @@ const SignInClientPage: FC = () => {
 					</button>
 				</div>
 			</div>
+
+			{productInvite && (
+				<Alert
+					message={
+						<p>
+							You&apos;ve been invited to join the product <b>{productName}</b>. Sign in to continue.
+						</p>
+					}
+					className="fixed bottom-8 right-12"
+				/>
+			)}
 		</div>
 	)
 }

@@ -1,12 +1,11 @@
 import {FrownOutlined, MehOutlined, SmileOutlined} from "@ant-design/icons"
-import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter, idSchema, timestampSchema} from "~/types"
 
 export const RetrospectiveItemSchema = z.object({
 	archived: z.boolean(),
-	createdAt: z.instanceof(Timestamp),
+	createdAt: timestampSchema,
 	description: z.string(),
 	proposedActions: z.array(
 		z.object({
