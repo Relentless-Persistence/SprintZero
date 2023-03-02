@@ -15,7 +15,7 @@ export const ProductSchema = z.object({
 			type: z.enum([`owner`, `editor`, `viewer`]),
 		}),
 	),
-	name: z.string().min(1),
+	name: z.string({invalid_type_error: `Required`}).min(1),
 
 	// Kickoff info
 	businessOutcomes: z.array(z.object({id: idSchema, text: z.string()})),

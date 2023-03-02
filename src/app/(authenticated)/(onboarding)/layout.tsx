@@ -22,7 +22,7 @@ const OnboardingLayout: FC<OnboardingLayoutProps> = ({children}) => {
 					<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={238} height={56} priority />
 					<div className="flex min-w-0 flex-1 flex-col items-end gap-1">
 						<div className="flex w-full flex-1 items-center gap-3">
-							<div className="flex min-w-0 flex-1 flex-col gap-2 text-end">
+							<div className="min-w-0 flex-1 text-end leading-normal">
 								<p>{user?.data().name}</p>
 								<p className="truncate text-sm text-textTertiary">{user?.data().email}</p>
 							</div>

@@ -1,60 +1,49 @@
 import {TRPCError} from "@trpc/server"
+import nodemailer from "nodemailer"
+import invariant from "tiny-invariant"
 import {z} from "zod"
 
-import type {WithFieldValue} from "firebase-admin/firestore"
-import type {Product} from "~/types/db/Products"
-
+import {userInviteRouter} from "./userInvite"
 import {procedure, router} from "../trpc"
-import {genAdminConverter} from "~/types"
-import {ProductInviteSchema} from "~/types/db/ProductInvites"
-import {ProductSchema} from "~/types/db/Products"
-import {dbAdmin} from "~/utils/firebaseAdmin"
 
 export const appRouter = router({
-	getProductInviteInfo: procedure
+	userInvite: userInviteRouter,
+
+	sendEmail: procedure
 		.input(
 			z.object({
-				inviteToken: z.string(),
+				body: z.string(),
+				from: z.string(),
+				subject: z.string(),
+				to: z.string(),
 			}),
 		)
-		.query(async ({input: {inviteToken}}) => {
-			const productInvite = await dbAdmin
-				.doc(`ProductInvites/${inviteToken}`)
-				.withConverter(genAdminConverter(ProductInviteSchema))
-				.get()
-			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
+		.mutation(async ({input: {body, from, subject, to}}) => {
+			if (process.env.NODE_ENV === `production`) {
+				const emailFrom = process.env.EMAIL_FROM_NO_REPLY
+				invariant(emailFrom, `EMAIL_FROM_NO_REPLY is not set`)
+				const emailPassword = process.env.EMAIL_PASSWORD_NO_REPLY
+				invariant(emailPassword, `EMAIL_PASSWORD_NO_REPLY is not set`)
+				if (from !== process.env.EMAIL_FROM_NO_REPLY)
+					throw new TRPCError({code: `BAD_REQUEST`, message: `Invalid from email`})
 
-			const product = await dbAdmin
-				.doc(`Products/${productInvite.data()!.productId}`)
-				.withConverter(genAdminConverter(ProductSchema))
-				.get()
-			if (!product.exists) throw new TRPCError({code: `UNAUTHORIZED`})
+				const transporter = nodemailer.createTransport({
+					service: `gmail`,
+					auth: {
+						user: emailFrom,
+						pass: emailPassword,
+					},
+				})
 
-			return {
-				productName: product.data()!.name,
+				await transporter.sendMail({
+					from,
+					to,
+					subject,
+					html: body,
+				})
+			} else {
+				console.info(`sendEmail`, {from, to, subject, body})
 			}
-		}),
-	putUserOnProduct: procedure
-		.input(
-			z.object({
-				userId: z.string(),
-				inviteToken: z.string(),
-			}),
-		)
-		.mutation(async ({input: {userId, inviteToken}}) => {
-			const productInvite = await dbAdmin
-				.doc(`ProductInvites/${inviteToken}`)
-				.withConverter(genAdminConverter(ProductInviteSchema))
-				.get()
-			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
-
-			const data: WithFieldValue<Partial<Product>> = {
-				[`members.${userId}`]: {type: `editor`},
-			}
-			await dbAdmin
-				.doc(`Products/${productInvite.data()!.productId}`)
-				.withConverter(genAdminConverter(ProductSchema))
-				.update(data)
 		}),
 })
 

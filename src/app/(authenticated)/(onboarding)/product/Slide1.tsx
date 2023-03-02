@@ -1,5 +1,4 @@
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Form} from "antd"
 import {useEffect} from "react"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
@@ -9,7 +8,6 @@ import type {FC} from "react"
 import SlideContainer from "./SlideContainer"
 import RhfInput from "~/components/rhf/RhfInput"
 import {ProductSchema} from "~/types/db/Products"
-import {formValidateStatus} from "~/utils/formValidateStatus"
 
 const formSchema = ProductSchema.pick({name: true}).extend({
 	email1: z.string().email().nullable(),
@@ -26,7 +24,7 @@ export type Slide1Props = {
 
 const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	const isActive = currentSlide === 0
-	const {control, formState, getFieldState, handleSubmit} = useForm<FormInputs>({
+	const {control, formState, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -51,86 +49,60 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					<p className="text-textTertiary">Please provide information below</p>
 				</div>
 
-				<Form
+				<form
 					id={isActive ? `current-slide` : ``}
-					layout="vertical"
-					requiredMark
-					onFinish={() => {
-						onSubmit().catch(console.error)
+					onSubmit={(e) => {
+						onSubmit(e).catch(console.error)
 					}}
 				>
 					<div className="flex flex-col gap-4">
-						<Form.Item
-							required
-							extra="32-character limit"
-							hasFeedback
-							validateStatus={formValidateStatus(getFieldState(`name`, formState))}
-							help={formState.errors.name?.message}
-						>
-							<p className="mb-1 text-lg font-semibold">Product name</p>
+						<div className="flex flex-col gap-1">
+							<label htmlFor="name" className="mb-1 text-lg font-semibold">
+								Product name
+							</label>
 							<RhfInput
 								htmlSize={32}
 								maxLength={32}
 								control={control}
+								id="name"
 								name="name"
+								disabled={!isActive}
 								placeholder="e.g., Netflix, Headspace, Spotify"
 							/>
-						</Form.Item>
+							<p className="text-textTertiary">32-character limit</p>
+						</div>
 
-						<div>
+						<div className="flex flex-col gap-1">
 							<p className="mb-1 text-lg font-semibold">Team members</p>
-							<div className="flex flex-col gap-2">
-								<Form.Item
-									required
-									hasFeedback
-									validateStatus={formValidateStatus(getFieldState(`email1`, formState))}
-									help={formState.errors.email1?.message}
-								>
-									<RhfInput
-										htmlSize={32}
-										maxLength={32}
-										control={control}
-										name="email1"
-										addonBefore="Email"
-										placeholder="username@domain.com"
-									/>
-								</Form.Item>
-								<Form.Item
-									required
-									hasFeedback
-									validateStatus={formValidateStatus(getFieldState(`email2`, formState))}
-									help={formState.errors.email2?.message}
-								>
-									<RhfInput
-										htmlSize={32}
-										maxLength={32}
-										control={control}
-										name="email2"
-										addonBefore="Email"
-										placeholder="username@domain.com"
-									/>
-								</Form.Item>
-								<Form.Item
-									required
-									hasFeedback
-									validateStatus={formValidateStatus(getFieldState(`email3`, formState))}
-									help={formState.errors.email3?.message}
-								>
-									<RhfInput
-										htmlSize={32}
-										maxLength={32}
-										control={control}
-										name="email3"
-										addonBefore="Email"
-										placeholder="username@domain.com"
-									/>
-								</Form.Item>
-							</div>
+							<RhfInput
+								htmlSize={32}
+								control={control}
+								name="email1"
+								disabled={!isActive}
+								addonBefore="Email"
+								placeholder="username@domain.com"
+							/>
+							<RhfInput
+								htmlSize={32}
+								control={control}
+								name="email2"
+								disabled={!isActive}
+								addonBefore="Email"
+								placeholder="username@domain.com"
+							/>
+							<RhfInput
+								htmlSize={32}
+								control={control}
+								name="email3"
+								disabled={!isActive}
+								addonBefore="Email"
+								placeholder="username@domain.com"
+							/>
 						</div>
 
 						<input type="submit" hidden />
 					</div>
-				</Form>
+				</form>
 			</div>
 		</SlideContainer>
 	)

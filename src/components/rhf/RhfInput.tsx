@@ -81,7 +81,7 @@ const RhfInput = <TFieldValues extends FieldValues = FieldValues>({
 						initial={{height: `0px`}}
 						animate={{height: `auto`}}
 						exit={{height: `0px`}}
-						className="overflow-hidden text-error"
+						className="overflow-hidden leading-tight text-error"
 					>
 						{error.message}
 					</motion.p>

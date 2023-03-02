@@ -1,7 +1,6 @@
 "use client"
 
 import {Button} from "antd"
-import axios from "axios"
 import crypto from "crypto"
 import {Timestamp, addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
@@ -9,8 +8,6 @@ import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
 import querystring from "querystring"
 import {useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
-import invariant from "tiny-invariant"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
@@ -26,20 +23,31 @@ import {ProductInviteConverter} from "~/types/db/ProductInvites"
 import {ProductConverter} from "~/types/db/Products"
 import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
 import {VersionConverter} from "~/types/db/Versions"
-import {auth, db} from "~/utils/firebase"
+import {db} from "~/utils/firebase"
+import {trpc} from "~/utils/trpc"
+import {useUser} from "~/utils/useUser"
+
+type FormInputs = Pick<
+	Product,
+	`cadence` | `effortCost` | `effortCostCurrencySymbol` | `name` | `sprintStartDayOfWeek`
+> & {
+	email1: string | null
+	email2: string | null
+	email3: string | null
+}
 
 const ProductSetupClientPage: FC = () => {
-	const [user] = useAuthState(auth)
-	invariant(user, `User must be logged in`)
+	const router = useRouter()
+	const user = useUser()
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const [canProceed, setCanProceed] = useState(false)
 	const [formData, setFormData] = useState<Partial<FormInputs>>({})
 	const [hasSubmitted, setHasSubmitted] = useState(false)
 
-	const router = useRouter()
+	const sendEmail = trpc.sendEmail.useMutation()
 
 	const submitForm = async (_data: FormInputs) => {
-		if (hasSubmitted) return
+		if (hasSubmitted || !user) return
 		setHasSubmitted(true)
 
 		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
@@ -51,8 +59,11 @@ const ProductSetupClientPage: FC = () => {
 			productId: slug,
 		})
 
-		const {email1, email2, email3, ...data} = _data
-		const members = {[user.uid as Id]: {type: `owner`} as const}
+		let {email1, email2, email3, ...data} = _data
+		if (email1 === email2) email2 = null
+		if (email1 === email3) email3 = null
+		if (email2 === email3) email3 = null
+		const members = {[user.id as Id]: {type: `owner`} as const}
 
 		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
 			...data,
@@ -76,7 +87,7 @@ const ProductSetupClientPage: FC = () => {
 			finalVision: ``,
 			updates: [],
 			huddles: {
-				[user.uid]: {
+				[user.id]: {
 					updatedAt: Timestamp.now(),
 					blockerStoryIds: [],
 					todayStoryIds: [],
@@ -129,38 +140,27 @@ const ProductSetupClientPage: FC = () => {
 			}),
 		])
 
-		//const productID = slug
-
-		const from = `no-reply@sprintzero.app`
-		const subject = `SprintZero | Member Invite`
-
 		for (const recipient of [email1, email2, email3]) {
 			if (!recipient) continue
 
 			const inviteToken = crypto.randomBytes(16).toString(`hex`)
-			const queryParams = querystring.stringify({
-				invite_token: inviteToken,
-			})
+			const queryParams = querystring.stringify({invite_token: inviteToken})
 			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
-			const body = `<b>${user.displayName}</b> has invited you to join the product <b>"${formData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`
+			const body = `<b>${user.data().name}</b> has invited you to join the product <b>"${
+				data.name
+			}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`
 
-			setDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter), {
+			await setDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter), {
+				email: recipient,
 				productId: slug,
-				userEmail: recipient,
 			})
 
-			const payload: EmailRequest = {
+			await sendEmail.mutateAsync({
 				to: recipient,
-				from,
-				subject: `${subject}`,
-				body: `${body}`,
-			}
-
-			try {
-				await axios.post(`/api/emails/send`, payload)
-			} catch (error) {
-				console.error(`Error sending email to ${recipient}:`, error)
-			}
+				from: `no-reply@sprintzero.app`,
+				subject: `SprintZero | Member Invite`,
+				body,
+			})
 		}
 
 		router.push(`/${slug}/map`)
@@ -251,20 +251,3 @@ const ProductSetupClientPage: FC = () => {
 export default ProductSetupClientPage
 
 const numSlides = 4
-
-type FormInputs = Pick<
-	Product,
-	`cadence` | `effortCost` | `effortCostCurrencySymbol` | `name` | `sprintStartDayOfWeek`
-> & {
-	email1: string | null
-	email2: string | null
-	email3: string | null
-}
-
-type EmailRequest = {
-	to: string
-	from: string
-	subject: string
-	body: string
-	attachments?: string[]
-}

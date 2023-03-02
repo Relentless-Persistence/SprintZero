@@ -11,7 +11,6 @@ import SlideContainer from "./SlideContainer"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {ProductSchema} from "~/types/db/Products"
-import {formValidateStatus} from "~/utils/formValidateStatus"
 
 const formSchema = ProductSchema.pick({effortCostCurrencySymbol: true}).extend({
 	effortCost: z
@@ -29,7 +28,7 @@ type Slide4Props = {
 
 const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	const isActive = currentSlide === 3
-	const {control, formState, handleSubmit, getFieldState} = useForm<FormInputs>({
+	const {control, formState, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -65,23 +64,20 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 						onSubmit().catch(console.error)
 					}}
 				>
-					<Form.Item
-						label="Amount"
-						hasFeedback
-						validateStatus={formValidateStatus(getFieldState(`effortCost`, formState))}
-						help={formState.errors.effortCost?.message}
-						className="w-64"
-					>
+					<div className="w-64">
+						<p>Amount</p>
 						<RhfInput
 							number="currency"
 							placeholder="0.00"
 							htmlSize={20}
 							control={control}
 							name="effortCost"
+							disabled={!isActive}
 							addonAfter={
 								<RhfSelect
 									control={control}
 									name="effortCostCurrencySymbol"
+									disabled={!isActive}
 									options={[
 										{label: `$`, value: `dollar`},
 										{label: `£`, value: `pound`},
@@ -92,7 +88,7 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								/>
 							}
 						/>
-					</Form.Item>
+					</div>
 
 					<input type="submit" hidden />
 				</Form>

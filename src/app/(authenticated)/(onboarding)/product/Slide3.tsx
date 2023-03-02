@@ -40,19 +40,19 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					}}
 					className="flex w-64 flex-col justify-items-center gap-4"
 				>
-					<Button onClick={() => setSelection(1)} type={selection === 1 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(1)} type={selection === 1 ? `primary` : `default`} disabled={!isActive}>
 						Monday
 					</Button>
-					<Button onClick={() => setSelection(2)} type={selection === 2 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(2)} type={selection === 2 ? `primary` : `default`} disabled={!isActive}>
 						Tuesday
 					</Button>
-					<Button onClick={() => setSelection(3)} type={selection === 3 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(3)} type={selection === 3 ? `primary` : `default`} disabled={!isActive}>
 						Wednesday
 					</Button>
-					<Button onClick={() => setSelection(4)} type={selection === 4 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(4)} type={selection === 4 ? `primary` : `default`} disabled={!isActive}>
 						Thursday
 					</Button>
-					<Button onClick={() => setSelection(5)} type={selection === 5 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(5)} type={selection === 5 ? `primary` : `default`} disabled={!isActive}>
 						Friday
 					</Button>
 

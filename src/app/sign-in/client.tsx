@@ -54,10 +54,12 @@ const SignInClientPage: FC = () => {
 	const [productInvite] = useDocument(
 		inviteToken ? doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter) : undefined,
 	)
-	const productName = trpc.getProductInviteInfo.useQuery({inviteToken: inviteToken!}, {enabled: !!inviteToken}).data
-		?.productName
+	const productName = trpc.userInvite.getProductInviteInfo.useQuery(
+		{inviteToken: inviteToken!},
+		{enabled: !!inviteToken},
+	).data?.productName
 
-	const putUserOnProduct = trpc.putUserOnProduct.useMutation()
+	const putUserOnProduct = trpc.userInvite.putUserOnProduct.useMutation()
 
 	const processUser = async (credential: UserCredential) => {
 		if (!credential.user.email) throw new Error(`No email address found for user.`)

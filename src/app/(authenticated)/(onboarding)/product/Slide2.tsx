@@ -35,13 +35,13 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					}}
 					className="flex w-64 flex-col justify-items-stretch gap-4"
 				>
-					<Button onClick={() => setSelection(1)} type={selection === 1 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(1)} type={selection === 1 ? `primary` : `default`} disabled={!isActive}>
 						One
 					</Button>
-					<Button onClick={() => setSelection(2)} type={selection === 2 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(2)} type={selection === 2 ? `primary` : `default`} disabled={!isActive}>
 						Two
 					</Button>
-					<Button onClick={() => setSelection(3)} type={selection === 3 ? `primary` : `default`}>
+					<Button onClick={() => setSelection(3)} type={selection === 3 ? `primary` : `default`} disabled={!isActive}>
 						Three
 					</Button>
 
