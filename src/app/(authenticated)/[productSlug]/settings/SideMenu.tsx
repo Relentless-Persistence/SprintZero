@@ -1,6 +1,6 @@
 "use client"
 
-import {IdcardOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
+import {SettingOutlined, TeamOutlined} from "@ant-design/icons"
 import {Menu} from "antd"
 import {usePathname} from "next/navigation"
 import {useState} from "react"
@@ -13,11 +13,6 @@ import LinkTo from "~/components/LinkTo"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const getItems = (activeProductId: Id): ItemType[] => [
-	{
-		key: `account`,
-		icon: <IdcardOutlined />,
-		label: <LinkTo href={`/${activeProductId}/settings/account`}>Account</LinkTo>,
-	},
 	{
 		key: `configuration`,
 		icon: <SettingOutlined />,

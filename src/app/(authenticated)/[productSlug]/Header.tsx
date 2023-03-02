@@ -1,4 +1,4 @@
-import {CustomerServiceOutlined, IdcardOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
+import {CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
 import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
 import {collection, doc, query, where} from "firebase/firestore"
 import Image from "next/image"
@@ -85,12 +85,6 @@ const Header: FC = () => {
 										...(Object.entries(activeProduct.data().members).find(([userId]) => userId === user?.uid)?.[1]
 											?.type === `owner`
 											? ([
-													{
-														key: `account`,
-														icon: <IdcardOutlined />,
-														label: <LinkTo href={`/${activeProductId}/settings/account`}>Account</LinkTo>,
-														onClick: () => setIsPopoverOpen(false),
-													},
 													{
 														key: `configuration`,
 														icon: <SettingOutlined />,

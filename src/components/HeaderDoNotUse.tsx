@@ -1,4 +1,4 @@
-import {CustomerServiceOutlined, IdcardOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
+import {CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
 import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
 import {collection, doc, query, where} from "firebase/firestore"
 import Image from "next/image"
@@ -87,12 +87,6 @@ const HeaderDoNotUse: FC = () => {
 								<Menu
 									className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
 									items={[
-										{
-											key: `account`,
-											icon: <IdcardOutlined />,
-											label: <LinkTo href={`/${activeProductId}/settings/account`}>Account</LinkTo>,
-											onClick: () => setIsPopoverOpen(false),
-										},
 										{
 											key: `configuration`,
 											icon: <SettingOutlined />,
