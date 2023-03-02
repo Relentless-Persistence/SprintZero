@@ -6,6 +6,7 @@ import {Avatar, Breadcrumb, Button, Card, Dropdown} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {Timestamp, arrayRemove, arrayUnion, collection, doc, getDoc, query, updateDoc, where} from "firebase/firestore"
+import {useEffect} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
@@ -22,6 +23,7 @@ import {UserConverter} from "~/types/db/Users"
 import {VersionConverter} from "~/types/db/Versions"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useUser} from "~/utils/useUser"
 
 dayjs.extend(relativeTime)
 
@@ -50,6 +52,22 @@ const HuddleClientPage: FC = () => {
 			? collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter)
 			: undefined,
 	)
+
+	const user = useUser()
+	useEffect(() => {
+		if (!activeProduct?.exists() || !user) return
+		if (activeProduct.data().huddles[user.id as Id] === undefined) {
+			const data: WithFieldValue<Partial<Product>> = {
+				[`huddles.${user.id}`]: {
+					updatedAt: Timestamp.now(),
+					blockerStoryIds: [],
+					todayStoryIds: [],
+					yesterdayStoryIds: [],
+				} satisfies Product[`huddles`][Id],
+			}
+			updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), data).catch(console.error)
+		}
+	}, [activeProduct, activeProductId, user])
 
 	return (
 		<div className="flex h-full w-full flex-col overflow-auto pb-8">
@@ -80,9 +98,11 @@ const HuddleClientPage: FC = () => {
 										<Avatar src={user.data().avatar} size="large" shape="square" />
 										<div>
 											<p>{user.data().name}</p>
-											<p className="text-sm font-normal text-textTertiary">
-												Updated {huddle ? dayjs(huddle.updatedAt.toMillis()).fromNow() : ``}
-											</p>
+											{huddle && (
+												<p className="text-sm font-normal text-textTertiary">
+													Updated {dayjs(huddle.updatedAt.toMillis()).fromNow()}
+												</p>
+											)}
 										</div>
 									</div>
 								}
