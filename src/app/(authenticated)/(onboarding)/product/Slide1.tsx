@@ -44,7 +44,7 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	return (
 		<SlideContainer isActive={isActive}>
 			<div className="flex flex-col items-center gap-4">
-				<div className="flex flex-col items-center gap-1">
+				<div className="flex flex-col items-center leading-normal">
 					<h3 className="text-xl font-semibold">Details</h3>
 					<p className="text-textTertiary">Please provide information below</p>
 				</div>
@@ -54,54 +54,50 @@ const Slide1: FC<Slide1Props> = ({setCanProceed, currentSlide, onComplete}) => {
 					onSubmit={(e) => {
 						onSubmit(e).catch(console.error)
 					}}
+					className="flex flex-col gap-4"
 				>
-					<div className="flex flex-col gap-4">
-						<div className="flex flex-col gap-1">
-							<label htmlFor="name" className="mb-1 text-lg font-semibold">
-								Product name
-							</label>
-							<RhfInput
-								htmlSize={32}
-								maxLength={32}
-								control={control}
-								id="name"
-								name="name"
-								disabled={!isActive}
-								placeholder="e.g., Netflix, Headspace, Spotify"
-							/>
-							<p className="text-textTertiary">32-character limit</p>
-						</div>
+					<label className="flex flex-col leading-normal">
+						<span className="mb-1 text-lg font-semibold">Product name</span>
+						<RhfInput
+							htmlSize={32}
+							maxLength={32}
+							control={control}
+							name="name"
+							disabled={!isActive}
+							placeholder="e.g., Netflix, Headspace, Spotify"
+						/>
+						<p className="text-textTertiary">32-character limit</p>
+					</label>
 
-						<div className="flex flex-col gap-1">
-							<p className="mb-1 text-lg font-semibold">Team members</p>
-							<RhfInput
-								htmlSize={32}
-								control={control}
-								name="email1"
-								disabled={!isActive}
-								addonBefore="Email"
-								placeholder="username@domain.com"
-							/>
-							<RhfInput
-								htmlSize={32}
-								control={control}
-								name="email2"
-								disabled={!isActive}
-								addonBefore="Email"
-								placeholder="username@domain.com"
-							/>
-							<RhfInput
-								htmlSize={32}
-								control={control}
-								name="email3"
-								disabled={!isActive}
-								addonBefore="Email"
-								placeholder="username@domain.com"
-							/>
-						</div>
-
-						<input type="submit" hidden />
+					<div className="flex flex-col gap-2 leading-normal">
+						<p className="text-lg font-semibold">Team members</p>
+						<RhfInput
+							htmlSize={32}
+							control={control}
+							name="email1"
+							disabled={!isActive}
+							addonBefore="Email"
+							placeholder="username@domain.com"
+						/>
+						<RhfInput
+							htmlSize={32}
+							control={control}
+							name="email2"
+							disabled={!isActive}
+							addonBefore="Email"
+							placeholder="username@domain.com"
+						/>
+						<RhfInput
+							htmlSize={32}
+							control={control}
+							name="email3"
+							disabled={!isActive}
+							addonBefore="Email"
+							placeholder="username@domain.com"
+						/>
 					</div>
+
+					<input type="submit" hidden />
 				</form>
 			</div>
 		</SlideContainer>

@@ -1,160 +1,190 @@
 "use client"
 
-import {FireOutlined} from "@ant-design/icons"
-import {Breadcrumb, Dropdown, Input, Segmented} from "antd"
-import {collection, doc, query, updateDoc, where} from "firebase/firestore"
-import {useEffect, useState} from "react"
-import {useCollection} from "react-firebase-hooks/firestore"
+import {FireFilled, FireOutlined} from "@ant-design/icons"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {Breadcrumb, Card, Dropdown} from "antd"
+import {doc, updateDoc} from "firebase/firestore"
+import {useEffect, useRef} from "react"
+import {useDocument} from "react-firebase-hooks/firestore"
+import {useForm} from "react-hook-form"
+import {z} from "zod"
 
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
 
-import {ProductConverter} from "~/types/db/Products"
+import RhfInput from "~/components/rhf/RhfInput"
+import RhfSegmented from "~/components/rhf/RhfSegmented"
+import RhfSelect from "~/components/rhf/RhfSelect"
+import {ProductConverter, ProductSchema} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
-import roundToNearest from "~/utils/roundToNearest"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
+
+const formSchema = ProductSchema.pick({
+	name: true,
+	cadence: true,
+	sprintStartDayOfWeek: true,
+	effortCostCurrencySymbol: true,
+}).extend({
+	effortCost: z
+		.string()
+		.regex(/^(\.[0-9]{1,2}|([0-9]+|[0-9]{1,3}(,[0-9]{3})*)(\.[0-9]{0,2})?)$/, `Invalid format.`)
+		.nullable(),
+})
+type FormInputs = z.infer<typeof formSchema>
 
 const ConfigurationSettingsClientPage: FC = () => {
 	const user = useUser()
-	const [allProducts] = useCollection(
-		user
-			? query(collection(db, `Products`), where(`members.${user.id}.type`, `in`, [`owner`, `editor`])).withConverter(
-					ProductConverter,
-			  )
-			: undefined,
-	)
-	// Technically the user can be a part of multiple products, but this page is only designed for one for now.
-	const firstProduct = allProducts?.docs[0]
+	const activeProductId = useActiveProductId()
+	const [product] = useDocument(user ? doc(db, `Products`, activeProductId).withConverter(ProductConverter) : undefined)
 
-	const [title, setTitle] = useState(firstProduct?.data().name)
-	useEffect(() => {
-		setTitle(firstProduct?.data().name)
-	}, [firstProduct])
+	const {control, handleSubmit, reset} = useForm<FormInputs>({
+		mode: `onChange`,
+		resolver: zodResolver(formSchema),
+		shouldFocusError: false,
+		defaultValues: {
+			name: product?.data()?.name,
+			cadence: product?.data()?.cadence,
+			sprintStartDayOfWeek: product?.data()?.sprintStartDayOfWeek,
+			effortCost: product?.data()?.effortCost ? product.data()!.effortCost?.toString() : null,
+			effortCostCurrencySymbol: product?.data()?.effortCostCurrencySymbol,
+		},
+	})
 
-	const [cadence, setCadence] = useState(firstProduct?.data().cadence)
+	const hasSetInitialData = useRef(false)
 	useEffect(() => {
-		setCadence(firstProduct?.data().cadence)
-	}, [firstProduct])
+		if (!product?.exists() || hasSetInitialData.current) return
+		reset({
+			name: product.data().name,
+			cadence: product.data().cadence,
+			sprintStartDayOfWeek: product.data().sprintStartDayOfWeek,
+			effortCost: product.data().effortCost ? product.data().effortCost?.toString() : null,
+			effortCostCurrencySymbol: product.data().effortCostCurrencySymbol,
+		})
+		hasSetInitialData.current = true
+	}, [product, reset])
 
-	const [gate, setGate] = useState(firstProduct?.data().sprintStartDayOfWeek)
-	useEffect(() => {
-		setGate(firstProduct?.data().sprintStartDayOfWeek)
-	}, [firstProduct])
-
-	const [effortCost, setEffortCost] = useState(
-		typeof firstProduct?.data().effortCost === `number` ? String(firstProduct.data().effortCost) : ``,
-	)
-	useEffect(() => {
-		setEffortCost(typeof firstProduct?.data().effortCost === `number` ? String(firstProduct.data().effortCost) : ``)
-	}, [firstProduct])
+	const onSubmit = handleSubmit(async (data) => {
+		await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+			...data,
+			effortCost: data.effortCost ? parseFloat(data.effortCost) : null,
+		})
+	})
 
 	return (
-		<div className="flex flex-col gap-6 px-12 py-8">
+		<div className="flex h-full flex-col gap-6 overflow-auto px-12 py-8">
 			<Breadcrumb>
 				<Breadcrumb.Item>Settings</Breadcrumb.Item>
 				<Breadcrumb.Item>Configuration</Breadcrumb.Item>
 			</Breadcrumb>
 
-			<div className="flex flex-col gap-4">
-				<p className="text-lg font-semibold">Configuration</p>
+			<p className="text-xl font-semibold">Configuration</p>
 
-				<label className="flex flex-col gap-2">
-					<span>Product Title</span>
-					<Input
-						value={title}
-						onChange={(e) => {
-							setTitle(e.target.value)
-							updateDoc(doc(db, `Products`, firstProduct!.id), {name: e.target.value} satisfies Partial<Product>).catch(
-								console.error,
-							)
-						}}
-						className="w-72"
-					/>
-				</label>
+			<Card className="w-fit">
+				<form className="flex flex-col items-start gap-4">
+					<label className="flex flex-col gap-1">
+						<span className="font-semibold">Product Title</span>
+						<RhfInput
+							control={control}
+							name="name"
+							onChange={() => {
+								onSubmit().catch(console.error)
+							}}
+							className="w-72"
+						/>
+					</label>
 
-				<label className="flex flex-col gap-2">
-					<span>Cadence (Weeks)</span>
-					<Segmented
-						value={cadence}
-						options={[
-							{label: `One`, value: 1},
-							{label: `Two`, value: 2},
-							{label: `Three`, value: 3},
-							{label: `Four`, value: 4},
-						]}
-						onChange={(value) => {
-							setCadence(value as number)
-							updateDoc(doc(db, `Products`, firstProduct!.id), {
-								cadence: value as number,
-							} satisfies Partial<Product>).catch(console.error)
-						}}
-						className="w-fit"
-					/>
-				</label>
+					<label className="flex flex-col gap-1">
+						<span className="font-semibold">Cadence (Weeks)</span>
+						<RhfSegmented
+							control={control}
+							name="cadence"
+							options={[
+								{label: `One`, value: 1},
+								{label: `Two`, value: 2},
+								{label: `Three`, value: 3},
+								{label: `Four`, value: 4},
+							]}
+							onChange={() => {
+								onSubmit().catch(console.error)
+							}}
+						/>
+					</label>
 
-				<label className="flex flex-col gap-2">
-					<span>Gate</span>
-					<Segmented
-						value={gate}
-						options={[
-							{label: `Monday`, value: 1},
-							{label: `Tuesday`, value: 2},
-							{label: `Wednesday`, value: 3},
-							{label: `Thursday`, value: 4},
-							{label: `Friday`, value: 5},
-						]}
-						onChange={(value) => {
-							setGate(value as number)
-							updateDoc(doc(db, `Products`, firstProduct!.id), {
-								sprintStartDayOfWeek: value as number,
-							} satisfies Partial<Product>).catch(console.error)
-						}}
-						className="w-fit"
-					/>
-				</label>
+					<label className="flex flex-col gap-1">
+						<span className="font-semibold">Gate</span>
+						<RhfSegmented
+							control={control}
+							name="sprintStartDayOfWeek"
+							options={[
+								{label: `Monday`, value: 1},
+								{label: `Tuesday`, value: 2},
+								{label: `Wednesday`, value: 3},
+								{label: `Thursday`, value: 4},
+								{label: `Friday`, value: 5},
+							]}
+							onChange={() => {
+								onSubmit().catch(console.error)
+							}}
+							className="w-fit"
+						/>
+					</label>
 
-				<label className="flex flex-col gap-2">
-					<span>Cost per Story Point</span>
-					<Input
-						value={effortCost ? `$${effortCost}` : undefined}
-						onChange={(e) => {
-							setEffortCost(e.target.value.replace(/^\$/, ``).replace(/(\.[0-9]{2}).+$/, `$1`))
-							const value =
-								e.target.value === `` ? null : roundToNearest(parseFloat(e.target.value.replace(/[^0-9.]/, ``)), 0.01)
-							updateDoc(doc(db, `Products`, firstProduct!.id), {effortCost: value} satisfies Partial<Product>).catch(
-								console.error,
-							)
-						}}
-						className="w-24"
-					/>
-				</label>
+					<label className="flex flex-col gap-1">
+						<span className="font-semibold">Cost per Story Point</span>
+						<RhfInput
+							control={control}
+							name="effortCost"
+							number="currency"
+							placeholder="0.00"
+							onChange={() => {
+								onSubmit().catch(console.error)
+							}}
+							addonAfter={
+								<RhfSelect
+									control={control}
+									name="effortCostCurrencySymbol"
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+									options={[
+										{label: `$`, value: `dollar`},
+										{label: `£`, value: `pound`},
+										{label: `€`, value: `euro`},
+										{label: `¥`, value: `yen`},
+										{label: `₹`, value: `rupee`},
+									]}
+								/>
+							}
+						/>
+					</label>
+				</form>
+			</Card>
 
-				<div className="mt-32 flex flex-col gap-2">
-					<div>
-						<p>Erase All Data</p>
-						<p className="text-sm text-textTertiary">
-							This action will erase all stored data and start over from scratch.
-						</p>
-					</div>
-					<Dropdown.Button
-						icon={<FireOutlined className="relative -top-[2.5px] text-xs" />}
-						menu={{
-							items: [
-								{
-									key: `confirm`,
-									label: `Confirm`,
-									onClick: () => {
-										// await Promise.all([
-										// ])
-									},
-								},
-								{key: `cancel`, label: `Cancel`},
-							],
-						}}
-					>
-						Halt + Catch Fire
-					</Dropdown.Button>
+			<div className="flex flex-col gap-2">
+				<div className="leading-normal">
+					<p>Erase All Data</p>
+					<p className="text-sm text-textTertiary">
+						This action will erase all stored data and start over from scratch.
+					</p>
 				</div>
+				<Dropdown.Button
+					icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}
+					menu={{
+						items: [
+							{
+								key: `confirm`,
+								label: `Confirm`,
+								onClick: () => {
+									// await Promise.all([
+									// ])
+								},
+							},
+							{key: `cancel`, label: `Cancel`},
+						],
+					}}
+				>
+					Halt + Catch Fire
+				</Dropdown.Button>
 			</div>
 		</div>
 	)

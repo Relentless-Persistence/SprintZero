@@ -27,13 +27,13 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({children}) => {
 	const [isOwner, setIsOwner] = useState(false)
 
 	useEffect(() => {
-		if (!activeProduct?.exists()) return
-		if (Object.entries(activeProduct.data().members).find(([userId]) => userId === user?.id)?.[1]?.type === `owner`) {
+		if (!activeProduct?.exists() || !user) return
+		if (Object.entries(activeProduct.data().members).find(([userId]) => userId === user.id)?.[1]?.type === `owner`) {
 			setIsOwner(true)
 		} else {
 			router.replace(`/404`)
 		}
-	}, [activeProduct, router, user?.id])
+	}, [activeProduct, router, user])
 
 	if (!isOwner) return null
 	return (

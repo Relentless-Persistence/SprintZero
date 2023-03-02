@@ -31,7 +31,7 @@ import {PersonaConverter} from "~/types/db/Personas"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
-import EarIcon from "~public/images/ear-icon.svg"
+import EarIcon from "~public/icons/ear.svg"
 
 dayjs.extend(relativeTime)
 

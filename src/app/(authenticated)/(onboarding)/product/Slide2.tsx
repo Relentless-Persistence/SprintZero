@@ -22,9 +22,9 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	return (
 		<SlideContainer isActive={isActive}>
 			<div className="flex flex-col items-center gap-4">
-				<div className="flex flex-col items-center gap-1">
+				<div className="flex flex-col items-center leading-normal">
 					<h3 className="text-xl font-semibold">Cadence</h3>
-					<p>How many weeks are allocated?</p>
+					<p className="text-textTertiary">How many weeks are allocated?</p>
 				</div>
 
 				<form

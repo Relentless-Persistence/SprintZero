@@ -84,7 +84,7 @@ service cloud.firestore {
     }
 
     match /Products/{productId} {
-      allow read, update, delete:
+      allow read, update:
       	if resource.data.members[request.auth.uid].type == "editor" || resource.data.members[request.auth.uid].type == "owner"
 
       allow create:

@@ -27,9 +27,9 @@ const Slide3: FC<Slide3Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	return (
 		<SlideContainer isActive={isActive}>
 			<div className="flex flex-col items-center gap-4">
-				<div className="flex flex-col items-center gap-1">
+				<div className="flex flex-col items-center leading-normal">
 					<h3 className="text-xl font-semibold">Gate</h3>
-					<p>Which day would you like to begin your sprints?</p>
+					<p className="text-textTertiary">Which day would you like to begin your sprints?</p>
 				</div>
 
 				<form

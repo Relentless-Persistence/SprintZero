@@ -1,5 +1,4 @@
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Form} from "antd"
 import {useEffect} from "react"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
@@ -15,7 +14,7 @@ import {ProductSchema} from "~/types/db/Products"
 const formSchema = ProductSchema.pick({effortCostCurrencySymbol: true}).extend({
 	effortCost: z
 		.string()
-		.regex(/^([0-9],?)+(\.[0-9]?[0-9]?)?$/, `Invalid format.`)
+		.regex(/^(\.[0-9]{1,2}|([0-9]+|[0-9]{1,3}(,[0-9]{3})*)(\.[0-9]{0,2})?)$/, `Invalid format.`)
 		.nullable(),
 })
 type FormInputs = z.infer<typeof formSchema>
@@ -51,27 +50,27 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	return (
 		<SlideContainer isActive={isActive}>
 			<div className="flex flex-col items-center gap-4">
-				<div className="flex flex-col items-center gap-1">
+				<div className="flex flex-col items-center leading-normal">
 					<h3 className="text-xl font-semibold">Effort Cost</h3>
-					<p>How much is 1 story point?</p>
+					<p className="text-textTertiary">How much is a single story point?</p>
 				</div>
 
-				<Form
+				<form
 					id={isActive ? `current-slide` : ``}
-					layout="vertical"
-					requiredMark="optional"
-					onFinish={() => {
-						onSubmit().catch(console.error)
+					onSubmit={(e) => {
+						onSubmit(e).catch(console.error)
 					}}
+					className="w-64"
 				>
-					<div className="w-64">
-						<p>Amount</p>
+					<label className="flex flex-col gap-1 leading-normal">
+						<span>
+							Amount <span className="text-textTertiary">(optional)</span>
+						</span>
 						<RhfInput
-							number="currency"
-							placeholder="0.00"
-							htmlSize={20}
 							control={control}
 							name="effortCost"
+							number="currency"
+							placeholder="0.00"
 							disabled={!isActive}
 							addonAfter={
 								<RhfSelect
@@ -88,10 +87,10 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 								/>
 							}
 						/>
-					</div>
+					</label>
 
 					<input type="submit" hidden />
-				</Form>
+				</form>
 			</div>
 		</SlideContainer>
 	)
