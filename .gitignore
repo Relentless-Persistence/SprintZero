@@ -15,6 +15,7 @@ yarn.lock
 # misc
 .DS_Store
 *.pem
+keys
 
 # debug
 /*-debug.log*

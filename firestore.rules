@@ -75,6 +75,14 @@ service cloud.firestore {
       	if request.auth != null
     }
 
+    match /ProductInvites/{productInviteId} {
+      allow get:
+        if true
+
+      allow create:
+        if request.auth != null
+    }
+
     match /Products/{productId} {
       allow read, update, delete:
       	if resource.data.members[request.auth.uid].type == "editor" || resource.data.members[request.auth.uid].type == "owner"

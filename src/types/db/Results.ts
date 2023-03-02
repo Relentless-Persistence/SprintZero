@@ -1,12 +1,11 @@
 // Objective results
 
-import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
 export const ResultSchema = z.object({
-	createdAt: z.instanceof(Timestamp),
+	createdAt: timestampSchema,
 	text: z.string().min(1, `Required`),
 })
 

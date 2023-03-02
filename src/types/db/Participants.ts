@@ -1,7 +1,6 @@
-import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter, idSchema, timestampSchema} from "~/types"
 
 export const ParticipantSchema = z.object({
 	availability: z.array(z.enum([`95only`, `email`, `phone`, `text`, `weekdays`, `weekends`])),
@@ -20,7 +19,7 @@ export const ParticipantSchema = z.object({
 	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable(),
 	title: z.enum([`dr`, `miss`, `mr`, `mrs`, `ms`, `prof`, `sir`]).nullable(),
 	transcript: z.string(),
-	updatedAt: z.instanceof(Timestamp),
+	updatedAt: timestampSchema,
 
 	personaIds: z.array(idSchema),
 	productId: idSchema,

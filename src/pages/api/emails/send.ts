@@ -39,7 +39,7 @@ const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse
 		from,
 		to,
 		subject,
-		text: body,
+		html: body,
 	}
 
 	try {

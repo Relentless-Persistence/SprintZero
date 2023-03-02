@@ -1,7 +1,7 @@
 "use client"
 
 import {Button, Checkbox, Input} from "antd"
-import {doc, updateDoc} from "firebase/firestore"
+import {collection, doc, getDocs, query, setDoc, updateDoc, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
 
@@ -12,6 +12,7 @@ import LinkTo from "~/components/LinkTo"
 import {nda} from "~/components/nda"
 import {privacyPolicy} from "~/components/privacy"
 import {termsOfService} from "~/components/terms"
+import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useUser} from "~/utils/useUser"
 
@@ -27,7 +28,14 @@ const AcceptTermsClientPage: FC = () => {
 		await updateDoc(doc(db, `Users`, user!.id), {
 			hasAcceptedTos: true,
 		} satisfies Partial<User>)
-		router.push(`/product`)
+
+		const {docs: products} = await getDocs(
+			query(collection(db, `Products`), where(`members.${user!.id}.type`, `==`, `editor`)).withConverter(
+				ProductConverter,
+			),
+		)
+		if (products.length === 0) router.push(`/product`)
+		else router.push(`/${products[0]!.id}/map`)
 	}
 
 	return (

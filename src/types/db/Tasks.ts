@@ -1,11 +1,10 @@
-import {Timestamp} from "firebase/firestore"
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter, idSchema, timestampSchema} from "~/types"
 
 export const TaskSchema = z.object({
 	board: z.string(),
-	dueDate: z.instanceof(Timestamp),
+	dueDate: timestampSchema,
 	notes: z.string(),
 	status: z.enum([`todo`, `inProgress`, `review`, `done`]),
 	subtasks: z.array(
