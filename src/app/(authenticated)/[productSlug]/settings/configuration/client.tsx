@@ -104,7 +104,6 @@ const ConfigurationSettingsClientPage: FC = () => {
 								{label: `One`, value: 1},
 								{label: `Two`, value: 2},
 								{label: `Three`, value: 3},
-								{label: `Four`, value: 4},
 							]}
 							onChange={() => {
 								onSubmit().catch(console.error)

@@ -80,6 +80,7 @@ const Header: FC = () => {
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Settings</p>
 							{activeProduct?.exists() && (
 								<Menu
+									selectedKeys={[]}
 									className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 bg-bgElevated [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
 									items={[
 										...(Object.entries(activeProduct.data().members).find(([userId]) => userId === user?.uid)?.[1]
@@ -104,7 +105,11 @@ const Header: FC = () => {
 											{
 												key: `support`,
 												icon: <CustomerServiceOutlined />,
-												label: <LinkTo href="https://www.sprintzero.app/contact">Support</LinkTo>,
+												label: (
+													<LinkTo href="https://www.sprintzero.app/contact" openInNewTab>
+														Support
+													</LinkTo>
+												),
 												onClick: () => setIsPopoverOpen(false),
 											},
 											{
