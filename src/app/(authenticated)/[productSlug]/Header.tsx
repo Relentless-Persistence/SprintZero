@@ -13,8 +13,8 @@ import {ProductConverter} from "~/types/db/Products"
 import {auth, db} from "~/utils/firebase"
 import {useSetTheme, useTheme} from "~/utils/ThemeContext"
 import {useActiveProductId} from "~/utils/useActiveProductId"
-import MoonIcon from "~public/images/moon-icon.svg"
-import SunIcon from "~public/images/sun-icon.svg"
+import MoonIcon from "~public/icons/moon.svg"
+import SunIcon from "~public/icons/sun.svg"
 
 const Header: FC = () => {
 	const activeProductId = useActiveProductId()
@@ -35,7 +35,7 @@ const Header: FC = () => {
 
 	return (
 		<Layout.Header className="flex items-center gap-8 !bg-[#161e12] !px-4">
-			<Image src="/images/logo_beta.png" alt="SprintZero logo" width={178} height={42} priority />
+			<Image src="/images/logo-dark.svg" alt="SprintZero logo" width={160} height={36} priority />
 
 			<Menu
 				theme="dark"

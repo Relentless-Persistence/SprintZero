@@ -12,7 +12,7 @@ const PrivacyClientPage: FC = () => {
 		<div className="h-full w-full overflow-x-hidden">
 			<div className="mx-auto flex h-full max-w-5xl flex-col gap-8 p-8">
 				<div className="flex justify-between">
-					<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={178} height={42} priority />
+					<Image src="/images/logo-light.svg" alt="SprintZero logo" width={214} height={48} priority />
 				</div>
 				<div className="flex flex-col gap-8">
 					<h1 className="text-3xl">Privacy Policy</h1>

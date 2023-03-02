@@ -22,8 +22,8 @@ const Slide2: FC<Slide2Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	return (
 		<SlideContainer isActive={isActive}>
 			<div className="flex flex-col items-center gap-4">
-				<div className="flex flex-col items-center gap-2">
-					<h3 className="text-2xl font-semibold">Cadence</h3>
+				<div className="flex flex-col items-center gap-1">
+					<h3 className="text-xl font-semibold">Cadence</h3>
 					<p>How many weeks are allocated?</p>
 				</div>
 

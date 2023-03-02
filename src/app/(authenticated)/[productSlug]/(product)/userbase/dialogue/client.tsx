@@ -17,7 +17,7 @@ import {PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
-import EarIcon from "~public/images/ear-icon.svg"
+import EarIcon from "~public/icons/ear.svg"
 
 const DialogueClientPage: FC = () => {
 	const user = useUser()

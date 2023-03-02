@@ -181,7 +181,7 @@ const SignInClientPage: FC = () => {
 	return (
 		<div className="h-full w-full px-12">
 			<div className="mx-auto flex h-full max-w-5xl flex-col py-8">
-				<Image src="/images/logo_beta_light.png" alt="SprintZero logo" width={238} height={56} priority />
+				<Image src="/images/logo-light.svg" alt="SprintZero logo" width={214} height={48} priority />
 				<div className="mt-6 flex flex-col gap-2">
 					<h1 className="text-3xl font-semibold">Authenticate Yourself Before You Wreck Yourself</h1>
 					<p className="text-xl text-textSecondary">Select a provider below to create an account</p>

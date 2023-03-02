@@ -51,8 +51,8 @@ const Slide4: FC<Slide4Props> = ({setCanProceed, currentSlide, onComplete}) => {
 	return (
 		<SlideContainer isActive={isActive}>
 			<div className="flex flex-col items-center gap-4">
-				<div className="flex flex-col items-center gap-2">
-					<h3 className="text-2xl font-semibold">Effort Cost</h3>
+				<div className="flex flex-col items-center gap-1">
+					<h3 className="text-xl font-semibold">Effort Cost</h3>
 					<p>How much is 1 story point?</p>
 				</div>
 
