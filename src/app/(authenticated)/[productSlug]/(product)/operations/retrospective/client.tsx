@@ -63,7 +63,7 @@ const RetrospectiveClientPage: FC = () => {
 							<Switch checked={includeArchived} onChange={(checked) => setIncludeArchived(checked)} />
 						</div>
 					</div>
-					<p>Which aspects have team members had fun with?</p>
+					<p>{tabDescriptions[currentTab]}</p>
 				</div>
 
 				{retrospectiveItems && retrospectiveItems.docs.length > 0 ? (
@@ -172,3 +172,9 @@ const RetrospectiveClientPage: FC = () => {
 }
 
 export default RetrospectiveClientPage
+
+const tabDescriptions = {
+	enjoyable: `Which aspects have team members had fun with?`,
+	puzzling: `Which aspects have team members not quite understood?`,
+	frustrating: `Which aspects have team members not found valuable?`,
+}
