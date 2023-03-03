@@ -103,6 +103,7 @@ export const addEpic = async (
 	const newData: WithFieldValue<Partial<StoryMapState>> = {
 		[`items.${nanoid()}`]: {
 			type: `epic` as const,
+			createdAt: Timestamp.now(),
 			description: ``,
 			effort: 0.5,
 			name: `Epic ${epics.length + 1}`,
@@ -112,7 +113,6 @@ export const addEpic = async (
 			acceptanceCriteria: null,
 			branchName: null,
 			bugs: null,
-			createdAt: null,
 			designEffort: null,
 			designLink: null,
 			engineeringEffort: null,
@@ -165,6 +165,7 @@ export const addFeature = async (
 	const newData: WithFieldValue<Partial<StoryMapState>> = {
 		[`items.${nanoid()}`]: {
 			type: `feature` as const,
+			createdAt: Timestamp.now(),
 			description: ``,
 			effort: 0.5,
 			name: `Feature ${features.length + 1}`,
@@ -173,7 +174,6 @@ export const addFeature = async (
 			acceptanceCriteria: null,
 			branchName: null,
 			bugs: null,
-			createdAt: null,
 			designEffort: null,
 			designLink: null,
 			engineeringEffort: null,

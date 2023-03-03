@@ -63,7 +63,12 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: defaultTheme}) 
 							},
 						}}
 					>
-						{!loading && (appInfo?.data()?.maintenanceMode ? <MaintenancePage /> : children)}
+						{!loading &&
+							(appInfo?.data()?.maintenanceMode ? (
+								<MaintenancePage />
+							) : (
+								<div className="isolate h-full">{children}</div>
+							))}
 						{!appInfo?.data()?.maintenanceMode && loadedVersion !== appInfo?.data()?.version && (
 							<Alert
 								type="warning"

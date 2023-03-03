@@ -1,14 +1,37 @@
 import {TRPCError} from "@trpc/server"
+import {Timestamp} from "firebase-admin/firestore"
 import nodemailer from "nodemailer"
 import invariant from "tiny-invariant"
 import {z} from "zod"
 
 import {userInviteRouter} from "./userInvite"
 import {procedure, router} from "../trpc"
+import {dbAdmin} from "~/utils/firebaseAdmin"
 
 export const appRouter = router({
 	userInvite: userInviteRouter,
 
+	migrateSchema: procedure.mutation(async () => {
+		const storyMapStates = await dbAdmin.collection(`StoryMapStates`).get()
+
+		await Promise.all([
+			...storyMapStates.docs.map(async (doc) => {
+				const items = doc.data().items as unknown
+				if (typeof items !== `object` || items === null) return
+				const updates = Object.fromEntries(
+					Object.entries(items)
+						.filter(
+							([, item]: [string, unknown]) =>
+								typeof item === `object` && item !== null && `createdAt` in item && item.createdAt === null,
+						)
+						.map(([id]) => {
+							return [`items.${id}.createdAt`, Timestamp.now()]
+						}),
+				)
+				await dbAdmin.doc(doc.ref.path).update(updates)
+			}),
+		])
+	}),
 	sendEmail: procedure
 		.input(
 			z.object({
