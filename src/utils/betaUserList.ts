@@ -101,4 +101,5 @@ export const betaUsers = [
 	`vanessajoy1221@gmail.com`,
 	`yangrin.design@gmail.com`,
 	`zachalbert@gmail.com`,
+	`gabriellavhirsch@gmail.com`,
 ]
