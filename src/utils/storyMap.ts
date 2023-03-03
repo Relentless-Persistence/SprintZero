@@ -237,7 +237,7 @@ export const addStory = async (
 			engineeringEffort: 1,
 			ethicsApproved: null,
 			ethicsColumn: null,
-			ethicsVotes: [],
+			ethicsVotes: {},
 			name: `Story ${stories.length + 1}`,
 			pageLink: null,
 			sprintColumn: `releaseBacklog` as const,

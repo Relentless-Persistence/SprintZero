@@ -26,12 +26,7 @@ const schemas = {
 	engineeringEffort: z.number().min(1),
 	ethicsApproved: z.boolean().nullable(),
 	ethicsColumn: z.enum([`underReview`, `adjudicated`]).nullable(),
-	ethicsVotes: z.array(
-		z.object({
-			userId: idSchema,
-			vote: z.boolean(),
-		}),
-	),
+	ethicsVotes: z.record(idSchema, z.boolean()),
 	name: z.string(),
 	pageLink: z.string().url().nullable(),
 	sprintColumn: z.enum([

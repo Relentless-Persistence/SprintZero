@@ -14,14 +14,13 @@ import {Avatar, Drawer, Input, Popover, Radio, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {doc, getDoc, setDoc} from "firebase/firestore"
+import {doc, getDoc, setDoc, updateDoc} from "firebase/firestore"
 import produce from "immer"
 import {useEffect, useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocument} from "react-firebase-hooks/firestore"
 import {useInterval} from "react-use"
 
-import type {QueryDocumentSnapshot} from "firebase/firestore"
+import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
@@ -33,8 +32,9 @@ import LinkTo from "~/components/LinkTo"
 import {sprintColumns} from "~/types/db/StoryMapStates"
 import {UserConverter} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
-import {auth, db} from "~/utils/firebase"
+import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
+import {useUser} from "~/utils/useUser"
 
 dayjs.extend(relativeTime)
 
@@ -47,7 +47,7 @@ export type StoryDrawerProps = {
 }
 
 const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyId, isOpen, onClose}) => {
-	const [user] = useAuthState(auth)
+	const user = useUser()
 	const story = getStories(storyMapState.data().items).find((story) => story.id === storyId)!
 	const [description, setDescription] = useState(story.description)
 	const [commentType, setCommentType] = useState<`design` | `code`>(`design`)
@@ -58,25 +58,27 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 
 	const addVote = async (vote: boolean) => {
 		if (!user) return
-		const ethicsVotes = story.ethicsVotes.filter((vote) => vote.userId !== user.uid)
-		ethicsVotes.push({userId: user.uid as Id, vote})
-		const votingComplete = ethicsVotes.length === Object.keys(activeProduct.data().members).length
 
-		let ethicsColumn: `underReview` | `adjudicated` = `underReview`
-		if (votingComplete) ethicsColumn = `adjudicated`
+		let votesFor = Object.values(story.ethicsVotes).filter((vote) => vote === true).length
+		let votesAgainst = Object.values(story.ethicsVotes).filter((vote) => vote === false).length
+		if (vote) votesFor++
+		else votesAgainst++
+		const votingComplete = votesFor + votesAgainst === Object.keys(activeProduct.data().members).length
+		const votingResult = votesFor > votesAgainst
 
-		const newData = produce(storyMapState.data(), (draft) => {
-			draft.items[storyId] = {
-				...(draft.items[storyId] as Story),
-				ethicsApproved: votingComplete
-					? ethicsVotes.filter((vote) => vote.vote === true).length >
-					  ethicsVotes.filter((vote) => vote.vote === false).length
-					: null,
-				ethicsColumn,
-				ethicsVotes,
+		if (votingComplete) {
+			const data: WithFieldValue<Partial<StoryMapState>> = {
+				[`items.${storyId}.ethicsVotes.${user.id}`]: vote,
+				[`items.${storyId}.ethicsApproved`]: votingResult,
+				[`items.${storyId}.ethicsColumn`]: `adjudicated`,
 			}
-		})
-		await setDoc(storyMapState.ref, newData)
+			await updateDoc(storyMapState.ref, data)
+		} else {
+			const data: WithFieldValue<Partial<StoryMapState>> = {
+				[`items.${storyId}.ethicsVotes.${user.id}`]: vote,
+			}
+			await updateDoc(storyMapState.ref, data)
+		}
 	}
 
 	const totalEffort = story.designEffort + story.engineeringEffort
@@ -190,40 +192,43 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 			<div className="grid h-full grid-cols-2 gap-8">
 				{/* Left column */}
 				<div className="flex h-full min-h-0 flex-col gap-6">
-					<div className="flex flex-col items-start gap-2">
-						{story.ethicsApproved === null ? (
-							<>
-								<div>
-									<p className="text-lg font-semibold">Adjudication Response</p>
-									<p className="text-xs">
-										Do you think this would provide value and reaffirm the commitment to our users?
-									</p>
-								</div>
+					{user && (
+						<div className="flex flex-col items-start gap-2">
+							{story.ethicsApproved === null ? (
+								<>
+									<div className="leading-normal">
+										<p className="text-lg font-semibold">Adjudication Response</p>
+										<p className="text-sm text-textTertiary">
+											Do you think this would provide value and reaffirm the commitment to our users?
+										</p>
+									</div>
 
-								<Radio.Group
-									onChange={(e) => {
-										addVote(e.target.value === `allow`).catch(console.error)
-									}}
-								>
-									<Radio value="allow">Allow</Radio>
-									<Radio value="reject">Reject</Radio>
-								</Radio.Group>
-							</>
-						) : (
-							<>
-								<p className="text-lg font-semibold">Adjudication Response</p>
-								{story.ethicsApproved ? (
-									<Tag icon={<LikeOutlined />} color="green">
-										Approved
-									</Tag>
-								) : (
-									<Tag icon={<DislikeOutlined />} color="red">
-										Rejected
-									</Tag>
-								)}
-							</>
-						)}
-					</div>
+									<Radio.Group
+										value={story.ethicsVotes[user.id as Id] ? `allow` : `reject`}
+										onChange={(e) => {
+											addVote(e.target.value === `allow`).catch(console.error)
+										}}
+									>
+										<Radio value="allow">Allow</Radio>
+										<Radio value="reject">Reject</Radio>
+									</Radio.Group>
+								</>
+							) : (
+								<>
+									<p className="text-lg font-semibold">Adjudication Response</p>
+									{story.ethicsApproved ? (
+										<Tag icon={<LikeOutlined />} color="green">
+											Approved
+										</Tag>
+									) : (
+										<Tag icon={<DislikeOutlined />} color="red">
+											Rejected
+										</Tag>
+									)}
+								</>
+							)}
+						</div>
+					)}
 					<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
 						<p className="text-lg font-semibold">User Story</p>
 						<Input.TextArea

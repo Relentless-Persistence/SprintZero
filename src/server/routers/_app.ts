@@ -1,8 +1,11 @@
 import {TRPCError} from "@trpc/server"
-import {Timestamp} from "firebase-admin/firestore"
 import nodemailer from "nodemailer"
 import invariant from "tiny-invariant"
 import {z} from "zod"
+
+import type {WithFieldValue} from "firebase-admin/firestore"
+import type {Id} from "~/types"
+import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import {userInviteRouter} from "./userInvite"
 import {procedure, router} from "../trpc"
@@ -16,18 +19,28 @@ export const appRouter = router({
 
 		await Promise.all([
 			...storyMapStates.docs.map(async (doc) => {
-				const items = doc.data().items as unknown
-				if (typeof items !== `object` || items === null) return
-				const updates = Object.fromEntries(
-					Object.entries(items)
-						.filter(
-							([, item]: [string, unknown]) =>
-								typeof item === `object` && item !== null && `createdAt` in item && item.createdAt === null,
-						)
-						.map(([id]) => {
-							return [`items.${id}.createdAt`, Timestamp.now()]
+				const items = z.record(z.string(), z.unknown()).parse(doc.data().items)
+				const oldItemSchema = z.object({
+					ethicsVotes: z.array(
+						z.object({
+							userId: z.string(),
+							vote: z.boolean(),
 						}),
-				)
+					),
+				})
+
+				let updates: WithFieldValue<Partial<StoryMapState>> = {}
+				for (const itemId in items) {
+					const item = oldItemSchema.safeParse(items[itemId])
+					if (!item.success) continue
+					let newEthicsVotes: Exclude<StoryMapState[`items`][Id], undefined>[`ethicsVotes`] = {}
+					for (const vote of item.data.ethicsVotes) {
+						newEthicsVotes[vote.userId as Id] = vote.vote
+					}
+					// @ts-ignore - Complex
+					updates[`items.${itemId}.ethicsVotes`] = newEthicsVotes
+				}
+
 				await dbAdmin.doc(doc.ref.path).update(updates)
 			}),
 		])

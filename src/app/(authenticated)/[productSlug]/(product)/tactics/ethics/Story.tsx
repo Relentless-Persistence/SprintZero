@@ -38,15 +38,16 @@ const Story: FC<StoryProps> = ({activeProduct, storyMapState, storyId}) => {
 					<Tag color="cyan" icon={<CopyOutlined />}>
 						{feature[1]!.name}
 					</Tag>
-					{story.ethicsApproved ? (
-						<Tag icon={<LikeOutlined />} color="green">
-							Approved
-						</Tag>
-					) : (
-						<Tag icon={<DislikeOutlined />} color="red">
-							Rejected
-						</Tag>
-					)}
+					{story.ethicsColumn === `adjudicated` &&
+						(story.ethicsApproved ? (
+							<Tag icon={<LikeOutlined />} color="green">
+								Approved
+							</Tag>
+						) : (
+							<Tag icon={<DislikeOutlined />} color="red">
+								Rejected
+							</Tag>
+						))}
 				</div>
 			</Card>
 

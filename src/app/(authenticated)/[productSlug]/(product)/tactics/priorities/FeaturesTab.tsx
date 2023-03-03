@@ -76,9 +76,10 @@ const FeaturesTab: FC<FeaturesTabProps> = ({activeProduct}) => {
 
 				<div className="h-0">
 					<Select
-						placeholder="Select an epic"
+						placeholder="Select an epic..."
 						options={epics.map((epic) => ({value: epic.id, label: epic.name}))}
 						onChange={(value) => setSelectedEpic(value as Id)}
+						className="w-48"
 					/>
 				</div>
 			</div>

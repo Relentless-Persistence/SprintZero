@@ -444,7 +444,7 @@ const StoryMap: FC<StoryMapProps> = ({
 								engineeringEffort: featureBeingDragged.engineeringEffort ?? 1,
 								ethicsApproved: featureBeingDragged.ethicsApproved,
 								ethicsColumn: featureBeingDragged.ethicsColumn,
-								ethicsVotes: featureBeingDragged.ethicsVotes ?? [],
+								ethicsVotes: featureBeingDragged.ethicsVotes ?? {},
 								pageLink: featureBeingDragged.pageLink,
 								sprintColumn: featureBeingDragged.sprintColumn ?? (`releaseBacklog` as const),
 								updatedAt: Timestamp.now(),
