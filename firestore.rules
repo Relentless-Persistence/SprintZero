@@ -9,6 +9,11 @@ service cloud.firestore {
       	if request.auth != null
     }
 
+    match /AppInfo/info {
+      allow read:
+        if true
+    }
+
     match /Comments/{commentId} {
     	allow read, update, delete:
       	if resource.data.authorId == request.auth.uid

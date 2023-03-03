@@ -54,7 +54,6 @@ const AccessibilityClientPage: FC = () => {
 									columnClassName="flex flex-col gap-8"
 								>
 									<Card
-										type="inner"
 										title="One"
 										extra={
 											<Switch
@@ -78,7 +77,6 @@ const AccessibilityClientPage: FC = () => {
 										</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Two"
 										extra={
 											<Switch
@@ -100,7 +98,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Media players that do not display captions and that do not provide volume controls.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Three"
 										extra={
 											<Switch
@@ -122,7 +119,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Media players that do not provide options to adjust the text size and colors for captions.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Four"
 										extra={
 											<Switch
@@ -144,7 +140,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Web-based services, including web applications, that rely on interaction using voice only.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Five"
 										extra={
 											<Switch
@@ -201,7 +196,6 @@ const AccessibilityClientPage: FC = () => {
 									columnClassName="flex flex-col gap-8"
 								>
 									<Card
-										type="inner"
 										title="One"
 										extra={
 											<Switch
@@ -223,7 +217,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Complex navigation mechanisms and page layouts that are difficult to understand and use.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Two"
 										extra={
 											<Switch
@@ -247,7 +240,6 @@ const AccessibilityClientPage: FC = () => {
 										</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Three"
 										extra={
 											<Switch
@@ -271,7 +263,6 @@ const AccessibilityClientPage: FC = () => {
 										</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Four"
 										extra={
 											<Switch
@@ -293,7 +284,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Moving, blinking, or flickering content, and background audio that cannot be turned off.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Five"
 										extra={
 											<Switch
@@ -317,7 +307,6 @@ const AccessibilityClientPage: FC = () => {
 										</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Six"
 										extra={
 											<Switch
@@ -373,7 +362,6 @@ const AccessibilityClientPage: FC = () => {
 									columnClassName="flex flex-col gap-8"
 								>
 									<Card
-										type="inner"
 										title="One"
 										extra={
 											<Switch
@@ -395,7 +383,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Websites, web browsers, and authoring tools that do not provide full keyboard support.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Two"
 										extra={
 											<Switch
@@ -417,7 +404,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Insufficient time limits to respond or to complete tasks, such as to fill out online forms.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Three"
 										extra={
 											<Switch
@@ -439,7 +425,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Controls, including links with images of text, that do not have equivalent text alternatives.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Four"
 										extra={
 											<Switch
@@ -461,7 +446,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Missing visual and non-visual orientation cues, page structure, and other navigational aids.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Five"
 										extra={
 											<Switch
@@ -516,7 +500,6 @@ const AccessibilityClientPage: FC = () => {
 									columnClassName="flex flex-col gap-8"
 								>
 									<Card
-										type="inner"
 										title="One"
 										extra={
 											<Switch
@@ -535,7 +518,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Web-based services, including web applications, that rely on interaction using voice only.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Two"
 										extra={
 											<Switch
@@ -589,7 +571,6 @@ const AccessibilityClientPage: FC = () => {
 									columnClassName="flex flex-col gap-8"
 								>
 									<Card
-										type="inner"
 										title="One"
 										extra={
 											<Switch
@@ -610,7 +591,6 @@ const AccessibilityClientPage: FC = () => {
 										</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Two"
 										extra={
 											<Switch
@@ -629,7 +609,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Text, images, and page layouts that cannot be resized, or that lose information when resized.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Three"
 										extra={
 											<Switch
@@ -648,7 +627,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Missing visual and non-visual orientation cues, page structure, and other navigational aids.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Four"
 										extra={
 											<Switch
@@ -667,7 +645,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Video content that does not have text or audio alternatives, or an audio-description track.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Five"
 										extra={
 											<Switch
@@ -686,7 +663,6 @@ const AccessibilityClientPage: FC = () => {
 										<p>Inconsistent, unpredictable, and overly complicated navigation mechanisms and page functions.</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Six"
 										extra={
 											<Switch
@@ -707,7 +683,6 @@ const AccessibilityClientPage: FC = () => {
 										</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Seven"
 										extra={
 											<Switch
@@ -729,7 +704,6 @@ const AccessibilityClientPage: FC = () => {
 										</p>
 									</Card>
 									<Card
-										type="inner"
 										title="Eight"
 										extra={
 											<Switch

@@ -51,7 +51,6 @@ const ResultCard: FC<ResultCardProps> = ({objectiveId, result, index, isEditing,
 
 	return (
 		<Card
-			type="inner"
 			title={
 				isEditing ? (
 					result?.exists() ? (

@@ -2,12 +2,17 @@
 
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
 import {httpBatchLink} from "@trpc/client"
-import {ConfigProvider, theme as antdTheme} from "antd"
-import {useState} from "react"
+import {Alert, ConfigProvider, theme as antdTheme} from "antd"
+import {doc} from "firebase/firestore"
+import {useEffect, useState} from "react"
+import {useDocument} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
 import type {FC, ReactNode} from "react"
 
+import MaintenancePage from "~/components/MaintenanceScreen"
+import {AppInfoConverter} from "~/types/db/AppInfo"
+import {db} from "~/utils/firebase"
 import {ThemeProvider} from "~/utils/ThemeContext"
 import {trpc} from "~/utils/trpc"
 
@@ -33,6 +38,12 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: defaultTheme}) 
 		}),
 	)
 
+	const [appInfo, loading] = useDocument(doc(db, `AppInfo`, `info`).withConverter(AppInfoConverter))
+	const [loadedVersion, setLoadedVersion] = useState<number | undefined>(undefined)
+	useEffect(() => {
+		if (!loading && appInfo?.exists() && loadedVersion === undefined) setLoadedVersion(appInfo.data().version)
+	}, [appInfo, loadedVersion, loading])
+
 	return (
 		<trpc.Provider client={trpcClient} queryClient={queryClient}>
 			<QueryClientProvider client={queryClient}>
@@ -52,7 +63,15 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: defaultTheme}) 
 							},
 						}}
 					>
-						{children}
+						{!loading && (appInfo?.data()?.maintenanceMode ? <MaintenancePage /> : children)}
+						{!appInfo?.data()?.maintenanceMode && loadedVersion !== appInfo?.data()?.version && (
+							<Alert
+								type="warning"
+								showIcon
+								message="A new version of the app is available. Reload the page to update."
+								className="fixed bottom-8 right-12"
+							/>
+						)}
 					</ThemeProvider>
 				</ConfigProvider>
 			</QueryClientProvider>

@@ -63,6 +63,7 @@ const schemas = {
 export const EpicSchema = z.object({
 	type: z.literal(`epic`),
 
+	createdAt: schemas.createdAt,
 	description: schemas.description,
 	effort: schemas.effort,
 	name: schemas.name,
@@ -74,7 +75,6 @@ export const EpicSchema = z.object({
 	acceptanceCriteria: schemas.acceptanceCriteria.nullable(),
 	branchName: schemas.branchName.nullable(),
 	bugs: schemas.bugs.nullable(),
-	createdAt: schemas.createdAt.nullable(),
 	designLink: schemas.designLink.nullable(),
 	designEffort: schemas.designEffort.nullable(),
 	engineeringEffort: schemas.engineeringEffort.nullable(),
@@ -94,6 +94,7 @@ export type Epic = z.infer<typeof EpicSchema>
 export const FeatureSchema = z.object({
 	type: z.literal(`feature`),
 
+	createdAt: schemas.createdAt,
 	description: schemas.description,
 	effort: schemas.effort,
 	name: schemas.name,
@@ -105,7 +106,6 @@ export const FeatureSchema = z.object({
 	acceptanceCriteria: schemas.acceptanceCriteria.nullable(),
 	branchName: schemas.branchName.nullable(),
 	bugs: schemas.bugs.nullable(),
-	createdAt: schemas.createdAt.nullable(),
 	designEffort: schemas.designEffort.nullable(),
 	designLink: schemas.designLink.nullable(),
 	engineeringEffort: schemas.engineeringEffort.nullable(),
