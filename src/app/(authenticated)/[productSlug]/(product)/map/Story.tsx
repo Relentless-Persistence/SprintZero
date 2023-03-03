@@ -70,7 +70,7 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 							onKeyDown={(e) => {
 								if (e.key === `Enter`) setHasBlurred(true)
 							}}
-							className="absolute inset-0 rounded-sm bg-transparent focus:outline focus:outline-offset-1 focus:outline-primaryHover"
+							className="absolute inset-0 rounded-sm bg-bgContainer focus:outline focus:outline-offset-1 focus:outline-primaryHover"
 							onChange={(e) => {
 								setLocalStoryName(e.target.value)
 								updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(console.error)

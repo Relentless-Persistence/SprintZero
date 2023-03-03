@@ -58,7 +58,7 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 						onKeyDown={(e) => {
 							if (e.key === `Enter`) setHasBlurred(true)
 						}}
-						className="absolute inset-0 rounded-sm bg-transparent focus:outline focus:outline-offset-1 focus:outline-primaryHover"
+						className="absolute inset-0 rounded-sm bg-bgContainer focus:outline focus:outline-offset-1 focus:outline-primaryHover"
 						onChange={(e) => {
 							setLocalFeatureName(e.target.value)
 							updateItem(meta.storyMapState, feature.id, {name: e.target.value}, meta.allVersions).catch(console.error)

@@ -58,7 +58,7 @@ const Epic: FC<EpicProps> = ({meta, epicId, inert = false, isInitialRender = fal
 						onKeyDown={(e) => {
 							if (e.key === `Enter`) setHasBlurred(true)
 						}}
-						className="absolute inset-0 rounded-sm bg-transparent focus:outline focus:outline-offset-1 focus:outline-primaryHover"
+						className="absolute inset-0 rounded-sm bg-bgContainer focus:outline focus:outline-offset-1 focus:outline-primaryHover"
 						onChange={(e) => {
 							setLocalEpicName(e.target.value)
 							updateItem(meta.storyMapState, epic.id, {name: e.target.value}, meta.allVersions).catch(console.error)
