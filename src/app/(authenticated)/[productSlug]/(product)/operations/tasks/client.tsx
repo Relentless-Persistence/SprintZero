@@ -41,7 +41,7 @@ const TasksClientPage: FC = () => {
 					</Breadcrumb>
 				</div>
 
-				<div className="ml-12 grid grow auto-cols-[16rem] grid-flow-col gap-4">
+				<div className="ml-12 grid grow auto-cols-[286px] grid-flow-col gap-4">
 					{tasks && (
 						<>
 							<TaskColumn id="todo" title="To Do" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
@@ -59,7 +59,7 @@ const TasksClientPage: FC = () => {
 					icon={<PlusOutlined />}
 					tooltip="Add Item"
 					onClick={() => setEditingTask(`new`)}
-					className="absolute bottom-8 right-12"
+					className="fixed bottom-8 right-24"
 				/>
 			</div>
 
