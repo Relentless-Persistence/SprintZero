@@ -67,6 +67,7 @@ const StoryMapClientPage: FC = () => {
 	const [editMode, setEditMode] = useState(false)
 	const [itemsToBeDeleted, setItemsToBeDeleted] = useState<Id[]>([])
 	const [versionsToBeDeleted, setVersionsToBeDeleted] = useState<Id[]>([])
+	const [isFloatOpen, setIsFloatOpen] = useState<boolean>(false)
 
 	const [histories] = useCollection(
 		storyMapState?.exists()
@@ -222,7 +223,9 @@ const StoryMapClientPage: FC = () => {
 					<FloatButton.Group
 						key="toolbelt"
 						trigger="click"
+						open={isFloatOpen}
 						icon={<MenuOutlined />}
+						onOpenChange={(open) => setIsFloatOpen(open)}
 						className="absolute right-12 bottom-8"
 					>
 						<Tooltip placement="left" title="Redo">
@@ -244,7 +247,10 @@ const StoryMapClientPage: FC = () => {
 							/>
 						</Tooltip>
 						<Tooltip placement="left" title="Add Release">
-							<FloatButton icon={<PlusOutlined />} onClick={() => setNewVesionInputValue(``)} />
+							<FloatButton icon={<PlusOutlined />} onClick={() => {
+								setNewVesionInputValue(``)
+								setIsFloatOpen(false)
+							}} />
 						</Tooltip>
 						<Tooltip placement="left" title="Edit">
 							<FloatButton icon={<EditOutlined />} onClick={() => setEditMode(true)} />
