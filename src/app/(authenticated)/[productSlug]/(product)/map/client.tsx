@@ -184,6 +184,7 @@ const StoryMapClientPage: FC = () => {
 									setEditMode(false)
 									setItemsToBeDeleted([])
 									setVersionsToBeDeleted([])
+									setIsFloatOpen(false)
 								}}
 							/>
 						</Tooltip>
@@ -213,6 +214,7 @@ const StoryMapClientPage: FC = () => {
 									])
 										.then(() => {
 											setEditMode(false)
+											setIsFloatOpen(false)
 										})
 										.catch(console.error)
 								}}
