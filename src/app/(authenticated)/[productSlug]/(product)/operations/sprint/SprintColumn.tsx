@@ -38,7 +38,12 @@ const SprintColumn: FC<SprintColumnProps> = ({
 	)
 
 	return (
-		<Card type="inner" title={title} extra={stories.length}>
+		<Card
+			title={title}
+			extra={stories.length}
+			id={columnName}
+			className="sprint-column grid min-h-0 grid-rows-[auto_1fr] [&>.ant-card-body]:overflow-auto"
+		>
 			<div className="flex flex-col gap-4">
 				{stories.map((story) => (
 					<Story key={story.id} storyMapState={storyMapState} allVersions={allVersions} storyId={story.id} />

@@ -106,7 +106,7 @@ const SprintClientPage: FC = () => {
 			</div>
 
 			<Tabs
-				className="grow [&_.ant-tabs-content]:h-full [&_.ant-tabs-nav]:px-12 [&_.ant-tabs-tabpane]:h-full"
+				className="min-h-0 grow [&_.ant-tabs-content]:h-full [&_.ant-tabs-nav]:px-12 [&_.ant-tabs-tabpane]:h-full"
 				items={[
 					{
 						key: `view`,
@@ -140,6 +140,7 @@ const SprintClientPage: FC = () => {
 					},
 					{
 						key: `plan`,
+						disabled: true,
 						label: (
 							<span>
 								<OrderedListOutlined /> Plan
@@ -148,6 +149,7 @@ const SprintClientPage: FC = () => {
 					},
 					{
 						key: `refine`,
+						disabled: true,
 						label: (
 							<span>
 								<FileSearchOutlined /> Refine
@@ -156,6 +158,7 @@ const SprintClientPage: FC = () => {
 					},
 					{
 						key: `critique`,
+						disabled: true,
 						label: (
 							<span>
 								<AuditOutlined /> Critique
@@ -164,6 +167,7 @@ const SprintClientPage: FC = () => {
 					},
 					{
 						key: `review`,
+						disabled: true,
 						label: (
 							<span>
 								<CodeSandboxOutlined /> Review
