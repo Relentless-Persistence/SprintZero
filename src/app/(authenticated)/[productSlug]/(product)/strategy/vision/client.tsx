@@ -71,6 +71,16 @@ const VisionsClientPage: FC = () => {
 				productType: activeProduct.productType,
 				valueProposition: activeProduct.valueProposition ?? ``,
 				features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
+				finalVision: activeProduct.finalVision,
+			})
+			setEditMode(true)
+			hasSetInitial.current = true
+		} else if (activeProduct && activeProduct.finalVision.length > 0) {
+			reset({
+				productType: activeProduct.productType,
+				valueProposition: activeProduct.valueProposition ?? ``,
+				features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
+				finalVision: activeProduct.finalVision
 			})
 			setEditMode(true)
 			hasSetInitial.current = true
@@ -302,7 +312,7 @@ const VisionsClientPage: FC = () => {
 
 												<Card className="max-w-2xl">
 													<div className="flex flex-col gap-4">
-														{rawVision !== undefined && rawVision !== `waiting` ? (
+														{rawVision !== `waiting` && activeProduct?.finalVision !== `` ? (
 															<RhfTextArea control={control} name="finalVision" rows={10} />
 														) : (
 															<Skeleton />
