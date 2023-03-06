@@ -1,18 +1,27 @@
+import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Input} from "antd"
+import {doc, getDoc} from "firebase/firestore"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
+import {useDocumentData} from "react-firebase-hooks/firestore"
 import {useFieldArray, useForm} from "react-hook-form"
 
 import type {Dayjs} from "dayjs"
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {Task} from "~/types/db/Tasks"
+import type {User} from "~/types/db/Users"
 
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfDateTimePicker from "~/components/rhf/RhfDateTimePicker"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
+import {ProductConverter} from "~/types/db/Products"
+import {UserConverter} from "~/types/db/Users"
+import {db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 type FormInputs = Omit<Task, `productId` | `dueDate`> & {dueDate: Dayjs}
 
@@ -25,6 +34,9 @@ export type TaskDrawerProps = {
 const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) => {
 	const [isOpen, setIsOpen] = useState(false)
 	useEffect(() => setIsOpen(true), [])
+
+	const activeProductId = useActiveProductId();
+	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -39,6 +51,13 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 		setTimeout(() => {
 			Promise.resolve(onCommit(data)).catch(console.error)
 		}, 300)
+	})
+
+	const teamMembers = useQueries({
+		queries: Object.keys(product?.members ?? {}).map((userId) => ({
+			queryKey: [`user`, userId],
+			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
+		})),
 	})
 
 	return (
@@ -86,7 +105,15 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 
 					<div className="flex flex-col gap-2">
 						<p className="text-lg font-semibold">Assign</p>
-						<RhfSelect control={control} name="assigneeIds" mode="multiple" />
+						<RhfSelect
+							control={control}
+							name="assigneeIds"
+							mode="multiple"
+							options={teamMembers
+								.map(({data: memberDoc}) => memberDoc)
+								.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
+								.map((user) => ({label: user.data().name, value: user.id}))}
+						/>
 					</div>
 				</div>
 
