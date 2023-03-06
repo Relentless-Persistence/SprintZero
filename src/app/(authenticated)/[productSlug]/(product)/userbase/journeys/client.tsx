@@ -34,7 +34,9 @@ const JourneysClientPage: FC = () => {
 			: undefined,
 	)
 
-	const [activeEvent, setActiveEvent] = useState<Id | `new` | undefined>(undefined)
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const [activeEventId, setActiveEventId] = useState<Id | undefined>(undefined)
+	const activeEvent = journeyEvents?.docs.find((event) => event.id === activeEventId)
 
 	if (activeJourney === `new`)
 		return (
@@ -52,7 +54,7 @@ const JourneysClientPage: FC = () => {
 						<Breadcrumb.Item>Journeys</Breadcrumb.Item>
 					</Breadcrumb>
 
-					<Button onClick={() => setActiveEvent(`new`)}>Add Event</Button>
+					<Button onClick={() => setIsDrawerOpen(true)}>Add Event</Button>
 				</div>
 
 				<div className="relative grow">
@@ -89,7 +91,7 @@ const JourneysClientPage: FC = () => {
 							{durationUnits[journey.data().durationUnit]} 0
 						</p>
 					)}
-					<div className="bg-laurel absolute top-0 left-1/2 my-10 h-[calc(100%-5rem)] w-0.5 -translate-x-1/2" />
+					<div className="absolute top-0 left-1/2 my-10 h-[calc(100%-5rem)] w-0.5 -translate-x-1/2 bg-textTertiary" />
 					<div className="absolute left-1/2 bottom-7 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-textTertiary bg-bgLayout" />
 					{journey && (
 						<p className="absolute left-1/2 bottom-[2.125rem] ml-3 translate-y-1/2 text-xs">
@@ -114,17 +116,22 @@ const JourneysClientPage: FC = () => {
 					<div className="pointer-events-none absolute top-[2.125rem] bottom-[2.125rem] right-0 left-1/2">
 						{journey &&
 							journeyEvents?.docs.map((event) => (
-								<div
+								<button
 									key={event.id}
-									className="pointer-events-auto absolute flex w-full -translate-y-1/2 items-center gap-1"
+									type="button"
+									onClick={() => {
+										setActiveEventId(event.id as Id)
+										setIsDrawerOpen(true)
+									}}
+									className="pointer-events-auto absolute flex -translate-y-1/2 items-center gap-1 text-left"
 									style={{top: `${((event.data().start + event.data().end) / 2 / journey.data().duration) * 100}%`}}
 								>
 									<div className="h-3 w-3 shrink-0 -translate-x-1/2 rounded-full border-2 border-textTertiary bg-bgLayout" />
-									<div className="min-w-0 flex-1">
+									<div className="min-w-0 flex-1 leading-normal">
 										<p className="font-semibold">{event.data().subject}</p>
 										<p className="font-light">{event.data().description}</p>
 									</div>
-								</div>
+								</button>
 							))}
 					</div>
 				</div>
@@ -141,20 +148,18 @@ const JourneysClientPage: FC = () => {
 				/>
 			)}
 
-			{journey && (
+			{journey && isDrawerOpen && (
 				<EventDrawer
 					journey={journey}
 					activeEvent={activeEvent}
-					onClose={() => setActiveEvent(undefined)}
+					onClose={() => setIsDrawerOpen(false)}
 					onCommit={async (data) => {
-						if (activeEvent === `new`) await addDoc(collection(db, `Journeys`, journey.id, `JourneyEvents`), data)
-						else if (activeEvent) await updateDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEvent), data)
-
-						setActiveEvent(undefined)
+						if (activeEventId === undefined) await addDoc(collection(db, `Journeys`, journey.id, `JourneyEvents`), data)
+						else await updateDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEventId), data)
 					}}
 					onDelete={async () => {
-						if (activeEvent !== undefined && activeEvent !== `new`)
-							await deleteDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEvent))
+						if (activeEventId !== undefined && activeEventId !== `new`)
+							await deleteDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEventId))
 					}}
 				/>
 			)}

@@ -1,4 +1,4 @@
-import {Timestamp, doc, updateDoc} from "firebase/firestore"
+import {Timestamp, updateDoc} from "firebase/firestore"
 import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 import {createPortal} from "react-dom"
@@ -9,9 +9,6 @@ import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
 import StoryCard from "./StoryCard"
-import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type StoryContainerProps = {
 	storyMapState: QueryDocumentSnapshot<StoryMapState>
@@ -30,8 +27,6 @@ const StoryContainer: FC<StoryContainerProps> = ({
 	onDragStart,
 	onDragEnd,
 }) => {
-	const activeProductId = useActiveProductId()
-
 	const ref = useRef<HTMLDivElement>(null)
 	const [dragInfo, setDragInfo] = useState({
 		width: 0,

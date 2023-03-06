@@ -33,7 +33,7 @@ module.exports = {
 		"no-empty": [`warn`, {allowEmptyCatch: true}],
 		"no-mixed-spaces-and-tabs": [`warn`, `smart-tabs`],
 		"no-param-reassign": `error`,
-		"no-unused-expressions": [`warn`, {enforceForJSX: true}],
+		"no-unused-expressions": [`warn`, {enforceForJSX: true, allowShortCircuit: true}],
 		"no-unused-vars": [`warn`, {ignoreRestSiblings: true}],
 		"object-shorthand": `warn`,
 		quotes: [`warn`, `backtick`],
