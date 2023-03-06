@@ -57,7 +57,7 @@ const ParticipantEditForm: FC<ParticipantEditFormProps> = ({participant, onFinis
 	})
 
 	const {isLoaded} = useJsApiLoader({
-		googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ``,
+		googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || ``,
 		libraries: useRef<Array<`places`>>([`places`]).current,
 	})
 
@@ -183,7 +183,7 @@ const ParticipantEditForm: FC<ParticipantEditFormProps> = ({participant, onFinis
 							allowFullScreen
 							referrerPolicy="no-referrer-when-downgrade"
 							src={`https://www.google.com/maps/embed/v1/place?key=${
-								process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ``
+								process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY ?? ``
 							}&q=place_id:${placeId}`}
 							className="h-full w-full"
 						/>
@@ -197,6 +197,7 @@ const ParticipantEditForm: FC<ParticipantEditFormProps> = ({participant, onFinis
 						`text-sm`,
 						wikipediaLink ? `text-textTertiary underline` : `cursor-not-allowed text-textQuaternary`,
 					)}
+					openInNewTab
 				>
 					Learn more about this place on Wikipedia
 				</LinkTo>
