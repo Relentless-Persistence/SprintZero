@@ -47,6 +47,7 @@ export const betaUsers = [
 	`herrema.drew@gmail.com`,
 	`hv18@caa.columbia.edu`,
 	`ilya@startsev.com`,
+	`ivan@wagely.app`,
 	`izzysanchezdesign@gmail.com`,
 	`jarell.alvarez@hotmail.com`,
 	`jarias.design@gmail.com`,
