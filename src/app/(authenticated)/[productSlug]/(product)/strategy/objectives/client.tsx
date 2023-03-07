@@ -116,6 +116,7 @@ const ObjectivesClientPage: FC = () => {
 
 						{activeResultId === `new` && currentObjective && (
 							<ResultCard
+								index={results?.docs.length}
 								isEditing
 								objectiveId={currentObjective.id as Id}
 								onEditStart={() => setActiveResultId(`new`)}

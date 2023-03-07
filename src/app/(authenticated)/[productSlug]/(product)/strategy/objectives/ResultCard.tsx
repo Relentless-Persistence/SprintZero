@@ -64,7 +64,9 @@ const ResultCard: FC<ResultCardProps> = ({objectiveId, result, index, isEditing,
 						>
 							Delete
 						</Button>
-					) : null
+					) : (
+						`Result #${index === undefined ? `???` : index + 1}`
+					)
 				) : (
 					`Result #${index === undefined ? `???` : index + 1}`
 				)
