@@ -1,5 +1,6 @@
 import {TRPCError} from "@trpc/server"
 import nodemailer from "nodemailer"
+import {Configuration, OpenAIApi} from "openai"
 import invariant from "tiny-invariant"
 import {z} from "zod"
 
@@ -7,13 +8,34 @@ import type {WithFieldValue} from "firebase-admin/firestore"
 import type {Id} from "~/types"
 import type {StoryMapState} from "~/types/db/StoryMapStates"
 
+import {funCardRouter} from "./funCard"
 import {userInviteRouter} from "./userInvite"
 import {procedure, router} from "../trpc"
 import {dbAdmin} from "~/utils/firebaseAdmin"
 
+const configuration = new Configuration({
+	apiKey: process.env.OPENAI_API_KEY,
+})
+const openai = new OpenAIApi(configuration)
+
 export const appRouter = router({
 	userInvite: userInviteRouter,
+	funCard: funCardRouter,
 
+	gpt: procedure.input(z.object({prompt: z.string()})).query(async ({input: {prompt}}) => {
+		const response = await openai.createCompletion({
+			model: `text-davinci-003`,
+			prompt,
+			temperature: 0.8,
+			max_tokens: 3000,
+			top_p: 0.8,
+			frequency_penalty: 1,
+			presence_penalty: 0,
+		})
+		return {
+			response: response.data.choices[0]?.text,
+		}
+	}),
 	migrateSchema: procedure.mutation(async () => {
 		const storyMapStates = await dbAdmin.collection(`StoryMapStates`).get()
 

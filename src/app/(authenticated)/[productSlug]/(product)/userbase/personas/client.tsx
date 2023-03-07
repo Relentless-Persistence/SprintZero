@@ -1,6 +1,6 @@
 "use client"
 
-import {Breadcrumb, Tabs} from "antd"
+import {Breadcrumb, Card, Tabs} from "antd"
 import {collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
@@ -9,7 +9,6 @@ import type {FC} from "react"
 import type {Persona} from "~/types/db/Personas"
 
 import EditableListCard from "./EditableListCard"
-import PersonaDescriptionCard from "./PersonaDescriptionCard"
 import {PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -148,16 +147,9 @@ const PersonasClientPage: FC = () => {
 								/>
 							</div>
 							<div className="flex flex-col gap-4">
-								<PersonaDescriptionCard
-								// productId={activeProductId}
-								// personaName={persona.data().name}
-								// personaId={persona.id as Id}
-								// personaPrevQnA={persona.data().prevQnA}
-								// text={persona.data().description}
-								// isEditing={isEditingCard === `description`}
-								// onEditStart={() => setIsEditingCard(`description`)}
-								// onEditEnd={() => setIsEditingCard(undefined)}
-								/>
+								<Card title="Description">
+									<p>{persona.data().description}</p>
+								</Card>
 								<EditableListCard
 									isEditing={isEditingCard === `dayInTheLife`}
 									onEditStart={() => setIsEditingCard(`dayInTheLife`)}

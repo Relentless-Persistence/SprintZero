@@ -7,6 +7,7 @@ export const UserSchema = z.object({
 	email: z.string(),
 	hasAcceptedTos: z.boolean(),
 	name: z.string(),
+	preferredMusicClient: z.enum([`appleMusic`, `spotify`]).default(`appleMusic`),
 })
 
 export type User = z.infer<typeof UserSchema>

@@ -3,8 +3,7 @@
 import {ClockCircleOutlined, DesktopOutlined, LayoutOutlined, MobileOutlined, TabletOutlined} from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useQueries} from "@tanstack/react-query"
-import {Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline, notification} from "antd"
-import axios from "axios"
+import {Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {diffArrays} from "diff"
@@ -24,6 +23,7 @@ import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
 import {ProductConverter, ProductSchema} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
+import {trpc} from "~/utils/trpc"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
 
@@ -44,15 +44,14 @@ const VisionsClientPage: FC = () => {
 
 	const [editMode, setEditMode] = useState(false)
 	const [currentStep, setCurrentStep] = useState(0)
-	const [rawVision, setRawVision] = useState<string | undefined>(undefined)
 
 	const {
 		control,
 		handleSubmit,
-		getValues,
-		setValue,
 		reset,
-		formState: {errors},
+		watch,
+		setValue,
+		formState: {errors, dirtyFields},
 	} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
@@ -65,8 +64,8 @@ const VisionsClientPage: FC = () => {
 
 	const hasSetInitial = useRef(false)
 	useEffect(() => {
-		if (hasSetInitial.current) return
-		if (activeProduct && !activeProduct.finalVision) {
+		if (hasSetInitial.current || !activeProduct) return
+		if (!activeProduct.finalVision) {
 			reset({
 				productType: activeProduct.productType,
 				valueProposition: activeProduct.valueProposition ?? ``,
@@ -75,12 +74,12 @@ const VisionsClientPage: FC = () => {
 			})
 			setEditMode(true)
 			hasSetInitial.current = true
-		} else if (activeProduct && activeProduct.finalVision.length > 0) {
+		} else if (activeProduct.finalVision !== ``) {
 			reset({
 				productType: activeProduct.productType,
 				valueProposition: activeProduct.valueProposition ?? ``,
 				features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
-				finalVision: activeProduct.finalVision
+				finalVision: activeProduct.finalVision,
 			})
 			setEditMode(true)
 			hasSetInitial.current = true
@@ -95,344 +94,312 @@ const VisionsClientPage: FC = () => {
 			})) ?? [],
 	})
 
-	type ProductVisionInput = {
-		productType: string
-		valueProposition: string
-		features: string[]
-	}
+	const [productType, valueProposition, features] = watch([`productType`, `valueProposition`, `features`])
+	const productVision = trpc.gpt.useQuery(
+		{
+			prompt: `Write a product vision for a ${productType} app. Its goal is to: ${valueProposition}. The app has the following features: ${features
+				.map((f) => f.text)
+				.join(`, `)}.`,
+		},
+		{
+			enabled: currentStep >= 3,
+			select: (data) => data.response?.trim(),
+		},
+	)
 
-	const generateProductVision = async ({productType, valueProposition, features}: ProductVisionInput) => {
-		const gptQuestion = `Write a product vision for a ${productType} app. Its goal is to: ${valueProposition}. The app has the following features: ${features.join(
-			`, `,
-		)}.`
-
-		let gptResponse = ``
-		try {
-			const _res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
-			const {response: res} = z.object({response: z.string()}).parse(_res.data)
-			gptResponse = res.trimStart()
-		} catch (error) {
-			console.error(error)
-			notification.error({message: `Something went wrong!`})
-		}
-
-		return gptResponse
-	}
+	const scrollerRef = useRef<HTMLDivElement | null>(null)
+	useEffect(() => {
+		if (!scrollerRef.current) return
+		const stepElement = document.getElementById(`step-${currentStep + 1}`)
+		const headingElement = document.getElementById(`heading`)
+		if (!stepElement || !headingElement) return
+		scrollerRef.current.scrollTo({
+			top:
+				stepElement.getBoundingClientRect().top +
+				scrollerRef.current.scrollTop -
+				scrollerRef.current.getBoundingClientRect().top -
+				headingElement.getBoundingClientRect().height -
+				16,
+			behavior: `smooth`,
+		})
+	}, [currentStep])
 
 	return (
 		<div className="grid h-full grid-cols-[2fr_16rem] gap-8">
-			<div className="ml-12 mt-8 overflow-auto">
-				<div className="sticky top-0 z-10 bg-bgLayout pb-8">
+			<div className="ml-12 mt-8 overflow-auto" ref={scrollerRef}>
+				<div id="heading" className="sticky top-0 z-10 flex flex-col gap-2 bg-bgLayout pb-6">
 					<Breadcrumb>
 						<Breadcrumb.Item>Strategy</Breadcrumb.Item>
 						<Breadcrumb.Item>Vision</Breadcrumb.Item>
 					</Breadcrumb>
-
-					<p className="mt-2">Outline the long-term goals and purpose of your product</p>
+					<div className="leading-normal">
+						<h1 className="text-3xl font-bold">Vision Statement</h1>
+						<p>A concise and inspiring statement that outlines the long-term goal and purpose of a product</p>
+					</div>
 				</div>
 
-				<div className="flex flex-col gap-6 overflow-auto pb-8">
-					<div className="grow">
-						{editMode ? (
-							<Steps
-								direction="vertical"
-								current={currentStep}
-								items={[
-									{
-										title: (
-											<div className="mb-8 flex w-full flex-col gap-6">
-												<div className="flex flex-col gap-2">
-													<p className="text-lg leading-none">Application Type</p>
-													<p className="text-base leading-none text-textTertiary">
-														How will users typically access your product?
-													</p>
-												</div>
-
-												<Card className="max-w-2xl">
-													<div className="flex flex-col gap-4">
-														<RhfSegmented
-															control={control}
-															name="productType"
-															block
-															options={[
-																{icon: <MobileOutlined />, label: `Mobile`, value: `mobile`},
-																{icon: <TabletOutlined />, label: `Tablet`, value: `tablet`},
-																{icon: <DesktopOutlined />, label: `Desktop`, value: `desktop`},
-																{icon: <ClockCircleOutlined />, label: `Watch`, value: `watch`},
-																{icon: <LayoutOutlined />, label: `Web`, value: `web`},
-															]}
-														/>
-
-														<div className="flex justify-end gap-4">
-															<Button
-																type="text"
-																disabled={!activeProduct?.finalVision}
-																onClick={() => setEditMode(false)}
-															>
-																Cancel
-															</Button>
-															<Button disabled={!!errors.productType} onClick={() => setCurrentStep(1)}>
-																Next
-															</Button>
-														</div>
-													</div>
-												</Card>
+				<div className="mt-1 grow pb-8">
+					{editMode ? (
+						<Steps
+							direction="vertical"
+							current={currentStep}
+							items={[
+								{
+									title: (
+										<div id="step-1" className="mb-6 flex w-full max-w-xl flex-col gap-4 leading-none">
+											<div className="leading-normal">
+												<p className="text-lg font-medium">Product Type</p>
+												<p className="text-base text-textTertiary">How will users typically access your product?</p>
 											</div>
-										),
-									},
-									{
-										title: (
-											<div className="mb-6 flex w-full flex-col gap-6">
-												<div className="flex flex-col gap-2">
-													<p className="text-lg leading-none">Value Proposition</p>
-													<p className="text-base leading-none text-textTertiary">
-														What is the main benefit of your product?
-													</p>
-												</div>
 
-												<Card className="max-w-2xl">
-													<div className="flex flex-col gap-4">
-														<RhfTextArea control={control} name="valueProposition" disabled={currentStep !== 1} />
+											<RhfSegmented
+												control={control}
+												name="productType"
+												block
+												options={[
+													{icon: <MobileOutlined />, label: `Mobile`, value: `mobile`},
+													{icon: <TabletOutlined />, label: `Tablet`, value: `tablet`},
+													{icon: <DesktopOutlined />, label: `Desktop`, value: `desktop`},
+													{icon: <ClockCircleOutlined />, label: `Watch`, value: `watch`},
+													{icon: <LayoutOutlined />, label: `Web`, value: `web`},
+												]}
+											/>
 
-														<div className="flex justify-end gap-4">
-															<Button
-																type="text"
-																disabled={!activeProduct?.finalVision || currentStep !== 1}
-																onClick={() => setEditMode(false)}
-															>
-																Cancel
-															</Button>
-															<Button
-																disabled={!!errors.valueProposition || currentStep !== 1}
-																onClick={() => setCurrentStep(2)}
-															>
-																Next
-															</Button>
-														</div>
-													</div>
-												</Card>
+											<div className="flex justify-end gap-4">
+												<Button type="text" disabled={!activeProduct?.finalVision} onClick={() => setEditMode(false)}>
+													Cancel
+												</Button>
+												<Button disabled={!!errors.productType} onClick={() => setCurrentStep(1)}>
+													Next
+												</Button>
 											</div>
-										),
-									},
-									{
-										title: (
-											<div className="mb-6 flex w-full flex-col gap-6">
-												<div className="flex flex-col gap-2">
-													<p className="text-lg leading-none">Features</p>
-													<p className="text-base leading-none text-textTertiary">
-														What are the specific functions, tools, and capabilities?
-													</p>
-												</div>
-
-												<Card className="max-w-2xl">
-													<div className="flex flex-col gap-4">
-														<RhfTextListEditor control={control} name="features" disabled={currentStep !== 2} />
-
-														<div className="flex justify-end gap-4">
-															<Button
-																type="text"
-																disabled={!activeProduct?.finalVision || currentStep !== 2}
-																onClick={() => setEditMode(false)}
-															>
-																Cancel
-															</Button>
-															<Button
-																disabled={!!errors.features || currentStep !== 2}
-																onClick={() => {
-																	setCurrentStep(3)
-																	setRawVision(`waiting`)
-																	const {productType, valueProposition, features} = getValues()
-																	generateProductVision({
-																		productType,
-																		valueProposition,
-																		features: features.map((f) => f.text),
-																	})
-																		.then((response) => {
-																			setRawVision(response)
-																			setValue(`finalVision`, response)
-																		})
-																		.catch(console.error)
-																}}
-															>
-																Next
-															</Button>
-														</div>
-													</div>
-												</Card>
+										</div>
+									),
+								},
+								{
+									title: (
+										<div id="step-2" className="mb-6 flex w-full max-w-xl flex-col gap-4 leading-none">
+											<div className="leading-normal">
+												<p className="text-lg font-medium">Value Proposition</p>
+												<p className="text-base text-textTertiary">What is the main benefit of your product?</p>
 											</div>
-										),
-									},
-									{
-										title: (
-											<div className="mb-6 flex w-full flex-col gap-6">
-												<div className="flex flex-col gap-2">
-													<p className="text-lg leading-none">Response</p>
-													<p className="text-base leading-none text-textTertiary">Let&apos;s review what came back!</p>
-												</div>
 
-												<Card className="max-w-2xl">
-													<div className="flex flex-col gap-4">
-														{rawVision === undefined ? (
-															<Skeleton />
-														) : rawVision === `waiting` ? (
-															<Skeleton active />
-														) : (
-															<p>{rawVision}</p>
-														)}
+											<RhfTextArea control={control} name="valueProposition" disabled={currentStep !== 1} />
 
-														<div className="flex justify-end gap-4">
-															<Button
-																type="text"
-																disabled={!activeProduct?.finalVision || currentStep !== 3}
-																onClick={() => setEditMode(false)}
-															>
-																Cancel
-															</Button>
-															<Button
-																disabled={rawVision === undefined || rawVision === `waiting`}
-																onClick={() => setCurrentStep(4)}
-															>
-																Next
-															</Button>
-														</div>
-													</div>
-												</Card>
+											<div className="flex justify-end gap-4">
+												<Button
+													type="text"
+													disabled={!activeProduct?.finalVision || currentStep !== 1}
+													onClick={() => setEditMode(false)}
+												>
+													Cancel
+												</Button>
+												<Button
+													disabled={!!errors.valueProposition || !dirtyFields.valueProposition || currentStep !== 1}
+													onClick={() => setCurrentStep(2)}
+												>
+													Next
+												</Button>
 											</div>
-										),
-									},
-									{
-										title: (
-											<div className="mb-6 flex w-full flex-col gap-6">
-												<div className="flex flex-col gap-2">
-													<p className="text-lg leading-none">Finalize</p>
-													<p className="text-base leading-none text-textTertiary">
-														Not a fan of any aspect? Go ahead and adjust as you see fit.
-													</p>
-												</div>
-
-												<Card className="max-w-2xl">
-													<div className="flex flex-col gap-4">
-														{rawVision !== `waiting` && activeProduct?.finalVision !== `` ? (
-															<RhfTextArea control={control} name="finalVision" rows={10} />
-														) : (
-															<Skeleton />
-														)}
-
-														<div className="flex justify-end gap-4">
-															<Button
-																type="text"
-																disabled={!activeProduct?.finalVision || currentStep !== 4}
-																onClick={() => setEditMode(false)}
-															>
-																Cancel
-															</Button>
-															<Button
-																disabled={!!errors.finalVision || currentStep !== 4}
-																onClick={() => {
-																	handleSubmit(async (data) => {
-																		if (!activeProduct) return
-
-																		const operations: string[] = []
-
-																		if (activeProduct.productType !== data.productType)
-																			operations.push(`changed the product type to ${data.productType}`)
-
-																		if (activeProduct.valueProposition !== data.valueProposition)
-																			operations.push(`changed the value proposition to "${data.valueProposition}"`)
-
-																		if (activeProduct.features !== data.features) {
-																			const differences = diffArrays(
-																				activeProduct.features?.map((feature) => feature.text) ?? [],
-																				data.features.map((feature) => feature.text),
-																			)
-																			const removals = differences
-																				.filter((difference) => difference.removed)
-																				.flatMap((difference) => difference.value)
-																				.map((removal) => `"${removal}"`)
-																			let removalsText = removals.length > 0 ? listToSentence(removals) : undefined
-																			removalsText = removalsText ? `removed the features ${removalsText}` : undefined
-																			if (removalsText) operations.push(removalsText)
-																			const additions = differences
-																				.filter((difference) => difference.added)
-																				.flatMap((difference) => difference.value)
-																				.map((addition) => `"${addition}"`)
-																			let additionsText = additions.length > 0 ? listToSentence(additions) : undefined
-																			additionsText = additionsText ? `added the features ${additionsText}` : undefined
-																			if (additionsText) operations.push(additionsText)
-																		}
-																		const operationsText = listToSentence(operations).concat(`.`)
-
-																		const updates = [...activeProduct.updates]
-																		if (activeProduct.finalVision === ``) {
-																			updates.push({
-																				id: nanoid(),
-																				userId: user!.id as Id,
-																				text: `created the product vision.`,
-																				timestamp: Timestamp.now(),
-																			})
-																		} else if (operations.length > 0) {
-																			updates.push({
-																				id: nanoid(),
-																				userId: user!.id as Id,
-																				text: operationsText,
-																				timestamp: Timestamp.now(),
-																			})
-																		}
-
-																		await updateDoc(
-																			doc(db, `Products`, activeProductId).withConverter(ProductConverter),
-																			{
-																				features: data.features,
-																				finalVision: data.finalVision,
-																				productType: data.productType,
-																				updates,
-																				valueProposition: data.valueProposition,
-																			},
-																		)
-																		setEditMode(false)
-																	})().catch(console.error)
-																}}
-															>
-																Save
-															</Button>
-														</div>
-													</div>
-												</Card>
+										</div>
+									),
+								},
+								{
+									title: (
+										<div id="step-3" className="mb-6 flex w-full max-w-xl flex-col gap-4 leading-none">
+											<div className="leading-normal">
+												<p className="text-lg font-medium">Features</p>
+												<p className="text-base text-textTertiary">
+													What are the specific functions, tools, and capabilities?
+												</p>
 											</div>
-										),
-									},
-								]}
-								className="[&_.ant-steps-item-title]:w-full"
-							/>
-						) : activeProduct?.finalVision ? (
-							<Card
-								title="Statement"
-								extra={
-									<Button
-										type="text"
-										className="text-primary"
-										onClick={() => {
-											reset({
-												productType: activeProduct.productType,
-												valueProposition: activeProduct.valueProposition ?? ``,
-												features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
-											})
-											setCurrentStep(0)
-											setEditMode(true)
-										}}
-									>
-										Edit
-									</Button>
-								}
-							>
-								<p>{activeProduct.finalVision}</p>
-							</Card>
-						) : (
-							<div className="grid h-full place-items-center">
-								<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-							</div>
-						)}
-					</div>
+
+											<RhfTextListEditor control={control} name="features" disabled={currentStep !== 2} />
+
+											<div className="flex justify-end gap-4">
+												<Button
+													type="text"
+													disabled={!activeProduct?.finalVision || currentStep !== 2}
+													onClick={() => setEditMode(false)}
+												>
+													Cancel
+												</Button>
+												<Button
+													disabled={!!errors.features || !dirtyFields.features || currentStep !== 2}
+													onClick={() => {
+														setCurrentStep(3)
+													}}
+												>
+													Next
+												</Button>
+											</div>
+										</div>
+									),
+								},
+								{
+									title: (
+										<div id="step-4" className="mb-6 flex w-full max-w-xl flex-col gap-4 leading-none">
+											<div className="leading-normal">
+												<p className="text-lg font-medium">Response</p>
+												<p className="text-base text-textTertiary">Let&apos;s review what came back!</p>
+											</div>
+
+											{productVision.isSuccess && productVision.data ? (
+												<Card>
+													<p>{productVision.data}</p>
+												</Card>
+											) : productVision.isFetching ? (
+												<Skeleton active />
+											) : (
+												<Skeleton />
+											)}
+
+											<div className="flex justify-end gap-4">
+												<Button
+													type="text"
+													disabled={!activeProduct?.finalVision || currentStep !== 3}
+													onClick={() => setEditMode(false)}
+												>
+													Cancel
+												</Button>
+												<Button
+													disabled={productVision.isFetching || currentStep !== 3}
+													onClick={() => {
+														setValue(`finalVision`, productVision.data ?? ``)
+														setCurrentStep(4)
+													}}
+												>
+													Next
+												</Button>
+											</div>
+										</div>
+									),
+								},
+								{
+									title: (
+										<div id="step-5" className="mb-6 flex w-full max-w-xl flex-col gap-4 leading-none">
+											<div className="leading-normal">
+												<p className="text-lg font-medium">Finalize</p>
+												<p className="text-base text-textTertiary">
+													Not a fan of any aspect? Go ahead and adjust as you see fit.
+												</p>
+											</div>
+
+											{productVision.data ? (
+												<RhfTextArea control={control} name="finalVision" rows={10} />
+											) : (
+												<Skeleton />
+											)}
+
+											<div className="flex justify-end gap-4">
+												<Button
+													type="text"
+													disabled={!activeProduct?.finalVision || currentStep !== 4}
+													onClick={() => setEditMode(false)}
+												>
+													Cancel
+												</Button>
+												<Button
+													disabled={!!errors.finalVision || currentStep !== 4}
+													onClick={() => {
+														handleSubmit(async (data) => {
+															if (!activeProduct) return
+
+															const operations: string[] = []
+
+															if (activeProduct.productType !== data.productType)
+																operations.push(`changed the product type to ${data.productType}`)
+
+															if (activeProduct.valueProposition !== data.valueProposition)
+																operations.push(`changed the value proposition to "${data.valueProposition}"`)
+
+															// Calculate feature diffs
+															if (activeProduct.features !== data.features) {
+																const differences = diffArrays(
+																	activeProduct.features?.map((feature) => feature.text) ?? [],
+																	data.features.map((feature) => feature.text),
+																)
+																const removals = differences
+																	.filter((difference) => difference.removed)
+																	.flatMap((difference) => difference.value)
+																	.map((removal) => `"${removal}"`)
+																let removalsText = removals.length > 0 ? listToSentence(removals) : undefined
+																removalsText = removalsText ? `removed the features ${removalsText}` : undefined
+																if (removalsText) operations.push(removalsText)
+																const additions = differences
+																	.filter((difference) => difference.added)
+																	.flatMap((difference) => difference.value)
+																	.map((addition) => `"${addition}"`)
+																let additionsText = additions.length > 0 ? listToSentence(additions) : undefined
+																additionsText = additionsText ? `added the features ${additionsText}` : undefined
+																if (additionsText) operations.push(additionsText)
+															}
+															const operationsText = listToSentence(operations).concat(`.`)
+
+															const updates = [...activeProduct.updates]
+															if (activeProduct.finalVision === ``) {
+																updates.push({
+																	id: nanoid(),
+																	userId: user!.id as Id,
+																	text: `created the product vision.`,
+																	timestamp: Timestamp.now(),
+																})
+															} else if (operations.length > 0) {
+																updates.push({
+																	id: nanoid(),
+																	userId: user!.id as Id,
+																	text: operationsText,
+																	timestamp: Timestamp.now(),
+																})
+															}
+
+															await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+																features: data.features,
+																finalVision: data.finalVision,
+																productType: data.productType,
+																updates,
+																valueProposition: data.valueProposition,
+															})
+															setEditMode(false)
+														})().catch(console.error)
+													}}
+												>
+													Save
+												</Button>
+											</div>
+										</div>
+									),
+								},
+							]}
+							className="[&_.ant-steps-item-title]:w-full"
+						/>
+					) : activeProduct?.finalVision ? (
+						<Card
+							title="Statement"
+							extra={
+								<Button
+									size="small"
+									onClick={() => {
+										reset({
+											productType: activeProduct.productType,
+											valueProposition: activeProduct.valueProposition ?? ``,
+											features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
+										})
+										setCurrentStep(0)
+										setEditMode(true)
+									}}
+								>
+									Edit
+								</Button>
+							}
+						>
+							<p>{activeProduct.finalVision}</p>
+						</Card>
+					) : (
+						<div className="grid h-full place-items-center">
+							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+						</div>
+					)}
 				</div>
 			</div>
 

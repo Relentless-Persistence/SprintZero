@@ -1,25 +1,27 @@
 import {AppleFilled, NotificationOutlined, SettingOutlined} from "@ant-design/icons"
-import {Button, Card, DatePicker, Dropdown, Empty, Skeleton} from "antd"
-import axios from "axios"
+import {Button, Card, DatePicker, Dropdown, Skeleton} from "antd"
 import dayjs from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
+import {doc, updateDoc} from "firebase/firestore"
 import {random} from "lodash"
 import {useState} from "react"
-import {z} from "zod"
 
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
+import {UserConverter} from "~/types/db/Users"
+import {db} from "~/utils/firebase"
+import {trpc} from "~/utils/trpc"
+import {useUser} from "~/utils/useUser"
 import ShuffleIcon from "~public/icons/shuffle.svg"
 import SpotifyIcon from "~public/icons/spotify.svg"
 
 dayjs.extend(isBetween)
 
 const FunCard: FC = () => {
+	const user = useUser()
 	const [date, setDate] = useState<Dayjs | null>(null)
-	const [clues, setClues] = useState<string[] | `loading` | undefined>(undefined)
-	const [musicClient, setMusicClient] = useState<`apple` | `spotify`>(`apple`)
-	const [songUrl, setSongUrl] = useState<string | undefined>(undefined)
+	const [hasSubmitted, setHasSubmitted] = useState(false)
 	const [showSong, setShowSong] = useState(false)
 
 	const generateRandomDate = () => {
@@ -31,57 +33,54 @@ const FunCard: FC = () => {
 		setDate(dayjs(`${randomYear}-${randomMonth}-${randomDate}`))
 	}
 
-	const getSongString = async () => {
-		if (!date) return
-		setClues(`loading`)
-
-		const gptQuestion = `What was the #1 song on the Billboard Top 100 list on ${date.format(
-			`MMMM D, YYYY`,
-		)}? Give in the format "Artist - Song name".`
-		const res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
-		const {response} = z.object({response: z.string()}).parse(res.data)
-
-		await Promise.all([getClues(response), getSong(response)])
-	}
-
-	const getClues = async (song: string) => {
-		const gptQuestion = `I'm playing a song guessing game. Generate three clues for the song "${song}". Make sure no names or song/album titles are used in any of the clues. Also try not to quote any lyrics from the song.`
-		const res = await axios.post(`/api/gpt`, {prompt: gptQuestion})
-		const {response} = z.object({response: z.string()}).parse(res.data)
-		const clues = response
-			.split(`\n`)
-			.map((s) => s.replace(/^[0-9]+\. */, ``))
-			.filter((s) => s !== ``)
-		setClues(clues)
-	}
-
-	const getSong = async (songString: string) => {
-		const newString = songString.replace(/^"/, ``).replace(/"$/, ``)
-
-		if (musicClient === `apple`) {
-			const res = await axios.post<AppleResult>(`/api/songs/fetchAppleSong`, {
-				song: encodeURIComponent(newString),
-			})
-			const oldUrl = res.data.results.songs.data[0]?.attributes.url
-			if (!oldUrl) return
-			const domainIndex = oldUrl.indexOf(`music.apple.com`)
-			const newUrl = `https://embed.${oldUrl.slice(domainIndex)}`
-			setSongUrl(newUrl)
-		} else {
-			const res = await axios.post<SpotifyResult>(`/api/songs/fetchSpotifySong`, {
-				song: encodeURIComponent(newString),
-			})
-			const oldUrl = res.data.tracks.items[0]?.external_urls.spotify
-			if (!oldUrl) return
-			const trackId = oldUrl.slice(oldUrl.lastIndexOf(`/`) + 1)
-			const newUrl = `https://open.spotify.com/embed/track/${trackId}`
-			setSongUrl(newUrl)
-		}
-	}
+	const {data: song, isSuccess: songIsSuccess} = trpc.gpt.useQuery(
+		{
+			prompt: `What was the #1 song on the Billboard Top 100 list on ${
+				date?.format(`MMMM D, YYYY`) ?? ``
+			}? Give in the format "Artist - Song name".`,
+		},
+		{
+			enabled: !!date && !hasSubmitted,
+			select: (data) => data.response?.replace(/^"/, ``).replace(/"$/, ``),
+		},
+	)
+	const clues = trpc.gpt.useQuery(
+		{
+			prompt: `I'm playing a song guessing game. Generate three clues for the song "${encodeURIComponent(
+				song!,
+			)}". Make sure no names or song/album titles are used in any of the clues. Also try not to quote any lyrics from the song.`,
+		},
+		{
+			enabled: songIsSuccess,
+			select: (data) =>
+				data.response
+					?.split(`\n`)
+					.map((s) => s.replace(/^[0-9]+\. */, ``))
+					.filter((s) => s !== ``),
+		},
+	)
+	const {data: songUrl} = trpc.funCard.getSongUrl.useQuery(
+		{
+			song: song!,
+			service: user?.data().preferredMusicClient ?? `appleMusic`,
+		},
+		{
+			enabled: !!song && !!user,
+			select: (data) => {
+				if (!data.url) return undefined
+				if (user!.data().preferredMusicClient === `appleMusic`) {
+					const domainIndex = data.url.indexOf(`music.apple.com`)
+					return `https://embed.${data.url.slice(domainIndex)}`
+				} else {
+					const trackId = data.url.slice(data.url.lastIndexOf(`/`) + 1)
+					return `https://open.spotify.com/embed/track/${trackId}`
+				}
+			},
+		},
+	)
 
 	const onReset = () => {
-		setClues(undefined)
-		setSongUrl(undefined)
+		setHasSubmitted(false)
 		setShowSong(false)
 	}
 
@@ -101,47 +100,51 @@ const FunCard: FC = () => {
 				</div>
 			}
 			extra={
-				<Dropdown
-					trigger={[`click`]}
-					placement="bottomRight"
-					menu={{
-						selectable: true,
-						selectedKeys: [musicClient],
-						items: [
-							{
-								key: `apple`,
-								label: (
-									<div
-										className="flex items-center gap-2"
-										onClick={() => {
-											onReset()
-											setMusicClient(`apple`)
-										}}
-									>
-										<AppleFilled />
-										<span>Apple Music</span>
-									</div>
-								),
-							},
-							{
-								key: `spotify`,
-								label: (
-									<div
-										className="flex items-center gap-2"
-										onClick={() => {
-											onReset()
-											setMusicClient(`spotify`)
-										}}
-									>
-										<SpotifyIcon /> <span>Spotify</span>
-									</div>
-								),
-							},
-						],
-					}}
-				>
-					<SettingOutlined className="text-lg" />
-				</Dropdown>
+				user && (
+					<Dropdown
+						trigger={[`click`]}
+						placement="bottomRight"
+						menu={{
+							selectable: true,
+							selectedKeys: [user.data().preferredMusicClient],
+							items: [
+								{
+									key: `apple`,
+									label: (
+										<div
+											className="flex items-center gap-2"
+											onClick={() => {
+												updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
+													preferredMusicClient: `appleMusic`,
+												}).catch(console.error)
+											}}
+										>
+											<AppleFilled />
+											<span>Apple Music</span>
+										</div>
+									),
+								},
+								{
+									key: `spotify`,
+									label: (
+										<div
+											className="flex items-center gap-2"
+											onClick={() => {
+												updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
+													preferredMusicClient: `spotify`,
+												}).catch(console.error)
+											}}
+										>
+											<SpotifyIcon /> <span>Spotify</span>
+										</div>
+									),
+								},
+							],
+						}}
+					>
+						<SettingOutlined className="text-lg" />
+					</Dropdown>
+				)
 			}
 		>
 			<div className="flex h-full flex-col gap-4">
@@ -160,7 +163,7 @@ const FunCard: FC = () => {
 						<Button
 							size="small"
 							icon={<ShuffleIcon />}
-							disabled={clues !== undefined}
+							disabled={clues.isSuccess}
 							className="flex items-center gap-2"
 							onClick={generateRandomDate}
 						>
@@ -170,13 +173,7 @@ const FunCard: FC = () => {
 							<Button type="text" size="small" disabled={date === null} onClick={onReset}>
 								Reset
 							</Button>
-							<Button
-								size="small"
-								onClick={() => {
-									getSongString().catch(console.error)
-								}}
-								disabled={date === null || clues !== undefined}
-							>
+							<Button size="small" onClick={() => setHasSubmitted(true)} disabled={date === null || clues.isSuccess}>
 								Submit
 							</Button>
 						</div>
@@ -185,23 +182,23 @@ const FunCard: FC = () => {
 
 				<div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
 					<p className="font-semibold">Clues</p>
-					{Array.isArray(clues) ? (
+					{clues.isSuccess && clues.data ? (
 						<ol className="w-full list-decimal space-y-1 pl-4">
-							{clues.map((clue, i) => (
+							{clues.data.map((clue, i) => (
 								<li key={i}>{clue}</li>
 							))}
 						</ol>
-					) : clues === `loading` ? (
+					) : hasSubmitted ? (
 						<Skeleton active />
 					) : (
-						<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
+						<Skeleton />
 					)}
 				</div>
 
 				<div className="flex flex-col gap-2">
 					<p className="font-semibold">Answer</p>
-					{showSong ? (
-						musicClient === `apple` ? (
+					{user && showSong ? (
+						user.data().preferredMusicClient === `appleMusic` ? (
 							<iframe
 								allow="autoplay *; encrypted-media *;"
 								height="192"
@@ -231,25 +228,3 @@ const FunCard: FC = () => {
 }
 
 export default FunCard
-
-type AppleResult = {
-	results: {
-		songs: {
-			data: Array<{
-				attributes: {
-					url: string
-				}
-			}>
-		}
-	}
-}
-
-type SpotifyResult = {
-	tracks: {
-		items: Array<{
-			external_urls: {
-				spotify: string
-			}
-		}>
-	}
-}

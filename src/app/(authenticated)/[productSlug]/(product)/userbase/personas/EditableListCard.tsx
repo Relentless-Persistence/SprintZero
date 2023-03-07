@@ -1,4 +1,4 @@
-import {Button, Card, Input} from "antd"
+import {Button, Card, Empty, Input} from "antd"
 import {useState} from "react"
 
 import type {FC} from "react"
@@ -30,7 +30,6 @@ const EditableListCard: FC<EditableListCardProps> = ({
 
 	return (
 		<Card
-			type="inner"
 			title={
 				isEditing ? (
 					<Input size="small" value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} className="mr-4" />
@@ -60,7 +59,7 @@ const EditableListCard: FC<EditableListCardProps> = ({
 						</Button>
 					</div>
 				) : (
-					<Button type="link" onClick={() => onEditStart()}>
+					<Button type="text" onClick={() => onEditStart()}>
 						Edit
 					</Button>
 				)
@@ -75,6 +74,8 @@ const EditableListCard: FC<EditableListCardProps> = ({
 						</Button>
 					)}
 				</div>
+			) : list.length === 0 ? (
+				<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
 			) : (
 				<ol className="list-decimal pl-4">
 					{list.map((item) => (
