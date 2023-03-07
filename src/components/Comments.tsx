@@ -1,11 +1,13 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Input} from "antd"
+import dayjs from "dayjs"
 import {addDoc, collection, doc, getDoc, orderBy, query, serverTimestamp, where} from "firebase/firestore"
 import {uniq} from "lodash"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
+import type {Timestamp} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {Id} from "~/types"
@@ -71,7 +73,15 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 								<div key={comment.id} className="flex gap-2">
 									<Avatar shape="square" src={author?.data()?.avatar} className="border border-border" />
 									<div className="flex min-w-0 flex-1 flex-col gap-1">
-										<p className="text-sm text-textTertiary">{author?.data()?.name}</p>
+										<p className="text-sm text-textTertiary">
+											{author?.data()?.name}
+											{` `}
+											<span className="ml-1 text-black/65">
+												{comment.data().createdAt
+													? dayjs((comment.data().createdAt as Timestamp).toDate()).fromNow()
+													: null}
+											</span>
+										</p>
 										<p className="leading-normal">{comment.data().text}</p>
 									</div>
 								</div>
