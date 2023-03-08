@@ -24,12 +24,12 @@ import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
-import type {Story, StoryMapState} from "~/types/db/StoryMapStates"
+import type {Story, StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {User} from "~/types/db/Users"
 
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
-import {sprintColumns} from "~/types/db/StoryMapStates"
+import {sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {UserConverter} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
@@ -40,7 +40,7 @@ dayjs.extend(relativeTime)
 
 export type StoryDrawerProps = {
 	activeProduct: QueryDocumentSnapshot<Product>
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapItem>
 	storyId: Id
 	isOpen: boolean
 	onClose: () => void
@@ -67,14 +67,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 		const votingResult = votesFor > votesAgainst
 
 		if (votingComplete) {
-			const data: WithFieldValue<Partial<StoryMapState>> = {
+			const data: WithFieldValue<Partial<StoryMapItem>> = {
 				[`items.${storyId}.ethicsVotes.${user.id}`]: vote,
 				[`items.${storyId}.ethicsApproved`]: votingResult,
 				[`items.${storyId}.ethicsColumn`]: `adjudicated`,
 			}
 			await updateDoc(storyMapState.ref, data)
 		} else {
-			const data: WithFieldValue<Partial<StoryMapState>> = {
+			const data: WithFieldValue<Partial<StoryMapItem>> = {
 				[`items.${storyId}.ethicsVotes.${user.id}`]: vote,
 			}
 			await updateDoc(storyMapState.ref, data)

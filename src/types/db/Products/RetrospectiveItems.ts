@@ -1,7 +1,7 @@
 import {FrownOutlined, MehOutlined, SmileOutlined} from "@ant-design/icons"
 import {z} from "zod"
 
-import {genConverter, idSchema, timestampSchema} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
 export const RetrospectiveItemSchema = z.object({
 	archived: z.boolean(),
@@ -17,8 +17,7 @@ export const RetrospectiveItemSchema = z.object({
 	title: z.string().min(1, `Required`),
 	type: z.enum([`enjoyable`, `puzzling`, `frustrating`]),
 
-	productId: idSchema,
-	userId: idSchema,
+	userId: z.string(),
 })
 
 export type RetrospectiveItem = z.infer<typeof RetrospectiveItemSchema>

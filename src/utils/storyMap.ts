@@ -2,300 +2,279 @@ import {
 	Timestamp,
 	addDoc,
 	collection,
-	deleteDoc,
-	deleteField,
-	documentId,
-	getDoc,
+	doc,
 	getDocs,
-	query,
+	runTransaction,
 	serverTimestamp,
 	updateDoc,
-	where,
 } from "firebase/firestore"
 import {debounce} from "lodash"
 import {nanoid} from "nanoid"
 
 import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
-import type {SetRequired} from "type-fest"
-import type {Id} from "~/types"
-import type {History} from "~/types/db/Histories"
-import type {Epic, Feature, Story, StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {Opaque, SetRequired} from "type-fest"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 
 import {db} from "./firebase"
 import {avg} from "./math"
-import {HistoryConverter} from "~/types/db/Histories"
+import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
+import {HistoryItemConverter} from "~/types/db/Products/StoryMapHistories/HistoryItems"
+import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 
-export const addHistoryEntry = debounce(async (storyMapState: QueryDocumentSnapshot<StoryMapState>) => {
-	const newItems = await getDoc(storyMapState.ref)
-	if (!newItems.exists()) throw new Error(`Failed to add epic`)
-	await Promise.all([
-		(async () => {
-			const ref = await addDoc(
-				collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-				{
-					future: false,
-					items: newItems.data().items,
-					timestamp: serverTimestamp(),
-				},
-			)
-			await updateDoc(storyMapState.ref, {currentHistoryId: ref.id as Id})
-		})(),
-		(async () => {
-			const futureHistories = await getDocs(
-				query(
-					collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-					where(`future`, `==`, true),
+export const addHistoryEntry = debounce(async (storyMapItems: QuerySnapshot<StoryMapItem>) => {
+	const firstItem = storyMapItems.docs[0]
+	if (!firstItem) return
+
+	// eslint-disable-next-line @typescript-eslint/require-await
+	await runTransaction(db, async (transaction) => {
+		const historyId = nanoid()
+		transaction.set(
+			doc(db, firstItem.ref.parent.parent!.path, `StoryMapHistories`, historyId).withConverter(
+				StoryMapHistoryConverter,
+			),
+			{
+				future: false,
+				timestamp: serverTimestamp(),
+			},
+		)
+		storyMapItems.forEach((item) => {
+			transaction.set(
+				doc(db, item.ref.parent.parent!.path, `StoryMapHistories`, historyId, `HistoryItems`, item.id).withConverter(
+					HistoryItemConverter,
 				),
+				item.data(),
 			)
-			await Promise.all(futureHistories.docs.map((doc) => deleteDoc(doc.ref)))
-		})(),
-	])
+		})
+	})
 }, 1000)
 
 export const updateItem = async (
-	storyMapState: QueryDocumentSnapshot<StoryMapState>,
-	id: Id,
-	data: Partial<WithFieldValue<Epic>> | Partial<WithFieldValue<Feature>> | Partial<WithFieldValue<Story>>,
+	storyMapItems: QuerySnapshot<StoryMapItem>,
+	id: string,
+	data: WithFieldValue<Partial<StoryMapItem>>,
 	allVersions: QuerySnapshot<Version>,
 ): Promise<void> => {
-	const newData: WithFieldValue<Partial<StoryMapState>> = {
-		[`items.${id}`]: {...storyMapState.data().items[id], ...data} as Epic | Feature | Story,
-		updatedAt: serverTimestamp(),
-	}
-	await updateDoc(storyMapState.ref, newData)
+	const oldItems = storyMapItems
 
-	const oldItems = storyMapState.data().items
-	const newItems = await getDoc(storyMapState.ref)
-	if (!newItems.exists()) throw new Error(`Shouldn't happen`)
+	const item = storyMapItems.docs.find((item) => item.id === id)!
+	await updateDoc(item.ref, {
+		...data,
+		updatedAt: serverTimestamp(),
+	})
+
+	const newItems = await getDocs(
+		collection(db, item.ref.parent.path, `StoryMapItems`).withConverter(StoryMapItemConverter),
+	)
 
 	if (
-		JSON.stringify(getStoryMapShape(oldItems, allVersions)) !==
-		JSON.stringify(getStoryMapShape(newItems.data().items, allVersions))
+		JSON.stringify(getStoryMapShape(oldItems, allVersions)) !== JSON.stringify(getStoryMapShape(newItems, allVersions))
 	)
-		await addHistoryEntry(storyMapState)
+		await addHistoryEntry(storyMapItems)
 }
 
-export const deleteItem = async (storyMapState: QueryDocumentSnapshot<StoryMapState>, id: Id): Promise<void> => {
-	const data: WithFieldValue<Partial<StoryMapState>> = {
-		[`items.${id}`]: deleteField(),
-		updatedAt: serverTimestamp(),
-	}
-	await updateDoc(storyMapState.ref, data)
-	const histories = await getDocs(
-		query(
-			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-			where(documentId(), `==`, storyMapState.data().currentHistoryId),
-		),
-	)
-	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
-	await addHistoryEntry(storyMapState)
+export const deleteItem = async (storyMapItems: QuerySnapshot<StoryMapItem>, id: string): Promise<void> => {
+	const item = storyMapItems.docs.find((item) => item.id === id)!
+	await updateDoc(item.ref, {
+		deleted: true,
+	})
+	await addHistoryEntry(storyMapItems)
 }
 
 export const addEpic = async (
-	storyMapState: QueryDocumentSnapshot<StoryMapState>,
-	data: Partial<Epic>,
+	storyMapItems: QuerySnapshot<StoryMapItem>,
+	data: Partial<StoryMapItem>,
+	userId: string,
 ): Promise<void> => {
-	const epics = getEpics(storyMapState.data().items)
-	const lastEpic =
-		epics.length > 0 ? epics.reduce((acc, cur) => (cur.userValue > acc.userValue ? cur : acc), epics[0]!) : undefined
+	const epics = getEpics(storyMapItems)
+	const firstEpic = epics[0]
+	if (!firstEpic) return
+	const lastEpic = epics.reduce((acc, cur) => (cur.data().userValue > acc.data().userValue ? cur : acc), firstEpic)
 
-	const newData: WithFieldValue<Partial<StoryMapState>> = {
-		[`items.${nanoid()}`]: {
-			type: `epic` as const,
-			createdAt: Timestamp.now(),
-			description: ``,
-			effort: 0.5,
-			name: `Epic ${epics.length + 1}`,
-			userValue: avg(lastEpic?.userValue ?? 0, 1),
-			keeperIds: [],
+	await addDoc(firstEpic.ref.parent, {
+		createdAt: Timestamp.now(),
+		deleted: false,
+		description: ``,
+		effort: 0.5,
+		name: `Epic ${epics.length + 1}`,
+		userValue: avg(lastEpic.data().userValue, 1),
+		keeperIds: [],
 
-			acceptanceCriteria: null,
-			branchName: null,
-			bugs: null,
-			designEffort: null,
-			designLink: null,
-			engineeringEffort: null,
-			ethicsApproved: null,
-			ethicsColumn: null,
-			ethicsVotes: null,
-			pageLink: null,
-			sprintColumn: null,
-			updatedAt: null,
-			parentId: null,
-			peopleIds: null,
-			updatedAtUserId: null,
-			versionId: null,
-			...data,
-		} satisfies Epic,
-		updatedAt: serverTimestamp(),
-	}
-	await updateDoc(storyMapState.ref, newData)
-
-	const histories = await getDocs(
-		query(
-			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-			where(documentId(), `==`, storyMapState.data().currentHistoryId),
-		),
-	)
-	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
-	await addHistoryEntry(storyMapState)
+		acceptanceCriteria: [],
+		branchName: null,
+		bugs: [],
+		designEffort: 1,
+		designLink: null,
+		engineeringEffort: 1,
+		ethicsApproved: null,
+		ethicsColumn: null,
+		ethicsVotes: {},
+		pageLink: null,
+		sprintColumn: `releaseBacklog`,
+		updatedAt: Timestamp.now(),
+		parentId: null,
+		peopleIds: [],
+		updatedAtUserId: userId,
+		versionId: null,
+		...data,
+	})
+	await addHistoryEntry(storyMapItems)
 }
 
-export const getEpics = (storyMapItems: History[`items`]): Array<Epic & {id: Id}> => {
-	const epics = Object.entries(storyMapItems)
-		.filter(([, item]) => item?.type === `epic`)
-		.map(([id, item]) => ({id, ...item})) as Array<Epic & {id: Id}>
+export const getEpics = (storyMapItems: QuerySnapshot<StoryMapItem>): Array<QueryDocumentSnapshot<StoryMapItem>> => {
+	const epics = storyMapItems.docs
+		.filter((item) => item.data().parentId === null)
+		.filter((item) => !item.data().deleted)
 	return epics
 }
 
-export const sortEpics = <T extends Epic>(epics: T[]): T[] =>
-	epics.sort((a, b) => a.name.localeCompare(b.name)).sort((a, b) => a.userValue - b.userValue)
+export const sortEpics = (
+	epics: Array<QueryDocumentSnapshot<StoryMapItem>>,
+): Array<QueryDocumentSnapshot<StoryMapItem>> =>
+	epics
+		.sort((a, b) => a.data().name.localeCompare(b.data().name))
+		.sort((a, b) => a.data().userValue - b.data().userValue)
 
 export const addFeature = async (
-	storyMapState: QueryDocumentSnapshot<StoryMapState>,
-	data: SetRequired<Partial<Feature>, `parentId`>,
+	storyMapItems: QuerySnapshot<StoryMapItem>,
+	data: SetRequired<Partial<StoryMapItem>, `parentId`>,
+	userId: string,
 ): Promise<void> => {
-	const features = getFeatures(storyMapState.data().items)
-	const lastFeature =
-		features.length > 0
-			? features.reduce((acc, cur) => (cur.userValue > acc.userValue ? cur : acc), features[0]!)
-			: undefined
-
-	const newData: WithFieldValue<Partial<StoryMapState>> = {
-		[`items.${nanoid()}`]: {
-			type: `feature` as const,
-			createdAt: Timestamp.now(),
-			description: ``,
-			effort: 0.5,
-			name: `Feature ${features.length + 1}`,
-			userValue: avg(lastFeature?.userValue ?? 0, 1),
-
-			acceptanceCriteria: null,
-			branchName: null,
-			bugs: null,
-			designEffort: null,
-			designLink: null,
-			engineeringEffort: null,
-			ethicsApproved: null,
-			ethicsColumn: null,
-			ethicsVotes: null,
-			pageLink: null,
-			sprintColumn: null,
-			updatedAt: null,
-			keeperIds: null,
-			peopleIds: null,
-			updatedAtUserId: null,
-			versionId: null,
-			...data,
-		} satisfies Feature,
-		updatedAt: serverTimestamp(),
-	}
-	await updateDoc(storyMapState.ref, newData)
-
-	const histories = await getDocs(
-		query(
-			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-			where(documentId(), `==`, storyMapState.data().currentHistoryId),
-		),
+	const features = getFeatures(storyMapItems)
+	const firstFeature = features[0]
+	if (!firstFeature) return
+	const lastFeature = features.reduce(
+		(acc, cur) => (cur.data().userValue > acc.data().userValue ? cur : acc),
+		firstFeature,
 	)
-	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
-	await addHistoryEntry(storyMapState)
+
+	await addDoc(firstFeature.ref.parent, {
+		createdAt: Timestamp.now(),
+		deleted: false,
+		description: ``,
+		effort: 0.5,
+		name: `Feature ${features.length + 1}`,
+		userValue: avg(lastFeature.data().userValue, 1),
+
+		acceptanceCriteria: [],
+		branchName: null,
+		bugs: [],
+		designEffort: 1,
+		designLink: null,
+		engineeringEffort: 1,
+		ethicsApproved: null,
+		ethicsColumn: null,
+		ethicsVotes: {},
+		pageLink: null,
+		sprintColumn: `releaseBacklog`,
+		updatedAt: Timestamp.now(),
+		keeperIds: [],
+		peopleIds: [],
+		updatedAtUserId: userId,
+		versionId: null,
+		...data,
+	})
+	await addHistoryEntry(storyMapItems)
 }
 
-export const getFeatures = (storyMapItems: History[`items`]): Array<Feature & {id: Id}> => {
-	const features = Object.entries(storyMapItems)
-		.filter(([, item]) => item?.type === `feature`)
-		.map(([id, item]) => ({id, ...item})) as Array<Feature & {id: Id}>
+export const getFeatures = (storyMapItems: QuerySnapshot<StoryMapItem>): Array<QueryDocumentSnapshot<StoryMapItem>> => {
+	const features = storyMapItems.docs
+		.filter((item) => {
+			const parent = storyMapItems.docs.find((parent) => parent.id === item.data().parentId)
+			if (!parent) return false
+			return parent.data().parentId === null
+		})
+		.filter((item) => !item.data().deleted)
 	return features
 }
 
 // Assumes all features are siblings
-export const sortFeatures = <T extends Feature>(features: T[]): T[] =>
-	features.sort((a, b) => a.name.localeCompare(b.name)).sort((a, b) => a.userValue - b.userValue)
+export const sortFeatures = (
+	features: Array<QueryDocumentSnapshot<StoryMapItem>>,
+): Array<QueryDocumentSnapshot<StoryMapItem>> =>
+	features
+		.sort((a, b) => a.data().name.localeCompare(b.data().name))
+		.sort((a, b) => a.data().userValue - b.data().userValue)
 
 export const addStory = async (
-	storyMapState: QueryDocumentSnapshot<StoryMapState>,
-	currentVersionId: Id | `__ALL_VERSIONS__`,
-	userId: Id,
-	data: SetRequired<Partial<Story>, `parentId`>,
+	storyMapItems: QuerySnapshot<StoryMapItem>,
+	data: SetRequired<Partial<StoryMapItem>, `parentId`>,
+	userId: string,
+	currentVersionId: string | typeof AllVersions,
 ): Promise<void> => {
-	if (currentVersionId === `__ALL_VERSIONS__`) return
+	if (currentVersionId === AllVersions) return
 
-	const stories = getStories(storyMapState.data().items)
+	const stories = getStories(storyMapItems)
+	const firstStory = stories[0]
+	if (!firstStory) return
 
-	const newData: WithFieldValue<Partial<StoryMapState>> = {
-		[`items.${nanoid()}`]: {
-			type: `story` as const,
-			acceptanceCriteria: [],
-			branchName: null,
-			bugs: [],
-			createdAt: Timestamp.now(),
-			description: ``,
-			designEffort: 1,
-			designLink: null,
-			engineeringEffort: 1,
-			ethicsApproved: null,
-			ethicsColumn: null,
-			ethicsVotes: {},
-			name: `Story ${stories.length + 1}`,
-			pageLink: null,
-			sprintColumn: `releaseBacklog` as const,
-			updatedAt: Timestamp.now(),
-			peopleIds: [],
-			updatedAtUserId: userId,
-			versionId: currentVersionId,
+	await addDoc(firstStory.ref.parent, {
+		acceptanceCriteria: [],
+		branchName: null,
+		bugs: [],
+		createdAt: Timestamp.now(),
+		deleted: false,
+		description: ``,
+		designEffort: 1,
+		designLink: null,
+		engineeringEffort: 1,
+		ethicsApproved: null,
+		ethicsColumn: null,
+		ethicsVotes: {},
+		name: `Story ${stories.length + 1}`,
+		pageLink: null,
+		sprintColumn: `releaseBacklog` as const,
+		updatedAt: Timestamp.now(),
+		peopleIds: [],
+		updatedAtUserId: userId,
+		versionId: currentVersionId,
 
-			effort: null,
-			userValue: null,
-			keeperIds: null,
-			...data,
-		} satisfies Story,
-		updatedAt: serverTimestamp(),
-	}
-	await updateDoc(storyMapState.ref, newData)
-
-	const histories = await getDocs(
-		query(
-			collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-			where(documentId(), `==`, storyMapState.data().currentHistoryId),
-		),
-	)
-	await Promise.all(histories.docs.map((doc) => deleteDoc(doc.ref)))
-	await addHistoryEntry(storyMapState)
+		effort: 1,
+		userValue: 0.5,
+		keeperIds: [],
+		...data,
+	})
+	await addHistoryEntry(storyMapItems)
 }
 
-export const getStories = (storyMapItems: History[`items`]): Array<Story & {id: Id}> => {
-	const stories = Object.entries(storyMapItems)
-		.filter(([, item]) => item?.type === `story`)
-		.map(([id, item]) => ({id, ...item})) as Array<Story & {id: Id}>
+export const getStories = (storyMapItems: QuerySnapshot<StoryMapItem>): Array<QueryDocumentSnapshot<StoryMapItem>> => {
+	const stories = storyMapItems.docs
+		.filter((item) => {
+			const parent = storyMapItems.docs.find((parent) => parent.id === item.data().parentId)
+			if (!parent) return false
+			return parent.data().parentId !== null
+		})
+		.filter((item) => !item.data().deleted)
 	return stories
 }
 
 // Assumes all stories are siblings
-export const sortStories = <T extends Story>(stories: T[], allVersions: QuerySnapshot<Version>): T[] =>
+export const sortStories = (
+	stories: Array<QueryDocumentSnapshot<StoryMapItem>>,
+	allVersions: QuerySnapshot<Version>,
+): Array<QueryDocumentSnapshot<StoryMapItem>> =>
 	stories
-		.sort((a, b) => a.createdAt.toMillis() - b.createdAt.toMillis())
+		.sort((a, b) => a.data().createdAt.toMillis() - b.data().createdAt.toMillis())
 		.sort((a, b) => {
-			const aVersion = allVersions.docs.find((version) => version.id === a.versionId)
-			const bVersion = allVersions.docs.find((version) => version.id === b.versionId)
+			const aVersion = allVersions.docs.find((version) => version.id === a.data().versionId)
+			const bVersion = allVersions.docs.find((version) => version.id === b.data().versionId)
 			return aVersion?.exists() && bVersion?.exists() ? aVersion.data().name.localeCompare(bVersion.data().name) : 0
 		})
 
 export const getStoryMapShape = (
-	storyMapItems: History[`items`],
+	storyMapItems: QuerySnapshot<StoryMapItem>,
 	allVersions: QuerySnapshot<Version>,
-): Array<{id: Id; children: Array<{id: Id; children: Array<{id: Id}>}>}> => {
+): Array<{id: string; children: Array<{id: string; children: Array<{id: string}>}>}> => {
 	const epics = sortEpics(getEpics(storyMapItems))
 	const features = sortFeatures(getFeatures(storyMapItems))
 	const stories = sortStories(getStories(storyMapItems), allVersions)
 
 	const storyMapShape = epics.map((epic) => {
-		const epicFeatures = features.filter((feature) => feature.parentId === epic.id)
+		const epicFeatures = features.filter((feature) => feature.data().parentId === epic.id)
 		return {
 			id: epic.id,
 			children: epicFeatures.map((feature) => {
-				const featureStories = stories.filter((story) => story.parentId === feature.id)
+				const featureStories = stories.filter((story) => story.data().parentId === feature.id)
 				return {
 					id: feature.id,
 					children: featureStories.map((story) => ({id: story.id})),
@@ -306,3 +285,16 @@ export const getStoryMapShape = (
 
 	return storyMapShape
 }
+
+export const getItemType = (
+	storyMapItems: QuerySnapshot<StoryMapItem>,
+	itemId: string,
+): `epic` | `feature` | `story` => {
+	const parent = storyMapItems.docs.find((parent) => parent.id === itemId)
+	const grandparent = parent && storyMapItems.docs.find((grandparent) => grandparent.id === parent.data().parentId)
+	if (!parent && !grandparent) return `epic`
+	if (!grandparent) return `feature`
+	return `story`
+}
+
+export const AllVersions = `__ALL_VERSIONS__` as Opaque<string, `all_versions`>

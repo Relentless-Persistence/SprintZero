@@ -1,24 +1,30 @@
 import {MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
+import {collection, updateDoc} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
+import {useCollection} from "react-firebase-hooks/firestore"
 
-import type {StoryMapMeta} from "./meta"
+import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {elementRegistry} from "./globals"
 import StoryDrawer from "./StoryDrawer"
+import {VersionConverter} from "~/types/db/Products/Versions"
 import {updateItem} from "~/utils/storyMap"
 
 export type StoryProps = {
-	meta: StoryMapMeta
-	storyId: Id
+	product: QueryDocumentSnapshot<Product>
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyId: string
+	editMode: boolean
+	onMarkForDeletion: () => void
 	inert?: boolean
-	isInitialRender?: boolean
 }
 
-const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) => {
-	const story = meta.stories.find((story) => story.id === storyId)!
+const Story: FC<StoryProps> = ({product, storyMapItems, storyId, editMode, onMarkForDeletion, inert = false}) => {
+	const story = storyMapItems.docs.find((story) => story.id === storyId)!
 
 	const contentRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
@@ -30,22 +36,21 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 		}
 	}, [story.id, inert])
 
-	const version = meta.allVersions.docs.find((version) => version.id === story.versionId)
+	const [versions] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
+	const version = versions?.docs.find((version) => version.id === story.data().versionId)
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const [localStoryName, setLocalStoryName] = useState(story.name)
+	const [localStoryName, setLocalStoryName] = useState(story.data().name)
 	useEffect(() => {
-		setLocalStoryName(story.name)
-	}, [story.name])
-
-	const [hasBlurred, setHasBlurred] = useState(isInitialRender)
+		setLocalStoryName(story.data().name)
+	}, [story])
 
 	return (
 		<div
 			className={clsx(
 				`flex touch-none select-none items-center overflow-hidden rounded border border-[#d9d9d9] bg-white font-medium dark:border-[#757575] dark:bg-black`,
 				inert && `cursor-grabbing`,
-				!meta.editMode && `cursor-grab  active:cursor-grabbing`,
+				!editMode && `cursor-grab  active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
@@ -57,36 +62,44 @@ const Story: FC<StoryProps> = ({meta, storyId, inert = false, isInitialRender}) 
 			>
 				<p className="max-h-8 w-[1em] truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 			</button>
-			<div className="flex items-center gap-2 px-2">
-				{(hasBlurred || inert) && !meta.editMode ? (
-					<p className="my-1 h-[1em]">{localStoryName}</p>
+			<div className="flex items-center gap-2 px-2 leading-tight">
+				{(story.data().initialRenameDone || inert) && !editMode ? (
+					<p className={clsx(`my-0.5`, localStoryName === `` && `invisible`)}>{localStoryName || `_`}</p>
 				) : (
-					<div className="relative my-1 mx-auto min-w-[1rem]">
+					<div className="relative my-0.5 mx-auto min-w-[1rem]">
 						<p>{localStoryName || `_`}</p>
 						<input
 							value={localStoryName}
-							autoFocus={!isInitialRender && !meta.editMode}
-							onBlur={() => setHasBlurred(true)}
-							onKeyDown={(e) => {
-								if (e.key === `Enter`) setHasBlurred(true)
+							autoFocus={!story.data().initialRenameDone && !editMode}
+							onBlur={() => {
+								updateDoc(story.ref, {initialRenameDone: true}).catch(console.error)
 							}}
-							className="absolute inset-0 rounded-sm bg-bgContainer focus:outline focus:outline-offset-1 focus:outline-primaryHover"
+							onKeyDown={(e) => {
+								if (e.key === `Enter`) updateDoc(story.ref, {initialRenameDone: true}).catch(console.error)
+							}}
+							className="absolute inset-0 w-full rounded-sm bg-bgContainer focus:outline focus:outline-1 focus:outline-offset-1 focus:outline-primaryHover"
 							onChange={(e) => {
+								if (!versions) return
 								setLocalStoryName(e.target.value)
-								updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(console.error)
+								updateItem(storyMapItems, story.id, {name: e.target.value}, versions).catch(console.error)
 							}}
 							onPointerDownCapture={(e) => e.stopPropagation()}
 						/>
 					</div>
 				)}
-				{meta.editMode && (
-					<button type="button" onClick={() => meta.markForDeletion(storyId)}>
+				{editMode && (
+					<button type="button" onClick={() => onMarkForDeletion()}>
 						<MinusCircleOutlined className="text-sm text-error" />
 					</button>
 				)}
 			</div>
 
-			<StoryDrawer meta={meta} storyId={storyId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+			<StoryDrawer
+				storyMapItems={storyMapItems}
+				storyId={storyId}
+				isOpen={isDrawerOpen}
+				onClose={() => setIsDrawerOpen(false)}
+			/>
 		</div>
 	)
 }

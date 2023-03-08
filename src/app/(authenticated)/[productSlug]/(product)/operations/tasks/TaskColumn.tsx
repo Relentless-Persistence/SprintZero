@@ -4,7 +4,7 @@ import dayjs from "dayjs"
 import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {Task} from "~/types/db/Tasks"
+import type {Task} from "~/types/db/Products/Tasks"
 
 export type TaskColumnProps = {
 	id: string

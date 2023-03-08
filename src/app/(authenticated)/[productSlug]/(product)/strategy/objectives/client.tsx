@@ -12,8 +12,8 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import ResultCard from "./ResultCard"
-import {ObjectiveConverter} from "~/types/db/Objectives"
-import {ResultConverter} from "~/types/db/Results"
+import {ObjectiveConverter} from "~/types/db/Products/Objectives"
+import {ResultConverter} from "~/types/db/Products/Results"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

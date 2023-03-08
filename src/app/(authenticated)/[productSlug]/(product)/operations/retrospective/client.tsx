@@ -12,10 +12,10 @@ import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {RetrospectiveItem} from "~/types/db/RetrospectiveItems"
+import type {RetrospectiveItem} from "~/types/db/Products/RetrospectiveItems"
 
 import RetrospectiveDrawer from "./RetrospectiveDrawer"
-import {RetrospectiveItemConverter, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
+import {RetrospectiveItemConverter, retrospectiveTabs} from "~/types/db/Products/RetrospectiveItems"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"

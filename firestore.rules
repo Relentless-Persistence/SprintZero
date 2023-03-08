@@ -1,164 +1,85 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-  	match /AccessibilityItems/{accessibilityItemId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-    }
-
-    match /AppInfo/info {
-      allow read:
-        if true
-    }
-
-    match /Comments/{commentId} {
-    	allow read, update, delete:
-      	if resource.data.authorId == request.auth.uid
-
-      allow create:
-      	if request.auth != null
-    }
-
-    match /Dialogues/{dialogueId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-    }
-
-    match /Journeys/{journeyId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-
-      match /JourneyEvents/{journeyEventId} {
-        allow read, write:
-          if isEditorOnProduct(get(/databases/$(database)/documents/Journeys/$(journeyId)).data.productId)
-      }
-    }
-
-    match /Insights/{insightId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-    }
-
-    match /Objectives/{objectiveId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-
-      match /Results/{resultId} {
-        allow read, write:
-          if isEditorOnProduct(get(/databases/$(database)/documents/Objectives/$(objectiveId)).data.productId)
-      }
-    }
-
-    match /Participants/{participantId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-    }
-
-    match /Personas/{personaId} {
-    	allow read, update, delete:
-      	if resource == null || isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-    }
-
-    match /ProductInvites/{productInviteId} {
-      allow get:
-        if true
-
-      allow create:
-        if request.auth != null
+  	match /AppInfo/info {
+      allow get: if true;
     }
 
     match /Products/{productId} {
-      allow read, update:
-      	if resource.data.members[request.auth.uid].type == "editor" || resource.data.members[request.auth.uid].type == "owner"
+      allow read, update: if debug(productId) && isEditorOnProduct(productId);
+      allow create: if request.auth != null;
+      allow delete: if resource.data.members[request.auth.uid].type == "owner";
 
-      allow create:
-      	if request.auth != null
-
-      match /Huddles/{huddleId} {
-        allow read:
-          if isEditorOnProduct(productId)
-
-        allow create:
-          if request.auth != null
-
-				allow update, delete:
-					if resource.data.userId == request.auth.uid
-      }
-    }
-
-    match /RetrospectiveItems/{retrospectiveItemId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-    }
-
-    match /StoryMapStates/{storyMapStateId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-
-      match /Comments/{commentId} {
-        allow read, create:
-          if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)
-
-        allow update, delete:
-          if resource.data.authorId == request.auth.uid
+      match /Insights/{insightId} {
+        allow read, write: if isEditorOnProduct(productId);
       }
 
-      match /Histories/{historyId} {
-        allow read, write:
-          if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)
+      match /Invites/{inviteId} {
+      allow read: if request.auth.token.email == resource.data.email;
+      allow write: if isEditorOnProduct(productId)
+    }
+
+      match /JourneyEvents/{journeyEventId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Journeys/{journeyId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Objectives/{objectiveId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Participants/{participantId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Personas/{personaId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Results/{resultId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /RetrospectiveItems/{retrospectiveItemId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /StoryMapComments/{storyMapCommentId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /StoryMapHistories/{storyMapHistoryId} {
+        allow read, write: if isEditorOnProduct(productId);
+
+        match /HistoryItems/{historyItemId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+      }
+
+      match /StoryMapItems/{storyMapItemId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Tasks/{taskId} {
+        allow read, write: if isEditorOnProduct(productId);
       }
 
       match /Versions/{versionId} {
-        allow read, write:
-          if isEditorOnProduct(get(/databases/$(database)/documents/StoryMapStates/$(storyMapStateId)).data.productId)
+        allow read, write: if isEditorOnProduct(productId);
       }
     }
 
-    match /Tasks/{taskId} {
-    	allow read, update, delete:
-      	if isEditorOnProduct(resource.data.productId)
-
-      allow create:
-      	if request.auth != null
-    }
-
     match /Users/{userId} {
-    	allow get, create:
-      	if request.auth != null
-
-      allow update, delete:
-      	if userId == request.auth.uid
+      allow get: if debug(request.auth) != null;
+      allow create: if request.resource.data.email == request.auth.token.email;
+      allow update, delete: if request.auth.uid == userId;
     }
 
     function isEditorOnProduct(productId) {
-      let product = get(/databases/$(database)/documents/Products/$(productId));
+      let product = getAfter(/databases/$(database)/documents/Products/$(productId));
       return product.data.members[request.auth.uid].type == "editor" || product.data.members[request.auth.uid].type == "owner"
     }
   }

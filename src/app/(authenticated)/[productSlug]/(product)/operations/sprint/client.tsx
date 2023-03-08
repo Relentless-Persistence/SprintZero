@@ -20,8 +20,8 @@ import type {Id} from "~/types"
 
 import SprintColumn from "./SprintColumn"
 import {ProductConverter} from "~/types/db/Products"
-import {StoryMapStateConverter, sprintColumns} from "~/types/db/StoryMapStates"
-import {VersionConverter} from "~/types/db/Versions"
+import {StoryMapItemConverter, sprintColumns} from "~/types/db/Products/StoryMapItems"
+import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
@@ -32,7 +32,7 @@ const SprintClientPage: FC = () => {
 	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [storyMapStates] = useCollection(
 		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
-			StoryMapStateConverter,
+			StoryMapItemConverter,
 		),
 	)
 	const storyMapState = storyMapStates?.docs[0]

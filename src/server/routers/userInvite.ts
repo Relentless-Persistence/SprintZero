@@ -6,7 +6,7 @@ import type {Product} from "~/types/db/Products"
 
 import {procedure, router} from "../trpc"
 import {genAdminConverter} from "~/types"
-import {ProductInviteSchema} from "~/types/db/ProductInvites"
+import {InviteSchema} from "~/types/db/Products/Invites"
 import {ProductSchema} from "~/types/db/Products"
 import {dbAdmin} from "~/utils/firebaseAdmin"
 
@@ -20,7 +20,7 @@ export const userInviteRouter = router({
 		.query(async ({input: {inviteToken}}) => {
 			const productInvite = await dbAdmin
 				.doc(`ProductInvites/${inviteToken}`)
-				.withConverter(genAdminConverter(ProductInviteSchema))
+				.withConverter(genAdminConverter(InviteSchema))
 				.get()
 			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
 
@@ -44,7 +44,7 @@ export const userInviteRouter = router({
 		.mutation(async ({input: {userId, inviteToken}}) => {
 			const productInvite = await dbAdmin
 				.doc(`ProductInvites/${inviteToken}`)
-				.withConverter(genAdminConverter(ProductInviteSchema))
+				.withConverter(genAdminConverter(InviteSchema))
 				.get()
 			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
 

@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, idSchema, timestampSchema} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
 export const ParticipantSchema = z.object({
 	availability: z.array(z.enum([`95only`, `email`, `phone`, `text`, `weekdays`, `weekends`])),
@@ -21,9 +21,8 @@ export const ParticipantSchema = z.object({
 	transcript: z.string(),
 	updatedAt: timestampSchema,
 
-	personaIds: z.array(idSchema),
-	productId: idSchema,
-	updatedAtUserId: idSchema,
+	personaIds: z.array(z.string()),
+	updatedAtUserId: z.string(),
 })
 
 export type Participant = z.infer<typeof ParticipantSchema>

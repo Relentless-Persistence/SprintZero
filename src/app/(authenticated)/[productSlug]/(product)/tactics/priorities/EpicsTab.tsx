@@ -10,7 +10,7 @@ import type {Product} from "~/types/db/Products"
 import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "./globals"
 import PrioritiesMatrix from "./PrioritiesMatrix"
-import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
+import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {db} from "~/utils/firebase"
 import {getEpics} from "~/utils/storyMap"
 
@@ -21,7 +21,7 @@ export type EpicsTabProps = {
 const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 	const [storyMapStates] = useCollection(
 		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProduct.id)).withConverter(
-			StoryMapStateConverter,
+			StoryMapItemConverter,
 		),
 	)
 	const storyMapState = storyMapStates?.docs[0]

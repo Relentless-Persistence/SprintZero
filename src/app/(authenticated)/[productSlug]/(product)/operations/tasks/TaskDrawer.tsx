@@ -10,7 +10,7 @@ import type {Dayjs} from "dayjs"
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
-import type {Task} from "~/types/db/Tasks"
+import type {Task} from "~/types/db/Products/Tasks"
 import type {User} from "~/types/db/Users"
 
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
@@ -35,7 +35,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 	const [isOpen, setIsOpen] = useState(false)
 	useEffect(() => setIsOpen(true), [])
 
-	const activeProductId = useActiveProductId();
+	const activeProductId = useActiveProductId()
 	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
 	const {control, handleSubmit} = useForm<FormInputs>({

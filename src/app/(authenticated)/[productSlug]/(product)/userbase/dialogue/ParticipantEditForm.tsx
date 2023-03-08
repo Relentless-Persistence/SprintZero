@@ -11,13 +11,13 @@ import usePlacesAutocomplete, {getGeocode} from "use-places-autocomplete"
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Participant} from "~/types/db/Participants"
+import type {Participant} from "~/types/db/Products/Participants"
 
 import LinkTo from "~/components/LinkTo"
 import RhfAutoComplete from "~/components/rhf/RhfAutoComplete"
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfRadioGroup from "~/components/rhf/RhfRadioGroup"
-import {ParticipantSchema} from "~/types/db/Participants"
+import {ParticipantSchema} from "~/types/db/Products/Participants"
 
 const formSchema = ParticipantSchema.pick({
 	disabilities: true,

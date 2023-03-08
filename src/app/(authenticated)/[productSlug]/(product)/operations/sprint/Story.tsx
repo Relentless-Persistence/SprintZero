@@ -3,15 +3,15 @@ import {useState} from "react"
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 
 import StoryContainer from "./StoryContainer"
 import {useGenMeta} from "~/app/(authenticated)/[productSlug]/(product)/map/meta"
 import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/map/StoryDrawer"
 
 export type StoryProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapItem>
 	allVersions: QuerySnapshot<Version>
 	storyId: Id
 }

@@ -6,11 +6,11 @@ import {useForm} from "react-hook-form"
 import type {FC} from "react"
 import type {z} from "zod"
 import type {Id} from "~/types"
-import type {Journey} from "~/types/db/Journeys"
+import type {Journey} from "~/types/db/Products/Journeys"
 
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {JourneyConverter, JourneySchema} from "~/types/db/Journeys"
+import {JourneyConverter, JourneySchema} from "~/types/db/Products/Journeys"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

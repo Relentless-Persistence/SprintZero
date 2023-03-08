@@ -6,7 +6,7 @@ import {z} from "zod"
 
 import type {WithFieldValue} from "firebase-admin/firestore"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {funCardRouter} from "./funCard"
 import {userInviteRouter} from "./userInvite"
@@ -51,11 +51,11 @@ export const appRouter = router({
 					),
 				})
 
-				let updates: WithFieldValue<Partial<StoryMapState>> = {}
+				let updates: WithFieldValue<Partial<StoryMapItem>> = {}
 				for (const itemId in items) {
 					const item = oldItemSchema.safeParse(items[itemId])
 					if (!item.success) continue
-					let newEthicsVotes: Exclude<StoryMapState[`items`][Id], undefined>[`ethicsVotes`] = {}
+					let newEthicsVotes: Exclude<StoryMapItem[`items`][Id], undefined>[`ethicsVotes`] = {}
 					for (const vote of item.data.ethicsVotes) {
 						newEthicsVotes[vote.userId as Id] = vote.vote
 					}

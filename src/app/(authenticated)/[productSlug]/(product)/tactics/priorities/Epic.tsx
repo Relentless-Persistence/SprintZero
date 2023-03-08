@@ -8,13 +8,13 @@ import {useEffect, useRef} from "react"
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {matrixRect} from "./globals"
 import {getEpics} from "~/utils/storyMap"
 
 export type EpicProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapItem>
 	epicId: Id
 }
 
@@ -72,7 +72,7 @@ const Epic: FC<EpicProps> = ({storyMapState, epicId}) => {
 export default Epic
 
 const debouncedSetStoryMapStateItems = debounce(
-	async (storyMapState: QueryDocumentSnapshot<StoryMapState>, data: StoryMapState[`items`]) => {
+	async (storyMapState: QueryDocumentSnapshot<StoryMapItem>, data: StoryMapItem[`items`]) => {
 		await updateDoc(storyMapState.ref, {
 			items: data,
 			updatedAt: Timestamp.now(),

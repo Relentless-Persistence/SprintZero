@@ -2,9 +2,10 @@
 
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
 import {httpBatchLink} from "@trpc/client"
-import {Alert, ConfigProvider, theme as antdTheme} from "antd"
+import {ConfigProvider, theme as antdTheme} from "antd"
+import "core-js/es/array/find-last"
 import {doc} from "firebase/firestore"
-import {useEffect, useState} from "react"
+import {useState} from "react"
 import {useDocument} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
@@ -21,12 +22,12 @@ export type RootProvidersProps = {
 	theme: `light` | `dark`
 }
 
-const RootProviders: FC<RootProvidersProps> = ({children, theme: defaultTheme}) => {
-	const [theme, setTheme] = useState(defaultTheme)
+const RootProviders: FC<RootProvidersProps> = ({children, theme: browserTheme}) => {
+	const [themeSetting, setThemeSetting] = useState<`light` | `auto` | `dark`>(`auto`)
+	const theme = themeSetting === `auto` ? browserTheme : themeSetting
 
 	const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 	invariant(baseUrl, `NEXT_PUBLIC_BASE_URL is not set`)
-
 	const [queryClient] = useState(() => new QueryClient())
 	const [trpcClient] = useState(() =>
 		trpc.createClient({
@@ -38,11 +39,8 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: defaultTheme}) 
 		}),
 	)
 
-	const [appInfo, loading] = useDocument(doc(db, `AppInfo`, `info`).withConverter(AppInfoConverter))
-	const [loadedVersion, setLoadedVersion] = useState<number | undefined>(undefined)
-	useEffect(() => {
-		if (!loading && appInfo?.exists() && loadedVersion === undefined) setLoadedVersion(appInfo.data().version)
-	}, [appInfo, loadedVersion, loading])
+	const [appInfo, loading, error] = useDocument(doc(db, `AppInfo`, `info`).withConverter(AppInfoConverter))
+	if (error) throw error
 
 	return (
 		<trpc.Provider client={trpcClient} queryClient={queryClient}>
@@ -57,9 +55,9 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: defaultTheme}) 
 						value={{
 							theme,
 							setTheme: (value) => {
-								setTheme(value)
-								document.documentElement.classList.remove(value === `light` ? `dark` : `light`)
-								document.documentElement.classList.add(value === `light` ? `light` : `dark`)
+								setThemeSetting(value)
+								document.documentElement.classList.remove(theme === `light` ? `dark` : `light`)
+								document.documentElement.classList.add(theme === `light` ? `light` : `dark`)
 							},
 						}}
 					>
@@ -69,14 +67,6 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: defaultTheme}) 
 							) : (
 								<div className="isolate h-full">{children}</div>
 							))}
-						{!appInfo?.data()?.maintenanceMode && loadedVersion !== appInfo?.data()?.version && (
-							<Alert
-								type="warning"
-								showIcon
-								message="A new version of the app is available. Reload the page to update."
-								className="fixed bottom-8 right-12"
-							/>
-						)}
 					</ThemeProvider>
 				</ConfigProvider>
 			</QueryClientProvider>

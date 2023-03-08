@@ -6,10 +6,10 @@ import {useEffect, useRef, useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {Persona} from "~/types/db/Personas"
+import type {Persona} from "~/types/db/Products/Personas"
 
 import EditableListCard from "./EditableListCard"
-import {PersonaConverter} from "~/types/db/Personas"
+import {PersonaConverter} from "~/types/db/Products/Personas"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

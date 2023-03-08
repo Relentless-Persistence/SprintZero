@@ -1,81 +1,79 @@
-import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
+import type {QuerySnapshot} from "firebase/firestore"
 import type {Dispatch, SetStateAction} from "react"
-import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
+import type {AllVersions} from "~/utils/storyMap"
 
 import {getEpics, getFeatures, getStories, sortEpics, sortFeatures, sortStories} from "~/utils/storyMap"
 
 export type UseGenMetaVars = {
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapItems: QuerySnapshot<StoryMapItem>
 	allVersions: QuerySnapshot<Version>
-	currentVersionId: Id | `__ALL_VERSIONS__`
+	currentVersionId: string | typeof AllVersions
 	editMode: boolean
-	itemsToBeDeleted: Id[]
-	setItemsToBeDeleted: Dispatch<SetStateAction<Id[]>>
+	itemsToBeDeleted: string[]
+	setItemsToBeDeleted: Dispatch<SetStateAction<string[]>>
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useGenMeta = ({
-	storyMapState,
+	storyMapItems,
 	allVersions,
 	currentVersionId,
 	editMode,
 	itemsToBeDeleted,
 	setItemsToBeDeleted,
 }: UseGenMetaVars) => {
-	const epics = getEpics(storyMapState.data().items)
-	const features = getFeatures(storyMapState.data().items)
-	const stories = getStories(storyMapState.data().items)
+	const epics = sortEpics(getEpics(storyMapItems).filter((epic) => !itemsToBeDeleted.includes(epic.id)))
+	const features = sortFeatures(getFeatures(storyMapItems).filter((feature) => !itemsToBeDeleted.includes(feature.id)))
+	const stories = sortStories(
+		getStories(storyMapItems).filter((story) => !itemsToBeDeleted.includes(story.id)),
+		allVersions,
+	)
 
-	const storiesWithExtra = stories
-		.filter((story) => !itemsToBeDeleted.includes(story.id))
-		.map((story) => {
-			const siblings = sortStories(
-				stories.filter((sibling) => sibling.parentId === story.parentId),
-				allVersions,
-			)
-			const position = siblings.findIndex((sibling) => sibling.id === story.id)
+	const epicsInfo = epics.map((epic) => ({
+		id: epic.id,
+		childrenIds: features.filter((feature) => feature.data().parentId === epic.id).map((feature) => feature.id),
+		position: epics.findIndex((sibling) => sibling.id === epic.id),
+	}))
+	const featuresInfo = features.map((feature) => {
+		const siblings = features.filter((sibling) => sibling.data().parentId === feature.data().parentId)
+		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
 
-			return {...story, position}
-		})
-	const featuresWithExtra = features
-		.filter((feature) => !itemsToBeDeleted.includes(feature.id))
-		.map((feature) => {
-			const siblings = sortFeatures(features.filter((sibling) => sibling.parentId === feature.parentId))
-			const position = siblings.findIndex((sibling) => sibling.id === feature.id)
+		return {
+			id: feature.id,
+			childrenIds: stories.filter((story) => story.data().parentId === feature.id).map((story) => story.id),
+			position,
+		}
+	})
+	const storiesInfo = stories.map((story) => {
+		const siblings = sortStories(
+			stories.filter((sibling) => sibling.data().parentId === story.data().parentId),
+			allVersions,
+		)
+		const position = siblings.findIndex((sibling) => sibling.id === story.id)
 
-			return {
-				...feature,
-				childrenIds: sortStories(
-					storiesWithExtra.filter((story) => story.parentId === feature.id),
-					allVersions,
-				).map((story) => story.id),
-				position,
-			}
-		})
-	const epicsWithExtra = sortEpics(epics)
-		.filter((epic) => !itemsToBeDeleted.includes(epic.id))
-		.map((epic) => ({
-			...epic,
-			childrenIds: sortFeatures(featuresWithExtra.filter((feature) => feature.parentId === epic.id)).map(
-				(feature) => feature.id,
-			),
-			position: epics.findIndex((sibling) => sibling.id === epic.id),
-		}))
+		return {
+			id: story.id,
+			position,
+		}
+	})
 
 	return {
-		storyMapState,
+		storyMapItems,
 		currentVersionId,
 		allVersions,
 		editMode,
-		markForDeletion: (id: Id) => {
+		markForDeletion: (id: string) => {
 			setItemsToBeDeleted((prev) => [...prev, id])
 		},
 
-		epics: epicsWithExtra,
-		features: featuresWithExtra,
-		stories: storiesWithExtra,
+		epics,
+		epicsInfo,
+		features,
+		featuresInfo,
+		stories,
+		storiesInfo,
 	}
 }
 

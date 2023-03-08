@@ -1,14 +1,13 @@
 import {z} from "zod"
 
-import {genConverter, idSchema, serverTimestampSchema} from "~/types"
+import {genConverter, serverTimestampSchema} from "~/types"
 
 export const CommentSchema = z.object({
 	createdAt: serverTimestampSchema,
 	text: z.string(),
 	type: z.enum([`design`, `code`]),
 
-	authorId: idSchema,
-	parentId: idSchema,
+	authorId: z.string(),
 })
 
 export type Comment = z.infer<typeof CommentSchema>

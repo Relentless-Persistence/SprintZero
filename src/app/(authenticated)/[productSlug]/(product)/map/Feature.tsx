@@ -1,23 +1,30 @@
 import {CopyOutlined, MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
+import {collection, updateDoc} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
+import {useCollection} from "react-firebase-hooks/firestore"
 
-import type {StoryMapMeta} from "./meta"
+import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
+import type {Product} from "~/types/db/Products"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {elementRegistry} from "./globals"
+import {VersionConverter} from "~/types/db/Products/Versions"
 import {updateItem} from "~/utils/storyMap"
 
 export type FeatureProps = {
-	meta: StoryMapMeta
-	featureId: Id
+	product: QueryDocumentSnapshot<Product>
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	featureId: string
+	editMode: boolean
+	onMarkForDeletion: (id: string) => void
 	inert?: boolean
-	isInitialRender?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRender = false}) => {
-	const feature = meta.features.find((feature) => feature.id === featureId)!
+const Feature: FC<FeatureProps> = ({product, storyMapItems, featureId, editMode, onMarkForDeletion, inert = false}) => {
+	const feature = storyMapItems.docs.find((feature) => feature.id === featureId)!
+	const children = storyMapItems.docs.filter((item) => item.data().parentId === featureId)
 
 	const contentRef = useRef<HTMLDivElement>(null)
 	useEffect(() => {
@@ -29,50 +36,53 @@ const Feature: FC<FeatureProps> = ({meta, featureId, inert = false, isInitialRen
 		}
 	}, [featureId, inert])
 
-	const [localFeatureName, setLocalFeatureName] = useState(feature.name)
+	const [localFeatureName, setLocalFeatureName] = useState(feature.data().name)
 	useEffect(() => {
-		setLocalFeatureName(feature.name)
-	}, [feature.name])
+		setLocalFeatureName(feature.data().name)
+	}, [feature])
 
-	const [hasBlurred, setHasBlurred] = useState(isInitialRender)
+	const [versions] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
 
 	return (
 		<div
 			className={clsx(
-				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-bgContainer px-2 py-1 font-medium text-[#006378] dark:text-[#00a2c4]`,
+				`flex min-w-[4rem] touch-none select-none items-center gap-2 rounded border border-current bg-bgContainer px-2 py-1 font-medium leading-tight text-[#006378] dark:text-[#00a2c4]`,
 				inert && `cursor-grabbing`,
-				!meta.editMode && `cursor-grab active:cursor-grabbing`,
+				!editMode && `cursor-grab active:cursor-grabbing`,
 			)}
 			ref={contentRef}
 		>
 			<CopyOutlined />
-			{(hasBlurred || inert) && !meta.editMode ? (
-				<p className="my-1 h-[1em]">{localFeatureName}</p>
+			{(feature.data().initialRenameDone || inert) && !editMode ? (
+				<p className={clsx(`my-0.5`, localFeatureName === `` && `invisible`)}>{localFeatureName || `_`}</p>
 			) : (
-				<div className="relative my-1 min-w-[1rem]">
+				<div className="relative my-0.5 min-w-[1rem]">
 					<p>{localFeatureName || `_`}</p>
 					<input
 						value={localFeatureName}
-						autoFocus={!isInitialRender && !meta.editMode}
-						onBlur={() => setHasBlurred(true)}
-						onKeyDown={(e) => {
-							if (e.key === `Enter`) setHasBlurred(true)
+						autoFocus={!feature.data().initialRenameDone && !editMode}
+						onBlur={() => {
+							updateDoc(feature.ref, {initialRenameDone: true}).catch(console.error)
 						}}
-						className="absolute inset-0 rounded-sm bg-bgContainer focus:outline focus:outline-offset-1 focus:outline-primaryHover"
+						onKeyDown={(e) => {
+							if (e.key === `Enter`) updateDoc(feature.ref, {initialRenameDone: true}).catch(console.error)
+						}}
+						className="absolute inset-0 w-full rounded-sm bg-bgContainer focus:outline focus:outline-1 focus:outline-offset-1 focus:outline-primaryHover"
 						onChange={(e) => {
+							if (!versions) return
 							setLocalFeatureName(e.target.value)
-							updateItem(meta.storyMapState, feature.id, {name: e.target.value}, meta.allVersions).catch(console.error)
+							updateItem(storyMapItems, feature.id, {name: e.target.value}, versions).catch(console.error)
 						}}
 						onPointerDownCapture={(e) => e.stopPropagation()}
 					/>
 				</div>
 			)}
-			{meta.editMode && (
+			{editMode && (
 				<button
 					type="button"
 					onClick={() => {
-						meta.markForDeletion(featureId)
-						feature.childrenIds.forEach((storyId) => meta.markForDeletion(storyId))
+						onMarkForDeletion(featureId)
+						children.forEach((story) => onMarkForDeletion(story.id))
 					}}
 				>
 					<MinusCircleOutlined className="text-sm text-error" />

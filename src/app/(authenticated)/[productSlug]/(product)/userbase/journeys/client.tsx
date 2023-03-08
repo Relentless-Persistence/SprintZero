@@ -11,8 +11,8 @@ import type {Id} from "~/types"
 
 import AddJourneyPage from "./AddJourneyPage"
 import EventDrawer from "./EventDrawer"
-import {JourneyEventConverter} from "~/types/db/JourneyEvents"
-import {JourneyConverter, durationUnits} from "~/types/db/Journeys"
+import {JourneyEventConverter} from "~/types/db/Products/JourneyEvents"
+import {JourneyConverter, durationUnits} from "~/types/db/Products/Journeys"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

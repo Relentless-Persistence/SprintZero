@@ -1,13 +1,11 @@
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter} from "~/types"
 
 export const JourneySchema = z.object({
 	duration: z.number(),
 	durationUnit: z.enum([`minutes`, `hours`, `days`, `weeks`, `months`, `years`]),
 	name: z.string(),
-
-	productId: idSchema,
 })
 
 export type Journey = z.infer<typeof JourneySchema>

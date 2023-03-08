@@ -7,10 +7,10 @@ import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
 import type {Id} from "~/types"
-import type {Result} from "~/types/db/Results"
+import type {Result} from "~/types/db/Products/Results"
 
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
-import {ResultConverter, ResultSchema} from "~/types/db/Results"
+import {ResultConverter, ResultSchema} from "~/types/db/Products/Results"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 

@@ -10,7 +10,7 @@ import type {FC} from "react"
 
 import Story from "./Story"
 import {ProductConverter} from "~/types/db/Products"
-import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
+import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
@@ -20,7 +20,7 @@ const EthicsClientPage: FC = () => {
 	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [storyMapStates] = useCollection(
 		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
-			StoryMapStateConverter,
+			StoryMapItemConverter,
 		),
 	)
 	const storyMapState = storyMapStates?.docs[0]

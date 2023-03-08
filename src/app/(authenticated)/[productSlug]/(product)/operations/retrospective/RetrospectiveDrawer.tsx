@@ -13,7 +13,7 @@ import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import {RetrospectiveItemSchema, retrospectiveTabs} from "~/types/db/RetrospectiveItems"
+import {RetrospectiveItemSchema, retrospectiveTabs} from "~/types/db/Products/RetrospectiveItems"
 
 const formSchema = RetrospectiveItemSchema.pick({description: true, proposedActions: true, title: true, type: true})
 type FormInputs = z.infer<typeof formSchema>

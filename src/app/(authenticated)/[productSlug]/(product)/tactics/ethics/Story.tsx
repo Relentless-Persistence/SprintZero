@@ -6,14 +6,14 @@ import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/tactics/ethics/StoryDrawer"
 import {getStories} from "~/utils/storyMap"
 
 export type StoryProps = {
 	activeProduct: QueryDocumentSnapshot<Product>
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapItem>
 	storyId: Id
 }
 

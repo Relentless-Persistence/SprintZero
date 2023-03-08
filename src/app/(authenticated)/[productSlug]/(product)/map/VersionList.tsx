@@ -8,10 +8,10 @@ import {useEffect} from "react"
 import type {DocumentReference, QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {Dispatch, FC, SetStateAction} from "react"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 
-import {VersionConverter} from "~/types/db/Versions"
+import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
 
 export type VersionListProps = {
@@ -20,7 +20,7 @@ export type VersionListProps = {
 	setCurrentVersionId: (id: Id | `__ALL_VERSIONS__`) => void
 	newVersionInputValue: string | undefined
 	setNewVersionInputValue: (value: string | undefined) => void
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapItems: QuerySnapshot<StoryMapItem>
 	editMode: boolean
 	setItemsToBeDeleted: Dispatch<SetStateAction<Id[]>>
 	versionsToBeDeleted: Id[]
@@ -33,7 +33,7 @@ const VersionList: FC<VersionListProps> = ({
 	setCurrentVersionId,
 	newVersionInputValue,
 	setNewVersionInputValue,
-	storyMapState,
+	storyMapItems,
 	editMode,
 	setItemsToBeDeleted,
 	versionsToBeDeleted,
@@ -45,6 +45,8 @@ const VersionList: FC<VersionListProps> = ({
 	}, [currentVersionId, setCurrentVersionId, allVersions.docs])
 
 	const addVersion = async (): Promise<DocumentReference<Version>> => {
+		const firstItem = storyMapItems.docs[0]
+		if (!firstItem) return
 		if (!newVersionInputValue) throw new Error(`Version name is required.`)
 		const existingDoc = (
 			await getDocs(

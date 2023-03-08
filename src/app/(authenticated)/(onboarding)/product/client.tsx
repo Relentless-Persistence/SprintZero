@@ -2,7 +2,7 @@
 
 import {Button} from "antd"
 import crypto from "crypto"
-import {Timestamp, addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
+import {Timestamp, doc, runTransaction, serverTimestamp, setDoc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
@@ -17,12 +17,11 @@ import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {HistoryConverter} from "~/types/db/Histories"
-import {ObjectiveConverter} from "~/types/db/Objectives"
-import {ProductInviteConverter} from "~/types/db/ProductInvites"
 import {ProductConverter} from "~/types/db/Products"
-import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
-import {VersionConverter} from "~/types/db/Versions"
+import {InviteConverter} from "~/types/db/Products/Invites"
+import {ObjectiveConverter} from "~/types/db/Products/Objectives"
+import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
+import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
 import {useUser} from "~/utils/useUser"
@@ -50,95 +49,87 @@ const ProductSetupClientPage: FC = () => {
 		if (hasSubmitted || !user) return
 		setHasSubmitted(true)
 
-		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
-
-		const storyMapState = await addDoc(collection(db, `StoryMapStates`).withConverter(StoryMapStateConverter), {
-			items: {},
-			updatedAt: serverTimestamp(),
-			currentHistoryId: `` as Id,
-			productId: slug,
-		})
-
 		let {email1, email2, email3, ...data} = _data
 		if (email1 === email2) email2 = null
 		if (email1 === email3) email3 = null
 		if (email2 === email3) email3 = null
 		const members = {[user.id as Id]: {type: `owner`} as const}
 
-		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
-			...data,
-			createdAt: Timestamp.now(),
-			members,
-			problemStatement: ``,
-			businessOutcomes: [],
-			marketLeaders: [],
-			potentialRisks: [],
-			userPriorities: [],
-			accessibility: {
-				auditory: [false, false, false, false, false],
-				cognitive: [false, false, false, false, false, false],
-				physical: [false, false, false, false, false],
-				speech: [false, false],
-				visual: [false, false, false, false, false, false, false, false],
-			},
-			productType: `mobile`,
-			valueProposition: null,
-			features: null,
-			finalVision: ``,
-			updates: [],
-			huddles: {
-				[user.id]: {
-					updatedAt: Timestamp.now(),
-					blockerStoryIds: [],
-					todayStoryIds: [],
-					yesterdayStoryIds: [],
-				},
-			},
-		})
+		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
+		// eslint-disable-next-line @typescript-eslint/require-await -- Callback requires Promise return
+		await runTransaction(db, async (transaction) => {
+			transaction.set(doc(db, `Products`, slug).withConverter(ProductConverter), {
+				...data,
+				createdAt: Timestamp.now(),
+				members,
 
-		await Promise.all([
-			(async () => {
-				const positionHistory = await addDoc(
-					collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-					{
-						future: false,
-						items: {},
-						timestamp: serverTimestamp(),
+				storyMapCurrentHistoryId: null,
+				storyMapUpdatedAt: serverTimestamp(),
+
+				businessOutcomes: [],
+				marketLeaders: [],
+				potentialRisks: [],
+				problemStatement: ``,
+				userPriorities: [],
+
+				accessibility: {
+					auditory: [false, false, false, false, false],
+					cognitive: [false, false, false, false, false, false],
+					physical: [false, false, false, false, false],
+					speech: [false, false],
+					visual: [false, false, false, false, false, false, false, false],
+				},
+
+				features: null,
+				finalVision: ``,
+				productType: `mobile`,
+				updates: [],
+				valueProposition: null,
+
+				huddles: {
+					[user.id]: {
+						updatedAt: Timestamp.now(),
+						blockerStoryIds: [],
+						todayStoryIds: [],
+						yesterdayStoryIds: [],
 					},
-				)
-				await updateDoc(storyMapState, {
-					currentHistoryId: positionHistory.id as Id,
-				})
-			})(),
-			addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter), {
+				},
+			})
+
+			transaction.set(
+				doc(db, `Products`, slug, `StoryMapHistories`, nanoid()).withConverter(StoryMapHistoryConverter),
+				{
+					future: false,
+					timestamp: serverTimestamp(),
+				},
+			)
+
+			transaction.set(doc(db, `Products`, slug, `Versions`, nanoid()).withConverter(VersionConverter), {
+				deleted: false,
 				name: `1.0`,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+			})
+
+			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
 				name: `001`,
 				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+			})
+			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
 				name: `002`,
 				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+			})
+			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
 				name: `003`,
 				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+			})
+			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
 				name: `004`,
 				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
+			})
+			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
 				name: `005`,
 				statement: ``,
-				productId: slug,
-			}),
-		])
+			})
+		})
 
 		for (const recipient of [email1, email2, email3]) {
 			if (!recipient) continue
@@ -150,7 +141,7 @@ const ProductSetupClientPage: FC = () => {
 				data.name
 			}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`
 
-			await setDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter), {
+			await setDoc(doc(db, `Products`, slug, `ProductInvites`, inviteToken).withConverter(InviteConverter), {
 				email: recipient,
 				productId: slug,
 			})
@@ -167,8 +158,8 @@ const ProductSetupClientPage: FC = () => {
 	}
 
 	return (
-		<div className="flex h-full flex-col gap-8">
-			<div className="flex flex-col gap-2">
+		<div className="flex h-full flex-col gap-6">
+			<div className="leading-normal">
 				<h1 className="text-3xl font-semibold">Product Configuration</h1>
 				<h2 className="text-xl text-textSecondary">
 					Almost time to start building! We just require a few data points before we can begin

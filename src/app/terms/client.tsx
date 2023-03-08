@@ -5,7 +5,7 @@ import Image from "next/image"
 
 import type {FC} from "react"
 
-import {termsOfService} from "~/components/terms"
+import {termsOfService} from "~/components/TermsOfService"
 
 const TermsClientPage: FC = () => {
 	return (

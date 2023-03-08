@@ -4,8 +4,8 @@ import {sortBy} from "lodash"
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 
 import Story from "./Story"
 import {getStories} from "~/utils/storyMap"
@@ -14,7 +14,7 @@ import {useUser} from "~/utils/useUser"
 export type SprintColumnProps = {
 	columnName: string
 	title: string
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapItem>
 	allVersions: QuerySnapshot<Version>
 	currentVersionId: Id | `__ALL_VERSIONS__`
 	myStoriesOnly: boolean

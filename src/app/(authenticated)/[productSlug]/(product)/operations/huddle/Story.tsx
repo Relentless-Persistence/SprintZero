@@ -5,11 +5,11 @@ import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 
 export type StoryProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
+	storyMapState: QueryDocumentSnapshot<StoryMapItem>
 	versions: QuerySnapshot<Version>
 	storyId: Id
 	onRemove: () => Promisable<void>

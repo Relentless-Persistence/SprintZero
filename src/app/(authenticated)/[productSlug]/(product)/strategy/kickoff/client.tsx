@@ -11,7 +11,7 @@ import type {Id} from "~/types"
 
 import EditableTextCard from "./EditableTextCard"
 import EditableTextListCard from "./EditableTextListCard"
-import {PersonaConverter} from "~/types/db/Personas"
+import {PersonaConverter} from "~/types/db/Products/Personas"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"

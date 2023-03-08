@@ -11,7 +11,7 @@ import type {FC} from "react"
 import type {Id} from "~/types"
 
 import InsightItemCard from "./InsightCard"
-import {InsightConverter} from "~/types/db/Insights"
+import {InsightConverter} from "~/types/db/Products/Insights"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

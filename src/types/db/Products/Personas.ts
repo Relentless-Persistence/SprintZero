@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, idSchema, timestampSchema} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
 export const PersonaSchema = z.object({
 	changes: z.array(
@@ -54,8 +54,6 @@ export const PersonaSchema = z.object({
 			text: z.string(),
 		}),
 	),
-
-	productId: idSchema,
 })
 
 export type Persona = z.infer<typeof PersonaSchema>

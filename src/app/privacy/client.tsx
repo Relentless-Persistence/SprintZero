@@ -5,7 +5,7 @@ import Image from "next/image"
 
 import type {FC} from "react"
 
-import {privacyPolicy} from "~/components/privacy"
+import {privacyPolicy} from "~/components/PrivacyPolicy"
 
 const PrivacyClientPage: FC = () => {
 	return (

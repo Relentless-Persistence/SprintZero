@@ -1,9 +1,7 @@
 /* eslint-disable no-var, @typescript-eslint/no-unnecessary-condition */
 
-import type {Id} from "~/types"
-
 declare global {
-	var __elementRegistry: Record<Id, HTMLElement | undefined>
+	var __elementRegistry: Record<string, HTMLElement | undefined>
 }
 
 export const storyMapTop = 224

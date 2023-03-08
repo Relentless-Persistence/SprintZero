@@ -9,11 +9,11 @@ import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {ComponentProps, FC} from "react"
 import type {Id} from "~/types"
-import type {Task} from "~/types/db/Tasks"
+import type {Task} from "~/types/db/Products/Tasks"
 
 import TaskColumn from "./TaskColumn"
 import TaskDrawer from "./TaskDrawer"
-import {TaskConverter} from "~/types/db/Tasks"
+import {TaskConverter} from "~/types/db/Products/Tasks"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 

@@ -18,9 +18,9 @@ import type {User} from "~/types/db/Users"
 import FunCard from "./FunCard"
 import Story from "./Story"
 import {ProductConverter} from "~/types/db/Products"
-import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
+import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {UserConverter} from "~/types/db/Users"
-import {VersionConverter} from "~/types/db/Versions"
+import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
@@ -46,7 +46,7 @@ const HuddleClientPage: FC = () => {
 
 	const [storyMapStates] = useCollection(
 		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
-			StoryMapStateConverter,
+			StoryMapItemConverter,
 		),
 	)
 	const storyMapState = storyMapStates?.docs[0]
