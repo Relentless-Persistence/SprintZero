@@ -8,6 +8,7 @@ import {useCollection} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 import type {Persona} from "~/types/db/Personas"
 
+import DayInTheLife from "./DayInTheLife"
 import EditableListCard from "./EditableListCard"
 import {PersonaConverter} from "~/types/db/Personas"
 import {db} from "~/utils/firebase"
@@ -150,7 +151,7 @@ const PersonasClientPage: FC = () => {
 								<Card title="Description">
 									<p>{persona.data().description}</p>
 								</Card>
-								<EditableListCard
+								<DayInTheLife
 									isEditing={isEditingCard === `dayInTheLife`}
 									onEditStart={() => setIsEditingCard(`dayInTheLife`)}
 									title="A Day in the Life"
