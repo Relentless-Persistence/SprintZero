@@ -58,7 +58,7 @@ export const updateItem = async (
 	const item = storyMapItems.docs.find((item) => item.id === id)!
 	await updateDoc(item.ref, {
 		...data,
-		updatedAt: serverTimestamp(),
+		updatedAt: Timestamp.now(),
 	})
 
 	const newItems = await getDocs(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))

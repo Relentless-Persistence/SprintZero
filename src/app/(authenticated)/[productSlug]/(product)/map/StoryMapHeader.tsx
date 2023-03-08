@@ -23,10 +23,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName, lastUpdated}) => 
 	return (
 		<div className="flex flex-col gap-8">
 			<div className="flex items-center justify-between gap-4 px-12 pt-8">
-				<Breadcrumb>
-					<Breadcrumb.Item>Story Map</Breadcrumb.Item>
-					<Breadcrumb.Item>{versionName}</Breadcrumb.Item>
-				</Breadcrumb>
+				<Breadcrumb items={[{title: `Story Map`}, {title: versionName}]} />
 				{lastUpdatedText && <p className="text-sm italic text-textTertiary">Last updated {lastUpdatedText}</p>}
 			</div>
 			<div className="px-12 text-[#595959]">

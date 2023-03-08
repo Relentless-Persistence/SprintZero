@@ -203,7 +203,6 @@ const StoryMapClientPage: FC = () => {
 									setEditMode(false)
 									setItemsToBeDeleted([])
 									setVersionsToBeDeleted([])
-									setIsToolbeltOpen(false)
 								}}
 							/>
 						</Tooltip>
@@ -233,7 +232,6 @@ const StoryMapClientPage: FC = () => {
 									])
 										.then(() => {
 											setEditMode(false)
-											setIsToolbeltOpen(false)
 										})
 										.catch(console.error)
 								}}
@@ -245,8 +243,14 @@ const StoryMapClientPage: FC = () => {
 						key="toolbelt"
 						trigger="click"
 						open={isToolbeltOpen}
+						onOpenChange={(open) =>
+							// FloatButton.Group seems to perform a state update at the same time it calls this, so I need to wait a
+							// bit for the state to update before I can set my own state.
+							setTimeout(() => {
+								setIsToolbeltOpen(open)
+							}, 0)
+						}
 						icon={<MenuOutlined />}
-						onOpenChange={(open) => setIsToolbeltOpen(open)}
 						className="absolute right-12 bottom-8"
 					>
 						<Tooltip placement="left" title="Redo">

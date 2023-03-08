@@ -344,12 +344,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 			}
 		>
 			{editMode ? (
-				<Form
+				<form
 					id="story-form"
-					layout="vertical"
 					className="flex flex-col gap-4"
-					onFinish={() => {
-						onSubmit().catch(console.error)
+					onSubmit={(e) => {
+						onSubmit(e).catch(console.error)
 					}}
 				>
 					<div className="flex gap-8">
@@ -409,7 +408,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 					>
 						<RhfInput control={control} name="pageLink" placeholder="https://" />
 					</Form.Item>
-				</Form>
+				</form>
 			) : (
 				<div className="grid h-full grid-cols-2 gap-6">
 					{/* Left column */}
