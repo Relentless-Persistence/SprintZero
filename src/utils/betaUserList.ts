@@ -24,6 +24,7 @@ export const betaUsers = [
 	`Celia.dallel17@gmail.com`,
 	`cherifb@gmail.com`,
 	`chibuzor.obilom@gmail.com`,
+	`chris.gagne@episource.com`,
 	`chrislouvion@gmail.com`,
 	`Chuckcosby@leverance.com`,
 	`cliff@desligneris.ch`,
