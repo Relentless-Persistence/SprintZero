@@ -27,7 +27,6 @@ import {motion} from "framer-motion"
 import produce from "immer"
 import {useRef, useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
-import invariant from "tiny-invariant"
 
 import type {FC} from "react"
 import type {HistoryItem} from "~/types/db/Products/StoryMapHistories/HistoryItems"
@@ -49,10 +48,7 @@ import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMapClientPage: FC = () => {
 	const activeProductId = useActiveProductId()
-	const [activeProduct, , activeProductError] = useDocument(
-		doc(db, `Products`, activeProductId).withConverter(ProductConverter),
-	)
-	invariant(activeProduct?.exists())
+	const [product, , productError] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 	const [storyMapItems, , storyMapItemsError] = useCollection(
 		collection(db, `Products`, activeProductId, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
@@ -65,7 +61,7 @@ const StoryMapClientPage: FC = () => {
 			orderBy(`timestamp`, `desc`),
 		),
 	)
-	conditionalThrow(activeProductError, storyMapItemsError, versionsError, historiesError)
+	conditionalThrow(productError, storyMapItemsError, versionsError, historiesError)
 
 	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions | undefined>(undefined)
 	const [newVesionInputValue, setNewVesionInputValue] = useState<string | undefined>(undefined)
@@ -75,10 +71,13 @@ const StoryMapClientPage: FC = () => {
 	const [versionsToBeDeleted, setVersionsToBeDeleted] = useState<string[]>([])
 	const [isToolbeltOpen, setIsToolbeltOpen] = useState(false)
 
-	const lastHistory = histories?.docs.find(
-		(history) => history.data().future === false && history.id !== activeProduct.data().storyMapCurrentHistoryId,
-	)
-	const currentHistory = histories?.docs.find((history) => history.id === activeProduct.data().storyMapCurrentHistoryId)
+	const lastHistory =
+		product?.exists() &&
+		histories?.docs.find(
+			(history) => history.data().future === false && history.id !== product.data().storyMapCurrentHistoryId,
+		)
+	const currentHistory =
+		product?.exists() && histories?.docs.find((history) => history.id === product.data().storyMapCurrentHistoryId)
 	const nextHistory = histories?.docs.findLast((history) => history.data().future === true)
 
 	const undo = async () => {
@@ -109,14 +108,14 @@ const StoryMapClientPage: FC = () => {
 			transaction.update(currentHistory.ref, {
 				future: true,
 			})
-			transaction.update(activeProduct.ref, {
+			transaction.update(product.ref, {
 				storyMapCurrentHistoryId: lastHistory.id,
 			})
 		})
 	}
 
 	const redo = async () => {
-		if (!histories || !nextHistory) return
+		if (!histories || !nextHistory || !product) return
 
 		await runTransaction(db, async (transaction) => {
 			const nextHistoryItems = await getDocs(
@@ -143,21 +142,24 @@ const StoryMapClientPage: FC = () => {
 			transaction.update(nextHistory.ref, {
 				future: false,
 			})
-			transaction.update(activeProduct.ref, {
+			transaction.update(product.ref, {
 				storyMapCurrentHistoryId: nextHistory.id,
 			})
 		})
 	}
 
 	const canRedo = histories?.docs.findLast((history) => history.data().future === true)
-	const canUndo = histories?.docs.find(
-		(history) => history.data().future === false && history.id !== activeProduct.data().storyMapCurrentHistoryId,
-	)
+	const canUndo =
+		product?.exists() &&
+		histories?.docs.find(
+			(history) => history.data().future === false && history.id !== product.data().storyMapCurrentHistoryId,
+		)
 
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
 	let lastUpdated: Timestamp | null = null
-	if (activeProduct.data().storyMapUpdatedAt instanceof Timestamp) lastUpdated = activeProduct.data().storyMapUpdatedAt
+	if (product?.exists() && product.data().storyMapUpdatedAt instanceof Timestamp)
+		lastUpdated = product.data().storyMapUpdatedAt
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_6rem]">
@@ -212,7 +214,10 @@ const StoryMapClientPage: FC = () => {
 								onClick={() => {
 									if (!storyMapItems) return
 									Promise.all([
-										itemsToBeDeleted.map((id) => deleteItem(storyMapItems, id)),
+										itemsToBeDeleted.map((id) => {
+											if (!product?.exists()) return
+											return deleteItem(product, storyMapItems, id)
+										}),
 										versionsToBeDeleted.map((id) =>
 											updateDoc(
 												doc(db, `Products`, activeProductId, `StoryMapVersions`, id).withConverter(VersionConverter),
@@ -221,7 +226,10 @@ const StoryMapClientPage: FC = () => {
 												},
 											),
 										),
-										addHistoryEntry(storyMapItems),
+										(() => {
+											if (!product?.exists()) return
+											return addHistoryEntry(product, storyMapItems)
+										})(),
 									])
 										.then(() => {
 											setEditMode(false)
@@ -275,8 +283,9 @@ const StoryMapClientPage: FC = () => {
 				)}
 			</div>
 
-			{storyMapItems && versions && (
+			{storyMapItems && versions && product?.exists() && (
 				<VersionList
+					product={product}
 					allVersions={versions}
 					currentVersionId={currentVersionId}
 					setCurrentVersionId={setCurrentVersionId}

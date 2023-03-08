@@ -7,27 +7,29 @@ import {useEffect} from "react"
 
 import type {DocumentReference, QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {Dispatch, FC, SetStateAction} from "react"
-import type {Id} from "~/types"
+import type {Product} from "~/types/db/Products"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 
 import {VersionConverter} from "~/types/db/Products/Versions"
-import {db} from "~/utils/firebase"
+import {AllVersions} from "~/utils/storyMap"
 
 export type VersionListProps = {
+	product: QueryDocumentSnapshot<Product>
 	allVersions: QuerySnapshot<Version>
-	currentVersionId: Id | `__ALL_VERSIONS__` | undefined
-	setCurrentVersionId: (id: Id | `__ALL_VERSIONS__`) => void
+	currentVersionId: string | typeof AllVersions | undefined
+	setCurrentVersionId: (id: string | typeof AllVersions) => void
 	newVersionInputValue: string | undefined
 	setNewVersionInputValue: (value: string | undefined) => void
 	storyMapItems: QuerySnapshot<StoryMapItem>
 	editMode: boolean
-	setItemsToBeDeleted: Dispatch<SetStateAction<Id[]>>
-	versionsToBeDeleted: Id[]
-	setVersionsToBeDeleted: Dispatch<SetStateAction<Id[]>>
+	setItemsToBeDeleted: Dispatch<SetStateAction<string[]>>
+	versionsToBeDeleted: string[]
+	setVersionsToBeDeleted: Dispatch<SetStateAction<string[]>>
 }
 
 const VersionList: FC<VersionListProps> = ({
+	product,
 	allVersions,
 	currentVersionId,
 	setCurrentVersionId,
@@ -40,45 +42,35 @@ const VersionList: FC<VersionListProps> = ({
 	setVersionsToBeDeleted,
 }) => {
 	useEffect(() => {
-		if (currentVersionId === undefined && allVersions.docs[0]?.exists())
-			setCurrentVersionId(allVersions.docs[0].id as Id)
+		if (currentVersionId === undefined && allVersions.docs[0]?.exists()) setCurrentVersionId(allVersions.docs[0].id)
 	}, [currentVersionId, setCurrentVersionId, allVersions.docs])
 
 	const addVersion = async (): Promise<DocumentReference<Version>> => {
-		const firstItem = storyMapItems.docs[0]
-		if (!firstItem) return
 		if (!newVersionInputValue) throw new Error(`Version name is required.`)
 		const existingDoc = (
-			await getDocs(
-				query(
-					collection(db, `StoryMapStates`, storyMapState.id, `Versions`),
-					where(`name`, `==`, newVersionInputValue),
-				),
-			)
+			await getDocs(query(collection(product.ref, `Versions`), where(`name`, `==`, newVersionInputValue)))
 		).docs[0]
 		if (existingDoc) throw new Error(`Version already exists.`)
 
 		const data: Version = {
+			deleted: false,
 			name: newVersionInputValue,
 		}
-		return await addDoc(
-			collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter),
-			data,
-		)
+		return await addDoc(collection(product.ref, `Versions`).withConverter(VersionConverter), data)
 	}
 
 	return (
 		<Tabs
 			tabPosition="right"
 			onChange={(key) => {
-				if (key !== `__NEW_VERSION__`) setCurrentVersionId(key as Id)
+				if (key !== `__NEW_VERSION__`) setCurrentVersionId(key)
 			}}
 			activeKey={currentVersionId}
 			items={allVersions.docs
-				.filter((version) => !versionsToBeDeleted.includes(version.id as Id))
+				.filter((version) => !versionsToBeDeleted.includes(version.id))
 				.sort((a, b) => a.data().name.localeCompare(b.data().name))
 				.map((version) => ({
-					key: version.id as Id | string,
+					key: version.id,
 					label: (
 						<div className="flex w-full justify-between gap-1">
 							<p className="overflow-hidden truncate">{version.data().name}</p>
@@ -87,13 +79,13 @@ const VersionList: FC<VersionListProps> = ({
 									type="button"
 									onClick={(e) => {
 										e.stopPropagation()
-										if (currentVersionId === version.id) setCurrentVersionId(`__ALL_VERSIONS__`)
-										setVersionsToBeDeleted((versions) => [...versions, version.id as Id])
-										const itemsWithVersion = Object.entries(storyMapState.data().items)
-											.filter(([, item]) => item?.versionId === version.id)
-											.map(([id]) => id)
+										if (currentVersionId === version.id) setCurrentVersionId(AllVersions)
+										setVersionsToBeDeleted((versions) => [...versions, version.id])
+										const itemsWithVersion = storyMapItems.docs
+											.filter((item) => item.data().versionId === version.id)
+											.map((item) => item.id)
 										itemsWithVersion.forEach((id) => {
-											setItemsToBeDeleted((items) => [...items, id as Id])
+											setItemsToBeDeleted((items) => [...items, id])
 										})
 									}}
 								>
@@ -105,7 +97,7 @@ const VersionList: FC<VersionListProps> = ({
 				}))
 				.concat([
 					{
-						key: `__ALL_VERSIONS__`,
+						key: AllVersions,
 						label: (
 							<p data-all className="text-left">
 								All
@@ -130,7 +122,7 @@ const VersionList: FC<VersionListProps> = ({
 														addVersion()
 															.then((doc) => {
 																setNewVersionInputValue(undefined)
-																setCurrentVersionId(doc.id as Id)
+																setCurrentVersionId(doc.id)
 															})
 															.catch(console.error)
 												}}

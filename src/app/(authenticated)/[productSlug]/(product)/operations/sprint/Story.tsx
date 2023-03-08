@@ -11,23 +11,14 @@ import {useGenMeta} from "~/app/(authenticated)/[productSlug]/(product)/map/meta
 import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/map/StoryDrawer"
 
 export type StoryProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapItem>
+	storyMapItems: QuerySnapshot<StoryMapItem>
 	allVersions: QuerySnapshot<Version>
 	storyId: Id
 }
 
-const Story: FC<StoryProps> = ({storyMapState, allVersions, storyId}) => {
+const Story: FC<StoryProps> = ({storyMapItems, allVersions, storyId}) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const [isBeingDragged, setIsBeingDragged] = useState(false)
-
-	const meta = useGenMeta({
-		storyMapState,
-		allVersions,
-		currentVersionId: `__ALL_VERSIONS__`,
-		editMode: false,
-		itemsToBeDeleted: [],
-		setItemsToBeDeleted: () => {},
-	})
 
 	return (
 		<>

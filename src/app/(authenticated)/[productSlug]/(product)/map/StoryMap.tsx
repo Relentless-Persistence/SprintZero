@@ -105,25 +105,6 @@ const StoryMap: FC<StoryMapProps> = ({
 		collection(db, `Products`, activeProductId, `Versions`).withConverter(VersionConverter),
 	)
 
-	const _epics = sortEpics(getEpics(storyMapItems).filter((epic) => !itemsToBeDeleted.includes(epic.id)))
-	const epics = _epics.map((epic) => ({
-		...epic.data(),
-		id: epic.id,
-		childrenIds: _features.filter((feature) => feature.data().parentId === epic.id).map((feature) => feature.id),
-		position: _epics.findIndex((sibling) => sibling.id === epic.id),
-	}))
-	const _features = sortFeatures(getFeatures(storyMapItems).filter((feature) => !itemsToBeDeleted.includes(feature.id)))
-	const features = _features.map((feature) => {
-		const siblings = _features.filter((sibling) => sibling.data().parentId === feature.data().parentId)
-		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
-
-		return {
-			...feature.data(),
-			id: feature.id,
-			childrenIds: _stories.filter((story) => story.data().parentId === feature.id).map((story) => story.id),
-			position,
-		}
-	})
 	const _stories = sortStories(
 		getStories(storyMapItems).filter((story) => !itemsToBeDeleted.includes(story.id)),
 		allVersions,
@@ -141,6 +122,25 @@ const StoryMap: FC<StoryMapProps> = ({
 			position,
 		}
 	})
+	const _features = sortFeatures(getFeatures(storyMapItems).filter((feature) => !itemsToBeDeleted.includes(feature.id)))
+	const features = _features.map((feature) => {
+		const siblings = _features.filter((sibling) => sibling.data().parentId === feature.data().parentId)
+		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
+
+		return {
+			...feature.data(),
+			id: feature.id,
+			childrenIds: _stories.filter((story) => story.data().parentId === feature.id).map((story) => story.id),
+			position,
+		}
+	})
+	const _epics = sortEpics(getEpics(storyMapItems).filter((epic) => !itemsToBeDeleted.includes(epic.id)))
+	const epics = _epics.map((epic) => ({
+		...epic.data(),
+		id: epic.id,
+		childrenIds: _features.filter((feature) => feature.data().parentId === epic.id).map((feature) => feature.id),
+		position: _epics.findIndex((sibling) => sibling.id === epic.id),
+	}))
 
 	// When I send an update to the server, I want to wait until the operation is complete before allowing drag events to
 	// be processed again.
@@ -148,7 +148,7 @@ const StoryMap: FC<StoryMapProps> = ({
 		undefined,
 	)
 	const onPan = async () => {
-		if (dragInfo.itemBeingDraggedId === undefined) return
+		if (dragInfo.itemBeingDraggedId === undefined || !product?.exists()) return
 
 		if (operationCompleteCondition.current) {
 			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
@@ -185,8 +185,8 @@ const StoryMap: FC<StoryMapProps> = ({
 							return currentEpicNewPos < prevEpicNewPos
 						}
 						await Promise.all([
-							updateItem(storyMapItems, prevEpic!.id, {userValue: currentEpic.userValue}, allVersions),
-							updateItem(storyMapItems, currentEpic.id, {userValue: prevEpic!.userValue}, allVersions),
+							updateItem(product, storyMapItems, prevEpic!.id, {userValue: currentEpic.userValue}, allVersions),
+							updateItem(product, storyMapItems, currentEpic.id, {userValue: prevEpic!.userValue}, allVersions),
 						])
 					} else if (x > boundaryRight) {
 						operationCompleteCondition.current = (storyMapItems) => {
@@ -197,8 +197,8 @@ const StoryMap: FC<StoryMapProps> = ({
 							return currentEpicNewPos > nextEpicNewPos
 						}
 						await Promise.all([
-							updateItem(storyMapItems, nextEpic!.id, {userValue: currentEpic.userValue}, allVersions),
-							updateItem(storyMapItems, currentEpic.id, {userValue: nextEpic!.userValue}, allVersions),
+							updateItem(product, storyMapItems, nextEpic!.id, {userValue: currentEpic.userValue}, allVersions),
+							updateItem(product, storyMapItems, currentEpic.id, {userValue: nextEpic!.userValue}, allVersions),
 						])
 					}
 				} else {
@@ -256,6 +256,7 @@ const StoryMap: FC<StoryMapProps> = ({
 					}
 					await Promise.all([
 						updateItem(
+							product,
 							storyMapItems,
 							itemBeingDragged.id,
 							{
@@ -266,11 +267,13 @@ const StoryMap: FC<StoryMapProps> = ({
 							allVersions,
 						),
 						// Delete child features, keep grandchild stories
-						...itemBeingDragged.childrenIds.map((featureId) => deleteItem(storyMapItems, featureId)),
+						...itemBeingDragged.childrenIds.map((featureId) => deleteItem(product, storyMapItems, featureId)),
 						...itemBeingDragged.childrenIds.flatMap((featureId) =>
 							stories
 								.filter((story) => story.parentId === featureId)
-								.map((story) => updateItem(storyMapItems, story.id, {parentId: itemBeingDragged.id}, allVersions)),
+								.map((story) =>
+									updateItem(product, storyMapItems, story.id, {parentId: itemBeingDragged.id}, allVersions),
+								),
 						),
 					])
 				}
@@ -308,6 +311,7 @@ const StoryMap: FC<StoryMapProps> = ({
 					}
 					await Promise.all([
 						updateItem(
+							product,
 							storyMapItems,
 							itemBeingDragged.id,
 							{
@@ -321,6 +325,7 @@ const StoryMap: FC<StoryMapProps> = ({
 						// Move child stories to feature level
 						...itemBeingDragged.childrenIds.map((storyId, i) =>
 							updateItem(
+								product,
 								storyMapItems,
 								storyId,
 								{
@@ -375,6 +380,7 @@ const StoryMap: FC<StoryMapProps> = ({
 								)
 							}
 							await updateItem(
+								product,
 								storyMapItems,
 								dragInfo.itemBeingDraggedId,
 								{
@@ -402,6 +408,7 @@ const StoryMap: FC<StoryMapProps> = ({
 								return getItemType(storyMapItems, item.id) === `feature` && item.data().parentId === newParent.id
 							}
 							await updateItem(
+								product,
 								storyMapItems,
 								dragInfo.itemBeingDraggedId,
 								{
@@ -438,8 +445,14 @@ const StoryMap: FC<StoryMapProps> = ({
 								return item?.data().userValue === prevFeature?.data().userValue
 							}
 							await Promise.all([
-								updateItem(storyMapItems, prevFeature!.id, {userValue: currentFeature.userValue}, allVersions),
-								updateItem(storyMapItems, currentFeature.id, {userValue: prevFeature!.data().userValue}, allVersions),
+								updateItem(product, storyMapItems, prevFeature!.id, {userValue: currentFeature.userValue}, allVersions),
+								updateItem(
+									product,
+									storyMapItems,
+									currentFeature.id,
+									{userValue: prevFeature!.data().userValue},
+									allVersions,
+								),
 							])
 						} else if (x > rightBoundary) {
 							operationCompleteCondition.current = (storyMapItems) => {
@@ -448,8 +461,14 @@ const StoryMap: FC<StoryMapProps> = ({
 								return item!.data().userValue === nextFeature!.data().userValue
 							}
 							await Promise.all([
-								updateItem(storyMapItems, nextFeature!.id, {userValue: currentFeature.userValue}, allVersions),
-								updateItem(storyMapItems, currentFeature.id, {userValue: nextFeature!.data().userValue}, allVersions),
+								updateItem(product, storyMapItems, nextFeature!.id, {userValue: currentFeature.userValue}, allVersions),
+								updateItem(
+									product,
+									storyMapItems,
+									currentFeature.id,
+									{userValue: nextFeature!.data().userValue},
+									allVersions,
+								),
 							])
 						}
 					}
@@ -496,6 +515,7 @@ const StoryMap: FC<StoryMapProps> = ({
 					}
 					await Promise.all([
 						updateItem(
+							product,
 							storyMapItems,
 							dragInfo.itemBeingDraggedId,
 							{
@@ -509,7 +529,7 @@ const StoryMap: FC<StoryMapProps> = ({
 							allVersions,
 						),
 						// Delete all children
-						...featureBeingDragged.childrenIds.map((childId) => deleteItem(storyMapItems, childId)),
+						...featureBeingDragged.childrenIds.map((childId) => deleteItem(product, storyMapItems, childId)),
 					])
 				}
 				break
@@ -553,7 +573,13 @@ const StoryMap: FC<StoryMapProps> = ({
 						if (getItemType(storyMapItems, storyBeingDragged.id) !== `story`) return false
 						return item.data().parentId === hoveringFeatureId
 					}
-					await updateItem(storyMapItems, dragInfo.itemBeingDraggedId, {parentId: hoveringFeatureId}, allVersions)
+					await updateItem(
+						product,
+						storyMapItems,
+						dragInfo.itemBeingDraggedId,
+						{parentId: hoveringFeatureId},
+						allVersions,
+					)
 				} else {
 					// Story to feature
 					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
@@ -601,6 +627,7 @@ const StoryMap: FC<StoryMapProps> = ({
 					}
 
 					await updateItem(
+						product,
 						storyMapItems,
 						dragInfo.itemBeingDraggedId,
 						{
@@ -630,6 +657,11 @@ const StoryMap: FC<StoryMapProps> = ({
 		if (x < 248) onScroll(Math.max(-10, -(248 - x) / 10))
 		else if (x > window.innerWidth - 144) onScroll(Math.min(10, (x - window.innerWidth + 144) / 10))
 	})
+
+	const surrogateParentPos = {
+		x: useTransform(dragInfo.mousePos[0], (x) => x - dragInfo.offsetToTopLeft[0]),
+		y: useTransform(dragInfo.mousePos[1], (y) => y - dragInfo.offsetToTopLeft[1]),
+	}
 
 	if (!product?.exists()) return null
 	return (
@@ -698,7 +730,7 @@ const StoryMap: FC<StoryMapProps> = ({
 										<button
 											type="button"
 											onClick={() => {
-												addFeature(storyMapItems, {parentId: epic.id}, user!.id).catch(console.error)
+												addFeature(product, storyMapItems, {parentId: epic.id}, user!.id).catch(console.error)
 											}}
 											className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[0.6rem] text-white"
 										>
@@ -734,12 +766,12 @@ const StoryMap: FC<StoryMapProps> = ({
 										<div className="h-8 w-px border border-border" />
 									)}
 
-									{stories.length === 0 && currentVersionId !== `__ALL_VERSIONS__` && !editMode && (
+									{stories.length === 0 && currentVersionId !== AllVersions && !editMode && (
 										<button
 											type="button"
 											onClick={() => {
 												if (currentVersionId !== AllVersions && user)
-													addStory(storyMapItems, {parentId: feature.id}, user.id, currentVersionId).catch(
+													addStory(product, storyMapItems, {parentId: feature.id}, user.id, currentVersionId).catch(
 														console.error,
 													)
 											}}
@@ -750,13 +782,14 @@ const StoryMap: FC<StoryMapProps> = ({
 										</button>
 									)}
 
-									{stories.length > 0 && (
+									{stories.length > 0 && versions && (
 										<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-border p-3">
 											{stories.map((story) => (
 												<div key={story.id} className={clsx(dragInfo.itemBeingDraggedId === story.id && `invisible`)}>
 													<Story
 														product={product}
 														storyMapItems={storyMapItems}
+														versions={versions}
 														storyId={story.id}
 														editMode={editMode}
 														onMarkForDeletion={() => {
@@ -771,7 +804,7 @@ const StoryMap: FC<StoryMapProps> = ({
 													type="button"
 													onClick={() => {
 														if (currentVersionId !== AllVersions && user)
-															addStory(storyMapItems, {parentId: feature.id}, user.id, currentVersionId).catch(
+															addStory(product, storyMapItems, {parentId: feature.id}, user.id, currentVersionId).catch(
 																console.error,
 															)
 													}}
@@ -791,7 +824,7 @@ const StoryMap: FC<StoryMapProps> = ({
 						<button
 							type="button"
 							onClick={() => {
-								addFeature(storyMapItems, {parentId: epic.id}, user!.id).catch(console.error)
+								addFeature(product, storyMapItems, {parentId: epic.id}, user!.id).catch(console.error)
 							}}
 							className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378] dark:bg-black dark:text-[#00a2c4]"
 						>
@@ -806,7 +839,7 @@ const StoryMap: FC<StoryMapProps> = ({
 				<button
 					type="button"
 					onClick={() => {
-						addEpic(storyMapItems, {}, user!.id).catch(console.error)
+						addEpic(product, storyMapItems, {}, user!.id).catch(console.error)
 					}}
 					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] dark:bg-black dark:text-[#6b44f8]"
 					data-testid="add-epic"
@@ -817,17 +850,9 @@ const StoryMap: FC<StoryMapProps> = ({
 			)}
 
 			{/* Surrogate parent for story map items as they're being dragged (the real item in the tree is made invisible) */}
-			<motion.div
-				className="fixed top-0 left-0 z-20 cursor-grabbing"
-				style={{
-					// eslint-disable-next-line react-hooks/rules-of-hooks
-					x: useTransform(dragInfo.mousePos[0], (x) => x - dragInfo.offsetToTopLeft[0]),
-					// eslint-disable-next-line react-hooks/rules-of-hooks
-					y: useTransform(dragInfo.mousePos[1], (y) => y - dragInfo.offsetToTopLeft[1]),
-				}}
-			>
+			<motion.div className="fixed top-0 left-0 z-20 cursor-grabbing" style={surrogateParentPos}>
 				{(() => {
-					if (!dragInfo.itemBeingDraggedId) return null
+					if (!dragInfo.itemBeingDraggedId || !versions) return null
 					switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 						case `epic`:
 							return (
@@ -860,6 +885,7 @@ const StoryMap: FC<StoryMapProps> = ({
 								<Story
 									product={product}
 									storyMapItems={storyMapItems}
+									versions={versions}
 									storyId={dragInfo.itemBeingDraggedId}
 									editMode={editMode}
 									onMarkForDeletion={() => {

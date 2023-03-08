@@ -3,38 +3,37 @@ import {sortBy} from "lodash"
 
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 
 import Story from "./Story"
-import {getStories} from "~/utils/storyMap"
+import {AllVersions, getStories} from "~/utils/storyMap"
 import {useUser} from "~/utils/useUser"
 
 export type SprintColumnProps = {
 	columnName: string
 	title: string
-	storyMapState: QueryDocumentSnapshot<StoryMapItem>
+	storyMapItems: QuerySnapshot<StoryMapItem>
 	allVersions: QuerySnapshot<Version>
-	currentVersionId: Id | `__ALL_VERSIONS__`
+	currentVersionId: string | typeof AllVersions
 	myStoriesOnly: boolean
 }
 
 const SprintColumn: FC<SprintColumnProps> = ({
 	columnName,
 	title,
-	storyMapState,
+	storyMapItems,
 	allVersions,
 	currentVersionId,
 	myStoriesOnly,
 }) => {
 	const user = useUser()
 	const stories = sortBy(
-		getStories(storyMapState.data().items)
-			.filter((story) => story.sprintColumn === columnName)
-			.filter((story) => (currentVersionId === `__ALL_VERSIONS__` ? true : story.versionId === currentVersionId))
-			.filter((story) => (myStoriesOnly && user ? story.peopleIds.includes(user.id as Id) : true)),
-		[(el) => el.updatedAt.toMillis()],
+		getStories(storyMapItems)
+			.filter((story) => story.data().sprintColumn === columnName)
+			.filter((story) => (currentVersionId === AllVersions ? true : story.data().versionId === currentVersionId))
+			.filter((story) => (myStoriesOnly && user ? story.data().peopleIds.includes(user.id) : true)),
+		[(el) => el.data().updatedAt.toMillis()],
 	)
 
 	return (
@@ -46,7 +45,7 @@ const SprintColumn: FC<SprintColumnProps> = ({
 		>
 			<div className="flex flex-col gap-4">
 				{stories.map((story) => (
-					<Story key={story.id} storyMapState={storyMapState} allVersions={allVersions} storyId={story.id} />
+					<Story key={story.id} storyMapState={storyMapItems} allVersions={allVersions} storyId={story.id} />
 				))}
 			</div>
 		</Card>

@@ -14,18 +14,20 @@ import {Avatar, Button, Checkbox, Drawer, Form, Input, Popover, Segmented, Tag} 
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {collection, doc, getDoc} from "firebase/firestore"
+import {doc, getDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useCollection, useDocument, useDocumentData} from "react-firebase-hooks/firestore"
+import {useDocument} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {useInterval} from "react-use"
 
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
+import type {Product} from "~/types/db/Products"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 import type {User} from "~/types/db/Users"
 
 import Comments from "~/components/Comments"
@@ -33,16 +35,13 @@ import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {ProductConverter} from "~/types/db/Products"
 import {StoryMapItemSchema, sprintColumns} from "~/types/db/Products/StoryMapItems"
-import {VersionConverter} from "~/types/db/Products/Versions"
 import {UserConverter} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {deleteItem, updateItem} from "~/utils/storyMap"
 import {useTheme} from "~/utils/ThemeContext"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
 
@@ -59,13 +58,15 @@ const formSchema = StoryMapItemSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
+	product: QueryDocumentSnapshot<Product>
 	storyMapItems: QuerySnapshot<StoryMapItem>
+	versions: QuerySnapshot<Version>
 	storyId: string
 	isOpen: boolean
 	onClose: () => void
 }
 
-const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onClose}) => {
+const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, storyId, isOpen, onClose}) => {
 	const [editMode, setEditMode] = useState(false)
 	const [newAcceptanceCriterionInput, setNewAcceptanceCriterionInput] = useState(``)
 	const [newBugInput, setNewBugInput] = useState(``)
@@ -89,11 +90,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 		setDescription(story.data().description)
 	}, [story])
 
-	const activeProductId = useActiveProductId()
-	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-
 	const teamMembers = useQueries({
-		queries: Object.keys(product?.members ?? {}).map((userId) => ({
+		queries: Object.keys(product.data().members).map((userId) => ({
 			queryKey: [`user`, userId],
 			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
 		})),
@@ -114,19 +112,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 		},
 	})
 
-	const [versions] = useCollection(
-		collection(db, `Products`, activeProductId, `Versions`).withConverter(VersionConverter),
-	)
-
 	const onSubmit = handleSubmit(async (data) => {
-		if (!versions) return
-		await updateItem(storyMapItems, story.id, data, versions)
+		await updateItem(product, storyMapItems, story.id, data, versions)
 		setEditMode(false)
 	})
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
-		if (!versions) return
 		await updateItem(
+			product,
 			storyMapItems,
 			story.id,
 			{
@@ -140,8 +133,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 	}
 
 	const addAcceptanceCriterion = async () => {
-		if (!newAcceptanceCriterionInput || !versions) return
+		if (!newAcceptanceCriterionInput) return
 		await updateItem(
+			product,
 			storyMapItems,
 			story.id,
 			{
@@ -155,8 +149,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 	}
 
 	const toggleBug = async (id: string, checked: boolean) => {
-		if (!versions) return
 		await updateItem(
+			product,
 			storyMapItems,
 			story.id,
 			{
@@ -170,8 +164,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 	}
 
 	const addBug = async () => {
-		if (!newBugInput || !versions) return
+		if (!newBugInput) return
 		await updateItem(
+			product,
 			storyMapItems,
 			story.id,
 			{
@@ -210,7 +205,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 							type="primary"
 							danger
 							onClick={() => {
-								deleteItem(storyMapItems, story.id).catch(console.error)
+								deleteItem(product, storyMapItems, story.id).catch(console.error)
 							}}
 						>
 							Delete
@@ -225,9 +220,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 									value={localStoryName}
 									className="absolute inset-0 bg-transparent"
 									onChange={(e) => {
-										if (!versions) return
 										setLocalStoryName(e.target.value)
-										updateItem(storyMapItems, story.id, {name: e.target.value}, versions).catch(console.error)
+										updateItem(product, storyMapItems, story.id, {name: e.target.value}, versions).catch(console.error)
 									}}
 								/>
 							</div>
@@ -244,14 +238,19 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 								</Tag>
 								<Tag
 									color={
-										typeof product?.effortCost === `number` ? `#585858` : theme === `light` ? `#f5f5f5` : `#333333`
+										typeof product.data().effortCost === `number`
+											? `#585858`
+											: theme === `light`
+											? `#f5f5f5`
+											: `#333333`
 									}
 									icon={<DollarOutlined />}
 									className={clsx(
-										typeof product?.effortCost !== `number` && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
+										typeof product.data().effortCost !== `number` &&
+											`!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
 									)}
 								>
-									{dollarFormat((product?.effortCost ?? 0) * totalEffort)}
+									{dollarFormat((product.data().effortCost ?? 0) * totalEffort)}
 								</Tag>
 								<Tag color="#585858" icon={<FlagOutlined />}>
 									{sprintColumns[story.data().sprintColumn]}
@@ -371,15 +370,13 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 						<Form.Item label={<span className="font-semibold">Engineering</span>}>
 							<RhfSegmented control={control} name="engineeringEffort" options={[1, 2, 3, 5, 8, 13]} />
 						</Form.Item>
-						{versions && (
-							<Form.Item label={<span className="font-semibold">Version</span>} className="shrink-0 basis-20">
-								<RhfSelect
-									control={control}
-									name="versionId"
-									options={versions.docs.map((version) => ({label: version.data().name, value: version.id}))}
-								/>
-							</Form.Item>
-						)}
+						<Form.Item label={<span className="font-semibold">Version</span>} className="shrink-0 basis-20">
+							<RhfSelect
+								control={control}
+								name="versionId"
+								options={versions.docs.map((version) => ({label: version.data().name, value: version.id}))}
+							/>
+						</Form.Item>
 						<Form.Item label={<span className="font-semibold">Status</span>} className="shrink-0 basis-56">
 							<RhfSelect
 								control={control}
@@ -423,16 +420,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 								rows={3}
 								value={description}
 								onChange={(e) => {
-									if (!versions) return
 									setDescription(e.target.value)
-									updateItem(
-										storyMapItems,
-										story.id,
-										{
-											description: e.target.value,
-										},
-										versions,
-									).catch(console.error)
+									updateItem(product, storyMapItems, story.id, {description: e.target.value}, versions).catch(
+										console.error,
+									)
 								}}
 								className="max-h-[calc(100%-2rem)]"
 							/>
@@ -525,8 +516,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 								flagged={story.data().ethicsColumn !== null}
 								commentType={commentType}
 								onFlag={() => {
-									if (!versions) return
-									updateItem(storyMapItems, story.id, {ethicsColumn: `underReview`}, versions).catch(console.error)
+									updateItem(product, storyMapItems, story.id, {ethicsColumn: `underReview`}, versions).catch(
+										console.error,
+									)
 								}}
 							/>
 						</div>

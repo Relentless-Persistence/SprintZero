@@ -16,13 +16,13 @@ import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import SprintColumn from "./SprintColumn"
 import {ProductConverter} from "~/types/db/Products"
 import {StoryMapItemConverter, sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
+import {AllVersions} from "~/utils/storyMap"
 import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
@@ -68,7 +68,7 @@ const SprintClientPage: FC = () => {
 			: undefined,
 	)
 
-	const [currentVersionId, setCurrentVersionId] = useState<Id | `__ALL_VERSIONS__`>(`__ALL_VERSIONS__`)
+	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions>(AllVersions)
 
 	return (
 		<div className="flex h-full flex-col gap-4">
@@ -92,7 +92,7 @@ const SprintClientPage: FC = () => {
 								value={currentVersionId}
 								onChange={(value) => setCurrentVersionId(value)}
 								options={[
-									{label: `All versions`, value: `__ALL_VERSIONS__`},
+									{label: `All versions`, value: AllVersions},
 									...versions.docs.map((version) => ({
 										label: `Version ${version.data().name}`,
 										value: version.id,

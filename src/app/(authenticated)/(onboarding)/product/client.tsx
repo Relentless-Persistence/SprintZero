@@ -10,7 +10,6 @@ import querystring from "querystring"
 import {useState} from "react"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 
 import Slide1 from "./Slide1"
@@ -53,9 +52,9 @@ const ProductSetupClientPage: FC = () => {
 		if (email1 === email2) email2 = null
 		if (email1 === email3) email3 = null
 		if (email2 === email3) email3 = null
-		const members = {[user.id as Id]: {type: `owner`} as const}
+		const members = {[user.id]: {type: `owner`} as const}
 
-		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
+		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}`
 		// eslint-disable-next-line @typescript-eslint/require-await -- Callback requires Promise return
 		await runTransaction(db, async (transaction) => {
 			transaction.set(doc(db, `Products`, slug).withConverter(ProductConverter), {
@@ -64,7 +63,7 @@ const ProductSetupClientPage: FC = () => {
 				members,
 
 				storyMapCurrentHistoryId: null,
-				storyMapUpdatedAt: serverTimestamp(),
+				storyMapUpdatedAt: Timestamp.now(),
 
 				businessOutcomes: [],
 				marketLeaders: [],
@@ -143,7 +142,6 @@ const ProductSetupClientPage: FC = () => {
 
 			await setDoc(doc(db, `Products`, slug, `ProductInvites`, inviteToken).withConverter(InviteConverter), {
 				email: recipient,
-				productId: slug,
 			})
 
 			await sendEmail.mutateAsync({

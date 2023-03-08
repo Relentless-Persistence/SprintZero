@@ -13,6 +13,7 @@ import {nanoid} from "nanoid"
 
 import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
 import type {Opaque, SetRequired} from "type-fest"
+import type {Product} from "~/types/db/Products"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 
@@ -22,34 +23,31 @@ import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
 import {HistoryItemConverter} from "~/types/db/Products/StoryMapHistories/HistoryItems"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 
-export const addHistoryEntry = debounce(async (storyMapItems: QuerySnapshot<StoryMapItem>) => {
-	const firstItem = storyMapItems.docs[0]
-	if (!firstItem) return
+export const addHistoryEntry = debounce(
+	async (product: QueryDocumentSnapshot<Product>, storyMapItems: QuerySnapshot<StoryMapItem>) => {
+		const firstItem = storyMapItems.docs[0]
+		if (!firstItem) return
 
-	// eslint-disable-next-line @typescript-eslint/require-await
-	await runTransaction(db, async (transaction) => {
-		const historyId = nanoid()
-		transaction.set(
-			doc(db, firstItem.ref.parent.parent!.path, `StoryMapHistories`, historyId).withConverter(
-				StoryMapHistoryConverter,
-			),
-			{
+		// eslint-disable-next-line @typescript-eslint/require-await
+		await runTransaction(db, async (transaction) => {
+			const historyId = nanoid()
+			transaction.set(doc(product.ref, `StoryMapHistories`, historyId).withConverter(StoryMapHistoryConverter), {
 				future: false,
 				timestamp: serverTimestamp(),
-			},
-		)
-		storyMapItems.forEach((item) => {
-			transaction.set(
-				doc(db, item.ref.parent.parent!.path, `StoryMapHistories`, historyId, `HistoryItems`, item.id).withConverter(
-					HistoryItemConverter,
-				),
-				item.data(),
-			)
+			})
+			storyMapItems.forEach((item) => {
+				transaction.set(
+					doc(product.ref, `StoryMapHistories`, historyId, `HistoryItems`, item.id).withConverter(HistoryItemConverter),
+					item.data(),
+				)
+			})
 		})
-	})
-}, 1000)
+	},
+	1000,
+)
 
 export const updateItem = async (
+	product: QueryDocumentSnapshot<Product>,
 	storyMapItems: QuerySnapshot<StoryMapItem>,
 	id: string,
 	data: WithFieldValue<Partial<StoryMapItem>>,
@@ -63,41 +61,41 @@ export const updateItem = async (
 		updatedAt: serverTimestamp(),
 	})
 
-	const newItems = await getDocs(
-		collection(db, item.ref.parent.path, `StoryMapItems`).withConverter(StoryMapItemConverter),
-	)
+	const newItems = await getDocs(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
 
 	if (
 		JSON.stringify(getStoryMapShape(oldItems, allVersions)) !== JSON.stringify(getStoryMapShape(newItems, allVersions))
 	)
-		await addHistoryEntry(storyMapItems)
+		await addHistoryEntry(product, storyMapItems)
 }
 
-export const deleteItem = async (storyMapItems: QuerySnapshot<StoryMapItem>, id: string): Promise<void> => {
+export const deleteItem = async (
+	product: QueryDocumentSnapshot<Product>,
+	storyMapItems: QuerySnapshot<StoryMapItem>,
+	id: string,
+): Promise<void> => {
 	const item = storyMapItems.docs.find((item) => item.id === id)!
 	await updateDoc(item.ref, {
 		deleted: true,
 	})
-	await addHistoryEntry(storyMapItems)
+	await addHistoryEntry(product, storyMapItems)
 }
 
 export const addEpic = async (
+	product: QueryDocumentSnapshot<Product>,
 	storyMapItems: QuerySnapshot<StoryMapItem>,
 	data: Partial<StoryMapItem>,
 	userId: string,
 ): Promise<void> => {
-	const epics = getEpics(storyMapItems)
-	const firstEpic = epics[0]
-	if (!firstEpic) return
-	const lastEpic = epics.reduce((acc, cur) => (cur.data().userValue > acc.data().userValue ? cur : acc), firstEpic)
+	const epics = sortEpics(getEpics(storyMapItems))
 
-	await addDoc(firstEpic.ref.parent, {
+	await addDoc(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter), {
 		createdAt: Timestamp.now(),
 		deleted: false,
 		description: ``,
 		effort: 0.5,
 		name: `Epic ${epics.length + 1}`,
-		userValue: avg(lastEpic.data().userValue, 1),
+		userValue: avg(epics.at(-1)?.data().userValue ?? 0, 1),
 		keeperIds: [],
 
 		acceptanceCriteria: [],
@@ -118,7 +116,7 @@ export const addEpic = async (
 		versionId: null,
 		...data,
 	})
-	await addHistoryEntry(storyMapItems)
+	await addHistoryEntry(product, storyMapItems)
 }
 
 export const getEpics = (storyMapItems: QuerySnapshot<StoryMapItem>): Array<QueryDocumentSnapshot<StoryMapItem>> => {
@@ -136,25 +134,20 @@ export const sortEpics = (
 		.sort((a, b) => a.data().userValue - b.data().userValue)
 
 export const addFeature = async (
+	product: QueryDocumentSnapshot<Product>,
 	storyMapItems: QuerySnapshot<StoryMapItem>,
 	data: SetRequired<Partial<StoryMapItem>, `parentId`>,
 	userId: string,
 ): Promise<void> => {
-	const features = getFeatures(storyMapItems)
-	const firstFeature = features[0]
-	if (!firstFeature) return
-	const lastFeature = features.reduce(
-		(acc, cur) => (cur.data().userValue > acc.data().userValue ? cur : acc),
-		firstFeature,
-	)
+	const features = sortFeatures(getFeatures(storyMapItems))
 
-	await addDoc(firstFeature.ref.parent, {
+	await addDoc(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter), {
 		createdAt: Timestamp.now(),
 		deleted: false,
 		description: ``,
 		effort: 0.5,
 		name: `Feature ${features.length + 1}`,
-		userValue: avg(lastFeature.data().userValue, 1),
+		userValue: avg(features.at(-1)?.data().userValue ?? 0, 1),
 
 		acceptanceCriteria: [],
 		branchName: null,
@@ -174,7 +167,7 @@ export const addFeature = async (
 		versionId: null,
 		...data,
 	})
-	await addHistoryEntry(storyMapItems)
+	await addHistoryEntry(product, storyMapItems)
 }
 
 export const getFeatures = (storyMapItems: QuerySnapshot<StoryMapItem>): Array<QueryDocumentSnapshot<StoryMapItem>> => {
@@ -197,6 +190,7 @@ export const sortFeatures = (
 		.sort((a, b) => a.data().userValue - b.data().userValue)
 
 export const addStory = async (
+	product: QueryDocumentSnapshot<Product>,
 	storyMapItems: QuerySnapshot<StoryMapItem>,
 	data: SetRequired<Partial<StoryMapItem>, `parentId`>,
 	userId: string,
@@ -205,10 +199,7 @@ export const addStory = async (
 	if (currentVersionId === AllVersions) return
 
 	const stories = getStories(storyMapItems)
-	const firstStory = stories[0]
-	if (!firstStory) return
-
-	await addDoc(firstStory.ref.parent, {
+	await addDoc(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter), {
 		acceptanceCriteria: [],
 		branchName: null,
 		bugs: [],
@@ -234,7 +225,7 @@ export const addStory = async (
 		keeperIds: [],
 		...data,
 	})
-	await addHistoryEntry(storyMapItems)
+	await addHistoryEntry(product, storyMapItems)
 }
 
 export const getStories = (storyMapItems: QuerySnapshot<StoryMapItem>): Array<QueryDocumentSnapshot<StoryMapItem>> => {

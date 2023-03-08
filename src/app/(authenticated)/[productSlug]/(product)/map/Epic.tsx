@@ -72,7 +72,7 @@ const Epic: FC<EpicProps> = ({product, storyMapItems, epicId, editMode, onMarkFo
 						onChange={(e) => {
 							if (!versions) return
 							setLocalEpicName(e.target.value)
-							updateItem(storyMapItems, epic.id, {name: e.target.value}, versions).catch(console.error)
+							updateItem(product, storyMapItems, epic.id, {name: e.target.value}, versions).catch(console.error)
 						}}
 						onPointerDownCapture={(e) => e.stopPropagation()}
 					/>

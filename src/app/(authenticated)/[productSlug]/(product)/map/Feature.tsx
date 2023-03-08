@@ -71,7 +71,7 @@ const Feature: FC<FeatureProps> = ({product, storyMapItems, featureId, editMode,
 						onChange={(e) => {
 							if (!versions) return
 							setLocalFeatureName(e.target.value)
-							updateItem(storyMapItems, feature.id, {name: e.target.value}, versions).catch(console.error)
+							updateItem(product, storyMapItems, feature.id, {name: e.target.value}, versions).catch(console.error)
 						}}
 						onPointerDownCapture={(e) => e.stopPropagation()}
 					/>
