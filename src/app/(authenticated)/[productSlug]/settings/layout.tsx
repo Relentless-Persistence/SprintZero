@@ -1,6 +1,7 @@
 "use client"
 
-import {Layout} from "antd"
+import {SelectOutlined} from "@ant-design/icons"
+import {Layout, Menu} from "antd"
 import {doc} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
@@ -8,6 +9,7 @@ import {useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC, ReactNode} from "react"
 
+import LinkTo from "~/components/LinkTo"
 import SideMenu from "./SideMenu"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
@@ -39,7 +41,19 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({children}) => {
 	return (
 		<>
 			<Layout.Sider theme="light">
-				<SideMenu />
+				<div className="h-full flex flex-col justify-between">
+					<SideMenu />
+					<Menu
+						items={[
+							{
+								key: `exit`,
+								icon: <SelectOutlined />,
+								label: <LinkTo href={`/${activeProductId}/map`}>Exit Settings</LinkTo>,
+							},
+						]}
+						className="content-baseline"
+					/>
+				</div>
 			</Layout.Sider>
 			<Layout.Content className="relative">{children}</Layout.Content>
 		</>
