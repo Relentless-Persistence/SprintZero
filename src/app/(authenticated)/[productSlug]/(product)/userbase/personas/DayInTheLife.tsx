@@ -1,4 +1,4 @@
-import {Button, Card, Empty, Input, Steps} from "antd"
+import {Button, Card, Empty, Input, Timeline} from "antd"
 import {useState} from "react"
 
 import type {FC} from "react"
@@ -17,8 +17,7 @@ export type EditableListCardProps = {
 }
 
 interface Ditl {
-  title: string,
-  description: string | null | undefined
+  children: string,
 }
 
 const DayInTheLife: FC<EditableListCardProps> = ({
@@ -37,8 +36,7 @@ const DayInTheLife: FC<EditableListCardProps> = ({
     const data: Ditl[] = [];
     list.map(item => {
       data.push({
-        title: item.text,
-        description: ``,
+        children: item.text,
       })
     })
     return data
@@ -93,10 +91,7 @@ const DayInTheLife: FC<EditableListCardProps> = ({
 			) : list.length === 0 ? (
 				<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
 			) : (
-				<Steps
-					progressDot
-					current={list.length}
-					direction="vertical"
+				<Timeline
 					items={items()}
 				/>
 			)}
