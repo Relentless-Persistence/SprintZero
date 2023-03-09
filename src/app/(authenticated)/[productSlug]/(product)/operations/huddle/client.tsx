@@ -58,6 +58,7 @@ const HuddleClientPage: FC = () => {
 	)
 
 	const user = useUser()
+
 	useEffect(() => {
 		if (!activeProduct?.exists() || !user) return
 		if (activeProduct.data().huddles[user.id as Id] === undefined) {
@@ -156,7 +157,7 @@ const HuddleClientPage: FC = () => {
 																				label: <span className="italic text-textTertiary">No more stories</span>,
 																			},
 																	  ]
-																	: blockerStoryOptions.map(([id, item]) => ({
+																	: blockerStoryOptions.filter((item) => item[1]?.peopleIds?.includes(user.id as Id)).map(([id, item]) => ({
 																			key: id,
 																			label: item?.name,
 																			onClick: async () => {
@@ -228,7 +229,7 @@ const HuddleClientPage: FC = () => {
 																				label: <span className="italic text-textTertiary">No more stories</span>,
 																			},
 																	  ]
-																	: todayStoryOptions.map(([id, item]) => ({
+																	: todayStoryOptions.filter((item) => item[1]?.peopleIds?.includes(user.id as Id)).map(([id, item]) => ({
 																			key: id,
 																			label: item?.name,
 																			onClick: async () => {
@@ -300,20 +301,22 @@ const HuddleClientPage: FC = () => {
 																				label: <span className="italic text-textTertiary">No more stories</span>,
 																			},
 																	  ]
-																	: yesterdayStoryOptions.map(([id, item]) => ({
-																			key: id,
-																			label: item?.name,
-																			onClick: async () => {
-																				const data: WithFieldValue<Partial<Product>> = {
-																					[`huddles.${huddleUser.id}.updatedAt`]: Timestamp.now(),
-																					[`huddles.${huddleUser.id}.yesterdayStoryIds`]: arrayUnion(id),
-																				}
-																				await updateDoc(
-																					doc(db, `Products`, activeProductId).withConverter(ProductConverter),
-																					data,
-																				)
-																			},
-																	  })),
+																	: yesterdayStoryOptions
+																			.filter((item) => item[1]?.peopleIds?.includes(user.id as Id))
+																			.map(([id, item]) => ({
+																				key: id,
+																				label: item?.name,
+																				onClick: async () => {
+																					const data: WithFieldValue<Partial<Product>> = {
+																						[`huddles.${huddleUser.id}.updatedAt`]: Timestamp.now(),
+																						[`huddles.${huddleUser.id}.yesterdayStoryIds`]: arrayUnion(id),
+																					}
+																					await updateDoc(
+																						doc(db, `Products`, activeProductId).withConverter(ProductConverter),
+																						data,
+																					)
+																				},
+																			})),
 														}}
 													>
 														<Button className="flex items-center justify-between">
