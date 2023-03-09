@@ -1,24 +1,21 @@
 "use client"
 
 import {Breadcrumb} from "antd"
-import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc, where} from "firebase/firestore"
+import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc} from "firebase/firestore"
 import {useState} from "react"
-import {useCollection, useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import EditableTextCard from "./EditableTextCard"
 import EditableTextListCard from "./EditableTextListCard"
+import {useProduct} from "~/app/(authenticated)/useProduct"
 import {PersonaConverter} from "~/types/db/Products/Personas"
-import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const KickoffClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const product = useProduct()
 	const [editingSection, setEditingSection] = useState<
 		| `problemStatement`
 		| `personas`
@@ -30,19 +27,15 @@ const KickoffClientPage: FC = () => {
 	>(undefined)
 
 	const [personas] = useCollection(
-		query(
-			collection(db, `Personas`),
-			where(`productId`, `==`, activeProductId),
-			orderBy(`createdAt`, `asc`),
-		).withConverter(PersonaConverter),
+		query(collection(product.ref, `Personas`), orderBy(`createdAt`, `asc`)).withConverter(PersonaConverter),
 	)
 
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
-			<Breadcrumb className="sticky top-0 z-10 bg-bgLayout pt-8 pb-6">
-				<Breadcrumb.Item>Strategy</Breadcrumb.Item>
-				<Breadcrumb.Item>Kickoff</Breadcrumb.Item>
-			</Breadcrumb>
+			<Breadcrumb
+				items={[{title: `Strategy`}, {title: `Kickoff`}]}
+				className="sticky top-0 z-10 bg-bgLayout pt-8 pb-6"
+			/>
 
 			<Masonry
 				breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
@@ -51,28 +44,26 @@ const KickoffClientPage: FC = () => {
 			>
 				<EditableTextCard
 					title="Problem Statement"
-					text={activeProduct?.problemStatement ?? ``}
+					text={product.data().problemStatement}
 					isEditing={editingSection === `problemStatement`}
 					onEditStart={() => setEditingSection(`problemStatement`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (text) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							problemStatement: text,
-						})
+						await updateDoc(product.ref, {problemStatement: text})
 					}}
 				/>
 
 				<EditableTextListCard
 					title="Personas"
-					textList={personas?.docs.map((doc) => ({id: doc.id as Id, text: doc.data().name})) ?? []}
+					textList={personas?.docs.map((doc) => ({id: doc.id, text: doc.data().name})) ?? []}
 					isEditing={editingSection === `personas`}
 					onEditStart={() => setEditingSection(`personas`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
 						await Promise.all(
 							textList.map(async (item) => {
-								const existingDoc = getDoc(doc(db, `Personas`, item.id))
-								if ((await existingDoc).exists()) {
+								const existingDoc = await getDoc(doc(product.ref, `Personas`, item.id))
+								if (existingDoc.exists()) {
 									await updateDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
 										name: item.text,
 									})
@@ -89,7 +80,6 @@ const KickoffClientPage: FC = () => {
 										priorities: [],
 										responsibilities: [],
 										tasks: [],
-										productId: activeProductId,
 									})
 								}
 							}),
@@ -99,53 +89,45 @@ const KickoffClientPage: FC = () => {
 
 				<EditableTextListCard
 					title="Business Outcomes"
-					textList={activeProduct?.businessOutcomes}
+					textList={product.data().businessOutcomes}
 					isEditing={editingSection === `businessOutcomes`}
 					onEditStart={() => setEditingSection(`businessOutcomes`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							businessOutcomes: textList,
-						})
+						await updateDoc(product.ref, {businessOutcomes: textList})
 					}}
 				/>
 
 				<EditableTextListCard
 					title="User Priorities"
-					textList={activeProduct?.userPriorities}
+					textList={product.data().userPriorities}
 					isEditing={editingSection === `userPriorities`}
 					onEditStart={() => setEditingSection(`userPriorities`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							userPriorities: textList,
-						})
+						await updateDoc(product.ref, {userPriorities: textList})
 					}}
 				/>
 
 				<EditableTextListCard
 					title="Potential Risks"
-					textList={activeProduct?.potentialRisks}
+					textList={product.data().potentialRisks}
 					isEditing={editingSection === `potentialRisks`}
 					onEditStart={() => setEditingSection(`potentialRisks`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							potentialRisks: textList,
-						})
+						await updateDoc(product.ref, {potentialRisks: textList})
 					}}
 				/>
 
 				<EditableTextListCard
 					title="Market Leaders"
-					textList={activeProduct?.marketLeaders}
+					textList={product.data().marketLeaders}
 					isEditing={editingSection === `marketLeaders`}
 					onEditStart={() => setEditingSection(`marketLeaders`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							marketLeaders: textList,
-						})
+						await updateDoc(product.ref, {marketLeaders: textList})
 					}}
 				/>
 			</Masonry>

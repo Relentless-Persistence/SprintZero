@@ -54,11 +54,9 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
 	const activeProductId = useActiveProductId()
 	const [product] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
 
-	return (
-		<ProductContext.Provider value={product?.exists() ? product : undefined}>
-			{userCanAccessApp && children}
-		</ProductContext.Provider>
-	)
+	if (pathname === `/product` && userCanAccessApp) return <>{children}</>
+	if (!product?.exists() || !userCanAccessApp) return null
+	return <ProductContext.Provider value={product}>{children}</ProductContext.Provider>
 }
 
 export default AuthenticatedLayout
