@@ -1,32 +1,21 @@
 import {Breadcrumb} from "antd"
-import {collection, query, where} from "firebase/firestore"
 import {useEffect, useRef} from "react"
-import {useCollection} from "react-firebase-hooks/firestore"
 
-import type {QueryDocumentSnapshot} from "firebase/firestore"
+import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import Epic from "./Epic"
 import {matrixRect, pointerLocation} from "./globals"
 import PrioritiesMatrix from "./PrioritiesMatrix"
-import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
-import {db} from "~/utils/firebase"
 import {getEpics} from "~/utils/storyMap"
 
 export type EpicsTabProps = {
-	activeProduct: QueryDocumentSnapshot<Product>
+	storyMapItems: QuerySnapshot<StoryMapItem>
 }
 
-const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
-	const [storyMapStates] = useCollection(
-		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProduct.id)).withConverter(
-			StoryMapItemConverter,
-		),
-	)
-	const storyMapState = storyMapStates?.docs[0]
-
-	const epics = storyMapState ? getEpics(storyMapState.data().items) : []
+const EpicsTab: FC<EpicsTabProps> = ({storyMapItems}) => {
+	const epics = getEpics(storyMapItems)
 
 	const matrixRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
@@ -62,11 +51,7 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 
 	return (
 		<div className="flex h-full flex-col px-12 py-8">
-			<Breadcrumb>
-				<Breadcrumb.Item>Tactics</Breadcrumb.Item>
-				<Breadcrumb.Item>Priorities</Breadcrumb.Item>
-				<Breadcrumb.Item>Epics</Breadcrumb.Item>
-			</Breadcrumb>
+			<Breadcrumb items={[{title: `Tactics`}, {title: `Priorities`}, {title: `Epics`}]} />
 
 			<p className="mt-2 text-textTertiary">
 				Assess the practicality of proposed items to objectively and rationally uncover strengths and weaknesses,
@@ -76,8 +61,9 @@ const EpicsTab: FC<EpicsTabProps> = ({activeProduct}) => {
 			<div className="relative mt-6 grow">
 				<div className="absolute inset-0" ref={matrixRef}>
 					<PrioritiesMatrix>
-						{storyMapState?.exists() &&
-							epics.map((epic) => <Epic key={epic.id} epicId={epic.id} storyMapState={storyMapState} />)}
+						{epics.map((epic) => (
+							<Epic key={epic.id} epicId={epic.id} storyMapItems={storyMapItems} />
+						))}
 					</PrioritiesMatrix>
 				</div>
 			</div>

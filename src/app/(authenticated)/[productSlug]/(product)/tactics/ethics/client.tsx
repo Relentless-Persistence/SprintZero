@@ -2,35 +2,27 @@
 
 import {CloseOutlined, DislikeOutlined, FilterOutlined, LikeOutlined} from "@ant-design/icons"
 import {Alert, Breadcrumb, Button, Card, Dropdown, Tag} from "antd"
-import {collection, doc, query, where} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import {useState} from "react"
-import {useCollection, useDocument} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
 import Story from "./Story"
-import {ProductConverter} from "~/types/db/Products"
+import {useProduct} from "~/app/(authenticated)/useProduct"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
-import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const EthicsClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-	const [storyMapStates] = useCollection(
-		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
-			StoryMapItemConverter,
-		),
-	)
-	const storyMapState = storyMapStates?.docs[0]
-	const stories = storyMapState ? getStories(storyMapState.data().items) : []
+	const product = useProduct()
+	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
+	const stories = storyMapItems ? getStories(storyMapItems) : []
 
 	const [filter, setFilter] = useState<`approved` | `rejected` | `all`>(`all`)
 
 	return (
 		<>
-			{stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
+			{stories.filter((story) => story.data().ethicsColumn !== null).length === 0 && (
 				<Alert
 					type="error"
 					showIcon
@@ -48,21 +40,13 @@ const EthicsClientPage: FC = () => {
 				<div className="grid w-full grow grid-cols-2 gap-6">
 					<Card
 						title="Under Review"
-						extra={<p>{stories.filter((story) => story.ethicsColumn === `underReview`).length}</p>}
+						extra={<p>{stories.filter((story) => story.data().ethicsColumn === `underReview`).length}</p>}
 					>
 						<div className="flex flex-col gap-4">
-							{activeProduct?.exists() &&
-								storyMapState?.exists() &&
+							{storyMapItems &&
 								stories
-									.filter((story) => story.ethicsColumn === `underReview`)
-									.map((story) => (
-										<Story
-											key={story.id}
-											activeProduct={activeProduct}
-											storyMapState={storyMapState}
-											storyId={story.id}
-										/>
-									))}
+									.filter((story) => story.data().ethicsColumn === `underReview`)
+									.map((story) => <Story key={story.id} storyMapItems={storyMapItems} storyId={story.id} />)}
 						</div>
 					</Card>
 					<Card
@@ -103,19 +87,11 @@ const EthicsClientPage: FC = () => {
 						}
 					>
 						<div className="flex flex-col gap-4">
-							{activeProduct?.exists() &&
-								storyMapState?.exists() &&
+							{storyMapItems &&
 								stories
-									.filter((story) => story.ethicsColumn === `adjudicated`)
-									.filter((story) => filter === `all` || (filter === `approved` && story.ethicsApproved))
-									.map((story) => (
-										<Story
-											key={story.id}
-											activeProduct={activeProduct}
-											storyMapState={storyMapState}
-											storyId={story.id}
-										/>
-									))}
+									.filter((story) => story.data().ethicsColumn === `adjudicated`)
+									.filter((story) => filter === `all` || (filter === `approved` && story.data().ethicsApproved))
+									.map((story) => <Story key={story.id} storyMapItems={storyMapItems} storyId={story.id} />)}
 						</div>
 					</Card>
 				</div>

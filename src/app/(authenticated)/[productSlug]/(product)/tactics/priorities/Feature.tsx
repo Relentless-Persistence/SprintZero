@@ -3,44 +3,40 @@
 import {CopyOutlined} from "@ant-design/icons"
 import {Timestamp, updateDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
-import produce from "immer"
 import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
-import type {QueryDocumentSnapshot} from "firebase/firestore"
+import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {matrixRect} from "./globals"
 import {getFeatures} from "~/utils/storyMap"
 
 export type FeatureProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapItem>
-	featureId: Id
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	featureId: string
 }
 
-const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
-	const features = getFeatures(storyMapState.data().items)
+const Feature: FC<FeatureProps> = ({storyMapItems, featureId}) => {
+	const features = getFeatures(storyMapItems)
 	const feature = features.find(({id}) => id === featureId)!
 
-	const x = useMotionValue(feature.effort)
-	const y = useMotionValue(feature.userValue)
+	const x = useMotionValue(feature.data().effort)
+	const y = useMotionValue(feature.data().userValue)
 
 	useEffect(() => {
-		x.set(features.find(({id}) => id === feature.id)!.effort)
-		y.set(features.find(({id}) => id === feature.id)!.userValue)
-	}, [feature.id, features, x, y])
+		x.set(feature.data().effort)
+		y.set(feature.data().userValue)
+	}, [feature, x, y])
 
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
 	const moveFeature = async (x: number, y: number) => {
-		const items = produce(storyMapState.data().items, (draft) => {
-			const newFeature = Object.entries(draft).find(([id]) => id === feature.id)![1]!
-			newFeature.effort = x
-			newFeature.userValue = y
+		await debouncedUpdateStoryMapItem(feature, {
+			effort: x,
+			userValue: y,
 		})
-		await debouncedSetStoryMapStateItems(storyMapState, items)
 	}
 
 	return (
@@ -66,17 +62,17 @@ const Feature: FC<FeatureProps> = ({storyMapState, featureId}) => {
 			ref={ref}
 		>
 			<CopyOutlined />
-			<p>{feature.name}</p>
+			<p className="w-max font-medium">{feature.data().name}</p>
 		</motion.div>
 	)
 }
 
 export default Feature
 
-const debouncedSetStoryMapStateItems = debounce(
-	async (storyMapState: QueryDocumentSnapshot<StoryMapItem>, data: StoryMapItem[`items`]) => {
-		await updateDoc(storyMapState.ref, {
-			items: data,
+const debouncedUpdateStoryMapItem = debounce(
+	async (storyMapItems: QueryDocumentSnapshot<StoryMapItem>, data: WithFieldValue<Partial<StoryMapItem>>) => {
+		await updateDoc(storyMapItems.ref, {
+			...data,
 			updatedAt: Timestamp.now(),
 		})
 	},

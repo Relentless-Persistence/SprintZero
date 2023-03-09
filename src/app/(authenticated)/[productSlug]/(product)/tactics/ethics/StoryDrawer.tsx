@@ -14,19 +14,17 @@ import {Avatar, Drawer, Input, Popover, Radio, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {doc, getDoc, setDoc, updateDoc} from "firebase/firestore"
-import produce from "immer"
+import {doc, getDoc, updateDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
 import {useDocument} from "react-firebase-hooks/firestore"
 import {useInterval} from "react-use"
 
-import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
+import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
-import type {Product} from "~/types/db/Products"
-import type {Story, StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {User} from "~/types/db/Users"
 
+import {useProduct} from "~/app/(authenticated)/useProduct"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import {sprintColumns} from "~/types/db/Products/StoryMapItems"
@@ -39,65 +37,66 @@ import {useUser} from "~/utils/useUser"
 dayjs.extend(relativeTime)
 
 export type StoryDrawerProps = {
-	activeProduct: QueryDocumentSnapshot<Product>
-	storyMapState: QueryDocumentSnapshot<StoryMapItem>
-	storyId: Id
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyId: string
 	isOpen: boolean
 	onClose: () => void
 }
 
-const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyId, isOpen, onClose}) => {
+const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onClose}) => {
 	const user = useUser()
-	const story = getStories(storyMapState.data().items).find((story) => story.id === storyId)!
-	const [description, setDescription] = useState(story.description)
+	const product = useProduct()
+	const story = getStories(storyMapItems).find((story) => story.id === storyId)!
+	const [description, setDescription] = useState(story.data().description)
 	const [commentType, setCommentType] = useState<`design` | `code`>(`design`)
 
 	useEffect(() => {
-		setDescription(story.description)
-	}, [story.description])
+		setDescription(story.data().description)
+	}, [story])
 
 	const addVote = async (vote: boolean) => {
 		if (!user) return
 
-		let votesFor = Object.values(story.ethicsVotes).filter((vote) => vote === true).length
-		let votesAgainst = Object.values(story.ethicsVotes).filter((vote) => vote === false).length
+		let votesFor = Object.values(story.data().ethicsVotes).filter((vote) => vote === true).length
+		let votesAgainst = Object.values(story.data().ethicsVotes).filter((vote) => vote === false).length
 		if (vote) votesFor++
 		else votesAgainst++
-		const votingComplete = votesFor + votesAgainst === Object.keys(activeProduct.data().members).length
+		const votingComplete = votesFor + votesAgainst === Object.keys(product.data().members).length
 		const votingResult = votesFor > votesAgainst
 
 		if (votingComplete) {
 			const data: WithFieldValue<Partial<StoryMapItem>> = {
-				[`items.${storyId}.ethicsVotes.${user.id}`]: vote,
-				[`items.${storyId}.ethicsApproved`]: votingResult,
-				[`items.${storyId}.ethicsColumn`]: `adjudicated`,
+				[`ethicsVotes.${user.id}`]: vote,
+				ethicsApproved: votingResult,
+				ethicsColumn: `adjudicated`,
 			}
-			await updateDoc(storyMapState.ref, data)
+			await updateDoc(story.ref, data)
 		} else {
 			const data: WithFieldValue<Partial<StoryMapItem>> = {
-				[`items.${storyId}.ethicsVotes.${user.id}`]: vote,
+				[`ethicsVotes.${user.id}`]: vote,
 			}
-			await updateDoc(storyMapState.ref, data)
+			await updateDoc(story.ref, data)
 		}
 	}
 
-	const totalEffort = story.designEffort + story.engineeringEffort
+	const totalEffort = story.data().designEffort + story.data().engineeringEffort
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
-		setLastModifiedText(dayjs(story.updatedAt.toMillis()).fromNow())
+		setLastModifiedText(dayjs(story.data().updatedAt.toMillis()).fromNow())
 	}, 1000)
-	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.updatedAtUserId).withConverter(UserConverter))
+	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.data().updatedAtUserId).withConverter(UserConverter))
 
 	const teamMembers = useQueries({
-		queries: Object.keys(activeProduct.data().members).map((userId) => ({
+		queries: Object.keys(product.data().members).map((userId) => ({
 			queryKey: [`user`, userId],
 			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
 		})),
 	})
 
-	const peoplePopoverItems = story.peopleIds
-		.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
+	const peoplePopoverItems = story
+		.data()
+		.peopleIds.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
 		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 		.map((user) => (
 			<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
@@ -116,7 +115,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 			title={
 				<div className="flex h-14 flex-col justify-center gap-1">
 					<div className="flex items-end gap-4">
-						<p>{story.name}</p>
+						<p>{story.data().name}</p>
 						{lastModifiedText && lastModifiedUser?.exists() && (
 							<p className="text-sm font-normal text-textTertiary">
 								Last modified {lastModifiedText} by {lastModifiedUser.data().name}
@@ -129,16 +128,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 								{totalEffort} point{totalEffort === 1 ? `` : `s`}
 							</Tag>
 							<Tag
-								color={typeof activeProduct.data().effortCost === `number` ? `#585858` : `#f5f5f5`}
+								color={typeof product.data().effortCost === `number` ? `#585858` : `#f5f5f5`}
 								icon={<DollarOutlined />}
-								className={clsx(
-									typeof activeProduct.data().effortCost !== `number` && `!border-current !text-[#d9d9d9]`,
-								)}
+								className={clsx(typeof product.data().effortCost !== `number` && `!border-current !text-[#d9d9d9]`)}
 							>
-								{dollarFormat((activeProduct.data().effortCost ?? 0) * totalEffort)}
+								{dollarFormat((product.data().effortCost ?? 0) * totalEffort)}
 							</Tag>
 							<Tag color="#585858" icon={<FlagOutlined />}>
-								{sprintColumns[story.sprintColumn]}
+								{sprintColumns[story.data().sprintColumn]}
 							</Tag>
 							<Popover
 								placement="bottom"
@@ -153,32 +150,32 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 								}
 							>
 								<Tag color="#585858" icon={<UserOutlined />} className="text-sm">
-									{story.peopleIds.length}
+									{story.data().peopleIds.length}
 								</Tag>
 							</Popover>
 
 							<div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
 								<Tag
-									color={story.branchName ? `#0958d9` : `#f5f5f5`}
+									color={story.data().branchName ? `#0958d9` : `#f5f5f5`}
 									icon={<CodeOutlined />}
-									style={story.branchName ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+									style={story.data().branchName ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
 								>
-									{story.branchName ?? `No branch`}
+									{story.data().branchName ?? `No branch`}
 								</Tag>
-								<LinkTo href={story.designLink} openInNewTab>
+								<LinkTo href={story.data().designLink} openInNewTab>
 									<Tag
-										color={story.designLink ? `#0958d9` : `#f5f5f5`}
+										color={story.data().designLink ? `#0958d9` : `#f5f5f5`}
 										icon={<BlockOutlined />}
-										style={story.designLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+										style={story.data().designLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
 									>
 										Design
 									</Tag>
 								</LinkTo>
-								<LinkTo href={story.pageLink} openInNewTab>
+								<LinkTo href={story.data().pageLink} openInNewTab>
 									<Tag
-										color={story.pageLink ? `#0958d9` : `#f5f5f5`}
+										color={story.data().pageLink ? `#0958d9` : `#f5f5f5`}
 										icon={<LinkOutlined />}
-										style={story.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+										style={story.data().pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
 									>
 										Page
 									</Tag>
@@ -194,7 +191,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 				<div className="flex h-full min-h-0 flex-col gap-6">
 					{user && (
 						<div className="flex flex-col items-start gap-2">
-							{story.ethicsApproved === null ? (
+							{story.data().ethicsApproved === null ? (
 								<>
 									<div className="leading-normal">
 										<p className="text-lg font-semibold">Adjudication Response</p>
@@ -204,7 +201,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 									</div>
 
 									<Radio.Group
-										value={story.ethicsVotes[user.id] ? `allow` : `reject`}
+										value={story.data().ethicsVotes[user.id] ? `allow` : `reject`}
 										onChange={(e) => {
 											addVote(e.target.value === `allow`).catch(console.error)
 										}}
@@ -216,7 +213,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 							) : (
 								<>
 									<p className="text-lg font-semibold">Adjudication Response</p>
-									{story.ethicsApproved ? (
+									{story.data().ethicsApproved ? (
 										<Tag icon={<LikeOutlined />} color="green">
 											Approved
 										</Tag>
@@ -236,10 +233,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 							value={description}
 							onChange={(e) => {
 								setDescription(e.target.value)
-								const newData = produce(storyMapState.data(), (draft) => {
-									draft.items[storyId] = {...(draft.items[storyId] as Story), description: e.target.value}
-								})
-								setDoc(storyMapState.ref, newData).catch(console.error)
+								updateDoc(story.ref, {description: e.target.value}).catch(console.error)
 							}}
 							className="max-h-[calc(100%-2.25rem)]"
 						/>
@@ -262,15 +256,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 					</div>
 					<div className="relative grow">
 						<Comments
-							storyMapStateId={storyMapState.id}
-							parentId={storyId}
+							storyMapItem={story}
 							commentType={commentType}
-							flagged={story.ethicsColumn !== null}
+							flagged={story.data().ethicsColumn !== null}
 							onFlag={async () => {
-								const newData = produce(storyMapState.data(), (draft) => {
-									draft.items[storyId] = {...(draft.items[storyId] as Story), ethicsColumn: `underReview`}
-								})
-								await setDoc(storyMapState.ref, newData)
+								await updateDoc(story.ref, {ethicsColumn: `underReview`})
 							}}
 						/>
 					</div>
