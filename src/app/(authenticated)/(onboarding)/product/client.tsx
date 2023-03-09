@@ -83,7 +83,7 @@ const ProductSetupClientPage: FC = () => {
 
 				features: null,
 				finalVision: ``,
-				productType: `mobile`,
+				productType: null,
 				updates: [],
 				valueProposition: null,
 

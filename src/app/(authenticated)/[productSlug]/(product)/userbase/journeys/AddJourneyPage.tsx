@@ -41,7 +41,7 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 			...data,
 			productId: activeProductId,
 		} satisfies Journey)
-		onFinish(ref.id as Id)
+		onFinish(ref.id)
 	})
 
 	return (

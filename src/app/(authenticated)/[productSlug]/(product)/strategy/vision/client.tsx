@@ -10,27 +10,25 @@ import {diffArrays} from "diff"
 import {Timestamp, doc, getDoc, updateDoc} from "firebase/firestore"
 import {nanoid} from "nanoid"
 import {useEffect, useRef, useState} from "react"
-import {useDocumentData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
+import {useProduct} from "~/app/(authenticated)/useProduct"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
-import {ProductConverter, ProductSchema} from "~/types/db/Products"
+import {ProductSchema} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 import {useUser} from "~/utils/useUser"
 
 dayjs.extend(relativeTime)
 
 const formSchema = z.object({
-	productType: ProductSchema.shape.productType,
+	productType: ProductSchema.shape.productType.unwrap(),
 	valueProposition: ProductSchema.shape.valueProposition.unwrap(),
 	features: ProductSchema.shape.features.unwrap(),
 	finalVision: ProductSchema.shape.finalVision,
@@ -38,9 +36,8 @@ const formSchema = z.object({
 type FormInputs = z.infer<typeof formSchema>
 
 const VisionsClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
 	const user = useUser()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const product = useProduct()
 
 	const [editMode, setEditMode] = useState(false)
 	const [currentStep, setCurrentStep] = useState(0)
@@ -56,42 +53,41 @@ const VisionsClientPage: FC = () => {
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			productType: activeProduct?.productType ?? `mobile`,
-			valueProposition: activeProduct?.valueProposition ?? ``,
-			features: activeProduct?.features ?? [{id: nanoid() as Id, text: ``}],
+			productType: product.data().productType ?? `mobile`,
+			valueProposition: product.data().valueProposition ?? ``,
+			features: product.data().features ?? [{id: nanoid(), text: ``}],
 		},
 	})
 
 	const hasSetInitial = useRef(false)
 	useEffect(() => {
-		if (hasSetInitial.current || !activeProduct) return
-		if (!activeProduct.finalVision) {
+		if (hasSetInitial.current) return
+		if (!product.data().finalVision) {
 			reset({
-				productType: activeProduct.productType,
-				valueProposition: activeProduct.valueProposition ?? ``,
-				features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
-				finalVision: activeProduct.finalVision,
+				productType: product.data().productType ?? `mobile`,
+				valueProposition: product.data().valueProposition ?? ``,
+				features: product.data().features ?? [{id: nanoid(), text: ``}],
+				finalVision: product.data().finalVision,
 			})
 			setEditMode(true)
 			hasSetInitial.current = true
-		} else if (activeProduct.finalVision !== ``) {
+		} else if (product.data().finalVision !== ``) {
 			reset({
-				productType: activeProduct.productType,
-				valueProposition: activeProduct.valueProposition ?? ``,
-				features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
-				finalVision: activeProduct.finalVision,
+				productType: product.data().productType ?? `mobile`,
+				valueProposition: product.data().valueProposition ?? ``,
+				features: product.data().features ?? [{id: nanoid(), text: ``}],
+				finalVision: product.data().finalVision,
 			})
 			setEditMode(true)
 			hasSetInitial.current = true
 		}
-	}, [activeProduct, reset])
+	}, [product, reset])
 
 	const usersData = useQueries({
-		queries:
-			activeProduct?.updates.map((update) => ({
-				queryKey: [`user`, update.userId],
-				queryFn: async () => await getDoc(doc(db, `Users`, update.userId).withConverter(UserConverter)),
-			})) ?? [],
+		queries: product.data().updates.map((update) => ({
+			queryKey: [`user`, update.userId],
+			queryFn: async () => await getDoc(doc(db, `Users`, update.userId).withConverter(UserConverter)),
+		})),
 	})
 
 	const [productType, valueProposition, features] = watch([`productType`, `valueProposition`, `features`])
@@ -166,7 +162,7 @@ const VisionsClientPage: FC = () => {
 											/>
 
 											<div className="flex justify-end gap-4">
-												<Button type="text" disabled={!activeProduct?.finalVision} onClick={() => setEditMode(false)}>
+												<Button type="text" disabled={!product.data().finalVision} onClick={() => setEditMode(false)}>
 													Cancel
 												</Button>
 												<Button disabled={!!errors.productType} onClick={() => setCurrentStep(1)}>
@@ -189,7 +185,7 @@ const VisionsClientPage: FC = () => {
 											<div className="flex justify-end gap-4">
 												<Button
 													type="text"
-													disabled={!activeProduct?.finalVision || currentStep !== 1}
+													disabled={!product.data().finalVision || currentStep !== 1}
 													onClick={() => setEditMode(false)}
 												>
 													Cancel
@@ -219,7 +215,7 @@ const VisionsClientPage: FC = () => {
 											<div className="flex justify-end gap-4">
 												<Button
 													type="text"
-													disabled={!activeProduct?.finalVision || currentStep !== 2}
+													disabled={!product.data().finalVision || currentStep !== 2}
 													onClick={() => setEditMode(false)}
 												>
 													Cancel
@@ -257,7 +253,7 @@ const VisionsClientPage: FC = () => {
 											<div className="flex justify-end gap-4">
 												<Button
 													type="text"
-													disabled={!activeProduct?.finalVision || currentStep !== 3}
+													disabled={!product.data().finalVision || currentStep !== 3}
 													onClick={() => setEditMode(false)}
 												>
 													Cancel
@@ -294,7 +290,7 @@ const VisionsClientPage: FC = () => {
 											<div className="flex justify-end gap-4">
 												<Button
 													type="text"
-													disabled={!activeProduct?.finalVision || currentStep !== 4}
+													disabled={!product.data().finalVision || currentStep !== 4}
 													onClick={() => setEditMode(false)}
 												>
 													Cancel
@@ -303,20 +299,18 @@ const VisionsClientPage: FC = () => {
 													disabled={!!errors.finalVision || currentStep !== 4}
 													onClick={() => {
 														handleSubmit(async (data) => {
-															if (!activeProduct) return
-
 															const operations: string[] = []
 
-															if (activeProduct.productType !== data.productType)
+															if (product.data().productType !== data.productType)
 																operations.push(`changed the product type to ${data.productType}`)
 
-															if (activeProduct.valueProposition !== data.valueProposition)
+															if (product.data().valueProposition !== data.valueProposition)
 																operations.push(`changed the value proposition to "${data.valueProposition}"`)
 
 															// Calculate feature diffs
-															if (activeProduct.features !== data.features) {
+															if (product.data().features !== data.features) {
 																const differences = diffArrays(
-																	activeProduct.features?.map((feature) => feature.text) ?? [],
+																	product.data().features?.map((feature) => feature.text) ?? [],
 																	data.features.map((feature) => feature.text),
 																)
 																const removals = differences
@@ -336,24 +330,24 @@ const VisionsClientPage: FC = () => {
 															}
 															const operationsText = listToSentence(operations).concat(`.`)
 
-															const updates = [...activeProduct.updates]
-															if (activeProduct.finalVision === ``) {
+															const updates = [...product.data().updates]
+															if (product.data().finalVision === ``) {
 																updates.push({
 																	id: nanoid(),
-																	userId: user!.id as Id,
+																	userId: user!.id,
 																	text: `created the product vision.`,
 																	timestamp: Timestamp.now(),
 																})
 															} else if (operations.length > 0) {
 																updates.push({
 																	id: nanoid(),
-																	userId: user!.id as Id,
+																	userId: user!.id,
 																	text: operationsText,
 																	timestamp: Timestamp.now(),
 																})
 															}
 
-															await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+															await updateDoc(product.ref, {
 																features: data.features,
 																finalVision: data.finalVision,
 																productType: data.productType,
@@ -373,7 +367,7 @@ const VisionsClientPage: FC = () => {
 							]}
 							className="[&_.ant-steps-item-title]:w-full"
 						/>
-					) : activeProduct?.finalVision ? (
+					) : product.data().finalVision ? (
 						<Card
 							title="Statement"
 							extra={
@@ -381,9 +375,9 @@ const VisionsClientPage: FC = () => {
 									size="small"
 									onClick={() => {
 										reset({
-											productType: activeProduct.productType,
-											valueProposition: activeProduct.valueProposition ?? ``,
-											features: activeProduct.features ?? [{id: nanoid() as Id, text: ``}],
+											productType: product.data().productType ?? `mobile`,
+											valueProposition: product.data().valueProposition ?? ``,
+											features: product.data().features ?? [{id: nanoid(), text: ``}],
 										})
 										setCurrentStep(0)
 										setEditMode(true)
@@ -393,7 +387,7 @@ const VisionsClientPage: FC = () => {
 								</Button>
 							}
 						>
-							<p>{activeProduct.finalVision}</p>
+							<p>{product.data().finalVision}</p>
 						</Card>
 					) : (
 						<div className="grid h-full place-items-center">
@@ -406,11 +400,11 @@ const VisionsClientPage: FC = () => {
 			<div className="mt-8 mr-12 flex flex-col items-start gap-4">
 				<Tag>Changelog</Tag>
 
-				{!activeProduct?.updates || activeProduct.updates.length === 0 ? (
+				{product.data().updates.length === 0 ? (
 					<p className="italic text-textTertiary">No changes yet</p>
 				) : (
 					<Timeline
-						items={activeProduct.updates.map((update) => ({
+						items={product.data().updates.map((update) => ({
 							children: (
 								<div className="flex flex-col gap-1">
 									<p className="font-mono">{dayjs(update.timestamp.toDate()).fromNow()}</p>

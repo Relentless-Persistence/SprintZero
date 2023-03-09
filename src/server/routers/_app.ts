@@ -57,7 +57,7 @@ export const appRouter = router({
 					if (!item.success) continue
 					let newEthicsVotes: Exclude<StoryMapItem[`items`][Id], undefined>[`ethicsVotes`] = {}
 					for (const vote of item.data.ethicsVotes) {
-						newEthicsVotes[vote.userId as Id] = vote.vote
+						newEthicsVotes[vote.userId] = vote.vote
 					}
 					// @ts-ignore - Complex
 					updates[`items.${itemId}.ethicsVotes`] = newEthicsVotes

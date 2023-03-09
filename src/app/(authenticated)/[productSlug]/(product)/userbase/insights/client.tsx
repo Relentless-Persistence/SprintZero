@@ -43,10 +43,10 @@ const InsightsClientPage: FC = () => {
 						.map((insight) => (
 							<InsightItemCard
 								key={insight.id}
-								insightId={insight.id as Id}
+								insightId={insight.id}
 								initialData={insight.data()}
 								isEditing={activeInsight === insight.id}
-								onEditStart={() => setActiveInsight(insight.id as Id)}
+								onEditStart={() => setActiveInsight(insight.id)}
 								onEditEnd={() => setActiveInsight(undefined)}
 							/>
 						))}

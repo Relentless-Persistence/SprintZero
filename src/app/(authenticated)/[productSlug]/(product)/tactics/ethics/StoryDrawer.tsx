@@ -204,7 +204,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 									</div>
 
 									<Radio.Group
-										value={story.ethicsVotes[user.id as Id] ? `allow` : `reject`}
+										value={story.ethicsVotes[user.id] ? `allow` : `reject`}
 										onChange={(e) => {
 											addVote(e.target.value === `allow`).catch(console.error)
 										}}
@@ -262,7 +262,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({activeProduct, storyMapState, storyI
 					</div>
 					<div className="relative grow">
 						<Comments
-							storyMapStateId={storyMapState.id as Id}
+							storyMapStateId={storyMapState.id}
 							parentId={storyId}
 							commentType={commentType}
 							flagged={story.ethicsColumn !== null}

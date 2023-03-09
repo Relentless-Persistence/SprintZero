@@ -25,7 +25,7 @@ const TaskColumn: FC<TaskColumnProps> = ({id, title, tasks, onEdit}) => {
 							type="inner"
 							title={task.data().title}
 							extra={
-								<Button size="small" onClick={() => onEdit(task.id as Id)}>
+								<Button size="small" onClick={() => onEdit(task.id)}>
 									Edit
 								</Button>
 							}

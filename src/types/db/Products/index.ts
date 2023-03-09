@@ -52,7 +52,7 @@ export const ProductSchema = z.object({
 		.min(1, `Required`)
 		.nullable(),
 	finalVision: z.string(),
-	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]),
+	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]).nullable(),
 	updates: z.array(
 		z.object({
 			id: z.string(),

@@ -24,7 +24,7 @@ const JourneysClientPage: FC = () => {
 
 	const [activeJourney, setActiveJourney] = useState<Id | `new` | undefined>(undefined)
 	useEffect(() => {
-		if (!loading) setActiveJourney(!journeys || journeys.docs.length === 0 ? `new` : (journeys.docs[0]!.id as Id))
+		if (!loading) setActiveJourney(!journeys || journeys.docs.length === 0 ? `new` : journeys.docs[0]!.id)
 	}, [journeys, loading])
 	const journey = journeys?.docs.find((journey) => journey.id === activeJourney)
 
@@ -41,7 +41,7 @@ const JourneysClientPage: FC = () => {
 	if (activeJourney === `new`)
 		return (
 			<AddJourneyPage
-				onCancel={() => setActiveJourney(journeys?.docs[0]?.id as Id)}
+				onCancel={() => setActiveJourney(journeys?.docs[0]?.id)}
 				onFinish={(id) => setActiveJourney(id)}
 			/>
 		)
@@ -120,7 +120,7 @@ const JourneysClientPage: FC = () => {
 									key={event.id}
 									type="button"
 									onClick={() => {
-										setActiveEventId(event.id as Id)
+										setActiveEventId(event.id)
 										setIsDrawerOpen(true)
 									}}
 									className="pointer-events-auto absolute flex -translate-y-1/2 items-center gap-1 text-left"
@@ -141,9 +141,9 @@ const JourneysClientPage: FC = () => {
 				<Tabs
 					tabPosition="right"
 					activeKey={activeJourney}
-					onChange={(key) => setActiveJourney(key as Id | `new`)}
+					onChange={(key) => setActiveJourney(key | `new`)}
 					items={journeys.docs
-						.map((journey) => ({key: journey.id as Id | `new`, label: journey.data().name}))
+						.map((journey) => ({key: journey.id | `new`, label: journey.data().name}))
 						.concat({key: `new`, label: `Add`})}
 				/>
 			)}

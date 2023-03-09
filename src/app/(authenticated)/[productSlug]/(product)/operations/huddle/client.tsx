@@ -60,7 +60,7 @@ const HuddleClientPage: FC = () => {
 	const user = useUser()
 	useEffect(() => {
 		if (!activeProduct?.exists() || !user) return
-		if (activeProduct.data().huddles[user.id as Id] === undefined) {
+		if (activeProduct.data().huddles[user.id] === undefined) {
 			const data: WithFieldValue<Partial<Product>> = {
 				[`huddles.${user.id}`]: {
 					updatedAt: Timestamp.now(),
@@ -88,7 +88,7 @@ const HuddleClientPage: FC = () => {
 
 				{users.map((huddleUser) => {
 					if (!activeProduct?.exists()) return null
-					const huddle = activeProduct.data().huddles[huddleUser.id as Id]
+					const huddle = activeProduct.data().huddles[huddleUser.id]
 
 					return (
 						<Card
@@ -142,7 +142,7 @@ const HuddleClientPage: FC = () => {
 											(() => {
 												const blockerStoryOptions = Object.entries(storyMapState.data().items)
 													.filter(([, item]) => item?.type === `story`)
-													.filter(([id]) => !huddle?.blockerStoryIds.includes(id as Id))
+													.filter(([id]) => !huddle?.blockerStoryIds.includes(id))
 
 												return (
 													<Dropdown
@@ -214,7 +214,7 @@ const HuddleClientPage: FC = () => {
 											(() => {
 												const todayStoryOptions = Object.entries(storyMapState.data().items)
 													.filter(([, item]) => item?.type === `story`)
-													.filter(([id]) => !huddle?.todayStoryIds.includes(id as Id))
+													.filter(([id]) => !huddle?.todayStoryIds.includes(id))
 
 												return (
 													<Dropdown
@@ -286,7 +286,7 @@ const HuddleClientPage: FC = () => {
 											(() => {
 												const yesterdayStoryOptions = Object.entries(storyMapState.data().items)
 													.filter(([, item]) => item?.type === `story`)
-													.filter(([id]) => !huddle?.yesterdayStoryIds.includes(id as Id))
+													.filter(([id]) => !huddle?.yesterdayStoryIds.includes(id))
 
 												return (
 													<Dropdown

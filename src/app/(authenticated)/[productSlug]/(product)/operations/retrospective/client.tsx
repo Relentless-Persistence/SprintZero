@@ -96,7 +96,7 @@ const RetrospectiveClientPage: FC = () => {
 									})()}
 									extra={
 										item.data().userId === user?.id ? (
-											<Button size="small" onClick={() => setActiveItemId(item.id as Id)}>
+											<Button size="small" onClick={() => setActiveItemId(item.id)}>
 												Edit
 											</Button>
 										) : undefined
@@ -156,7 +156,7 @@ const RetrospectiveClientPage: FC = () => {
 							archived: false,
 							createdAt: Timestamp.now(),
 							productId: activeProductId,
-							userId: user!.id as Id,
+							userId: user!.id,
 						}
 						if (activeItemId === `new`) {
 							await addDoc(collection(db, `RetrospectiveItems`).withConverter(RetrospectiveItemConverter), data)

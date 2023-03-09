@@ -23,7 +23,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 	ref,
 ) => {
 	useEffect(() => {
-		if (textList.length === 0) onChange([{id: nanoid() as Id, text: ``}])
+		if (textList.length === 0) onChange([{id: nanoid(), text: ``}])
 	}, [onChange, textList.length])
 
 	// For managing focus on new elements
@@ -41,7 +41,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 								onChange((state) => {
 									let newState = [...state]
 									newState.splice(i, 1)
-									if (newState.length === 0) newState = [{id: nanoid() as Id, text: ``}]
+									if (newState.length === 0) newState = [{id: nanoid(), text: ``}]
 									return newState
 								})
 							}
@@ -64,7 +64,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 							onBlur={() => onBlur?.()}
 							onPressEnter={() => {
 								if (textList.at(-1)!.text !== ``) {
-									const newId = nanoid() as Id
+									const newId = nanoid()
 									newestElement.current = newId
 									onChange((state) => [...state, {id: newId, text: ``}])
 								}
@@ -85,7 +85,7 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 								danger={errors?.[i]?.text !== undefined}
 								disabled={textList.at(-1)!.text.trim() === `` || disabled}
 								onClick={() => {
-									const newId = nanoid() as Id
+									const newId = nanoid()
 									newestElement.current = newId
 									onChange((state) => [...state, {id: newId, text: ``}])
 								}}

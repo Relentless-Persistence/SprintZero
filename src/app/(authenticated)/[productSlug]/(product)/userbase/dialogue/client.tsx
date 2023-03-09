@@ -60,7 +60,7 @@ const DialogueClientPage: FC = () => {
 						.filter((participant) => participant.data().status === currentTab)
 						.map((participant) => {
 							const personas = allPersonas
-								.filter(({data: persona}) => persona && participant.data().personaIds.includes(persona.id as Id))
+								.filter(({data: persona}) => persona && participant.data().personaIds.includes(persona.id))
 								.map((persona) => persona.data)
 
 							return (
@@ -79,7 +79,7 @@ const DialogueClientPage: FC = () => {
 										</div>
 									}
 									extra={
-										<Button size="small" onClick={() => setActiveParticipant(participant.id as Id)}>
+										<Button size="small" onClick={() => setActiveParticipant(participant.id)}>
 											View
 										</Button>
 									}
@@ -160,10 +160,10 @@ const DialogueClientPage: FC = () => {
 							updatedAt: Timestamp.now(),
 							personaIds: [],
 							productId: activeProductId,
-							updatedAtUserId: user!.id as Id,
+							updatedAtUserId: user!.id,
 						})
 							.then((docRef) => {
-								setActiveParticipant(docRef.id as Id)
+								setActiveParticipant(docRef.id)
 							})
 							.catch(console.error)
 					}}
