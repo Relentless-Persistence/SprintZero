@@ -70,10 +70,10 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 								<div key={comment.id} className="flex gap-2">
 									<Avatar shape="square" src={author?.data()?.avatar} className="border border-border" />
 									<div className="flex min-w-0 flex-1 flex-col gap-1">
-										<p className="text-sm text-textTertiary">
+										<p className="text-sm font-medium">
 											{author?.data()?.name}
 											{` `}
-											<span className="text-black/65 ml-1">
+											<span className="font-normal text-textTertiary">
 												{comment.data().createdAt
 													? dayjs((comment.data().createdAt as Timestamp).toDate()).fromNow()
 													: null}

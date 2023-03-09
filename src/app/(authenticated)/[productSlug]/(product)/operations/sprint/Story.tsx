@@ -8,7 +8,7 @@ import type {Version} from "~/types/db/Products/Versions"
 
 import StoryContainer from "./StoryContainer"
 import {useGenMeta} from "~/app/(authenticated)/[productSlug]/(product)/map/meta"
-import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/map/StoryDrawer"
+import StoryDrawer from "~/components/StoryDrawer"
 
 export type StoryProps = {
 	storyMapItems: QuerySnapshot<StoryMapItem>

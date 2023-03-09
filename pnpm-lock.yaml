@@ -41,7 +41,6 @@ specifiers:
   framer-motion: 10.2.3
   googleapis: 112.0.0
   immer: 9.0.19
-  jotai: 2.0.3
   jsonwebtoken: 9.0.0
   lodash: 4.17.21
   nanoid: 4.0.1
@@ -57,6 +56,7 @@ specifiers:
   react-hook-form: 7.43.5
   react-masonry-css: ^1.0.16
   react-use: 17.4.0
+  server-only: 0.0.1
   sharp: 0.31.3
   tailwindcss: 3.2.7
   tiny-invariant: 1.3.1
@@ -107,7 +107,6 @@ dependencies:
   framer-motion: 10.2.3_biqbaboplfbrettd7655fr4n2y
   googleapis: 112.0.0_encoding@0.1.13
   immer: 9.0.19
-  jotai: 2.0.3_react@18.2.0
   jsonwebtoken: 9.0.0
   lodash: 4.17.21
   nanoid: 4.0.1
@@ -123,6 +122,7 @@ dependencies:
   react-hook-form: 7.43.5_react@18.2.0
   react-masonry-css: 1.0.16_react@18.2.0
   react-use: 17.4.0_biqbaboplfbrettd7655fr4n2y
+  server-only: 0.0.1
   sharp: 0.31.3
   tailwindcss: 3.2.7_postcss@8.4.21
   tiny-invariant: 1.3.1
@@ -5261,18 +5261,6 @@ packages:
     resolution: {integrity: sha512-v6BN7fuPVfG9XIxcPT2jzyAg5EmA/mtNeJEXJ7d31Wz7fFOqOZeN8mPtNJYQmnuAIxJII7EcURcbZ7qXs9a4kA==}
     dev: false
 
-  /jotai/2.0.3_react@18.2.0:
-    resolution: {integrity: sha512-MMjhSPAL3RoeZD9WbObufRT2quThEAEknHHridf2ma8Ml7ZVQmUiHk0ssdbR3F0h3kcwhYqSGJ59OjhPge7RRg==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      react: '>=17.0.0'
-    peerDependenciesMeta:
-      react:
-        optional: true
-    dependencies:
-      react: 18.2.0
-    dev: false
-
   /js-cookie/2.2.1:
     resolution: {integrity: sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==}
     dev: false
@@ -7178,6 +7166,10 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
+    dev: false
+
+  /server-only/0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
     dev: false
 
   /set-harmonic-interval/1.0.1:

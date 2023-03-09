@@ -113,67 +113,43 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
-		await updateItem(product, storyMapItems, story.id, data, versions)
+		await updateItem(product, storyMapItems, versions, story.id, data)
 		setEditMode(false)
 	})
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
-		await updateItem(
-			product,
-			storyMapItems,
-			story.id,
-			{
-				acceptanceCriteria: produce(story.data().acceptanceCriteria, (draft) => {
-					const index = draft.findIndex((criterion) => criterion.id === id)
-					draft[index]!.checked = checked
-				}),
-			},
-			versions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			acceptanceCriteria: produce(story.data().acceptanceCriteria, (draft) => {
+				const index = draft.findIndex((criterion) => criterion.id === id)
+				draft[index]!.checked = checked
+			}),
+		})
 	}
 
 	const addAcceptanceCriterion = async () => {
 		if (!newAcceptanceCriterionInput) return
-		await updateItem(
-			product,
-			storyMapItems,
-			story.id,
-			{
-				acceptanceCriteria: [
-					...story.data().acceptanceCriteria,
-					{id: nanoid(), name: newAcceptanceCriterionInput, checked: false},
-				],
-			},
-			versions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			acceptanceCriteria: [
+				...story.data().acceptanceCriteria,
+				{id: nanoid(), name: newAcceptanceCriterionInput, checked: false},
+			],
+		})
 	}
 
 	const toggleBug = async (id: string, checked: boolean) => {
-		await updateItem(
-			product,
-			storyMapItems,
-			story.id,
-			{
-				bugs: produce(story.data().bugs, (draft) => {
-					const index = draft.findIndex((bug) => bug.id === id)
-					draft[index]!.checked = checked
-				}),
-			},
-			versions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			bugs: produce(story.data().bugs, (draft) => {
+				const index = draft.findIndex((bug) => bug.id === id)
+				draft[index]!.checked = checked
+			}),
+		})
 	}
 
 	const addBug = async () => {
 		if (!newBugInput) return
-		await updateItem(
-			product,
-			storyMapItems,
-			story.id,
-			{
-				bugs: [...story.data().bugs, {id: nanoid(), name: newBugInput, checked: false}],
-			},
-			versions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			bugs: [...story.data().bugs, {id: nanoid(), name: newBugInput, checked: false}],
+		})
 	}
 
 	const totalEffort = story.data().designEffort + story.data().engineeringEffort
@@ -205,7 +181,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 							type="primary"
 							danger
 							onClick={() => {
-								deleteItem(product, storyMapItems, story.id).catch(console.error)
+								deleteItem(product, storyMapItems, versions, story.id).catch(console.error)
 							}}
 						>
 							Delete
@@ -221,7 +197,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 									className="absolute inset-0 bg-transparent"
 									onChange={(e) => {
 										setLocalStoryName(e.target.value)
-										updateItem(product, storyMapItems, story.id, {name: e.target.value}, versions).catch(console.error)
+										updateItem(product, storyMapItems, versions, story.id, {name: e.target.value}).catch(console.error)
 									}}
 								/>
 							</div>
@@ -352,7 +328,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 					}}
 				>
 					<div className="flex gap-8">
-						<Form.Item label={<span className="font-semibold">Team members</span>} className="grow">
+						<label className="flex grow flex-col gap-2">
+							<span className="font-semibold">Team members</span>
 							<RhfSelect
 								control={control}
 								name="peopleIds"
@@ -362,27 +339,31 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 									.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 									.map((user) => ({label: user.data().name, value: user.id}))}
 							/>
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Design</span>}>
+						</label>
+						<label className="flex flex-col gap-2">
+							<span className="font-semibold">Design Effort</span>
 							<RhfSegmented control={control} name="designEffort" options={[1, 2, 3, 5, 8, 13]} />
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Engineering</span>}>
+						</label>
+						<label className="flex flex-col gap-2">
+							<span className="font-semibold">Engineering Effort</span>
 							<RhfSegmented control={control} name="engineeringEffort" options={[1, 2, 3, 5, 8, 13]} />
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Version</span>} className="shrink-0 basis-20">
+						</label>
+						<label className="flex shrink-0 basis-20 flex-col gap-2">
+							<span className="font-semibold">Version</span>
 							<RhfSelect
 								control={control}
 								name="versionId"
 								options={versions.docs.map((version) => ({label: version.data().name, value: version.id}))}
 							/>
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Status</span>} className="shrink-0 basis-56">
+						</label>
+						<label className="flex shrink-0 basis-56 flex-col gap-2">
+							<span className="font-semibold">Status</span>
 							<RhfSelect
 								control={control}
 								name="sprintColumn"
 								options={Object.entries(sprintColumns).map(([key, value]) => ({label: value, value: key}))}
 							/>
-						</Form.Item>
+						</label>
 					</div>
 					<Form.Item
 						label="Design"
@@ -420,7 +401,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)
-									updateItem(product, storyMapItems, story.id, {description: e.target.value}, versions).catch(
+									updateItem(product, storyMapItems, versions, story.id, {description: e.target.value}).catch(
 										console.error,
 									)
 								}}
@@ -515,7 +496,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, st
 								flagged={story.data().ethicsColumn !== null}
 								commentType={commentType}
 								onFlag={() => {
-									updateItem(product, storyMapItems, story.id, {ethicsColumn: `underReview`}, versions).catch(
+									updateItem(product, storyMapItems, versions, story.id, {ethicsColumn: `underReview`}).catch(
 										console.error,
 									)
 								}}

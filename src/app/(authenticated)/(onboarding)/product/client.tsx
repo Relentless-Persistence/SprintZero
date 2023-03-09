@@ -57,12 +57,14 @@ const ProductSetupClientPage: FC = () => {
 		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}`
 		// eslint-disable-next-line @typescript-eslint/require-await -- Callback requires Promise return
 		await runTransaction(db, async (transaction) => {
+			const storyMapHistoryId = nanoid()
+
 			transaction.set(doc(db, `Products`, slug).withConverter(ProductConverter), {
 				...data,
 				createdAt: Timestamp.now(),
 				members,
 
-				storyMapCurrentHistoryId: null,
+				storyMapCurrentHistoryId: storyMapHistoryId,
 				storyMapUpdatedAt: Timestamp.now(),
 
 				businessOutcomes: [],
@@ -96,7 +98,7 @@ const ProductSetupClientPage: FC = () => {
 			})
 
 			transaction.set(
-				doc(db, `Products`, slug, `StoryMapHistories`, nanoid()).withConverter(StoryMapHistoryConverter),
+				doc(db, `Products`, slug, `StoryMapHistories`, storyMapHistoryId).withConverter(StoryMapHistoryConverter),
 				{
 					future: false,
 					timestamp: serverTimestamp(),

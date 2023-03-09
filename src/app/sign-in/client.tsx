@@ -23,7 +23,6 @@ import {z} from "zod"
 
 import type {AuthProvider, UserCredential} from "firebase/auth"
 import type {FC} from "react"
-import type {User} from "~/types/db/Users"
 
 import {ProductConverter} from "~/types/db/Products"
 import {InviteConverter} from "~/types/db/Products/Invites"
@@ -93,12 +92,13 @@ const SignInClientPage: FC = () => {
 				})
 
 			if (isNewUser) {
-				await setDoc(doc(db, `Users`, credential.user.uid), {
+				await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
 					avatar: credential.user.photoURL,
 					email: credential.user.email,
 					hasAcceptedTos: false,
 					name: credential.user.displayName,
-				} satisfies User)
+					preferredMusicClient: `appleMusic`,
+				})
 				router.push(`/accept-terms`)
 			} else if (!user.hasAcceptedTos) {
 				router.push(`/accept-terms`)

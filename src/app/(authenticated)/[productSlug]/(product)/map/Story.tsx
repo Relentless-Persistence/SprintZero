@@ -1,48 +1,33 @@
 import {MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
 import {updateDoc} from "firebase/firestore"
+import {useAnimationFrame} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
-import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
+import type {DragInfo} from "./types"
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
-import type {Version} from "~/types/db/Products/Versions"
 
 import {elementRegistry} from "./globals"
-import StoryDrawer from "./StoryDrawer"
+import {useStoryMapContext} from "./StoryMapContext"
+import StoryDrawer from "~/components/StoryDrawer"
 import {updateItem} from "~/utils/storyMap"
 
 export type StoryProps = {
-	product: QueryDocumentSnapshot<Product>
-	storyMapItems: QuerySnapshot<StoryMapItem>
-	versions: QuerySnapshot<Version>
 	storyId: string
-	editMode: boolean
+	dragInfo: DragInfo
 	onMarkForDeletion: () => void
 	inert?: boolean
 }
 
-const Story: FC<StoryProps> = ({
-	product,
-	storyMapItems,
-	versions,
-	storyId,
-	editMode,
-	onMarkForDeletion,
-	inert = false,
-}) => {
+const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = false}) => {
+	const {product, storyMapItems, versions, editMode} = useStoryMapContext()
+
 	const story = storyMapItems.docs.find((story) => story.id === storyId)!
 
 	const contentRef = useRef<HTMLDivElement>(null)
-	useEffect(() => {
-		if (inert || !contentRef.current) return
-		elementRegistry[story.id] = contentRef.current
-		return () => {
-			if (!contentRef.current) return
-			elementRegistry[story.id] = contentRef.current // eslint-disable-line react-hooks/exhaustive-deps
-		}
-	}, [story.id, inert])
+	useAnimationFrame(() => {
+		elementRegistry[storyId] = {container: contentRef.current ?? undefined, content: contentRef.current ?? undefined}
+	})
 
 	const version = versions.docs.find((version) => version.id === story.data().versionId)
 
@@ -58,6 +43,7 @@ const Story: FC<StoryProps> = ({
 				`flex touch-none select-none items-center overflow-hidden rounded border border-[#d9d9d9] bg-white font-medium dark:border-[#757575] dark:bg-black`,
 				inert && `cursor-grabbing`,
 				!editMode && `cursor-grab  active:cursor-grabbing`,
+				dragInfo.itemBeingDraggedId === story.id && !inert && `invisible`,
 			)}
 			ref={contentRef}
 		>
@@ -87,7 +73,7 @@ const Story: FC<StoryProps> = ({
 							className="absolute inset-0 w-full rounded-sm bg-bgContainer focus:outline focus:outline-1 focus:outline-offset-1 focus:outline-primaryHover"
 							onChange={(e) => {
 								setLocalStoryName(e.target.value)
-								updateItem(product, storyMapItems, story.id, {name: e.target.value}, versions).catch(console.error)
+								updateItem(product, storyMapItems, versions, story.id, {name: e.target.value}).catch(console.error)
 							}}
 							onPointerDownCapture={(e) => e.stopPropagation()}
 						/>

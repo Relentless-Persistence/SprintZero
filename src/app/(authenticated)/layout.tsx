@@ -3,12 +3,16 @@
 import {doc, getDoc} from "firebase/firestore"
 import {usePathname, useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
+import {useAuthState, useIdToken} from "react-firebase-hooks/auth"
+import {useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC, ReactNode} from "react"
 
+import {ProductContext} from "./useProduct"
+import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {auth, db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type AuthenticatedLayoutProps = {
 	children: ReactNode
@@ -37,7 +41,24 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
 			.catch(console.error)
 	}, [loading, pathname, router, user])
 
-	return <>{userCanAccessApp && children}</>
+	const [credential] = useIdToken(auth)
+	useEffect(() => {
+		credential
+			?.getIdToken()
+			?.then((token) => {
+				document.cookie = `firebaseSession=${token}; path=/; sameSite=strict; secure;`
+			})
+			.catch(console.error)
+	}, [credential])
+
+	const activeProductId = useActiveProductId()
+	const [product] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+
+	return (
+		<ProductContext.Provider value={product?.exists() ? product : undefined}>
+			{userCanAccessApp && children}
+		</ProductContext.Provider>
+	)
 }
 
 export default AuthenticatedLayout

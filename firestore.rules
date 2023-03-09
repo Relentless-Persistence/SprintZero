@@ -47,10 +47,6 @@ service cloud.firestore {
         allow read, write: if isEditorOnProduct(productId);
       }
 
-      match /StoryMapComments/{storyMapCommentId} {
-        allow read, write: if isEditorOnProduct(productId);
-      }
-
       match /StoryMapHistories/{storyMapHistoryId} {
         allow read, write: if isEditorOnProduct(productId);
 
@@ -61,6 +57,12 @@ service cloud.firestore {
 
       match /StoryMapItems/{storyMapItemId} {
         allow read, write: if isEditorOnProduct(productId);
+
+        match /Comments/{storyMapCommentId} {
+          allow read: if isEditorOnProduct(productId);
+          allow create: if isEditorOnProduct(productId) && request.auth.uid == request.resource.data.authorId;
+          allow update, delete: if isEditorOnProduct(productId) && request.auth.uid == resource.data.authorId;
+        }
       }
 
       match /Tasks/{taskId} {

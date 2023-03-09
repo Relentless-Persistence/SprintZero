@@ -1,5 +1,6 @@
 import {initializeApp} from "firebase-admin/app"
 import {getFirestore} from "firebase-admin/firestore"
+import "server-only"
 import invariant from "tiny-invariant"
 
 declare global {
@@ -8,9 +9,10 @@ declare global {
 }
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-invariant(projectId, "NEXT_PUBLIC_FIREBASE_PROJECT_ID is not defined")
+invariant(projectId, `NEXT_PUBLIC_FIREBASE_PROJECT_ID is not defined`)
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 global.adminApp = global.adminApp ?? initializeApp({projectId})
 
+export const appAdmin = global.adminApp
 export const dbAdmin = getFirestore(global.adminApp)

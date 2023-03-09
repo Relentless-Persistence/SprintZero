@@ -1,7 +1,13 @@
 /* eslint-disable no-var, @typescript-eslint/no-unnecessary-condition */
 
 declare global {
-	var __elementRegistry: Record<string, HTMLElement | undefined>
+	var __elementRegistry: Record<
+		string,
+		{
+			container: HTMLElement | undefined
+			content: HTMLElement | undefined
+		}
+	>
 }
 
 export const storyMapTop = 224

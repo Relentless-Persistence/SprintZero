@@ -24,12 +24,13 @@ export const useUser = (): QueryDocumentSnapshot<User> | undefined => {
 			invariant(user.email, `User has no email`)
 			invariant(user.displayName, `User has no name`)
 
-			setDoc(doc(db, `Users`, user.uid), {
+			setDoc(doc(db, `Users`, user.uid).withConverter(UserConverter), {
 				avatar: user.photoURL,
 				email: user.email,
 				hasAcceptedTos: false,
 				name: user.displayName,
-			} satisfies User).catch(console.error)
+				preferredMusicClient: `appleMusic`,
+			}).catch(console.error)
 
 			return undefined
 		}

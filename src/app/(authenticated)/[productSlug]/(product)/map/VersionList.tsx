@@ -3,47 +3,29 @@
 import {MinusCircleOutlined} from "@ant-design/icons"
 import {Button, Input, Tabs} from "antd"
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
-import {useEffect} from "react"
 
-import type {DocumentReference, QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
-import type {Dispatch, FC, SetStateAction} from "react"
-import type {Product} from "~/types/db/Products"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {DocumentReference} from "firebase/firestore"
+import type {FC} from "react"
 import type {Version} from "~/types/db/Products/Versions"
 
+import {useStoryMapContext} from "./StoryMapContext"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {AllVersions} from "~/utils/storyMap"
 
-export type VersionListProps = {
-	product: QueryDocumentSnapshot<Product>
-	allVersions: QuerySnapshot<Version>
-	currentVersionId: string | typeof AllVersions | undefined
-	setCurrentVersionId: (id: string | typeof AllVersions) => void
-	newVersionInputValue: string | undefined
-	setNewVersionInputValue: (value: string | undefined) => void
-	storyMapItems: QuerySnapshot<StoryMapItem>
-	editMode: boolean
-	setItemsToBeDeleted: Dispatch<SetStateAction<string[]>>
-	versionsToBeDeleted: string[]
-	setVersionsToBeDeleted: Dispatch<SetStateAction<string[]>>
-}
-
-const VersionList: FC<VersionListProps> = ({
-	product,
-	allVersions,
-	currentVersionId,
-	setCurrentVersionId,
-	newVersionInputValue,
-	setNewVersionInputValue,
-	storyMapItems,
-	editMode,
-	setItemsToBeDeleted,
-	versionsToBeDeleted,
-	setVersionsToBeDeleted,
-}) => {
-	useEffect(() => {
-		if (currentVersionId === undefined && allVersions.docs[0]?.exists()) setCurrentVersionId(allVersions.docs[0].id)
-	}, [currentVersionId, setCurrentVersionId, allVersions.docs])
+const VersionList: FC = () => {
+	const {
+		product,
+		versions,
+		currentVersionId,
+		setCurrentVersionId,
+		newVersionInputValue,
+		setNewVersionInputValue,
+		storyMapItems,
+		editMode,
+		setItemsToBeDeleted,
+		versionsToBeDeleted,
+		setVersionsToBeDeleted,
+	} = useStoryMapContext()
 
 	const addVersion = async (): Promise<DocumentReference<Version>> => {
 		if (!newVersionInputValue) throw new Error(`Version name is required.`)
@@ -66,7 +48,7 @@ const VersionList: FC<VersionListProps> = ({
 				if (key !== `__NEW_VERSION__`) setCurrentVersionId(key)
 			}}
 			activeKey={currentVersionId}
-			items={allVersions.docs
+			items={versions.docs
 				.filter((version) => !versionsToBeDeleted.includes(version.id))
 				.sort((a, b) => a.data().name.localeCompare(b.data().name))
 				.map((version) => ({
