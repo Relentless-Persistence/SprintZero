@@ -6,19 +6,18 @@ import {useForm} from "react-hook-form"
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Id} from "~/types"
-import type {Result} from "~/types/db/Products/Results"
+import type {Result} from "~/types/db/Products/Objectives/Results"
 
+import {useProduct} from "~/app/(authenticated)/useProduct"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
-import {ResultConverter, ResultSchema} from "~/types/db/Products/Results"
-import {db} from "~/utils/firebase"
+import {ResultConverter, ResultSchema} from "~/types/db/Products/Objectives/Results"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 
 const formSchema = ResultSchema.pick({text: true})
 type FormInputs = z.infer<typeof formSchema>
 
 export type ResultCardProps = {
-	objectiveId: Id
+	objectiveId: string
 	result?: QueryDocumentSnapshot<Result>
 	index?: number
 	isEditing: boolean
@@ -27,6 +26,7 @@ export type ResultCardProps = {
 }
 
 const ResultCard: FC<ResultCardProps> = ({objectiveId, result, index, isEditing, onEditStart, onEditEnd}) => {
+	const product = useProduct()
 	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
@@ -42,7 +42,7 @@ const ResultCard: FC<ResultCardProps> = ({objectiveId, result, index, isEditing,
 				text: data.text,
 			})
 		} else {
-			await addDoc(collection(db, `Objectives`, objectiveId, `Results`).withConverter(ResultConverter), {
+			await addDoc(collection(product.ref, `Objectives`, objectiveId, `Results`).withConverter(ResultConverter), {
 				createdAt: Timestamp.now(),
 				text: data.text,
 			})

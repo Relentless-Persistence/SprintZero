@@ -15,9 +15,9 @@ service cloud.firestore {
       }
 
       match /Invites/{inviteId} {
-      allow read: if request.auth.token.email == resource.data.email;
-      allow write: if isEditorOnProduct(productId)
-    }
+        allow read: if request.auth.token.email == resource.data.email;
+        allow write: if isEditorOnProduct(productId)
+      }
 
       match /JourneyEvents/{journeyEventId} {
         allow read, write: if isEditorOnProduct(productId);
@@ -29,6 +29,10 @@ service cloud.firestore {
 
       match /Objectives/{objectiveId} {
         allow read, write: if isEditorOnProduct(productId);
+
+        match /Results/{resultId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
       }
 
       match /Participants/{participantId} {
@@ -36,10 +40,6 @@ service cloud.firestore {
       }
 
       match /Personas/{personaId} {
-        allow read, write: if isEditorOnProduct(productId);
-      }
-
-      match /Results/{resultId} {
         allow read, write: if isEditorOnProduct(productId);
       }
 

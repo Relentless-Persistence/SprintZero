@@ -2,37 +2,31 @@
 
 import {AimOutlined, PlusOutlined} from "@ant-design/icons"
 import {Breadcrumb, Empty, FloatButton, Input, Tabs} from "antd"
-import {collection, doc, orderBy, query, updateDoc, where} from "firebase/firestore"
+import {collection, doc, orderBy, query, updateDoc} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 import {useDebounce} from "react-use"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import ResultCard from "./ResultCard"
+import {useProduct} from "~/app/(authenticated)/useProduct"
 import {ObjectiveConverter} from "~/types/db/Products/Objectives"
-import {ResultConverter} from "~/types/db/Products/Results"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {ResultConverter} from "~/types/db/Products/Objectives/Results"
 
 const ObjectivesClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [currentObjectiveId, setCurrentObjectiveId] = useState<Id | undefined>(undefined)
+	const product = useProduct()
+	const [currentObjectiveId, setCurrentObjectiveId] = useState<string | undefined>(undefined)
 
 	const [objectives] = useCollection(
-		query(
-			collection(db, `Objectives`),
-			where(`productId`, `==`, activeProductId),
-			orderBy(`name`, `asc`),
-		).withConverter(ObjectiveConverter),
+		query(collection(product.ref, `Objectives`), orderBy(`name`, `asc`)).withConverter(ObjectiveConverter),
 	)
 
 	const hasSetInitialObjective = useRef(false)
 	useEffect(() => {
 		if (hasSetInitialObjective.current || !objectives) return
-		if (objectives.docs.length > 0) setCurrentObjectiveId(objectives.docs[0]!.id as Id)
+		if (objectives.docs.length > 0) setCurrentObjectiveId(objectives.docs[0]!.id)
 		hasSetInitialObjective.current = true
 	}, [objectives])
 
@@ -40,16 +34,17 @@ const ObjectivesClientPage: FC = () => {
 
 	const [results] = useCollection(
 		currentObjectiveId
-			? query(collection(db, `Objectives`, currentObjectiveId, `Results`), orderBy(`createdAt`, `asc`)).withConverter(
-					ResultConverter,
-			  )
+			? query(
+					collection(product.ref, `Objectives`, currentObjectiveId, `Results`),
+					orderBy(`createdAt`, `asc`),
+			  ).withConverter(ResultConverter)
 			: undefined,
 	)
 
 	const hasSetDefaultObjective = useRef(false)
 	useEffect(() => {
 		if (hasSetDefaultObjective.current || !objectives) return
-		if (objectives.docs.length > 0) setCurrentObjectiveId(objectives.docs[0]!.id as Id)
+		if (objectives.docs.length > 0) setCurrentObjectiveId(objectives.docs[0]!.id)
 		hasSetDefaultObjective.current = true
 	}, [objectives])
 
@@ -62,7 +57,7 @@ const ObjectivesClientPage: FC = () => {
 	useDebounce(
 		async () => {
 			if (!currentObjective || statement === dbStatement) return
-			await updateDoc(doc(db, `Objectives`, currentObjective.id).withConverter(ObjectiveConverter), {
+			await updateDoc(doc(product.ref, `Objectives`, currentObjective.id).withConverter(ObjectiveConverter), {
 				statement,
 			})
 		},
@@ -75,11 +70,7 @@ const ObjectivesClientPage: FC = () => {
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="relative flex w-full flex-col gap-6 overflow-auto px-12 py-8">
-				<Breadcrumb>
-					<Breadcrumb.Item>Strategy</Breadcrumb.Item>
-					<Breadcrumb.Item>Objectives</Breadcrumb.Item>
-					<Breadcrumb.Item>{currentObjective?.data().name}</Breadcrumb.Item>
-				</Breadcrumb>
+				<Breadcrumb items={[{title: `Strategy`}, {title: `Objectives`}, {title: currentObjective?.data().name}]} />
 
 				{currentObjectiveId && (
 					<Input
@@ -104,7 +95,7 @@ const ObjectivesClientPage: FC = () => {
 								currentObjective?.exists() && (
 									<ResultCard
 										key={result.id}
-										objectiveId={currentObjective.id as Id}
+										objectiveId={currentObjective.id}
 										result={result}
 										index={index}
 										isEditing={result.id === activeResultId}
@@ -118,7 +109,7 @@ const ObjectivesClientPage: FC = () => {
 							<ResultCard
 								index={results?.docs.length}
 								isEditing
-								objectiveId={currentObjective.id as Id}
+								objectiveId={currentObjective.id}
 								onEditStart={() => setActiveResultId(`new`)}
 								onEditEnd={() => setActiveResultId(undefined)}
 							/>
@@ -134,6 +125,7 @@ const ObjectivesClientPage: FC = () => {
 
 				<FloatButton
 					icon={<PlusOutlined className="text-primary" />}
+					tooltip="Add Result"
 					onClick={() => setActiveResultId(`new`)}
 					className="absolute right-12 bottom-8"
 				/>
@@ -142,7 +134,7 @@ const ObjectivesClientPage: FC = () => {
 			<Tabs
 				tabPosition="right"
 				activeKey={currentObjectiveId}
-				onChange={(key: Id) => {
+				onChange={(key) => {
 					setCurrentObjectiveId(key)
 					setStatement(objectives?.docs.find((objective) => objective.id === key)?.data().statement || ``)
 				}}
