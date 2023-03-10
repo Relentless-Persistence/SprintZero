@@ -13,10 +13,10 @@ import type {Promisable} from "type-fest"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Comment} from "~/types/db/Products/StoryMapItems/Comments"
 
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {CommentConverter} from "~/types/db/Products/StoryMapItems/Comments"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {useUser} from "~/utils/useUser"
 
 export type CommentsProps = {
 	storyMapItem: QueryDocumentSnapshot<StoryMapItem>
@@ -26,7 +26,7 @@ export type CommentsProps = {
 }
 
 const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag}) => {
-	const user = useUser()
+	const {user} = useAppContext()
 	const [commentDraft, setCommentDraft] = useState(``)
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +35,7 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 			createdAt: serverTimestamp(),
 			text: commentDraft,
 			type: commentType,
-			authorId: user!.id,
+			authorId: user.id,
 		}
 		await addDoc(collection(storyMapItem.ref, `Comments`), data)
 		setCommentDraft(``)
@@ -93,7 +93,7 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 				}}
 				className="mt-4 flex gap-2"
 			>
-				<Avatar shape="square" src={user?.data().avatar} className="border border-border" />
+				<Avatar shape="square" src={user.data().avatar} className="border border-border" />
 				<div className="flex grow flex-col gap-2">
 					<Input value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} />
 					<div className="flex justify-between gap-2">

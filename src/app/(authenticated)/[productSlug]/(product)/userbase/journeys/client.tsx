@@ -2,27 +2,24 @@
 
 import {Breadcrumb, Button, Tabs} from "antd"
 import clsx from "clsx"
-import {addDoc, collection, deleteDoc, doc, query, updateDoc, where} from "firebase/firestore"
+import {addDoc, collection, deleteDoc, doc, updateDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import AddJourneyPage from "./AddJourneyPage"
 import EventDrawer from "./EventDrawer"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {JourneyEventConverter} from "~/types/db/Products/JourneyEvents"
 import {JourneyConverter, durationUnits} from "~/types/db/Products/Journeys"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const JourneysClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [journeys, loading] = useCollection(
-		query(collection(db, `Journeys`), where(`productId`, `==`, activeProductId)).withConverter(JourneyConverter),
-	)
+	const {product} = useAppContext()
+	const [journeys, loading] = useCollection(collection(product.ref, `Journeys`).withConverter(JourneyConverter))
 
-	const [activeJourney, setActiveJourney] = useState<Id | `new` | undefined>(undefined)
+	const [activeJourney, setActiveJourney] = useState<string | `new` | undefined>(undefined)
 	useEffect(() => {
 		if (!loading) setActiveJourney(!journeys || journeys.docs.length === 0 ? `new` : journeys.docs[0]!.id)
 	}, [journeys, loading])
@@ -30,12 +27,12 @@ const JourneysClientPage: FC = () => {
 
 	const [journeyEvents] = useCollection(
 		activeJourney !== undefined && activeJourney !== `new`
-			? collection(db, `Journeys`, activeJourney, `JourneyEvents`).withConverter(JourneyEventConverter)
+			? collection(product.ref, `Journeys`, activeJourney, `JourneyEvents`).withConverter(JourneyEventConverter)
 			: undefined,
 	)
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const [activeEventId, setActiveEventId] = useState<Id | undefined>(undefined)
+	const [activeEventId, setActiveEventId] = useState<string | undefined>(undefined)
 	const activeEvent = journeyEvents?.docs.find((event) => event.id === activeEventId)
 
 	if (activeJourney === `new`)
@@ -141,9 +138,9 @@ const JourneysClientPage: FC = () => {
 				<Tabs
 					tabPosition="right"
 					activeKey={activeJourney}
-					onChange={(key) => setActiveJourney(key | `new`)}
+					onChange={(key) => setActiveJourney(key || `new`)}
 					items={journeys.docs
-						.map((journey) => ({key: journey.id | `new`, label: journey.data().name}))
+						.map((journey) => ({key: journey.id || `new`, label: journey.data().name}))
 						.concat({key: `new`, label: `Add`})}
 				/>
 			)}

@@ -10,8 +10,8 @@ import type {FC} from "react"
 import Feature from "./Feature"
 import {elementRegistry} from "./globals"
 import {useStoryMapContext} from "./StoryMapContext"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {addFeature, sortFeatures, updateItem} from "~/utils/storyMap"
-import {useUser} from "~/utils/useUser"
 
 export type EpicProps = {
 	epicId: string
@@ -21,8 +21,8 @@ export type EpicProps = {
 }
 
 const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false}) => {
-	const {product, storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
-	const user = useUser()
+	const {product, user} = useAppContext()
+	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
 
 	const epic = storyMapItems.docs.find((item) => item.id === epicId)!
 	const children = sortFeatures(storyMapItems.docs.filter((item) => item.data().parentId === epicId))
@@ -124,7 +124,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 								<button
 									type="button"
 									onClick={() => {
-										addFeature(product, storyMapItems, versions, {parentId: epic.id}, user!.id).catch(console.error)
+										addFeature(product, storyMapItems, versions, {parentId: epic.id}, user.id).catch(console.error)
 									}}
 									className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[0.6rem] text-white"
 								>
@@ -153,7 +153,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 				<button
 					type="button"
 					onClick={() => {
-						addFeature(product, storyMapItems, versions, {parentId: epic.id}, user!.id).catch(console.error)
+						addFeature(product, storyMapItems, versions, {parentId: epic.id}, user.id).catch(console.error)
 					}}
 					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378] dark:bg-black dark:text-[#00a2c4]"
 				>

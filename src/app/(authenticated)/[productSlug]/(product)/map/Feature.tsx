@@ -10,8 +10,8 @@ import type {FC} from "react"
 import {elementRegistry} from "./globals"
 import Story from "./Story"
 import {useStoryMapContext} from "./StoryMapContext"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {AllVersions, addStory, sortStories, updateItem} from "~/utils/storyMap"
-import {useUser} from "~/utils/useUser"
 
 export type FeatureProps = {
 	featureId: string
@@ -21,8 +21,8 @@ export type FeatureProps = {
 }
 
 const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, inert = false}) => {
-	const {product, storyMapItems, versions, editMode, currentVersionId, setItemsToBeDeleted} = useStoryMapContext()
-	const user = useUser()
+	const {product, user} = useAppContext()
+	const {storyMapItems, versions, editMode, currentVersionId, setItemsToBeDeleted} = useStoryMapContext()
 
 	const feature = storyMapItems.docs.find((feature) => feature.id === featureId)!
 	const children = sortStories(
@@ -105,7 +105,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 				<button
 					type="button"
 					onClick={() => {
-						if (currentVersionId !== AllVersions && user)
+						if (currentVersionId !== AllVersions)
 							addStory(product, storyMapItems, versions, {parentId: feature.id}, user.id, currentVersionId).catch(
 								console.error,
 							)
@@ -135,7 +135,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 						<button
 							type="button"
 							onClick={() => {
-								if (currentVersionId !== AllVersions && user)
+								if (currentVersionId !== AllVersions)
 									addStory(product, storyMapItems, versions, {parentId: feature.id}, user.id, currentVersionId).catch(
 										console.error,
 									)

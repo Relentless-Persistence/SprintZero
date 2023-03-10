@@ -9,6 +9,7 @@ import type {FC} from "react"
 
 import {elementRegistry} from "./globals"
 import {useStoryMapContext} from "./StoryMapContext"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import StoryDrawer from "~/components/StoryDrawer"
 import {updateItem} from "~/utils/storyMap"
 
@@ -20,7 +21,8 @@ export type StoryProps = {
 }
 
 const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = false}) => {
-	const {product, storyMapItems, versions, editMode} = useStoryMapContext()
+	const {product} = useAppContext()
+	const {storyMapItems, versions, editMode} = useStoryMapContext()
 
 	const story = storyMapItems.docs.find((story) => story.id === storyId)!
 
@@ -87,7 +89,6 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 			</div>
 
 			<StoryDrawer
-				product={product}
 				storyMapItems={storyMapItems}
 				versions={versions}
 				storyId={storyId}

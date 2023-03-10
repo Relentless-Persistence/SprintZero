@@ -22,11 +22,7 @@ export const ProductSchema = z.object({
 	storyMapUpdatedAt: timestampSchema,
 
 	// Kickoff info
-	businessOutcomes: z.array(z.object({id: z.string(), text: z.string()})),
-	marketLeaders: z.array(z.object({id: z.string(), text: z.string()})),
-	potentialRisks: z.array(z.object({id: z.string(), text: z.string()})),
 	problemStatement: z.string(),
-	userPriorities: z.array(z.object({id: z.string(), text: z.string()})),
 
 	// Accessibility info
 	accessibility: z.object({
@@ -47,33 +43,9 @@ export const ProductSchema = z.object({
 	}),
 
 	// Vision info
-	features: z
-		.array(z.object({id: z.string(), text: z.string().min(1, `Required`)}))
-		.min(1, `Required`)
-		.nullable(),
 	finalVision: z.string(),
 	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]).nullable(),
-	updates: z.array(
-		z.object({
-			id: z.string(),
-			userId: z.string(),
-			text: z.string(),
-			timestamp: timestampSchema,
-		}),
-	),
 	valueProposition: z.string({invalid_type_error: `Required`}).min(1, `Required`).nullable(),
-
-	// Huddle info
-	huddles: z.record(
-		z.string(),
-		z.object({
-			updatedAt: timestampSchema,
-
-			blockerStoryIds: z.array(z.string()),
-			todayStoryIds: z.array(z.string()),
-			yesterdayStoryIds: z.array(z.string()),
-		}),
-	),
 })
 
 export type Product = z.infer<typeof ProductSchema>

@@ -5,36 +5,31 @@ import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Button, Card, Empty, FloatButton, Switch, Tabs, Tag} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {Timestamp, addDoc, collection, doc, getDoc, query, updateDoc, where} from "firebase/firestore"
+import {Timestamp, addDoc, collection, doc, getDoc, query, updateDoc} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {RetrospectiveItem} from "~/types/db/Products/RetrospectiveItems"
 
 import RetrospectiveDrawer from "./RetrospectiveDrawer"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {RetrospectiveItemConverter, retrospectiveTabs} from "~/types/db/Products/RetrospectiveItems"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
-import {useUser} from "~/utils/useUser"
 
 dayjs.extend(relativeTime)
 
 const RetrospectiveClientPage: FC = () => {
-	const user = useUser()
+	const {product, user} = useAppContext()
 
-	const activeProductId = useActiveProductId()
 	const [retrospectiveItems, loading] = useCollection(
-		query(collection(db, `RetrospectiveItems`), where(`productId`, `==`, activeProductId)).withConverter(
-			RetrospectiveItemConverter,
-		),
+		query(collection(product.ref, `RetrospectiveItems`)).withConverter(RetrospectiveItemConverter),
 	)
 
 	const [currentTab, setCurrentTab] = useState<`enjoyable` | `puzzling` | `frustrating`>(`enjoyable`)
-	const [activeItemId, setActiveItemId] = useState<Id | `new` | undefined>(undefined)
+	const [activeItemId, setActiveItemId] = useState<string | `new` | undefined>(undefined)
 	const [includeArchived, setIncludeArchived] = useState(false)
 	const activeItem = retrospectiveItems?.docs.find((item) => item.id === activeItemId)
 
@@ -95,7 +90,7 @@ const RetrospectiveClientPage: FC = () => {
 										)
 									})()}
 									extra={
-										item.data().userId === user?.id ? (
+										item.data().userId === user.id ? (
 											<Button size="small" onClick={() => setActiveItemId(item.id)}>
 												Edit
 											</Button>
@@ -155,11 +150,13 @@ const RetrospectiveClientPage: FC = () => {
 							...values,
 							archived: false,
 							createdAt: Timestamp.now(),
-							productId: activeProductId,
-							userId: user!.id,
+							userId: user.id,
 						}
 						if (activeItemId === `new`) {
-							await addDoc(collection(db, `RetrospectiveItems`).withConverter(RetrospectiveItemConverter), data)
+							await addDoc(
+								collection(product.ref, `RetrospectiveItems`).withConverter(RetrospectiveItemConverter),
+								data,
+							)
 						} else {
 							await updateDoc(activeItem!.ref, data)
 						}

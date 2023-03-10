@@ -7,11 +7,10 @@ import {forwardRef, useEffect, useRef} from "react"
 
 import type {Dispatch, ForwardRefRenderFunction, SetStateAction} from "react"
 import type {FieldErrors} from "react-hook-form"
-import type {Id} from "~/types"
 
 export type TextListEditorProps = {
 	textList: Array<{id: string; text: string}>
-	onChange: Dispatch<SetStateAction<Array<{id: Id; text: string}>>>
+	onChange: Dispatch<SetStateAction<Array<{id: string; text: string}>>>
 	onBlur?: () => void
 	maxItems?: number
 	disabled?: boolean

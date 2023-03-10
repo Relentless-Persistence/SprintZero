@@ -7,40 +7,43 @@ import {Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline} from "a
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {diffArrays} from "diff"
-import {Timestamp, doc, getDoc, updateDoc} from "firebase/firestore"
+import {Timestamp, collection, doc, getDoc, writeBatch} from "firebase/firestore"
 import {nanoid} from "nanoid"
 import {useEffect, useRef, useState} from "react"
+import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 
 import type {FC} from "react"
 
-import {useProduct} from "~/app/(authenticated)/useProduct"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
 import {ProductSchema} from "~/types/db/Products"
+import {FeatureConverter, FeatureSchema} from "~/types/db/Products/Features"
+import {VisionUpdateConverter} from "~/types/db/Products/VisionUpdates"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
-import {useUser} from "~/utils/useUser"
 
 dayjs.extend(relativeTime)
 
 const formSchema = z.object({
 	productType: ProductSchema.shape.productType.unwrap(),
 	valueProposition: ProductSchema.shape.valueProposition.unwrap(),
-	features: ProductSchema.shape.features.unwrap(),
+	features: z.array(z.object({id: z.string(), text: FeatureSchema.shape.text})),
 	finalVision: ProductSchema.shape.finalVision,
 })
 type FormInputs = z.infer<typeof formSchema>
 
 const VisionsClientPage: FC = () => {
-	const user = useUser()
-	const product = useProduct()
+	const {product, user} = useAppContext()
 
 	const [editMode, setEditMode] = useState(false)
 	const [currentStep, setCurrentStep] = useState(0)
+
+	const [dbFeatures] = useCollection(collection(product.ref, `Features`).withConverter(FeatureConverter))
 
 	const {
 		control,
@@ -55,7 +58,9 @@ const VisionsClientPage: FC = () => {
 		defaultValues: {
 			productType: product.data().productType ?? `mobile`,
 			valueProposition: product.data().valueProposition ?? ``,
-			features: product.data().features ?? [{id: nanoid(), text: ``}],
+			features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
+				{id: nanoid(), text: ``},
+			],
 		},
 	})
 
@@ -66,7 +71,9 @@ const VisionsClientPage: FC = () => {
 			reset({
 				productType: product.data().productType ?? `mobile`,
 				valueProposition: product.data().valueProposition ?? ``,
-				features: product.data().features ?? [{id: nanoid(), text: ``}],
+				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
+					{id: nanoid(), text: ``},
+				],
 				finalVision: product.data().finalVision,
 			})
 			setEditMode(true)
@@ -75,27 +82,32 @@ const VisionsClientPage: FC = () => {
 			reset({
 				productType: product.data().productType ?? `mobile`,
 				valueProposition: product.data().valueProposition ?? ``,
-				features: product.data().features ?? [{id: nanoid(), text: ``}],
+				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
+					{id: nanoid(), text: ``},
+				],
 				finalVision: product.data().finalVision,
 			})
 			setEditMode(true)
 			hasSetInitial.current = true
 		}
-	}, [product, reset])
+	}, [dbFeatures?.docs, product, reset])
 
+	const [visionUpdates] = useCollection(collection(product.ref, `VisionUpdates`).withConverter(VisionUpdateConverter))
 	const usersData = useQueries({
-		queries: product.data().updates.map((update) => ({
-			queryKey: [`user`, update.userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, update.userId).withConverter(UserConverter)),
-		})),
+		queries: visionUpdates
+			? visionUpdates.docs.map((update) => ({
+					queryKey: [`user`, update.data().userId],
+					queryFn: async () => await getDoc(doc(db, `Users`, update.data().userId).withConverter(UserConverter)),
+			  }))
+			: [],
 	})
 
 	const [productType, valueProposition, features] = watch([`productType`, `valueProposition`, `features`])
 	const productVision = trpc.gpt.useQuery(
 		{
-			prompt: `Write a product vision for a ${productType} app. Its goal is to: ${valueProposition}. The app has the following features: ${features
-				.map((f) => f.text)
-				.join(`, `)}.`,
+			prompt: `Write a product vision for a ${productType} app. Its goal is to: ${valueProposition}. The app has the following features: ${features.join(
+				`, `,
+			)}.`,
 		},
 		{
 			enabled: currentStep >= 3,
@@ -308,9 +320,12 @@ const VisionsClientPage: FC = () => {
 																operations.push(`changed the value proposition to "${data.valueProposition}"`)
 
 															// Calculate feature diffs
-															if (product.data().features !== data.features) {
+															if (
+																dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) !==
+																data.features
+															) {
 																const differences = diffArrays(
-																	product.data().features?.map((feature) => feature.text) ?? [],
+																	dbFeatures?.docs.map((feature) => feature.data().text) ?? [],
 																	data.features.map((feature) => feature.text),
 																)
 																const removals = differences
@@ -330,30 +345,48 @@ const VisionsClientPage: FC = () => {
 															}
 															const operationsText = listToSentence(operations).concat(`.`)
 
-															const updates = [...product.data().updates]
+															const batch = writeBatch(db)
 															if (product.data().finalVision === ``) {
-																updates.push({
-																	id: nanoid(),
-																	userId: user!.id,
-																	text: `created the product vision.`,
-																	timestamp: Timestamp.now(),
-																})
+																batch.set(
+																	doc(product.ref, `VisionUpdates`, nanoid()).withConverter(VisionUpdateConverter),
+																	{
+																		userId: user.id,
+																		text: `created the product vision.`,
+																		timestamp: Timestamp.now(),
+																	},
+																)
 															} else if (operations.length > 0) {
-																updates.push({
-																	id: nanoid(),
-																	userId: user!.id,
-																	text: operationsText,
-																	timestamp: Timestamp.now(),
-																})
+																batch.set(
+																	doc(product.ref, `VisionUpdates`, nanoid()).withConverter(VisionUpdateConverter),
+																	{
+																		userId: user.id,
+																		text: operationsText,
+																		timestamp: Timestamp.now(),
+																	},
+																)
 															}
 
-															await updateDoc(product.ref, {
-																features: data.features,
+															batch.update(product.ref, {
 																finalVision: data.finalVision,
 																productType: data.productType,
-																updates,
 																valueProposition: data.valueProposition,
 															})
+															features.forEach((feature) => {
+																if (feature.id.startsWith(`new`)) {
+																	batch.set(doc(product.ref, `features`, nanoid()).withConverter(FeatureConverter), {
+																		text: feature.text,
+																	})
+																} else {
+																	batch.update(
+																		doc(product.ref, `features`, feature.id).withConverter(FeatureConverter),
+																		{
+																			text: feature.text,
+																		},
+																	)
+																}
+															})
+															await batch.commit()
+
 															setEditMode(false)
 														})().catch(console.error)
 													}}
@@ -377,7 +410,9 @@ const VisionsClientPage: FC = () => {
 										reset({
 											productType: product.data().productType ?? `mobile`,
 											valueProposition: product.data().valueProposition ?? ``,
-											features: product.data().features ?? [{id: nanoid(), text: ``}],
+											features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
+												{id: nanoid(), text: ``},
+											],
 										})
 										setCurrentStep(0)
 										setEditMode(true)
@@ -400,28 +435,31 @@ const VisionsClientPage: FC = () => {
 			<div className="mt-8 mr-12 flex flex-col items-start gap-4">
 				<Tag>Changelog</Tag>
 
-				{product.data().updates.length === 0 ? (
+				{visionUpdates?.docs.length === 0 ? (
 					<p className="italic text-textTertiary">No changes yet</p>
 				) : (
 					<Timeline
-						items={product.data().updates.map((update) => ({
+						items={visionUpdates?.docs.map((update) => ({
 							children: (
 								<div className="flex flex-col gap-1">
-									<p className="font-mono">{dayjs(update.timestamp.toDate()).fromNow()}</p>
+									<p className="font-mono">{dayjs(update.data().timestamp.toDate()).fromNow()}</p>
 									<p className="text-xs">
 										<span className="text-info">
-											@{usersData.find((user) => user.data?.id === update.userId)?.data?.data()?.name}
+											@{usersData.find((user) => user.data?.id === update.data().userId)?.data?.data()?.name}
 										</span>
 										{` `}
-										{update.text.split(`"`).map((text, i) =>
-											i % 2 === 0 ? (
-												<span key={i}>{text}</span>
-											) : (
-												<b key={i} className="font-semibold">
-													&quot;{text}&quot;
-												</b>
-											),
-										)}
+										{update
+											.data()
+											.text.split(`"`)
+											.map((text, i) =>
+												i % 2 === 0 ? (
+													<span key={i}>{text}</span>
+												) : (
+													<b key={i} className="font-semibold">
+														&quot;{text}&quot;
+													</b>
+												),
+											)}
 									</p>
 								</div>
 							),

@@ -10,54 +10,46 @@ import {
 import {Breadcrumb, Select, Switch, Tabs, Tag} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {collection, doc, orderBy, query, where} from "firebase/firestore"
+import {collection, orderBy, query} from "firebase/firestore"
 import {useMemo, useState} from "react"
-import {useCollection, useDocument} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
 import SprintColumn from "./SprintColumn"
-import {ProductConverter} from "~/types/db/Products"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {StoryMapItemConverter, sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
 import {AllVersions} from "~/utils/storyMap"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
 
 const SprintClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-	const [storyMapStates] = useCollection(
-		query(collection(db, `StoryMapStates`), where(`productId`, `==`, activeProductId)).withConverter(
-			StoryMapItemConverter,
-		),
-	)
-	const storyMapState = storyMapStates?.docs[0]
+	const {product} = useAppContext()
+	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
+	const storyMapState = storyMapItems?.docs[0]
 	const [myStoriesOnly, setMyStoriesOnly] = useState(false)
 
-	const firstSprintStartDate = activeProduct?.exists()
-		? findPreviousOccurenceOfDayOfWeek(
-				dayjs(activeProduct.data().createdAt.toMillis()),
-				activeProduct.data().sprintStartDayOfWeek,
-		  )
-		: undefined
+	const firstSprintStartDate = findPreviousOccurenceOfDayOfWeek(
+		dayjs(product.data().createdAt.toMillis()),
+		product.data().sprintStartDayOfWeek,
+	)
 	const sprints = useMemo(() => {
-		if (!activeProduct?.exists()) return []
+		if (!product.exists()) return []
 		const sprints: Array<{startDate: string; endDate: string}> = []
 		let dateCursor = firstSprintStartDate
-		while (dateCursor && dateCursor.isBefore(dayjs())) {
+		while (dateCursor.isBefore(dayjs())) {
 			const sprintStartDate = dateCursor.format(`YYYY-MM-DD`)
-			dateCursor = dateCursor.add(activeProduct.data().cadence - 1, `week`)
+			dateCursor = dateCursor.add(product.data().cadence - 1, `week`)
 			dateCursor = dateCursor.add(6, `day`)
 			const sprintEndDate = dateCursor.format(`YYYY-MM-DD`)
 			sprints.push({startDate: sprintStartDate, endDate: sprintEndDate})
 			dateCursor = dateCursor.add(1, `day`)
 		}
 		return sprints
-	}, [activeProduct, firstSprintStartDate])
+	}, [product, firstSprintStartDate])
 	const currentSprintEndDate = dayjs(sprints.at(-1)?.endDate)
 
 	const [versions] = useCollection(
@@ -125,8 +117,8 @@ const SprintClientPage: FC = () => {
 												key={columnName}
 												columnName={columnName}
 												title={title}
-												storyMapState={storyMapState}
-												allVersions={versions}
+												storyMapItems={storyMapItems}
+												versions={versions}
 												currentVersionId={currentVersionId}
 												myStoriesOnly={myStoriesOnly}
 											/>

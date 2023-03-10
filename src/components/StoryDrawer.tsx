@@ -25,11 +25,11 @@ import {useInterval} from "react-use"
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Product} from "~/types/db/Products"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 import type {User} from "~/types/db/Users"
 
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
@@ -58,7 +58,6 @@ const formSchema = StoryMapItemSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
-	product: QueryDocumentSnapshot<Product>
 	storyMapItems: QuerySnapshot<StoryMapItem>
 	versions: QuerySnapshot<Version>
 	storyId: string
@@ -66,7 +65,8 @@ export type StoryDrawerProps = {
 	onClose: () => void
 }
 
-const StoryDrawer: FC<StoryDrawerProps> = ({product, storyMapItems, versions, storyId, isOpen, onClose}) => {
+const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, isOpen, onClose}) => {
+	const {product} = useAppContext()
 	const [editMode, setEditMode] = useState(false)
 	const [newAcceptanceCriterionInput, setNewAcceptanceCriterionInput] = useState(``)
 	const [newBugInput, setNewBugInput] = useState(``)

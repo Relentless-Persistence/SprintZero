@@ -1,13 +1,11 @@
 import {TRPCError} from "@trpc/server"
 import {z} from "zod"
 
-import type {WithFieldValue} from "firebase-admin/firestore"
-import type {Product} from "~/types/db/Products"
-
 import {procedure, router} from "../trpc"
 import {genAdminConverter} from "~/types"
-import {InviteSchema} from "~/types/db/Products/Invites"
 import {ProductSchema} from "~/types/db/Products"
+import {InviteSchema} from "~/types/db/Products/Invites"
+import {MemberSchema} from "~/types/db/Products/Members"
 import {dbAdmin} from "~/utils/firebaseAdmin"
 
 export const userInviteRouter = router({
@@ -25,7 +23,7 @@ export const userInviteRouter = router({
 			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
 
 			const product = await dbAdmin
-				.doc(`Products/${productInvite.data()!.productId}`)
+				.doc(productInvite.ref.parent.parent!.id)
 				.withConverter(genAdminConverter(ProductSchema))
 				.get()
 			if (!product.exists) throw new TRPCError({code: `UNAUTHORIZED`})
@@ -48,12 +46,9 @@ export const userInviteRouter = router({
 				.get()
 			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
 
-			const data: WithFieldValue<Partial<Product>> = {
-				[`members.${userId}`]: {type: `editor`},
-			}
 			await dbAdmin
-				.doc(`Products/${productInvite.data()!.productId}`)
-				.withConverter(genAdminConverter(ProductSchema))
-				.update(data)
+				.doc(`${productInvite.ref.parent.parent!.path}/Members/${userId}`)
+				.withConverter(genAdminConverter(MemberSchema))
+				.set({type: `editor`})
 		}),
 })

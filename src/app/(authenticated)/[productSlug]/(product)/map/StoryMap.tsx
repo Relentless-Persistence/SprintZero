@@ -13,6 +13,7 @@ import Feature from "./Feature"
 import {elementRegistry, layerBoundaries} from "./globals"
 import Story from "./Story"
 import {useStoryMapContext} from "./StoryMapContext"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {avg} from "~/utils/math"
 import {
 	AllVersions,
@@ -28,15 +29,14 @@ import {
 	sortStories,
 	updateItem,
 } from "~/utils/storyMap"
-import {useUser} from "~/utils/useUser"
 
 export type StoryMapProps = {
 	onScroll: (amt: number) => void
 }
 
 const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
-	const user = useUser()
-	const {product, storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted, setItemsToBeDeleted} =
+	const {product, user} = useAppContext()
+	const {storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted, setItemsToBeDeleted} =
 		useStoryMapContext()
 
 	const _stories = sortStories(
@@ -455,7 +455,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 							createdAt: Timestamp.now(),
 							updatedAt: Timestamp.now(),
 							parentId: hoveringFeature.id,
-							updatedAtUserId: user!.id,
+							updatedAtUserId: user.id,
 							versionId: featureBeingDragged.versionId ?? currentVersionId,
 						}),
 						// Delete all children
@@ -617,7 +617,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 				<button
 					type="button"
 					onClick={() => {
-						addEpic(product, storyMapItems, versions, {}, user!.id).catch(console.error)
+						addEpic(product, storyMapItems, versions, {}, user.id).catch(console.error)
 					}}
 					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] dark:bg-black dark:text-[#6b44f8]"
 					data-testid="add-epic"

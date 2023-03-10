@@ -8,30 +8,30 @@ import {useState} from "react"
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
+import {useAppContext} from "../../AppContext"
 import LinkTo from "~/components/LinkTo"
 import NonDiscolsureAgreement from "~/components/NonDisclosureAgreement"
 import PrivacyPolicy from "~/components/PrivacyPolicy"
 import TermsOfService from "~/components/TermsOfService"
 import {ProductConverter} from "~/types/db/Products"
 import {db} from "~/utils/firebase"
-import {useUser} from "~/utils/useUser"
 
 const AcceptTermsClientPage: FC = () => {
 	const router = useRouter()
 	const [agree, setAgree] = useState(false)
-	const user = useUser()
+	const {user} = useAppContext()
 
 	const [hasAccepted, setHasAccepted] = useState(false)
 	const onAccept = async () => {
 		if (hasAccepted) return
 		try {
 			setHasAccepted(true)
-			await updateDoc(doc(db, `Users`, user!.id), {
+			await updateDoc(doc(db, `Users`, user.id), {
 				hasAcceptedTos: true,
 			} satisfies Partial<User>)
 
 			const {docs: products} = await getDocs(
-				query(collection(db, `Products`), where(`members.${user!.id}.type`, `==`, `editor`)).withConverter(
+				query(collection(db, `Products`), where(`members.${user.id}.type`, `==`, `editor`)).withConverter(
 					ProductConverter,
 				),
 			)

@@ -16,14 +16,15 @@ import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
+import {useAppContext} from "../../AppContext"
 import {ProductConverter} from "~/types/db/Products"
+import {HuddleConverter} from "~/types/db/Products/Huddles"
 import {InviteConverter} from "~/types/db/Products/Invites"
 import {ObjectiveConverter} from "~/types/db/Products/Objectives"
 import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
-import {useUser} from "~/utils/useUser"
 
 type FormInputs = Pick<
 	Product,
@@ -36,7 +37,7 @@ type FormInputs = Pick<
 
 const ProductSetupClientPage: FC = () => {
 	const router = useRouter()
-	const user = useUser()
+	const {user} = useAppContext()
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const [canProceed, setCanProceed] = useState(false)
 	const [formData, setFormData] = useState<Partial<FormInputs>>({})
@@ -45,7 +46,7 @@ const ProductSetupClientPage: FC = () => {
 	const sendEmail = trpc.sendEmail.useMutation()
 
 	const submitForm = async (_data: FormInputs) => {
-		if (hasSubmitted || !user) return
+		if (hasSubmitted) return
 		setHasSubmitted(true)
 
 		let {email1, email2, email3, ...data} = _data
@@ -67,11 +68,7 @@ const ProductSetupClientPage: FC = () => {
 				storyMapCurrentHistoryId: storyMapHistoryId,
 				storyMapUpdatedAt: Timestamp.now(),
 
-				businessOutcomes: [],
-				marketLeaders: [],
-				potentialRisks: [],
 				problemStatement: ``,
-				userPriorities: [],
 
 				accessibility: {
 					auditory: [false, false, false, false, false],
@@ -81,20 +78,16 @@ const ProductSetupClientPage: FC = () => {
 					visual: [false, false, false, false, false, false, false, false],
 				},
 
-				features: null,
 				finalVision: ``,
 				productType: null,
-				updates: [],
 				valueProposition: null,
+			})
 
-				huddles: {
-					[user.id]: {
-						updatedAt: Timestamp.now(),
-						blockerStoryIds: [],
-						todayStoryIds: [],
-						yesterdayStoryIds: [],
-					},
-				},
+			transaction.set(doc(db, `Products`, slug, `Huddles`, nanoid()).withConverter(HuddleConverter), {
+				updatedAt: Timestamp.now(),
+				blockerStoryIds: [],
+				todayStoryIds: [],
+				yesterdayStoryIds: [],
 			})
 
 			transaction.set(

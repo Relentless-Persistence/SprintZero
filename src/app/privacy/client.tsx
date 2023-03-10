@@ -1,11 +1,11 @@
 "use client"
 
-import {Input} from "antd"
+import {Card} from "antd"
 import Image from "next/image"
 
 import type {FC} from "react"
 
-import {privacyPolicy} from "~/components/PrivacyPolicy"
+import PrivacyPolicy from "~/components/PrivacyPolicy"
 
 const PrivacyClientPage: FC = () => {
 	return (
@@ -16,13 +16,9 @@ const PrivacyClientPage: FC = () => {
 				</div>
 				<div className="flex flex-col gap-8">
 					<h1 className="text-3xl">Privacy Policy</h1>
-					<Input.TextArea
-						size="large"
-						readOnly
-						rows={20}
-						value={privacyPolicy}
-						className="!resize-none bg-[#eceef1] font-mono text-sm text-text"
-					/>
+					<Card className="min-h-0 flex-1 !resize-none overflow-auto border-border bg-fillTertiary font-mono text-text">
+						<PrivacyPolicy />
+					</Card>
 				</div>
 			</div>
 		</div>

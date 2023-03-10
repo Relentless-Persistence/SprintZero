@@ -1,7 +1,7 @@
 "use client"
 
 import {Breadcrumb, Card, Tabs} from "antd"
-import {collection, doc, query, updateDoc, where} from "firebase/firestore"
+import {collection, doc, updateDoc} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
@@ -9,12 +9,12 @@ import type {FC} from "react"
 import type {Persona} from "~/types/db/Products/Personas"
 
 import EditableListCard from "./EditableListCard"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {PersonaConverter} from "~/types/db/Products/Personas"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const PersonasClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
+	const {product} = useAppContext()
 	const [activeTab, setActiveTab] = useState(``)
 	const [isEditingCard, setIsEditingCard] = useState<
 		| `goals`
@@ -29,9 +29,7 @@ const PersonasClientPage: FC = () => {
 		| undefined
 	>(undefined)
 
-	const [personas] = useCollection(
-		query(collection(db, `Personas`), where(`productId`, `==`, activeProductId)).withConverter(PersonaConverter),
-	)
+	const [personas] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
 
 	const hasSetDefaultPersona = useRef(false)
 	useEffect(() => {

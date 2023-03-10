@@ -9,12 +9,12 @@ import {useCollection} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 
 import Story from "./Story"
-import {useProduct} from "~/app/(authenticated)/useProduct"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {getStories} from "~/utils/storyMap"
 
 const EthicsClientPage: FC = () => {
-	const product = useProduct()
+	const {product} = useAppContext()
 	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
 	const stories = storyMapItems ? getStories(storyMapItems) : []
 

@@ -8,19 +8,17 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {useUser} from "~/utils/useUser"
 
 const TeamSettingsClientPage: FC = () => {
-	const user = useUser()
+	const {user} = useAppContext()
 	const [allProducts] = useCollectionData(
-		user
-			? query(collection(db, `Products`), where(`members.${user.id}.type`, `in`, [`owner`, `editor`])).withConverter(
-					ProductConverter,
-			  )
-			: undefined,
+		query(collection(db, `Products`), where(`members.${user.id}.type`, `in`, [`owner`, `editor`])).withConverter(
+			ProductConverter,
+		),
 	)
 	// Technically the user can be a part of multiple products, but this page is only designed for one for now.
 	const firstProduct = allProducts?.[0]
@@ -30,7 +28,7 @@ const TeamSettingsClientPage: FC = () => {
 	const members = useQueries({
 		queries: firstProduct
 			? Object.entries(firstProduct.members)
-					.filter(([, info]) => info?.type === currentTab)
+					.filter(([, info]) => info.type === currentTab)
 					.map(([id]) => ({
 						queryKey: [`user`, id],
 						queryFn: async () => await getDoc(doc(db, `Users`, id).withConverter(UserConverter)),

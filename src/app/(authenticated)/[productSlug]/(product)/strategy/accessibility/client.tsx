@@ -8,11 +8,11 @@ import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
 
-import {useProduct} from "~/app/(authenticated)/useProduct"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import LinkTo from "~/components/LinkTo"
 
 const AccessibilityClientPage: FC = () => {
-	const product = useProduct()
+	const {product} = useAppContext()
 
 	return (
 		<Tabs

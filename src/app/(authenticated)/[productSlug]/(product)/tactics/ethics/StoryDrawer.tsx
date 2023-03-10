@@ -24,7 +24,7 @@ import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {User} from "~/types/db/Users"
 
-import {useProduct} from "~/app/(authenticated)/useProduct"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import {sprintColumns} from "~/types/db/Products/StoryMapItems"
@@ -32,7 +32,6 @@ import {UserConverter} from "~/types/db/Users"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
-import {useUser} from "~/utils/useUser"
 
 dayjs.extend(relativeTime)
 
@@ -44,8 +43,7 @@ export type StoryDrawerProps = {
 }
 
 const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onClose}) => {
-	const user = useUser()
-	const product = useProduct()
+	const {product, user} = useAppContext()
 	const story = getStories(storyMapItems).find((story) => story.id === storyId)!
 	const [description, setDescription] = useState(story.data().description)
 	const [commentType, setCommentType] = useState<`design` | `code`>(`design`)
@@ -55,8 +53,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 	}, [story])
 
 	const addVote = async (vote: boolean) => {
-		if (!user) return
-
 		let votesFor = Object.values(story.data().ethicsVotes).filter((vote) => vote === true).length
 		let votesAgainst = Object.values(story.data().ethicsVotes).filter((vote) => vote === false).length
 		if (vote) votesFor++
@@ -189,43 +185,41 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 			<div className="grid h-full grid-cols-2 gap-8">
 				{/* Left column */}
 				<div className="flex h-full min-h-0 flex-col gap-6">
-					{user && (
-						<div className="flex flex-col items-start gap-2">
-							{story.data().ethicsApproved === null ? (
-								<>
-									<div className="leading-normal">
-										<p className="text-lg font-semibold">Adjudication Response</p>
-										<p className="text-sm text-textTertiary">
-											Do you think this would provide value and reaffirm the commitment to our users?
-										</p>
-									</div>
-
-									<Radio.Group
-										value={story.data().ethicsVotes[user.id] ? `allow` : `reject`}
-										onChange={(e) => {
-											addVote(e.target.value === `allow`).catch(console.error)
-										}}
-									>
-										<Radio value="allow">Allow</Radio>
-										<Radio value="reject">Reject</Radio>
-									</Radio.Group>
-								</>
-							) : (
-								<>
+					<div className="flex flex-col items-start gap-2">
+						{story.data().ethicsApproved === null ? (
+							<>
+								<div className="leading-normal">
 									<p className="text-lg font-semibold">Adjudication Response</p>
-									{story.data().ethicsApproved ? (
-										<Tag icon={<LikeOutlined />} color="green">
-											Approved
-										</Tag>
-									) : (
-										<Tag icon={<DislikeOutlined />} color="red">
-											Rejected
-										</Tag>
-									)}
-								</>
-							)}
-						</div>
-					)}
+									<p className="text-sm text-textTertiary">
+										Do you think this would provide value and reaffirm the commitment to our users?
+									</p>
+								</div>
+
+								<Radio.Group
+									value={story.data().ethicsVotes[user.id] ? `allow` : `reject`}
+									onChange={(e) => {
+										addVote(e.target.value === `allow`).catch(console.error)
+									}}
+								>
+									<Radio value="allow">Allow</Radio>
+									<Radio value="reject">Reject</Radio>
+								</Radio.Group>
+							</>
+						) : (
+							<>
+								<p className="text-lg font-semibold">Adjudication Response</p>
+								{story.data().ethicsApproved ? (
+									<Tag icon={<LikeOutlined />} color="green">
+										Approved
+									</Tag>
+								) : (
+									<Tag icon={<DislikeOutlined />} color="red">
+										Rejected
+									</Tag>
+								)}
+							</>
+						)}
+					</div>
 					<div className="flex max-h-[calc(100%-8rem)] flex-col gap-2">
 						<p className="text-lg font-semibold">User Story</p>
 						<Input.TextArea

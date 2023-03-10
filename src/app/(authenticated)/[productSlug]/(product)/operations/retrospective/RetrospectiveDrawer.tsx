@@ -7,7 +7,6 @@ import {useFieldArray, useForm} from "react-hook-form"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {z} from "zod"
-import type {Id} from "~/types"
 
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfInput from "~/components/rhf/RhfInput"
@@ -19,7 +18,7 @@ const formSchema = RetrospectiveItemSchema.pick({description: true, proposedActi
 type FormInputs = z.infer<typeof formSchema>
 
 export type RetrospectiveDrawerProps = {
-	activeItemId: Id | `new`
+	activeItemId: string | `new`
 	initialValues: FormInputs
 	onCancel: () => void
 	onArchive: () => Promisable<void>

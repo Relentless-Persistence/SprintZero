@@ -8,11 +8,11 @@ import type {FC} from "react"
 
 import EpicsTab from "./EpicsTab"
 import FeaturesTab from "./FeaturesTab"
-import {useProduct} from "~/app/(authenticated)/useProduct"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 
 const PrioritiesClientPage: FC = () => {
-	const product = useProduct()
+	const {product} = useAppContext()
 	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
 
 	if (!storyMapItems) return null

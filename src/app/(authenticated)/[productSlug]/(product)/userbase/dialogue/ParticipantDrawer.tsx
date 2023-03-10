@@ -11,7 +11,7 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {Button, Drawer, Tag} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {Timestamp, collection, doc, query, updateDoc, where} from "firebase/firestore"
+import {Timestamp, collection, doc, updateDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
@@ -19,10 +19,10 @@ import {useForm} from "react-hook-form"
 import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Id} from "~/types"
 import type {Participant} from "~/types/db/Products/Participants"
 
 import ParticipantEditForm from "./ParticipantEditForm"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
@@ -30,7 +30,6 @@ import {ParticipantSchema, statuses, timings} from "~/types/db/Products/Particip
 import {PersonaConverter} from "~/types/db/Products/Personas"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 import EarIcon from "~public/icons/ear.svg"
 
 dayjs.extend(relativeTime)
@@ -48,12 +47,12 @@ type FormInputs = z.infer<typeof formSchema>
 
 export type ParticipantDrawerProps = {
 	participants: QuerySnapshot<Participant> | undefined
-	activeParticipant: Id | undefined
+	activeParticipant: string | undefined
 	onClose: () => void
 }
 
 const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activeParticipant, onClose}) => {
-	const activeProductId = useActiveProductId()
+	const {product} = useAppContext()
 
 	const [isOpen, setIsOpen] = useState(true)
 	const close = () => {
@@ -67,9 +66,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 	const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
 	const participantData = participant?.data()
 
-	const [personas] = useCollection(
-		query(collection(db, `Personas`), where(`productId`, `==`, activeProductId)).withConverter(PersonaConverter),
-	)
+	const [personas] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
 
 	const [lastUpdatedAtUser] = useDocument(
 		participant?.data().updatedAtUserId

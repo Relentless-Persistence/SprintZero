@@ -1,32 +1,27 @@
 import {Breadcrumb, Button, Form} from "antd"
-import {addDoc, collection, query, where} from "firebase/firestore"
+import {addDoc, collection} from "firebase/firestore"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Id} from "~/types"
-import type {Journey} from "~/types/db/Products/Journeys"
 
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {JourneyConverter, JourneySchema} from "~/types/db/Products/Journeys"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const formSchema = JourneySchema.pick({name: true, duration: true, durationUnit: true})
 type FormInputs = z.infer<typeof formSchema>
 
 export type AddJourneyPageProps = {
 	onCancel: () => void
-	onFinish: (newJourneyId: Id) => void
+	onFinish: (newJourneyId: string) => void
 }
 
 const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
-	const activeProductId = useActiveProductId()
-	const [journeys] = useCollectionData(
-		query(collection(db, `Journeys`), where(`productId`, `==`, activeProductId)).withConverter(JourneyConverter),
-	)
+	const {product} = useAppContext()
+	const [journeys] = useCollectionData(collection(product.ref, `Journeys`).withConverter(JourneyConverter))
 
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -37,10 +32,7 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
-		const ref = await addDoc(collection(db, `Journeys`), {
-			...data,
-			productId: activeProductId,
-		} satisfies Journey)
+		const ref = await addDoc(collection(product.ref, `Journeys`).withConverter(JourneyConverter), data)
 		onFinish(ref.id)
 	})
 

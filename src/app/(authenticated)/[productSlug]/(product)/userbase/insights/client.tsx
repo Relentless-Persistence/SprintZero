@@ -2,27 +2,23 @@
 
 import {PlusOutlined} from "@ant-design/icons"
 import {Breadcrumb, FloatButton, Tabs} from "antd"
-import {collection, query, where} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import InsightItemCard from "./InsightCard"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {InsightConverter} from "~/types/db/Products/Insights"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const InsightsClientPage: FC = () => {
+	const {product} = useAppContext()
 	const [currentTab, setCurrentTab] = useState<keyof typeof tabNames>(`validated`)
 
-	const activeProductId = useActiveProductId()
-	const [insights] = useCollection(
-		query(collection(db, `Insights`), where(`productId`, `==`, activeProductId)).withConverter(InsightConverter),
-	)
-	const [activeInsight, setActiveInsight] = useState<Id | `new` | undefined>(undefined)
+	const [insights] = useCollection(collection(product.ref, `Insights`).withConverter(InsightConverter))
+	const [activeInsight, setActiveInsight] = useState<string | `new` | undefined>(undefined)
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">

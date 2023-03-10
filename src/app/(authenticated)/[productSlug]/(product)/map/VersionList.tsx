@@ -9,12 +9,13 @@ import type {FC} from "react"
 import type {Version} from "~/types/db/Products/Versions"
 
 import {useStoryMapContext} from "./StoryMapContext"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {AllVersions} from "~/utils/storyMap"
 
 const VersionList: FC = () => {
+	const {product} = useAppContext()
 	const {
-		product,
 		versions,
 		currentVersionId,
 		setCurrentVersionId,

@@ -8,7 +8,7 @@ import type {FC} from "react"
 import type {z} from "zod"
 import type {Result} from "~/types/db/Products/Objectives/Results"
 
-import {useProduct} from "~/app/(authenticated)/useProduct"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
 import {ResultConverter, ResultSchema} from "~/types/db/Products/Objectives/Results"
 import {formValidateStatus} from "~/utils/formValidateStatus"
@@ -26,7 +26,7 @@ export type ResultCardProps = {
 }
 
 const ResultCard: FC<ResultCardProps> = ({objectiveId, result, index, isEditing, onEditStart, onEditEnd}) => {
-	const product = useProduct()
+	const {product} = useAppContext()
 	const {control, handleSubmit, getFieldState, formState} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),

@@ -3,16 +3,17 @@
 import {doc, getDoc} from "firebase/firestore"
 import {usePathname, useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
-import {useAuthState, useIdToken} from "react-firebase-hooks/auth"
+import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocument} from "react-firebase-hooks/firestore"
+import invariant from "tiny-invariant"
 
 import type {FC, ReactNode} from "react"
 
-import {ProductContext} from "./useProduct"
+import {AppContext} from "./AppContext"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import {auth, db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 export type AuthenticatedLayoutProps = {
 	children: ReactNode
@@ -41,22 +42,17 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
 			.catch(console.error)
 	}, [loading, pathname, router, user])
 
-	const [credential] = useIdToken(auth)
-	useEffect(() => {
-		credential
-			?.getIdToken()
-			?.then((token) => {
-				document.cookie = `firebaseSession=${token}; path=/; sameSite=strict; secure;`
-			})
-			.catch(console.error)
-	}, [credential])
+	const [dbUser, , error] = useDocument(user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined)
+	conditionalThrow(error)
 
-	const activeProductId = useActiveProductId()
-	const [product] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const slugs = pathname?.split(`/`)
+	const productId = slugs?.[1]
+	invariant(productId, `No product ID in pathname`)
+	const [product] = useDocument(doc(db, `Products`, productId).withConverter(ProductConverter))
 
 	if (pathname === `/product` && userCanAccessApp) return <>{children}</>
-	if (!product?.exists() || !userCanAccessApp) return null
-	return <ProductContext.Provider value={product}>{children}</ProductContext.Provider>
+	if (!product?.exists() || !dbUser?.exists() || !userCanAccessApp) return null
+	return <AppContext.Provider value={{product, user: dbUser}}>{children}</AppContext.Provider>
 }
 
 export default AuthenticatedLayout

@@ -5,7 +5,6 @@ import invariant from "tiny-invariant"
 import {z} from "zod"
 
 import type {WithFieldValue} from "firebase-admin/firestore"
-import type {Id} from "~/types"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {funCardRouter} from "./funCard"
@@ -55,7 +54,7 @@ export const appRouter = router({
 				for (const itemId in items) {
 					const item = oldItemSchema.safeParse(items[itemId])
 					if (!item.success) continue
-					let newEthicsVotes: Exclude<StoryMapItem[`items`][Id], undefined>[`ethicsVotes`] = {}
+					let newEthicsVotes: StoryMapItem[`ethicsVotes`] = {}
 					for (const vote of item.data.ethicsVotes) {
 						newEthicsVotes[vote.userId] = vote.vote
 					}

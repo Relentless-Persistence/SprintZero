@@ -11,12 +11,12 @@ import {useDebounce} from "react-use"
 import type {FC} from "react"
 
 import ResultCard from "./ResultCard"
-import {useProduct} from "~/app/(authenticated)/useProduct"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {ObjectiveConverter} from "~/types/db/Products/Objectives"
 import {ResultConverter} from "~/types/db/Products/Objectives/Results"
 
 const ObjectivesClientPage: FC = () => {
-	const product = useProduct()
+	const {product} = useAppContext()
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<string | undefined>(undefined)
 
 	const [objectives] = useCollection(

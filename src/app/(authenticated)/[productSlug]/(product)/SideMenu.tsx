@@ -12,12 +12,11 @@ import {usePathname} from "next/navigation"
 import {useState} from "react"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
+import {useAppContext} from "../../AppContext"
 import LinkTo from "~/components/LinkTo"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const getItems = (activeProductId: Id) => [
+const getItems = (activeProductId: string) => [
 	{
 		key: `map`,
 		icon: <ApartmentOutlined />,
@@ -111,9 +110,9 @@ const getItems = (activeProductId: Id) => [
 
 const SideMenu: FC = () => {
 	const pathname = usePathname()
-	const activeProductId = useActiveProductId()
+	const {product} = useAppContext()
 
-	const items = getItems(activeProductId)
+	const items = getItems(product.id)
 	const [openKey, setOpenKey] = useState<string | undefined>(
 		items.find((item) => item.children?.find((child) => child.key === pathname?.replace(/^\/[^/]+\//, ``)))?.key,
 	)

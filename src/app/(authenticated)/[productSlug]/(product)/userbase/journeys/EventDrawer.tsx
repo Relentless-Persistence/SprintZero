@@ -1,5 +1,5 @@
 import {Button, Drawer} from "antd"
-import {collection, query, where} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
@@ -11,6 +11,7 @@ import type {z} from "zod"
 import type {JourneyEvent} from "~/types/db/Products/JourneyEvents"
 import type {Journey} from "~/types/db/Products/Journeys"
 
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
@@ -18,7 +19,6 @@ import RhfTextArea from "~/components/rhf/RhfTextArea"
 import {JourneyEventSchema} from "~/types/db/Products/JourneyEvents"
 import {durationUnits} from "~/types/db/Products/Journeys"
 import {PersonaConverter} from "~/types/db/Products/Personas"
-import {db} from "~/utils/firebase"
 
 const formSchema = JourneyEventSchema.pick({
 	description: true,
@@ -40,12 +40,9 @@ export type EventDrawerProps = {
 }
 
 const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCommit, onDelete}) => {
+	const {product} = useAppContext()
 	const [isDrawerOpen, setIsDrawerOpen] = useState(true)
-	const [personas] = useCollection(
-		query(collection(db, `Personas`), where(`productId`, `==`, journey.data().productId)).withConverter(
-			PersonaConverter,
-		),
-	)
+	const [personas] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
 
 	const {control, watch, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,

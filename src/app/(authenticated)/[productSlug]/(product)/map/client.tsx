@@ -27,7 +27,7 @@ import {motion} from "framer-motion"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useRef, useState} from "react"
-import {useCollection, useDocument} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {HistoryItem} from "~/types/db/Products/StoryMapHistories/HistoryItems"
@@ -38,31 +38,27 @@ import StoryMap from "./StoryMap"
 import {StoryMapContext} from "./StoryMapContext"
 import StoryMapHeader from "./StoryMapHeader"
 import VersionList from "./VersionList"
-import {ProductConverter} from "~/types/db/Products"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
 import {HistoryItemConverter} from "~/types/db/Products/StoryMapHistories/HistoryItems"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const StoryMapClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [product, , productError] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const {product} = useAppContext()
 	const [storyMapItems, , storyMapItemsError] = useCollection(
-		collection(db, `Products`, activeProductId, `StoryMapItems`).withConverter(StoryMapItemConverter),
+		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
-	const [versions, , versionsError] = useCollection(
-		collection(db, `Products`, activeProductId, `Versions`).withConverter(VersionConverter),
-	)
+	const [versions, , versionsError] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
 	const [histories, , historiesError] = useCollection(
 		query(
-			collection(db, `Products`, activeProductId, `StoryMapHistories`).withConverter(StoryMapHistoryConverter),
+			collection(product.ref, `StoryMapHistories`).withConverter(StoryMapHistoryConverter),
 			orderBy(`timestamp`, `desc`),
 		),
 	)
-	conditionalThrow(productError, storyMapItemsError, versionsError, historiesError)
+	conditionalThrow(storyMapItemsError, versionsError, historiesError)
 
 	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions | undefined>(undefined)
 	const [newVersionInputValue, setNewVersionInputValue] = useState<string | undefined>(undefined)
@@ -77,12 +73,12 @@ const StoryMapClientPage: FC = () => {
 	const [isToolbeltOpen, setIsToolbeltOpen] = useState(false)
 
 	const lastHistory =
-		product?.exists() &&
+		product.exists() &&
 		histories?.docs.find(
 			(history) => history.data().future === false && history.id !== product.data().storyMapCurrentHistoryId,
 		)
 	const currentHistory =
-		product?.exists() && histories?.docs.find((history) => history.id === product.data().storyMapCurrentHistoryId)
+		product.exists() && histories?.docs.find((history) => history.id === product.data().storyMapCurrentHistoryId)
 	const nextHistory = histories?.docs.findLast((history) => history.data().future === true)
 
 	const undo = async () => {
@@ -90,17 +86,12 @@ const StoryMapClientPage: FC = () => {
 
 		await runTransaction(db, async (transaction) => {
 			const currentHistoryItems = await getDocs(
-				collection(
-					db,
-					`Products`,
-					activeProductId,
-					`StoryMapHistories`,
-					currentHistory.id,
-					`HistoryItems`,
-				).withConverter(HistoryItemConverter),
+				collection(product.ref, `StoryMapHistories`, currentHistory.id, `HistoryItems`).withConverter(
+					HistoryItemConverter,
+				),
 			)
 			const lastHistoryItems = await getDocs(
-				collection(db, `Products`, activeProductId, `StoryMapHistories`, lastHistory.id, `HistoryItems`).withConverter(
+				collection(product.ref, `StoryMapHistories`, lastHistory.id, `HistoryItems`).withConverter(
 					HistoryItemConverter,
 				),
 			)
@@ -111,13 +102,10 @@ const StoryMapClientPage: FC = () => {
 						if (draft[key as keyof HistoryItem] === null) delete draft[key as keyof HistoryItem]
 					}
 				}) as StoryMapItem
-				transaction.update(
-					doc(db, `Products`, activeProductId, `StoryMapItems`, historyItem.id).withConverter(StoryMapItemConverter),
-					{
-						...dataWithoutNull,
-						updatedAt: serverTimestamp(),
-					},
-				)
+				transaction.update(doc(product.ref, `StoryMapItems`, historyItem.id).withConverter(StoryMapItemConverter), {
+					...dataWithoutNull,
+					updatedAt: serverTimestamp(),
+				})
 			})
 
 			const itemsToDelete = currentHistoryItems.docs
@@ -129,13 +117,10 @@ const StoryMapClientPage: FC = () => {
 							.some((item) => item.id === currentHistoryItem.id),
 				)
 			itemsToDelete.forEach((item) => {
-				transaction.update(
-					doc(db, `Products`, activeProductId, `StoryMapItems`, item.id).withConverter(StoryMapItemConverter),
-					{
-						deleted: true,
-						updatedAt: Timestamp.now(),
-					},
-				)
+				transaction.update(doc(product.ref, `StoryMapItems`, item.id).withConverter(StoryMapItemConverter), {
+					deleted: true,
+					updatedAt: Timestamp.now(),
+				})
 			})
 
 			transaction.update(currentHistory.ref, {
@@ -148,11 +133,11 @@ const StoryMapClientPage: FC = () => {
 	}
 
 	const redo = async () => {
-		if (!histories || !nextHistory || !product) return
+		if (!histories || !nextHistory) return
 
 		await runTransaction(db, async (transaction) => {
 			const nextHistoryItems = await getDocs(
-				collection(db, `Products`, activeProductId, `StoryMapHistories`, nextHistory.id, `HistoryItems`).withConverter(
+				collection(product.ref, `StoryMapHistories`, nextHistory.id, `HistoryItems`).withConverter(
 					HistoryItemConverter,
 				),
 			)
@@ -163,13 +148,10 @@ const StoryMapClientPage: FC = () => {
 						if (draft[key as keyof HistoryItem] === null) delete draft[key as keyof HistoryItem]
 					}
 				}) as StoryMapItem
-				transaction.update(
-					doc(db, `Products`, activeProductId, `StoryMapItems`, historyItem.id).withConverter(StoryMapItemConverter),
-					{
-						...dataWithoutNull,
-						updatedAt: serverTimestamp(),
-					},
-				)
+				transaction.update(doc(product.ref, `StoryMapItems`, historyItem.id).withConverter(StoryMapItemConverter), {
+					...dataWithoutNull,
+					updatedAt: serverTimestamp(),
+				})
 			})
 
 			transaction.update(nextHistory.ref, {
@@ -183,7 +165,7 @@ const StoryMapClientPage: FC = () => {
 
 	const canRedo = histories?.docs.findLast((history) => history.data().future === true)
 	const canUndo =
-		product?.exists() &&
+		product.exists() &&
 		histories?.docs.find(
 			(history) => history.data().future === false && history.id !== product.data().storyMapCurrentHistoryId,
 		)
@@ -191,11 +173,11 @@ const StoryMapClientPage: FC = () => {
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
 	let lastUpdated: Timestamp | null = null
-	if (product?.exists() && product.data().storyMapUpdatedAt instanceof Timestamp)
+	if (product.exists() && product.data().storyMapUpdatedAt instanceof Timestamp)
 		lastUpdated = product.data().storyMapUpdatedAt
 
 	const deleteItems = async () => {
-		if (!storyMapItems || !versions || !product || itemsToBeDeleted.length === 0) return
+		if (!storyMapItems || !versions || itemsToBeDeleted.length === 0) return
 		const batch = writeBatch(db)
 
 		itemsToBeDeleted.forEach((id) => {
@@ -204,20 +186,17 @@ const StoryMapClientPage: FC = () => {
 			})
 		})
 		versionsToBeDeleted.forEach((id) => {
-			batch.update(doc(db, `Products`, activeProductId, `StoryMapVersions`, id).withConverter(VersionConverter), {
+			batch.update(doc(product.ref, `StoryMapVersions`, id).withConverter(VersionConverter), {
 				deleted: true,
 			})
 		})
 
 		// Add a story map history entry
 		const historyId = nanoid()
-		batch.set(
-			doc(db, `Products`, activeProductId, `StoryMapHistories`, historyId).withConverter(StoryMapHistoryConverter),
-			{
-				future: false,
-				timestamp: serverTimestamp(),
-			},
-		)
+		batch.set(doc(product.ref, `StoryMapHistories`, historyId).withConverter(StoryMapHistoryConverter), {
+			future: false,
+			timestamp: serverTimestamp(),
+		})
 		storyMapItems.forEach((item) => {
 			batch.set(
 				doc(product.ref, `StoryMapHistories`, historyId, `HistoryItems`, item.id).withConverter(HistoryItemConverter),
@@ -232,11 +211,10 @@ const StoryMapClientPage: FC = () => {
 		setEditMode(false)
 	}
 
-	if (!product?.exists() || !storyMapItems || !versions || currentVersionId === undefined) return null
+	if (!product.exists() || !storyMapItems || !versions || currentVersionId === undefined) return null
 	return (
 		<StoryMapContext.Provider
 			value={{
-				product,
 				storyMapItems,
 				versions,
 				editMode,

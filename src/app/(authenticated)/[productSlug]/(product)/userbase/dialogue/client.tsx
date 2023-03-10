@@ -3,33 +3,26 @@
 import {EyeOutlined, PhoneOutlined, PlusOutlined, UserOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Button, Card, FloatButton, Tabs, Tag} from "antd"
-import {Timestamp, addDoc, collection, doc, getDoc, query, where} from "firebase/firestore"
+import {Timestamp, addDoc, collection, doc, getDoc} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import ParticipantDrawer from "./ParticipantDrawer"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {ParticipantConverter} from "~/types/db/Products/Participants"
 import {PersonaConverter} from "~/types/db/Products/Personas"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
-import {useUser} from "~/utils/useUser"
 import EarIcon from "~public/icons/ear.svg"
 
 const DialogueClientPage: FC = () => {
-	const user = useUser()
+	const {product, user} = useAppContext()
 	const [currentTab, setCurrentTab] = useState<(typeof tabs)[number][0]>(`identified`)
-	const [activeParticipant, setActiveParticipant] = useState<Id | undefined>(undefined)
+	const [activeParticipant, setActiveParticipant] = useState<string | undefined>(undefined)
 
-	const activeProductId = useActiveProductId()
-	const [participants] = useCollection(
-		query(collection(db, `Participants`), where(`productId`, `==`, activeProductId)).withConverter(
-			ParticipantConverter,
-		),
-	)
+	const [participants] = useCollection(collection(product.ref, `Participants`).withConverter(ParticipantConverter))
 
 	const allPersonas = useQueries({
 		queries: participants
@@ -159,8 +152,7 @@ const DialogueClientPage: FC = () => {
 							transcript: ``,
 							updatedAt: Timestamp.now(),
 							personaIds: [],
-							productId: activeProductId,
-							updatedAtUserId: user!.id,
+							updatedAtUserId: user.id,
 						})
 							.then((docRef) => {
 								setActiveParticipant(docRef.id)

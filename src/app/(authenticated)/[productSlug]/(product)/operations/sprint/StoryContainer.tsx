@@ -3,16 +3,15 @@ import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 import {createPortal} from "react-dom"
 
-import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
+import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
+import type {StoryMapItem, sprintColumns} from "~/types/db/Products/StoryMapItems"
 
 import StoryCard from "./StoryCard"
 
 export type StoryContainerProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
-	storyId: Id
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyId: string
 	onDrawerOpen: () => void
 	isBeingDragged: boolean
 	onDragStart: () => void
@@ -20,13 +19,15 @@ export type StoryContainerProps = {
 }
 
 const StoryContainer: FC<StoryContainerProps> = ({
-	storyMapState,
+	storyMapItems,
 	storyId,
 	onDrawerOpen,
 	isBeingDragged,
 	onDragStart,
 	onDragEnd,
 }) => {
+	const story = storyMapItems.docs.find((story) => story.id === storyId)!
+
 	const ref = useRef<HTMLDivElement>(null)
 	const [dragInfo, setDragInfo] = useState({
 		width: 0,
@@ -41,13 +42,13 @@ const StoryContainer: FC<StoryContainerProps> = ({
 	const yP = useTransform(y, (y) => y - dragInfo.offsetY)
 
 	const pointerPos = useRef({x: 0, y: 0})
-	const currentColumn = useRef<string | undefined>(undefined)
+	const currentColumn = useRef<keyof typeof sprintColumns | undefined>(undefined)
 	useEffect(() => {
 		const onPointerMove = (e: PointerEvent) => {
 			pointerPos.current = {x: e.clientX, y: e.clientY}
 			currentColumn.current = Array.from(document.querySelectorAll(`.sprint-column`)).find((column) =>
 				column.contains(e.target as Node | null),
-			)?.id
+			)?.id as keyof typeof sprintColumns | undefined
 		}
 
 		window.addEventListener(`pointermove`, onPointerMove)
@@ -73,10 +74,10 @@ const StoryContainer: FC<StoryContainerProps> = ({
 					onDragStart()
 				}}
 				onPanEnd={() => {
-					updateDoc(storyMapState.ref, {
-						[`items.${storyId}.sprintColumn`]: currentColumn.current,
+					updateDoc(story.ref, {
+						sprintColumn: currentColumn.current,
 						updatedAt: Timestamp.now(),
-					} as WithFieldValue<Partial<StoryMapState>>)
+					})
 						.then(() => {
 							onDragEnd()
 						})
@@ -89,7 +90,7 @@ const StoryContainer: FC<StoryContainerProps> = ({
 				className="touch-none"
 				ref={ref}
 			>
-				<StoryCard storyMapState={storyMapState} storyId={storyId} onDrawerOpen={onDrawerOpen} />
+				<StoryCard storyMapItems={storyMapItems} storyId={storyId} onDrawerOpen={onDrawerOpen} />
 			</motion.div>
 
 			{isBeingDragged &&
@@ -101,7 +102,7 @@ const StoryContainer: FC<StoryContainerProps> = ({
 						transition={{duration: 0}}
 						style={{left: xP, top: yP, width: dragInfo.width, height: dragInfo.height}}
 					>
-						<StoryCard storyMapState={storyMapState} storyId={storyId} onDrawerOpen={onDrawerOpen} />
+						<StoryCard storyMapItems={storyMapItems} storyId={storyId} onDrawerOpen={onDrawerOpen} />
 					</motion.div>,
 					document.body,
 				)}

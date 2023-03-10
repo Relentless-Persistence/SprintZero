@@ -1,20 +1,20 @@
 import {Card} from "antd"
 import {sortBy} from "lodash"
 
-import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
+import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 
 import Story from "./Story"
+import {useAppContext} from "~/app/(authenticated)/AppContext"
 import {AllVersions, getStories} from "~/utils/storyMap"
-import {useUser} from "~/utils/useUser"
 
 export type SprintColumnProps = {
 	columnName: string
 	title: string
 	storyMapItems: QuerySnapshot<StoryMapItem>
-	allVersions: QuerySnapshot<Version>
+	versions: QuerySnapshot<Version>
 	currentVersionId: string | typeof AllVersions
 	myStoriesOnly: boolean
 }
@@ -23,16 +23,16 @@ const SprintColumn: FC<SprintColumnProps> = ({
 	columnName,
 	title,
 	storyMapItems,
-	allVersions,
+	versions,
 	currentVersionId,
 	myStoriesOnly,
 }) => {
-	const user = useUser()
+	const {user} = useAppContext()
 	const stories = sortBy(
 		getStories(storyMapItems)
 			.filter((story) => story.data().sprintColumn === columnName)
 			.filter((story) => (currentVersionId === AllVersions ? true : story.data().versionId === currentVersionId))
-			.filter((story) => (myStoriesOnly && user ? story.data().peopleIds.includes(user.id) : true)),
+			.filter((story) => myStoriesOnly && story.data().peopleIds.includes(user.id)),
 		[(el) => el.data().updatedAt.toMillis()],
 	)
 
@@ -45,7 +45,7 @@ const SprintColumn: FC<SprintColumnProps> = ({
 		>
 			<div className="flex flex-col gap-4">
 				{stories.map((story) => (
-					<Story key={story.id} storyMapState={storyMapItems} allVersions={allVersions} storyId={story.id} />
+					<Story key={story.id} storyMapItems={storyMapItems} versions={versions} storyId={story.id} />
 				))}
 			</div>
 		</Card>

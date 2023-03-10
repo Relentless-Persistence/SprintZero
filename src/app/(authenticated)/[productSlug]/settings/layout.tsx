@@ -1,39 +1,31 @@
 "use client"
 
 import {Layout} from "antd"
-import {doc} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
-import {useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC, ReactNode} from "react"
 
 import SideMenu from "./SideMenu"
-import {ProductConverter} from "~/types/db/Products"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
-import {useUser} from "~/utils/useUser"
+import {useAppContext} from "../../AppContext"
 
 export type SettingsLayoutProps = {
 	children: ReactNode
 }
 
 const SettingsLayout: FC<SettingsLayoutProps> = ({children}) => {
-	const user = useUser()
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const {product, user} = useAppContext()
 	const router = useRouter()
 
 	const [isOwner, setIsOwner] = useState(false)
 
 	useEffect(() => {
-		if (!activeProduct?.exists() || !user) return
-		if (Object.entries(activeProduct.data().members).find(([userId]) => userId === user.id)?.[1]?.type === `owner`) {
+		if (Object.entries(product.data().members).find(([userId]) => userId === user.id)?.[1]?.type === `owner`) {
 			setIsOwner(true)
 		} else {
 			router.replace(`/404`)
 		}
-	}, [activeProduct, router, user])
+	}, [product, router, user])
 
 	if (!isOwner) return null
 	return (

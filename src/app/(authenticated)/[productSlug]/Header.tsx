@@ -1,32 +1,27 @@
 import {CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
 import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
-import {collection, doc, query, where} from "firebase/firestore"
+import {collection, query, where} from "firebase/firestore"
 import Image from "next/image"
 import {useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
-import {useCollectionOnce, useDocument} from "react-firebase-hooks/firestore"
+import {useCollectionOnce} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
+import {useAppContext} from "../AppContext"
 import LinkTo from "~/components/LinkTo"
 import {ProductConverter} from "~/types/db/Products"
-import {auth, db} from "~/utils/firebase"
+import {db} from "~/utils/firebase"
 import {useSetTheme, useTheme} from "~/utils/ThemeContext"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 import MoonIcon from "~public/icons/moon.svg"
 import SunIcon from "~public/icons/sun.svg"
 
 const Header: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const {product, user} = useAppContext()
 
-	const [user] = useAuthState(auth)
 	const [allProducts] = useCollectionOnce(
-		user
-			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `in`, [`owner`, `editor`])).withConverter(
-					ProductConverter,
-			  )
-			: undefined,
+		query(collection(db, `Products`), where(`members.${user.id}.type`, `in`, [`owner`, `editor`])).withConverter(
+			ProductConverter,
+		),
 	)
 
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false)
@@ -40,7 +35,7 @@ const Header: FC = () => {
 			<Menu
 				theme="dark"
 				mode="horizontal"
-				selectedKeys={[activeProduct?.id ?? ``]}
+				selectedKeys={[product.id]}
 				items={allProducts?.docs.map((product) => ({
 					key: product.id,
 					label: (
@@ -78,56 +73,54 @@ const Header: FC = () => {
 						</div>
 						<div className="flex flex-col gap-2">
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Settings</p>
-							{activeProduct?.exists() && (
-								<Menu
-									selectedKeys={[]}
-									className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 bg-bgElevated [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
-									items={[
-										...(Object.entries(activeProduct.data().members).find(([userId]) => userId === user?.uid)?.[1]
-											?.type === `owner`
-											? ([
-													{
-														key: `configuration`,
-														icon: <SettingOutlined />,
-														label: <LinkTo href={`/${activeProductId}/settings/configuration`}>Configuration</LinkTo>,
-														onClick: () => setIsPopoverOpen(false),
-													},
-													{
-														key: `team`,
-														icon: <TeamOutlined />,
-														label: <LinkTo href={`/${activeProductId}/settings/team`}>Team</LinkTo>,
-														onClick: () => setIsPopoverOpen(false),
-													},
-													{type: `divider`, className: `mx-3`},
-											  ] as const)
-											: []),
-										...[
-											{
-												key: `support`,
-												icon: <CustomerServiceOutlined />,
-												label: (
-													<LinkTo href="https://www.sprintzero.app/contact" openInNewTab>
-														Support
-													</LinkTo>
-												),
-												onClick: () => setIsPopoverOpen(false),
-											},
-											{
-												key: `sign-out`,
-												icon: <LogoutOutlined />,
-												label: <LinkTo href="/sign-out">Sign out</LinkTo>,
-												onClick: () => setIsPopoverOpen(false),
-											},
-										],
-									]}
-								/>
-							)}
+							<Menu
+								selectedKeys={[]}
+								className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 bg-bgElevated [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
+								items={[
+									...(Object.entries(product.data().members).find(([userId]) => userId === user.id)?.[1]?.type ===
+									`owner`
+										? ([
+												{
+													key: `configuration`,
+													icon: <SettingOutlined />,
+													label: <LinkTo href={`/${product.id}/settings/configuration`}>Configuration</LinkTo>,
+													onClick: () => setIsPopoverOpen(false),
+												},
+												{
+													key: `team`,
+													icon: <TeamOutlined />,
+													label: <LinkTo href={`/${product.id}/settings/team`}>Team</LinkTo>,
+													onClick: () => setIsPopoverOpen(false),
+												},
+												{type: `divider`, className: `mx-3`},
+										  ] as const)
+										: []),
+									...[
+										{
+											key: `support`,
+											icon: <CustomerServiceOutlined />,
+											label: (
+												<LinkTo href="https://www.sprintzero.app/contact" openInNewTab>
+													Support
+												</LinkTo>
+											),
+											onClick: () => setIsPopoverOpen(false),
+										},
+										{
+											key: `sign-out`,
+											icon: <LogoutOutlined />,
+											label: <LinkTo href="/sign-out">Sign out</LinkTo>,
+											onClick: () => setIsPopoverOpen(false),
+										},
+									],
+								]}
+							/>
 						</div>
 						<p className="text-end text-sm text-textTertiary">v0.45</p>
 					</div>
 				}
 			>
-				<Avatar src={user?.photoURL} className="cursor-pointer border-2 border-primary" />
+				<Avatar src={user.data().avatar} className="cursor-pointer border-2 border-primary" />
 			</Popover>
 		</Layout.Header>
 	)
