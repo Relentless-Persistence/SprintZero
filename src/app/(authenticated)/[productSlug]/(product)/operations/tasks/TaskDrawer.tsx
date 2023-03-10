@@ -1,8 +1,9 @@
 import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Input} from "antd"
-import {doc, getDoc} from "firebase/firestore"
+import {collection, doc, getDoc} from "firebase/firestore"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
+import {useCollection} from "react-firebase-hooks/firestore"
 import {useFieldArray, useForm} from "react-hook-form"
 
 import type {Dayjs} from "dayjs"
@@ -18,7 +19,9 @@ import RhfDateTimePicker from "~/components/rhf/RhfDateTimePicker"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
 
 type FormInputs = Omit<Task, `productId` | `dueDate`> & {dueDate: Dayjs}
@@ -35,6 +38,9 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 
 	const {product} = useAppContext()
 
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	conditionalThrow(membersError)
+
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
 		defaultValues: initialValues,
@@ -50,11 +56,12 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 		}, 300)
 	})
 
-	const teamMembers = useQueries({
-		queries: Object.keys(product.data().members).map((userId) => ({
-			queryKey: [`user`, userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
-		})),
+	const memberUsers = useQueries({
+		queries:
+			members?.docs.map((member) => ({
+				queryKey: [`user`, member.id],
+				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
+			})) ?? [],
 	})
 
 	return (
@@ -106,7 +113,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 							control={control}
 							name="assigneeIds"
 							mode="multiple"
-							options={teamMembers
+							options={memberUsers
 								.map(({data: memberDoc}) => memberDoc)
 								.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 								.map((user) => ({label: user.data().name, value: user.id}))}

@@ -17,9 +17,11 @@ import FunCard from "./FunCard"
 import Story from "./Story"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {HuddleConverter} from "~/types/db/Products/Huddles"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 
@@ -28,11 +30,15 @@ dayjs.extend(relativeTime)
 const HuddleClientPage: FC = () => {
 	const {product, user} = useAppContext()
 
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	conditionalThrow(membersError)
+
 	const usersData = useQueries({
-		queries: Object.keys(product.data().members).map((userId) => ({
-			queryKey: [`user`, userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
-		})),
+		queries:
+			members?.docs.map((member) => ({
+				queryKey: [`user`, member.id],
+				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
+			})) ?? [],
 	})
 	const users = usersData
 		.sort((a, b) => (a.data?.exists() && b.data?.exists() ? a.data.data().name.localeCompare(b.data.data().name) : 0))

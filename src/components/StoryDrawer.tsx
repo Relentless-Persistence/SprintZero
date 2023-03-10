@@ -95,7 +95,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 		setDescription(story.data().description)
 	}, [story])
 
-	const teamMembers = useQueries({
+	const memberUsers = useQueries({
 		queries:
 			members?.docs.map((member) => ({
 				queryKey: [`user`, member.id],
@@ -162,7 +162,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 
 	const peoplePopoverItems = story
 		.data()
-		.peopleIds.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
+		.peopleIds.map((userId) => memberUsers.find((user) => user.data?.id === userId)?.data)
 		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 		.map((user) => (
 			<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
@@ -340,7 +340,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 								control={control}
 								name="peopleIds"
 								mode="multiple"
-								options={teamMembers
+								options={memberUsers
 									.map(({data: memberDoc}) => memberDoc)
 									.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 									.map((user) => ({label: user.data().name, value: user.id}))}

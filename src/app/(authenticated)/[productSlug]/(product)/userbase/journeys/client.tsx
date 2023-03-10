@@ -11,8 +11,8 @@ import type {FC} from "react"
 import AddJourneyPage from "./AddJourneyPage"
 import EventDrawer from "./EventDrawer"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {JourneyEventConverter} from "~/types/db/Products/Journeys/JourneyEvents"
 import {JourneyConverter, durationUnits} from "~/types/db/Products/Journeys"
+import {EventConverter} from "~/types/db/Products/Journeys/Events"
 import {db} from "~/utils/firebase"
 
 const JourneysClientPage: FC = () => {
@@ -27,7 +27,7 @@ const JourneysClientPage: FC = () => {
 
 	const [journeyEvents] = useCollection(
 		activeJourney !== undefined && activeJourney !== `new`
-			? collection(product.ref, `Journeys`, activeJourney, `JourneyEvents`).withConverter(JourneyEventConverter)
+			? collection(product.ref, `Journeys`, activeJourney, `JourneyEvents`).withConverter(EventConverter)
 			: undefined,
 	)
 

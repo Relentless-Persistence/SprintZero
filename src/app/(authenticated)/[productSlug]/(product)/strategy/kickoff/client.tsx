@@ -87,17 +87,9 @@ const KickoffClientPage: FC = () => {
 									})
 								} else {
 									await setDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
-										changes: [],
 										createdAt: Timestamp.now(),
-										dayInTheLife: [],
 										description: ``,
-										frustrations: [],
-										goals: [],
-										interactions: [],
 										name: item.text,
-										priorities: [],
-										responsibilities: [],
-										tasks: [],
 									})
 								}
 							}),

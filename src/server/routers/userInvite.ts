@@ -54,6 +54,9 @@ export const userInviteRouter = router({
 				.collection(`Members`)
 				.doc(userId)
 				.withConverter(genAdminConverter(MemberSchema))
-				.set({type: `editor`})
+				.set({
+					type: `editor`,
+					id: userId,
+				})
 		}),
 })

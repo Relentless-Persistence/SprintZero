@@ -1,4 +1,4 @@
-import {Button, Card, Empty, Input} from "antd"
+import {Button, Card, Empty} from "antd"
 import {useState} from "react"
 
 import type {FC} from "react"
@@ -7,52 +7,31 @@ import type {Promisable} from "type-fest"
 import TextListEditor from "~/components/TextListEditor"
 
 export type EditableListCardProps = {
-	isEditing: boolean
-	onEditStart: () => void
 	title: string
 	list: Array<{id: string; text: string}>
-	onCancel: () => void
-	onCommit: (title: string, list: Array<{id: string; text: string}>) => Promisable<void>
-	onDelete?: () => void
+	isEditing: boolean
+	onEditStart: () => void
+	onEditEnd: () => void
+	onCommit: (list: Array<{id: string; text: string}>) => Promisable<void>
 }
 
-const EditableListCard: FC<EditableListCardProps> = ({
-	isEditing,
-	onEditStart,
-	title,
-	list,
-	onCancel,
-	onCommit,
-	onDelete,
-}) => {
-	const [titleDraft, setTitleDraft] = useState(title)
+const EditableListCard: FC<EditableListCardProps> = ({title, list, isEditing, onEditStart, onEditEnd, onCommit}) => {
 	const [listDraft, setListDraft] = useState(list)
 
 	return (
 		<Card
-			title={
-				isEditing ? (
-					<Input size="small" value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} className="mr-4" />
-				) : (
-					<p>{title}</p>
-				)
-			}
+			title={title}
 			extra={
 				isEditing ? (
 					<div className="ml-4 flex gap-2">
-						<Button size="small" onClick={() => onCancel()}>
+						<Button size="small" onClick={() => onEditEnd()}>
 							Cancel
 						</Button>
 						<Button
 							size="small"
 							type="primary"
 							onClick={() => {
-								Promise.resolve(
-									onCommit(
-										titleDraft,
-										listDraft.filter((item) => item.text !== ``),
-									),
-								).catch(console.error)
+								Promise.resolve(onCommit(listDraft.filter((item) => item.text !== ``))).catch(console.error)
 							}}
 						>
 							Done
@@ -68,11 +47,6 @@ const EditableListCard: FC<EditableListCardProps> = ({
 			{isEditing ? (
 				<div className="flex flex-col gap-2">
 					<TextListEditor textList={listDraft} onChange={setListDraft} />
-					{onDelete && (
-						<Button danger onClick={() => onDelete()} className="w-full">
-							Remove
-						</Button>
-					)}
 				</div>
 			) : list.length === 0 ? (
 				<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
