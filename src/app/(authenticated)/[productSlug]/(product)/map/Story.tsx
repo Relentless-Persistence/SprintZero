@@ -9,7 +9,7 @@ import type {FC} from "react"
 
 import {elementRegistry} from "./globals"
 import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import StoryDrawer from "~/components/StoryDrawer"
 import {updateItem} from "~/utils/storyMap"
 

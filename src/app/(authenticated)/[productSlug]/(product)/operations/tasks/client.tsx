@@ -11,7 +11,7 @@ import type {ComponentProps, FC} from "react"
 
 import TaskColumn from "./TaskColumn"
 import TaskDrawer from "./TaskDrawer"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {TaskConverter} from "~/types/db/Products/Tasks"
 
 const TasksClientPage: FC = () => {

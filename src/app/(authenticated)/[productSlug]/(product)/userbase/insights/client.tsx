@@ -10,7 +10,7 @@ import Masonry from "react-masonry-css"
 import type {FC} from "react"
 
 import InsightItemCard from "./InsightCard"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {InsightConverter} from "~/types/db/Products/Insights"
 
 const InsightsClientPage: FC = () => {

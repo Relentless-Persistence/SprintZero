@@ -1,4 +1,5 @@
 import {TRPCError} from "@trpc/server"
+import {FieldPath} from "firebase-admin/firestore"
 import {z} from "zod"
 
 import {procedure, router} from "../trpc"
@@ -41,13 +42,17 @@ export const userInviteRouter = router({
 		)
 		.mutation(async ({input: {userId, inviteToken}}) => {
 			const productInvite = await dbAdmin
-				.doc(`ProductInvites/${inviteToken}`)
+				.collectionGroup(`Invites`)
+				.where(FieldPath.documentId(), `==`, inviteToken)
 				.withConverter(genAdminConverter(InviteSchema))
 				.get()
-			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
+			if (productInvite.docs.length === 0) throw new TRPCError({code: `UNAUTHORIZED`})
+			const invite = productInvite.docs[0]!
 
 			await dbAdmin
-				.doc(`${productInvite.ref.parent.parent!.path}/Members/${userId}`)
+				.doc(invite.ref.parent.parent!.path)
+				.collection(`Members`)
+				.doc(userId)
 				.withConverter(genAdminConverter(MemberSchema))
 				.set({type: `editor`})
 		}),

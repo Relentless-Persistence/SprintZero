@@ -1,15 +1,20 @@
 import {CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
+import {useQueries} from "@tanstack/react-query"
 import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
-import {collection, query, where} from "firebase/firestore"
+import {collectionGroup, doc, getDoc, query, where} from "firebase/firestore"
 import Image from "next/image"
 import {useState} from "react"
 import {useCollectionOnce} from "react-firebase-hooks/firestore"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
+import type {Product} from "~/types/db/Products"
 
-import {useAppContext} from "../AppContext"
+import {useAppContext} from "./AppContext"
 import LinkTo from "~/components/LinkTo"
 import {ProductConverter} from "~/types/db/Products"
+import {MemberConverter} from "~/types/db/Products/Members"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
 import {useSetTheme, useTheme} from "~/utils/ThemeContext"
 import MoonIcon from "~public/icons/moon.svg"
@@ -18,11 +23,29 @@ import SunIcon from "~public/icons/sun.svg"
 const Header: FC = () => {
 	const {product, user} = useAppContext()
 
-	const [allProducts] = useCollectionOnce(
-		query(collection(db, `Products`), where(`members.${user.id}.type`, `in`, [`owner`, `editor`])).withConverter(
-			ProductConverter,
-		),
+	const [members, , membersError] = useCollectionOnce(
+		query(
+			collectionGroup(db, `Members`),
+			where(`id`, `==`, user.id),
+			where(`type`, `in`, [`owner`, `editor`]),
+		).withConverter(MemberConverter),
 	)
+	const _products = useQueries({
+		queries:
+			members?.docs.map((member) => {
+				const productId = member.ref.parent.parent!.id
+				return {
+					queryKey: [`product`, productId],
+					queryFn: () => getDoc(doc(db, `Products`, productId).withConverter(ProductConverter)),
+				}
+			}) ?? [],
+	})
+	conditionalThrow(membersError, ..._products.map((product) => product.error))
+	const products = _products
+		.map((product) => product.data)
+		.filter((product): product is QueryDocumentSnapshot<Product> => product?.exists() ?? false)
+
+	const currentProductMember = members?.docs.find((member) => member.ref.parent.parent!.id === product.id)
 
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 	const theme = useTheme()
@@ -36,7 +59,7 @@ const Header: FC = () => {
 				theme="dark"
 				mode="horizontal"
 				selectedKeys={[product.id]}
-				items={allProducts?.docs.map((product) => ({
+				items={products.map((product) => ({
 					key: product.id,
 					label: (
 						<LinkTo href={`/${product.id}/map`} className="relative">
@@ -77,8 +100,7 @@ const Header: FC = () => {
 								selectedKeys={[]}
 								className="-mx-3 -mb-3 -mt-1 rounded-lg !border-0 bg-bgElevated [&>.ant-menu-item]:h-8 [&>.ant-menu-item]:leading-8"
 								items={[
-									...(Object.entries(product.data().members).find(([userId]) => userId === user.id)?.[1]?.type ===
-									`owner`
+									...(currentProductMember?.data()?.type === `owner`
 										? ([
 												{
 													key: `configuration`,

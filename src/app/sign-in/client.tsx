@@ -13,7 +13,7 @@ import {
 	signInWithPopup,
 	signOut,
 } from "firebase/auth"
-import {collection, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
+import {collectionGroup, doc, documentId, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter, useSearchParams} from "next/navigation"
 import {useEffect, useState} from "react"
@@ -24,8 +24,8 @@ import {z} from "zod"
 import type {AuthProvider, UserCredential} from "firebase/auth"
 import type {FC} from "react"
 
-import {ProductConverter} from "~/types/db/Products"
 import {InviteConverter} from "~/types/db/Products/Invites"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {UserConverter} from "~/types/db/Users"
 import {betaUsers} from "~/utils/betaUserList"
 import {
@@ -67,7 +67,8 @@ const SignInClientPage: FC = () => {
 
 		setHasSignedIn(true)
 
-		const isBetaUser = betaUsers.includes(credential.user.email)
+		const isBetaUser =
+			betaUsers.includes(credential.user.email) || credential.user.email.endsWith(`@relentlesspersistenceinc.com`)
 		if (isBetaUser) {
 			setHasSignedIn(true)
 
@@ -103,18 +104,26 @@ const SignInClientPage: FC = () => {
 			} else if (!user.hasAcceptedTos) {
 				router.push(`/accept-terms`)
 			} else {
-				const {docs: products} = await getDocs(
+				// Nothing special to do, redirect to one of their products
+
+				const members = await getDocs(
 					query(
-						collection(db, `Products`),
-						where(`members.${credential.user.uid}.type`, `in`, [`owner`, `editor`]),
-					).withConverter(ProductConverter),
+						collectionGroup(db, `Members`),
+						where(documentId(), `==`, credential.user.uid),
+						where(`type`, `in`, [`owner`, `editor`]),
+					).withConverter(MemberConverter),
 				)
-				if (products.length === 0) router.push(`/product`)
-				else router.push(`/${products[0]!.id}/map`)
+				if (members.docs.length === 0) {
+					router.push(`/product`)
+				} else {
+					const productId = members.docs[0]!.ref.parent.parent!.id
+					router.push(`/${productId}/map`)
+				}
 			}
 		} else {
 			notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
 			await signOut(auth)
+			setHasSignedIn(false)
 		}
 	}
 

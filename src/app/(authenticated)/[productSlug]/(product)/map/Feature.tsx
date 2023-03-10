@@ -10,7 +10,7 @@ import type {FC} from "react"
 import {elementRegistry} from "./globals"
 import Story from "./Story"
 import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {AllVersions, addStory, sortStories, updateItem} from "~/utils/storyMap"
 
 export type FeatureProps = {

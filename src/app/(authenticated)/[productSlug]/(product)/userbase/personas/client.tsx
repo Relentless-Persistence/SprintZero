@@ -9,7 +9,7 @@ import type {FC} from "react"
 import type {Persona} from "~/types/db/Products/Personas"
 
 import EditableListCard from "./EditableListCard"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {PersonaConverter} from "~/types/db/Products/Personas"
 import {db} from "~/utils/firebase"
 

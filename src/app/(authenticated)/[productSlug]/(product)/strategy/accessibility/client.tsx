@@ -8,7 +8,7 @@ import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import LinkTo from "~/components/LinkTo"
 
 const AccessibilityClientPage: FC = () => {

@@ -16,7 +16,7 @@ import {z} from "zod"
 
 import type {FC} from "react"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"

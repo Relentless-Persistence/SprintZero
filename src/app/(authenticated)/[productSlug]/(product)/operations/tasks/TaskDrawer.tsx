@@ -12,7 +12,7 @@ import type {Promisable} from "type-fest"
 import type {Task} from "~/types/db/Products/Tasks"
 import type {User} from "~/types/db/Users"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfDateTimePicker from "~/components/rhf/RhfDateTimePicker"
 import RhfInput from "~/components/rhf/RhfInput"

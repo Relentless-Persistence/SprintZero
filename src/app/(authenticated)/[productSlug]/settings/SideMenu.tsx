@@ -8,7 +8,7 @@ import {useState} from "react"
 import type {ItemType} from "antd/es/menu/hooks/useItems"
 import type {FC} from "react"
 
-import {useAppContext} from "../../AppContext"
+import {useAppContext} from "../AppContext"
 import LinkTo from "~/components/LinkTo"
 
 const getItems = (activeProductId: string): ItemType[] => [

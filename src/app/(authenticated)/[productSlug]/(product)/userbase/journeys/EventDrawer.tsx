@@ -8,19 +8,19 @@ import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {z} from "zod"
-import type {JourneyEvent} from "~/types/db/Products/JourneyEvents"
 import type {Journey} from "~/types/db/Products/Journeys"
+import type {Event} from "~/types/db/Products/Journeys/Events"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import {JourneyEventSchema} from "~/types/db/Products/JourneyEvents"
 import {durationUnits} from "~/types/db/Products/Journeys"
+import {EventSchema} from "~/types/db/Products/Journeys/Events"
 import {PersonaConverter} from "~/types/db/Products/Personas"
 
-const formSchema = JourneyEventSchema.pick({
+const formSchema = EventSchema.pick({
 	description: true,
 	emotion: true,
 	emotionLevel: true,
@@ -33,7 +33,7 @@ type FormInputs = z.infer<typeof formSchema>
 
 export type EventDrawerProps = {
 	journey: QueryDocumentSnapshot<Journey>
-	activeEvent: QueryDocumentSnapshot<JourneyEvent> | undefined
+	activeEvent: QueryDocumentSnapshot<Event> | undefined
 	onClose: () => void
 	onCommit: (event: FormInputs) => Promisable<void>
 	onDelete: () => Promisable<void>

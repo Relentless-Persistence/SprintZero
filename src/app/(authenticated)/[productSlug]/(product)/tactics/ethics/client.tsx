@@ -9,7 +9,7 @@ import {useCollection} from "react-firebase-hooks/firestore"
 import type {FC} from "react"
 
 import Story from "./Story"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {getStories} from "~/utils/storyMap"
 

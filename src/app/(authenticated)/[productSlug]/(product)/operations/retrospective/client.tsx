@@ -14,7 +14,7 @@ import type {FC} from "react"
 import type {RetrospectiveItem} from "~/types/db/Products/RetrospectiveItems"
 
 import RetrospectiveDrawer from "./RetrospectiveDrawer"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {RetrospectiveItemConverter, retrospectiveTabs} from "~/types/db/Products/RetrospectiveItems"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"

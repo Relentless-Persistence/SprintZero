@@ -1,29 +1,57 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /{path=**}/Members/{memberId} {
+      allow read: if request.auth.uid == resource.data.id;
+    }
+
   	match /AppInfo/info {
       allow get: if true;
     }
 
     match /Products/{productId} {
-      allow read, update: if resource.data.members[request.auth.uid].type == "editor" || resource.data.members[request.auth.uid].type == "owner";
-      allow create: if request.auth != null;
-      allow delete: if resource.data.members[request.auth.uid].type == "owner";
+      allow read, update: if isEditorOnProduct(productId);
+      allow delete: if get(/databases/$(database)/documents/Products/$(productId)/Members/$(request.auth.uid)).data.type == "owner";
+
+      match /BusinessOutcomes/{businessOutcomeId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /DialogueParticipants/{dialogueParticipantId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Features/{featureId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /Huddles/{huddleId} {
+        allow read: if isEditorOnProduct(productId);
+        allow write: if isEditorOnProduct(productId) && request.auth.uid == huddleId;
+      }
 
       match /Insights/{insightId} {
         allow read, write: if isEditorOnProduct(productId);
       }
 
       match /Invites/{inviteId} {
-        allow read: if request.auth.token.email == resource.data.email;
+        allow read: if isEditorOnProduct(productId) || request.auth.token.email == resource.data.email;
         allow write: if isEditorOnProduct(productId)
       }
 
-      match /JourneyEvents/{journeyEventId} {
+      match /Journeys/{journeyId} {
+        allow read, write: if isEditorOnProduct(productId);
+
+        match /Events/{eventId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+      }
+
+      match /MarketLeaders/{marketLeaderId} {
         allow read, write: if isEditorOnProduct(productId);
       }
 
-      match /Journeys/{journeyId} {
+      match /Members/{memberId} {
         allow read, write: if isEditorOnProduct(productId);
       }
 
@@ -35,11 +63,43 @@ service cloud.firestore {
         }
       }
 
-      match /Participants/{participantId} {
+      match /Personas/{personaId} {
         allow read, write: if isEditorOnProduct(productId);
+
+        match /Changes/{changeId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+
+        match /DaysInTheLife/{dayInTheLifeId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+
+        match /Frustrations/{frustrationId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+
+        match /Goals/{goalId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+
+        match /Interactions/{interactionId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+
+        match /PersonaTasks/{personaTaskId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+
+        match /Priorities/{priorityId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
+
+        match /Responsibilities/{responsibilityId} {
+          allow read, write: if isEditorOnProduct(productId);
+        }
       }
 
-      match /Personas/{personaId} {
+      match /PotentialRisks/{potentialRiskId} {
         allow read, write: if isEditorOnProduct(productId);
       }
 
@@ -69,7 +129,15 @@ service cloud.firestore {
         allow read, write: if isEditorOnProduct(productId);
       }
 
+      match /UserPriorities/{userPriorityId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
       match /Versions/{versionId} {
+        allow read, write: if isEditorOnProduct(productId);
+      }
+
+      match /VisionUpdates/{visionUpdateId} {
         allow read, write: if isEditorOnProduct(productId);
       }
     }
@@ -81,8 +149,8 @@ service cloud.firestore {
     }
 
     function isEditorOnProduct(productId) {
-      let product = getAfter(/databases/$(database)/documents/Products/$(productId));
-      return product.data.members[request.auth.uid].type == "editor" || product.data.members[request.auth.uid].type == "owner"
+      let member = getAfter(/databases/$(database)/documents/Products/$(productId)/Members/$(request.auth.uid));
+      return member.data.type == "editor" || member.data.type == "owner"
     }
   }
 }

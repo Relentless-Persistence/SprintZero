@@ -10,7 +10,7 @@ import type {FC} from "react"
 
 import EditableTextCard from "./EditableTextCard"
 import EditableTextListCard from "./EditableTextListCard"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {BusinessOutcomeConverter} from "~/types/db/Products/BusinessOutcomes"
 import {MarketLeaderConverter} from "~/types/db/Products/MarketLeaders"
 import {PersonaConverter} from "~/types/db/Products/Personas"

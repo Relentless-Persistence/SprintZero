@@ -1,42 +1,44 @@
 "use client"
 
 import {Button, Card, Checkbox} from "antd"
-import {collection, doc, getDocs, query, updateDoc, where} from "firebase/firestore"
+import {collectionGroup, doc, getDocs, query, updateDoc, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
-import {useAppContext} from "../../AppContext"
 import LinkTo from "~/components/LinkTo"
 import NonDiscolsureAgreement from "~/components/NonDisclosureAgreement"
 import PrivacyPolicy from "~/components/PrivacyPolicy"
 import TermsOfService from "~/components/TermsOfService"
-import {ProductConverter} from "~/types/db/Products"
-import {db} from "~/utils/firebase"
+import {MemberConverter} from "~/types/db/Products/Members"
+import {conditionalThrow} from "~/utils/conditionalThrow"
+import {auth, db} from "~/utils/firebase"
 
 const AcceptTermsClientPage: FC = () => {
 	const router = useRouter()
 	const [agree, setAgree] = useState(false)
-	const {user} = useAppContext()
+	const [user, , userError] = useAuthState(auth)
+	conditionalThrow(userError)
 
 	const [hasAccepted, setHasAccepted] = useState(false)
 	const onAccept = async () => {
-		if (hasAccepted) return
+		if (hasAccepted || !user) return
 		try {
 			setHasAccepted(true)
-			await updateDoc(doc(db, `Users`, user.id), {
+			await updateDoc(doc(db, `Users`, user.uid), {
 				hasAcceptedTos: true,
 			} satisfies Partial<User>)
 
 			const {docs: products} = await getDocs(
-				query(collection(db, `Products`), where(`members.${user.id}.type`, `==`, `editor`)).withConverter(
-					ProductConverter,
+				query(collectionGroup(db, `Members`), where(`id`, `==`, user.uid), where(`type`, `==`, `editor`)).withConverter(
+					MemberConverter,
 				),
 			)
 			if (products.length === 0) router.push(`/product`)
-			else router.push(`/${products[0]!.id}/map`)
+			else router.push(`/${products[0]!.ref.parent.parent!.id}/map`)
 		} catch (e) {
 			setHasAccepted(false)
 			throw e

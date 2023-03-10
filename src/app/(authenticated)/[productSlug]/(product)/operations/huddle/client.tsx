@@ -15,7 +15,7 @@ import type {User} from "~/types/db/Users"
 
 import FunCard from "./FunCard"
 import Story from "./Story"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {HuddleConverter} from "~/types/db/Products/Huddles"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"

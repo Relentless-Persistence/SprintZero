@@ -10,8 +10,8 @@ import type {FC} from "react"
 
 import AddJourneyPage from "./AddJourneyPage"
 import EventDrawer from "./EventDrawer"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
-import {JourneyEventConverter} from "~/types/db/Products/JourneyEvents"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {JourneyEventConverter} from "~/types/db/Products/Journeys/JourneyEvents"
 import {JourneyConverter, durationUnits} from "~/types/db/Products/Journeys"
 import {db} from "~/utils/firebase"
 

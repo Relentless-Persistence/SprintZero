@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form"
 import type {FC} from "react"
 import type {z} from "zod"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {JourneyConverter, JourneySchema} from "~/types/db/Products/Journeys"

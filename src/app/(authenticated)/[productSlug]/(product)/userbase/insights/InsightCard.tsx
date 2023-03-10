@@ -7,7 +7,7 @@ import type {FC} from "react"
 import type {z} from "zod"
 import type {Insight} from "~/types/db/Products/Insights"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"

@@ -14,8 +14,14 @@ export const timestampSchema = z.custom<Timestamp>(
 
 // Distinct from a regular Timestamp because onAuthStateChanged() can return null for serverTimestamp() sent to the server
 export const serverTimestampSchema = z
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-	.union([z.instanceof(Timestamp), z.custom<FieldValue>((val) => (val as any)?._methodName === `serverTimestamp`)])
+	.union([
+		z.instanceof(Timestamp),
+		z.custom<FieldValue>(
+			(val) =>
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+				(val as any)?._methodName === `serverTimestamp` || (val as any)?.methodName === `FieldValue.serverTimestamp`,
+		),
+	])
 	.nullable()
 
 export const genConverter = <T extends Record<string, unknown>>(

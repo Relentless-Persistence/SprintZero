@@ -13,7 +13,7 @@ import Feature from "./Feature"
 import {elementRegistry, layerBoundaries} from "./globals"
 import Story from "./Story"
 import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {avg} from "~/utils/math"
 import {
 	AllVersions,

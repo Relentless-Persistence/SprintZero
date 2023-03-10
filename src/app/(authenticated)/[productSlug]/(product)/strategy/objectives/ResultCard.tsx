@@ -8,7 +8,7 @@ import type {FC} from "react"
 import type {z} from "zod"
 import type {Result} from "~/types/db/Products/Objectives/Results"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
 import {ResultConverter, ResultSchema} from "~/types/db/Products/Objectives/Results"
 import {formValidateStatus} from "~/utils/formValidateStatus"

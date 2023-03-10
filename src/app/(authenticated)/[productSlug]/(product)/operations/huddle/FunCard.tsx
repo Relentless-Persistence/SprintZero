@@ -9,7 +9,7 @@ import {useState} from "react"
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"

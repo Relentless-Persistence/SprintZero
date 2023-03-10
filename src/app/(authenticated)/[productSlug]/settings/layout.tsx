@@ -7,7 +7,7 @@ import {useEffect, useState} from "react"
 import type {FC, ReactNode} from "react"
 
 import SideMenu from "./SideMenu"
-import {useAppContext} from "../../AppContext"
+import {useAppContext} from "../AppContext"
 
 export type SettingsLayoutProps = {
 	children: ReactNode

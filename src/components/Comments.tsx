@@ -13,7 +13,7 @@ import type {Promisable} from "type-fest"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Comment} from "~/types/db/Products/StoryMapItems/Comments"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {CommentConverter} from "~/types/db/Products/StoryMapItems/Comments"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"

@@ -8,7 +8,7 @@ import type {FC} from "react"
 
 import EpicsTab from "./EpicsTab"
 import FeaturesTab from "./FeaturesTab"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 
 const PrioritiesClientPage: FC = () => {

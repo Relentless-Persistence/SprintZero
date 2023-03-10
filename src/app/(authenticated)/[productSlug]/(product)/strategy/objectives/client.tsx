@@ -11,7 +11,7 @@ import {useDebounce} from "react-use"
 import type {FC} from "react"
 
 import ResultCard from "./ResultCard"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {ObjectiveConverter} from "~/types/db/Products/Objectives"
 import {ResultConverter} from "~/types/db/Products/Objectives/Results"
 

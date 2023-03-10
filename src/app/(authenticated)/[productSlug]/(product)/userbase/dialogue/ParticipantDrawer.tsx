@@ -19,14 +19,14 @@ import {useForm} from "react-hook-form"
 import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Participant} from "~/types/db/Products/Participants"
+import type {DialogueParticipant} from "~/types/db/Products/DialogueParticipants"
 
 import ParticipantEditForm from "./ParticipantEditForm"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import {ParticipantSchema, statuses, timings} from "~/types/db/Products/Participants"
+import {DialogueParticipantSchema, statuses, timings} from "~/types/db/Products/DialogueParticipants"
 import {PersonaConverter} from "~/types/db/Products/Personas"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
@@ -34,7 +34,7 @@ import EarIcon from "~public/icons/ear.svg"
 
 dayjs.extend(relativeTime)
 
-const formSchema = ParticipantSchema.pick({
+const formSchema = DialogueParticipantSchema.pick({
 	availability: true,
 	email: true,
 	name: true,
@@ -46,7 +46,7 @@ const formSchema = ParticipantSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type ParticipantDrawerProps = {
-	participants: QuerySnapshot<Participant> | undefined
+	participants: QuerySnapshot<DialogueParticipant> | undefined
 	activeParticipant: string | undefined
 	onClose: () => void
 }

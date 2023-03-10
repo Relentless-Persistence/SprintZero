@@ -10,7 +10,7 @@ import type {FC} from "react"
 import Feature from "./Feature"
 import {elementRegistry} from "./globals"
 import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {addFeature, sortFeatures, updateItem} from "~/utils/storyMap"
 
 export type EpicProps = {

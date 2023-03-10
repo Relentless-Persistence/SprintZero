@@ -9,7 +9,7 @@ import type {FC} from "react"
 import type {Version} from "~/types/db/Products/Versions"
 
 import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {AllVersions} from "~/utils/storyMap"
 

@@ -14,11 +14,11 @@ import {Avatar, Button, Checkbox, Drawer, Form, Input, Popover, Segmented, Tag} 
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {doc, getDoc} from "firebase/firestore"
+import {collection, doc, getDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {useInterval} from "react-use"
 
@@ -29,14 +29,16 @@ import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 import type {User} from "~/types/db/Users"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {StoryMapItemSchema, sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
@@ -73,6 +75,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 	const story = storyMapItems.docs.find((story) => story.id === storyId)!
 	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	conditionalThrow(membersError)
+
 	const [localStoryName, setLocalStoryName] = useState(story.data().name)
 	useEffect(() => {
 		setLocalStoryName(story.data().name)
@@ -91,10 +96,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 	}, [story])
 
 	const teamMembers = useQueries({
-		queries: Object.keys(product.data().members).map((userId) => ({
-			queryKey: [`user`, userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
-		})),
+		queries:
+			members?.docs.map((member) => ({
+				queryKey: [`user`, member.id],
+				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
+			})) ?? [],
 	})
 
 	const {control, handleSubmit, getFieldState, formState, reset} = useForm<FormInputs>({

@@ -9,12 +9,6 @@ export const ProductSchema = z.object({
 	effortCost: z.number().nullable(),
 	effortCostCurrencySymbol: z.enum([`dollar`, `euro`, `pound`, `yen`, `rupee`]).nullable(),
 	sprintStartDayOfWeek: z.number().int().min(0).max(6),
-	members: z.record(
-		z.string(),
-		z.object({
-			type: z.enum([`owner`, `editor`, `viewer`]),
-		}),
-	),
 	name: z.string({invalid_type_error: `Required`}).min(1),
 
 	// Story map info

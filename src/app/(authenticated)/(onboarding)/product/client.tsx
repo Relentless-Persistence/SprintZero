@@ -1,13 +1,12 @@
 "use client"
 
 import {Button} from "antd"
-import crypto from "crypto"
-import {Timestamp, doc, runTransaction, serverTimestamp, setDoc} from "firebase/firestore"
+import {doc} from "firebase/firestore"
 import {motion} from "framer-motion"
-import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
-import querystring from "querystring"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import {useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 import type {Product} from "~/types/db/Products"
@@ -16,14 +15,9 @@ import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {useAppContext} from "../../AppContext"
-import {ProductConverter} from "~/types/db/Products"
-import {HuddleConverter} from "~/types/db/Products/Huddles"
-import {InviteConverter} from "~/types/db/Products/Invites"
-import {ObjectiveConverter} from "~/types/db/Products/Objectives"
-import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
-import {VersionConverter} from "~/types/db/Products/Versions"
-import {db} from "~/utils/firebase"
+import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
+import {auth, db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
 
 type FormInputs = Pick<
@@ -37,117 +31,47 @@ type FormInputs = Pick<
 
 const ProductSetupClientPage: FC = () => {
 	const router = useRouter()
-	const {user} = useAppContext()
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const [canProceed, setCanProceed] = useState(false)
 	const [formData, setFormData] = useState<Partial<FormInputs>>({})
 	const [hasSubmitted, setHasSubmitted] = useState(false)
+	const createProduct = trpc.product.create.useMutation()
+	const inviteUser = trpc.product.inviteUser.useMutation()
 
-	const sendEmail = trpc.sendEmail.useMutation()
+	const [user, , userError] = useAuthState(auth)
+	const [dbUser, , dbUserError] = useDocument(
+		user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined,
+	)
+	conditionalThrow(userError, dbUserError)
 
-	const submitForm = async (_data: FormInputs) => {
-		if (hasSubmitted) return
+	const submitForm = async (data: FormInputs) => {
+		if (hasSubmitted || !dbUser?.exists() || !user) return
 		setHasSubmitted(true)
 
-		let {email1, email2, email3, ...data} = _data
+		const {productId} = await createProduct.mutateAsync({
+			cadence: data.cadence,
+			effortCost: data.effortCost,
+			effortCostCurrencySymbol: data.effortCostCurrencySymbol,
+			name: data.name,
+			sprintStartDayOfWeek: data.sprintStartDayOfWeek,
+			userIdToken: await user.getIdToken(true),
+		})
+
+		let {email1, email2, email3} = data
 		if (email1 === email2) email2 = null
 		if (email1 === email3) email3 = null
 		if (email2 === email3) email3 = null
-		const members = {[user.id]: {type: `owner`} as const}
-
-		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}`
-		// eslint-disable-next-line @typescript-eslint/require-await -- Callback requires Promise return
-		await runTransaction(db, async (transaction) => {
-			const storyMapHistoryId = nanoid()
-
-			transaction.set(doc(db, `Products`, slug).withConverter(ProductConverter), {
-				...data,
-				createdAt: Timestamp.now(),
-				members,
-
-				storyMapCurrentHistoryId: storyMapHistoryId,
-				storyMapUpdatedAt: Timestamp.now(),
-
-				problemStatement: ``,
-
-				accessibility: {
-					auditory: [false, false, false, false, false],
-					cognitive: [false, false, false, false, false, false],
-					physical: [false, false, false, false, false],
-					speech: [false, false],
-					visual: [false, false, false, false, false, false, false, false],
-				},
-
-				finalVision: ``,
-				productType: null,
-				valueProposition: null,
-			})
-
-			transaction.set(doc(db, `Products`, slug, `Huddles`, nanoid()).withConverter(HuddleConverter), {
-				updatedAt: Timestamp.now(),
-				blockerStoryIds: [],
-				todayStoryIds: [],
-				yesterdayStoryIds: [],
-			})
-
-			transaction.set(
-				doc(db, `Products`, slug, `StoryMapHistories`, storyMapHistoryId).withConverter(StoryMapHistoryConverter),
-				{
-					future: false,
-					timestamp: serverTimestamp(),
-				},
-			)
-
-			transaction.set(doc(db, `Products`, slug, `Versions`, nanoid()).withConverter(VersionConverter), {
-				deleted: false,
-				name: `1.0`,
-			})
-
-			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
-				name: `001`,
-				statement: ``,
-			})
-			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
-				name: `002`,
-				statement: ``,
-			})
-			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
-				name: `003`,
-				statement: ``,
-			})
-			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
-				name: `004`,
-				statement: ``,
-			})
-			transaction.set(doc(db, `Products`, slug, `Objectives`, nanoid()).withConverter(ObjectiveConverter), {
-				name: `005`,
-				statement: ``,
-			})
-		})
 
 		for (const recipient of [email1, email2, email3]) {
 			if (!recipient) continue
-
-			const inviteToken = crypto.randomBytes(16).toString(`hex`)
-			const queryParams = querystring.stringify({invite_token: inviteToken})
-			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
-			const body = `<b>${user.data().name}</b> has invited you to join the product <b>"${
-				data.name
-			}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`
-
-			await setDoc(doc(db, `Products`, slug, `ProductInvites`, inviteToken).withConverter(InviteConverter), {
+			await inviteUser.mutateAsync({
 				email: recipient,
-			})
-
-			await sendEmail.mutateAsync({
-				to: recipient,
-				from: `no-reply@sprintzero.app`,
-				subject: `SprintZero | Member Invite`,
-				body,
+				productId,
+				userIdToken: await user.getIdToken(),
 			})
 		}
 
-		router.push(`/${slug}/map`)
+		router.push(`/${productId}/map`)
 	}
 
 	return (

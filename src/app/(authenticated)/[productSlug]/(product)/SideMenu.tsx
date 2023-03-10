@@ -13,7 +13,7 @@ import {useState} from "react"
 
 import type {FC} from "react"
 
-import {useAppContext} from "../../AppContext"
+import {useAppContext} from "../AppContext"
 import LinkTo from "~/components/LinkTo"
 
 const getItems = (activeProductId: string) => [

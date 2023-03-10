@@ -14,9 +14,9 @@ import {Avatar, Drawer, Input, Popover, Radio, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {doc, getDoc, updateDoc} from "firebase/firestore"
+import {collection, doc, getDoc, updateDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 import {useInterval} from "react-use"
 
 import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
@@ -24,11 +24,13 @@ import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {User} from "~/types/db/Users"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
@@ -48,16 +50,21 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 	const [description, setDescription] = useState(story.data().description)
 	const [commentType, setCommentType] = useState<`design` | `code`>(`design`)
 
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	conditionalThrow(membersError)
+
 	useEffect(() => {
 		setDescription(story.data().description)
 	}, [story])
 
 	const addVote = async (vote: boolean) => {
+		if (!members) return
+
 		let votesFor = Object.values(story.data().ethicsVotes).filter((vote) => vote === true).length
 		let votesAgainst = Object.values(story.data().ethicsVotes).filter((vote) => vote === false).length
 		if (vote) votesFor++
 		else votesAgainst++
-		const votingComplete = votesFor + votesAgainst === Object.keys(product.data().members).length
+		const votingComplete = votesFor + votesAgainst === members.docs.length
 		const votingResult = votesFor > votesAgainst
 
 		if (votingComplete) {
@@ -83,16 +90,17 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 	}, 1000)
 	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.data().updatedAtUserId).withConverter(UserConverter))
 
-	const teamMembers = useQueries({
-		queries: Object.keys(product.data().members).map((userId) => ({
-			queryKey: [`user`, userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
-		})),
+	const memberUsers = useQueries({
+		queries:
+			members?.docs.map((member) => ({
+				queryKey: [`user`, member.id],
+				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
+			})) ?? [],
 	})
 
 	const peoplePopoverItems = story
 		.data()
-		.peopleIds.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
+		.peopleIds.map((userId) => memberUsers.find((user) => user.data?.id === userId)?.data)
 		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 		.map((user) => (
 			<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">

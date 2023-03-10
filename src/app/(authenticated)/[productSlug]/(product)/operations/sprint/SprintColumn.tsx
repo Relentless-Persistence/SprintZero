@@ -7,7 +7,7 @@ import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 
 import Story from "./Story"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {AllVersions, getStories} from "~/utils/storyMap"
 
 export type SprintColumnProps = {

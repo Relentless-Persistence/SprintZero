@@ -11,8 +11,8 @@ import Masonry from "react-masonry-css"
 import type {FC} from "react"
 
 import ParticipantDrawer from "./ParticipantDrawer"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
-import {ParticipantConverter} from "~/types/db/Products/Participants"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {DialogueParticipantConverter} from "~/types/db/Products/DialogueParticipants"
 import {PersonaConverter} from "~/types/db/Products/Personas"
 import {db} from "~/utils/firebase"
 import EarIcon from "~public/icons/ear.svg"
@@ -22,7 +22,9 @@ const DialogueClientPage: FC = () => {
 	const [currentTab, setCurrentTab] = useState<(typeof tabs)[number][0]>(`identified`)
 	const [activeParticipant, setActiveParticipant] = useState<string | undefined>(undefined)
 
-	const [participants] = useCollection(collection(product.ref, `Participants`).withConverter(ParticipantConverter))
+	const [participants] = useCollection(
+		collection(product.ref, `Participants`).withConverter(DialogueParticipantConverter),
+	)
 
 	const allPersonas = useQueries({
 		queries: participants
@@ -133,7 +135,7 @@ const DialogueClientPage: FC = () => {
 					icon={<PlusOutlined className="text-primary" />}
 					tooltip="Add Participant"
 					onClick={() => {
-						addDoc(collection(db, `Participants`).withConverter(ParticipantConverter), {
+						addDoc(collection(db, `Participants`).withConverter(DialogueParticipantConverter), {
 							availability: [],
 							disabilities: {
 								auditory: false,

@@ -8,7 +8,7 @@ import {useCollectionData} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {ProductConverter} from "~/types/db/Products"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"

@@ -18,7 +18,7 @@ import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
 import SprintColumn from "./SprintColumn"
-import {useAppContext} from "~/app/(authenticated)/AppContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {StoryMapItemConverter, sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
 import {db} from "~/utils/firebase"
