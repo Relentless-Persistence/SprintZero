@@ -130,3 +130,30 @@ const getItems = (activeProductId: string) => [
 		],
 	},
 ]
+<<<<<<< HEAD
+=======
+
+const SideMenu: FC = () => {
+	const pathname = usePathname()
+	const {product} = useAppContext()
+
+	const items = getItems(product.id)
+	const [openKey, setOpenKey] = useState<string | undefined>(
+		items.find((item) => item.children?.find((child) => child.key === pathname?.replace(/^\/[^/]+\//, ``)))?.key,
+	)
+
+	return (
+		<Menu
+			id="mainMenu"
+			mode="inline"
+			openKeys={openKey ? [openKey] : []}
+			onOpenChange={(openKeys) => setOpenKey(openKeys.find((key) => key !== openKey))}
+			selectedKeys={[pathname?.replace(/^\/[^/]+\//, ``) ?? ``]}
+			items={items}
+			className="h-full"
+		/>
+	)
+}
+
+export default SideMenu
+>>>>>>> 7840dfa... Change Navigation to colorPrimary

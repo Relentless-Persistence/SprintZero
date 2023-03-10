@@ -84,6 +84,11 @@ button.ant-btn-link {
 	max-width: 100%;
 }
 
+#mainMenu .ant-menu-item-selected {
+	color: #103001 !important;
+	font-weight: 600;
+}
+
 @layer base {
 	html.light {
 		--color-primary-bg: 221 227 213;
