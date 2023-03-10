@@ -204,7 +204,13 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 								</div>
 
 								<Radio.Group
-									value={story.data().ethicsVotes[user.id] ? `allow` : `reject`}
+									value={
+										story.data().ethicsVotes[user.id] === true
+											? `allow`
+											: story.data().ethicsVotes[user.id] === false
+											? `reject`
+											: undefined
+									}
 									onChange={(e) => {
 										addVote(e.target.value === `allow`).catch(console.error)
 									}}
