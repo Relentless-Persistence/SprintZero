@@ -10,7 +10,7 @@ const Error403Page: FC = () => {
 		<RootProviders theme="light">
 			<Layout className="h-full">
 				<HeaderDoNotUse />
-				<Layout.Content className="grid place-items-center">
+				<Layout.Content className="grid place-items-center overflow-auto">
 					<Result
 						status="403"
 						title="Error 403: Forbidden"

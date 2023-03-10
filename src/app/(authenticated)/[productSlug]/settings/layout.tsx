@@ -29,12 +29,13 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({children}) => {
 	const [isOwner, setIsOwner] = useState(false)
 
 	useEffect(() => {
-		if (members?.docs.find((member) => member.id === user.id)?.data().type === `owner`) {
+		if (!members) return
+		if (members.docs.find((member) => member.id === user.id)!.data().type === `owner`) {
 			setIsOwner(true)
 		} else {
 			router.replace(`/404`)
 		}
-	}, [members?.docs, router, user.id])
+	}, [members, router, user.id])
 
 	if (!isOwner) return null
 	return (

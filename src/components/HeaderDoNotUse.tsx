@@ -40,7 +40,9 @@ const HeaderDoNotUse: FC = () => {
 
 	return (
 		<Layout.Header className="flex items-center gap-8 !bg-[#161e12] !px-4">
-			<Image src="/images/logo-dark.svg" alt="SprintZero logo" width={160} height={36} priority />
+			<LinkTo href="/">
+				<Image src="/images/logo-dark.svg" alt="SprintZero logo" width={160} height={36} priority />
+			</LinkTo>
 
 			<Menu
 				theme="dark"

@@ -67,12 +67,10 @@ const ConfigurationSettingsClientPage: FC = () => {
 
 	return (
 		<div className="flex h-full flex-col gap-6 overflow-auto px-12 py-8">
-			<Breadcrumb>
-				<Breadcrumb.Item>Settings</Breadcrumb.Item>
-				<Breadcrumb.Item>Configuration</Breadcrumb.Item>
-			</Breadcrumb>
-
-			<p className="text-xl font-semibold">Product Configuration</p>
+			<div className="flex flex-col gap-2">
+				<Breadcrumb items={[{title: `Settings`}, {title: `Configuration`}]} />
+				<p className="text-3xl font-bold">Product Configuration</p>
+			</div>
 
 			<Card className="w-fit">
 				<form className="flex flex-col items-start gap-4">

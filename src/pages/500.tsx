@@ -10,7 +10,7 @@ const Error500Page: FC = () => {
 		<RootProviders theme="light">
 			<Layout className="h-full">
 				<HeaderDoNotUse />
-				<Layout.Content className="grid place-items-center">
+				<Layout.Content className="grid place-items-center overflow-auto">
 					<Result
 						status="500"
 						title="Error 500: Internal Server Error"

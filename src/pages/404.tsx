@@ -10,7 +10,7 @@ const Error404Page: FC = () => {
 		<RootProviders theme="light">
 			<Layout className="h-full">
 				<HeaderDoNotUse />
-				<Layout.Content className="grid place-items-center">
+				<Layout.Content className="grid place-items-center overflow-auto">
 					<Result
 						status="404"
 						title="Error 404: Page not found"

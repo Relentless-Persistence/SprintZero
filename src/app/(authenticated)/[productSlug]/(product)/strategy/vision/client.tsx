@@ -136,10 +136,7 @@ const VisionsClientPage: FC = () => {
 		<div className="grid h-full grid-cols-[2fr_16rem] gap-8">
 			<div className="ml-12 mt-8 overflow-auto" ref={scrollerRef}>
 				<div id="heading" className="sticky top-0 z-10 flex flex-col gap-2 bg-bgLayout pb-6">
-					<Breadcrumb>
-						<Breadcrumb.Item>Strategy</Breadcrumb.Item>
-						<Breadcrumb.Item>Vision</Breadcrumb.Item>
-					</Breadcrumb>
+					<Breadcrumb items={[{title: `Strategy`}, {title: `Vision`}]} />
 					<div className="leading-normal">
 						<h1 className="text-3xl font-bold">Vision Statement</h1>
 						<p>A concise and inspiring statement that outlines the long-term goal and purpose of a product</p>
