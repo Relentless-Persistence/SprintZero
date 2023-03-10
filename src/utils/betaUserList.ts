@@ -64,6 +64,7 @@ export const betaUsers = [
 	`josh@turtleinc.com`,
 	`katherine.ly.chong@gmail.com`,
 	`kellymccann91@gmail.com`,
+	`klenkde@gmail.com`,
 	`laurenproctor32@gmail.com`,
 	`lcmontgomery11@gmail.com`,
 	`linzi.shearer@landgah.com`,
