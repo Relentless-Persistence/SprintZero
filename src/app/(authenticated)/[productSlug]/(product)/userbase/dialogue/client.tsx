@@ -3,32 +3,27 @@
 import {EyeOutlined, PhoneOutlined, PlusOutlined, UserOutlined} from "@ant-design/icons"
 import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Button, Card, FloatButton, Tabs, Tag} from "antd"
-import {Timestamp, addDoc, collection, doc, getDoc, query, where} from "firebase/firestore"
+import {Timestamp, addDoc, collection, doc, getDoc} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import ParticipantDrawer from "./ParticipantDrawer"
-import {ParticipantConverter} from "~/types/db/Participants"
-import {PersonaConverter} from "~/types/db/Personas"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {DialogueParticipantConverter} from "~/types/db/Products/DialogueParticipants"
+import {PersonaConverter} from "~/types/db/Products/Personas"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
-import {useUser} from "~/utils/useUser"
 import EarIcon from "~public/icons/ear.svg"
 
 const DialogueClientPage: FC = () => {
-	const user = useUser()
+	const {product, user} = useAppContext()
 	const [currentTab, setCurrentTab] = useState<(typeof tabs)[number][0]>(`identified`)
-	const [activeParticipant, setActiveParticipant] = useState<Id | undefined>(undefined)
+	const [activeParticipant, setActiveParticipant] = useState<string | undefined>(undefined)
 
-	const activeProductId = useActiveProductId()
 	const [participants] = useCollection(
-		query(collection(db, `Participants`), where(`productId`, `==`, activeProductId)).withConverter(
-			ParticipantConverter,
-		),
+		collection(product.ref, `Participants`).withConverter(DialogueParticipantConverter),
 	)
 
 	const allPersonas = useQueries({
@@ -60,7 +55,7 @@ const DialogueClientPage: FC = () => {
 						.filter((participant) => participant.data().status === currentTab)
 						.map((participant) => {
 							const personas = allPersonas
-								.filter(({data: persona}) => persona && participant.data().personaIds.includes(persona.id as Id))
+								.filter(({data: persona}) => persona && participant.data().personaIds.includes(persona.id))
 								.map((persona) => persona.data)
 
 							return (
@@ -79,7 +74,7 @@ const DialogueClientPage: FC = () => {
 										</div>
 									}
 									extra={
-										<Button size="small" onClick={() => setActiveParticipant(participant.id as Id)}>
+										<Button size="small" onClick={() => setActiveParticipant(participant.id)}>
 											View
 										</Button>
 									}
@@ -140,7 +135,7 @@ const DialogueClientPage: FC = () => {
 					icon={<PlusOutlined className="text-primary" />}
 					tooltip="Add Participant"
 					onClick={() => {
-						addDoc(collection(db, `Participants`).withConverter(ParticipantConverter), {
+						addDoc(collection(db, `Participants`).withConverter(DialogueParticipantConverter), {
 							availability: [],
 							disabilities: {
 								auditory: false,
@@ -159,11 +154,10 @@ const DialogueClientPage: FC = () => {
 							transcript: ``,
 							updatedAt: Timestamp.now(),
 							personaIds: [],
-							productId: activeProductId,
-							updatedAtUserId: user!.id as Id,
+							updatedAtUserId: user.id,
 						})
 							.then((docRef) => {
-								setActiveParticipant(docRef.id as Id)
+								setActiveParticipant(docRef.id)
 							})
 							.catch(console.error)
 					}}

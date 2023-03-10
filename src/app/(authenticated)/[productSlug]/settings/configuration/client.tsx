@@ -3,21 +3,18 @@
 import {FireFilled} from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Breadcrumb, Card, Dropdown} from "antd"
-import {doc, updateDoc} from "firebase/firestore"
+import {updateDoc} from "firebase/firestore"
 import {useEffect, useRef} from "react"
-import {useDocument} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 
 import type {FC} from "react"
 
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {ProductConverter, ProductSchema} from "~/types/db/Products"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
-import {useUser} from "~/utils/useUser"
+import {ProductSchema} from "~/types/db/Products"
 
 const formSchema = ProductSchema.pick({
 	name: true,
@@ -33,26 +30,24 @@ const formSchema = ProductSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 const ConfigurationSettingsClientPage: FC = () => {
-	const user = useUser()
-	const activeProductId = useActiveProductId()
-	const [product] = useDocument(user ? doc(db, `Products`, activeProductId).withConverter(ProductConverter) : undefined)
+	const {product} = useAppContext()
 
 	const {control, handleSubmit, reset} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		shouldFocusError: false,
 		defaultValues: {
-			name: product?.data()?.name,
-			cadence: product?.data()?.cadence,
-			sprintStartDayOfWeek: product?.data()?.sprintStartDayOfWeek,
-			effortCost: product?.data()?.effortCost ? product.data()!.effortCost?.toString() : null,
-			effortCostCurrencySymbol: product?.data()?.effortCostCurrencySymbol,
+			name: product.data().name,
+			cadence: product.data().cadence,
+			sprintStartDayOfWeek: product.data().sprintStartDayOfWeek,
+			effortCost: product.data().effortCost ? product.data()!.effortCost?.toString() : null,
+			effortCostCurrencySymbol: product.data().effortCostCurrencySymbol,
 		},
 	})
 
 	const hasSetInitialData = useRef(false)
 	useEffect(() => {
-		if (!product?.exists() || hasSetInitialData.current) return
+		if (!product.exists() || hasSetInitialData.current) return
 		reset({
 			name: product.data().name,
 			cadence: product.data().cadence,
@@ -64,7 +59,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 	}, [product, reset])
 
 	const onSubmit = handleSubmit(async (data) => {
-		await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
+		await updateDoc(product.ref, {
 			...data,
 			effortCost: data.effortCost ? parseFloat(data.effortCost) : null,
 		})

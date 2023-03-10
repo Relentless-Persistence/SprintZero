@@ -14,39 +14,40 @@ import {Avatar, Button, Checkbox, Drawer, Form, Input, Popover, Segmented, Tag} 
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {doc, getDoc} from "firebase/firestore"
+import {collection, doc, getDoc} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useDocument, useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {useInterval} from "react-use"
 
-import type {StoryMapMeta} from "./meta"
-import type {QueryDocumentSnapshot} from "firebase/firestore"
+import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Id} from "~/types"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 import type {User} from "~/types/db/Users"
 
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {ProductConverter} from "~/types/db/Products"
-import {StorySchema, sprintColumns} from "~/types/db/StoryMapStates"
+import {MemberConverter} from "~/types/db/Products/Members"
+import {StoryMapItemSchema, sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import dollarFormat from "~/utils/dollarFormat"
 import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {deleteItem, updateItem} from "~/utils/storyMap"
 import {useTheme} from "~/utils/ThemeContext"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 dayjs.extend(relativeTime)
 
-const formSchema = StorySchema.pick({
+const formSchema = StoryMapItemSchema.pick({
 	branchName: true,
 	designEffort: true,
 	designLink: true,
@@ -59,125 +60,109 @@ const formSchema = StorySchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
-	meta: StoryMapMeta
-	storyId: Id
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	versions: QuerySnapshot<Version>
+	storyId: string
 	isOpen: boolean
 	onClose: () => void
 }
 
-const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => {
+const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, isOpen, onClose}) => {
+	const {product} = useAppContext()
 	const [editMode, setEditMode] = useState(false)
 	const [newAcceptanceCriterionInput, setNewAcceptanceCriterionInput] = useState(``)
 	const [newBugInput, setNewBugInput] = useState(``)
-	const story = meta.stories.find((story) => story.id === storyId)!
+	const story = storyMapItems.docs.find((story) => story.id === storyId)!
 	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
-	const [localStoryName, setLocalStoryName] = useState(story.name)
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	conditionalThrow(membersError)
+
+	const [localStoryName, setLocalStoryName] = useState(story.data().name)
 	useEffect(() => {
-		setLocalStoryName(story.name)
-	}, [story.name])
+		setLocalStoryName(story.data().name)
+	}, [story])
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
-		setLastModifiedText(dayjs(story.updatedAt.toMillis()).fromNow())
+		setLastModifiedText(dayjs(story.data().updatedAt.toMillis()).fromNow())
 	}, 1000)
 
-	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.updatedAtUserId).withConverter(UserConverter))
+	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.data().updatedAtUserId).withConverter(UserConverter))
 
-	const [description, setDescription] = useState(story.description)
+	const [description, setDescription] = useState(story.data().description)
 	useEffect(() => {
-		setDescription(story.description)
-	}, [story.description])
+		setDescription(story.data().description)
+	}, [story])
 
-	const activeProductId = useActiveProductId()
-	const [product] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
-
-	const teamMembers = useQueries({
-		queries: Object.keys(product?.members ?? {}).map((userId) => ({
-			queryKey: [`user`, userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
-		})),
+	const memberUsers = useQueries({
+		queries:
+			members?.docs.map((member) => ({
+				queryKey: [`user`, member.id],
+				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
+			})) ?? [],
 	})
 
 	const {control, handleSubmit, getFieldState, formState, reset} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			branchName: story.branchName,
-			designLink: story.designLink,
-			designEffort: story.designEffort,
-			engineeringEffort: story.engineeringEffort,
-			pageLink: story.pageLink,
-			sprintColumn: story.sprintColumn,
-			peopleIds: story.peopleIds,
-			versionId: story.versionId,
+			branchName: story.data().branchName,
+			designLink: story.data().designLink,
+			designEffort: story.data().designEffort,
+			engineeringEffort: story.data().engineeringEffort,
+			pageLink: story.data().pageLink,
+			sprintColumn: story.data().sprintColumn,
+			peopleIds: story.data().peopleIds,
+			versionId: story.data().versionId,
 		},
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
-		await updateItem(meta.storyMapState, story.id, data, meta.allVersions)
+		await updateItem(product, storyMapItems, versions, story.id, data)
 		setEditMode(false)
 	})
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
-		await updateItem(
-			meta.storyMapState,
-			story.id,
-			{
-				acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
-					const index = draft.findIndex((criterion) => criterion.id === id)
-					draft[index]!.checked = checked
-				}),
-			},
-			meta.allVersions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			acceptanceCriteria: produce(story.data().acceptanceCriteria, (draft) => {
+				const index = draft.findIndex((criterion) => criterion.id === id)
+				draft[index]!.checked = checked
+			}),
+		})
 	}
 
 	const addAcceptanceCriterion = async () => {
 		if (!newAcceptanceCriterionInput) return
-		await updateItem(
-			meta.storyMapState,
-			story.id,
-			{
-				acceptanceCriteria: [
-					...story.acceptanceCriteria,
-					{id: nanoid() as Id, name: newAcceptanceCriterionInput, checked: false},
-				],
-			},
-			meta.allVersions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			acceptanceCriteria: [
+				...story.data().acceptanceCriteria,
+				{id: nanoid(), name: newAcceptanceCriterionInput, checked: false},
+			],
+		})
 	}
 
 	const toggleBug = async (id: string, checked: boolean) => {
-		await updateItem(
-			meta.storyMapState,
-			story.id,
-			{
-				bugs: produce(story.bugs, (draft) => {
-					const index = draft.findIndex((bug) => bug.id === id)
-					draft[index]!.checked = checked
-				}),
-			},
-			meta.allVersions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			bugs: produce(story.data().bugs, (draft) => {
+				const index = draft.findIndex((bug) => bug.id === id)
+				draft[index]!.checked = checked
+			}),
+		})
 	}
 
 	const addBug = async () => {
 		if (!newBugInput) return
-		await updateItem(
-			meta.storyMapState,
-			story.id,
-			{
-				bugs: [...story.bugs, {id: nanoid() as Id, name: newBugInput, checked: false}],
-			},
-			meta.allVersions,
-		)
+		await updateItem(product, storyMapItems, versions, story.id, {
+			bugs: [...story.data().bugs, {id: nanoid(), name: newBugInput, checked: false}],
+		})
 	}
 
-	const totalEffort = story.designEffort + story.engineeringEffort
+	const totalEffort = story.data().designEffort + story.data().engineeringEffort
 
-	const peoplePopoverItems = story.peopleIds
-		.map((userId) => teamMembers.find((user) => user.data?.id === userId)?.data)
+	const peoplePopoverItems = story
+		.data()
+		.peopleIds.map((userId) => memberUsers.find((user) => user.data?.id === userId)?.data)
 		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 		.map((user) => (
 			<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
@@ -202,7 +187,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							type="primary"
 							danger
 							onClick={() => {
-								deleteItem(meta.storyMapState, story.id).catch(console.error)
+								deleteItem(product, storyMapItems, versions, story.id).catch(console.error)
 							}}
 						>
 							Delete
@@ -218,9 +203,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 									className="absolute inset-0 bg-transparent"
 									onChange={(e) => {
 										setLocalStoryName(e.target.value)
-										updateItem(meta.storyMapState, story.id, {name: e.target.value}, meta.allVersions).catch(
-											console.error,
-										)
+										updateItem(product, storyMapItems, versions, story.id, {name: e.target.value}).catch(console.error)
 									}}
 								/>
 							</div>
@@ -237,17 +220,22 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								</Tag>
 								<Tag
 									color={
-										typeof product?.effortCost === `number` ? `#585858` : theme === `light` ? `#f5f5f5` : `#333333`
+										typeof product.data().effortCost === `number`
+											? `#585858`
+											: theme === `light`
+											? `#f5f5f5`
+											: `#333333`
 									}
 									icon={<DollarOutlined />}
 									className={clsx(
-										typeof product?.effortCost !== `number` && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
+										typeof product.data().effortCost !== `number` &&
+											`!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
 									)}
 								>
-									{dollarFormat((product?.effortCost ?? 0) * totalEffort)}
+									{dollarFormat((product.data().effortCost ?? 0) * totalEffort)}
 								</Tag>
 								<Tag color="#585858" icon={<FlagOutlined />}>
-									{sprintColumns[story.sprintColumn]}
+									{sprintColumns[story.data().sprintColumn]}
 								</Tag>
 								<Popover
 									placement="bottom"
@@ -262,33 +250,35 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 									}
 								>
 									<Tag color="#585858" icon={<UserOutlined />} className="text-sm">
-										{story.peopleIds.length}
+										{story.data().peopleIds.length}
 									</Tag>
 								</Popover>
 
 								<div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
 									<Tag
-										color={story.branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+										color={story.data().branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 										icon={<CodeOutlined />}
-										className={clsx(!story.branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+										className={clsx(!story.data().branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 									>
-										{story.branchName ?? `No branch`}
+										{story.data().branchName ?? `No branch`}
 									</Tag>
-									<LinkTo href={story.designLink} openInNewTab>
+									<LinkTo href={story.data().designLink} openInNewTab>
 										<Tag
-											color={story.designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+											color={story.data().designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<BlockOutlined />}
-											className={clsx(!story.designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+											className={clsx(
+												!story.data().designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
+											)}
 										>
 											Design
 										</Tag>
 									</LinkTo>
-									<LinkTo href={story.pageLink} openInNewTab>
+									<LinkTo href={story.data().pageLink} openInNewTab>
 										<Tag
-											color={story.pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+											color={story.data().pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<LinkOutlined />}
-											style={story.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
-											className={clsx(!story.pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+											style={story.data().pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+											className={clsx(!story.data().pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 										>
 											Page
 										</Tag>
@@ -307,14 +297,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								onClick={() => {
 									setEditMode(false)
 									reset({
-										branchName: story.branchName,
-										designLink: story.designLink,
-										designEffort: story.designEffort,
-										engineeringEffort: story.engineeringEffort,
-										pageLink: story.pageLink,
-										sprintColumn: story.sprintColumn,
-										peopleIds: story.peopleIds,
-										versionId: story.versionId,
+										branchName: story.data().branchName,
+										designLink: story.data().designLink,
+										designEffort: story.data().designEffort,
+										engineeringEffort: story.data().engineeringEffort,
+										pageLink: story.data().pageLink,
+										sprintColumn: story.data().sprintColumn,
+										peopleIds: story.data().peopleIds,
+										versionId: story.data().versionId,
 									})
 								}}
 							>
@@ -336,46 +326,50 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 			}
 		>
 			{editMode ? (
-				<Form
+				<form
 					id="story-form"
-					layout="vertical"
 					className="flex flex-col gap-4"
-					onFinish={() => {
-						onSubmit().catch(console.error)
+					onSubmit={(e) => {
+						onSubmit(e).catch(console.error)
 					}}
 				>
 					<div className="flex gap-8">
-						<Form.Item label={<span className="font-semibold">Team members</span>} className="grow">
+						<label className="flex grow flex-col gap-2">
+							<span className="font-semibold">Team members</span>
 							<RhfSelect
 								control={control}
 								name="peopleIds"
 								mode="multiple"
-								options={teamMembers
+								options={memberUsers
 									.map(({data: memberDoc}) => memberDoc)
 									.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 									.map((user) => ({label: user.data().name, value: user.id}))}
 							/>
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Design</span>}>
+						</label>
+						<label className="flex flex-col gap-2">
+							<span className="font-semibold">Design Effort</span>
 							<RhfSegmented control={control} name="designEffort" options={[1, 2, 3, 5, 8, 13]} />
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Engineering</span>}>
+						</label>
+						<label className="flex flex-col gap-2">
+							<span className="font-semibold">Engineering Effort</span>
 							<RhfSegmented control={control} name="engineeringEffort" options={[1, 2, 3, 5, 8, 13]} />
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Version</span>} className="shrink-0 basis-20">
+						</label>
+						<label className="flex shrink-0 basis-20 flex-col gap-2">
+							<span className="font-semibold">Version</span>
 							<RhfSelect
 								control={control}
 								name="versionId"
-								options={meta.allVersions.docs.map((version) => ({label: version.data().name, value: version.id}))}
+								options={versions.docs.map((version) => ({label: version.data().name, value: version.id}))}
 							/>
-						</Form.Item>
-						<Form.Item label={<span className="font-semibold">Status</span>} className="shrink-0 basis-56">
+						</label>
+						<label className="flex shrink-0 basis-56 flex-col gap-2">
+							<span className="font-semibold">Status</span>
 							<RhfSelect
 								control={control}
 								name="sprintColumn"
 								options={Object.entries(sprintColumns).map(([key, value]) => ({label: value, value: key}))}
 							/>
-						</Form.Item>
+						</label>
 					</div>
 					<Form.Item
 						label="Design"
@@ -401,7 +395,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 					>
 						<RhfInput control={control} name="pageLink" placeholder="https://" />
 					</Form.Item>
-				</Form>
+				</form>
 			) : (
 				<div className="grid h-full grid-cols-2 gap-6">
 					{/* Left column */}
@@ -413,14 +407,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)
-									updateItem(
-										meta.storyMapState,
-										story.id,
-										{
-											description: e.target.value,
-										},
-										meta.allVersions,
-									).catch(console.error)
+									updateItem(product, storyMapItems, versions, story.id, {description: e.target.value}).catch(
+										console.error,
+									)
 								}}
 								className="max-h-[calc(100%-2rem)]"
 							/>
@@ -430,7 +419,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							<div className="flex min-h-0 flex-col gap-2">
 								<p className="text-lg font-semibold">Acceptance Criteria</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
-									{story.acceptanceCriteria.map((criterion) => (
+									{story.data().acceptanceCriteria.map((criterion) => (
 										<Checkbox
 											key={criterion.id}
 											checked={criterion.checked}
@@ -462,7 +451,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 							<div className="flex min-h-0 flex-col gap-2 overflow-auto">
 								<p className="text-lg font-semibold">Bugs</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
-									{story.bugs.map((bug) => (
+									{story.data().bugs.map((bug) => (
 										<Checkbox
 											key={bug.id}
 											checked={bug.checked}
@@ -509,12 +498,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({meta, storyId, isOpen, onClose}) => 
 						</div>
 						<div className="relative grow">
 							<Comments
-								storyMapStateId={meta.storyMapState.id as Id}
-								parentId={storyId}
-								flagged={story.ethicsColumn !== null}
+								storyMapItem={story}
+								flagged={story.data().ethicsColumn !== null}
 								commentType={commentType}
 								onFlag={() => {
-									updateItem(meta.storyMapState, story.id, {ethicsColumn: `underReview`}, meta.allVersions).catch(
+									updateItem(product, storyMapItems, versions, story.id, {ethicsColumn: `underReview`}).catch(
 										console.error,
 									)
 								}}

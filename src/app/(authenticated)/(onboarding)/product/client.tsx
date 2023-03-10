@@ -1,31 +1,24 @@
 "use client"
 
 import {Button} from "antd"
-import crypto from "crypto"
-import {Timestamp, addDoc, collection, doc, serverTimestamp, setDoc, updateDoc} from "firebase/firestore"
+import {doc} from "firebase/firestore"
 import {motion} from "framer-motion"
-import {nanoid} from "nanoid"
 import {useRouter} from "next/navigation"
-import querystring from "querystring"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import {useDocument} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 import type {Product} from "~/types/db/Products"
 
 import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {HistoryConverter} from "~/types/db/Histories"
-import {ObjectiveConverter} from "~/types/db/Objectives"
-import {ProductInviteConverter} from "~/types/db/ProductInvites"
-import {ProductConverter} from "~/types/db/Products"
-import {StoryMapStateConverter} from "~/types/db/StoryMapStates"
-import {VersionConverter} from "~/types/db/Versions"
-import {db} from "~/utils/firebase"
+import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
+import {auth, db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
-import {useUser} from "~/utils/useUser"
 
 type FormInputs = Pick<
 	Product,
@@ -38,137 +31,52 @@ type FormInputs = Pick<
 
 const ProductSetupClientPage: FC = () => {
 	const router = useRouter()
-	const user = useUser()
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const [canProceed, setCanProceed] = useState(false)
 	const [formData, setFormData] = useState<Partial<FormInputs>>({})
 	const [hasSubmitted, setHasSubmitted] = useState(false)
+	const createProduct = trpc.product.create.useMutation()
+	const inviteUser = trpc.product.inviteUser.useMutation()
 
-	const sendEmail = trpc.sendEmail.useMutation()
+	const [user, , userError] = useAuthState(auth)
+	const [dbUser, , dbUserError] = useDocument(
+		user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined,
+	)
+	conditionalThrow(userError, dbUserError)
 
-	const submitForm = async (_data: FormInputs) => {
-		if (hasSubmitted || !user) return
+	const submitForm = async (data: FormInputs) => {
+		if (hasSubmitted || !dbUser?.exists() || !user) return
 		setHasSubmitted(true)
 
-		const slug = `${_data.name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}` as Id
-
-		const storyMapState = await addDoc(collection(db, `StoryMapStates`).withConverter(StoryMapStateConverter), {
-			items: {},
-			updatedAt: serverTimestamp(),
-			currentHistoryId: `` as Id,
-			productId: slug,
+		const {productId} = await createProduct.mutateAsync({
+			cadence: data.cadence,
+			effortCost: data.effortCost,
+			effortCostCurrencySymbol: data.effortCostCurrencySymbol,
+			name: data.name,
+			sprintStartDayOfWeek: data.sprintStartDayOfWeek,
+			userIdToken: await user.getIdToken(true),
 		})
 
-		let {email1, email2, email3, ...data} = _data
+		let {email1, email2, email3} = data
 		if (email1 === email2) email2 = null
 		if (email1 === email3) email3 = null
 		if (email2 === email3) email3 = null
-		const members = {[user.id as Id]: {type: `owner`} as const}
-
-		await setDoc(doc(db, `Products`, slug).withConverter(ProductConverter), {
-			...data,
-			createdAt: Timestamp.now(),
-			members,
-			problemStatement: ``,
-			businessOutcomes: [],
-			marketLeaders: [],
-			potentialRisks: [],
-			userPriorities: [],
-			accessibility: {
-				auditory: [false, false, false, false, false],
-				cognitive: [false, false, false, false, false, false],
-				physical: [false, false, false, false, false],
-				speech: [false, false],
-				visual: [false, false, false, false, false, false, false, false],
-			},
-			productType: `mobile`,
-			valueProposition: null,
-			features: null,
-			finalVision: ``,
-			updates: [],
-			huddles: {
-				[user.id]: {
-					updatedAt: Timestamp.now(),
-					blockerStoryIds: [],
-					todayStoryIds: [],
-					yesterdayStoryIds: [],
-				},
-			},
-		})
-
-		await Promise.all([
-			(async () => {
-				const positionHistory = await addDoc(
-					collection(db, `StoryMapStates`, storyMapState.id, `Histories`).withConverter(HistoryConverter),
-					{
-						future: false,
-						items: {},
-						timestamp: serverTimestamp(),
-					},
-				)
-				await updateDoc(storyMapState, {
-					currentHistoryId: positionHistory.id as Id,
-				})
-			})(),
-			addDoc(collection(db, `StoryMapStates`, storyMapState.id, `Versions`).withConverter(VersionConverter), {
-				name: `1.0`,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
-				name: `001`,
-				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
-				name: `002`,
-				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
-				name: `003`,
-				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
-				name: `004`,
-				statement: ``,
-				productId: slug,
-			}),
-			addDoc(collection(db, `Objectives`).withConverter(ObjectiveConverter), {
-				name: `005`,
-				statement: ``,
-				productId: slug,
-			}),
-		])
 
 		for (const recipient of [email1, email2, email3]) {
 			if (!recipient) continue
-
-			const inviteToken = crypto.randomBytes(16).toString(`hex`)
-			const queryParams = querystring.stringify({invite_token: inviteToken})
-			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
-			const body = `<b>${user.data().name}</b> has invited you to join the product <b>"${
-				data.name
-			}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`
-
-			await setDoc(doc(db, `ProductInvites`, inviteToken).withConverter(ProductInviteConverter), {
+			await inviteUser.mutateAsync({
 				email: recipient,
-				productId: slug,
-			})
-
-			await sendEmail.mutateAsync({
-				to: recipient,
-				from: `no-reply@sprintzero.app`,
-				subject: `SprintZero | Member Invite`,
-				body,
+				productId,
+				userIdToken: await user.getIdToken(),
 			})
 		}
 
-		router.push(`/${slug}/map`)
+		router.push(`/${productId}/map`)
 	}
 
 	return (
-		<div className="flex h-full flex-col gap-8">
-			<div className="flex flex-col gap-2">
+		<div className="flex h-full flex-col gap-6">
+			<div className="leading-normal">
 				<h1 className="text-3xl font-semibold">Product Configuration</h1>
 				<h2 className="text-xl text-textSecondary">
 					Almost time to start building! We just require a few data points before we can begin

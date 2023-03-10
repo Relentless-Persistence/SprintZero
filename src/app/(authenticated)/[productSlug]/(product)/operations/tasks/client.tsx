@@ -8,26 +8,19 @@ import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {ComponentProps, FC} from "react"
-import type {Id} from "~/types"
-import type {Task} from "~/types/db/Tasks"
 
 import TaskColumn from "./TaskColumn"
 import TaskDrawer from "./TaskDrawer"
-import {TaskConverter} from "~/types/db/Tasks"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {TaskConverter} from "~/types/db/Products/Tasks"
 
 const TasksClientPage: FC = () => {
+	const {product} = useAppContext()
 	const [activeBoard, setActiveBoard] = useState(`one`)
-	const [editingTask, setEditingTask] = useState<Id | `new` | undefined>(undefined)
+	const [editingTask, setEditingTask] = useState<string | `new` | undefined>(undefined)
 
-	const activeProductId = useActiveProductId()
 	const [tasks, loading] = useCollection(
-		query(
-			collection(db, `Tasks`),
-			where(`productId`, `==`, activeProductId),
-			where(`board`, `==`, activeBoard),
-		).withConverter(TaskConverter),
+		query(collection(product.ref, `Tasks`), where(`board`, `==`, activeBoard)).withConverter(TaskConverter),
 	)
 
 	return (
@@ -102,17 +95,16 @@ const TasksClientPage: FC = () => {
 					onCancel={() => setEditingTask(undefined)}
 					onCommit={async (data) => {
 						if (editingTask === `new`) {
-							await addDoc(collection(db, `Tasks`), {
+							await addDoc(collection(product.ref, `Tasks`).withConverter(TaskConverter), {
 								...data,
 								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
-								productId: activeProductId,
 								board: activeBoard,
-							} satisfies Task)
+							})
 						} else {
-							await updateDoc(doc(db, `Tasks`, editingTask), {
+							await updateDoc(doc(product.ref, `Tasks`, editingTask).withConverter(TaskConverter), {
 								...data,
 								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
-							} satisfies Partial<Task>)
+							})
 						}
 						setEditingTask(undefined)
 					}}

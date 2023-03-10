@@ -1,7 +1,10 @@
 import {createContext, useContext} from "react"
 
-const ThemeContext = createContext<{theme: `light` | `dark`; setTheme: (value: `light` | `dark`) => void}>({
-	theme: `light`,
+const ThemeContext = createContext<{
+	theme: `light` | `auto` | `dark`
+	setTheme: (value: `light` | `auto` | `dark`) => void
+}>({
+	theme: `auto`,
 	setTheme: () => {},
 })
 

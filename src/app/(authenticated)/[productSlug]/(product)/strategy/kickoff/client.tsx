@@ -1,24 +1,25 @@
 "use client"
 
 import {Breadcrumb} from "antd"
-import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc, where} from "firebase/firestore"
+import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc, writeBatch} from "firebase/firestore"
 import {useState} from "react"
-import {useCollection, useDocumentData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import EditableTextCard from "./EditableTextCard"
 import EditableTextListCard from "./EditableTextListCard"
-import {PersonaConverter} from "~/types/db/Personas"
-import {ProductConverter} from "~/types/db/Products"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {BusinessOutcomeConverter} from "~/types/db/Products/BusinessOutcomes"
+import {MarketLeaderConverter} from "~/types/db/Products/MarketLeaders"
+import {PersonaConverter} from "~/types/db/Products/Personas"
+import {PotentialRiskConverter} from "~/types/db/Products/PotentialRisks"
+import {UserPriorityConverter} from "~/types/db/Products/UserPriorities"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const KickoffClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocumentData(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const {product} = useAppContext()
 	const [editingSection, setEditingSection] = useState<
 		| `problemStatement`
 		| `personas`
@@ -30,19 +31,29 @@ const KickoffClientPage: FC = () => {
 	>(undefined)
 
 	const [personas] = useCollection(
-		query(
-			collection(db, `Personas`),
-			where(`productId`, `==`, activeProductId),
-			orderBy(`createdAt`, `asc`),
-		).withConverter(PersonaConverter),
+		query(collection(product.ref, `Personas`), orderBy(`createdAt`, `asc`)).withConverter(PersonaConverter),
+	)
+	const [businessOutcomes] = useCollection(
+		query(collection(product.ref, `BusinessOutcomes`), orderBy(`createdAt`, `asc`)).withConverter(
+			BusinessOutcomeConverter,
+		),
+	)
+	const [userPriorities] = useCollection(
+		query(collection(product.ref, `UserPriorities`), orderBy(`createdAt`, `asc`)).withConverter(UserPriorityConverter),
+	)
+	const [potentialRisks] = useCollection(
+		query(collection(product.ref, `PotentialRisks`), orderBy(`createdAt`, `asc`)).withConverter(PotentialRiskConverter),
+	)
+	const [marketLeaders] = useCollection(
+		query(collection(product.ref, `MarketLeaders`), orderBy(`createdAt`, `asc`)).withConverter(MarketLeaderConverter),
 	)
 
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
-			<Breadcrumb className="sticky top-0 z-10 bg-bgLayout pt-8 pb-6">
-				<Breadcrumb.Item>Strategy</Breadcrumb.Item>
-				<Breadcrumb.Item>Kickoff</Breadcrumb.Item>
-			</Breadcrumb>
+			<Breadcrumb
+				items={[{title: `Strategy`}, {title: `Kickoff`}]}
+				className="sticky top-0 z-10 bg-bgLayout pt-8 pb-6"
+			/>
 
 			<Masonry
 				breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
@@ -51,45 +62,34 @@ const KickoffClientPage: FC = () => {
 			>
 				<EditableTextCard
 					title="Problem Statement"
-					text={activeProduct?.problemStatement ?? ``}
+					text={product.data().problemStatement}
 					isEditing={editingSection === `problemStatement`}
 					onEditStart={() => setEditingSection(`problemStatement`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (text) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							problemStatement: text,
-						})
+						await updateDoc(product.ref, {problemStatement: text})
 					}}
 				/>
 
 				<EditableTextListCard
 					title="Personas"
-					textList={personas?.docs.map((doc) => ({id: doc.id as Id, text: doc.data().name})) ?? []}
+					textList={personas?.docs.map((doc) => ({id: doc.id, text: doc.data().name})) ?? []}
 					isEditing={editingSection === `personas`}
 					onEditStart={() => setEditingSection(`personas`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
 						await Promise.all(
 							textList.map(async (item) => {
-								const existingDoc = getDoc(doc(db, `Personas`, item.id))
-								if ((await existingDoc).exists()) {
+								const existingDoc = await getDoc(doc(product.ref, `Personas`, item.id))
+								if (existingDoc.exists()) {
 									await updateDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
 										name: item.text,
 									})
 								} else {
 									await setDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
-										changes: [],
 										createdAt: Timestamp.now(),
-										dayInTheLife: [],
 										description: ``,
-										frustrations: [],
-										goals: [],
-										interactions: [],
 										name: item.text,
-										priorities: [],
-										responsibilities: [],
-										tasks: [],
-										productId: activeProductId,
 									})
 								}
 							}),
@@ -99,53 +99,69 @@ const KickoffClientPage: FC = () => {
 
 				<EditableTextListCard
 					title="Business Outcomes"
-					textList={activeProduct?.businessOutcomes}
+					textList={businessOutcomes?.docs.map((item) => ({id: item.id, text: item.data().text}))}
 					isEditing={editingSection === `businessOutcomes`}
 					onEditStart={() => setEditingSection(`businessOutcomes`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							businessOutcomes: textList,
+						const batch = writeBatch(db)
+						textList.forEach((item) => {
+							batch.update(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
+								text: item.text,
+							})
 						})
+						await batch.commit()
 					}}
 				/>
 
 				<EditableTextListCard
 					title="User Priorities"
-					textList={activeProduct?.userPriorities}
+					textList={userPriorities?.docs.map((item) => ({id: item.id, text: item.data().text}))}
 					isEditing={editingSection === `userPriorities`}
 					onEditStart={() => setEditingSection(`userPriorities`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							userPriorities: textList,
+						const batch = writeBatch(db)
+						textList.forEach((item) => {
+							batch.update(doc(product.ref, `UserPriorities`, item.id).withConverter(UserPriorityConverter), {
+								text: item.text,
+							})
 						})
+						await batch.commit()
 					}}
 				/>
 
 				<EditableTextListCard
 					title="Potential Risks"
-					textList={activeProduct?.potentialRisks}
+					textList={potentialRisks?.docs.map((item) => ({id: item.id, text: item.data().text}))}
 					isEditing={editingSection === `potentialRisks`}
 					onEditStart={() => setEditingSection(`potentialRisks`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							potentialRisks: textList,
+						const batch = writeBatch(db)
+						textList.forEach((item) => {
+							batch.update(doc(product.ref, `PotentialRisks`, item.id).withConverter(PotentialRiskConverter), {
+								text: item.text,
+							})
 						})
+						await batch.commit()
 					}}
 				/>
 
 				<EditableTextListCard
 					title="Market Leaders"
-					textList={activeProduct?.marketLeaders}
+					textList={marketLeaders?.docs.map((item) => ({id: item.id, text: item.data().text}))}
 					isEditing={editingSection === `marketLeaders`}
 					onEditStart={() => setEditingSection(`marketLeaders`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						await updateDoc(doc(db, `Products`, activeProductId).withConverter(ProductConverter), {
-							marketLeaders: textList,
+						const batch = writeBatch(db)
+						textList.forEach((item) => {
+							batch.update(doc(product.ref, `MarketLeaders`, item.id).withConverter(MarketLeaderConverter), {
+								text: item.text,
+							})
 						})
+						await batch.commit()
 					}}
 				/>
 			</Masonry>

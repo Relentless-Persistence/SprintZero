@@ -7,27 +7,26 @@ import {uniq} from "lodash"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 
-import type {Timestamp} from "firebase/firestore"
+import type {QueryDocumentSnapshot, Timestamp} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
-import type {Id} from "~/types"
-import type {Comment} from "~/types/db/Comments"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Comment} from "~/types/db/Products/StoryMapItems/Comments"
 
-import {CommentConverter} from "~/types/db/Comments"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {CommentConverter} from "~/types/db/Products/StoryMapItems/Comments"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
-import {useUser} from "~/utils/useUser"
 
 export type CommentsProps = {
-	storyMapStateId: Id
-	parentId: Id
+	storyMapItem: QueryDocumentSnapshot<StoryMapItem>
 	commentType: `code` | `design`
 	flagged?: boolean
 	onFlag?: () => Promisable<void>
 }
 
-const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, flagged, onFlag}) => {
-	const user = useUser()
+const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag}) => {
+	const {user} = useAppContext()
 	const [commentDraft, setCommentDraft] = useState(``)
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,17 +35,15 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 			createdAt: serverTimestamp(),
 			text: commentDraft,
 			type: commentType,
-			authorId: user!.id as Id,
-			parentId,
+			authorId: user.id,
 		}
-		await addDoc(collection(db, `StoryMapStates`, storyMapStateId, `Comments`), data)
+		await addDoc(collection(storyMapItem.ref, `Comments`), data)
 		setCommentDraft(``)
 	}
 
 	const [comments] = useCollection(
 		query(
-			collection(db, `StoryMapStates`, storyMapStateId, `Comments`),
-			where(`parentId`, `==`, parentId),
+			collection(storyMapItem.ref, `Comments`),
 			where(`type`, `==`, commentType),
 			orderBy(`createdAt`, `asc`),
 		).withConverter(CommentConverter),
@@ -73,10 +70,10 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 								<div key={comment.id} className="flex gap-2">
 									<Avatar shape="square" src={author?.data()?.avatar} className="border border-border" />
 									<div className="flex min-w-0 flex-1 flex-col gap-1">
-										<p className="text-sm text-textTertiary">
+										<p className="text-sm font-medium">
 											{author?.data()?.name}
 											{` `}
-											<span className="ml-1 text-black/65">
+											<span className="font-normal text-textTertiary">
 												{comment.data().createdAt
 													? dayjs((comment.data().createdAt as Timestamp).toDate()).fromNow()
 													: null}
@@ -96,7 +93,7 @@ const Comments: FC<CommentsProps> = ({storyMapStateId, parentId, commentType, fl
 				}}
 				className="mt-4 flex gap-2"
 			>
-				<Avatar shape="square" src={user?.data().avatar} className="border border-border" />
+				<Avatar shape="square" src={user.data().avatar} className="border border-border" />
 				<div className="flex grow flex-col gap-2">
 					<Input value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} />
 					<div className="flex justify-between gap-2">

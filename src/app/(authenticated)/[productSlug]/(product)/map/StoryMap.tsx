@@ -1,53 +1,80 @@
-import {CopyOutlined, FileOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
-import clsx from "clsx"
+import {ReadOutlined} from "@ant-design/icons"
 import {Timestamp} from "firebase/firestore"
 import {motion, useAnimationFrame, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
 import type {DragInfo} from "./types"
-import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
-import type {Dispatch, FC, SetStateAction} from "react"
-import type {Id} from "~/types"
-import type {StoryMapState, Story as StoryType} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {QuerySnapshot} from "firebase/firestore"
+import type {FC} from "react"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import Epic from "./Epic"
 import Feature from "./Feature"
 import {elementRegistry, layerBoundaries} from "./globals"
-import {useGenMeta} from "./meta"
 import Story from "./Story"
+import {useStoryMapContext} from "./StoryMapContext"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {avg} from "~/utils/math"
-import {addEpic, addFeature, addStory, deleteItem, sortFeatures, updateItem} from "~/utils/storyMap"
-import {useUser} from "~/utils/useUser"
+import {
+	AllVersions,
+	addEpic,
+	deleteItem,
+	getEpics,
+	getFeatures,
+	getItemType,
+	getStories,
+	getStoryMapShape,
+	sortEpics,
+	sortFeatures,
+	sortStories,
+	updateItem,
+} from "~/utils/storyMap"
 
 export type StoryMapProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
-	allVersions: QuerySnapshot<Version>
-	currentVersionId: Id | `__ALL_VERSIONS__`
-	editMode: boolean
-	itemsToBeDeleted: Id[]
-	setItemsToBeDeleted: Dispatch<SetStateAction<Id[]>>
 	onScroll: (amt: number) => void
 }
 
-const StoryMap: FC<StoryMapProps> = ({
-	storyMapState,
-	allVersions,
-	currentVersionId,
-	editMode,
-	itemsToBeDeleted,
-	setItemsToBeDeleted,
-	onScroll,
-}) => {
-	const user = useUser()
-	const meta = useGenMeta({
-		storyMapState,
-		allVersions,
-		currentVersionId,
-		editMode,
-		itemsToBeDeleted,
-		setItemsToBeDeleted,
+const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
+	const {product, user} = useAppContext()
+	const {storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted, setItemsToBeDeleted} =
+		useStoryMapContext()
+
+	const _stories = sortStories(
+		getStories(storyMapItems).filter((story) => !itemsToBeDeleted.includes(story.id)),
+		versions,
+	)
+	const stories = _stories.map((story) => {
+		const siblings = sortStories(
+			_stories.filter((sibling) => sibling.data().parentId === story.data().parentId),
+			versions,
+		)
+		const position = siblings.findIndex((sibling) => sibling.id === story.id)
+
+		return {
+			...story.data(),
+			id: story.id,
+			position,
+		}
 	})
+	const _features = sortFeatures(getFeatures(storyMapItems).filter((feature) => !itemsToBeDeleted.includes(feature.id)))
+	const features = _features.map((feature) => {
+		const siblings = _features.filter((sibling) => sibling.data().parentId === feature.data().parentId)
+		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
+
+		return {
+			...feature.data(),
+			id: feature.id,
+			childrenIds: _stories.filter((story) => story.data().parentId === feature.id).map((story) => story.id),
+			position,
+		}
+	})
+	const _epics = sortEpics(getEpics(storyMapItems).filter((epic) => !itemsToBeDeleted.includes(epic.id)))
+	const epics = _epics.map((epic) => ({
+		...epic.data(),
+		id: epic.id,
+		childrenIds: _features.filter((feature) => feature.data().parentId === epic.id).map((feature) => feature.id),
+		position: _epics.findIndex((sibling) => sibling.id === epic.id),
+	}))
 
 	const [dragInfo, setDragInfo] = useState<DragInfo>({
 		mousePos: [useMotionValue(0), useMotionValue(0)],
@@ -62,8 +89,8 @@ const StoryMap: FC<StoryMapProps> = ({
 				dragInfo.mousePos[0].set(e.clientX)
 				dragInfo.mousePos[1].set(e.clientY)
 			}
-			window.addEventListener(`pointermove`, handlePointerMove)
 
+			window.addEventListener(`pointermove`, handlePointerMove)
 			return () => {
 				window.removeEventListener(`pointermove`, handlePointerMove)
 			}
@@ -72,31 +99,35 @@ const StoryMap: FC<StoryMapProps> = ({
 
 	const pointerDownTarget = useRef<HTMLElement | null>(null)
 	const onPanStart = () => {
-		const entry = Object.entries(elementRegistry).find(([, element]) => element?.contains(pointerDownTarget.current))
-		if (!entry || !entry[1]) return
-		const [id, element] = entry
+		const registryEntry = Object.entries(elementRegistry).find(([, element]) =>
+			element.content?.contains(pointerDownTarget.current),
+		)
+		const id = registryEntry?.[0]
+		const element = registryEntry?.[1]?.content
+		const contentBox = registryEntry?.[1]?.content?.getBoundingClientRect()
+		if (!id || !element || !contentBox) return
+
 		setDragInfo((prev) => ({
 			...prev,
-			itemBeingDraggedId: id as Id,
-			offsetToTopLeft: [
-				prev.mousePos[0].get() - element.getBoundingClientRect().left,
-				prev.mousePos[1].get() - element.getBoundingClientRect().top,
-			],
+			itemBeingDraggedId: id,
+			offsetToTopLeft: [prev.mousePos[0].get() - contentBox.left, prev.mousePos[1].get() - contentBox.top],
 			offsetToMiddle: [
-				element.getBoundingClientRect().left + element.offsetWidth / 2 - prev.mousePos[0].get(),
-				element.getBoundingClientRect().top + element.offsetHeight / 2 - prev.mousePos[1].get(),
+				contentBox.left + element.offsetWidth / 2 - prev.mousePos[0].get(),
+				contentBox.top + element.offsetHeight / 2 - prev.mousePos[1].get(),
 			],
 		}))
 	}
 
 	// When I send an update to the server, I want to wait until the operation is complete before allowing drag events to
 	// be processed again.
-	const operationCompleteCondition = useRef<((storyMapItems: StoryMapState[`items`]) => boolean) | undefined>(undefined)
+	const operationCompleteCondition = useRef<((storyMapItems: QuerySnapshot<StoryMapItem>) => boolean) | undefined>(
+		undefined,
+	)
 	const onPan = async () => {
-		if (dragInfo.itemBeingDraggedId === undefined) return
+		if (dragInfo.itemBeingDraggedId === undefined || !product.exists()) return
 
 		if (operationCompleteCondition.current) {
-			const isOperationComplete = operationCompleteCondition.current(storyMapState.data().items)
+			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
 			if (isOperationComplete) operationCompleteCondition.current = undefined
 			else return
 		}
@@ -105,52 +136,57 @@ const StoryMap: FC<StoryMapProps> = ({
 		const y = dragInfo.mousePos[1].get()
 
 		// All the logic for moving items around are in this switch statement
-		switch (storyMapState.data().items[dragInfo.itemBeingDraggedId]!.type) {
+		switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 			case `epic`: {
+				const itemBeingDragged = epics.find((epic) => epic.id === dragInfo.itemBeingDraggedId)!
 				if (y <= layerBoundaries[0]) {
-					// Reorder epics
-					const currentEpicIndex = meta.epics.findIndex((epic) => epic.id === dragInfo.itemBeingDraggedId)
-					const currentEpic = meta.epics[currentEpicIndex]
-					const currentEpicLeft =
-						elementRegistry[currentEpic?.id ?? (`` as Id)]?.parentElement!.getBoundingClientRect().left
-					const currentEpicRight =
-						elementRegistry[currentEpic?.id ?? (`` as Id)]?.parentElement!.getBoundingClientRect().right
-					const prevEpic = meta.epics[currentEpicIndex - 1]
-					const prevEpicLeft = elementRegistry[prevEpic?.id ?? (`` as Id)]?.parentElement!.getBoundingClientRect().left
-					const nextEpic = meta.epics[currentEpicIndex + 1]
-					const nextEpicRight =
-						elementRegistry[nextEpic?.id ?? (`` as Id)]?.parentElement!.getBoundingClientRect().right
+					// === Reorder epics ===
 
-					const boundaryLeft = prevEpicLeft && currentEpicRight ? avg(prevEpicLeft, currentEpicRight) : -Infinity
-					const boundaryRight = currentEpicLeft && nextEpicRight ? avg(currentEpicLeft, nextEpicRight) : Infinity
+					const currentEpic = epics.find((epic) => epic.id === itemBeingDragged.id)!
+					const currentEpicBox = elementRegistry[currentEpic.id]?.container?.getBoundingClientRect()
+					const prevEpic = epics.find((epic) => epic.position === currentEpic.position - 1)
+					const nextEpic = epics.find((epic) => epic.position === currentEpic.position + 1)
+					const prevEpicBox = elementRegistry[prevEpic?.id ?? ``]?.container?.getBoundingClientRect()
+					const nextEpicBox = elementRegistry[nextEpic?.id ?? ``]?.container?.getBoundingClientRect()
+
+					const boundaryLeft = prevEpicBox && currentEpicBox ? avg(prevEpicBox.left, currentEpicBox.right) : -Infinity
+					const boundaryRight = currentEpicBox && nextEpicBox ? avg(currentEpicBox.left, nextEpicBox.right) : Infinity
 
 					if (x < boundaryLeft) {
 						operationCompleteCondition.current = (storyMapItems) => {
-							const item = storyMapItems[currentEpic!.id]
-							if (item?.type !== `epic`) return false
-							return item.userValue === prevEpic!.userValue
+							const storyMapShape = getStoryMapShape(storyMapItems, versions)
+							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
+							const prevEpicNewPos = storyMapShape.findIndex((epic) => epic.id === prevEpic!.id)
+							return currentEpicNewPos < prevEpicNewPos
 						}
 						await Promise.all([
-							updateItem(storyMapState, prevEpic!.id, {userValue: currentEpic!.userValue}, allVersions),
-							updateItem(storyMapState, currentEpic!.id, {userValue: prevEpic!.userValue}, allVersions),
+							updateItem(product, storyMapItems, versions, prevEpic!.id, {userValue: currentEpic.userValue}),
+							updateItem(product, storyMapItems, versions, currentEpic.id, {userValue: prevEpic!.userValue}),
 						])
 					} else if (x > boundaryRight) {
 						operationCompleteCondition.current = (storyMapItems) => {
-							const item = storyMapItems[currentEpic!.id]
-							if (item?.type !== `epic`) return false
-							return item.userValue === nextEpic!.userValue
+							const storyMapShape = getStoryMapShape(storyMapItems, versions)
+							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
+							const nextEpicNewPos = storyMapShape.findIndex((epic) => epic.id === nextEpic!.id)
+							return currentEpicNewPos > nextEpicNewPos
 						}
 						await Promise.all([
-							updateItem(storyMapState, nextEpic!.id, {userValue: currentEpic!.userValue}, allVersions),
-							updateItem(storyMapState, currentEpic!.id, {userValue: nextEpic!.userValue}, allVersions),
+							updateItem(product, storyMapItems, versions, nextEpic!.id, {userValue: currentEpic.userValue}),
+							updateItem(product, storyMapItems, versions, currentEpic.id, {userValue: nextEpic!.userValue}),
 						])
 					}
 				} else {
-					// Epic to feature
-					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
-					for (const epic of meta.epics) {
+					// === Epic to feature ===
+
+					/*              ||                       Epic 1                        ||                  Epic 2                   ||
+					 * --------------------------------------------------------------------------------------------------------------------------------
+					 * <- -Infinity ||   Feature 1   |              Feature 2              ||                 Feature 3                 || +Infinity ->
+					 * | Boundary, Feature 1 |   Boundary, Feature 2    | Boundary, Epic 1 || Boundary, Feature 3 |         Boundary, Epic 2          |
+					 */
+					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
+					for (const epic of epics) {
 						for (const featureId of epic.childrenIds) {
-							const featureRect = elementRegistry[featureId]?.parentElement?.getBoundingClientRect()
+							const featureRect = elementRegistry[featureId]?.container?.getBoundingClientRect()
 							const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
 							if (featureRect)
 								allFeatureBounds.push({
@@ -160,137 +196,131 @@ const StoryMap: FC<StoryMapProps> = ({
 								})
 						}
 						const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
-						const epicRect = elementRegistry[epic.id]?.parentElement?.getBoundingClientRect()
-						if (epicRect) allFeatureBounds.push({left: prevRect.right, right: epicRect.right, id: epic.id})
+						const epicRect = elementRegistry[epic.id]?.container?.getBoundingClientRect()
+						if (epicRect) allFeatureBounds.push({id: epic.id, left: prevRect.right, right: epicRect.right})
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
-					const itemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
-					let parentId: Id
-					let featureIndex: number
-					if (storyMapState.data().items[itemId]!.type === `epic`) {
-						parentId = itemId
-						const epic = meta.epics.find((epic) => epic.id === itemId)!
-						featureIndex = epic.childrenIds.length
+					const boundaryItemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
+					let boundaryItemParentId: string
+					let newFeatureIndex: number
+					if (getItemType(storyMapItems, boundaryItemId) === `epic`) {
+						boundaryItemParentId = boundaryItemId
+						const epic = epics.find((epic) => epic.id === boundaryItemId)!
+						newFeatureIndex = epic.childrenIds.length
 					} else {
-						const feature = meta.features.find((feature) => feature.id === itemId)!
-						parentId = feature.parentId
-						featureIndex = feature.position
+						const feature = features.find((feature) => feature.id === boundaryItemId)!
+						boundaryItemParentId = feature.parentId!
+						newFeatureIndex = feature.position
 					}
-					if (parentId === dragInfo.itemBeingDraggedId) return
+					if (boundaryItemParentId === dragInfo.itemBeingDraggedId) return
 
-					const parent = meta.epics.find((epic) => epic.id === parentId)!
+					const parent = epics.find((epic) => epic.id === boundaryItemParentId)!
 					const prevFeatureUserValue =
-						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex - 1])?.userValue ?? 0
+						features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex - 1])?.userValue ?? 0
 					const nextFeatureUserValue =
-						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex])?.userValue ?? 1
+						features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex])?.userValue ?? 1
 
-					const itemBeingDragged = meta.epics.find((epic) => epic.id === dragInfo.itemBeingDraggedId)!
-
-					const id = dragInfo.itemBeingDraggedId
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems[id]
-						return item?.type === `feature` && item.parentId === parentId
+						const item = storyMapItems.docs.find((item) => item.id === itemBeingDragged.id)
+						return (
+							getItemType(storyMapItems, itemBeingDragged.id) === `feature` &&
+							item?.data().parentId === boundaryItemParentId
+						)
 					}
-
 					await Promise.all([
-						updateItem(
-							storyMapState,
-							dragInfo.itemBeingDraggedId,
-							{
-								type: `feature` as const,
-								effort: 0.5,
-								userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
-								parentId,
-							},
-							allVersions,
-						),
+						updateItem(product, storyMapItems, versions, itemBeingDragged.id, {
+							effort: 0.5,
+							userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
+							parentId: boundaryItemParentId,
+						}),
 						// Delete child features, keep grandchild stories
-						...itemBeingDragged.childrenIds.map((featureId) => deleteItem(storyMapState, featureId)),
+						...itemBeingDragged.childrenIds.map((featureId) => deleteItem(product, storyMapItems, versions, featureId)),
 						...itemBeingDragged.childrenIds.flatMap((featureId) =>
-							meta.stories
+							stories
 								.filter((story) => story.parentId === featureId)
-								.map((story) => updateItem(storyMapState, story.id, {parentId: id}, allVersions)),
+								.map((story) =>
+									updateItem(product, storyMapItems, versions, story.id, {parentId: itemBeingDragged.id}),
+								),
 						),
 					])
 				}
 				break
 			}
 			case `feature`: {
+				const itemBeingDragged = features.find((item) => item.id === dragInfo.itemBeingDraggedId)!
 				if (y <= layerBoundaries[0]) {
-					// Feature to epic
-					const allEpicBounds: Array<{id: Id | `end`; left: number; right: number}> = []
-					for (const epic of meta.epics) {
-						const epicRect = elementRegistry[epic.id]?.parentElement?.getBoundingClientRect()
+					// === Feature to epic ===
+
+					/* <- -Infinity |  Epic 1   |          Epic 2          | +Infinity ->
+					 * | Boundary, Epic 1 | Boundary, Epic 2 |      Boundary, end       |
+					 */
+					const allEpicBounds: Array<{id: string; left: number; right: number}> = []
+					for (const epic of epics) {
+						const epicRect = elementRegistry[epic.id]?.container?.getBoundingClientRect()
 						const prevRect = allEpicBounds.at(-1) ?? {right: -Infinity}
 						if (epicRect)
 							allEpicBounds.push({
+								id: epic.id,
 								left: prevRect.right,
 								right: epicRect.left + epicRect.width / 2,
-								id: epic.id,
 							})
 					}
-					allEpicBounds.push({left: allEpicBounds.at(-1)!.right, right: Infinity, id: `end`})
+					allEpicBounds.push({id: `end`, left: allEpicBounds.at(-1)!.right, right: Infinity})
 
-					const itemId = allEpicBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
-					const itemIndex = itemId === `end` ? meta.epics.length : meta.epics.findIndex((epic) => epic.id === itemId)
-					const prevEpicUserValue = meta.epics[itemIndex - 1]?.userValue ?? 0
-					const nextEpicUserValue = meta.epics[itemIndex]?.userValue ?? 1
+					const targetEpicId = allEpicBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
+					const targetEpicIndex =
+						targetEpicId === `end` ? epics.length : epics.findIndex((epic) => epic.id === targetEpicId)
+					const prevEpicUserValue = epics[targetEpicIndex - 1]?.userValue ?? 0
+					const nextEpicUserValue = epics[targetEpicIndex]?.userValue ?? 1
 
-					const itemBeingDragged = meta.features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
-					const id = dragInfo.itemBeingDraggedId
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems[id]
-						return item?.type === `epic`
+						return getItemType(storyMapItems, itemBeingDragged.id) === `epic`
 					}
-
 					await Promise.all([
-						updateItem(
-							storyMapState,
-							dragInfo.itemBeingDraggedId,
-							{
-								...itemBeingDragged,
-								type: `epic` as const,
-								effort: 0.5,
-								userValue: avg(prevEpicUserValue, nextEpicUserValue),
-								keeperIds: itemBeingDragged.keeperIds ?? [],
-							},
-							allVersions,
-						),
+						updateItem(product, storyMapItems, versions, itemBeingDragged.id, {
+							...itemBeingDragged,
+							effort: 0.5,
+							userValue: avg(prevEpicUserValue, nextEpicUserValue),
+							keeperIds: itemBeingDragged.keeperIds,
+							parentId: null,
+						}),
 						// Move child stories to feature level
 						...itemBeingDragged.childrenIds.map((storyId, i) =>
-							updateItem(
-								storyMapState,
-								storyId,
-								{
-									type: `feature` as const,
-									effort: 0.5,
-									userValue: (i + 1) / (itemBeingDragged.childrenIds.length + 1),
-									parentId: id,
-								},
-								allVersions,
-							),
+							updateItem(product, storyMapItems, versions, storyId, {
+								effort: 0.5,
+								userValue: (i + 1) / (itemBeingDragged.childrenIds.length + 1),
+								parentId: itemBeingDragged.id,
+							}),
 						),
 					])
 				} else if (y <= layerBoundaries[1]) {
-					// Reorder features
-					const currentFeature = meta.features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
-					const currentFeatureRect = elementRegistry[currentFeature.id]?.parentElement?.getBoundingClientRect()
-					const parentRect = elementRegistry[currentFeature.parentId]?.parentElement?.getBoundingClientRect()
+					// === Reorder features ===
+
+					const currentFeature = itemBeingDragged
+					const currentFeatureRect = elementRegistry[currentFeature.id]?.container?.getBoundingClientRect()
+					const parentRect = elementRegistry[currentFeature.parentId!]?.container?.getBoundingClientRect()
+
 					if (!parentRect || !currentFeatureRect) return
 					if (x < parentRect.left || x > parentRect.right) {
 						// Move to another epic
-						const currentParent = meta.epics.find((epic) => epic.id === currentFeature.parentId)!
+
+						const currentParent = epics.find((epic) => epic.id === currentFeature.parentId)!
 						const newParent =
-							x < parentRect.left ? meta.epics[currentParent.position - 1] : meta.epics[currentParent.position + 1]
-						const newParentRect = elementRegistry[newParent?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect()
+							x < parentRect.left ? epics[currentParent.position - 1] : epics[currentParent.position + 1]
+						const newParentRect = elementRegistry[newParent?.id ?? ``]?.container?.getBoundingClientRect()
 						if (!newParent || !newParentRect) return
-						const siblings = sortFeatures(meta.features.filter(({parentId}) => parentId === newParent.id))
+						const siblings = sortFeatures(
+							storyMapItems.docs.filter(
+								(item) => item.data().parentId === newParent.id && item.data().deleted === false,
+							),
+						)
+
 						if (x < parentRect.left) {
 							// Move to epic on the left
+
 							const prevFeature = siblings.at(-1)
-							const prevFeatureRect =
-								elementRegistry[prevFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect()
+							const prevFeatureRect = elementRegistry[prevFeature?.id ?? ``]?.container?.getBoundingClientRect()
 							const boundary = avg(
 								prevFeatureRect
 									? prevFeatureRect.left + prevFeatureRect.width / 2
@@ -298,27 +328,24 @@ const StoryMap: FC<StoryMapProps> = ({
 								currentFeatureRect.left + currentFeatureRect.width / 2,
 							)
 							if (x > boundary) return
-							const prevFeatureUserValue = siblings.at(-1)?.userValue ?? 0
-							const id = dragInfo.itemBeingDraggedId
+							const prevFeatureUserValue = siblings.at(-1)?.data().userValue ?? 0
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems[id]
-								return item?.type === `feature` && item.parentId === newParent.id
+								const item = storyMapItems.docs.find((item) => item.id === itemBeingDragged.id)
+								return (
+									getItemType(storyMapItems, itemBeingDragged.id) === `feature` &&
+									item?.data().parentId === newParent.id
+								)
 							}
-							await updateItem(
-								storyMapState,
-								dragInfo.itemBeingDraggedId,
-								{
-									effort: 0.5,
-									userValue: avg(prevFeatureUserValue, 1),
-									parentId: newParent.id,
-								},
-								allVersions,
-							)
+							await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {
+								effort: 0.5,
+								userValue: avg(prevFeatureUserValue, 1),
+								parentId: newParent.id,
+							})
 						} else {
 							// Move to epic on the right
+
 							const nextFeature = siblings[currentFeature.position]
-							const nextFeatureRect =
-								elementRegistry[nextFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect()
+							const nextFeatureRect = elementRegistry[nextFeature?.id ?? ``]?.container?.getBoundingClientRect()
 							const boundary = avg(
 								currentFeatureRect.right + currentFeatureRect.width / 2,
 								nextFeatureRect
@@ -326,38 +353,29 @@ const StoryMap: FC<StoryMapProps> = ({
 									: newParentRect.left + newParentRect.width / 2,
 							)
 							if (x < boundary) return
-							const nextFeatureUserValue = siblings[currentFeature.position]?.userValue ?? 1
-							const id = dragInfo.itemBeingDraggedId
+							const nextFeatureUserValue = siblings[currentFeature.position]?.data().userValue ?? 1
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems[id]
-								return item?.type === `feature` && item.parentId === newParent.id
+								const item = storyMapItems.docs.find((item) => item.id === itemBeingDragged.id)!
+								return getItemType(storyMapItems, item.id) === `feature` && item.data().parentId === newParent.id
 							}
-							await updateItem(
-								storyMapState,
-								dragInfo.itemBeingDraggedId,
-								{
-									effort: 0.5,
-									userValue: avg(nextFeatureUserValue, 0),
-									parentId: newParent.id,
-								},
-								allVersions,
-							)
+							await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {
+								effort: 0.5,
+								userValue: avg(nextFeatureUserValue, 0),
+								parentId: newParent.id,
+							})
 						}
 					} else {
 						// Reorder within epic
-						const siblings = sortFeatures(meta.features.filter(({parentId}) => parentId === currentFeature.parentId))
+						const siblings = sortFeatures(
+							storyMapItems.docs.filter((item) => item.data().parentId === currentFeature.parentId),
+						)
 						const prevFeature = siblings[currentFeature.position - 1]
 						const nextFeature = siblings[currentFeature.position + 1]
-						const currentFeatureRect =
-							elementRegistry[dragInfo.itemBeingDraggedId]?.parentElement?.getBoundingClientRect()
+						const currentFeatureRect = elementRegistry[dragInfo.itemBeingDraggedId]?.container?.getBoundingClientRect()
 						const prevFeatureRect =
-							elementRegistry[
-								siblings[currentFeature.position - 1]?.id ?? (`` as Id)
-							]?.parentElement?.getBoundingClientRect()
+							elementRegistry[siblings[currentFeature.position - 1]?.id ?? ``]?.container?.getBoundingClientRect()
 						const nextFeatureRect =
-							elementRegistry[
-								siblings[currentFeature.position + 1]?.id ?? (`` as Id)
-							]?.parentElement?.getBoundingClientRect()
+							elementRegistry[siblings[currentFeature.position + 1]?.id ?? ``]?.container?.getBoundingClientRect()
 
 						const leftBoundary =
 							currentFeatureRect && prevFeatureRect ? avg(prevFeatureRect.left, currentFeatureRect.right) : -Infinity
@@ -366,42 +384,46 @@ const StoryMap: FC<StoryMapProps> = ({
 
 						if (x < leftBoundary) {
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems[currentFeature.id]
-								if (item?.type !== `feature`) return false
-								return item.userValue === prevFeature!.userValue
+								const item = storyMapItems.docs.find((item) => item.id === currentFeature.id)
+								if (getItemType(storyMapItems, currentFeature.id) !== `feature`) return false
+								return item?.data().userValue === prevFeature?.data().userValue
 							}
 							await Promise.all([
-								updateItem(storyMapState, prevFeature!.id, {userValue: currentFeature.userValue}, allVersions),
-								updateItem(storyMapState, currentFeature.id, {userValue: prevFeature!.userValue}, allVersions),
+								updateItem(product, storyMapItems, versions, prevFeature!.id, {userValue: currentFeature.userValue}),
+								updateItem(product, storyMapItems, versions, currentFeature.id, {
+									userValue: prevFeature!.data().userValue,
+								}),
 							])
 						} else if (x > rightBoundary) {
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems[currentFeature.id]
-								if (item?.type !== `feature`) return false
-								return item.userValue === nextFeature!.userValue
+								const item = storyMapItems.docs.find((item) => item.id === currentFeature.id)
+								if (getItemType(storyMapItems, currentFeature.id) !== `feature`) return false
+								return item!.data().userValue === nextFeature!.data().userValue
 							}
 							await Promise.all([
-								updateItem(storyMapState, nextFeature!.id, {userValue: currentFeature.userValue}, allVersions),
-								updateItem(storyMapState, currentFeature.id, {userValue: nextFeature!.userValue}, allVersions),
+								updateItem(product, storyMapItems, versions, nextFeature!.id, {userValue: currentFeature.userValue}),
+								updateItem(product, storyMapItems, versions, currentFeature.id, {
+									userValue: nextFeature!.data().userValue,
+								}),
 							])
 						}
 					}
 				} else {
 					// Feature to story
-					const allFeaturesSorted = meta.features.sort((a, b) => {
-						const aParent = meta.epics.find((epic) => epic.id === a.parentId)!
-						const bParent = meta.epics.find((epic) => epic.id === b.parentId)!
+					const allFeaturesSorted = features.sort((a, b) => {
+						const aParent = epics.find((epic) => epic.id === a.parentId)!
+						const bParent = epics.find((epic) => epic.id === b.parentId)!
 						return aParent.position - bParent.position || a.position - b.position
 					})
-					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
+					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
 					for (const feature of allFeaturesSorted) {
-						const featureRect = elementRegistry[feature.id]?.parentElement?.getBoundingClientRect()
+						const featureRect = elementRegistry[feature.id]?.container?.getBoundingClientRect()
 						const prevFeature = allFeaturesSorted[feature.position - 1]
 						const nextFeature = allFeaturesSorted[feature.position + 1]
-						const prevRect = elementRegistry[prevFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+						const prevRect = elementRegistry[prevFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
 							right: -Infinity,
 						}
-						const nextRect = elementRegistry[nextFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+						const nextRect = elementRegistry[nextFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
 							left: Infinity,
 						}
 
@@ -415,69 +437,51 @@ const StoryMap: FC<StoryMapProps> = ({
 					allFeatureBounds.at(-1)!.right = Infinity
 
 					const hoveringFeatureId = allFeatureBounds.find((feature) => x >= feature.left && x <= feature.right)?.id
-					const hoveringFeature = meta.features.find((feature) => feature.id === hoveringFeatureId)
+					const hoveringFeature = features.find((feature) => feature.id === hoveringFeatureId)
 					if (
 						!hoveringFeature ||
 						hoveringFeature.id === dragInfo.itemBeingDraggedId ||
-						currentVersionId === `__ALL_VERSIONS__`
+						currentVersionId === AllVersions
 					)
 						return
 
-					const featureBeingDragged = meta.features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
+					const featureBeingDragged = features.find((feature) => feature.id === dragInfo.itemBeingDraggedId)!
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems[featureBeingDragged.id]
-						return item?.type === `story`
+						return getItemType(storyMapItems, featureBeingDragged.id) === `story`
 					}
 					await Promise.all([
-						updateItem(
-							storyMapState,
-							dragInfo.itemBeingDraggedId,
-							{
-								...featureBeingDragged,
-								type: `story` as const,
-								acceptanceCriteria: featureBeingDragged.acceptanceCriteria ?? [],
-								branchName: featureBeingDragged.branchName,
-								bugs: featureBeingDragged.bugs ?? [],
-								createdAt: Timestamp.now(),
-								designEffort: featureBeingDragged.designEffort ?? 1,
-								designLink: featureBeingDragged.designLink,
-								engineeringEffort: featureBeingDragged.engineeringEffort ?? 1,
-								ethicsApproved: featureBeingDragged.ethicsApproved,
-								ethicsColumn: featureBeingDragged.ethicsColumn,
-								ethicsVotes: featureBeingDragged.ethicsVotes ?? {},
-								pageLink: featureBeingDragged.pageLink,
-								sprintColumn: featureBeingDragged.sprintColumn ?? (`releaseBacklog` as const),
-								updatedAt: Timestamp.now(),
-								parentId: hoveringFeature.id,
-								peopleIds: featureBeingDragged.peopleIds ?? [],
-								updatedAtUserId: user!.id as Id,
-								versionId: featureBeingDragged.versionId ?? currentVersionId,
-							},
-							allVersions,
-						),
+						updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {
+							...featureBeingDragged,
+							createdAt: Timestamp.now(),
+							updatedAt: Timestamp.now(),
+							parentId: hoveringFeature.id,
+							updatedAtUserId: user.id,
+							versionId: featureBeingDragged.versionId ?? currentVersionId,
+						}),
 						// Delete all children
-						...featureBeingDragged.childrenIds.map((childId) => deleteItem(storyMapState, childId)),
+						...featureBeingDragged.childrenIds.map((childId) => deleteItem(product, storyMapItems, versions, childId)),
 					])
 				}
 				break
 			}
 			case `story`: {
+				const itemBeingDragged = stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
 				if (y > layerBoundaries[1]) {
 					// Move story between features
-					const allFeaturesSorted = meta.features.sort((a, b) => {
-						const aParent = meta.epics.find((epic) => epic.id === a.parentId)!
-						const bParent = meta.epics.find((epic) => epic.id === b.parentId)!
+					const allFeaturesSorted = features.sort((a, b) => {
+						const aParent = epics.find((epic) => epic.id === a.parentId)!
+						const bParent = epics.find((epic) => epic.id === b.parentId)!
 						return aParent.position - bParent.position || a.position - b.position
 					})
-					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
+					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
 					for (const feature of allFeaturesSorted) {
-						const featureRect = elementRegistry[feature.id]?.parentElement?.getBoundingClientRect()
+						const featureRect = elementRegistry[feature.id]?.container?.getBoundingClientRect()
 						const prevFeature = allFeaturesSorted[feature.position - 1]
 						const nextFeature = allFeaturesSorted[feature.position + 1]
-						const prevRect = elementRegistry[prevFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+						const prevRect = elementRegistry[prevFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
 							right: -Infinity,
 						}
-						const nextRect = elementRegistry[nextFeature?.id ?? (`` as Id)]?.parentElement?.getBoundingClientRect() ?? {
+						const nextRect = elementRegistry[nextFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
 							left: Infinity,
 						}
 
@@ -491,21 +495,21 @@ const StoryMap: FC<StoryMapProps> = ({
 					allFeatureBounds.at(-1)!.right = Infinity
 
 					const hoveringFeatureId = allFeatureBounds.find((feature) => x >= feature.left && x <= feature.right)?.id
-					const storyBeingDragged = meta.stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
+					const storyBeingDragged = stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
 					if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) return
 
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems[storyBeingDragged.id]
-						if (item?.type !== `story`) return false
-						return item.parentId === hoveringFeatureId
+						const item = storyMapItems.docs.find((item) => item.id === storyBeingDragged.id)!
+						if (getItemType(storyMapItems, storyBeingDragged.id) !== `story`) return false
+						return item.data().parentId === hoveringFeatureId
 					}
-					await updateItem(storyMapState, dragInfo.itemBeingDraggedId, {parentId: hoveringFeatureId}, allVersions)
+					await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {parentId: hoveringFeatureId})
 				} else {
 					// Story to feature
-					const allFeatureBounds: Array<{id: Id; left: number; right: number}> = []
-					for (const epic of meta.epics) {
+					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
+					for (const epic of epics) {
 						for (const featureId of epic.childrenIds) {
-							const featureRect = elementRegistry[featureId]?.parentElement?.getBoundingClientRect()
+							const featureRect = elementRegistry[featureId]?.container?.getBoundingClientRect()
 							const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
 							if (featureRect)
 								allFeatureBounds.push({
@@ -515,51 +519,43 @@ const StoryMap: FC<StoryMapProps> = ({
 								})
 						}
 						const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
-						const epicRect = elementRegistry[epic.id]?.parentElement?.getBoundingClientRect()
+						const epicRect = elementRegistry[epic.id]?.container?.getBoundingClientRect()
 						if (epicRect) allFeatureBounds.push({left: prevRect.right, right: epicRect.right, id: epic.id})
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
 					const itemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
-					let parentId: Id
+					let parentId: string
 					let featureIndex: number
-					if (storyMapState.data().items[itemId]!.type === `epic`) {
+					if (getItemType(storyMapItems, itemId) === `epic`) {
 						parentId = itemId
-						const epic = meta.epics.find((epic) => epic.id === itemId)!
+						const epic = epics.find((epic) => epic.id === itemId)!
 						featureIndex = epic.childrenIds.length
 					} else {
-						const feature = meta.features.find((feature) => feature.id === itemId)!
-						parentId = feature.parentId
+						const feature = features.find((feature) => feature.id === itemId)!
+						parentId = feature.parentId!
 						featureIndex = feature.position
 					}
 					if (parentId === dragInfo.itemBeingDraggedId) return
 
-					const parent = meta.epics.find((epic) => epic.id === parentId)!
+					const parent = epics.find((epic) => epic.id === parentId)!
 					const prevFeatureUserValue =
-						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex - 1])?.userValue ?? 0
+						features.find((feature) => feature.id === parent.childrenIds[featureIndex - 1])?.userValue ?? 0
 					const nextFeatureUserValue =
-						meta.features.find((feature) => feature.id === parent.childrenIds[featureIndex])?.userValue ?? 1
-
-					const itemBeingDragged = storyMapState.data().items[dragInfo.itemBeingDraggedId] as StoryType
+						features.find((feature) => feature.id === parent.childrenIds[featureIndex])?.userValue ?? 1
 
 					const id = dragInfo.itemBeingDraggedId
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems[id]
-						return item?.type === `feature` && item.parentId === parentId
+						const item = storyMapItems.docs.find((item) => item.id === id)
+						return getItemType(storyMapItems, id) === `feature` && item?.data().parentId === parentId
 					}
 
-					await updateItem(
-						storyMapState,
-						dragInfo.itemBeingDraggedId,
-						{
-							...itemBeingDragged,
-							type: `feature` as const,
-							effort: 0.5,
-							userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
-							parentId,
-						},
-						allVersions,
-					)
+					await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {
+						...itemBeingDragged,
+						effort: 0.5,
+						userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
+						parentId,
+					})
 				}
 				break
 			}
@@ -580,11 +576,12 @@ const StoryMap: FC<StoryMapProps> = ({
 		else if (x > window.innerWidth - 144) onScroll(Math.min(10, (x - window.innerWidth + 144) / 10))
 	})
 
-	const [isInitialRender, setIsInitialRender] = useState(true)
-	useEffect(() => {
-		setIsInitialRender(false)
-	}, [])
+	const surrogateParentPos = {
+		x: useTransform(dragInfo.mousePos[0], (x) => x - dragInfo.offsetToTopLeft[0]),
+		y: useTransform(dragInfo.mousePos[1], (y) => y - dragInfo.offsetToTopLeft[1]),
+	}
 
+	if (!product.exists()) return null
 	return (
 		<motion.div
 			className="relative z-10 flex w-max items-start gap-8"
@@ -605,144 +602,22 @@ const StoryMap: FC<StoryMapProps> = ({
 			}}
 			onPanEnd={onPanEnd}
 		>
-			{meta.epics.map((epic) => (
-				<div
+			{epics.map((epic) => (
+				<Epic
 					key={epic.id}
-					className={clsx(`grid justify-items-center gap-x-6`, dragInfo.itemBeingDraggedId === epic.id && `invisible`)}
-					style={{gridTemplateColumns: `repeat(${epic.childrenIds.length}, auto)`}}
-				>
-					<Epic meta={meta} epicId={epic.id} isInitialRender={isInitialRender} />
-
-					{/* Pad out the remaining columns in row 1 */}
-					{Array(Math.max(epic.childrenIds.length - 1, 0))
-						.fill(undefined)
-						.map((_, i) => (
-							<div key={`row1-${i}`} />
-						))}
-
-					{/* Pad out the beginning columns in row 2 */}
-					{Array(Math.max(epic.childrenIds.length, editMode ? 0 : 1))
-						.fill(undefined)
-						.map((_, i) => (
-							<div key={`row2-${i}`} className="relative h-16 w-[calc(100%+1.5rem)]">
-								{/* Top */}
-								{i === 0 && (
-									<div className="absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 border border-border" />
-								)}
-								{/* Right */}
-								{i < epic.childrenIds.length - 1 && (
-									<div className="absolute left-1/2 top-1/2 h-px w-1/2 -translate-y-1/2 border border-border" />
-								)}
-								{/* Bottom */}
-								<div className="absolute left-1/2 top-1/2 h-1/2 w-px -translate-x-1/2 border border-border" />
-								{/* Left */}
-								{i > 0 && <div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 border border-border" />}
-
-								{i === epic.childrenIds.length - 1 && epic.childrenIds.length > 0 && !editMode && (
-									<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-										<button
-											type="button"
-											onClick={() => {
-												addFeature(storyMapState, {parentId: epic.id}).catch(console.error)
-											}}
-											className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[0.6rem] text-white"
-										>
-											<PlusOutlined />
-										</button>
-									</div>
-								)}
-							</div>
-						))}
-
-					{epic.childrenIds
-						.map((id) => meta.features.find((feature) => id === feature.id)!)
-						.map((feature) => {
-							const stories = feature.childrenIds
-								.map((id) => meta.stories.find((story) => story.id === id)!)
-								.filter((story) => {
-									if (meta.currentVersionId === `__ALL_VERSIONS__`) return true
-									return story.versionId === meta.currentVersionId
-								})
-
-							return (
-								<div
-									key={feature.id}
-									className={clsx(
-										`flex flex-col items-center`,
-										dragInfo.itemBeingDraggedId === feature.id && `invisible`,
-									)}
-								>
-									<Feature meta={meta} featureId={feature.id} isInitialRender={isInitialRender} />
-
-									{((meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode) || feature.childrenIds.length > 0) && (
-										<div className="h-8 w-px border border-border" />
-									)}
-
-									{stories.length === 0 && meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode && (
-										<button
-											type="button"
-											onClick={() => {
-												if (meta.currentVersionId !== `__ALL_VERSIONS__` && user)
-													addStory(storyMapState, currentVersionId, user.id as Id, {parentId: feature.id}).catch(
-														console.error,
-													)
-											}}
-											className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101] dark:bg-black dark:text-[#757575]"
-										>
-											<FileOutlined />
-											<span className="my-1">Add story</span>
-										</button>
-									)}
-
-									{stories.length > 0 && (
-										<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-border p-3">
-											{stories.map((story) => (
-												<div key={story.id} className={clsx(dragInfo.itemBeingDraggedId === story.id && `invisible`)}>
-													<Story meta={meta} storyId={story.id} isInitialRender={isInitialRender} />
-												</div>
-											))}
-
-											{meta.currentVersionId !== `__ALL_VERSIONS__` && !editMode && (
-												<button
-													type="button"
-													onClick={() => {
-														if (meta.currentVersionId !== `__ALL_VERSIONS__` && user)
-															addStory(storyMapState, currentVersionId, user.id as Id, {parentId: feature.id}).catch(
-																console.error,
-															)
-													}}
-													className="flex w-full items-center justify-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#0e3101] dark:bg-black dark:text-[#757575]"
-												>
-													<FileOutlined />
-													<span className="my-1">Add story</span>
-												</button>
-											)}
-										</div>
-									)}
-								</div>
-							)
-						})}
-
-					{epic.childrenIds.length === 0 && !editMode && (
-						<button
-							type="button"
-							onClick={() => {
-								addFeature(storyMapState, {parentId: epic.id}).catch(console.error)
-							}}
-							className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378] dark:bg-black dark:text-[#00a2c4]"
-						>
-							<CopyOutlined />
-							<span className="my-1">Add feature</span>
-						</button>
-					)}
-				</div>
+					epicId={epic.id}
+					dragInfo={dragInfo}
+					onMarkForDeletion={(id: string) => {
+						setItemsToBeDeleted((prev) => [...prev, id])
+					}}
+				/>
 			))}
 
 			{!editMode && (
 				<button
 					type="button"
 					onClick={() => {
-						addEpic(storyMapState, {}).catch(console.error)
+						addEpic(product, storyMapItems, versions, {}, user.id).catch(console.error)
 					}}
 					className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#4f2dc8] dark:bg-black dark:text-[#6b44f8]"
 					data-testid="add-epic"
@@ -753,22 +628,43 @@ const StoryMap: FC<StoryMapProps> = ({
 			)}
 
 			{/* Surrogate parent for story map items as they're being dragged (the real item in the tree is made invisible) */}
-			<motion.div
-				className="fixed top-0 left-0 z-20 cursor-grabbing"
-				style={{
-					x: useTransform(dragInfo.mousePos[0], (x) => x - dragInfo.offsetToTopLeft[0]),
-					y: useTransform(dragInfo.mousePos[1], (y) => y - dragInfo.offsetToTopLeft[1]),
-				}}
-			>
+			<motion.div className="fixed top-0 left-0 z-20 cursor-grabbing" style={surrogateParentPos}>
 				{(() => {
-					const item = Object.entries(storyMapState.data().items).find(([id]) => id === dragInfo.itemBeingDraggedId)
-					switch (item?.[1]!.type) {
+					if (!dragInfo.itemBeingDraggedId) return null
+					switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 						case `epic`:
-							return <Epic meta={meta} epicId={item[0] as Id} inert />
+							return (
+								<Epic
+									epicId={dragInfo.itemBeingDraggedId}
+									dragInfo={dragInfo}
+									onMarkForDeletion={(id: string) => {
+										setItemsToBeDeleted((prev) => [...prev, id])
+									}}
+									inert
+								/>
+							)
 						case `feature`:
-							return <Feature meta={meta} featureId={item[0] as Id} inert />
+							return (
+								<Feature
+									featureId={dragInfo.itemBeingDraggedId}
+									dragInfo={dragInfo}
+									onMarkForDeletion={(id: string) => {
+										setItemsToBeDeleted((prev) => [...prev, id])
+									}}
+									inert
+								/>
+							)
 						case `story`:
-							return <Story meta={meta} storyId={item[0] as Id} inert />
+							return (
+								<Story
+									storyId={dragInfo.itemBeingDraggedId}
+									dragInfo={dragInfo}
+									onMarkForDeletion={() => {
+										setItemsToBeDeleted((prev) => [...prev, dragInfo.itemBeingDraggedId!])
+									}}
+									inert
+								/>
+							)
 					}
 				})()}
 			</motion.div>

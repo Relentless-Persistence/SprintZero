@@ -1,5 +1,5 @@
 import {Button, Drawer} from "antd"
-import {collection, query, where} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
@@ -8,19 +8,19 @@ import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {z} from "zod"
-import type {JourneyEvent} from "~/types/db/JourneyEvents"
-import type {Journey} from "~/types/db/Journeys"
+import type {Journey} from "~/types/db/Products/Journeys"
+import type {Event} from "~/types/db/Products/Journeys/Events"
 
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import {JourneyEventSchema} from "~/types/db/JourneyEvents"
-import {durationUnits} from "~/types/db/Journeys"
-import {PersonaConverter} from "~/types/db/Personas"
-import {db} from "~/utils/firebase"
+import {durationUnits} from "~/types/db/Products/Journeys"
+import {EventSchema} from "~/types/db/Products/Journeys/Events"
+import {PersonaConverter} from "~/types/db/Products/Personas"
 
-const formSchema = JourneyEventSchema.pick({
+const formSchema = EventSchema.pick({
 	description: true,
 	emotion: true,
 	emotionLevel: true,
@@ -33,19 +33,16 @@ type FormInputs = z.infer<typeof formSchema>
 
 export type EventDrawerProps = {
 	journey: QueryDocumentSnapshot<Journey>
-	activeEvent: QueryDocumentSnapshot<JourneyEvent> | undefined
+	activeEvent: QueryDocumentSnapshot<Event> | undefined
 	onClose: () => void
 	onCommit: (event: FormInputs) => Promisable<void>
 	onDelete: () => Promisable<void>
 }
 
 const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCommit, onDelete}) => {
+	const {product} = useAppContext()
 	const [isDrawerOpen, setIsDrawerOpen] = useState(true)
-	const [personas] = useCollection(
-		query(collection(db, `Personas`), where(`productId`, `==`, journey.data().productId)).withConverter(
-			PersonaConverter,
-		),
-	)
+	const [personas] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
 
 	const {control, watch, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,

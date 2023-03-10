@@ -7,12 +7,11 @@ import {useState} from "react"
 
 import type {ItemType} from "antd/es/menu/hooks/useItems"
 import type {FC} from "react"
-import type {Id} from "~/types"
 
+import {useAppContext} from "../AppContext"
 import LinkTo from "~/components/LinkTo"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
-const getItems = (activeProductId: Id): ItemType[] => [
+const getItems = (activeProductId: string): ItemType[] => [
 	{
 		key: `configuration`,
 		icon: <SettingOutlined />,
@@ -27,9 +26,9 @@ const getItems = (activeProductId: Id): ItemType[] => [
 
 const SideMenu: FC = () => {
 	const pathname = usePathname()
-	const activeProductId = useActiveProductId()
+	const {product} = useAppContext()
 
-	const items = getItems(activeProductId)
+	const items = getItems(product.id)
 	const [openKey, setOpenKey] = useState(
 		items.find((item) => item?.key === pathname?.split(`/`).at(-1))?.key as string | undefined,
 	)

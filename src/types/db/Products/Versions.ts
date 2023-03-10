@@ -3,6 +3,7 @@ import {z} from "zod"
 import {genConverter} from "~/types"
 
 export const VersionSchema = z.object({
+	deleted: z.boolean(),
 	name: z.string(),
 })
 

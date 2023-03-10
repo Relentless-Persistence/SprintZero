@@ -2,41 +2,39 @@
 
 import {useQueries} from "@tanstack/react-query"
 import {Breadcrumb, Tabs} from "antd"
-import {collection, doc, getDoc, query, where} from "firebase/firestore"
+import {collection, doc, getDoc} from "firebase/firestore"
 import {useState} from "react"
-import {useCollectionData} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
+import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
+import type {User} from "~/types/db/Users"
 
-import {ProductConverter} from "~/types/db/Products"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
-import {useUser} from "~/utils/useUser"
 
 const TeamSettingsClientPage: FC = () => {
-	const user = useUser()
-	const [allProducts] = useCollectionData(
-		user
-			? query(collection(db, `Products`), where(`members.${user.id}.type`, `in`, [`owner`, `editor`])).withConverter(
-					ProductConverter,
-			  )
-			: undefined,
-	)
-	// Technically the user can be a part of multiple products, but this page is only designed for one for now.
-	const firstProduct = allProducts?.[0]
+	const {product} = useAppContext()
 
 	const [currentTab, setcurrentTab] = useState<`editor` | `viewer`>(`editor`)
 
-	const members = useQueries({
-		queries: firstProduct
-			? Object.entries(firstProduct.members)
-					.filter(([, info]) => info?.type === currentTab)
-					.map(([id]) => ({
-						queryKey: [`user`, id],
-						queryFn: async () => await getDoc(doc(db, `Users`, id).withConverter(UserConverter)),
-					}))
-			: [],
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	conditionalThrow(membersError)
+
+	const _memberUsers = useQueries({
+		queries:
+			members?.docs.map((member) => ({
+				queryKey: [`user`, member.id],
+				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
+			})) ?? [],
 	})
+	conditionalThrow(membersError, ..._memberUsers.map((product) => product.error))
+	const memberUsers = _memberUsers
+		.map((user) => user.data)
+		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
 
 	return (
 		<div className="flex flex-col gap-6 px-12 py-8">
@@ -54,15 +52,12 @@ const TeamSettingsClientPage: FC = () => {
 						key: `editor`,
 						children: (
 							<div className="flex flex-col gap-4">
-								{members.map(
-									({data: member}) =>
-										member?.exists() && (
-											<div key={member.id} className="flex flex-col gap-1 border border-border bg-white px-6 py-4">
-												<p className="font-semibold">{member.data().name}</p>
-												<p>{member.data().email}</p>
-											</div>
-										),
-								)}
+								{memberUsers.map((member) => (
+									<div key={member.id} className="flex flex-col gap-1 border border-border bg-white px-6 py-4">
+										<p className="font-semibold">{member.data().name}</p>
+										<p>{member.data().email}</p>
+									</div>
+								))}
 							</div>
 						),
 					},
@@ -71,15 +66,12 @@ const TeamSettingsClientPage: FC = () => {
 						key: `viewer`,
 						children: (
 							<div className="flex flex-col gap-4">
-								{members.map(
-									({data: member}) =>
-										member?.exists() && (
-											<div key={member.id} className="flex flex-col gap-1 border border-border bg-white px-6 py-4">
-												<p className="font-semibold">{member.data().name}</p>
-												<p>{member.data().email}</p>
-											</div>
-										),
-								)}
+								{memberUsers.map((member) => (
+									<div key={member.id} className="flex flex-col gap-1 border border-border bg-white px-6 py-4">
+										<p className="font-semibold">{member.data().name}</p>
+										<p>{member.data().email}</p>
+									</div>
+								))}
 							</div>
 						),
 					},

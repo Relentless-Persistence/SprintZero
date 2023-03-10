@@ -1,53 +1,60 @@
 "use client"
 
-import {Button, Checkbox, Input} from "antd"
-import {collection, doc, getDocs, query, setDoc, updateDoc, where} from "firebase/firestore"
+import {Button, Card, Checkbox} from "antd"
+import {collectionGroup, doc, getDocs, query, updateDoc, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {FC} from "react"
 import type {User} from "~/types/db/Users"
 
 import LinkTo from "~/components/LinkTo"
-import {nda} from "~/components/nda"
-import {privacyPolicy} from "~/components/privacy"
-import {termsOfService} from "~/components/terms"
-import {ProductConverter} from "~/types/db/Products"
-import {db} from "~/utils/firebase"
-import {useUser} from "~/utils/useUser"
+import NonDiscolsureAgreement from "~/components/NonDisclosureAgreement"
+import PrivacyPolicy from "~/components/PrivacyPolicy"
+import TermsOfService from "~/components/TermsOfService"
+import {MemberConverter} from "~/types/db/Products/Members"
+import {conditionalThrow} from "~/utils/conditionalThrow"
+import {auth, db} from "~/utils/firebase"
 
 const AcceptTermsClientPage: FC = () => {
 	const router = useRouter()
 	const [agree, setAgree] = useState(false)
-	const user = useUser()
+	const [user, , userError] = useAuthState(auth)
+	conditionalThrow(userError)
 
 	const [hasAccepted, setHasAccepted] = useState(false)
 	const onAccept = async () => {
-		if (hasAccepted) return
-		setHasAccepted(true)
-		await updateDoc(doc(db, `Users`, user!.id), {
-			hasAcceptedTos: true,
-		} satisfies Partial<User>)
+		if (hasAccepted || !user) return
+		try {
+			setHasAccepted(true)
+			await updateDoc(doc(db, `Users`, user.uid), {
+				hasAcceptedTos: true,
+			} satisfies Partial<User>)
 
-		const {docs: products} = await getDocs(
-			query(collection(db, `Products`), where(`members.${user!.id}.type`, `==`, `editor`)).withConverter(
-				ProductConverter,
-			),
-		)
-		if (products.length === 0) router.push(`/product`)
-		else router.push(`/${products[0]!.id}/map`)
+			const {docs: products} = await getDocs(
+				query(collectionGroup(db, `Members`), where(`id`, `==`, user.uid), where(`type`, `==`, `editor`)).withConverter(
+					MemberConverter,
+				),
+			)
+			if (products.length === 0) router.push(`/product`)
+			else router.push(`/${products[0]!.ref.parent.parent!.id}/map`)
+		} catch (e) {
+			setHasAccepted(false)
+			throw e
+		}
 	}
 
 	return (
-		<div className="flex h-full flex-col gap-8">
-			<div>
+		<div className="flex h-full flex-col gap-6">
+			<div className="leading-normal">
 				<h1 className="text-3xl font-semibold">Let&apos;s Get Started!</h1>
 				<p className="text-xl text-textSecondary">
 					To create an account, please agree to below{` `}
 					<LinkTo href="https://www.sprintzero.app/terms" className="font-medium text-info">
 						Terms of Service
 					</LinkTo>
-					{` `},{` `}
+					,{` `}
 					<LinkTo href="https://www.sprintzero.app/privacy" className="font-medium text-info">
 						Privacy Policy
 					</LinkTo>
@@ -56,13 +63,13 @@ const AcceptTermsClientPage: FC = () => {
 			</div>
 
 			<div className="flex grow flex-col gap-4">
-				<Input.TextArea
-					size="large"
-					readOnly
-					rows={15}
-					value={termsOfService + `\n\n\n` + privacyPolicy + `\n\n\n` + nda}
-					className="grow !resize-none bg-[#eceef1] font-mono text-sm text-text"
-				/>
+				<Card className="min-h-0 flex-1 !resize-none overflow-auto border-border bg-fillTertiary font-mono text-text">
+					<TermsOfService />
+					<br />
+					<PrivacyPolicy />
+					<br />
+					<NonDiscolsureAgreement />
+				</Card>
 
 				<Checkbox checked={agree} onChange={() => setAgree((agree) => !agree)}>
 					By checking this box you agree to our Terms of Service and Privacy Policy.

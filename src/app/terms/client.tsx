@@ -1,11 +1,11 @@
 "use client"
 
-import {Input} from "antd"
+import {Card} from "antd"
 import Image from "next/image"
 
 import type {FC} from "react"
 
-import {termsOfService} from "~/components/terms"
+import TermsOfService from "~/components/TermsOfService"
 
 const TermsClientPage: FC = () => {
 	return (
@@ -16,13 +16,9 @@ const TermsClientPage: FC = () => {
 				</div>
 				<div className="flex flex-col gap-8">
 					<h1 className="text-3xl">Terms of Service</h1>
-					<Input.TextArea
-						size="large"
-						readOnly
-						rows={20}
-						value={termsOfService}
-						className="!resize-none bg-[#eceef1] font-mono text-sm text-text"
-					/>
+					<Card className="min-h-0 flex-1 !resize-none overflow-auto border-border bg-fillTertiary font-mono text-text">
+						<TermsOfService />
+					</Card>
 				</div>
 			</div>
 		</div>

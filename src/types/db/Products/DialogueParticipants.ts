@@ -1,8 +1,8 @@
 import {z} from "zod"
 
-import {genConverter, idSchema, timestampSchema} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
-export const ParticipantSchema = z.object({
+export const DialogueParticipantSchema = z.object({
 	availability: z.array(z.enum([`95only`, `email`, `phone`, `text`, `weekdays`, `weekends`])),
 	disabilities: z.object({
 		auditory: z.boolean(),
@@ -21,13 +21,12 @@ export const ParticipantSchema = z.object({
 	transcript: z.string(),
 	updatedAt: timestampSchema,
 
-	personaIds: z.array(idSchema),
-	productId: idSchema,
-	updatedAtUserId: idSchema,
+	personaIds: z.array(z.string()),
+	updatedAtUserId: z.string(),
 })
 
-export type Participant = z.infer<typeof ParticipantSchema>
-export const ParticipantConverter = genConverter(ParticipantSchema)
+export type DialogueParticipant = z.infer<typeof DialogueParticipantSchema>
+export const DialogueParticipantConverter = genConverter(DialogueParticipantSchema)
 
 export const statuses = [
 	[`identified`, `Identified`],

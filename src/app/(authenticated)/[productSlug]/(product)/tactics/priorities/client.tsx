@@ -1,29 +1,28 @@
 "use client"
 
 import {Tabs} from "antd"
-import {doc} from "firebase/firestore"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {collection} from "firebase/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
 import EpicsTab from "./EpicsTab"
 import FeaturesTab from "./FeaturesTab"
-import {ProductConverter} from "~/types/db/Products"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 
 const PrioritiesClientPage: FC = () => {
-	const activeProductId = useActiveProductId()
-	const [activeProduct] = useDocument(doc(db, `Products`, activeProductId).withConverter(ProductConverter))
+	const {product} = useAppContext()
+	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
 
-	if (!activeProduct?.exists()) return null
+	if (!storyMapItems) return null
 	return (
 		<div className="h-full">
 			<Tabs
 				tabPosition="right"
 				items={[
-					{key: `epics`, label: `Epics`, children: <EpicsTab activeProduct={activeProduct} />},
-					{key: `features`, label: `Features`, children: <FeaturesTab activeProduct={activeProduct} />},
+					{key: `epics`, label: `Epics`, children: <EpicsTab storyMapItems={storyMapItems} />},
+					{key: `features`, label: `Features`, children: <FeaturesTab storyMapItems={storyMapItems} />},
 				]}
 				style={{height: `100%`}}
 			/>

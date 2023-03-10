@@ -9,17 +9,17 @@ import {useState} from "react"
 import type {Dayjs} from "dayjs"
 import type {FC} from "react"
 
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
-import {useUser} from "~/utils/useUser"
 import ShuffleIcon from "~public/icons/shuffle.svg"
 import SpotifyIcon from "~public/icons/spotify.svg"
 
 dayjs.extend(isBetween)
 
 const FunCard: FC = () => {
-	const user = useUser()
+	const {user} = useAppContext()
 	const [date, setDate] = useState<Dayjs | null>(null)
 	const [hasSubmitted, setHasSubmitted] = useState(false)
 	const [showSong, setShowSong] = useState(false)
@@ -62,13 +62,13 @@ const FunCard: FC = () => {
 	const {data: songUrl} = trpc.funCard.getSongUrl.useQuery(
 		{
 			song: song!,
-			service: user?.data().preferredMusicClient ?? `appleMusic`,
+			service: user.data().preferredMusicClient,
 		},
 		{
 			enabled: !!song && !!user,
 			select: (data) => {
 				if (!data.url) return undefined
-				if (user!.data().preferredMusicClient === `appleMusic`) {
+				if (user.data().preferredMusicClient === `appleMusic`) {
 					const domainIndex = data.url.indexOf(`music.apple.com`)
 					return `https://embed.${data.url.slice(domainIndex)}`
 				} else {
@@ -100,51 +100,49 @@ const FunCard: FC = () => {
 				</div>
 			}
 			extra={
-				user && (
-					<Dropdown
-						trigger={[`click`]}
-						placement="bottomRight"
-						menu={{
-							selectable: true,
-							selectedKeys: [user.data().preferredMusicClient],
-							items: [
-								{
-									key: `apple`,
-									label: (
-										<div
-											className="flex items-center gap-2"
-											onClick={() => {
-												updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
-													preferredMusicClient: `appleMusic`,
-												}).catch(console.error)
-											}}
-										>
-											<AppleFilled />
-											<span>Apple Music</span>
-										</div>
-									),
-								},
-								{
-									key: `spotify`,
-									label: (
-										<div
-											className="flex items-center gap-2"
-											onClick={() => {
-												updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
-													preferredMusicClient: `spotify`,
-												}).catch(console.error)
-											}}
-										>
-											<SpotifyIcon /> <span>Spotify</span>
-										</div>
-									),
-								},
-							],
-						}}
-					>
-						<SettingOutlined className="text-lg" />
-					</Dropdown>
-				)
+				<Dropdown
+					trigger={[`click`]}
+					placement="bottomRight"
+					menu={{
+						selectable: true,
+						selectedKeys: [user.data().preferredMusicClient],
+						items: [
+							{
+								key: `apple`,
+								label: (
+									<div
+										className="flex items-center gap-2"
+										onClick={() => {
+											updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
+												preferredMusicClient: `appleMusic`,
+											}).catch(console.error)
+										}}
+									>
+										<AppleFilled />
+										<span>Apple Music</span>
+									</div>
+								),
+							},
+							{
+								key: `spotify`,
+								label: (
+									<div
+										className="flex items-center gap-2"
+										onClick={() => {
+											updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
+												preferredMusicClient: `spotify`,
+											}).catch(console.error)
+										}}
+									>
+										<SpotifyIcon /> <span>Spotify</span>
+									</div>
+								),
+							},
+						],
+					}}
+				>
+					<SettingOutlined className="text-lg" />
+				</Dropdown>
 			}
 		>
 			<div className="flex h-full flex-col gap-4">
@@ -197,7 +195,7 @@ const FunCard: FC = () => {
 
 				<div className="flex flex-col gap-2">
 					<p className="font-semibold">Answer</p>
-					{user && showSong ? (
+					{showSong ? (
 						user.data().preferredMusicClient === `appleMusic` ? (
 							<iframe
 								allow="autoplay *; encrypted-media *;"

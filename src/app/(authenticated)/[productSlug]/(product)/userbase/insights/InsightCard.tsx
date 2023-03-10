@@ -5,21 +5,20 @@ import {useForm} from "react-hook-form"
 
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Id} from "~/types"
-import type {Insight} from "~/types/db/Insights"
+import type {Insight} from "~/types/db/Products/Insights"
 
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
-import {InsightSchema} from "~/types/db/Insights"
+import {InsightConverter, InsightSchema} from "~/types/db/Products/Insights"
 import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
 
 const formSchema = InsightSchema.pick({status: true, text: true, title: true})
 type FormInputs = z.infer<typeof formSchema>
 
 export type InsightCardProps = {
-	insightId?: Id
+	insightId?: string
 	initialData: Partial<Insight>
 	isEditing: boolean
 	onEditStart?: () => void
@@ -27,6 +26,8 @@ export type InsightCardProps = {
 }
 
 const InsightItemCard: FC<InsightCardProps> = ({insightId, initialData, isEditing, onEditStart, onEditEnd}) => {
+	const {product} = useAppContext()
+
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
 		defaultValues: {
@@ -36,10 +37,9 @@ const InsightItemCard: FC<InsightCardProps> = ({insightId, initialData, isEditin
 		},
 	})
 
-	const activeProductId = useActiveProductId()
 	const onSubmit = handleSubmit(async (data) => {
-		if (insightId) await updateDoc(doc(db, `Insights`, insightId), data satisfies Partial<Insight>)
-		else await addDoc(collection(db, `Insights`), {...data, productId: activeProductId} satisfies Insight)
+		if (insightId) await updateDoc(doc(product.ref, `Insights`, insightId).withConverter(InsightConverter), data)
+		else await addDoc(collection(product.ref, `Insights`).withConverter(InsightConverter), data)
 		onEditEnd()
 	})
 

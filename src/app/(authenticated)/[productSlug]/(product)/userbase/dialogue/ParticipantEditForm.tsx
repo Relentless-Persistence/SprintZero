@@ -11,15 +11,15 @@ import usePlacesAutocomplete, {getGeocode} from "use-places-autocomplete"
 import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
-import type {Participant} from "~/types/db/Participants"
+import type {DialogueParticipant} from "~/types/db/Products/DialogueParticipants"
 
 import LinkTo from "~/components/LinkTo"
 import RhfAutoComplete from "~/components/rhf/RhfAutoComplete"
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfRadioGroup from "~/components/rhf/RhfRadioGroup"
-import {ParticipantSchema} from "~/types/db/Participants"
+import {DialogueParticipantSchema} from "~/types/db/Products/DialogueParticipants"
 
-const formSchema = ParticipantSchema.pick({
+const formSchema = DialogueParticipantSchema.pick({
 	disabilities: true,
 	location: true,
 	status: true,
@@ -28,7 +28,7 @@ const formSchema = ParticipantSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type ParticipantEditFormProps = {
-	participant: QueryDocumentSnapshot<Participant>
+	participant: QueryDocumentSnapshot<DialogueParticipant>
 	onFinish: () => void
 }
 

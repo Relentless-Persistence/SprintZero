@@ -1,13 +1,11 @@
 import {z} from "zod"
 
-import {genConverter, idSchema} from "~/types"
+import {genConverter} from "~/types"
 
 export const InsightSchema = z.object({
 	status: z.enum([`validated`, `assumed`, `disproven`]),
 	text: z.string(),
 	title: z.string(),
-
-	productId: idSchema,
 })
 
 export type Insight = z.infer<typeof InsightSchema>

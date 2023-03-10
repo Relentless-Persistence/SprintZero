@@ -1,38 +1,27 @@
 import {useState} from "react"
 
-import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
+import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 
 import StoryContainer from "./StoryContainer"
-import {useGenMeta} from "~/app/(authenticated)/[productSlug]/(product)/map/meta"
-import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/map/StoryDrawer"
+import StoryDrawer from "~/components/StoryDrawer"
 
 export type StoryProps = {
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
-	allVersions: QuerySnapshot<Version>
-	storyId: Id
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	versions: QuerySnapshot<Version>
+	storyId: string
 }
 
-const Story: FC<StoryProps> = ({storyMapState, allVersions, storyId}) => {
+const Story: FC<StoryProps> = ({storyMapItems, versions, storyId}) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const [isBeingDragged, setIsBeingDragged] = useState(false)
-
-	const meta = useGenMeta({
-		storyMapState,
-		allVersions,
-		currentVersionId: `__ALL_VERSIONS__`,
-		editMode: false,
-		itemsToBeDeleted: [],
-		setItemsToBeDeleted: () => {},
-	})
 
 	return (
 		<>
 			<StoryContainer
-				storyMapState={storyMapState}
+				storyMapItems={storyMapItems}
 				storyId={storyId}
 				onDrawerOpen={() => setIsDrawerOpen(true)}
 				isBeingDragged={isBeingDragged}
@@ -40,7 +29,13 @@ const Story: FC<StoryProps> = ({storyMapState, allVersions, storyId}) => {
 				onDragEnd={() => setIsBeingDragged(false)}
 			/>
 
-			<StoryDrawer meta={meta} storyId={storyId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+			<StoryDrawer
+				storyMapItems={storyMapItems}
+				versions={versions}
+				storyId={storyId}
+				isOpen={isDrawerOpen}
+				onClose={() => setIsDrawerOpen(false)}
+			/>
 		</>
 	)
 }

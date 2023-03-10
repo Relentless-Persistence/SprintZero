@@ -13,15 +13,17 @@ import {auth, db} from "~/utils/firebase"
 
 const HomePage: FC = () => {
 	const router = useRouter()
-	const [user, userLoading] = useAuthState(auth)
+	const [user, userLoading, userError] = useAuthState(auth)
+	if (userError) throw userError
 
-	const [products, loading] = useCollectionOnce(
+	const [products, loading, error] = useCollectionOnce(
 		user
 			? query(collection(db, `Products`), where(`members.${user.uid}.type`, `in`, [`owner`, `editor`])).withConverter(
 					ProductConverter,
 			  )
 			: undefined,
 	)
+	if (error) throw error
 
 	useEffect(() => {
 		if (!userLoading && !user) router.replace(`/sign-in`)

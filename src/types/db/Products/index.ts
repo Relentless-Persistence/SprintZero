@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, idSchema, timestampSchema} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
 export const ProductSchema = z.object({
 	// General product info
@@ -9,20 +9,14 @@ export const ProductSchema = z.object({
 	effortCost: z.number().nullable(),
 	effortCostCurrencySymbol: z.enum([`dollar`, `euro`, `pound`, `yen`, `rupee`]).nullable(),
 	sprintStartDayOfWeek: z.number().int().min(0).max(6),
-	members: z.record(
-		idSchema,
-		z.object({
-			type: z.enum([`owner`, `editor`, `viewer`]),
-		}),
-	),
 	name: z.string({invalid_type_error: `Required`}).min(1),
 
+	// Story map info
+	storyMapCurrentHistoryId: z.string().nullable(),
+	storyMapUpdatedAt: timestampSchema,
+
 	// Kickoff info
-	businessOutcomes: z.array(z.object({id: idSchema, text: z.string()})),
-	marketLeaders: z.array(z.object({id: idSchema, text: z.string()})),
-	potentialRisks: z.array(z.object({id: idSchema, text: z.string()})),
 	problemStatement: z.string(),
-	userPriorities: z.array(z.object({id: idSchema, text: z.string()})),
 
 	// Accessibility info
 	accessibility: z.object({
@@ -43,33 +37,9 @@ export const ProductSchema = z.object({
 	}),
 
 	// Vision info
-	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]),
-	valueProposition: z.string({invalid_type_error: `Required`}).min(1, `Required`).nullable(),
-	features: z
-		.array(z.object({id: idSchema, text: z.string().min(1, `Required`)}))
-		.min(1, `Required`)
-		.nullable(),
 	finalVision: z.string(),
-	updates: z.array(
-		z.object({
-			id: z.string(),
-			userId: idSchema,
-			text: z.string(),
-			timestamp: timestampSchema,
-		}),
-	),
-
-	// Huddle info
-	huddles: z.record(
-		idSchema,
-		z.object({
-			updatedAt: timestampSchema,
-
-			blockerStoryIds: z.array(idSchema),
-			todayStoryIds: z.array(idSchema),
-			yesterdayStoryIds: z.array(idSchema),
-		}),
-	),
+	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]).nullable(),
+	valueProposition: z.string({invalid_type_error: `Required`}).min(1, `Required`).nullable(),
 })
 
 export type Product = z.infer<typeof ProductSchema>

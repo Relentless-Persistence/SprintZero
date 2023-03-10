@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-import {genConverter, idSchema, timestampSchema} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
 export const TaskSchema = z.object({
 	board: z.string(),
@@ -16,8 +16,7 @@ export const TaskSchema = z.object({
 	),
 	title: z.string(),
 
-	assigneeIds: z.array(idSchema),
-	productId: idSchema,
+	assigneeIds: z.array(z.string()),
 })
 
 export type Task = z.infer<typeof TaskSchema>

@@ -1,13 +1,12 @@
 import {TRPCError} from "@trpc/server"
+import {FieldPath} from "firebase-admin/firestore"
 import {z} from "zod"
-
-import type {WithFieldValue} from "firebase-admin/firestore"
-import type {Product} from "~/types/db/Products"
 
 import {procedure, router} from "../trpc"
 import {genAdminConverter} from "~/types"
-import {ProductInviteSchema} from "~/types/db/ProductInvites"
 import {ProductSchema} from "~/types/db/Products"
+import {InviteSchema} from "~/types/db/Products/Invites"
+import {MemberSchema} from "~/types/db/Products/Members"
 import {dbAdmin} from "~/utils/firebaseAdmin"
 
 export const userInviteRouter = router({
@@ -20,12 +19,12 @@ export const userInviteRouter = router({
 		.query(async ({input: {inviteToken}}) => {
 			const productInvite = await dbAdmin
 				.doc(`ProductInvites/${inviteToken}`)
-				.withConverter(genAdminConverter(ProductInviteSchema))
+				.withConverter(genAdminConverter(InviteSchema))
 				.get()
 			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
 
 			const product = await dbAdmin
-				.doc(`Products/${productInvite.data()!.productId}`)
+				.doc(productInvite.ref.parent.parent!.id)
 				.withConverter(genAdminConverter(ProductSchema))
 				.get()
 			if (!product.exists) throw new TRPCError({code: `UNAUTHORIZED`})
@@ -43,17 +42,21 @@ export const userInviteRouter = router({
 		)
 		.mutation(async ({input: {userId, inviteToken}}) => {
 			const productInvite = await dbAdmin
-				.doc(`ProductInvites/${inviteToken}`)
-				.withConverter(genAdminConverter(ProductInviteSchema))
+				.collectionGroup(`Invites`)
+				.where(FieldPath.documentId(), `==`, inviteToken)
+				.withConverter(genAdminConverter(InviteSchema))
 				.get()
-			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
+			if (productInvite.docs.length === 0) throw new TRPCError({code: `UNAUTHORIZED`})
+			const invite = productInvite.docs[0]!
 
-			const data: WithFieldValue<Partial<Product>> = {
-				[`members.${userId}`]: {type: `editor`},
-			}
 			await dbAdmin
-				.doc(`Products/${productInvite.data()!.productId}`)
-				.withConverter(genAdminConverter(ProductSchema))
-				.update(data)
+				.doc(invite.ref.parent.parent!.path)
+				.collection(`Members`)
+				.doc(userId)
+				.withConverter(genAdminConverter(MemberSchema))
+				.set({
+					type: `editor`,
+					id: userId,
+				})
 		}),
 })

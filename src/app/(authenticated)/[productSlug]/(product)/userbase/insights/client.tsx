@@ -2,27 +2,23 @@
 
 import {PlusOutlined} from "@ant-design/icons"
 import {Breadcrumb, FloatButton, Tabs} from "antd"
-import {collection, query, where} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type {FC} from "react"
-import type {Id} from "~/types"
 
 import InsightItemCard from "./InsightCard"
-import {InsightConverter} from "~/types/db/Insights"
-import {db} from "~/utils/firebase"
-import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {InsightConverter} from "~/types/db/Products/Insights"
 
 const InsightsClientPage: FC = () => {
+	const {product} = useAppContext()
 	const [currentTab, setCurrentTab] = useState<keyof typeof tabNames>(`validated`)
 
-	const activeProductId = useActiveProductId()
-	const [insights] = useCollection(
-		query(collection(db, `Insights`), where(`productId`, `==`, activeProductId)).withConverter(InsightConverter),
-	)
-	const [activeInsight, setActiveInsight] = useState<Id | `new` | undefined>(undefined)
+	const [insights] = useCollection(collection(product.ref, `Insights`).withConverter(InsightConverter))
+	const [activeInsight, setActiveInsight] = useState<string | `new` | undefined>(undefined)
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
@@ -43,10 +39,10 @@ const InsightsClientPage: FC = () => {
 						.map((insight) => (
 							<InsightItemCard
 								key={insight.id}
-								insightId={insight.id as Id}
+								insightId={insight.id}
 								initialData={insight.data()}
 								isEditing={activeInsight === insight.id}
-								onEditStart={() => setActiveInsight(insight.id as Id)}
+								onEditStart={() => setActiveInsight(insight.id)}
 								onEditEnd={() => setActiveInsight(undefined)}
 							/>
 						))}

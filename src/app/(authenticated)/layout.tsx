@@ -28,7 +28,11 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
 		}
 		getDoc(doc(db, `Users`, user.uid).withConverter(UserConverter))
 			.then((dbUser) => {
-				if (!dbUser.data()?.hasAcceptedTos && pathname !== `/accept-terms`) {
+				if (!dbUser.exists()) {
+					router.replace(`/sign-out`)
+					return
+				}
+				if (!dbUser.data().hasAcceptedTos && pathname !== `/accept-terms`) {
 					router.replace(`/accept-terms`)
 					return
 				}
@@ -37,7 +41,8 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
 			.catch(console.error)
 	}, [loading, pathname, router, user])
 
-	return <>{userCanAccessApp && children}</>
+	if (!userCanAccessApp) return null
+	return <>{children}</>
 }
 
 export default AuthenticatedLayout

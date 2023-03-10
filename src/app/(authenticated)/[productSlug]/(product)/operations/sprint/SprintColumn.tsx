@@ -1,40 +1,39 @@
 import {Card} from "antd"
 import {sortBy} from "lodash"
 
-import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
+import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Id} from "~/types"
-import type {StoryMapState} from "~/types/db/StoryMapStates"
-import type {Version} from "~/types/db/Versions"
+import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type {Version} from "~/types/db/Products/Versions"
 
 import Story from "./Story"
-import {getStories} from "~/utils/storyMap"
-import {useUser} from "~/utils/useUser"
+import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {AllVersions, getStories} from "~/utils/storyMap"
 
 export type SprintColumnProps = {
 	columnName: string
 	title: string
-	storyMapState: QueryDocumentSnapshot<StoryMapState>
-	allVersions: QuerySnapshot<Version>
-	currentVersionId: Id | `__ALL_VERSIONS__`
+	storyMapItems: QuerySnapshot<StoryMapItem>
+	versions: QuerySnapshot<Version>
+	currentVersionId: string | typeof AllVersions
 	myStoriesOnly: boolean
 }
 
 const SprintColumn: FC<SprintColumnProps> = ({
 	columnName,
 	title,
-	storyMapState,
-	allVersions,
+	storyMapItems,
+	versions,
 	currentVersionId,
 	myStoriesOnly,
 }) => {
-	const user = useUser()
+	const {user} = useAppContext()
 	const stories = sortBy(
-		getStories(storyMapState.data().items)
-			.filter((story) => story.sprintColumn === columnName)
-			.filter((story) => (currentVersionId === `__ALL_VERSIONS__` ? true : story.versionId === currentVersionId))
-			.filter((story) => (myStoriesOnly && user ? story.peopleIds.includes(user.id as Id) : true)),
-		[(el) => el.updatedAt.toMillis()],
+		getStories(storyMapItems)
+			.filter((story) => story.data().sprintColumn === columnName)
+			.filter((story) => (currentVersionId === AllVersions ? true : story.data().versionId === currentVersionId))
+			.filter((story) => myStoriesOnly && story.data().peopleIds.includes(user.id)),
+		[(el) => el.data().updatedAt.toMillis()],
 	)
 
 	return (
@@ -46,7 +45,7 @@ const SprintColumn: FC<SprintColumnProps> = ({
 		>
 			<div className="flex flex-col gap-4">
 				{stories.map((story) => (
-					<Story key={story.id} storyMapState={storyMapState} allVersions={allVersions} storyId={story.id} />
+					<Story key={story.id} storyMapItems={storyMapItems} versions={versions} storyId={story.id} />
 				))}
 			</div>
 		</Card>
