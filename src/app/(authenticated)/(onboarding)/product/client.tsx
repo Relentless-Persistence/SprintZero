@@ -5,6 +5,7 @@ import {doc} from "firebase/firestore"
 import {motion} from "framer-motion"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocument} from "react-firebase-hooks/firestore"
 
@@ -16,7 +17,6 @@ import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
 import {UserConverter} from "~/types/db/Users"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import {auth, db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
 
@@ -39,10 +39,11 @@ const ProductSetupClientPage: FC = () => {
 	const inviteUser = trpc.product.inviteUser.useMutation()
 
 	const [user, , userError] = useAuthState(auth)
+	useErrorHandler(userError)
 	const [dbUser, , dbUserError] = useDocument(
 		user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined,
 	)
-	conditionalThrow(userError, dbUserError)
+	useErrorHandler(dbUserError)
 
 	const submitForm = async (data: FormInputs) => {
 		if (hasSubmitted || !dbUser?.exists() || !user) return

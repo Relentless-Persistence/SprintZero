@@ -1,10 +1,9 @@
 import {FlagOutlined, SendOutlined} from "@ant-design/icons"
-import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Input} from "antd"
 import dayjs from "dayjs"
-import {addDoc, collection, doc, getDoc, orderBy, query, serverTimestamp, where} from "firebase/firestore"
-import {uniq} from "lodash"
+import {addDoc, collection, orderBy, query, serverTimestamp, where} from "firebase/firestore"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {QueryDocumentSnapshot, Timestamp} from "firebase/firestore"
@@ -16,8 +15,6 @@ import type {Comment} from "~/types/db/Products/StoryMapItems/Comments"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {CommentConverter} from "~/types/db/Products/StoryMapItems/Comments"
-import {conditionalThrow} from "~/utils/conditionalThrow"
-import {db} from "~/utils/firebase"
 
 export type CommentsProps = {
 	storyMapItem: QueryDocumentSnapshot<StoryMapItem>
@@ -49,8 +46,9 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 			orderBy(`createdAt`, `asc`),
 		).withConverter(CommentConverter),
 	)
+	useErrorHandler(commentsError)
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
-	conditionalThrow(commentsError, membersError)
+	useErrorHandler(membersError)
 
 	return (
 		<div className="absolute inset-0 flex flex-col">

@@ -62,7 +62,7 @@ const AcceptTermsClientPage: FC = () => {
 				</p>
 			</div>
 
-			<div className="flex grow flex-col gap-4">
+			<div className="flex grow flex-col items-start gap-4">
 				<Card className="min-h-0 flex-1 !resize-none overflow-auto border-border bg-fillTertiary font-mono text-text">
 					<TermsOfService />
 					<br />

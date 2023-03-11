@@ -1,3 +1,4 @@
+import {TRPCError} from "@trpc/server"
 import crypto from "crypto"
 import {FieldValue, Timestamp} from "firebase-admin/firestore"
 import {nanoid} from "nanoid"
@@ -129,6 +130,30 @@ export const productRouter = router({
 				return {productId: slug}
 			},
 		),
+
+	haltAndCatchFire: procedure
+		.input(
+			z.object({
+				productId: z.string(),
+				userIdToken: z.string(),
+			}),
+		)
+		.mutation(async ({input: {productId, userIdToken}}) => {
+			const user = await authAdmin.verifyIdToken(userIdToken)
+			const member = await dbAdmin
+				.collection(`Products`)
+				.doc(productId)
+				.collection(`Members`)
+				.doc(user.uid)
+				.withConverter(genAdminConverter(MemberSchema))
+				.get()
+			if (member.data()?.type !== `owner`) throw new TRPCError({code: `UNAUTHORIZED`})
+
+			await dbAdmin.recursiveDelete(
+				dbAdmin.collection(`Products`).doc(productId).withConverter(genAdminConverter(ProductSchema)),
+			)
+		}),
+
 	inviteUser: procedure
 		.input(
 			z.object({

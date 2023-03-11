@@ -2,12 +2,12 @@
 
 import {Avatar} from "antd"
 import Image from "next/image"
+import {useErrorHandler} from "react-error-boundary"
 import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {FC, ReactNode} from "react"
 
 import LinkTo from "~/components/LinkTo"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import {auth} from "~/utils/firebase"
 
 export type OnboardingLayoutProps = {
@@ -16,7 +16,7 @@ export type OnboardingLayoutProps = {
 
 const OnboardingLayout: FC<OnboardingLayoutProps> = ({children}) => {
 	const [user, , userError] = useAuthState(auth)
-	conditionalThrow(userError)
+	useErrorHandler(userError)
 
 	if (!user) return null
 	return (

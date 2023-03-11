@@ -17,6 +17,7 @@ import {collection} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {useInterval} from "react-use"
@@ -36,7 +37,6 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {StoryMapItemSchema, sprintColumns} from "~/types/db/Products/StoryMapItems"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import dollarFormat from "~/utils/dollarFormat"
 import {formValidateStatus} from "~/utils/formValidateStatus"
 import {debouncedUpdateItem, deleteItem, updateItem} from "~/utils/storyMap"
@@ -74,7 +74,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
-	conditionalThrow(membersError)
+	useErrorHandler(membersError)
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {

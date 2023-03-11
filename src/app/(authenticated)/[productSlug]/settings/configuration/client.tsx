@@ -2,8 +2,9 @@
 
 import {FireFilled} from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {Breadcrumb, Card, Dropdown} from "antd"
+import {Breadcrumb, Button, Card, Popconfirm} from "antd"
 import {updateDoc} from "firebase/firestore"
+import {useRouter} from "next/navigation"
 import {useEffect, useRef} from "react"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
@@ -15,6 +16,8 @@ import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {ProductSchema} from "~/types/db/Products"
+import {auth} from "~/utils/firebase"
+import {trpc} from "~/utils/trpc"
 
 const formSchema = ProductSchema.pick({
 	name: true,
@@ -31,6 +34,7 @@ type FormInputs = z.infer<typeof formSchema>
 
 const ConfigurationSettingsClientPage: FC = () => {
 	const {product} = useAppContext()
+	const router = useRouter()
 
 	const {control, handleSubmit, reset} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -65,11 +69,13 @@ const ConfigurationSettingsClientPage: FC = () => {
 		})
 	})
 
+	const haltAndCatchFire = trpc.product.haltAndCatchFire.useMutation()
+
 	return (
 		<div className="flex h-full flex-col gap-6 overflow-auto px-12 py-8">
 			<div className="flex flex-col gap-2">
 				<Breadcrumb items={[{title: `Settings`}, {title: `Configuration`}]} />
-				<p className="text-3xl font-bold">Product Configuration</p>
+				<h1 className="text-3xl font-bold">Product Configuration</h1>
 			</div>
 
 			<Card className="w-fit">
@@ -124,7 +130,9 @@ const ConfigurationSettingsClientPage: FC = () => {
 					</label>
 
 					<label className="flex flex-col gap-1">
-						<span className="font-semibold">Cost per Story Point</span>
+						<span className="font-semibold">
+							Cost per Story Point <span className="font-normal text-textTertiary">(optional)</span>
+						</span>
 						<RhfInput
 							control={control}
 							name="effortCost"
@@ -154,31 +162,32 @@ const ConfigurationSettingsClientPage: FC = () => {
 				</form>
 			</Card>
 
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col items-start gap-2">
 				<div className="leading-normal">
-					<p>Erase All Data</p>
+					<h2 className="font-semibold">Erase All Data</h2>
 					<p className="text-sm text-textTertiary">
 						This action will erase all stored data and start over from scratch.
 					</p>
 				</div>
-				<Dropdown.Button
-					icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}
-					menu={{
-						items: [
-							{
-								key: `confirm`,
-								label: `Confirm`,
-								onClick: () => {
-									// await Promise.all([
-									// ])
-								},
-							},
-							{key: `cancel`, label: `Cancel`},
-						],
+				<Popconfirm
+					title="Delete Product"
+					description="Are you sure you want to do this? This action is not reversable."
+					rootClassName="max-w-xs"
+					placement="right"
+					okText="Yes"
+					cancelText="No"
+					onConfirm={() => {
+						auth
+							.currentUser!.getIdToken(true)
+							.then(async (userIdToken) => {
+								await haltAndCatchFire.mutateAsync({productId: product.id, userIdToken})
+							})
+							.catch(console.error)
+						// router.push(`/`)
 					}}
 				>
-					Halt + Catch Fire
-				</Dropdown.Button>
+					<Button icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
+				</Popconfirm>
 			</div>
 		</div>
 	)

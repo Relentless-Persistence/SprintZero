@@ -27,7 +27,7 @@ module.exports = {
 		],
 		"import/no-unresolved": [`warn`, {ignore: [`\\.svg$`]}],
 		"sort-imports": [`warn`, {ignoreDeclarationSort: true}],
-		"no-console": [`warn`, {allow: [`info`, `warn`, `error`]}],
+		"no-console": [`warn`, {allow: [`info`, `warn`, `error`, `trace`]}],
 		"no-constant-condition": [`error`, {checkLoops: false}],
 		"no-control-regex": `off`,
 		"no-empty": [`warn`, {allowEmptyCatch: true}],

@@ -3,6 +3,7 @@ import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
 import {collection, collectionGroup, query, where} from "firebase/firestore"
 import Image from "next/image"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection, useCollectionOnce} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -10,22 +11,22 @@ import type {FC} from "react"
 import {useAppContext} from "./AppContext"
 import LinkTo from "~/components/LinkTo"
 import {MemberConverter} from "~/types/db/Products/Members"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
 import {useSetTheme, useTheme} from "~/utils/ThemeContext"
 import MoonIcon from "~public/icons/moon.svg"
 import SunIcon from "~public/icons/sun.svg"
 
 const Header: FC = () => {
-	const {product, user} = useAppContext()
+	const {product, member} = useAppContext()
 
 	const [members, , membersError] = useCollectionOnce(
 		query(
 			collectionGroup(db, `Members`),
-			where(`id`, `==`, user.id),
+			where(`id`, `==`, member.id),
 			where(`type`, `in`, [`owner`, `editor`]),
 		).withConverter(MemberConverter),
 	)
+	useErrorHandler(membersError)
 	const [products, , productsError] = useCollection(
 		members
 			? query(
@@ -38,7 +39,7 @@ const Header: FC = () => {
 			  )
 			: undefined,
 	)
-	conditionalThrow(membersError, productsError)
+	useErrorHandler(productsError)
 
 	const currentProductMember = members?.docs.find((member) => member.ref.parent.parent!.id === product.id)
 
@@ -139,7 +140,7 @@ const Header: FC = () => {
 					</div>
 				}
 			>
-				<Avatar src={user.data().avatar} className="cursor-pointer border-2 border-primary" />
+				<Avatar src={member.data().avatar} className="cursor-pointer border-2 border-primary" />
 			</Popover>
 		</Layout.Header>
 	)

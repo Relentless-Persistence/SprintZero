@@ -5,6 +5,7 @@ import {Layout, Menu} from "antd"
 import {collection} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useEffect, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC, ReactNode} from "react"
@@ -13,7 +14,6 @@ import SideMenu from "./SideMenu"
 import {useAppContext} from "../AppContext"
 import LinkTo from "~/components/LinkTo"
 import {MemberConverter} from "~/types/db/Products/Members"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 
 export type SettingsLayoutProps = {
 	children: ReactNode
@@ -24,7 +24,7 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({children}) => {
 	const router = useRouter()
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
-	conditionalThrow(membersError)
+	useErrorHandler(membersError)
 
 	const [isOwner, setIsOwner] = useState(false)
 

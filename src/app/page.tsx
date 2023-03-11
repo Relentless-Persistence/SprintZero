@@ -3,21 +3,22 @@
 import {collectionGroup, query, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
 
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import {auth, db} from "~/utils/firebase"
 
 const HomePage: FC = () => {
 	const router = useRouter()
 	const [user, userLoading, userError] = useAuthState(auth)
+	useErrorHandler(userError)
 	const [members, , membersError] = useCollection(
 		user ? query(collectionGroup(db, `Members`), where(`id`, `==`, user.uid)) : undefined,
 	)
-	conditionalThrow(userError, membersError)
+	useErrorHandler(membersError)
 
 	useEffect(() => {
 		if (!userLoading && !user) router.replace(`/sign-in`)

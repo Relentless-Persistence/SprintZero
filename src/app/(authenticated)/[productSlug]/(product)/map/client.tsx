@@ -27,6 +27,7 @@ import {motion} from "framer-motion"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useRef, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -43,7 +44,6 @@ import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
 import {HistoryItemConverter} from "~/types/db/Products/StoryMapHistories/HistoryItems"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
 
 const StoryMapClientPage: FC = () => {
@@ -51,14 +51,16 @@ const StoryMapClientPage: FC = () => {
 	const [storyMapItems, , storyMapItemsError] = useCollection(
 		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
+	useErrorHandler(storyMapItemsError)
 	const [versions, , versionsError] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
+	useErrorHandler(versionsError)
 	const [histories, , historiesError] = useCollection(
 		query(
 			collection(product.ref, `StoryMapHistories`).withConverter(StoryMapHistoryConverter),
 			orderBy(`timestamp`, `desc`),
 		),
 	)
-	conditionalThrow(storyMapItemsError, versionsError, historiesError)
+	useErrorHandler(historiesError)
 
 	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions | undefined>(undefined)
 	const [newVersionInputValue, setNewVersionInputValue] = useState<string | undefined>(undefined)
