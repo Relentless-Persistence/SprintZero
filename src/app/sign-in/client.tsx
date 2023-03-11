@@ -107,7 +107,7 @@ const SignInClientPage: FC = () => {
 				const members = await getDocs(
 					query(
 						collectionGroup(db, `Members`),
-						where(documentId(), `==`, credential.user.uid),
+						where(`id`, `==`, credential.user.uid),
 						where(`type`, `in`, [`owner`, `editor`]),
 					).withConverter(MemberConverter),
 				)
