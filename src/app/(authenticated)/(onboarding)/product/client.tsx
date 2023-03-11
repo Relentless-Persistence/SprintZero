@@ -55,6 +55,8 @@ const ProductSetupClientPage: FC = () => {
 			name: data.name,
 			sprintStartDayOfWeek: data.sprintStartDayOfWeek,
 			userIdToken: await user.getIdToken(true),
+			userAvatar: user.photoURL,
+			userName: user.displayName ?? user.email ?? `Unknown User`,
 		})
 
 		let {email1, email2, email3} = data

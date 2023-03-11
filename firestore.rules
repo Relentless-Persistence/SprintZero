@@ -10,7 +10,7 @@ service cloud.firestore {
     }
 
     match /Products/{productId} {
-      allow read, update: if isEditorOnProduct(productId);
+      allow read, update: if isEditorOnProduct(resource.data.id);
       allow delete: if get(/databases/$(database)/documents/Products/$(productId)/Members/$(request.auth.uid)).data.type == "owner";
 
       match /BusinessOutcomes/{businessOutcomeId} {
@@ -144,8 +144,8 @@ service cloud.firestore {
 
     match /Users/{userId} {
       allow get: if request.auth != null;
-      allow create: if request.resource.data.email == request.auth.token.email;
-      allow update, delete: if request.auth.uid == userId;
+      allow create, update: if userId == request.auth.uid && request.resource.data.email == request.auth.token.email;
+      allow delete: if userId == request.auth.uid;
     }
 
     function isEditorOnProduct(productId) {

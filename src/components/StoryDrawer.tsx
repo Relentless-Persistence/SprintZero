@@ -9,25 +9,24 @@ import {
 	UserOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {useQueries} from "@tanstack/react-query"
 import {Avatar, Button, Checkbox, Drawer, Form, Input, Popover, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {collection, doc, getDoc} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import produce from "immer"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
-import {useCollection, useDocument} from "react-firebase-hooks/firestore"
+import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {useInterval} from "react-use"
 
 import type {QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {z} from "zod"
+import type {Member} from "~/types/db/Products/Members"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
-import type {User} from "~/types/db/Users"
 
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import Comments from "~/components/Comments"
@@ -37,12 +36,10 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {StoryMapItemSchema, sprintColumns} from "~/types/db/Products/StoryMapItems"
-import {UserConverter} from "~/types/db/Users"
 import {conditionalThrow} from "~/utils/conditionalThrow"
 import dollarFormat from "~/utils/dollarFormat"
-import {db} from "~/utils/firebase"
 import {formValidateStatus} from "~/utils/formValidateStatus"
-import {deleteItem, updateItem} from "~/utils/storyMap"
+import {debouncedUpdateItem, deleteItem, updateItem} from "~/utils/storyMap"
 import {useTheme} from "~/utils/ThemeContext"
 
 dayjs.extend(relativeTime)
@@ -73,48 +70,39 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 	const [newAcceptanceCriterionInput, setNewAcceptanceCriterionInput] = useState(``)
 	const [newBugInput, setNewBugInput] = useState(``)
 	const story = storyMapItems.docs.find((story) => story.id === storyId)!
+	const storyData = story.data()
 	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	conditionalThrow(membersError)
 
-	const [localStoryName, setLocalStoryName] = useState(story.data().name)
-	useEffect(() => {
-		setLocalStoryName(story.data().name)
-	}, [story])
-
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
-		setLastModifiedText(dayjs(story.data().updatedAt.toMillis()).fromNow())
-	}, 1000)
+		setLastModifiedText(dayjs(storyData.updatedAt.toMillis()).fromNow())
+	}, 200)
 
-	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.data().updatedAtUserId).withConverter(UserConverter))
-
-	const [description, setDescription] = useState(story.data().description)
+	const [localStoryName, setLocalStoryName] = useState(storyData.name)
 	useEffect(() => {
-		setDescription(story.data().description)
-	}, [story])
+		setLocalStoryName(storyData.name)
+	}, [storyData.name])
 
-	const memberUsers = useQueries({
-		queries:
-			members?.docs.map((member) => ({
-				queryKey: [`user`, member.id],
-				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
-			})) ?? [],
-	})
+	const [description, setDescription] = useState(storyData.description)
+	useEffect(() => {
+		setDescription(storyData.description)
+	}, [storyData.description])
 
 	const {control, handleSubmit, getFieldState, formState, reset} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			branchName: story.data().branchName,
-			designLink: story.data().designLink,
-			designEffort: story.data().designEffort,
-			engineeringEffort: story.data().engineeringEffort,
-			pageLink: story.data().pageLink,
-			sprintColumn: story.data().sprintColumn,
-			peopleIds: story.data().peopleIds,
-			versionId: story.data().versionId,
+			branchName: storyData.branchName,
+			designLink: storyData.designLink,
+			designEffort: storyData.designEffort,
+			engineeringEffort: storyData.engineeringEffort,
+			pageLink: storyData.pageLink,
+			sprintColumn: storyData.sprintColumn,
+			peopleIds: storyData.peopleIds,
+			versionId: storyData.versionId,
 		},
 	})
 
@@ -125,7 +113,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
 		await updateItem(product, storyMapItems, versions, story.id, {
-			acceptanceCriteria: produce(story.data().acceptanceCriteria, (draft) => {
+			acceptanceCriteria: produce(storyData.acceptanceCriteria, (draft) => {
 				const index = draft.findIndex((criterion) => criterion.id === id)
 				draft[index]!.checked = checked
 			}),
@@ -136,7 +124,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 		if (!newAcceptanceCriterionInput) return
 		await updateItem(product, storyMapItems, versions, story.id, {
 			acceptanceCriteria: [
-				...story.data().acceptanceCriteria,
+				...storyData.acceptanceCriteria,
 				{id: nanoid(), name: newAcceptanceCriterionInput, checked: false},
 			],
 		})
@@ -144,7 +132,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 
 	const toggleBug = async (id: string, checked: boolean) => {
 		await updateItem(product, storyMapItems, versions, story.id, {
-			bugs: produce(story.data().bugs, (draft) => {
+			bugs: produce(storyData.bugs, (draft) => {
 				const index = draft.findIndex((bug) => bug.id === id)
 				draft[index]!.checked = checked
 			}),
@@ -154,20 +142,20 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 	const addBug = async () => {
 		if (!newBugInput) return
 		await updateItem(product, storyMapItems, versions, story.id, {
-			bugs: [...story.data().bugs, {id: nanoid(), name: newBugInput, checked: false}],
+			bugs: [...storyData.bugs, {id: nanoid(), name: newBugInput, checked: false}],
 		})
 	}
 
-	const totalEffort = story.data().designEffort + story.data().engineeringEffort
+	const totalEffort = storyData.designEffort + storyData.engineeringEffort
 
 	const peoplePopoverItems = story
 		.data()
-		.peopleIds.map((userId) => memberUsers.find((user) => user.data?.id === userId)?.data)
-		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
-		.map((user) => (
-			<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
-				<Avatar src={user.data().avatar} shape="square" size="small" />
-				{user.data().name}
+		.peopleIds.map((userId) => members?.docs.find((user) => user.id === userId))
+		.filter((member): member is QueryDocumentSnapshot<Member> => member?.exists() ?? false)
+		.map((member) => (
+			<div key={member.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
+				<Avatar src={member.data().avatar} shape="square" size="small" />
+				{member.data().name}
 			</div>
 		))
 
@@ -207,9 +195,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 									}}
 								/>
 							</div>
-							{lastModifiedText && lastModifiedUser?.exists() && (
+							{lastModifiedText && members && (
 								<p className="text-sm font-normal text-textTertiary">
-									Last modified {lastModifiedText} by {lastModifiedUser.data().name}
+									Last modified {lastModifiedText} by{` `}
+									{members.docs.find((user) => user.id === storyData.updatedAtUserId)!.data().name}
 								</p>
 							)}
 						</div>
@@ -235,7 +224,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 									{dollarFormat((product.data().effortCost ?? 0) * totalEffort)}
 								</Tag>
 								<Tag color="#585858" icon={<FlagOutlined />}>
-									{sprintColumns[story.data().sprintColumn]}
+									{sprintColumns[storyData.sprintColumn]}
 								</Tag>
 								<Popover
 									placement="bottom"
@@ -250,35 +239,33 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 									}
 								>
 									<Tag color="#585858" icon={<UserOutlined />} className="text-sm">
-										{story.data().peopleIds.length}
+										{storyData.peopleIds.length}
 									</Tag>
 								</Popover>
 
 								<div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
 									<Tag
-										color={story.data().branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+										color={storyData.branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 										icon={<CodeOutlined />}
-										className={clsx(!story.data().branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+										className={clsx(!storyData.branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 									>
-										{story.data().branchName ?? `No branch`}
+										{storyData.branchName ?? `No branch`}
 									</Tag>
-									<LinkTo href={story.data().designLink} openInNewTab>
+									<LinkTo href={storyData.designLink} openInNewTab>
 										<Tag
-											color={story.data().designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+											color={storyData.designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<BlockOutlined />}
-											className={clsx(
-												!story.data().designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
-											)}
+											className={clsx(!storyData.designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 										>
 											Design
 										</Tag>
 									</LinkTo>
-									<LinkTo href={story.data().pageLink} openInNewTab>
+									<LinkTo href={storyData.pageLink} openInNewTab>
 										<Tag
-											color={story.data().pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+											color={storyData.pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<LinkOutlined />}
-											style={story.data().pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
-											className={clsx(!story.data().pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+											style={storyData.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+											className={clsx(!storyData.pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 										>
 											Page
 										</Tag>
@@ -297,14 +284,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 								onClick={() => {
 									setEditMode(false)
 									reset({
-										branchName: story.data().branchName,
-										designLink: story.data().designLink,
-										designEffort: story.data().designEffort,
-										engineeringEffort: story.data().engineeringEffort,
-										pageLink: story.data().pageLink,
-										sprintColumn: story.data().sprintColumn,
-										peopleIds: story.data().peopleIds,
-										versionId: story.data().versionId,
+										branchName: storyData.branchName,
+										designLink: storyData.designLink,
+										designEffort: storyData.designEffort,
+										engineeringEffort: storyData.engineeringEffort,
+										pageLink: storyData.pageLink,
+										sprintColumn: storyData.sprintColumn,
+										peopleIds: storyData.peopleIds,
+										versionId: storyData.versionId,
 									})
 								}}
 							>
@@ -340,10 +327,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 								control={control}
 								name="peopleIds"
 								mode="multiple"
-								options={memberUsers
-									.map(({data: memberDoc}) => memberDoc)
-									.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
-									.map((user) => ({label: user.data().name, value: user.id}))}
+								options={members?.docs
+									.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
+									.map((member) => ({label: member.data().name, value: member.id}))}
 							/>
 						</label>
 						<label className="flex flex-col gap-2">
@@ -407,7 +393,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value)
-									updateItem(product, storyMapItems, versions, story.id, {description: e.target.value}).catch(
+									debouncedUpdateItem(product, storyMapItems, versions, story.id, {description: e.target.value})?.catch(
 										console.error,
 									)
 								}}
@@ -419,7 +405,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 							<div className="flex min-h-0 flex-col gap-2">
 								<p className="text-lg font-semibold">Acceptance Criteria</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
-									{story.data().acceptanceCriteria.map((criterion) => (
+									{storyData.acceptanceCriteria.map((criterion) => (
 										<Checkbox
 											key={criterion.id}
 											checked={criterion.checked}
@@ -451,7 +437,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 							<div className="flex min-h-0 flex-col gap-2 overflow-auto">
 								<p className="text-lg font-semibold">Bugs</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
-									{story.data().bugs.map((bug) => (
+									{storyData.bugs.map((bug) => (
 										<Checkbox
 											key={bug.id}
 											checked={bug.checked}
@@ -499,7 +485,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 						<div className="relative grow">
 							<Comments
 								storyMapItem={story}
-								flagged={story.data().ethicsColumn !== null}
+								flagged={storyData.ethicsColumn !== null}
 								commentType={commentType}
 								onFlag={() => {
 									updateItem(product, storyMapItems, versions, story.id, {ethicsColumn: `underReview`}).catch(

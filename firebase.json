@@ -1,6 +1,7 @@
 {
 	"runtime": "nodejs18",
 	"emulators": {
+		"singleProjectMode": false,
 		"auth": {
 			"port": 9099
 		},

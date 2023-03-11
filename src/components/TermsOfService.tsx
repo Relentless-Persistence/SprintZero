@@ -66,9 +66,9 @@ const TermsOfService: FC = () => {
 
 			<h3 className="font-bold">Governing Law</h3>
 			<p>
-				These Terms shall be governed by and construed in accordance with the laws of [Jurisdiction], and any disputes
-				arising in relation to these Terms shall be subject to the exclusive jurisdiction of the courts of
-				[Jurisdiction].
+				These Terms shall be governed by and construed in accordance with the laws of the State of Washington, United
+				States. Any disputes arising in relation to these Terms shall be subject to the exclusive jurisdiction of the
+				courts of the State of Washington, United States.
 			</p>
 
 			<h3 className="font-bold">Changes to These Terms</h3>

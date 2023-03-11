@@ -94,10 +94,8 @@ const SignInClientPage: FC = () => {
 
 			if (isNewUser) {
 				await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
-					avatar: credential.user.photoURL,
 					email: credential.user.email,
 					hasAcceptedTos: false,
-					name: credential.user.displayName,
 					preferredMusicClient: `appleMusic`,
 				})
 				router.push(`/accept-terms`)
@@ -179,6 +177,8 @@ const SignInClientPage: FC = () => {
 					if (credential === null) throw error
 					await linkWithCredential(user, credential)
 					await processUser(result)
+				} else {
+					throw error
 				}
 			} catch (error) {
 				notification.error({message: `An error occurred while trying to log you in.`})

@@ -79,6 +79,8 @@ export const updateItem = async (
 	await addHistoryEntry(product, storyMapItems, versions)
 }
 
+export const debouncedUpdateItem = debounce(updateItem, 200)
+
 export const updateItems = async (
 	product: QueryDocumentSnapshot<Product>,
 	storyMapItems: QuerySnapshot<StoryMapItem>,

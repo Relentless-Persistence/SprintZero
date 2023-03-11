@@ -9,11 +9,16 @@ const NonDiscolsureAgreement: FC = () => {
 				This Non-Disclosure Agreement (&quot;Agreement&quot;) is entered into by and between the undersigned (&quot;Beta
 				User&quot;) and Relentless Persistence, Inc. (&quot;SprintZero&quot;), for the purpose of protecting the
 				confidential information of relentless persistence inc related to its web application called
-				&quot;SprintZero&quot; (&quot;Application&quot;). WHEREAS, SprintZero is the owner of the Application and has
-				developed it for the purpose of testing and gathering feedback from beta users; and WHEREAS, Beta User desires
-				to participate in the beta testing of the Application; NOW, THEREFORE, in consideration of the mutual promises
-				and agreements contained herein, and for other good and valuable consideration, the receipt and sufficiency of
-				which is hereby acknowledged, the parties agree as follows:
+				&quot;SprintZero&quot; (&quot;Application&quot;).
+				<br />
+				WHEREAS, SprintZero is the owner of the Application and has developed it for the purpose of testing and
+				gathering feedback from beta users; and
+				<br />
+				WHEREAS, Beta User desires to participate in the beta testing of the Application;
+				<br />
+				NOW, THEREFORE, in consideration of the mutual promises and agreements contained herein, and for other good and
+				valuable consideration, the receipt and sufficiency of which is hereby acknowledged, the parties agree as
+				follows:
 			</p>
 
 			<h3 className="font-bold">CONFIDENTIAL INFORMATION</h3>
@@ -51,7 +56,7 @@ const NonDiscolsureAgreement: FC = () => {
 				Beta User acknowledges that any unauthorized use or disclosure of Confidential Information by Beta User may
 				cause irreparable harm to SprintZero, for which money damages may not be an adequate remedy. SprintZero shall be
 				entitled to seek injunctive relief, without the posting of a bond or other security, in addition to any other
-				remedies available at law or in equity
+				remedies available at law or in equity.
 			</p>
 
 			<h3 className="font-bold">MISCELLANEOUS</h3>
@@ -66,13 +71,13 @@ const NonDiscolsureAgreement: FC = () => {
 				</li>
 				<li>This Agreement may not be amended except in writing signed by both parties.</li>
 				<li>
-					This Agreement shall be governed by and construed in accordance with the laws of the State of [insert state],
+					This Agreement shall be governed by and construed in accordance with the laws of the State of Washington,
 					without regard to its conflicts of laws provisions.
 				</li>
 				<li>
 					Any dispute arising under or related to this Agreement shall be resolved exclusively in the state or federal
-					courts located in [insert county and state], and the parties consent to the personal jurisdiction of such
-					courts.
+					courts located in King County, State of Washington, and the parties consent to the personal jurisdiction of
+					such courts.
 				</li>
 			</ul>
 		</div>

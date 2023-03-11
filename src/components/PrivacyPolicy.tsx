@@ -36,8 +36,9 @@ const PrivacyPolicy: FC = () => {
 				<li>Communicate with you regarding your account and purchases</li>
 				<li>Personalize your experience on our web application</li>
 				<li>Send promotional materials, such as updates on new features or special offers</li>
-				<li>Data Retention</li>
 			</ul>
+
+			<h3 className="font-bold">Data Retention</h3>
 			<p>
 				We will retain your personal information only for as long as is necessary to fulfill the purposes outlined in
 				this privacy policy statement. After this time, your information will be deleted from our systems.

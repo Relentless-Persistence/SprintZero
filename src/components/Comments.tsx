@@ -14,8 +14,9 @@ import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Comment} from "~/types/db/Products/StoryMapItems/Comments"
 
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {CommentConverter} from "~/types/db/Products/StoryMapItems/Comments"
-import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
 
 export type CommentsProps = {
@@ -26,7 +27,7 @@ export type CommentsProps = {
 }
 
 const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag}) => {
-	const {user} = useAppContext()
+	const {product, user} = useAppContext()
 	const [commentDraft, setCommentDraft] = useState(``)
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,21 +42,15 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 		setCommentDraft(``)
 	}
 
-	const [comments] = useCollection(
+	const [comments, , commentsError] = useCollection(
 		query(
 			collection(storyMapItem.ref, `Comments`),
 			where(`type`, `==`, commentType),
 			orderBy(`createdAt`, `asc`),
 		).withConverter(CommentConverter),
 	)
-
-	const commentAuthorIds = uniq(comments?.docs.map((comment) => comment.data().authorId))
-	const commentAuthors = useQueries({
-		queries: commentAuthorIds.map((userId) => ({
-			queryKey: [`user`, userId],
-			queryFn: async () => await getDoc(doc(db, `Users`, userId).withConverter(UserConverter)),
-		})),
-	})
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	conditionalThrow(commentsError, membersError)
 
 	return (
 		<div className="absolute inset-0 flex flex-col">
@@ -65,7 +60,7 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 						<p className="italic leading-normal text-textTertiary">Nothing here yet</p>
 					) : (
 						comments?.docs.map((comment) => {
-							const author = commentAuthors.find((author) => author.data?.id === comment.data().authorId)?.data
+							const author = members?.docs.find((member) => member.id === comment.data().authorId)
 							return (
 								<div key={comment.id} className="flex gap-2">
 									<Avatar shape="square" src={author?.data()?.avatar} className="border border-border" />
@@ -73,7 +68,7 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 										<p className="text-sm font-medium">
 											{author?.data()?.name}
 											{` `}
-											<span className="font-normal text-textTertiary">
+											<span className="ml-1 font-normal text-textTertiary">
 												{comment.data().createdAt
 													? dayjs((comment.data().createdAt as Timestamp).toDate()).fromNow()
 													: null}
@@ -93,7 +88,11 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 				}}
 				className="mt-4 flex gap-2"
 			>
-				<Avatar shape="square" src={user.data().avatar} className="border border-border" />
+				<Avatar
+					shape="square"
+					src={members?.docs.find((member) => member.id === user.id)!.data().avatar}
+					className="border border-border"
+				/>
 				<div className="flex grow flex-col gap-2">
 					<Input value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} />
 					<div className="flex justify-between gap-2">

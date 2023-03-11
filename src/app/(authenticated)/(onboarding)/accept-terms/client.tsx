@@ -1,19 +1,19 @@
 "use client"
 
 import {Button, Card, Checkbox} from "antd"
-import {collectionGroup, doc, getDocs, query, updateDoc, where} from "firebase/firestore"
+import {collectionGroup, doc, getDocs, orderBy, query, updateDoc, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {FC} from "react"
-import type {User} from "~/types/db/Users"
 
 import LinkTo from "~/components/LinkTo"
 import NonDiscolsureAgreement from "~/components/NonDisclosureAgreement"
 import PrivacyPolicy from "~/components/PrivacyPolicy"
 import TermsOfService from "~/components/TermsOfService"
 import {MemberConverter} from "~/types/db/Products/Members"
+import {UserConverter} from "~/types/db/Users"
 import {conditionalThrow} from "~/utils/conditionalThrow"
 import {auth, db} from "~/utils/firebase"
 
@@ -28,17 +28,17 @@ const AcceptTermsClientPage: FC = () => {
 		if (hasAccepted || !user) return
 		try {
 			setHasAccepted(true)
-			await updateDoc(doc(db, `Users`, user.uid), {
+			await updateDoc(doc(db, `Users`, user.uid).withConverter(UserConverter), {
 				hasAcceptedTos: true,
-			} satisfies Partial<User>)
+			})
 
-			const {docs: products} = await getDocs(
-				query(collectionGroup(db, `Members`), where(`id`, `==`, user.uid), where(`type`, `==`, `editor`)).withConverter(
+			const {docs: members} = await getDocs(
+				query(collectionGroup(db, `Members`), where(`id`, `==`, user.uid), orderBy(`name`, `asc`)).withConverter(
 					MemberConverter,
 				),
 			)
-			if (products.length === 0) router.push(`/product`)
-			else router.push(`/${products[0]!.ref.parent.parent!.id}/map`)
+			if (members.length === 0) router.push(`/product`)
+			else router.push(`/${members[0]!.ref.parent.parent!.id}/map`)
 		} catch (e) {
 			setHasAccepted(false)
 			throw e

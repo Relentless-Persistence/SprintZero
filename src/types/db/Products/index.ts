@@ -11,6 +11,8 @@ export const ProductSchema = z.object({
 	sprintStartDayOfWeek: z.number().int().min(0).max(6),
 	name: z.string({invalid_type_error: `Required`}).min(1),
 
+	id: z.string(),
+
 	// Story map info
 	storyMapCurrentHistoryId: z.string().nullable(),
 	storyMapUpdatedAt: timestampSchema,

@@ -1,18 +1,14 @@
 import {CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
-import {useQueries} from "@tanstack/react-query"
 import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
-import {collectionGroup, doc, getDoc, query, where} from "firebase/firestore"
+import {collection, collectionGroup, query, where} from "firebase/firestore"
 import Image from "next/image"
 import {useState} from "react"
-import {useCollectionOnce} from "react-firebase-hooks/firestore"
+import {useCollection, useCollectionOnce} from "react-firebase-hooks/firestore"
 
-import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
 
 import {useAppContext} from "./AppContext"
 import LinkTo from "~/components/LinkTo"
-import {ProductConverter} from "~/types/db/Products"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {conditionalThrow} from "~/utils/conditionalThrow"
 import {db} from "~/utils/firebase"
@@ -30,20 +26,19 @@ const Header: FC = () => {
 			where(`type`, `in`, [`owner`, `editor`]),
 		).withConverter(MemberConverter),
 	)
-	const _products = useQueries({
-		queries:
-			members?.docs.map((member) => {
-				const productId = member.ref.parent.parent!.id
-				return {
-					queryKey: [`product`, productId],
-					queryFn: () => getDoc(doc(db, `Products`, productId).withConverter(ProductConverter)),
-				}
-			}) ?? [],
-	})
-	conditionalThrow(membersError, ..._products.map((product) => product.error))
-	const products = _products
-		.map((product) => product.data)
-		.filter((product): product is QueryDocumentSnapshot<Product> => product?.exists() ?? false)
+	const [products, , productsError] = useCollection(
+		members
+			? query(
+					collection(db, `Products`),
+					where(
+						`id`,
+						`in`,
+						members.docs.map((member) => member.ref.parent.parent!.id),
+					),
+			  )
+			: undefined,
+	)
+	conditionalThrow(membersError, productsError)
 
 	const currentProductMember = members?.docs.find((member) => member.ref.parent.parent!.id === product.id)
 
@@ -53,13 +48,15 @@ const Header: FC = () => {
 
 	return (
 		<Layout.Header className="flex items-center gap-8 !bg-[#161e12] !px-4">
-			<Image src="/images/logo-dark.svg" alt="SprintZero logo" width={160} height={36} priority />
+			<LinkTo href="/">
+				<Image src="/images/logo-dark.svg" alt="SprintZero logo" width={160} height={36} priority />
+			</LinkTo>
 
 			<Menu
 				theme="dark"
 				mode="horizontal"
 				selectedKeys={[product.id]}
-				items={products.map((product) => ({
+				items={products?.docs.map((product) => ({
 					key: product.id,
 					label: (
 						<LinkTo href={`/${product.id}/map`} className="relative">

@@ -14,7 +14,6 @@ import {MemberSchema} from "~/types/db/Products/Members"
 import {ObjectiveSchema} from "~/types/db/Products/Objectives"
 import {StoryMapHistorySchema} from "~/types/db/Products/StoryMapHistories"
 import {VersionSchema} from "~/types/db/Products/Versions"
-import {UserSchema} from "~/types/db/Users"
 import {authAdmin, dbAdmin} from "~/utils/firebaseAdmin"
 import {sendEmail} from "~/utils/sendEmail"
 
@@ -29,10 +28,23 @@ export const productRouter = router({
 				sprintStartDayOfWeek: true,
 			}).extend({
 				userIdToken: z.string(),
+				userName: z.string(),
+				userAvatar: z.string().nullable(),
 			}),
 		)
 		.mutation(
-			async ({input: {cadence, effortCost, effortCostCurrencySymbol, name, sprintStartDayOfWeek, userIdToken}}) => {
+			async ({
+				input: {
+					cadence,
+					effortCost,
+					effortCostCurrencySymbol,
+					name,
+					sprintStartDayOfWeek,
+					userIdToken,
+					userName,
+					userAvatar,
+				},
+			}) => {
 				const user = await authAdmin.verifyIdToken(userIdToken)
 
 				const slug = `${name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}`
@@ -47,6 +59,7 @@ export const productRouter = router({
 					name,
 					sprintStartDayOfWeek,
 					createdAt: Timestamp.now(),
+					id: slug,
 
 					storyMapCurrentHistoryId: storyMapHistoryId,
 					storyMapUpdatedAt: Timestamp.now(),
@@ -66,8 +79,10 @@ export const productRouter = router({
 					valueProposition: null,
 				})
 				batch.set(product.collection(`Members`).doc(user.uid).withConverter(genAdminConverter(MemberSchema)), {
-					id: user.uid,
+					avatar: userAvatar,
+					name: userName,
 					type: `owner`,
+					id: user.uid,
 				})
 				batch.set(product.collection(`Huddles`).doc(user.uid).withConverter(genAdminConverter(HuddleSchema)), {
 					updatedAt: Timestamp.now(),
@@ -124,9 +139,15 @@ export const productRouter = router({
 		)
 		.mutation(async ({input: {email, productId, userIdToken}}) => {
 			const user = await authAdmin.verifyIdToken(userIdToken)
-			const dbUser = await dbAdmin.collection(`Users`).doc(user.uid).withConverter(genAdminConverter(UserSchema)).get()
-			const userData = dbUser.data()
-			invariant(userData)
+			const member = await dbAdmin
+				.collection(`Products`)
+				.doc(productId)
+				.collection(`Members`)
+				.doc(user.uid)
+				.withConverter(genAdminConverter(MemberSchema))
+				.get()
+			const memberData = member.data()
+			invariant(memberData)
 			const product = await dbAdmin
 				.collection(`Products`)
 				.doc(productId)
@@ -136,16 +157,10 @@ export const productRouter = router({
 			invariant(productData)
 
 			const inviteToken = crypto.randomBytes(16).toString(`hex`)
-			await dbAdmin
-				.collection(`Products`)
-				.doc(productId)
-				.collection(`Invites`)
-				.doc(inviteToken)
-				.withConverter(genAdminConverter(InviteSchema))
-				.set({
-					email,
-					id: inviteToken,
-				})
+			await product.ref.collection(`Invites`).doc(inviteToken).withConverter(genAdminConverter(InviteSchema)).set({
+				email,
+				id: inviteToken,
+			})
 
 			const queryParams = querystring.stringify({invite_token: inviteToken})
 			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
@@ -153,7 +168,7 @@ export const productRouter = router({
 				to: email,
 				from: `no-reply@sprintzero.app`,
 				subject: `SprintZero | Member Invite`,
-				body: `<b>${userData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
+				body: `<b>${memberData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
 			})
 		}),
 })
