@@ -1,22 +1,41 @@
 "use client"
 
+<<<<<<< HEAD
 import {Breadcrumb, Tabs} from "antd"
 import {collection} from "firebase/firestore"
 import {useEffect, useState} from "react"
 import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
+=======
+import {DeleteOutlined} from "@ant-design/icons"
+import {useQueries} from "@tanstack/react-query"
+import {Avatar, Breadcrumb, Card, Tabs, Tag} from "antd"
+import {collection, doc, getDoc, query, where} from "firebase/firestore"
+import {useState} from "react"
+import {useCollectionData, useDocument} from "react-firebase-hooks/firestore"
+>>>>>>> 2fc32b8... Teams UI
 
 import type {FC} from "react"
 
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {MemberConverter} from "~/types/db/Products/Members"
+<<<<<<< HEAD
 import {auth} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
+=======
+import {UserConverter} from "~/types/db/Users"
+import {conditionalThrow} from "~/utils/conditionalThrow"
+import {db} from "~/utils/firebase"
+import {useActiveProductId} from "~/utils/useActiveProductId"
+import {useUser} from "~/utils/useUser"
+
+const {Meta} = Card
+>>>>>>> 2fc32b8... Teams UI
 
 const TeamSettingsClientPage: FC = () => {
 	const {product} = useAppContext()
 
-	const [currentTab, setcurrentTab] = useState<`editor` | `viewer`>(`editor`)
+	const [currentTab, setcurrentTab] = useState<`editor` | `viewer` | `removed`>(`editor`)
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
@@ -41,6 +60,43 @@ const TeamSettingsClientPage: FC = () => {
 						label: `Members`,
 						key: `editor`,
 						children: (
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+								{members.map(
+									({data: member}, i) =>
+										member?.exists() && (
+											<Card
+												key={member.id}
+												// style={{width: 300}}
+												actions={[
+													<div className="space-x-[10px]" key="remove">
+														<DeleteOutlined /> <span>Remove</span>
+													</div>,
+												]}
+											>
+												<div className="flex items-center justify-between">
+													<Meta
+														avatar={<Avatar src={member.data().avatar} />}
+														title={
+															<div>
+																<span>{member.data().name}</span> <Tag className="font-normal">Owner</Tag>
+															</div>
+														}
+														description={member.data().email}
+													/>
+													<Avatar style={{backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)`}} size="small">
+														{i + 1}
+													</Avatar>
+												</div>
+											</Card>
+										),
+								)}
+							</div>
+						),
+					},
+					{
+						label: `Viewers`,
+						key: `viewer`,
+						children: (
 							<div className="flex flex-col gap-4">
 								{members?.docs
 									.filter((member) => member.data().type === `editor`)
@@ -54,8 +110,8 @@ const TeamSettingsClientPage: FC = () => {
 						),
 					},
 					{
-						label: `Viewers`,
-						key: `viewer`,
+						label: `Removed`,
+						key: `removed`,
 						children: (
 							<div className="flex flex-col gap-4">
 								{members?.docs
