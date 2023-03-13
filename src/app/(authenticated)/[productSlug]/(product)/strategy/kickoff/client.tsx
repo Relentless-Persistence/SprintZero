@@ -59,10 +59,13 @@ const KickoffClientPage: FC = () => {
 
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
-			<Breadcrumb
-				items={[{title: `Strategy`}, {title: `Kickoff`}]}
-				className="sticky top-0 z-10 bg-bgLayout pt-8 pb-6"
-			/>
+			<div className="sticky top-0 z-10 flex flex-col gap-2 bg-bgLayout pt-8 pb-6">
+				<Breadcrumb items={[{title: `Strategy`}, {title: `Kickoff`}]} />
+				<div className="leading-normal">
+					<h1 className="text-3xl font-bold">Let&apos;s Get This Party Started</h1>
+					<h2 className="text-textTertiary">Complete the cards below to inform other sections throughout the app</h2>
+				</div>
+			</div>
 
 			<Masonry
 				breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}

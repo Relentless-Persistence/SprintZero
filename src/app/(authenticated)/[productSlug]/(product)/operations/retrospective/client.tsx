@@ -35,18 +35,20 @@ const RetrospectiveClientPage: FC = () => {
 			<div className="relative flex h-full w-full flex-col gap-6 px-12 py-8">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between">
-						<Breadcrumb>
-							<Breadcrumb.Item>Tactics</Breadcrumb.Item>
-							<Breadcrumb.Item>Retrospective</Breadcrumb.Item>
-							<Breadcrumb.Item>{retrospectiveTabs.find(([id]) => id === currentTab)![1]}</Breadcrumb.Item>
-						</Breadcrumb>
+						<Breadcrumb
+							items={[
+								{title: `Tactics`},
+								{title: `Retrospective`},
+								{title: retrospectiveTabs.find(([id]) => id === currentTab)![1]},
+							]}
+						/>
 
 						<div className="flex items-center gap-2">
 							<p className="text-sm">Include archived items</p>
 							<Switch checked={includeArchived} onChange={(checked) => setIncludeArchived(checked)} />
 						</div>
 					</div>
-					<p>{tabDescriptions[currentTab]}</p>
+					<p className="text-textTertiary">{tabDescriptions[currentTab]}</p>
 				</div>
 
 				{retrospectiveItems && retrospectiveItems.docs.length > 0 ? (

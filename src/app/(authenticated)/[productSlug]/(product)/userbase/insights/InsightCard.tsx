@@ -12,7 +12,6 @@ import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfStretchyTextArea from "~/components/rhf/RhfStretchyTextArea"
 import {InsightConverter, InsightSchema} from "~/types/db/Products/Insights"
-import {db} from "~/utils/firebase"
 
 const formSchema = InsightSchema.pick({status: true, text: true, title: true})
 type FormInputs = z.infer<typeof formSchema>
@@ -58,7 +57,7 @@ const InsightItemCard: FC<InsightCardProps> = ({insightId, initialData, isEditin
 						</Button>
 					</div>
 				) : (
-					<Button type="text" onClick={() => onEditStart?.()}>
+					<Button type="text" className="text-primary" onClick={() => onEditStart?.()}>
 						Edit
 					</Button>
 				)

@@ -1,6 +1,6 @@
 "use client"
 
-import {EyeOutlined, PhoneOutlined, PlusOutlined, UserOutlined} from "@ant-design/icons"
+import {EyeOutlined, PhoneOutlined, PlusOutlined, SoundOutlined, UserOutlined} from "@ant-design/icons"
 import {Avatar, Breadcrumb, Button, Card, Empty, FloatButton, Spin, Tabs, Tag} from "antd"
 import {Timestamp, addDoc, collection} from "firebase/firestore"
 import {useState} from "react"
@@ -14,6 +14,8 @@ import ParticipantDrawer from "./ParticipantDrawer"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {DialogueParticipantConverter} from "~/types/db/Products/DialogueParticipants"
 import {PersonaConverter} from "~/types/db/Products/Personas"
+import BoneIcon from "~public/icons/bone.svg"
+import CognitionIcon from "~public/icons/cognition.svg"
 import EarIcon from "~public/icons/ear.svg"
 
 const DialogueClientPage: FC = () => {
@@ -77,14 +79,18 @@ const DialogueClientPage: FC = () => {
 													</Tag>
 												))}
 												{participant.data().disabilities.auditory && (
-													<Tag color="gold" icon={<EarIcon className="inline-block" />} className="flex items-center">
+													<Tag
+														color="gold"
+														icon={<EarIcon className="mr-1.5 inline-block" />}
+														className="flex items-center"
+													>
 														Auditory
 													</Tag>
 												)}
 												{participant.data().disabilities.cognitive && (
 													<Tag
 														color="gold"
-														icon={<EarIcon className="inline-block stroke-current" />}
+														icon={<CognitionIcon className="mr-1.5 inline-block" />}
 														className="flex items-center"
 													>
 														Cognitive
@@ -93,7 +99,7 @@ const DialogueClientPage: FC = () => {
 												{participant.data().disabilities.physical && (
 													<Tag
 														color="gold"
-														icon={<EarIcon className="inline-block stroke-current" />}
+														icon={<BoneIcon className="mr-1.5 inline-block stroke-current" />}
 														className="flex items-center"
 													>
 														Physical
@@ -102,7 +108,7 @@ const DialogueClientPage: FC = () => {
 												{participant.data().disabilities.speech && (
 													<Tag
 														color="gold"
-														icon={<EarIcon className="inline-block stroke-current" />}
+														icon={<SoundOutlined className="inline-block" />}
 														className="flex items-center"
 													>
 														Speech

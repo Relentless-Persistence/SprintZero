@@ -109,7 +109,7 @@ const ParticipantEditForm: FC<ParticipantEditFormProps> = ({participant, onFinis
 		>
 			<div className="flex flex-col gap-4">
 				<div className="flex flex-col gap-2">
-					<div>
+					<div className="leading-snug">
 						<p className="text-lg font-semibold">Disability</p>
 						<p className="text-sm text-textSecondary">Select all that apply</p>
 					</div>
@@ -130,7 +130,7 @@ const ParticipantEditForm: FC<ParticipantEditFormProps> = ({participant, onFinis
 					</RhfCheckbox>
 				</div>
 				<div className="flex flex-col gap-2">
-					<div>
+					<div className="leading-snug">
 						<p className="text-lg font-semibold">Timing</p>
 						<p className="text-sm text-textSecondary">Select one only</p>
 					</div>
@@ -142,7 +142,7 @@ const ParticipantEditForm: FC<ParticipantEditFormProps> = ({participant, onFinis
 				</div>
 			</div>
 			<div className="mr-12 flex flex-col gap-2">
-				<div>
+				<div className="leading-snug">
 					<p className="text-lg font-semibold">Status</p>
 					<p className="text-sm text-textSecondary">Which stage are they in?</p>
 				</div>

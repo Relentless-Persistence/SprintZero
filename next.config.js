@@ -60,7 +60,6 @@ module.exports = {
 							loader: `@svgr/webpack`,
 							options: {
 								icon: true,
-								replaceAttrValues: {"#000": `currentColor`},
 							},
 						},
 					],

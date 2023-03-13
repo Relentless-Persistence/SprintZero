@@ -52,7 +52,7 @@ const DayInTheLife: FC<EditableListCardProps> = ({title, list, isEditing, onEdit
 						</Button>
 					</div>
 				) : (
-					<Button type="text" onClick={() => onEditStart()}>
+					<Button type="text" className="text-primary" onClick={() => onEditStart()}>
 						Edit
 					</Button>
 				)

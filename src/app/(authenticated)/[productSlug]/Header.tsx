@@ -2,6 +2,7 @@ import {CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} 
 import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
 import {collection, collectionGroup, query, where} from "firebase/firestore"
 import Image from "next/image"
+import {usePathname} from "next/navigation"
 import {useState} from "react"
 import {useErrorHandler} from "react-error-boundary"
 import {useCollection, useCollectionOnce} from "react-firebase-hooks/firestore"
@@ -18,6 +19,7 @@ import SunIcon from "~public/icons/sun.svg"
 
 const Header: FC = () => {
 	const {product, member} = useAppContext()
+	const pathname = usePathname()
 
 	const [members, , membersError] = useCollectionOnce(
 		query(
@@ -47,6 +49,8 @@ const Header: FC = () => {
 	const theme = useTheme()
 	const setTheme = useSetTheme()
 
+	const isCurrentPageSettings = pathname?.startsWith(`/${product.id}/settings`) ?? false
+
 	return (
 		<Layout.Header className="flex items-center gap-8 !bg-[#161e12] !px-4">
 			<LinkTo href="/">
@@ -60,7 +64,10 @@ const Header: FC = () => {
 				items={products?.docs.map((product) => ({
 					key: product.id,
 					label: (
-						<LinkTo href={`/${product.id}/map`} className="relative">
+						<LinkTo
+							href={`/${product.id}/${isCurrentPageSettings ? `settings/configuration` : `map`}`}
+							className="relative"
+						>
 							{product.data().name}
 						</LinkTo>
 					),

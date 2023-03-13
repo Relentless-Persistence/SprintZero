@@ -38,7 +38,7 @@ const EditableListCard: FC<EditableListCardProps> = ({title, list, isEditing, on
 						</Button>
 					</div>
 				) : (
-					<Button type="text" onClick={() => onEditStart()}>
+					<Button type="text" className="text-primary" onClick={() => onEditStart()}>
 						Edit
 					</Button>
 				)

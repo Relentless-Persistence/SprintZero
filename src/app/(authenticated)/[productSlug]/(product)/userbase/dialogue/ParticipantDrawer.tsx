@@ -5,6 +5,7 @@ import {
 	MailOutlined,
 	PhoneOutlined,
 	PushpinOutlined,
+	SoundOutlined,
 	SyncOutlined,
 } from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
@@ -30,6 +31,8 @@ import RhfTextArea from "~/components/rhf/RhfTextArea"
 import {DialogueParticipantSchema, statuses, timings} from "~/types/db/Products/DialogueParticipants"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {PersonaConverter} from "~/types/db/Products/Personas"
+import BoneIcon from "~public/icons/bone.svg"
+import CognitionIcon from "~public/icons/cognition.svg"
 import EarIcon from "~public/icons/ear.svg"
 
 dayjs.extend(relativeTime)
@@ -141,22 +144,26 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 								</Tag>
 							)}
 							{participantData?.disabilities.auditory && (
-								<Tag color="#585858" icon={<EarIcon className="inline-block" />} className="flex items-center">
+								<Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
 									Auditory
 								</Tag>
 							)}
 							{participantData?.disabilities.cognitive && (
-								<Tag color="#585858" icon={<PushpinOutlined />}>
+								<Tag
+									color="#585858"
+									icon={<CognitionIcon className="mr-1.5 inline-block" />}
+									className="flex items-center"
+								>
 									Cognitive
 								</Tag>
 							)}
 							{participantData?.disabilities.physical && (
-								<Tag color="#585858" icon={<PushpinOutlined />}>
+								<Tag color="#585858" icon={<BoneIcon className="mr-1.5 inline-block" />} className="flex items-center">
 									Physical
 								</Tag>
 							)}
 							{participantData?.disabilities.speech && (
-								<Tag color="#585858" icon={<PushpinOutlined />}>
+								<Tag color="#585858" icon={<SoundOutlined />}>
 									Speech
 								</Tag>
 							)}

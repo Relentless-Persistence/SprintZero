@@ -139,7 +139,9 @@ const VisionsClientPage: FC = () => {
 					<Breadcrumb items={[{title: `Strategy`}, {title: `Vision`}]} />
 					<div className="leading-normal">
 						<h1 className="text-3xl font-bold">Vision Statement</h1>
-						<p>A concise and inspiring statement that outlines the long-term goal and purpose of a product</p>
+						<p className="text-textTertiary">
+							A concise and inspiring statement that outlines the long-term goal and purpose of a product
+						</p>
 					</div>
 				</div>
 

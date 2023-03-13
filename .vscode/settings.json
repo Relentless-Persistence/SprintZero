@@ -7,5 +7,11 @@
 	"typescript.preferences.importModuleSpecifier": "shortest",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
+	},
+	"[svg]": {
+		"editor.defaultFormatter": "jock.svg"
+	},
+	"[xml]": {
+		"editor.defaultFormatter": "DotJoshJohnson.xml"
 	}
 }

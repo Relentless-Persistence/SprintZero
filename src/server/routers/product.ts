@@ -77,7 +77,7 @@ export const productRouter = router({
 					},
 
 					finalVision: ``,
-					productType: null,
+					productTypes: [],
 					valueProposition: null,
 				})
 				batch.set(product.collection(`Members`).doc(user.uid).withConverter(genAdminConverter(MemberSchema)), {
