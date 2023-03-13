@@ -2,6 +2,8 @@ import {FieldValue, Timestamp} from "firebase-admin/firestore"
 import {Configuration, OpenAIApi} from "openai"
 import {z} from "zod"
 
+import type {User} from "~/types/db/Users"
+
 import {funCardRouter} from "./funCard"
 import {productRouter} from "./product"
 import {userInviteRouter} from "./userInvite"
@@ -55,7 +57,6 @@ import {TaskSchema} from "~/types/db/Products/Tasks"
 import {UserPrioritySchema} from "~/types/db/Products/UserPriorities"
 import {VersionSchema} from "~/types/db/Products/Versions"
 import {VisionUpdateSchema} from "~/types/db/Products/VisionUpdates"
-import {UserSchema} from "~/types/db/Users"
 import {dbAdmin} from "~/utils/firebaseAdmin"
 
 const configuration = new Configuration({
@@ -639,13 +640,13 @@ export const appRouter = router({
 			})
 
 			allUsers.forEach((user) => {
-				transaction.update(dbAdmin.doc(user.ref.path).withConverter(genAdminConverter(UserSchema)), {
+				transaction.update(dbAdmin.doc(user.ref.path), {
 					// @ts-ignore -- Legacy field
 					avatar: FieldValue.delete(),
 					// @ts-ignore -- Legacy field
 					name: FieldValue.delete(),
 					preferredMusicClient: `appleMusic`,
-				})
+				} satisfies User)
 			})
 
 			allComments.forEach((comment) => {
