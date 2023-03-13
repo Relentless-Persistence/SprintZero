@@ -21,7 +21,6 @@ import SprintColumn from "./SprintColumn"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {StoryMapItemConverter, sprintColumns} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
-import {db} from "~/utils/firebase"
 import {AllVersions} from "~/utils/storyMap"
 
 dayjs.extend(relativeTime)

@@ -1,4 +1,3 @@
-import {FrownOutlined, MehOutlined, SmileOutlined} from "@ant-design/icons"
 import {z} from "zod"
 
 import {genConverter, timestampSchema} from "~/types"
@@ -22,9 +21,3 @@ export const RetrospectiveItemSchema = z.object({
 
 export type RetrospectiveItem = z.infer<typeof RetrospectiveItemSchema>
 export const RetrospectiveItemConverter = genConverter(RetrospectiveItemSchema)
-
-export const retrospectiveTabs = [
-	[`enjoyable`, `Enjoyable`, SmileOutlined],
-	[`puzzling`, `Puzzling`, MehOutlined],
-	[`frustrating`, `Frustrating`, FrownOutlined],
-] as const

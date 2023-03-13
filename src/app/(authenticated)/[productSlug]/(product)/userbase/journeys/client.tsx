@@ -13,7 +13,6 @@ import EventDrawer from "./EventDrawer"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {JourneyConverter, durationUnits} from "~/types/db/Products/Journeys"
 import {EventConverter} from "~/types/db/Products/Journeys/Events"
-import {db} from "~/utils/firebase"
 
 const JourneysClientPage: FC = () => {
 	const {product} = useAppContext()

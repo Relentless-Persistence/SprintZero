@@ -1,9 +1,10 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <DatePicker /> otherwise. */
 
-import {DatePicker, DatePickerProps} from "antd"
+import {DatePicker} from "antd"
 import dayjs from "dayjs"
 import {useController} from "react-hook-form"
 
+import type {DatePickerProps} from "antd"
 import type {ReactElement} from "react"
 import type {UseControllerProps} from "react-hook-form"
 import type {Promisable, SetRequired, SetReturnType} from "type-fest"

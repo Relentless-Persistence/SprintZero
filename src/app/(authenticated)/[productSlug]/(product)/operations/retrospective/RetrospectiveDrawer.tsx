@@ -8,11 +8,12 @@ import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {z} from "zod"
 
+import {retrospectiveTabs} from "./types"
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import {RetrospectiveItemSchema, retrospectiveTabs} from "~/types/db/Products/RetrospectiveItems"
+import {RetrospectiveItemSchema} from "~/types/db/Products/RetrospectiveItems"
 
 const formSchema = RetrospectiveItemSchema.pick({description: true, proposedActions: true, title: true, type: true})
 type FormInputs = z.infer<typeof formSchema>

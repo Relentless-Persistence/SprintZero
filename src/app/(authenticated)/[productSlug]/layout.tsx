@@ -3,7 +3,7 @@
 import {Layout} from "antd"
 import {doc} from "firebase/firestore"
 import {usePathname, useRouter} from "next/navigation"
-import {useEffect, useState} from "react"
+import {useEffect} from "react"
 import {useErrorHandler} from "react-error-boundary"
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocument} from "react-firebase-hooks/firestore"
