@@ -1,5 +1,6 @@
 "use client"
 
+import { DeleteOutlined } from "@ant-design/icons"
 import {Avatar, Breadcrumb, Card, Tabs, Tag} from "antd"
 import {collection} from "firebase/firestore"
 import {useEffect, useState} from "react"
@@ -14,7 +15,7 @@ import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {auth} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
-import { DeleteOutlined } from "@ant-design/icons"
+
 
 const TeamSettingsClientPage: FC = () => {
 	const {product} = useAppContext()
