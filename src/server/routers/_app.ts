@@ -102,22 +102,22 @@ export const appRouter = router({
 			allUsers,
 			allVersions,
 		] = await Promise.all([
-			dbAdmin.collection(`Comments`).withConverter(genAdminConverter(OldCommentSchema)).get(),
-			dbAdmin.collection(`Histories`).withConverter(genAdminConverter(OldHistorySchema)).get(),
+			dbAdmin.collectionGroup(`Comments`).withConverter(genAdminConverter(OldCommentSchema)).get(),
+			dbAdmin.collectionGroup(`Histories`).withConverter(genAdminConverter(OldHistorySchema)).get(),
 			dbAdmin.collection(`Insights`).withConverter(genAdminConverter(OldInsightSchema)).get(),
-			dbAdmin.collection(`JourneyEvents`).withConverter(genAdminConverter(OldJourneyEventSchema)).get(),
+			dbAdmin.collectionGroup(`JourneyEvents`).withConverter(genAdminConverter(OldJourneyEventSchema)).get(),
 			dbAdmin.collection(`Journeys`).withConverter(genAdminConverter(OldJourneySchema)).get(),
 			dbAdmin.collection(`Objectives`).withConverter(genAdminConverter(OldObjectiveSchema)).get(),
 			dbAdmin.collection(`Participants`).withConverter(genAdminConverter(OldParticipantSchema)).get(),
 			dbAdmin.collection(`Personas`).withConverter(genAdminConverter(OldPersonaSchema)).get(),
 			dbAdmin.collection(`ProductInvites`).withConverter(genAdminConverter(OldProductInviteSchema)).get(),
 			dbAdmin.collection(`Products`).withConverter(genAdminConverter(OldProductSchema)).get(),
-			dbAdmin.collection(`Results`).withConverter(genAdminConverter(OldResultSchema)).get(),
+			dbAdmin.collectionGroup(`Results`).withConverter(genAdminConverter(OldResultSchema)).get(),
 			dbAdmin.collection(`RetrospectiveItems`).withConverter(genAdminConverter(OldRetrospectiveItemSchema)).get(),
 			dbAdmin.collection(`StoryMapStates`).withConverter(genAdminConverter(OldStoryMapStateSchema)).get(),
 			dbAdmin.collection(`Tasks`).withConverter(genAdminConverter(OldTaskSchema)).get(),
 			dbAdmin.collection(`Users`).withConverter(genAdminConverter(OldUserSchema)).get(),
-			dbAdmin.collection(`Versions`).withConverter(genAdminConverter(OldVersionSchema)).get(),
+			dbAdmin.collectionGroup(`Versions`).withConverter(genAdminConverter(OldVersionSchema)).get(),
 		])
 
 		// eslint-disable-next-line @typescript-eslint/require-await
@@ -240,7 +240,13 @@ export const appRouter = router({
 
 					persona.data().changes.forEach((change) => {
 						transaction.set(
-							dbAdmin.doc(persona.ref.path).collection(`Changes`).doc().withConverter(genAdminConverter(ChangeSchema)),
+							dbAdmin
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
+								.collection(`Changes`)
+								.doc()
+								.withConverter(genAdminConverter(ChangeSchema)),
 							{
 								text: change.text,
 							},

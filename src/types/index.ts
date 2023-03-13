@@ -19,7 +19,10 @@ export const serverTimestampSchema = z
 		z.custom<FieldValue>(
 			(val) =>
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-				(val as any)?._methodName === `serverTimestamp` || (val as any)?.methodName === `FieldValue.serverTimestamp`,
+				(val as any)?._methodName === `serverTimestamp` ||
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+				(val as any)?.methodName === `FieldValue.serverTimestamp` ||
+				(typeof val === `object` && val !== null && `seconds` in val && `nanoseconds` in val),
 		),
 	])
 	.nullable()
