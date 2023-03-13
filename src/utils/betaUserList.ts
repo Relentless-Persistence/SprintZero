@@ -105,4 +105,6 @@ export const betaUsers = [
 	`yangrin.design@gmail.com`,
 	`zachalbert@gmail.com`,
 	`gabriellavhirsch@gmail.com`,
+	`mincho.kavaldzhiev@gmail.com`,
+	`sidiknatasha@gmail.com`,
 ]
