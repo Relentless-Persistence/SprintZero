@@ -684,10 +684,6 @@ export const appRouter = router({
 				transaction.delete(productInvite.ref)
 			})
 
-			allProducts.forEach((product) => {
-				transaction.delete(product.ref)
-			})
-
 			allResults.forEach((result) => {
 				transaction.delete(result.ref)
 			})
