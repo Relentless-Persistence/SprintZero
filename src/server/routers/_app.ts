@@ -1,4 +1,4 @@
-import {Timestamp} from "firebase-admin/firestore"
+import {FieldValue, Timestamp} from "firebase-admin/firestore"
 import {Configuration, OpenAIApi} from "openai"
 import {z} from "zod"
 
@@ -55,6 +55,7 @@ import {TaskSchema} from "~/types/db/Products/Tasks"
 import {UserPrioritySchema} from "~/types/db/Products/UserPriorities"
 import {VersionSchema} from "~/types/db/Products/Versions"
 import {VisionUpdateSchema} from "~/types/db/Products/VisionUpdates"
+import {UserSchema} from "~/types/db/Users"
 import {dbAdmin} from "~/utils/firebaseAdmin"
 
 const configuration = new Configuration({
@@ -635,6 +636,76 @@ export const appRouter = router({
 						},
 					)
 				})
+			})
+
+			allUsers.forEach((user) => {
+				transaction.update(dbAdmin.doc(user.ref.path).withConverter(genAdminConverter(UserSchema)), {
+					// @ts-ignore -- Legacy field
+					avatar: FieldValue.delete(),
+					// @ts-ignore -- Legacy field
+					name: FieldValue.delete(),
+					preferredMusicClient: `appleMusic`,
+				})
+			})
+
+			allComments.forEach((comment) => {
+				transaction.delete(comment.ref)
+			})
+
+			allHistories.forEach((history) => {
+				transaction.delete(history.ref)
+			})
+
+			allInsights.forEach((insight) => {
+				transaction.delete(insight.ref)
+			})
+
+			allJourneyEvents.forEach((journeyEvent) => {
+				transaction.delete(journeyEvent.ref)
+			})
+
+			allJourneys.forEach((journey) => {
+				transaction.delete(journey.ref)
+			})
+
+			allObjectives.forEach((objective) => {
+				transaction.delete(objective.ref)
+			})
+
+			allParticipants.forEach((participant) => {
+				transaction.delete(participant.ref)
+			})
+
+			allPersonas.forEach((persona) => {
+				transaction.delete(persona.ref)
+			})
+
+			allProductInvites.forEach((productInvite) => {
+				transaction.delete(productInvite.ref)
+			})
+
+			allProducts.forEach((product) => {
+				transaction.delete(product.ref)
+			})
+
+			allResults.forEach((result) => {
+				transaction.delete(result.ref)
+			})
+
+			allRetrospectiveItems.forEach((retrospectiveItem) => {
+				transaction.delete(retrospectiveItem.ref)
+			})
+
+			allStoryMapStates.forEach((storyMapState) => {
+				transaction.delete(storyMapState.ref)
+			})
+
+			allTasks.forEach((task) => {
+				transaction.delete(task.ref)
+			})
+
+			allVersions.forEach((version) => {
+				transaction.delete(version.ref)
 			})
 		})
 	}),
