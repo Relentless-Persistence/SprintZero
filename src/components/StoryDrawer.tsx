@@ -198,7 +198,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 							{lastModifiedText && members && (
 								<p className="text-sm font-normal text-textTertiary">
 									Last modified {lastModifiedText} by{` `}
-									{members.docs.find((user) => user.id === storyData.updatedAtUserId)!.data().name}
+									{members.docs.find((user) => user.id === storyData.updatedAtUserId)?.data().name ?? `unknown user`}
 								</p>
 							)}
 						</div>
