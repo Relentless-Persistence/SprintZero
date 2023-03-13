@@ -1,5 +1,6 @@
 import {Breadcrumb, Button, Form} from "antd"
 import {addDoc, collection} from "firebase/firestore"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollectionData} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
@@ -21,7 +22,10 @@ export type AddJourneyPageProps = {
 
 const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 	const {product} = useAppContext()
-	const [journeys] = useCollectionData(collection(product.ref, `Journeys`).withConverter(JourneyConverter))
+	const [journeys, , journeysError] = useCollectionData(
+		collection(product.ref, `Journeys`).withConverter(JourneyConverter),
+	)
+	useErrorHandler(journeysError)
 
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -38,10 +42,7 @@ const AddJourneyPage: FC<AddJourneyPageProps> = ({onCancel, onFinish}) => {
 
 	return (
 		<div className="flex h-full flex-col px-12 py-8">
-			<Breadcrumb>
-				<Breadcrumb.Item>Userbase</Breadcrumb.Item>
-				<Breadcrumb.Item>Journeys</Breadcrumb.Item>
-			</Breadcrumb>
+			<Breadcrumb items={[{title: `Userbase`}, {title: `Journeys`}]} />
 			<div className="grid grow place-items-center">
 				<Form
 					layout="vertical"

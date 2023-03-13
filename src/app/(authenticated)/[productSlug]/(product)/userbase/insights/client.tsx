@@ -27,11 +27,7 @@ const InsightsClientPage: FC = () => {
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="relative flex h-full flex-col gap-6 overflow-auto px-12 py-8">
-				<Breadcrumb>
-					<Breadcrumb.Item>Userbase</Breadcrumb.Item>
-					<Breadcrumb.Item>Insights</Breadcrumb.Item>
-					<Breadcrumb.Item>{tabNames[currentTab]}</Breadcrumb.Item>
-				</Breadcrumb>
+				<Breadcrumb items={[{title: `Userbase`}, {title: `Insights`}, {title: tabNames[currentTab]}]} />
 
 				{!insightsLoading && insights?.empty && activeInsight !== `new` ? (
 					<div className="grid h-full place-items-center">

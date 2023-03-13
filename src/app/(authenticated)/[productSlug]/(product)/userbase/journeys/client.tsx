@@ -4,6 +4,7 @@ import {Breadcrumb, Button, Tabs} from "antd"
 import clsx from "clsx"
 import {addDoc, collection, deleteDoc, doc, updateDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -16,19 +17,23 @@ import {EventConverter} from "~/types/db/Products/Journeys/Events"
 
 const JourneysClientPage: FC = () => {
 	const {product} = useAppContext()
-	const [journeys, loading] = useCollection(collection(product.ref, `Journeys`).withConverter(JourneyConverter))
+	const [journeys, journeysLoading, journeysError] = useCollection(
+		collection(product.ref, `Journeys`).withConverter(JourneyConverter),
+	)
+	useErrorHandler(journeysError)
 
 	const [activeJourney, setActiveJourney] = useState<string | `new` | undefined>(undefined)
 	useEffect(() => {
-		if (!loading) setActiveJourney(!journeys || journeys.docs.length === 0 ? `new` : journeys.docs[0]!.id)
-	}, [journeys, loading])
+		if (!journeysLoading) setActiveJourney(!journeys || journeys.docs.length === 0 ? `new` : journeys.docs[0]!.id)
+	}, [journeys, journeysLoading])
 	const journey = journeys?.docs.find((journey) => journey.id === activeJourney)
 
-	const [journeyEvents] = useCollection(
+	const [journeyEvents, , journeyEventsError] = useCollection(
 		activeJourney !== undefined && activeJourney !== `new`
 			? collection(product.ref, `Journeys`, activeJourney, `JourneyEvents`).withConverter(EventConverter)
 			: undefined,
 	)
+	useErrorHandler(journeyEventsError)
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const [activeEventId, setActiveEventId] = useState<string | undefined>(undefined)
@@ -45,10 +50,7 @@ const JourneysClientPage: FC = () => {
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="flex h-full flex-col gap-6 px-12 py-8">
 				<div className="flex justify-between">
-					<Breadcrumb>
-						<Breadcrumb.Item>Userbase</Breadcrumb.Item>
-						<Breadcrumb.Item>Journeys</Breadcrumb.Item>
-					</Breadcrumb>
+					<Breadcrumb items={[{title: `Userbae`}, {title: `Journeys`}]} />
 
 					<Button onClick={() => setIsDrawerOpen(true)}>Add Event</Button>
 				</div>

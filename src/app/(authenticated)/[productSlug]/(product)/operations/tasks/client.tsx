@@ -5,6 +5,7 @@ import {Breadcrumb, FloatButton, Tabs} from "antd"
 import dayjs from "dayjs"
 import {Timestamp, addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {ComponentProps, FC} from "react"
@@ -19,19 +20,16 @@ const TasksClientPage: FC = () => {
 	const [activeBoard, setActiveBoard] = useState(`one`)
 	const [editingTask, setEditingTask] = useState<string | `new` | undefined>(undefined)
 
-	const [tasks, loading] = useCollection(
+	const [tasks, tasksLoading, tasksError] = useCollection(
 		query(collection(product.ref, `Tasks`), where(`board`, `==`, activeBoard)).withConverter(TaskConverter),
 	)
+	useErrorHandler(tasksError)
 
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="relative flex h-full w-full flex-col overflow-auto pb-8">
 				<div className="sticky left-0 flex w-full justify-between px-12 py-8">
-					<Breadcrumb>
-						<Breadcrumb.Item>Operations</Breadcrumb.Item>
-						<Breadcrumb.Item>Tasks</Breadcrumb.Item>
-						<Breadcrumb.Item className="capitalize">{activeBoard}</Breadcrumb.Item>
-					</Breadcrumb>
+					<Breadcrumb items={[{title: `Operations`}, {title: `Tasks`}, {title: activeBoard}]} />
 				</div>
 
 				<div className="ml-12 grid grow auto-cols-[286px] grid-flow-col gap-4">
@@ -69,7 +67,7 @@ const TasksClientPage: FC = () => {
 				]}
 			/>
 
-			{editingTask && !loading && (
+			{editingTask && !tasksLoading && (
 				<TaskDrawer
 					initialValues={(() => {
 						let initialValues: ComponentProps<typeof TaskDrawer>["initialValues"]

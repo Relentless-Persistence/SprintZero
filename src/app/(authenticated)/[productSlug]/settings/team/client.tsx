@@ -31,10 +31,7 @@ const TeamSettingsClientPage: FC = () => {
 
 	return (
 		<div className="flex flex-col gap-6 px-12 py-8">
-			<Breadcrumb>
-				<Breadcrumb.Item>Settings</Breadcrumb.Item>
-				<Breadcrumb.Item>Team</Breadcrumb.Item>
-			</Breadcrumb>
+			<Breadcrumb items={[{title: `Settings`}, {title: `Team`}]} />
 
 			<Tabs
 				activeKey={currentTab}

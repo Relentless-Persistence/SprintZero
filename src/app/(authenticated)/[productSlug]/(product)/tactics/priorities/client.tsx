@@ -2,6 +2,7 @@
 
 import {Tabs} from "antd"
 import {collection} from "firebase/firestore"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -13,7 +14,10 @@ import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 
 const PrioritiesClientPage: FC = () => {
 	const {product} = useAppContext()
-	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
+	const [storyMapItems, , storyMapItemsError] = useCollection(
+		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
+	)
+	useErrorHandler(storyMapItemsError)
 
 	if (!storyMapItems) return null
 	return (

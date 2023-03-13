@@ -4,6 +4,7 @@ import {CloseOutlined, DislikeOutlined, FilterOutlined, LikeOutlined} from "@ant
 import {Alert, Breadcrumb, Button, Card, Dropdown, Tag} from "antd"
 import {collection} from "firebase/firestore"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -15,7 +16,10 @@ import {getStories} from "~/utils/storyMap"
 
 const EthicsClientPage: FC = () => {
 	const {product} = useAppContext()
-	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
+	const [storyMapItems, , storyMapItemsError] = useCollection(
+		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
+	)
+	useErrorHandler(storyMapItemsError)
 	const stories = storyMapItems ? getStories(storyMapItems) : []
 
 	const [filter, setFilter] = useState<`approved` | `rejected` | `all`>(`all`)
@@ -32,10 +36,7 @@ const EthicsClientPage: FC = () => {
 			)}
 
 			<div className="flex h-full flex-col gap-6 px-12 py-8">
-				<Breadcrumb>
-					<Breadcrumb.Item>Tactics</Breadcrumb.Item>
-					<Breadcrumb.Item>Ethics</Breadcrumb.Item>
-				</Breadcrumb>
+				<Breadcrumb items={[{title: `Tactics`}, {title: `Ethics`}]} />
 
 				<div className="grid w-full grow grid-cols-2 gap-6">
 					<Card

@@ -1,6 +1,7 @@
 import {Button, Drawer} from "antd"
 import {collection} from "firebase/firestore"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
@@ -42,7 +43,8 @@ export type EventDrawerProps = {
 const EventDrawer: FC<EventDrawerProps> = ({journey, activeEvent, onClose, onCommit, onDelete}) => {
 	const {product} = useAppContext()
 	const [isDrawerOpen, setIsDrawerOpen] = useState(true)
-	const [personas] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
+	const [personas, , personasError] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
+	useErrorHandler(personasError)
 
 	const {control, watch, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,

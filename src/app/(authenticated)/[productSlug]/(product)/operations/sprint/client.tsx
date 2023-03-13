@@ -12,6 +12,7 @@ import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {collection, orderBy, query} from "firebase/firestore"
 import {useMemo, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {Dayjs} from "dayjs"
@@ -27,7 +28,10 @@ dayjs.extend(relativeTime)
 
 const SprintClientPage: FC = () => {
 	const {product} = useAppContext()
-	const [storyMapItems] = useCollection(collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter))
+	const [storyMapItems, , storyMapItemsError] = useCollection(
+		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
+	)
+	useErrorHandler(storyMapItemsError)
 	const storyMapState = storyMapItems?.docs[0]
 	const [myStoriesOnly, setMyStoriesOnly] = useState(false)
 
@@ -51,7 +55,7 @@ const SprintClientPage: FC = () => {
 	}, [product, firstSprintStartDate])
 	const currentSprintEndDate = dayjs(sprints.at(-1)?.endDate)
 
-	const [versions] = useCollection(
+	const [versions, , versionsError] = useCollection(
 		storyMapState
 			? query(
 					collection(product.ref, `StoryMapStates`, storyMapState.id, `Versions`),
@@ -59,16 +63,14 @@ const SprintClientPage: FC = () => {
 			  ).withConverter(VersionConverter)
 			: undefined,
 	)
+	useErrorHandler(versionsError)
 
 	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions>(AllVersions)
 
 	return (
 		<div className="flex h-full flex-col gap-4">
 			<div className="mx-12 mt-8 flex flex-col gap-4">
-				<Breadcrumb>
-					<Breadcrumb.Item>Operations</Breadcrumb.Item>
-					<Breadcrumb.Item>Sprint</Breadcrumb.Item>
-				</Breadcrumb>
+				<Breadcrumb items={[{title: `Operations`}, {title: `Sprint`}]} />
 
 				<div className="flex justify-between">
 					<div className="flex items-center gap-4">

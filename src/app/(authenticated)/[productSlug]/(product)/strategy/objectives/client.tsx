@@ -4,6 +4,7 @@ import {AimOutlined, PlusOutlined} from "@ant-design/icons"
 import {Breadcrumb, Empty, FloatButton, Input, Tabs} from "antd"
 import {collection, doc, orderBy, query, updateDoc} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 import {useDebounce} from "react-use"
@@ -19,9 +20,10 @@ const ObjectivesClientPage: FC = () => {
 	const {product} = useAppContext()
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<string | undefined>(undefined)
 
-	const [objectives] = useCollection(
+	const [objectives, , objectivesError] = useCollection(
 		query(collection(product.ref, `Objectives`), orderBy(`name`, `asc`)).withConverter(ObjectiveConverter),
 	)
+	useErrorHandler(objectivesError)
 
 	const hasSetInitialObjective = useRef(false)
 	useEffect(() => {
@@ -32,7 +34,7 @@ const ObjectivesClientPage: FC = () => {
 
 	const currentObjective = objectives?.docs.find((doc) => doc.id === currentObjectiveId)
 
-	const [results] = useCollection(
+	const [results, , resultsError] = useCollection(
 		currentObjectiveId
 			? query(
 					collection(product.ref, `Objectives`, currentObjectiveId, `Results`),
@@ -40,6 +42,7 @@ const ObjectivesClientPage: FC = () => {
 			  ).withConverter(ResultConverter)
 			: undefined,
 	)
+	useErrorHandler(resultsError)
 
 	const hasSetDefaultObjective = useRef(false)
 	useEffect(() => {

@@ -3,6 +3,7 @@
 import {Breadcrumb, Card, Tabs} from "antd"
 import {collection, doc, writeBatch} from "firebase/firestore"
 import {useEffect, useRef, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
 import type {FC} from "react"
@@ -37,61 +38,70 @@ const PersonasClientPage: FC = () => {
 		| undefined
 	>(undefined)
 
-	const [personas] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
-	const [goals] = useCollection(
+	const [personas, , personasError] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
+	useErrorHandler(personasError)
+	const [goals, , goalsError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `Goals`).withConverter(GoalConverter)
 			: undefined,
 	)
-	const [interactions] = useCollection(
+	useErrorHandler(goalsError)
+	const [interactions, , interactionsError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `Interactions`).withConverter(
 					InteractionConverter,
 			  )
 			: undefined,
 	)
-	const [personaTasks] = useCollection(
+	useErrorHandler(interactionsError)
+	const [personaTasks, , personaTasksError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `PersonaTasks`).withConverter(
 					PersonaTaskConverter,
 			  )
 			: undefined,
 	)
-	const [responsibilities] = useCollection(
+	useErrorHandler(personaTasksError)
+	const [responsibilities, , responsibilitiesError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `Responsibilities`).withConverter(
 					ResponsibilityConverter,
 			  )
 			: undefined,
 	)
-	const [priorities] = useCollection(
+	useErrorHandler(responsibilitiesError)
+	const [priorities, , prioritiesError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `Priorities`).withConverter(
 					PriorityConverter,
 			  )
 			: undefined,
 	)
-	const [frustrations] = useCollection(
+	useErrorHandler(prioritiesError)
+	const [frustrations, , frustrationsError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `Frustrations`).withConverter(
 					FrustrationConverter,
 			  )
 			: undefined,
 	)
-	const [changes] = useCollection(
+	useErrorHandler(frustrationsError)
+	const [changes, , changesError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `Changes`).withConverter(
 					ChangeConverter,
 			  )
 			: undefined,
 	)
-	const [daysInTheLife] = useCollection(
+	useErrorHandler(changesError)
+	const [daysInTheLife, , daysInTheLifeError] = useCollection(
 		personas && activeTab !== ``
 			? collection(personas.docs.find((persona) => persona.id === activeTab)!.ref, `DaysInTheLife`).withConverter(
 					DayInTheLifeConverter,
 			  )
 			: undefined,
 	)
+	useErrorHandler(daysInTheLifeError)
 
 	const hasSetDefaultPersona = useRef(false)
 	useEffect(() => {
@@ -113,10 +123,7 @@ const PersonasClientPage: FC = () => {
 				children: (
 					<div className="flex h-full flex-col overflow-auto">
 						<div className="sticky top-0 z-10 bg-bgLayout px-12 pt-8 pb-6">
-							<Breadcrumb>
-								<Breadcrumb.Item>Userbase</Breadcrumb.Item>
-								<Breadcrumb.Item>Personas</Breadcrumb.Item>
-							</Breadcrumb>
+							<Breadcrumb items={[{title: `Userbase`}, {title: `Personas`}]} />
 						</div>
 
 						<div className="grid grid-cols-2 gap-4 px-12 pb-8">
