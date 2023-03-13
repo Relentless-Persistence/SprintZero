@@ -106,9 +106,10 @@ const PersonasClientPage: FC = () => {
 			tabPosition="right"
 			activeKey={activeTab}
 			onChange={(key) => setActiveTab(key)}
+			className="h-full"
 			items={personas?.docs.map((persona) => ({
 				key: persona.id,
-				label: persona.data().name,
+				label: <span className="inline-block min-w-0 max-w-[4rem] truncate">{persona.data().name}</span>,
 				children: (
 					<div className="flex h-full flex-col overflow-auto">
 						<div className="sticky top-0 z-10 bg-bgLayout px-12 pt-8 pb-6">
@@ -285,7 +286,6 @@ const PersonasClientPage: FC = () => {
 					</div>
 				),
 			}))}
-			className="h-full"
 		/>
 	)
 }

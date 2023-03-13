@@ -41,7 +41,7 @@ const SideMenu: FC = () => {
 				(items.find((item) => item?.key === pathname?.split(`/`).at(-1))?.key as string | undefined) ?? ``,
 			]}
 			items={items}
-			className="h-full"
+			className="h-full !shadow-[0px_0px_12px_rgb(0_0_0/0.04)]"
 		/>
 	)
 }

@@ -23,10 +23,10 @@ const spotifyBasicAuth = Buffer.from(`${spotifyClientId}:${spotifyClientSecret}`
 
 export const funCardRouter = router({
 	getSongUrl: procedure
-		.input(z.object({song: z.string(), service: z.enum([`appleMusic`, `spotify`])}))
-		.query(async ({input: {song, service}}) => {
+		.input(z.object({songName: z.string(), service: z.enum([`appleMusic`, `spotify`])}))
+		.query(async ({input: {songName, service}}) => {
 			if (service === `appleMusic`) {
-				const url = `https://api.music.apple.com/v1/catalog/us/search?types=songs&term=${song}`
+				const url = `https://api.music.apple.com/v1/catalog/us/search?types=songs&term=${songName}`
 
 				const res = await axios.get<AppleMusicSearchResult>(url, {
 					headers: {
@@ -37,7 +37,7 @@ export const funCardRouter = router({
 			} else {
 				const token: string = await getSpotifyToken()
 
-				const url = `https://api.spotify.com/v1/search?q=${song}&type=track&market=ES&limit=1`
+				const url = `https://api.spotify.com/v1/search?q=${songName}&type=track&market=ES&limit=1`
 
 				const res = await axios.get<SpotifySearchResult>(url, {
 					headers: {

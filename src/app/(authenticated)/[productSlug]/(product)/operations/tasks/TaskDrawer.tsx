@@ -1,17 +1,15 @@
-import {useQueries} from "@tanstack/react-query"
 import {Button, Checkbox, Drawer, Input} from "antd"
-import {collection, doc, getDoc} from "firebase/firestore"
+import {collection} from "firebase/firestore"
 import {nanoid} from "nanoid"
 import {useEffect, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 import {useFieldArray, useForm} from "react-hook-form"
 
 import type {Dayjs} from "dayjs"
-import type {QueryDocumentSnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {Task} from "~/types/db/Products/Tasks"
-import type {User} from "~/types/db/Users"
 
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfCheckbox from "~/components/rhf/RhfCheckbox"
@@ -20,9 +18,6 @@ import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import {MemberConverter} from "~/types/db/Products/Members"
-import {UserConverter} from "~/types/db/Users"
-import {conditionalThrow} from "~/utils/conditionalThrow"
-import {db} from "~/utils/firebase"
 
 type FormInputs = Omit<Task, `productId` | `dueDate`> & {dueDate: Dayjs}
 
@@ -39,7 +34,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 	const {product} = useAppContext()
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
-	conditionalThrow(membersError)
+	useErrorHandler(membersError)
 
 	const {control, handleSubmit} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -54,14 +49,6 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 		setTimeout(() => {
 			Promise.resolve(onCommit(data)).catch(console.error)
 		}, 300)
-	})
-
-	const memberUsers = useQueries({
-		queries:
-			members?.docs.map((member) => ({
-				queryKey: [`user`, member.id],
-				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
-			})) ?? [],
 	})
 
 	return (
@@ -113,10 +100,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({initialValues, onCancel, onCommit}) =>
 							control={control}
 							name="assigneeIds"
 							mode="multiple"
-							options={memberUsers
-								.map(({data: memberDoc}) => memberDoc)
-								.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
-								.map((user) => ({label: user.data().name, value: user.id}))}
+							options={members?.docs.map((user) => ({label: user.data().name, value: user.id}))}
 						/>
 					</div>
 				</div>

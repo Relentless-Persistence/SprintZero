@@ -16,6 +16,29 @@ import type {FC} from "react"
 import {useAppContext} from "../AppContext"
 import LinkTo from "~/components/LinkTo"
 
+const SideMenu: FC = () => {
+	const pathname = usePathname()
+	const {product} = useAppContext()
+
+	const items = getItems(product.id)
+	const [openKey, setOpenKey] = useState<string | undefined>(
+		items.find((item) => item.children?.find((child) => child.key === pathname?.replace(/^\/[^/]+\//, ``)))?.key,
+	)
+
+	return (
+		<Menu
+			mode="inline"
+			openKeys={openKey ? [openKey] : []}
+			onOpenChange={(openKeys) => setOpenKey(openKeys.find((key) => key !== openKey))}
+			selectedKeys={[pathname?.replace(/^\/[^/]+\//, ``) ?? ``]}
+			items={items}
+			className="h-full !shadow-[0px_0px_12px_rgb(0_0_0/0.04)]"
+		/>
+	)
+}
+
+export default SideMenu
+
 const getItems = (activeProductId: string) => [
 	{
 		key: `map`,
@@ -107,26 +130,3 @@ const getItems = (activeProductId: string) => [
 		],
 	},
 ]
-
-const SideMenu: FC = () => {
-	const pathname = usePathname()
-	const {product} = useAppContext()
-
-	const items = getItems(product.id)
-	const [openKey, setOpenKey] = useState<string | undefined>(
-		items.find((item) => item.children?.find((child) => child.key === pathname?.replace(/^\/[^/]+\//, ``)))?.key,
-	)
-
-	return (
-		<Menu
-			mode="inline"
-			openKeys={openKey ? [openKey] : []}
-			onOpenChange={(openKeys) => setOpenKey(openKeys.find((key) => key !== openKey))}
-			selectedKeys={[pathname?.replace(/^\/[^/]+\//, ``) ?? ``]}
-			items={items}
-			className="h-full"
-		/>
-	)
-}
-
-export default SideMenu

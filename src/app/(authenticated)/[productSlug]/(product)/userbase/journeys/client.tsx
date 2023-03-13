@@ -151,12 +151,13 @@ const JourneysClientPage: FC = () => {
 					activeEvent={activeEvent}
 					onClose={() => setIsDrawerOpen(false)}
 					onCommit={async (data) => {
-						if (activeEventId === undefined) await addDoc(collection(db, `Journeys`, journey.id, `JourneyEvents`), data)
-						else await updateDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEventId), data)
+						if (activeEventId === undefined)
+							await addDoc(collection(product.ref, `Journeys`, journey.id, `JourneyEvents`), data)
+						else await updateDoc(doc(product.ref, `Journeys`, journey.id, `JourneyEvents`, activeEventId), data)
 					}}
 					onDelete={async () => {
 						if (activeEventId !== undefined && activeEventId !== `new`)
-							await deleteDoc(doc(db, `Journeys`, journey.id, `JourneyEvents`, activeEventId))
+							await deleteDoc(doc(product.ref, `Journeys`, journey.id, `JourneyEvents`, activeEventId))
 					}}
 				/>
 			)}

@@ -1,15 +1,14 @@
 "use client"
 
-import {ClockCircleOutlined, DesktopOutlined, LayoutOutlined, MobileOutlined, TabletOutlined} from "@ant-design/icons"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {useQueries} from "@tanstack/react-query"
 import {Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {diffArrays} from "diff"
-import {Timestamp, collection, doc, getDoc, writeBatch} from "firebase/firestore"
+import {Timestamp, collection, doc, writeBatch} from "firebase/firestore"
 import {nanoid} from "nanoid"
 import {useEffect, useRef, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
@@ -17,20 +16,20 @@ import {z} from "zod"
 import type {FC} from "react"
 
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import RhfSegmented from "~/components/rhf/RhfSegmented"
+import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
-import {ProductSchema} from "~/types/db/Products"
+import {ProductSchema, productTypes as productTypesEnum} from "~/types/db/Products"
 import {FeatureConverter, FeatureSchema} from "~/types/db/Products/Features"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {VisionUpdateConverter} from "~/types/db/Products/VisionUpdates"
-import {UserConverter} from "~/types/db/Users"
 import {db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
 
 dayjs.extend(relativeTime)
 
 const formSchema = z.object({
-	productType: ProductSchema.shape.productType.unwrap(),
+	productTypes: ProductSchema.shape.productTypes,
 	valueProposition: ProductSchema.shape.valueProposition.unwrap(),
 	features: z.array(z.object({id: z.string(), text: FeatureSchema.shape.text})),
 	finalVision: ProductSchema.shape.finalVision,
@@ -43,7 +42,10 @@ const VisionsClientPage: FC = () => {
 	const [editMode, setEditMode] = useState(false)
 	const [currentStep, setCurrentStep] = useState(0)
 
-	const [dbFeatures] = useCollection(collection(product.ref, `Features`).withConverter(FeatureConverter))
+	const [dbFeatures, dbFeaturesLoading, dbFeaturesError] = useCollection(
+		collection(product.ref, `Features`).withConverter(FeatureConverter),
+	)
+	useErrorHandler(dbFeaturesError)
 
 	const {
 		control,
@@ -51,25 +53,35 @@ const VisionsClientPage: FC = () => {
 		reset,
 		watch,
 		setValue,
-		formState: {errors, dirtyFields},
+		trigger,
+		formState: {errors},
 	} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
-		defaultValues: {
-			productType: product.data().productType ?? `mobile`,
-			valueProposition: product.data().valueProposition ?? ``,
-			features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
-				{id: nanoid(), text: ``},
-			],
-		},
 	})
+
+	const hasSetDefaultValues = useRef(false)
+	useEffect(() => {
+		if (hasSetDefaultValues.current) return
+		if (!dbFeaturesLoading) {
+			reset({
+				productTypes: product.data().productTypes,
+				valueProposition: product.data().valueProposition ?? ``,
+				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
+					{id: nanoid(), text: ``},
+				],
+			})
+			setEditMode(true)
+			hasSetDefaultValues.current = true
+		}
+	}, [dbFeatures?.docs, dbFeaturesLoading, product, reset])
 
 	const hasSetInitial = useRef(false)
 	useEffect(() => {
 		if (hasSetInitial.current) return
 		if (!product.data().finalVision) {
 			reset({
-				productType: product.data().productType ?? `mobile`,
+				productTypes: product.data().productTypes,
 				valueProposition: product.data().valueProposition ?? ``,
 				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
 					{id: nanoid(), text: ``},
@@ -80,7 +92,7 @@ const VisionsClientPage: FC = () => {
 			hasSetInitial.current = true
 		} else if (product.data().finalVision !== ``) {
 			reset({
-				productType: product.data().productType ?? `mobile`,
+				productTypes: product.data().productTypes,
 				valueProposition: product.data().valueProposition ?? ``,
 				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
 					{id: nanoid(), text: ``},
@@ -92,28 +104,16 @@ const VisionsClientPage: FC = () => {
 		}
 	}, [dbFeatures?.docs, product, reset])
 
-	const [visionUpdates] = useCollection(collection(product.ref, `VisionUpdates`).withConverter(VisionUpdateConverter))
-	const usersData = useQueries({
-		queries: visionUpdates
-			? visionUpdates.docs.map((update) => ({
-					queryKey: [`user`, update.data().userId],
-					queryFn: async () => await getDoc(doc(db, `Users`, update.data().userId).withConverter(UserConverter)),
-			  }))
-			: [],
-	})
-
-	const [productType, valueProposition, features] = watch([`productType`, `valueProposition`, `features`])
-	const productVision = trpc.gpt.useQuery(
-		{
-			prompt: `Write a product vision for a ${productType} app. Its goal is to: ${valueProposition}. The app has the following features: ${features.join(
-				`, `,
-			)}.`,
-		},
-		{
-			enabled: currentStep >= 3,
-			select: (data) => data.response?.trim(),
-		},
+	const [visionUpdates, , visionUpdatesError] = useCollection(
+		collection(product.ref, `VisionUpdates`).withConverter(VisionUpdateConverter),
 	)
+	useErrorHandler(visionUpdatesError)
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	useErrorHandler(membersError)
+
+	const [productTypes, valueProposition, features] = watch([`productTypes`, `valueProposition`, `features`])
+	const gpt = trpc.gpt.useMutation()
+	const [productVision, setProductVision] = useState<string | undefined>(undefined)
 
 	const scrollerRef = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
@@ -157,16 +157,23 @@ const VisionsClientPage: FC = () => {
 												<p className="text-base text-textTertiary">How will users typically access your product?</p>
 											</div>
 
-											<RhfSegmented
+											<RhfSelect
 												control={control}
-												name="productType"
-												block
+												name="productTypes"
+												mode="multiple"
+												disabled={currentStep !== 0}
+												className="w-full"
 												options={[
-													{icon: <MobileOutlined />, label: `Mobile`, value: `mobile`},
-													{icon: <TabletOutlined />, label: `Tablet`, value: `tablet`},
-													{icon: <DesktopOutlined />, label: `Desktop`, value: `desktop`},
-													{icon: <ClockCircleOutlined />, label: `Watch`, value: `watch`},
-													{icon: <LayoutOutlined />, label: `Web`, value: `web`},
+													{label: `Mobile`, value: `mobile`},
+													{label: `Tablet`, value: `tablet`},
+													{label: `Desktop`, value: `desktop`},
+													{label: `Watch`, value: `watch`},
+													{label: `Web`, value: `web`},
+													{label: `Augmented Reality`, value: `augmentedReality`},
+													{label: `Virtual Reality`, value: `virtualReality`},
+													{label: `Artificial Intelligence`, value: `artificialIntelligence`},
+													{label: `Humanoid`, value: `humanoid`},
+													{label: `API`, value: `api`},
 												]}
 											/>
 
@@ -174,7 +181,7 @@ const VisionsClientPage: FC = () => {
 												<Button type="text" disabled={!product.data().finalVision} onClick={() => setEditMode(false)}>
 													Cancel
 												</Button>
-												<Button disabled={!!errors.productType} onClick={() => setCurrentStep(1)}>
+												<Button disabled={!!errors.productTypes || currentStep !== 0} onClick={() => setCurrentStep(1)}>
 													Next
 												</Button>
 											</div>
@@ -200,8 +207,14 @@ const VisionsClientPage: FC = () => {
 													Cancel
 												</Button>
 												<Button
-													disabled={!!errors.valueProposition || !dirtyFields.valueProposition || currentStep !== 1}
-													onClick={() => setCurrentStep(2)}
+													disabled={!!errors.valueProposition || currentStep !== 1}
+													onClick={() => {
+														trigger(`valueProposition`)
+															.then((allowed) => {
+																if (allowed) setCurrentStep(2)
+															})
+															.catch(console.error)
+													}}
 												>
 													Next
 												</Button>
@@ -230,9 +243,21 @@ const VisionsClientPage: FC = () => {
 													Cancel
 												</Button>
 												<Button
-													disabled={!!errors.features || !dirtyFields.features || currentStep !== 2}
+													disabled={!!errors.features || currentStep !== 2}
 													onClick={() => {
-														setCurrentStep(3)
+														gpt
+															.mutateAsync({
+																prompt: `Write a product vision for a ${listToSentence(
+																	productTypes.map((type) => productTypesEnum.find((t) => t[0] === type)![1]),
+																)} app. Its goal is to: ${valueProposition}. The app has the following features: ${features.join(
+																	`, `,
+																)}.`,
+															})
+															.then((data) => {
+																setProductVision(data.response?.trim())
+																setCurrentStep(3)
+															})
+															.catch(console.error)
 													}}
 												>
 													Next
@@ -249,11 +274,11 @@ const VisionsClientPage: FC = () => {
 												<p className="text-base text-textTertiary">Let&apos;s review what came back!</p>
 											</div>
 
-											{productVision.isSuccess && productVision.data ? (
+											{gpt.isSuccess ? (
 												<Card>
-													<p>{productVision.data}</p>
+													<p>{productVision}</p>
 												</Card>
-											) : productVision.isFetching ? (
+											) : gpt.isLoading ? (
 												<Skeleton active />
 											) : (
 												<Skeleton />
@@ -268,9 +293,9 @@ const VisionsClientPage: FC = () => {
 													Cancel
 												</Button>
 												<Button
-													disabled={productVision.isFetching || currentStep !== 3}
+													disabled={gpt.isLoading || currentStep !== 3}
 													onClick={() => {
-														setValue(`finalVision`, productVision.data ?? ``)
+														setValue(`finalVision`, productVision ?? ``)
 														setCurrentStep(4)
 													}}
 												>
@@ -290,11 +315,7 @@ const VisionsClientPage: FC = () => {
 												</p>
 											</div>
 
-											{productVision.data ? (
-												<RhfTextArea control={control} name="finalVision" rows={10} />
-											) : (
-												<Skeleton />
-											)}
+											{gpt.data ? <RhfTextArea control={control} name="finalVision" rows={10} /> : <Skeleton />}
 
 											<div className="flex justify-end gap-4">
 												<Button
@@ -310,11 +331,31 @@ const VisionsClientPage: FC = () => {
 														handleSubmit(async (data) => {
 															const operations: string[] = []
 
-															if (product.data().productType !== data.productType)
-																operations.push(`changed the product type to ${data.productType}`)
-
 															if (product.data().valueProposition !== data.valueProposition)
 																operations.push(`changed the value proposition to "${data.valueProposition}"`)
+
+															// Calculate product type diffs
+															if (product.data().productTypes !== data.productTypes) {
+																const differences = diffArrays(product.data().productTypes, data.productTypes)
+																const removals = differences
+																	.filter((difference) => difference.removed)
+																	.flatMap((difference) => difference.value)
+																	.map((removal) => `"${productTypes.find((type) => type[0] === removal)![1]!}"`)
+																let removalsText = removals.length > 0 ? listToSentence(removals) : undefined
+																removalsText = removalsText
+																	? `removed the product type${removals.length === 1 ? `` : `s`} ${removalsText}`
+																	: undefined
+																if (removalsText) operations.push(removalsText)
+																const additions = differences
+																	.filter((difference) => difference.added)
+																	.flatMap((difference) => difference.value)
+																	.map((addition) => `"${productTypes.find((type) => type[0] === addition)![1]!}"`)
+																let additionsText = additions.length > 0 ? listToSentence(additions) : undefined
+																additionsText = additionsText
+																	? `added the product type${additions.length === 1 ? `` : `s`} ${additionsText}`
+																	: undefined
+																if (additionsText) operations.push(additionsText)
+															}
 
 															// Calculate feature diffs
 															if (
@@ -330,16 +371,21 @@ const VisionsClientPage: FC = () => {
 																	.flatMap((difference) => difference.value)
 																	.map((removal) => `"${removal}"`)
 																let removalsText = removals.length > 0 ? listToSentence(removals) : undefined
-																removalsText = removalsText ? `removed the features ${removalsText}` : undefined
+																removalsText = removalsText
+																	? `removed the feature${removals.length === 1 ? `` : `s`} ${removalsText}`
+																	: undefined
 																if (removalsText) operations.push(removalsText)
 																const additions = differences
 																	.filter((difference) => difference.added)
 																	.flatMap((difference) => difference.value)
 																	.map((addition) => `"${addition}"`)
 																let additionsText = additions.length > 0 ? listToSentence(additions) : undefined
-																additionsText = additionsText ? `added the features ${additionsText}` : undefined
+																additionsText = additionsText
+																	? `added the feature${additions.length === 1 ? `` : `s`} ${additionsText}`
+																	: undefined
 																if (additionsText) operations.push(additionsText)
 															}
+
 															const operationsText = listToSentence(operations).concat(`.`)
 
 															const batch = writeBatch(db)
@@ -365,22 +411,13 @@ const VisionsClientPage: FC = () => {
 
 															batch.update(product.ref, {
 																finalVision: data.finalVision,
-																productType: data.productType,
+																productTypes: data.productTypes,
 																valueProposition: data.valueProposition,
 															})
 															features.forEach((feature) => {
-																if (feature.id.startsWith(`new`)) {
-																	batch.set(doc(product.ref, `features`, nanoid()).withConverter(FeatureConverter), {
-																		text: feature.text,
-																	})
-																} else {
-																	batch.update(
-																		doc(product.ref, `features`, feature.id).withConverter(FeatureConverter),
-																		{
-																			text: feature.text,
-																		},
-																	)
-																}
+																batch.set(doc(product.ref, `Features`, feature.id).withConverter(FeatureConverter), {
+																	text: feature.text,
+																})
 															})
 															await batch.commit()
 
@@ -405,7 +442,7 @@ const VisionsClientPage: FC = () => {
 									size="small"
 									onClick={() => {
 										reset({
-											productType: product.data().productType ?? `mobile`,
+											productTypes: product.data().productTypes,
 											valueProposition: product.data().valueProposition ?? ``,
 											features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
 												{id: nanoid(), text: ``},
@@ -437,12 +474,12 @@ const VisionsClientPage: FC = () => {
 				) : (
 					<Timeline
 						items={visionUpdates?.docs.map((update) => ({
-							children: (
+							children: members && (
 								<div className="flex flex-col gap-1">
 									<p className="font-mono">{dayjs(update.data().timestamp.toDate()).fromNow()}</p>
 									<p className="text-xs">
 										<span className="text-info">
-											@{usersData.find((user) => user.data?.id === update.data().userId)?.data?.data()?.name}
+											@{members.docs.find((member) => member.id === update.data().userId)?.data()?.name}
 										</span>
 										{` `}
 										{update

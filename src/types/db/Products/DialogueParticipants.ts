@@ -13,15 +13,15 @@ export const DialogueParticipantSchema = z.object({
 	}),
 	email: z.string().email().nullable(),
 	location: z.string(),
-	name: z.string(),
-	phoneNumber: z.string(),
+	name: z.string({invalid_type_error: `Required`}),
+	phoneNumber: z.string().nullable(),
 	status: z.enum([`identified`, `contacted`, `scheduled`, `interviewed`, `analyzing`, `processed`]),
 	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable(),
 	title: z.enum([`dr`, `miss`, `mr`, `mrs`, `ms`, `prof`, `sir`]).nullable(),
 	transcript: z.string(),
 	updatedAt: timestampSchema,
 
-	personaIds: z.array(z.string()),
+	personaId: z.string().nullable(),
 	updatedAtUserId: z.string(),
 })
 

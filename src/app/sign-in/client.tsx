@@ -13,12 +13,12 @@ import {
 	signInWithPopup,
 	signOut,
 } from "firebase/auth"
-import {collectionGroup, doc, documentId, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
+import {collectionGroup, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
 import Image from "next/image"
 import {useRouter, useSearchParams} from "next/navigation"
 import {useEffect, useState} from "react"
 import {useAuthState} from "react-firebase-hooks/auth"
-import {useDocument} from "react-firebase-hooks/firestore"
+import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 import {z} from "zod"
 
 import type {AuthProvider, UserCredential} from "firebase/auth"
@@ -51,9 +51,6 @@ const SignInClientPage: FC = () => {
 
 	const searchParams = useSearchParams()
 	const inviteToken = searchParams?.get(`invite_token`)
-	const [productInvite] = useDocument(
-		inviteToken ? doc(db, `ProductInvites`, inviteToken).withConverter(InviteConverter) : undefined,
-	)
 	const productName = trpc.userInvite.getProductInviteInfo.useQuery(
 		{inviteToken: inviteToken!},
 		{enabled: !!inviteToken},
@@ -63,7 +60,6 @@ const SignInClientPage: FC = () => {
 
 	const processUser = async (credential: UserCredential) => {
 		if (!credential.user.email) throw new Error(`No email address found for user.`)
-		if (!credential.user.displayName) throw new Error(`No display name found for user.`)
 
 		setHasSignedIn(true)
 
@@ -88,6 +84,8 @@ const SignInClientPage: FC = () => {
 
 			if (typeof inviteToken === `string`)
 				await putUserOnProduct.mutateAsync({
+					userAvatar: credential.user.photoURL,
+					userName: credential.user.displayName ?? credential.user.email,
 					userId: credential.user.uid,
 					inviteToken,
 				})
@@ -252,7 +250,7 @@ const SignInClientPage: FC = () => {
 				</Spin>
 			</div>
 
-			{productInvite && (
+			{productName && (
 				<Alert
 					message={
 						<p>

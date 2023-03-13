@@ -3,6 +3,7 @@
 import {Breadcrumb} from "antd"
 import {Timestamp, collection, doc, getDoc, orderBy, query, setDoc, updateDoc, writeBatch} from "firebase/firestore"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
@@ -17,6 +18,7 @@ import {PersonaConverter} from "~/types/db/Products/Personas"
 import {PotentialRiskConverter} from "~/types/db/Products/PotentialRisks"
 import {UserPriorityConverter} from "~/types/db/Products/UserPriorities"
 import {db} from "~/utils/firebase"
+import {trpc} from "~/utils/trpc"
 
 const KickoffClientPage: FC = () => {
 	const {product} = useAppContext()
@@ -30,23 +32,30 @@ const KickoffClientPage: FC = () => {
 		| undefined
 	>(undefined)
 
-	const [personas] = useCollection(
+	const [personas, , personasError] = useCollection(
 		query(collection(product.ref, `Personas`), orderBy(`createdAt`, `asc`)).withConverter(PersonaConverter),
 	)
-	const [businessOutcomes] = useCollection(
+	useErrorHandler(personasError)
+	const [businessOutcomes, , businessOutcomesError] = useCollection(
 		query(collection(product.ref, `BusinessOutcomes`), orderBy(`createdAt`, `asc`)).withConverter(
 			BusinessOutcomeConverter,
 		),
 	)
-	const [userPriorities] = useCollection(
+	useErrorHandler(businessOutcomesError)
+	const [userPriorities, , userPrioritiesError] = useCollection(
 		query(collection(product.ref, `UserPriorities`), orderBy(`createdAt`, `asc`)).withConverter(UserPriorityConverter),
 	)
-	const [potentialRisks] = useCollection(
+	useErrorHandler(userPrioritiesError)
+	const [potentialRisks, , potentialRisksError] = useCollection(
 		query(collection(product.ref, `PotentialRisks`), orderBy(`createdAt`, `asc`)).withConverter(PotentialRiskConverter),
 	)
-	const [marketLeaders] = useCollection(
+	useErrorHandler(potentialRisksError)
+	const [marketLeaders, , marketLeadersError] = useCollection(
 		query(collection(product.ref, `MarketLeaders`), orderBy(`createdAt`, `asc`)).withConverter(MarketLeaderConverter),
 	)
+	useErrorHandler(marketLeadersError)
+
+	const gpt = trpc.gpt.useMutation()
 
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
@@ -82,15 +91,28 @@ const KickoffClientPage: FC = () => {
 							textList.map(async (item) => {
 								const existingDoc = await getDoc(doc(product.ref, `Personas`, item.id))
 								if (existingDoc.exists()) {
-									await updateDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
+									await updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
 										name: item.text,
 									})
 								} else {
-									await setDoc(doc(db, `Personas`, item.id).withConverter(PersonaConverter), {
+									await setDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
 										createdAt: Timestamp.now(),
 										description: ``,
 										name: item.text,
 									})
+
+									// Generate description asynchonously
+									updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
+										description: (
+											await gpt.mutateAsync({
+												prompt: `Below is a vision statement for an app I'm building:\n\n"${
+													product.data().finalVision
+												}"\n\nDescribe the user persona "${item.text}" in a paragraph.`,
+											})
+										).response
+											?.replace(/^\\n+/, ``)
+											.replace(/\\n+$/, ``),
+									}).catch(console.error)
 								}
 							}),
 						)

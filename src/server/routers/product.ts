@@ -15,6 +15,7 @@ import {MemberSchema} from "~/types/db/Products/Members"
 import {ObjectiveSchema} from "~/types/db/Products/Objectives"
 import {StoryMapHistorySchema} from "~/types/db/Products/StoryMapHistories"
 import {VersionSchema} from "~/types/db/Products/Versions"
+import {UserSchema} from "~/types/db/Users"
 import {authAdmin, dbAdmin} from "~/utils/firebaseAdmin"
 import {sendEmail} from "~/utils/sendEmail"
 
@@ -130,6 +131,44 @@ export const productRouter = router({
 				return {productId: slug}
 			},
 		),
+
+	getMemberEmails: procedure
+		.input(
+			z.object({
+				productId: z.string(),
+				userIdToken: z.string(),
+			}),
+		)
+		.query(async ({input: {productId, userIdToken}}) => {
+			const user = await authAdmin.verifyIdToken(userIdToken)
+			const member = await dbAdmin
+				.collection(`Products`)
+				.doc(productId)
+				.collection(`Members`)
+				.doc(user.uid)
+				.withConverter(genAdminConverter(MemberSchema))
+				.get()
+			if (member.data()?.type !== `owner`) throw new TRPCError({code: `UNAUTHORIZED`})
+
+			const members = await dbAdmin
+				.collection(`Products`)
+				.doc(productId)
+				.collection(`Members`)
+				.withConverter(genAdminConverter(MemberSchema))
+				.get()
+			const emails: Record<string, string> = {}
+			await Promise.all(
+				members.docs.map(async (member) => {
+					const user = await dbAdmin
+						.collection(`Users`)
+						.doc(member.id)
+						.withConverter(genAdminConverter(UserSchema))
+						.get()
+					emails[member.id] = user.data()!.email
+				}),
+			)
+			return emails
+		}),
 
 	haltAndCatchFire: procedure
 		.input(

@@ -4,6 +4,7 @@ import {Button, Card, Checkbox} from "antd"
 import {collectionGroup, doc, getDocs, orderBy, query, updateDoc, where} from "firebase/firestore"
 import {useRouter} from "next/navigation"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useAuthState} from "react-firebase-hooks/auth"
 
 import type {FC} from "react"
@@ -14,14 +15,13 @@ import PrivacyPolicy from "~/components/PrivacyPolicy"
 import TermsOfService from "~/components/TermsOfService"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {UserConverter} from "~/types/db/Users"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import {auth, db} from "~/utils/firebase"
 
 const AcceptTermsClientPage: FC = () => {
 	const router = useRouter()
 	const [agree, setAgree] = useState(false)
 	const [user, , userError] = useAuthState(auth)
-	conditionalThrow(userError)
+	useErrorHandler(userError)
 
 	const [hasAccepted, setHasAccepted] = useState(false)
 	const onAccept = async () => {

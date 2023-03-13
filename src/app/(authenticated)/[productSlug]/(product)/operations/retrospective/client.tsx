@@ -1,11 +1,10 @@
 "use client"
 
 import {PlusOutlined} from "@ant-design/icons"
-import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Button, Card, Empty, FloatButton, Switch, Tabs, Tag} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {Timestamp, addDoc, collection, doc, getDoc, query, updateDoc} from "firebase/firestore"
+import {Timestamp, addDoc, collection, query, updateDoc} from "firebase/firestore"
 import {useState} from "react"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
@@ -16,13 +15,11 @@ import type {RetrospectiveItem} from "~/types/db/Products/RetrospectiveItems"
 import RetrospectiveDrawer from "./RetrospectiveDrawer"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {RetrospectiveItemConverter, retrospectiveTabs} from "~/types/db/Products/RetrospectiveItems"
-import {UserConverter} from "~/types/db/Users"
-import {db} from "~/utils/firebase"
 
 dayjs.extend(relativeTime)
 
 const RetrospectiveClientPage: FC = () => {
-	const {product, user} = useAppContext()
+	const {product, member} = useAppContext()
 
 	const [retrospectiveItems, loading] = useCollection(
 		query(collection(product.ref, `RetrospectiveItems`)).withConverter(RetrospectiveItemConverter),
@@ -32,15 +29,6 @@ const RetrospectiveClientPage: FC = () => {
 	const [activeItemId, setActiveItemId] = useState<string | `new` | undefined>(undefined)
 	const [includeArchived, setIncludeArchived] = useState(false)
 	const activeItem = retrospectiveItems?.docs.find((item) => item.id === activeItemId)
-
-	const usersData = useQueries({
-		queries: retrospectiveItems
-			? retrospectiveItems.docs.map((item) => ({
-					queryKey: [`user`, item.data().userId],
-					queryFn: async () => await getDoc(doc(db, `Users`, item.data().userId).withConverter(UserConverter)),
-			  }))
-			: [],
-	})
 
 	return (
 		<div className="flex h-full items-start justify-between">
@@ -75,13 +63,11 @@ const RetrospectiveClientPage: FC = () => {
 									key={item.id}
 									type="inner"
 									title={(() => {
-										const user = usersData.find((user) => user.data?.id === item.data().userId)?.data
-
 										return (
 											<div className="my-4 flex items-center gap-4">
-												<Avatar src={user?.data()?.avatar} shape="square" size="large" />
+												<Avatar src={member.data().avatar} shape="square" size="large" />
 												<div className="flex flex-col">
-													<p>{user?.data()?.name}</p>
+													<p>{member.data().name}</p>
 													<p className="font-normal text-textTertiary">
 														Created {dayjs(item.data().createdAt.toMillis()).fromNow()}
 													</p>
@@ -90,7 +76,7 @@ const RetrospectiveClientPage: FC = () => {
 										)
 									})()}
 									extra={
-										item.data().userId === user.id ? (
+										item.data().userId === member.id ? (
 											<Button size="small" onClick={() => setActiveItemId(item.id)}>
 												Edit
 											</Button>
@@ -150,7 +136,7 @@ const RetrospectiveClientPage: FC = () => {
 							...values,
 							archived: false,
 							createdAt: Timestamp.now(),
-							userId: user.id,
+							userId: member.id,
 						}
 						if (activeItemId === `new`) {
 							await addDoc(

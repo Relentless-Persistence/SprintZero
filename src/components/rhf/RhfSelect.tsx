@@ -1,6 +1,7 @@
 /* Specifically for use with react-hook-form. Use Antd's plain <Select /> otherwise. */
 
 import {Select} from "antd"
+import {AnimatePresence, motion} from "framer-motion"
 import {useController} from "react-hook-form"
 
 import type {SelectProps as AntdSelectProps} from "antd"
@@ -28,20 +29,36 @@ const RhfSelect = <TFieldValues extends FieldValues = FieldValues>({
 	onChange,
 	...props
 }: RhfSelectProps<TFieldValues>): ReactElement | null => {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	const {field} = useController({control, name, rules, defaultValue, shouldUnregister})
+	const {
+		field,
+		fieldState: {error},
+	} = useController({control, name, rules, defaultValue, shouldUnregister})
 
 	return (
-		<Select
-			{...props}
-			onChange={(value, option) => {
-				field.onChange(value)
-				onChange && Promise.resolve(onChange(value, option)).catch(console.error)
-			}}
-			onBlur={field.onBlur}
-			value={field.value}
-			ref={(v) => field.ref(v)}
-		/>
+		<div className="grid place-items-stretch">
+			<Select
+				{...props}
+				onChange={(value, option) => {
+					field.onChange(value)
+					onChange && Promise.resolve(onChange(value, option)).catch(console.error)
+				}}
+				onBlur={field.onBlur}
+				value={field.value}
+				ref={(v) => field.ref(v)}
+			/>
+			<AnimatePresence>
+				{error && (
+					<motion.p
+						initial={{height: `0px`}}
+						animate={{height: `auto`}}
+						exit={{height: `0px`}}
+						className="overflow-hidden leading-tight text-error"
+					>
+						{error.message}
+					</motion.p>
+				)}
+			</AnimatePresence>
+		</div>
 	)
 }
 

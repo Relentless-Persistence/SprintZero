@@ -87,7 +87,7 @@ const InsightItemCard: FC<InsightCardProps> = ({insightId, initialData, isEditin
 						<Button
 							danger
 							onClick={() => {
-								deleteDoc(doc(db, `Insights`, insightId)).catch(console.error)
+								deleteDoc(doc(product.ref, `Insights`, insightId)).catch(console.error)
 							}}
 							className="w-full"
 						>

@@ -21,7 +21,8 @@ dayjs.extend(isBetween)
 const FunCard: FC = () => {
 	const {user} = useAppContext()
 	const [date, setDate] = useState<Dayjs | null>(null)
-	const [hasSubmitted, setHasSubmitted] = useState(false)
+	const [songName, setSongName] = useState<string | undefined>(undefined)
+	const [clues, setClues] = useState<string[] | undefined>(undefined)
 	const [showSong, setShowSong] = useState(false)
 
 	const generateRandomDate = () => {
@@ -33,39 +34,15 @@ const FunCard: FC = () => {
 		setDate(dayjs(`${randomYear}-${randomMonth}-${randomDate}`))
 	}
 
-	const {data: song, isSuccess: songIsSuccess} = trpc.gpt.useQuery(
-		{
-			prompt: `What was the #1 song on the Billboard Top 100 list on ${
-				date?.format(`MMMM D, YYYY`) ?? ``
-			}? Give in the format "Artist - Song name".`,
-		},
-		{
-			enabled: !!date && !hasSubmitted,
-			select: (data) => data.response?.replace(/^"/, ``).replace(/"$/, ``),
-		},
-	)
-	const clues = trpc.gpt.useQuery(
-		{
-			prompt: `I'm playing a song guessing game. Generate three clues for the song "${encodeURIComponent(
-				song!,
-			)}". Make sure no names or song/album titles are used in any of the clues. Also try not to quote any lyrics from the song.`,
-		},
-		{
-			enabled: songIsSuccess,
-			select: (data) =>
-				data.response
-					?.split(`\n`)
-					.map((s) => s.replace(/^[0-9]+\. */, ``))
-					.filter((s) => s !== ``),
-		},
-	)
+	const songGpt = trpc.gpt.useMutation()
+	const cluesGpt = trpc.gpt.useMutation()
 	const {data: songUrl} = trpc.funCard.getSongUrl.useQuery(
 		{
-			song: song!,
+			songName: encodeURIComponent(songName!),
 			service: user.data().preferredMusicClient,
 		},
 		{
-			enabled: !!song && !!user,
+			enabled: !!songName && !!user,
 			select: (data) => {
 				if (!data.url) return undefined
 				if (user.data().preferredMusicClient === `appleMusic`) {
@@ -80,14 +57,15 @@ const FunCard: FC = () => {
 	)
 
 	const onReset = () => {
-		setHasSubmitted(false)
+		setSongName(undefined)
+		setClues(undefined)
 		setShowSong(false)
 	}
 
 	return (
 		<Card
 			type="inner"
-			className="flex flex-col [&>.ant-card-body]:grow"
+			className="flex min-h-0 flex-col [&>.ant-card-body]:grow [&>.ant-card-body]:overflow-auto [&>.ant-card-head]:shrink-0"
 			title={
 				<div className="flex items-center gap-4 py-4">
 					<div className="grid h-10 w-10 place-items-center rounded-md border border-primary bg-primaryBg">
@@ -161,7 +139,7 @@ const FunCard: FC = () => {
 						<Button
 							size="small"
 							icon={<ShuffleIcon />}
-							disabled={clues.isSuccess}
+							disabled={!!songName || songGpt.isLoading}
 							className="flex items-center gap-2"
 							onClick={generateRandomDate}
 						>
@@ -171,22 +149,49 @@ const FunCard: FC = () => {
 							<Button type="text" size="small" disabled={date === null} onClick={onReset}>
 								Reset
 							</Button>
-							<Button size="small" onClick={() => setHasSubmitted(true)} disabled={date === null || clues.isSuccess}>
+							<Button
+								size="small"
+								loading={songGpt.isLoading || cluesGpt.isLoading}
+								onClick={() => {
+									songGpt
+										.mutateAsync({
+											prompt: `What was the #1 song on the Billboard Top 100 list on ${
+												date?.format(`MMMM D, YYYY`) ?? ``
+											}? Give in the format "Artist - Song name".`,
+										})
+										.then(async (data) => {
+											const song = data.response!.replace(/^"/, ``).replace(/"$/, ``).replaceAll(`\n`, ``)
+											setSongName(song)
+
+											const clues = (
+												await cluesGpt.mutateAsync({
+													prompt: `I'm playing a song guessing game. Generate three clues for the song "${song}". Make sure no names or song/album titles are used in any of the clues. Also try not to quote any lyrics from the song.`,
+												})
+											).response
+												?.split(`\n`)
+												.map((s) => s.replace(/^[0-9]+\. */, ``))
+												.filter((s) => s !== ``)
+											setClues(clues)
+										})
+										.catch(console.error)
+								}}
+								disabled={date === null || songGpt.isLoading || songName !== undefined}
+							>
 								Submit
 							</Button>
 						</div>
 					</div>
 				</div>
 
-				<div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+				<div className="flex flex-1 flex-col gap-2">
 					<p className="font-semibold">Clues</p>
-					{clues.isSuccess && clues.data ? (
+					{clues ? (
 						<ol className="w-full list-decimal space-y-1 pl-4">
-							{clues.data.map((clue, i) => (
+							{clues.map((clue, i) => (
 								<li key={i}>{clue}</li>
 							))}
 						</ol>
-					) : hasSubmitted ? (
+					) : cluesGpt.isLoading || songGpt.isLoading ? (
 						<Skeleton active />
 					) : (
 						<Skeleton />
@@ -215,7 +220,7 @@ const FunCard: FC = () => {
 							/>
 						)
 					) : (
-						<Button block disabled={songUrl === undefined} onClick={() => setShowSong(true)}>
+						<Button block disabled={songUrl === undefined || clues === undefined} onClick={() => setShowSong(true)}>
 							Reveal
 						</Button>
 					)}

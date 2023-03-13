@@ -13,6 +13,7 @@ import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {Timestamp, collection, doc, updateDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection, useDocument} from "react-firebase-hooks/firestore"
 import {useForm} from "react-hook-form"
 
@@ -27,9 +28,8 @@ import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import {DialogueParticipantSchema, statuses, timings} from "~/types/db/Products/DialogueParticipants"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {PersonaConverter} from "~/types/db/Products/Personas"
-import {UserConverter} from "~/types/db/Users"
-import {db} from "~/utils/firebase"
 import EarIcon from "~public/icons/ear.svg"
 
 dayjs.extend(relativeTime)
@@ -41,7 +41,7 @@ const formSchema = DialogueParticipantSchema.pick({
 	phoneNumber: true,
 	title: true,
 	transcript: true,
-	personaIds: true,
+	personaId: true,
 })
 type FormInputs = z.infer<typeof formSchema>
 
@@ -66,13 +66,14 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 	const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
 	const participantData = participant?.data()
 
-	const [personas] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
-
-	const [lastUpdatedAtUser] = useDocument(
+	const [personas, , personasError] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
+	useErrorHandler(personasError)
+	const [lastUpdatedAtUser, , lastUpdatedAtUserError] = useDocument(
 		participant?.data().updatedAtUserId
-			? doc(db, `Users`, participant.data().updatedAtUserId).withConverter(UserConverter)
+			? doc(product.ref, `Members`, participant.data().updatedAtUserId).withConverter(MemberConverter)
 			: undefined,
 	)
+	useErrorHandler(lastUpdatedAtUserError)
 
 	const {control, handleSubmit, setValue} = useForm<FormInputs>({
 		mode: `onChange`,
@@ -80,17 +81,18 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 		shouldFocusError: false,
 		defaultValues: {
 			availability: participantData?.availability ?? [],
-			email: participantData?.email ?? ``,
+			email: participantData?.email ?? null,
 			name: participantData?.name ?? `New Participant`,
-			phoneNumber: participantData?.phoneNumber ?? ``,
+			phoneNumber: participantData?.phoneNumber ?? null,
 			title: participantData?.title ?? null,
 			transcript: participantData?.transcript ?? ``,
+			personaId: participantData?.personaId ?? null,
 		},
 	})
 
 	const onSubmit = handleSubmit(async (data) => {
 		if (!activeParticipant) return
-		await updateDoc(doc(db, `Participants`, activeParticipant), {
+		await updateDoc(doc(product.ref, `DialogueParticipants`, activeParticipant), {
 			...data,
 			updatedAt: Timestamp.now(),
 		})
@@ -108,7 +110,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 		<Drawer
 			placement="bottom"
 			closable={false}
-			height={400}
+			height={440}
 			open={isOpen}
 			onClose={close}
 			title={
@@ -117,16 +119,16 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 						Delete
 					</Button>
 				) : (
-					<div className="flex flex-col gap-1">
-						<div className="flex items-end gap-4">
-							<p className="font-semibold">{participant?.data().name}</p>
+					<div className="mr-4 flex min-w-0 max-w-full flex-col gap-1 overflow-auto">
+						<p className="max-w-full leading-none">
+							<span className="mr-4 inline-block max-w-full truncate font-semibold">{participant?.data().name}</span>
 							{participant && (
-								<p className="mb-0.5 text-sm font-normal text-textTertiary">
+								<span className="mb-0.5 text-sm font-normal text-textTertiary">
 									Last modified {dayjs(participant.data().updatedAt.toMillis()).fromNow()}
 									{lastUpdatedAtUser?.data() && ` by ${lastUpdatedAtUser.data()!.name}`}
-								</p>
+								</span>
 							)}
-						</div>
+						</p>
 						<div className="flex gap-2">
 							{participantData?.location && (
 								<Tag color="#585858" icon={<PushpinOutlined />}>
@@ -208,86 +210,106 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 							onChange={() => {
 								onSubmit().catch(console.error)
 							}}
-							className="grow !resize-none"
+							wrapperClassName="grow"
+							className="!h-full !resize-none"
 						/>
 					</div>
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-col gap-2">
 							<p className="text-lg font-semibold">Contact</p>
-							<RhfInput
-								control={control}
-								name="name"
-								onChange={() => {
-									onSubmit().catch(console.error)
-								}}
-								addonBefore={
-									<RhfSelect
+							<label className="leading-normal">
+								<span className="text-sm text-textTertiary">Name</span>
+								<RhfInput
+									control={control}
+									name="name"
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+									addonBefore={
+										<RhfSelect
+											control={control}
+											name="title"
+											onChange={() => {
+												onSubmit().catch(console.error)
+											}}
+											className="w-[78px]"
+											options={[
+												{label: `Dr.`, value: `dr`},
+												{label: `Miss`, value: `miss`},
+												{label: `Mr.`, value: `mr`},
+												{label: `Mrs.`, value: `mrs`},
+												{label: `Ms.`, value: `ms`},
+												{label: `Prof.`, value: `prof`},
+												{label: `Sir`, value: `sir`},
+											]}
+										/>
+									}
+								/>
+							</label>
+							<label className="leading-normal">
+								<span className="text-sm text-textTertiary">Email Address</span>
+								<RhfInput
+									control={control}
+									name="email"
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+									addonBefore={
+										<div className="w-14">
+											<MailOutlined />
+										</div>
+									}
+								/>
+							</label>
+							<div className="flex flex-col gap-1">
+								<label className="leading-normal">
+									<span className="text-sm text-textTertiary">Phone Number</span>
+									<RhfInput
 										control={control}
-										name="title"
+										name="phoneNumber"
 										onChange={() => {
 											onSubmit().catch(console.error)
 										}}
-										className="w-20"
-										options={[
-											{label: `Dr.`, value: `dr`},
-											{label: `Miss`, value: `miss`},
-											{label: `Mr.`, value: `mr`},
-											{label: `Mrs.`, value: `mrs`},
-											{label: `Ms.`, value: `ms`},
-											{label: `Prof.`, value: `prof`},
-											{label: `Sir`, value: `sir`},
-										]}
+										addonBefore={
+											<div className="w-14">
+												<PhoneOutlined />
+											</div>
+										}
 									/>
-								}
-							/>
-							<RhfInput
-								control={control}
-								name="email"
-								onChange={() => {
-									onSubmit().catch(console.error)
-								}}
-								addonBefore={<MailOutlined />}
-							/>
-							<RhfInput
-								control={control}
-								name="phoneNumber"
-								onChange={() => {
-									onSubmit().catch(console.error)
-								}}
-								addonBefore={<PhoneOutlined />}
-							/>
-							<RhfSelect
-								control={control}
-								name="availability"
-								mode="multiple"
-								onChange={() => {
-									onSubmit().catch(console.error)
-								}}
-								className="w-full"
-								options={[
-									{label: `9am - 5pm only`, value: `95only`},
-									{label: `Email`, value: `email`},
-									{label: `Phone`, value: `phone`},
-									{label: `Text`, value: `text`},
-									{label: `Weekdays only`, value: `weekdays`},
-									{label: `Weekends only`, value: `weekends`},
-								]}
-							/>
-						</div>
-						<div>
-							<p className="text-lg font-semibold">Personas</p>
-							<RhfSelect
-								control={control}
-								name="personaIds"
-								mode="multiple"
-								onChange={() => {
-									onSubmit().catch(console.error)
-								}}
-								options={
-									personas ? personas.docs.map((persona) => ({label: persona.data().name, value: persona.id})) : []
-								}
-								className="w-full"
-							/>
+								</label>
+								<RhfSelect
+									control={control}
+									name="availability"
+									size="small"
+									mode="multiple"
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+									className="w-full"
+									options={[
+										{label: `9am - 5pm only`, value: `95only`},
+										{label: `Email`, value: `email`},
+										{label: `Phone`, value: `phone`},
+										{label: `Text`, value: `text`},
+										{label: `Weekdays only`, value: `weekdays`},
+										{label: `Weekends only`, value: `weekends`},
+									]}
+								/>
+							</div>
+							<label className="leading-normal">
+								<span className="text-sm text-textTertiary">Persona</span>
+								<RhfSelect
+									control={control}
+									name="personaId"
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+									options={
+										personas ? personas.docs.map((persona) => ({label: persona.data().name, value: persona.id})) : []
+									}
+									className="w-full [contain:inline-size]"
+								/>
+							</label>
 						</div>
 					</div>
 				</form>

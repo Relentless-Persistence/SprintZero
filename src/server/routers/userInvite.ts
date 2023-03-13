@@ -17,14 +17,15 @@ export const userInviteRouter = router({
 			}),
 		)
 		.query(async ({input: {inviteToken}}) => {
-			const productInvite = await dbAdmin
-				.doc(`ProductInvites/${inviteToken}`)
+			const invites = await dbAdmin
+				.collectionGroup(`Invites/${inviteToken}`)
 				.withConverter(genAdminConverter(InviteSchema))
 				.get()
-			if (!productInvite.exists) throw new TRPCError({code: `UNAUTHORIZED`})
+			if (!invites.docs[0]) throw new TRPCError({code: `UNAUTHORIZED`})
+			const invite = invites.docs[0]!
 
 			const product = await dbAdmin
-				.doc(productInvite.ref.parent.parent!.id)
+				.doc(invite.ref.parent.parent!.path)
 				.withConverter(genAdminConverter(ProductSchema))
 				.get()
 			if (!product.exists) throw new TRPCError({code: `UNAUTHORIZED`})
@@ -37,10 +38,12 @@ export const userInviteRouter = router({
 		.input(
 			z.object({
 				userId: z.string(),
+				userName: z.string(),
+				userAvatar: z.string().nullable(),
 				inviteToken: z.string(),
 			}),
 		)
-		.mutation(async ({input: {userId, inviteToken}}) => {
+		.mutation(async ({input: {userId, userName, userAvatar, inviteToken}}) => {
 			const productInvite = await dbAdmin
 				.collectionGroup(`Invites`)
 				.where(FieldPath.documentId(), `==`, inviteToken)
@@ -55,6 +58,8 @@ export const userInviteRouter = router({
 				.doc(userId)
 				.withConverter(genAdminConverter(MemberSchema))
 				.set({
+					name: userName,
+					avatar: userAvatar,
 					type: `editor`,
 					id: userId,
 				})

@@ -20,7 +20,7 @@ export const appRouter = router({
 	product: productRouter,
 	userInvite: userInviteRouter,
 
-	gpt: procedure.input(z.object({prompt: z.string()})).query(async ({input: {prompt}}) => {
+	gpt: procedure.input(z.object({prompt: z.string()})).mutation(async ({input: {prompt}}) => {
 		const response = await openai.createCompletion({
 			model: `text-davinci-003`,
 			prompt,

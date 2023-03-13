@@ -74,6 +74,14 @@ button.ant-btn-link {
 
 .ant-tag {
 	margin-inline-end: unset;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+.ant-drawer-title {
+	min-width: 0px;
+	max-width: 100%;
 }
 
 @layer base {

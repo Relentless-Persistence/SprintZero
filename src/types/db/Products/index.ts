@@ -2,6 +2,19 @@ import {z} from "zod"
 
 import {genConverter, timestampSchema} from "~/types"
 
+export const productTypes = [
+	[`mobile`, `Mobile`],
+	[`tablet`, `Tablet`],
+	[`desktop`, `Desktop`],
+	[`watch`, `Watch`],
+	[`web`, `Web`],
+	[`augmentedReality`, `Augmented Reality`],
+	[`virtualReality`, `Virtual Reality`],
+	[`artificialIntelligence`, `Artificial Intelligence`],
+	[`humanoid`, `Humanoid`],
+	[`api`, `API`],
+] as const
+
 export const ProductSchema = z.object({
 	// General product info
 	cadence: z.number(),
@@ -40,7 +53,7 @@ export const ProductSchema = z.object({
 
 	// Vision info
 	finalVision: z.string(),
-	productType: z.enum([`mobile`, `tablet`, `desktop`, `watch`, `web`]).nullable(),
+	productTypes: z.array(z.enum(productTypes.map(([value]) => value) as [string])),
 	valueProposition: z.string({invalid_type_error: `Required`}).min(1, `Required`).nullable(),
 })
 

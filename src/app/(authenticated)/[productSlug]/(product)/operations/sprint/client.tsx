@@ -54,9 +54,10 @@ const SprintClientPage: FC = () => {
 
 	const [versions] = useCollection(
 		storyMapState
-			? query(collection(db, `StoryMapStates`, storyMapState.id, `Versions`), orderBy(`name`, `asc`)).withConverter(
-					VersionConverter,
-			  )
+			? query(
+					collection(product.ref, `StoryMapStates`, storyMapState.id, `Versions`),
+					orderBy(`name`, `asc`),
+			  ).withConverter(VersionConverter)
 			: undefined,
 	)
 

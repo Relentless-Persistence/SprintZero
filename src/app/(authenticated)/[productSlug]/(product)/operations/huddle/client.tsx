@@ -1,17 +1,14 @@
 "use client"
 
 import {DownOutlined} from "@ant-design/icons"
-import {useQueries} from "@tanstack/react-query"
 import {Avatar, Breadcrumb, Button, Card, Dropdown} from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {Timestamp, arrayRemove, arrayUnion, collection, doc, getDoc, query, updateDoc} from "firebase/firestore"
+import {Timestamp, arrayRemove, arrayUnion, collection, orderBy, query, updateDoc} from "firebase/firestore"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
-import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
-import type {User} from "~/types/db/Users"
 
 import FunCard from "./FunCard"
 import Story from "./Story"
@@ -20,9 +17,6 @@ import {HuddleConverter} from "~/types/db/Products/Huddles"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {VersionConverter} from "~/types/db/Products/Versions"
-import {UserConverter} from "~/types/db/Users"
-import {conditionalThrow} from "~/utils/conditionalThrow"
-import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 
 dayjs.extend(relativeTime)
@@ -30,49 +24,43 @@ dayjs.extend(relativeTime)
 const HuddleClientPage: FC = () => {
 	const {product, user} = useAppContext()
 
-	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
-	conditionalThrow(membersError)
+	const [members, , membersError] = useCollection(
+		query(collection(product.ref, `Members`), orderBy(`name`, `asc`)).withConverter(MemberConverter),
+	)
+	useErrorHandler(membersError)
 
-	const usersData = useQueries({
-		queries:
-			members?.docs.map((member) => ({
-				queryKey: [`user`, member.id],
-				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
-			})) ?? [],
-	})
-	const users = usersData
-		.sort((a, b) => (a.data?.exists() && b.data?.exists() ? a.data.data().name.localeCompare(b.data.data().name) : 0))
-		.map((data) => data.data)
-		.filter((data): data is QueryDocumentSnapshot<User> => data?.exists() ?? false)
-
-	const [storyMapItems] = useCollection(
+	const [storyMapItems, , storyMapItemsError] = useCollection(
 		query(collection(product.ref, `StoryMapItems`)).withConverter(StoryMapItemConverter),
 	)
-	const [versions] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
-	const [huddles] = useCollection(collection(product.ref, `Huddles`).withConverter(HuddleConverter))
+	useErrorHandler(storyMapItemsError)
+	const [versions, , versionsError] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
+	useErrorHandler(versionsError)
+	const [huddles, , huddlesError] = useCollection(collection(product.ref, `Huddles`).withConverter(HuddleConverter))
+	useErrorHandler(huddlesError)
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-auto pb-8">
+		<div className="flex h-full w-full flex-col pb-8">
 			<div className="sticky left-0 flex flex-col gap-2 px-12 py-8">
 				<Breadcrumb items={[{title: `Operations`}, {title: `Huddle`}]} />
 				<p className="text-textTertiary">What did you do yesterday, today, and any blockers?</p>
 			</div>
 
-			<div className="ml-12 grid grow auto-cols-[24rem] grid-flow-col gap-4">
+			<div className="ml-12 grid min-h-0 grow auto-cols-[24rem] grid-flow-col gap-4">
 				<FunCard />
 
-				{users.map((huddleUser) => {
-					const huddle = huddles?.docs.find(({id}) => id === huddleUser.id)
+				{members?.docs.map((member) => {
+					const huddle = huddles?.docs.find(({id}) => id === member.id)
 
 					return (
 						<Card
-							key={huddleUser.id}
+							key={member.id}
 							type="inner"
+							className="flex min-h-0 flex-col [&>.ant-card-body]:min-h-0 [&>.ant-card-body]:flex-1 [&>.ant-card-body]:overflow-auto [&>.ant-card-head]:shrink-0"
 							title={
 								<div className="my-4 flex items-center gap-4">
-									<Avatar src={huddleUser.data().avatar} size="large" shape="square" />
+									<Avatar src={member.data().avatar} size="large" shape="square" />
 									<div>
-										<p>{huddleUser.data().name}</p>
+										<p>{member.data().name}</p>
 										{huddle && (
 											<p className="text-sm font-normal text-textTertiary">
 												Updated {dayjs(huddle.data().updatedAt.toMillis()).fromNow()}
@@ -99,16 +87,15 @@ const HuddleClientPage: FC = () => {
 														versions={versions}
 														storyId={storyId}
 														onRemove={async () => {
-															const data: WithFieldValue<Partial<Product>> = {
-																[`huddles.${huddleUser.id}.updatedAt`]: Timestamp.now(),
-																[`huddles.${huddleUser.id}.blockerStoryIds`]: arrayRemove(storyId),
-															}
-															await updateDoc(product.ref, data)
+															await updateDoc(huddle.ref, {
+																updatedAt: Timestamp.now(),
+																blockerStoryIds: arrayRemove(storyId),
+															})
 														}}
 													/>
 												)
 											})) || <p className="italic text-textTertiary">No blockers</p>}
-										{huddleUser.id === user.id &&
+										{member.id === user.id &&
 											storyMapItems &&
 											(() => {
 												const blockerStoryOptions = getStories(storyMapItems)
@@ -173,7 +160,7 @@ const HuddleClientPage: FC = () => {
 													/>
 												)
 											})) || <p className="italic text-textTertiary">No items</p>}
-										{huddleUser.id === user.id &&
+										{member.id === user.id &&
 											storyMapItems &&
 											(() => {
 												const todayStoryOptions = getStories(storyMapItems)
@@ -238,7 +225,7 @@ const HuddleClientPage: FC = () => {
 													/>
 												)
 											})) || <p className="italic text-textTertiary">No items</p>}
-										{huddleUser.id === user.id &&
+										{member.id === user.id &&
 											storyMapItems &&
 											(() => {
 												const yesterdayStoryOptions = getStories(storyMapItems)

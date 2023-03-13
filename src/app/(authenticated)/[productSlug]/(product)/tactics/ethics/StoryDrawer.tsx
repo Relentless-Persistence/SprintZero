@@ -9,30 +9,27 @@ import {
 	NumberOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
-import {useQueries} from "@tanstack/react-query"
 import {Avatar, Drawer, Input, Popover, Radio, Segmented, Tag} from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {collection, doc, getDoc, updateDoc} from "firebase/firestore"
+import {collection, updateDoc} from "firebase/firestore"
 import {useEffect, useState} from "react"
-import {useCollection, useDocument} from "react-firebase-hooks/firestore"
+import {useErrorHandler} from "react-error-boundary"
+import {useCollection} from "react-firebase-hooks/firestore"
 import {useInterval} from "react-use"
 
 import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
+import type {Member} from "~/types/db/Products/Members"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
-import type {User} from "~/types/db/Users"
 
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
 import {MemberConverter} from "~/types/db/Products/Members"
 import {sprintColumns} from "~/types/db/Products/StoryMapItems"
-import {UserConverter} from "~/types/db/Users"
-import {conditionalThrow} from "~/utils/conditionalThrow"
 import dollarFormat from "~/utils/dollarFormat"
-import {db} from "~/utils/firebase"
 import {getStories} from "~/utils/storyMap"
 
 dayjs.extend(relativeTime)
@@ -45,13 +42,13 @@ export type StoryDrawerProps = {
 }
 
 const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onClose}) => {
-	const {product, user} = useAppContext()
+	const {product, member} = useAppContext()
 	const story = getStories(storyMapItems).find((story) => story.id === storyId)!
 	const [description, setDescription] = useState(story.data().description)
 	const [commentType, setCommentType] = useState<`design` | `code`>(`design`)
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
-	conditionalThrow(membersError)
+	useErrorHandler(membersError)
 
 	useEffect(() => {
 		setDescription(story.data().description)
@@ -69,14 +66,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 
 		if (votingComplete) {
 			const data: WithFieldValue<Partial<StoryMapItem>> = {
-				[`ethicsVotes.${user.id}`]: vote,
+				[`ethicsVotes.${member.id}`]: vote,
 				ethicsApproved: votingResult,
 				ethicsColumn: `adjudicated`,
 			}
 			await updateDoc(story.ref, data)
 		} else {
 			const data: WithFieldValue<Partial<StoryMapItem>> = {
-				[`ethicsVotes.${user.id}`]: vote,
+				[`ethicsVotes.${member.id}`]: vote,
 			}
 			await updateDoc(story.ref, data)
 		}
@@ -88,24 +85,15 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 	useInterval(() => {
 		setLastModifiedText(dayjs(story.data().updatedAt.toMillis()).fromNow())
 	}, 1000)
-	const [lastModifiedUser] = useDocument(doc(db, `Users`, story.data().updatedAtUserId).withConverter(UserConverter))
-
-	const memberUsers = useQueries({
-		queries:
-			members?.docs.map((member) => ({
-				queryKey: [`user`, member.id],
-				queryFn: async () => await getDoc(doc(db, `Users`, member.id).withConverter(UserConverter)),
-			})) ?? [],
-	})
 
 	const peoplePopoverItems = story
 		.data()
-		.peopleIds.map((userId) => memberUsers.find((user) => user.data?.id === userId)?.data)
-		.filter((user): user is QueryDocumentSnapshot<User> => user?.exists() ?? false)
+		.peopleIds.map((userId) => members?.docs.find((user) => user.id === userId))
+		.filter((user): user is QueryDocumentSnapshot<Member> => user?.exists() ?? false)
 		.map((user) => (
 			<div key={user.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
-				<Avatar src={user.data().avatar} shape="square" size="small" />
-				{user.data().name}
+				<Avatar src={member.data().avatar} shape="square" size="small" />
+				{member.data().name}
 			</div>
 		))
 
@@ -120,9 +108,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 				<div className="flex h-14 flex-col justify-center gap-1">
 					<div className="flex items-end gap-4">
 						<p>{story.data().name}</p>
-						{lastModifiedText && lastModifiedUser?.exists() && (
+						{lastModifiedText && members && (
 							<p className="text-sm font-normal text-textTertiary">
-								Last modified {lastModifiedText} by {lastModifiedUser.data().name}
+								Last modified {lastModifiedText} by{` `}
+								{members.docs.find((member) => member.id === story.data().updatedAtUserId)!.data().name}
 							</p>
 						)}
 					</div>
@@ -205,9 +194,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 
 								<Radio.Group
 									value={
-										story.data().ethicsVotes[user.id] === true
+										story.data().ethicsVotes[member.id] === true
 											? `allow`
-											: story.data().ethicsVotes[user.id] === false
+											: story.data().ethicsVotes[member.id] === false
 											? `reject`
 											: undefined
 									}
