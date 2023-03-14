@@ -3,6 +3,7 @@
 import {MinusCircleOutlined} from "@ant-design/icons"
 import {Button, Input, Tabs} from "antd"
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
+import {useState} from "react"
 
 import type {DocumentReference} from "firebase/firestore"
 import type {FC} from "react"
@@ -28,8 +29,22 @@ const VersionList: FC = () => {
 		setVersionsToBeDeleted,
 	} = useStoryMapContext()
 
+	const [isVersionValid, setVersionIsValid] = useState(true)
+
 	const addVersion = async (): Promise<DocumentReference<Version>> => {
 		if (!newVersionInputValue) throw new Error(`Version name is required.`)
+
+		// Check if the value is a valid semantic version number
+		const semanticVersionRegex =
+			/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+		const isValidVersion = semanticVersionRegex.test(newVersionInputValue)
+		if (isValidVersion) {
+			setVersionIsValid(true)
+		} else {
+			setVersionIsValid(false)
+			throw new Error(`Invalid semantic version number`)
+		}
+
 		const existingDoc = (
 			await getDocs(query(collection(product.ref, `Versions`), where(`name`, `==`, newVersionInputValue)))
 		).docs[0]
@@ -100,6 +115,8 @@ const VersionList: FC = () => {
 												autoFocus
 												value={newVersionInputValue}
 												onChange={(e) => setNewVersionInputValue(e.target.value)}
+												status={isVersionValid ? `` : `error`}
+												//help={!isVersionValid && `Please enter a valid semantic version number`}
 												onPressEnter={() => {
 													if (newVersionInputValue)
 														addVersion()
