@@ -535,6 +535,7 @@ export const appRouter = router({
 						.set({
 							email: productInvite.data().email,
 							id: productInvite.id,
+							userType: `editor`,
 						})
 				}),
 
