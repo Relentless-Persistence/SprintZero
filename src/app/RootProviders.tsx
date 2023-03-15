@@ -5,6 +5,7 @@ import {httpBatchLink} from "@trpc/client"
 import {ConfigProvider, theme as antdTheme} from "antd"
 import "core-js/es/array/find-last"
 import {doc} from "firebase/firestore"
+import {usePathname} from "next/navigation"
 import {useState} from "react"
 import {useDocument} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
@@ -25,6 +26,7 @@ export type RootProvidersProps = {
 const RootProviders: FC<RootProvidersProps> = ({children, theme: browserTheme}) => {
 	const [themeSetting, setThemeSetting] = useState<`light` | `auto` | `dark`>(`auto`)
 	const theme = themeSetting === `auto` ? browserTheme : themeSetting
+	const pathname = usePathname()
 
 	const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 	invariant(baseUrl, `NEXT_PUBLIC_BASE_URL is not set`)
@@ -62,7 +64,7 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: browserTheme}) 
 						}}
 					>
 						{!loading &&
-							(appInfo?.data()?.maintenanceMode ? (
+							(appInfo?.data()?.maintenanceMode && pathname !== `/admin` ? (
 								<MaintenancePage />
 							) : (
 								<div className="isolate h-full">{children}</div>

@@ -120,9 +120,8 @@ export const appRouter = router({
 			dbAdmin.collectionGroup(`Versions`).withConverter(genAdminConverter(OldVersionSchema)).get(),
 		])
 
-		// eslint-disable-next-line @typescript-eslint/require-await
-		await dbAdmin.runTransaction(async (transaction) => {
-			allProducts.docs.forEach((product) => {
+		await Promise.all(
+			allProducts.docs.map(async (product) => {
 				const insights = allInsights.docs.filter((doc) => doc.data().productId === product.id)
 				const journeys = allJourneys.docs.filter((doc) => doc.data().productId === product.id)
 				const objectives = allObjectives.docs.filter((doc) => doc.data().productId === product.id)
@@ -136,608 +135,599 @@ export const appRouter = router({
 				const histories = allHistories.docs.filter((doc) => doc.ref.parent.parent?.id === storyMapState.id)
 				const versions = allVersions.docs.filter((doc) => doc.ref.parent.parent?.id === storyMapState.id)
 
-				transaction.set(
-					dbAdmin.collection(`Products`).doc(product.id).withConverter(genAdminConverter(ProductSchema)),
-					{
-						cadence: product.data().cadence,
-						createdAt: product.data().createdAt,
-						effortCost: product.data().effortCost,
-						effortCostCurrencySymbol: product.data().effortCostCurrencySymbol,
-						sprintStartDayOfWeek: product.data().sprintStartDayOfWeek,
-						name: product.data().name,
-						id: product.id,
+				await Promise.all([
+					// Update products
+					dbAdmin
+						.collection(`Products`)
+						.doc(product.id)
+						.withConverter(genAdminConverter(ProductSchema))
+						.set({
+							cadence: product.data().cadence,
+							createdAt: product.data().createdAt,
+							effortCost: product.data().effortCost,
+							effortCostCurrencySymbol: product.data().effortCostCurrencySymbol,
+							sprintStartDayOfWeek: product.data().sprintStartDayOfWeek,
+							name: product.data().name,
+							id: product.id,
 
-						storyMapCurrentHistoryId: storyMapState.data().currentHistoryId,
-						storyMapUpdatedAt: storyMapState.data().updatedAt as Timestamp,
+							storyMapCurrentHistoryId: storyMapState.data().currentHistoryId,
+							storyMapUpdatedAt: storyMapState.data().updatedAt as Timestamp,
 
-						problemStatement: product.data().problemStatement,
+							problemStatement: product.data().problemStatement,
 
-						accessibility: product.data().accessibility,
+							accessibility: product.data().accessibility,
 
-						finalVision: product.data().finalVision,
-						productTypes: [product.data().productType],
-						valueProposition: product.data().valueProposition,
-					},
-				)
+							finalVision: product.data().finalVision,
+							productTypes: [product.data().productType],
+							valueProposition: product.data().valueProposition,
+						}),
 
-				journeys.forEach((journey) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
-							.collection(`Journeys`)
-							.doc(journey.id)
-							.withConverter(genAdminConverter(JourneySchema)),
-						{
-							duration: journey.data().duration,
-							durationUnit: journey.data().durationUnit,
-							name: journey.data().name,
-						},
-					)
-
-					const journeyEvents = allJourneyEvents.docs.filter((doc) => doc.ref.parent.parent?.id === journey.id)
-					journeyEvents.forEach((journeyEvent) => {
-						transaction.set(
+					// Update journeys
+					...journeys.map(async (journey) => {
+						const journeyEvents = allJourneyEvents.docs.filter((doc) => doc.ref.parent.parent?.id === journey.id)
+						await Promise.all([
+							// Journeys
 							dbAdmin
 								.collection(`Products`)
 								.doc(product.id)
 								.collection(`Journeys`)
 								.doc(journey.id)
-								.collection(`Events`)
-								.doc(journeyEvent.id)
-								.withConverter(genAdminConverter(EventSchema)),
-							{
-								description: journeyEvent.data().description,
-								emotion: journeyEvent.data().emotion,
-								emotionLevel: journeyEvent.data().emotionLevel,
-								end: journeyEvent.data().end,
-								start: journeyEvent.data().start,
-								subject: journeyEvent.data().subject,
-								personaIds: journeyEvent.data().personaIds,
-							},
-						)
-					})
-				})
+								.withConverter(genAdminConverter(JourneySchema))
+								.set({
+									duration: journey.data().duration,
+									durationUnit: journey.data().durationUnit,
+									name: journey.data().name,
+								}),
 
-				objectives.forEach((objective) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
-							.collection(`Objectives`)
-							.doc(objective.id)
-							.withConverter(genAdminConverter(ObjectiveSchema)),
-						{
-							name: objective.data().name,
-							statement: objective.data().statement,
-						},
-					)
+							// Journey events
+							...journeyEvents.map(async (journeyEvent) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Journeys`)
+									.doc(journey.id)
+									.collection(`Events`)
+									.doc(journeyEvent.id)
+									.withConverter(genAdminConverter(EventSchema))
+									.set({
+										description: journeyEvent.data().description,
+										emotion: journeyEvent.data().emotion,
+										emotionLevel: journeyEvent.data().emotionLevel,
+										end: journeyEvent.data().end,
+										start: journeyEvent.data().start,
+										subject: journeyEvent.data().subject,
+										personaIds: journeyEvent.data().personaIds,
+									})
+							}),
+						])
+					}),
 
-					const results = allResults.docs.filter((doc) => doc.ref.parent.parent?.id === objective.id)
-					results.forEach((result) => {
-						transaction.set(
+					// Update objectives
+					...objectives.map(async (objective) => {
+						const results = allResults.docs.filter((doc) => doc.ref.parent.parent?.id === objective.id)
+						await Promise.all([
+							// Objective
 							dbAdmin
-								.doc(product.ref.path)
+								.collection(`Products`)
+								.doc(product.id)
 								.collection(`Objectives`)
 								.doc(objective.id)
-								.collection(`Results`)
-								.doc(result.id)
-								.withConverter(genAdminConverter(ResultSchema)),
-							{
-								createdAt: result.data().createdAt,
-								text: result.data().text,
-							},
-						)
-					})
-				})
+								.withConverter(genAdminConverter(ObjectiveSchema))
+								.set({
+									name: objective.data().name,
+									statement: objective.data().statement,
+								}),
+							// Results
+							...results.map(async (result) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Objectives`)
+									.doc(objective.id)
+									.collection(`Results`)
+									.doc(result.id)
+									.withConverter(genAdminConverter(ResultSchema))
+									.set({
+										createdAt: result.data().createdAt,
+										text: result.data().text,
+									})
+							}),
+						])
+					}),
 
-				personas.forEach((persona) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
-							.collection(`Personas`)
-							.doc(persona.id)
-							.withConverter(genAdminConverter(PersonaSchema)),
-						{
-							createdAt: persona.data().createdAt,
-							description: persona.data().description,
-							name: persona.data().name,
-						},
-					)
-
-					persona.data().changes.forEach((change) => {
-						transaction.set(
+					// Update personas
+					...personas.map(async (persona) => {
+						// Persona
+						await Promise.all([
 							dbAdmin
-								.doc(product.ref.path)
+								.collection(`Products`)
+								.doc(product.id)
 								.collection(`Personas`)
 								.doc(persona.id)
-								.collection(`Changes`)
-								.doc()
-								.withConverter(genAdminConverter(ChangeSchema)),
-							{
-								text: change.text,
-							},
-						)
-					})
+								.withConverter(genAdminConverter(PersonaSchema))
+								.set({
+									createdAt: persona.data().createdAt,
+									description: persona.data().description,
+									name: persona.data().name,
+								}),
+							// Persona changes
+							...persona.data().changes.map(async (change) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`Changes`)
+									.doc()
+									.withConverter(genAdminConverter(ChangeSchema))
+									.set({
+										text: change.text,
+									})
+							}),
+							// Persona day in the life
+							...persona.data().dayInTheLife.map(async (dayInTheLife) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`DaysInTheLife`)
+									.doc()
+									.withConverter(genAdminConverter(DayInTheLifeSchema))
+									.set({
+										text: dayInTheLife.text,
+									})
+							}),
+							...persona.data().frustrations.map(async (frustration) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`Frustrations`)
+									.doc()
+									.withConverter(genAdminConverter(FrustrationSchema))
+									.set({
+										text: frustration.text,
+									})
+							}),
+							...persona.data().goals.map(async (goal) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`Goals`)
+									.doc()
+									.withConverter(genAdminConverter(GoalSchema))
+									.set({
+										text: goal.text,
+									})
+							}),
+							...persona.data().interactions.map(async (interaction) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`Interactions`)
+									.doc()
+									.withConverter(genAdminConverter(InteractionSchema))
+									.set({
+										text: interaction.text,
+									})
+							}),
+							...persona.data().tasks.map(async (task) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`PersonaTasks`)
+									.doc()
+									.withConverter(genAdminConverter(PersonaTaskSchema))
+									.set({
+										text: task.text,
+									})
+							}),
+							...persona.data().priorities.map(async (priority) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`Priorities`)
+									.doc()
+									.withConverter(genAdminConverter(PrioritySchema))
+									.set({
+										text: priority.text,
+									})
+							}),
+							...persona.data().responsibilities.map(async (responsibility) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`Personas`)
+									.doc(persona.id)
+									.collection(`Responsibilities`)
+									.doc()
+									.withConverter(genAdminConverter(ResponsibilitySchema))
+									.set({
+										text: responsibility.text,
+									})
+							}),
+						])
+					}),
 
-					persona.data().dayInTheLife.forEach((dayInTheLife) => {
-						transaction.set(
+					...histories.map(async (history) => {
+						await Promise.all([
 							dbAdmin
-								.doc(product.ref.path)
-								.collection(`Personas`)
-								.doc(persona.id)
-								.collection(`DaysInTheLife`)
-								.doc()
-								.withConverter(genAdminConverter(DayInTheLifeSchema)),
-							{
-								text: dayInTheLife.text,
-							},
-						)
-					})
-
-					persona.data().frustrations.forEach((frustration) => {
-						transaction.set(
-							dbAdmin
-								.doc(product.ref.path)
-								.collection(`Personas`)
-								.doc(persona.id)
-								.collection(`Frustrations`)
-								.doc()
-								.withConverter(genAdminConverter(FrustrationSchema)),
-							{
-								text: frustration.text,
-							},
-						)
-					})
-
-					persona.data().goals.forEach((goal) => {
-						transaction.set(
-							dbAdmin
-								.doc(product.ref.path)
-								.collection(`Personas`)
-								.doc(persona.id)
-								.collection(`Goals`)
-								.doc()
-								.withConverter(genAdminConverter(GoalSchema)),
-							{
-								text: goal.text,
-							},
-						)
-					})
-
-					persona.data().interactions.forEach((interaction) => {
-						transaction.set(
-							dbAdmin
-								.doc(product.ref.path)
-								.collection(`Personas`)
-								.doc(persona.id)
-								.collection(`Interactions`)
-								.doc()
-								.withConverter(genAdminConverter(InteractionSchema)),
-							{
-								text: interaction.text,
-							},
-						)
-					})
-
-					persona.data().tasks.forEach((task) => {
-						transaction.set(
-							dbAdmin
-								.doc(product.ref.path)
-								.collection(`Personas`)
-								.doc(persona.id)
-								.collection(`PersonaTasks`)
-								.doc()
-								.withConverter(genAdminConverter(PersonaTaskSchema)),
-							{
-								text: task.text,
-							},
-						)
-					})
-
-					persona.data().priorities.forEach((priority) => {
-						transaction.set(
-							dbAdmin
-								.doc(product.ref.path)
-								.collection(`Personas`)
-								.doc(persona.id)
-								.collection(`Priorities`)
-								.doc()
-								.withConverter(genAdminConverter(PrioritySchema)),
-							{
-								text: priority.text,
-							},
-						)
-					})
-
-					persona.data().responsibilities.forEach((responsibility) => {
-						transaction.set(
-							dbAdmin
-								.doc(product.ref.path)
-								.collection(`Personas`)
-								.doc(persona.id)
-								.collection(`Responsibilities`)
-								.doc()
-								.withConverter(genAdminConverter(ResponsibilitySchema)),
-							{
-								text: responsibility.text,
-							},
-						)
-					})
-				})
-
-				histories.forEach((history) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
-							.collection(`StoryMapHistories`)
-							.doc(history.id)
-							.withConverter(genAdminConverter(StoryMapHistorySchema)),
-						{
-							future: history.data().future,
-							timestamp: history.data().timestamp,
-						},
-					)
-
-					for (const itemId in history.data().items) {
-						const item = history.data().items[itemId]!
-						transaction.set(
-							dbAdmin
-								.doc(product.ref.path)
+								.collection(`Products`)
+								.doc(product.id)
 								.collection(`StoryMapHistories`)
 								.doc(history.id)
-								.collection(`HistoryItems`)
-								.doc(itemId)
-								.withConverter(genAdminConverter(HistoryItemSchema)),
-							{
-								deleted: false,
-								effort: `effort` in item ? item.effort : null,
-								userValue: `userValue` in item ? item.userValue : null,
-								parentId: `parentId` in item ? item.parentId : null,
-								versionId: `versionId` in item ? item.versionId : null,
-							},
-						)
-					}
-				})
+								.withConverter(genAdminConverter(StoryMapHistorySchema))
+								.set({
+									future: history.data().future,
+									timestamp: history.data().timestamp,
+								}),
+							...Object.keys(history.data().items).map(async (itemId) => {
+								const item = history.data().items[itemId]!
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`StoryMapHistories`)
+									.doc(history.id)
+									.collection(`HistoryItems`)
+									.doc(itemId)
+									.withConverter(genAdminConverter(HistoryItemSchema))
+									.set({
+										deleted: false,
+										effort: `effort` in item ? item.effort : null,
+										userValue: `userValue` in item ? item.userValue : null,
+										parentId: `parentId` in item ? item.parentId : null,
+										versionId: `versionId` in item ? item.versionId : null,
+									})
+							}),
+						])
+					}),
 
-				for (const itemId in storyMapState.data().items) {
-					const item = storyMapState.data().items[itemId]!
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
-							.collection(`StoryMapItems`)
-							.doc(itemId)
-							.withConverter(genAdminConverter(StoryMapItemSchema)),
-						{
-							acceptanceCriteria: item.acceptanceCriteria ?? [],
-							branchName: item.branchName,
-							bugs: item.bugs ?? [],
-							createdAt: item.createdAt,
-							deleted: false,
-							description: item.description,
-							designEffort: item.designEffort ?? 1,
-							designLink: item.designLink,
-							effort: item.effort ?? 0.5,
-							engineeringEffort: item.engineeringEffort ?? 1,
-							ethicsApproved: item.ethicsApproved,
-							ethicsColumn: item.ethicsColumn,
-							ethicsVotes: item.ethicsVotes ?? {},
-							initialRenameDone: true,
-							name: item.name,
-							pageLink: item.pageLink,
-							sprintColumn: item.sprintColumn ?? `releaseBacklog`,
-							updatedAt: item.updatedAt ?? Timestamp.now(),
-							userValue: item.userValue ?? 0.5,
-							keeperIds: item.keeperIds ?? [],
-							parentId: item.parentId,
-							peopleIds: item.peopleIds ?? [],
-							updatedAtUserId: item.updatedAtUserId ?? ``,
-							versionId: item.versionId,
-						},
-					)
-
-					const comments = allComments.docs.filter((comment) => comment.data().parentId === itemId)
-					comments.forEach((comment) => {
-						transaction.set(
+					...Object.keys(storyMapState.data().items).map(async (itemId) => {
+						const item = storyMapState.data().items[itemId]!
+						const comments = allComments.docs.filter((comment) => comment.data().parentId === itemId)
+						await Promise.all([
 							dbAdmin
-								.doc(product.ref.path)
+								.collection(`Products`)
+								.doc(product.id)
 								.collection(`StoryMapItems`)
 								.doc(itemId)
-								.collection(`Comments`)
-								.doc(comment.id)
-								.withConverter(genAdminConverter(CommentSchema)),
-							{
-								createdAt: comment.data().createdAt,
-								text: comment.data().text,
-								type: comment.data().type,
-								authorId: comment.data().authorId,
-							},
-						)
-					})
-				}
+								.withConverter(genAdminConverter(StoryMapItemSchema))
+								.set({
+									acceptanceCriteria: item.acceptanceCriteria ?? [],
+									branchName: item.branchName,
+									bugs: item.bugs ?? [],
+									createdAt: item.createdAt,
+									deleted: false,
+									description: item.description,
+									designEffort: item.designEffort ?? 1,
+									designLink: item.designLink,
+									effort: item.effort ?? 0.5,
+									engineeringEffort: item.engineeringEffort ?? 1,
+									ethicsApproved: item.ethicsApproved,
+									ethicsColumn: item.ethicsColumn,
+									ethicsVotes: item.ethicsVotes ?? {},
+									initialRenameDone: true,
+									name: item.name,
+									pageLink: item.pageLink,
+									sprintColumn: item.sprintColumn ?? `releaseBacklog`,
+									updatedAt: item.updatedAt ?? Timestamp.now(),
+									userValue: item.userValue ?? 0.5,
+									keeperIds: item.keeperIds ?? [],
+									parentId: item.parentId,
+									peopleIds: item.peopleIds ?? [],
+									updatedAtUserId: item.updatedAtUserId ?? ``,
+									versionId: item.versionId,
+								}),
+							...comments.map(async (comment) => {
+								await dbAdmin
+									.collection(`Products`)
+									.doc(product.id)
+									.collection(`StoryMapItems`)
+									.doc(itemId)
+									.collection(`Comments`)
+									.doc(comment.id)
+									.withConverter(genAdminConverter(CommentSchema))
+									.set({
+										createdAt: comment.data().createdAt,
+										text: comment.data().text,
+										type: comment.data().type,
+										authorId: comment.data().authorId,
+									})
+							}),
+						])
+					}),
 
-				product.data().businessOutcomes.forEach((businessOutcome) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...product.data().businessOutcomes.map(async (businessOutcome) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`BusinessOutcomes`)
 							.doc()
-							.withConverter(genAdminConverter(BusinessOutcomeSchema)),
-						{
-							createdAt: Timestamp.now(),
-							text: businessOutcome.text,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(BusinessOutcomeSchema))
+							.set({
+								createdAt: Timestamp.now(),
+								text: businessOutcome.text,
+							})
+					}),
 
-				participants.forEach((participant) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...participants.map(async (participant) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`DialogueParticipants`)
 							.doc(participant.id)
-							.withConverter(genAdminConverter(DialogueParticipantSchema)),
-						{
-							availability: participant.data().availability,
-							disabilities: participant.data().disabilities,
-							email: participant.data().email,
-							location: participant.data().location,
-							name: participant.data().name,
-							phoneNumber: participant.data().phoneNumber,
-							status: participant.data().status,
-							timing: participant.data().timing,
-							title: participant.data().title,
-							transcript: participant.data().transcript,
-							updatedAt: participant.data().updatedAt,
-							personaId: participant.data().personaIds[0] ?? null,
-							updatedAtUserId: participant.data().updatedAtUserId,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(DialogueParticipantSchema))
+							.set({
+								availability: participant.data().availability,
+								disabilities: participant.data().disabilities,
+								email: participant.data().email,
+								location: participant.data().location,
+								name: participant.data().name,
+								phoneNumber: participant.data().phoneNumber,
+								status: participant.data().status,
+								timing: participant.data().timing,
+								title: participant.data().title,
+								transcript: participant.data().transcript,
+								updatedAt: participant.data().updatedAt,
+								personaId: participant.data().personaIds[0] ?? null,
+								updatedAtUserId: participant.data().updatedAtUserId,
+							})
+					}),
 
-				product.data().features?.forEach((feature) => {
-					transaction.set(
-						dbAdmin.doc(product.ref.path).collection(`Features`).doc().withConverter(genAdminConverter(FeatureSchema)),
-						{
-							text: feature.text,
-						},
-					)
-				})
+					...(product.data().features ?? []).map(async (feature) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
+							.collection(`Features`)
+							.doc()
+							.withConverter(genAdminConverter(FeatureSchema))
+							.set({
+								text: feature.text,
+							})
+					}),
 
-				for (const huddleId in product.data().huddles) {
-					const huddle = product.data().huddles[huddleId]!
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...Object.keys(product.data().huddles).map(async (huddleId) => {
+						const huddle = product.data().huddles[huddleId]!
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`Huddles`)
 							.doc(huddleId)
-							.withConverter(genAdminConverter(HuddleSchema)),
-						{
-							updatedAt: huddle.updatedAt,
-							blockerStoryIds: huddle.blockerStoryIds,
-							todayStoryIds: huddle.todayStoryIds,
-							yesterdayStoryIds: huddle.yesterdayStoryIds,
-						},
-					)
-				}
+							.withConverter(genAdminConverter(HuddleSchema))
+							.set({
+								updatedAt: huddle.updatedAt,
+								blockerStoryIds: huddle.blockerStoryIds,
+								todayStoryIds: huddle.todayStoryIds,
+								yesterdayStoryIds: huddle.yesterdayStoryIds,
+							})
+					}),
 
-				insights.forEach((insight) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...insights.map(async (insight) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`Insights`)
 							.doc(insight.id)
-							.withConverter(genAdminConverter(InsightSchema)),
-						{
-							status: insight.data().status,
-							text: insight.data().text,
-							title: insight.data().title,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(InsightSchema))
+							.set({
+								status: insight.data().status,
+								text: insight.data().text,
+								title: insight.data().title,
+							})
+					}),
 
-				productInvites.forEach((productInvite) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...productInvites.map(async (productInvite) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`Invites`)
 							.doc(productInvite.id)
-							.withConverter(genAdminConverter(InviteSchema)),
-						{
-							email: productInvite.data().email,
-							id: productInvite.id,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(InviteSchema))
+							.set({
+								email: productInvite.data().email,
+								id: productInvite.id,
+							})
+					}),
 
-				product.data().marketLeaders.forEach((marketLeader) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...product.data().marketLeaders.map(async (marketLeader) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`MarketLeaders`)
 							.doc()
-							.withConverter(genAdminConverter(MarketLeaderSchema)),
-						{
-							createdAt: Timestamp.now(),
-							text: marketLeader.text,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(MarketLeaderSchema))
+							.set({
+								createdAt: Timestamp.now(),
+								text: marketLeader.text,
+							})
+					}),
 
-				for (const memberId in product.data().members) {
-					const member = product.data().members[memberId]!
-					const user = allUsers.docs.find((user) => user.id === memberId)!
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...Object.keys(product.data().members).map(async (memberId) => {
+						const member = product.data().members[memberId]!
+						const user = allUsers.docs.find((user) => user.id === memberId)!
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`Members`)
 							.doc(memberId)
-							.withConverter(genAdminConverter(MemberSchema)),
-						{
-							avatar: user.data().avatar,
-							name: user.data().name,
-							type: member.type,
-							id: memberId,
-						},
-					)
-				}
+							.withConverter(genAdminConverter(MemberSchema))
+							.set({
+								avatar: user.data().avatar,
+								name: user.data().name,
+								type: member.type,
+								id: memberId,
+							})
+					}),
 
-				product.data().potentialRisks.forEach((potentialRisk) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...product.data().potentialRisks.map(async (potentialRisk) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`PotentialRisks`)
 							.doc()
-							.withConverter(genAdminConverter(PotentialRiskSchema)),
-						{
-							createdAt: Timestamp.now(),
-							text: potentialRisk.text,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(PotentialRiskSchema))
+							.set({
+								createdAt: Timestamp.now(),
+								text: potentialRisk.text,
+							})
+					}),
 
-				retrospectiveItems.forEach((retrospectiveItem) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...retrospectiveItems.map(async (retrospectiveItem) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`RetrospectiveItems`)
 							.doc(retrospectiveItem.id)
-							.withConverter(genAdminConverter(RetrospectiveItemSchema)),
-						{
-							archived: retrospectiveItem.data().archived,
-							createdAt: retrospectiveItem.data().createdAt,
-							description: retrospectiveItem.data().description,
-							proposedActions: retrospectiveItem.data().proposedActions,
-							title: retrospectiveItem.data().title,
-							type: retrospectiveItem.data().type,
-							userId: retrospectiveItem.data().userId,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(RetrospectiveItemSchema))
+							.set({
+								archived: retrospectiveItem.data().archived,
+								createdAt: retrospectiveItem.data().createdAt,
+								description: retrospectiveItem.data().description,
+								proposedActions: retrospectiveItem.data().proposedActions,
+								title: retrospectiveItem.data().title,
+								type: retrospectiveItem.data().type,
+								userId: retrospectiveItem.data().userId,
+							})
+					}),
 
-				tasks.forEach((task) => {
-					transaction.set(
-						dbAdmin.doc(product.ref.path).collection(`Tasks`).doc(task.id).withConverter(genAdminConverter(TaskSchema)),
-						{
-							board: task.data().board,
-							dueDate: task.data().dueDate,
-							notes: task.data().notes,
-							status: task.data().status,
-							subtasks: task.data().subtasks,
-							title: task.data().title,
-							assigneeIds: task.data().assigneeIds,
-						},
-					)
-				})
+					...tasks.map(async (task) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
+							.collection(`Tasks`)
+							.doc(task.id)
+							.withConverter(genAdminConverter(TaskSchema))
+							.set({
+								board: task.data().board,
+								dueDate: task.data().dueDate,
+								notes: task.data().notes,
+								status: task.data().status,
+								subtasks: task.data().subtasks,
+								title: task.data().title,
+								assigneeIds: task.data().assigneeIds,
+							})
+					}),
 
-				product.data().userPriorities.forEach((userPriority) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...product.data().userPriorities.map(async (userPriority) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`UserPriorities`)
 							.doc()
-							.withConverter(genAdminConverter(UserPrioritySchema)),
-						{
-							createdAt: Timestamp.now(),
-							text: userPriority.text,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(UserPrioritySchema))
+							.set({
+								createdAt: Timestamp.now(),
+								text: userPriority.text,
+							})
+					}),
 
-				versions.forEach((version) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...versions.map(async (version) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`Versions`)
 							.doc(version.id)
-							.withConverter(genAdminConverter(VersionSchema)),
-						{
-							deleted: false,
-							name: version.data().name,
-						},
-					)
-				})
+							.withConverter(genAdminConverter(VersionSchema))
+							.set({
+								deleted: false,
+								name: version.data().name,
+							})
+					}),
 
-				product.data().updates.forEach((update) => {
-					transaction.set(
-						dbAdmin
-							.doc(product.ref.path)
+					...product.data().updates.map(async (update) => {
+						await dbAdmin
+							.collection(`Products`)
+							.doc(product.id)
 							.collection(`VisionUpdates`)
 							.doc(update.id)
-							.withConverter(genAdminConverter(VisionUpdateSchema)),
-						{
-							text: update.text,
-							timestamp: update.timestamp,
-							userId: update.userId,
-						},
-					)
-				})
-			})
+							.withConverter(genAdminConverter(VisionUpdateSchema))
+							.set({
+								text: update.text,
+								timestamp: update.timestamp,
+								userId: update.userId,
+							})
+					}),
+				])
+			}),
+		)
 
-			allUsers.forEach((user) => {
-				transaction.update(dbAdmin.doc(user.ref.path), {
+		await Promise.all([
+			...allUsers.docs.map(async (user) => {
+				await dbAdmin.doc(user.ref.path).update({
 					// @ts-ignore -- Legacy field
 					avatar: FieldValue.delete(),
 					// @ts-ignore -- Legacy field
 					name: FieldValue.delete(),
 					preferredMusicClient: `appleMusic`,
 				} satisfies User)
-			})
+			}),
 
-			allComments.forEach((comment) => {
-				transaction.delete(comment.ref)
-			})
+			...allComments.docs.map(async (comment) => {
+				await comment.ref.delete()
+			}),
 
-			allHistories.forEach((history) => {
-				transaction.delete(history.ref)
-			})
+			...allHistories.docs.map(async (history) => {
+				await history.ref.delete()
+			}),
 
-			allInsights.forEach((insight) => {
-				transaction.delete(insight.ref)
-			})
+			...allInsights.docs.map(async (insight) => {
+				await insight.ref.delete()
+			}),
 
-			allJourneyEvents.forEach((journeyEvent) => {
-				transaction.delete(journeyEvent.ref)
-			})
+			...allJourneyEvents.docs.map(async (journeyEvent) => {
+				await journeyEvent.ref.delete()
+			}),
 
-			allJourneys.forEach((journey) => {
-				transaction.delete(journey.ref)
-			})
+			...allJourneys.docs.map(async (journey) => {
+				await journey.ref.delete()
+			}),
 
-			allObjectives.forEach((objective) => {
-				transaction.delete(objective.ref)
-			})
+			...allObjectives.docs.map(async (objective) => {
+				await objective.ref.delete()
+			}),
 
-			allParticipants.forEach((participant) => {
-				transaction.delete(participant.ref)
-			})
+			...allParticipants.docs.map(async (participant) => {
+				await participant.ref.delete()
+			}),
 
-			allPersonas.forEach((persona) => {
-				transaction.delete(persona.ref)
-			})
+			...allPersonas.docs.map(async (persona) => {
+				await persona.ref.delete()
+			}),
 
-			allProductInvites.forEach((productInvite) => {
-				transaction.delete(productInvite.ref)
-			})
+			...allProductInvites.docs.map(async (productInvite) => {
+				await productInvite.ref.delete()
+			}),
 
-			allResults.forEach((result) => {
-				transaction.delete(result.ref)
-			})
+			...allResults.docs.map(async (result) => {
+				await result.ref.delete()
+			}),
 
-			allRetrospectiveItems.forEach((retrospectiveItem) => {
-				transaction.delete(retrospectiveItem.ref)
-			})
+			...allRetrospectiveItems.docs.map(async (retrospectiveItem) => {
+				await retrospectiveItem.ref.delete()
+			}),
 
-			allStoryMapStates.forEach((storyMapState) => {
-				transaction.delete(storyMapState.ref)
-			})
+			...allStoryMapStates.docs.map(async (storyMapState) => {
+				await storyMapState.ref.delete()
+			}),
 
-			allTasks.forEach((task) => {
-				transaction.delete(task.ref)
-			})
+			...allTasks.docs.map(async (task) => {
+				await task.ref.delete()
+			}),
 
-			allVersions.forEach((version) => {
-				transaction.delete(version.ref)
-			})
-		})
+			...allVersions.docs.map(async (version) => {
+				await version.ref.delete()
+			}),
+		])
 	}),
 })
 
