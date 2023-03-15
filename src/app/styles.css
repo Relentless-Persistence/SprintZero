@@ -8,6 +8,10 @@ body,
 	height: 100%;
 }
 
+::selection {
+	background-color: theme(colors.primaryBg);
+}
+
 button.ant-btn-default {
 	background-color: theme(colors.bgContainer);
 }

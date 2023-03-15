@@ -25,6 +25,7 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 	const {storyMapItems, versions, editMode} = useStoryMapContext()
 
 	const story = storyMapItems.docs.find((story) => story.id === storyId)!
+	const storyData = story.data()
 
 	const contentRef = useRef<HTMLDivElement>(null)
 	useAnimationFrame(() => {
@@ -36,8 +37,8 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const [localStoryName, setLocalStoryName] = useState(story.data().name)
 	useEffect(() => {
-		setLocalStoryName(story.data().name)
-	}, [story])
+		setLocalStoryName(storyData.name)
+	}, [storyData.name])
 
 	return (
 		<div
@@ -59,22 +60,29 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 			</button>
 			<div className="flex items-center gap-2 px-2 leading-tight">
 				{(story.data().initialRenameDone || inert) && !editMode ? (
-					<p className={clsx(`my-0.5`, localStoryName === `` && `invisible`)}>{localStoryName || `_`}</p>
+					<p className={clsx(`m-0.5`, localStoryName === `` && `invisible`)}>{localStoryName || `_`}</p>
 				) : (
 					<div className="relative my-0.5 mx-auto min-w-[1rem]">
-						<p>{localStoryName || `_`}</p>
+						<p className="px-0.5">{localStoryName || `_`}</p>
 						<input
 							value={localStoryName}
 							autoFocus={!story.data().initialRenameDone && !editMode}
+							onFocus={(e) => e.target.select()}
 							onBlur={() => {
-								updateDoc(story.ref, {initialRenameDone: true}).catch(console.error)
+								if (localStoryName !== ``) updateDoc(story.ref, {initialRenameDone: true}).catch(console.error)
 							}}
 							onKeyDown={(e) => {
 								if (e.key === `Enter`) updateDoc(story.ref, {initialRenameDone: true}).catch(console.error)
 							}}
-							className="absolute inset-0 w-full rounded-sm bg-bgContainer focus:outline focus:outline-1 focus:outline-offset-1 focus:outline-primaryHover"
+							className={clsx(
+								`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
+								localStoryName === ``
+									? `bg-errorBg outline-2 outline-errorBorder`
+									: `focus:outline-2 focus:outline-primaryHover`,
+							)}
 							onChange={(e) => {
 								setLocalStoryName(e.target.value)
+								if (localStoryName !== ``) return
 								updateItem(product, storyMapItems, versions, story.id, {name: e.target.value}).catch(console.error)
 							}}
 							onPointerDownCapture={(e) => e.stopPropagation()}

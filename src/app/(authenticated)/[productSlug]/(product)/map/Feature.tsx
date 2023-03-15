@@ -25,6 +25,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 	const {storyMapItems, versions, editMode, currentVersionId, setItemsToBeDeleted} = useStoryMapContext()
 
 	const feature = storyMapItems.docs.find((feature) => feature.id === featureId)!
+	const featureData = feature.data()
 	const children = sortStories(
 		storyMapItems.docs
 			.filter((item) => item.data().parentId === featureId)
@@ -43,8 +44,8 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 
 	const [localFeatureName, setLocalFeatureName] = useState(feature.data().name)
 	useEffect(() => {
-		setLocalFeatureName(feature.data().name)
-	}, [feature])
+		setLocalFeatureName(featureData.name)
+	}, [featureData.name])
 
 	return (
 		<div
@@ -64,22 +65,29 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 			>
 				<CopyOutlined />
 				{(feature.data().initialRenameDone || inert) && !editMode ? (
-					<p className={clsx(`my-0.5`, localFeatureName === `` && `invisible`)}>{localFeatureName || `_`}</p>
+					<p className={clsx(`m-0.5`, localFeatureName === `` && `invisible`)}>{localFeatureName || `_`}</p>
 				) : (
 					<div className="relative my-0.5 min-w-[1rem]">
-						<p>{localFeatureName || `_`}</p>
+						<p className="px-0.5">{localFeatureName || `_`}</p>
 						<input
 							value={localFeatureName}
 							autoFocus={!feature.data().initialRenameDone && !editMode}
+							onFocus={(e) => e.target.select()}
 							onBlur={() => {
-								updateDoc(feature.ref, {initialRenameDone: true}).catch(console.error)
+								if (localFeatureName !== ``) updateDoc(feature.ref, {initialRenameDone: true}).catch(console.error)
 							}}
 							onKeyDown={(e) => {
 								if (e.key === `Enter`) updateDoc(feature.ref, {initialRenameDone: true}).catch(console.error)
 							}}
-							className="absolute inset-0 w-full rounded-sm bg-bgContainer focus:outline focus:outline-1 focus:outline-offset-1 focus:outline-primaryHover"
+							className={clsx(
+								`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
+								localFeatureName === ``
+									? `bg-errorBg outline-2 outline-errorBorder`
+									: `focus:outline-2 focus:outline-primaryHover`,
+							)}
 							onChange={(e) => {
 								setLocalFeatureName(e.target.value)
+								if (e.target.value !== ``) return
 								updateItem(product, storyMapItems, versions, feature.id, {name: e.target.value}).catch(console.error)
 							}}
 							onPointerDownCapture={(e) => e.stopPropagation()}

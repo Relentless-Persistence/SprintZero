@@ -5,8 +5,9 @@ import {httpBatchLink} from "@trpc/client"
 import {ConfigProvider, theme as antdTheme} from "antd"
 import "core-js/es/array/find-last"
 import {doc} from "firebase/firestore"
-import {usePathname} from "next/navigation"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
+import {useAuthState} from "react-firebase-hooks/auth"
 import {useDocument} from "react-firebase-hooks/firestore"
 import invariant from "tiny-invariant"
 
@@ -14,7 +15,8 @@ import type {FC, ReactNode} from "react"
 
 import MaintenancePage from "~/components/MaintenanceScreen"
 import {AppInfoConverter} from "~/types/db/AppInfo"
-import {db} from "~/utils/firebase"
+import {UserConverter} from "~/types/db/Users"
+import {auth, db} from "~/utils/firebase"
 import {ThemeProvider} from "~/utils/ThemeContext"
 import {trpc} from "~/utils/trpc"
 
@@ -26,7 +28,6 @@ export type RootProvidersProps = {
 const RootProviders: FC<RootProvidersProps> = ({children, theme: browserTheme}) => {
 	const [themeSetting, setThemeSetting] = useState<`light` | `auto` | `dark`>(`auto`)
 	const theme = themeSetting === `auto` ? browserTheme : themeSetting
-	const pathname = usePathname()
 
 	const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 	invariant(baseUrl, `NEXT_PUBLIC_BASE_URL is not set`)
@@ -41,8 +42,16 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: browserTheme}) 
 		}),
 	)
 
-	const [appInfo, loading, error] = useDocument(doc(db, `AppInfo`, `info`).withConverter(AppInfoConverter))
-	if (error) throw error
+	const [appInfo, appInfoLoading, appInfoError] = useDocument(
+		doc(db, `AppInfo`, `info`).withConverter(AppInfoConverter),
+	)
+	useErrorHandler(appInfoError)
+	const [user, , userError] = useAuthState(auth)
+	useErrorHandler(userError)
+	const [dbUser, , dbUserError] = useDocument(
+		user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined,
+	)
+	useErrorHandler(dbUserError)
 
 	return (
 		<trpc.Provider client={trpcClient} queryClient={queryClient}>
@@ -63,8 +72,8 @@ const RootProviders: FC<RootProvidersProps> = ({children, theme: browserTheme}) 
 							},
 						}}
 					>
-						{!loading &&
-							(appInfo?.data()?.maintenanceMode && pathname !== `/admin` ? (
+						{!appInfoLoading &&
+							(appInfo?.data()?.maintenanceMode && dbUser?.data()?.type !== `admin` ? (
 								<MaintenancePage />
 							) : (
 								<div className="isolate h-full">{children}</div>

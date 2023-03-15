@@ -1,7 +1,6 @@
 import {initializeApp} from "firebase/app"
 import {GithubAuthProvider, GoogleAuthProvider, OAuthProvider, connectAuthEmulator, getAuth} from "firebase/auth"
 import {connectFirestoreEmulator, getFirestore} from "firebase/firestore"
-import invariant from "tiny-invariant"
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY,
@@ -16,12 +15,11 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
-if (process.env.NODE_ENV === `development`) {
-	invariant(process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT, `NEXT_PUBLIC_FIREBASE_EMULATOR_PORT is not defined`)
-	invariant(
-		process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST,
-		`NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST is not defined`,
-	)
+if (
+	process.env.NODE_ENV === `development` &&
+	process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT &&
+	process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST
+) {
 	connectAuthEmulator(auth, process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST, {disableWarnings: true})
 	connectFirestoreEmulator(db, `localhost`, parseInt(process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_PORT))
 }

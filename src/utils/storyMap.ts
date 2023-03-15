@@ -130,6 +130,7 @@ export const addEpic = async (
 		deleted: false,
 		description: ``,
 		effort: 0.5,
+		initialRenameDone: false,
 		name: `Epic ${epics.length + 1}`,
 		userValue: avg(epics.at(-1)?.data().userValue ?? 0, 1),
 		keeperIds: [],
@@ -183,6 +184,7 @@ export const addFeature = async (
 		deleted: false,
 		description: ``,
 		effort: 0.5,
+		initialRenameDone: false,
 		name: `Feature ${features.length + 1}`,
 		userValue: avg(features.at(-1)?.data().userValue ?? 0, 1),
 
@@ -250,6 +252,7 @@ export const addStory = async (
 		ethicsApproved: null,
 		ethicsColumn: null,
 		ethicsVotes: {},
+		initialRenameDone: false,
 		name: `Story ${stories.length + 1}`,
 		pageLink: null,
 		sprintColumn: `releaseBacklog` as const,

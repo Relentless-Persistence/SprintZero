@@ -25,6 +25,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
 
 	const epic = storyMapItems.docs.find((item) => item.id === epicId)!
+	const epicData = epic.data()
 	const children = sortFeatures(storyMapItems.docs.filter((item) => item.data().parentId === epicId))
 	const grandchildren = storyMapItems.docs.filter((item) => children.some((child) => child.id === item.data().parentId))
 
@@ -39,8 +40,8 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 
 	const [localEpicName, setLocalEpicName] = useState(epic.data().name)
 	useEffect(() => {
-		setLocalEpicName(epic.data().name)
-	}, [epic])
+		setLocalEpicName(epicData.name)
+	}, [epicData.name])
 
 	return (
 		<div
@@ -60,22 +61,29 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 			>
 				<ReadOutlined />
 				{(epic.data().initialRenameDone || inert) && !editMode ? (
-					<p className={clsx(`my-0.5`, localEpicName === `` && `invisible`)}>{localEpicName || `_`}</p>
+					<p className={clsx(`m-0.5`, localEpicName === `` && `invisible`)}>{localEpicName || `_`}</p>
 				) : (
 					<div className="relative my-0.5 min-w-[1rem]">
-						<p>{localEpicName || `_`}</p>
+						<p className="px-0.5">{localEpicName || `_`}</p>
 						<input
 							value={localEpicName}
 							autoFocus={!epic.data().initialRenameDone && !editMode}
+							onFocus={(e) => e.target.select()}
 							onBlur={() => {
-								updateDoc(epic.ref, {initialRenameDone: true}).catch(console.error)
+								if (localEpicName !== ``) updateDoc(epic.ref, {initialRenameDone: true}).catch(console.error)
 							}}
 							onKeyDown={(e) => {
 								if (e.key === `Enter`) updateDoc(epic.ref, {initialRenameDone: true}).catch(console.error)
 							}}
-							className="absolute inset-0 w-full rounded-sm bg-bgContainer focus:outline focus:outline-1 focus:outline-offset-1 focus:outline-primaryHover"
+							className={clsx(
+								`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
+								localEpicName === ``
+									? `bg-errorBg outline-2 outline-errorBorder`
+									: `focus:outline-2 focus:outline-primaryHover`,
+							)}
 							onChange={(e) => {
 								setLocalEpicName(e.target.value)
+								if (e.target.value === ``) return
 								updateItem(product, storyMapItems, versions, epic.id, {name: e.target.value}).catch(console.error)
 							}}
 							onPointerDownCapture={(e) => e.stopPropagation()}
