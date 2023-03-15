@@ -92,8 +92,7 @@ const KickoffClientPage: FC = () => {
 					onCommit={async (textList) => {
 						await Promise.all(
 							textList.map(async (item) => {
-								const existingDoc = await getDoc(doc(product.ref, `Personas`, item.id))
-								if (existingDoc.exists()) {
+								if (personas?.docs.some((doc) => doc.id === item.id)) {
 									await updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
 										name: item.text,
 									})
@@ -105,17 +104,19 @@ const KickoffClientPage: FC = () => {
 									})
 
 									// Generate description asynchonously
-									updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
-										description: (
-											await gpt.mutateAsync({
-												prompt: `Below is a vision statement for an app I'm building:\n\n"${
-													product.data().finalVision
-												}"\n\nDescribe the user persona "${item.text}" in a paragraph.`,
-											})
-										).response
-											?.replace(/^\\n+/, ``)
-											.replace(/\\n+$/, ``),
-									}).catch(console.error)
+									gpt
+										.mutateAsync({
+											prompt: `Below is a vision statement for an app I'm building:\n\n"${
+												product.data().finalVision
+											}"\n\nDescribe the user persona "${item.text}" in a paragraph.`,
+										})
+										.then(({response}) => {
+											const description = response?.replace(/^\\n+/, ``).replace(/\\n+$/, ``)
+											updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
+												description,
+											}).catch(console.error)
+										})
+										.catch(console.error)
 								}
 							}),
 						)

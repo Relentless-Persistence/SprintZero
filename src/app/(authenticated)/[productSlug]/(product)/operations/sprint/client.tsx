@@ -32,7 +32,6 @@ const SprintClientPage: FC = () => {
 		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
 	useErrorHandler(storyMapItemsError)
-	const storyMapState = storyMapItems?.docs[0]
 	const [myStoriesOnly, setMyStoriesOnly] = useState(false)
 
 	const firstSprintStartDate = findPreviousOccurenceOfDayOfWeek(
@@ -56,16 +55,11 @@ const SprintClientPage: FC = () => {
 	const currentSprintEndDate = dayjs(sprints.at(-1)?.endDate)
 
 	const [versions, , versionsError] = useCollection(
-		storyMapState
-			? query(
-					collection(product.ref, `StoryMapStates`, storyMapState.id, `Versions`),
-					orderBy(`name`, `asc`),
-			  ).withConverter(VersionConverter)
-			: undefined,
+		query(collection(product.ref, `Versions`), orderBy(`name`, `asc`)).withConverter(VersionConverter),
 	)
 	useErrorHandler(versionsError)
 
-	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions>(AllVersions)
+	const [currentVersionId, setCurrentVersionId] = useState<string>(AllVersions)
 
 	return (
 		<div className="flex h-full flex-col gap-4">
@@ -112,7 +106,7 @@ const SprintClientPage: FC = () => {
 						children: (
 							<div className="flex h-full w-full grow overflow-x-auto pl-12 pb-8">
 								<div className="grid h-full grid-cols-[repeat(14,20rem)] gap-4">
-									{storyMapState &&
+									{storyMapItems &&
 										versions &&
 										Object.entries(sprintColumns).map(([columnName, title]) => (
 											<SprintColumn

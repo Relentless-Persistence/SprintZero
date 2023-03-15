@@ -86,12 +86,16 @@ const HuddleClientPage: FC = () => {
 														storyMapItems={storyMapItems}
 														versions={versions}
 														storyId={storyId}
-														onRemove={async () => {
-															await updateDoc(huddle.ref, {
-																updatedAt: Timestamp.now(),
-																blockerStoryIds: arrayRemove(storyId),
-															})
-														}}
+														onRemove={
+															member.id === user.id
+																? async () => {
+																		await updateDoc(huddle.ref, {
+																			updatedAt: Timestamp.now(),
+																			blockerStoryIds: arrayRemove(storyId),
+																		})
+																  }
+																: undefined
+														}
 													/>
 												)
 											})) || <p className="italic text-textTertiary">No blockers</p>}
@@ -151,12 +155,16 @@ const HuddleClientPage: FC = () => {
 														storyMapItems={storyMapItems}
 														versions={versions}
 														storyId={storyId}
-														onRemove={async () => {
-															await updateDoc(huddle.ref, {
-																updatedAt: Timestamp.now(),
-																todayStoryIds: arrayRemove(storyId),
-															})
-														}}
+														onRemove={
+															member.id === user.id
+																? async () => {
+																		await updateDoc(huddle.ref, {
+																			updatedAt: Timestamp.now(),
+																			todayStoryIds: arrayRemove(storyId),
+																		})
+																  }
+																: undefined
+														}
 													/>
 												)
 											})) || <p className="italic text-textTertiary">No items</p>}
@@ -216,12 +224,16 @@ const HuddleClientPage: FC = () => {
 														storyMapItems={storyMapItems}
 														versions={versions}
 														storyId={storyId}
-														onRemove={async () => {
-															await updateDoc(huddle.ref, {
-																updatedAt: Timestamp.now(),
-																yesterdayStoryIds: arrayRemove(storyId),
-															})
-														}}
+														onRemove={
+															member.id === user.id
+																? async () => {
+																		await updateDoc(huddle.ref, {
+																			updatedAt: Timestamp.now(),
+																			yesterdayStoryIds: arrayRemove(storyId),
+																		})
+																  }
+																: undefined
+														}
 													/>
 												)
 											})) || <p className="italic text-textTertiary">No items</p>}

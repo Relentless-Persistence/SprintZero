@@ -6,6 +6,7 @@ import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {Timestamp, addDoc, collection, query, updateDoc} from "firebase/firestore"
 import {useState} from "react"
+import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
@@ -15,6 +16,7 @@ import type {RetrospectiveItem} from "~/types/db/Products/RetrospectiveItems"
 import RetrospectiveDrawer from "./RetrospectiveDrawer"
 import {retrospectiveTabs} from "./types"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import {MemberConverter} from "~/types/db/Products/Members"
 import {RetrospectiveItemConverter} from "~/types/db/Products/RetrospectiveItems"
 
 dayjs.extend(relativeTime)
@@ -22,9 +24,12 @@ dayjs.extend(relativeTime)
 const RetrospectiveClientPage: FC = () => {
 	const {product, member} = useAppContext()
 
-	const [retrospectiveItems, loading] = useCollection(
+	const [retrospectiveItems, retrospectiveItemsLoading, retrospectiveItemsError] = useCollection(
 		query(collection(product.ref, `RetrospectiveItems`)).withConverter(RetrospectiveItemConverter),
 	)
+	useErrorHandler(retrospectiveItemsError)
+	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+	useErrorHandler(membersError)
 
 	const [currentTab, setCurrentTab] = useState<`enjoyable` | `puzzling` | `frustrating`>(`enjoyable`)
 	const [activeItemId, setActiveItemId] = useState<string | `new` | undefined>(undefined)
@@ -61,40 +66,44 @@ const RetrospectiveClientPage: FC = () => {
 						{retrospectiveItems.docs
 							.filter((item) => item.data().type === currentTab)
 							.filter((item) => includeArchived || !item.data().archived)
-							.map((item) => (
-								<Card
-									key={item.id}
-									type="inner"
-									title={(() => {
-										return (
-											<div className="my-4 flex items-center gap-4">
-												<Avatar src={member.data().avatar} shape="square" size="large" />
-												<div className="flex flex-col">
-													<p>{member.data().name}</p>
-													<p className="font-normal text-textTertiary">
-														Created {dayjs(item.data().createdAt.toMillis()).fromNow()}
-													</p>
+							.map((item) => {
+								const retrospectiveMember = members?.docs.find((member) => member.id === item.data().userId)
+
+								return (
+									<Card
+										key={item.id}
+										type="inner"
+										title={(() => {
+											return (
+												<div className="my-4 flex items-center gap-4">
+													<Avatar src={retrospectiveMember?.data().avatar} shape="square" size="large" />
+													<div className="flex flex-col">
+														<p>{retrospectiveMember?.data().name}</p>
+														<p className="font-normal text-textTertiary">
+															Created {dayjs(item.data().createdAt.toMillis()).fromNow()}
+														</p>
+													</div>
 												</div>
-											</div>
-										)
-									})()}
-									extra={
-										item.data().userId === member.id ? (
-											<Button size="small" onClick={() => setActiveItemId(item.id)}>
-												Edit
-											</Button>
-										) : undefined
-									}
-								>
-									<div className="flex flex-col items-start gap-2">
-										<Tag>
-											{item.data().proposedActions.length} proposed action
-											{item.data().proposedActions.length === 1 ? `` : `s`}
-										</Tag>
-										<p>{item.data().description}</p>
-									</div>
-								</Card>
-							))}
+											)
+										})()}
+										extra={
+											item.data().userId === member.id ? (
+												<Button size="small" onClick={() => setActiveItemId(item.id)}>
+													Edit
+												</Button>
+											) : undefined
+										}
+									>
+										<div className="flex flex-col items-start gap-2">
+											<Tag>
+												{item.data().proposedActions.length} proposed action
+												{item.data().proposedActions.length === 1 ? `` : `s`}
+											</Tag>
+											<p>{item.data().description}</p>
+										</div>
+									</Card>
+								)
+							})}
 					</Masonry>
 				) : (
 					<div className="grid h-full place-items-center">
@@ -118,7 +127,7 @@ const RetrospectiveClientPage: FC = () => {
 				items={retrospectiveTabs.map(([key, label]) => ({key, label}))}
 			/>
 
-			{!loading && activeItemId && (
+			{!retrospectiveItemsLoading && activeItemId && (
 				<RetrospectiveDrawer
 					activeItemId={activeItemId}
 					initialValues={

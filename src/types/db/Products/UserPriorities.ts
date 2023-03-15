@@ -1,8 +1,9 @@
 import {z} from "zod"
 
-import {genConverter} from "~/types"
+import {genConverter, timestampSchema} from "~/types"
 
 export const UserPrioritySchema = z.object({
+	createdAt: timestampSchema,
 	text: z.string(),
 })
 

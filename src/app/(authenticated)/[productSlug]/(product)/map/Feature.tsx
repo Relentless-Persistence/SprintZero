@@ -26,7 +26,9 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 
 	const feature = storyMapItems.docs.find((feature) => feature.id === featureId)!
 	const children = sortStories(
-		storyMapItems.docs.filter((item) => item.data().parentId === featureId),
+		storyMapItems.docs
+			.filter((item) => item.data().parentId === featureId)
+			.filter((item) => item.data().versionId === currentVersionId || currentVersionId === AllVersions),
 		versions,
 	)
 

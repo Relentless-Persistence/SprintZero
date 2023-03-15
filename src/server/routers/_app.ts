@@ -178,7 +178,10 @@ export const appRouter = router({
 					journeyEvents.forEach((journeyEvent) => {
 						transaction.set(
 							dbAdmin
-								.doc(journey.ref.path)
+								.collection(`Products`)
+								.doc(product.id)
+								.collection(`Journeys`)
+								.doc(journey.id)
 								.collection(`Events`)
 								.doc(journeyEvent.id)
 								.withConverter(genAdminConverter(EventSchema)),
@@ -212,7 +215,9 @@ export const appRouter = router({
 					results.forEach((result) => {
 						transaction.set(
 							dbAdmin
-								.doc(objective.ref.path)
+								.doc(product.ref.path)
+								.collection(`Objectives`)
+								.doc(objective.id)
 								.collection(`Results`)
 								.doc(result.id)
 								.withConverter(genAdminConverter(ResultSchema)),
@@ -256,7 +261,9 @@ export const appRouter = router({
 					persona.data().dayInTheLife.forEach((dayInTheLife) => {
 						transaction.set(
 							dbAdmin
-								.doc(persona.ref.path)
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
 								.collection(`DaysInTheLife`)
 								.doc()
 								.withConverter(genAdminConverter(DayInTheLifeSchema)),
@@ -269,7 +276,9 @@ export const appRouter = router({
 					persona.data().frustrations.forEach((frustration) => {
 						transaction.set(
 							dbAdmin
-								.doc(persona.ref.path)
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
 								.collection(`Frustrations`)
 								.doc()
 								.withConverter(genAdminConverter(FrustrationSchema)),
@@ -281,7 +290,13 @@ export const appRouter = router({
 
 					persona.data().goals.forEach((goal) => {
 						transaction.set(
-							dbAdmin.doc(persona.ref.path).collection(`Goals`).doc().withConverter(genAdminConverter(GoalSchema)),
+							dbAdmin
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
+								.collection(`Goals`)
+								.doc()
+								.withConverter(genAdminConverter(GoalSchema)),
 							{
 								text: goal.text,
 							},
@@ -291,7 +306,9 @@ export const appRouter = router({
 					persona.data().interactions.forEach((interaction) => {
 						transaction.set(
 							dbAdmin
-								.doc(persona.ref.path)
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
 								.collection(`Interactions`)
 								.doc()
 								.withConverter(genAdminConverter(InteractionSchema)),
@@ -304,7 +321,9 @@ export const appRouter = router({
 					persona.data().tasks.forEach((task) => {
 						transaction.set(
 							dbAdmin
-								.doc(persona.ref.path)
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
 								.collection(`PersonaTasks`)
 								.doc()
 								.withConverter(genAdminConverter(PersonaTaskSchema)),
@@ -317,7 +336,9 @@ export const appRouter = router({
 					persona.data().priorities.forEach((priority) => {
 						transaction.set(
 							dbAdmin
-								.doc(persona.ref.path)
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
 								.collection(`Priorities`)
 								.doc()
 								.withConverter(genAdminConverter(PrioritySchema)),
@@ -330,7 +351,9 @@ export const appRouter = router({
 					persona.data().responsibilities.forEach((responsibility) => {
 						transaction.set(
 							dbAdmin
-								.doc(persona.ref.path)
+								.doc(product.ref.path)
+								.collection(`Personas`)
+								.doc(persona.id)
 								.collection(`Responsibilities`)
 								.doc()
 								.withConverter(genAdminConverter(ResponsibilitySchema)),
@@ -439,6 +462,7 @@ export const appRouter = router({
 							.doc()
 							.withConverter(genAdminConverter(BusinessOutcomeSchema)),
 						{
+							createdAt: Timestamp.now(),
 							text: businessOutcome.text,
 						},
 					)
@@ -532,6 +556,7 @@ export const appRouter = router({
 							.doc()
 							.withConverter(genAdminConverter(MarketLeaderSchema)),
 						{
+							createdAt: Timestamp.now(),
 							text: marketLeader.text,
 						},
 					)
@@ -563,6 +588,7 @@ export const appRouter = router({
 							.doc()
 							.withConverter(genAdminConverter(PotentialRiskSchema)),
 						{
+							createdAt: Timestamp.now(),
 							text: potentialRisk.text,
 						},
 					)
@@ -610,6 +636,7 @@ export const appRouter = router({
 							.doc()
 							.withConverter(genAdminConverter(UserPrioritySchema)),
 						{
+							createdAt: Timestamp.now(),
 							text: userPriority.text,
 						},
 					)

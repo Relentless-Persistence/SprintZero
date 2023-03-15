@@ -138,9 +138,15 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(doc(persona.ref, `Goals`, item.id).withConverter(GoalConverter), {
-													text: item.text,
-												})
+												if (goals.docs.find((goal) => goal.id === item.id)) {
+													batch.update(doc(persona.ref, `Goals`, item.id).withConverter(GoalConverter), {
+														text: item.text,
+													})
+												} else {
+													batch.set(doc(persona.ref, `Goals`, item.id).withConverter(GoalConverter), {
+														text: item.text,
+													})
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)
@@ -157,9 +163,15 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(doc(persona.ref, `Interactions`, item.id).withConverter(InteractionConverter), {
-													text: item.text,
-												})
+												if (interactions.docs.find((interaction) => interaction.id === item.id)) {
+													batch.update(doc(persona.ref, `Interactions`, item.id).withConverter(InteractionConverter), {
+														text: item.text,
+													})
+												} else {
+													batch.set(doc(persona.ref, `Interactions`, item.id).withConverter(InteractionConverter), {
+														text: item.text,
+													})
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)
@@ -176,9 +188,15 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(doc(persona.ref, `PersonaTasks`, item.id).withConverter(PersonaTaskConverter), {
-													text: item.text,
-												})
+												if (personaTasks.docs.find((personaTask) => personaTask.id === item.id)) {
+													batch.update(doc(persona.ref, `PersonaTasks`, item.id).withConverter(PersonaTaskConverter), {
+														text: item.text,
+													})
+												} else {
+													batch.set(doc(persona.ref, `PersonaTasks`, item.id).withConverter(PersonaTaskConverter), {
+														text: item.text,
+													})
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)
@@ -195,12 +213,21 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(
-													doc(persona.ref, `Responsibilities`, item.id).withConverter(ResponsibilityConverter),
-													{
-														text: item.text,
-													},
-												)
+												if (responsibilities.docs.find((responsibility) => responsibility.id === item.id)) {
+													batch.update(
+														doc(persona.ref, `Responsibilities`, item.id).withConverter(ResponsibilityConverter),
+														{
+															text: item.text,
+														},
+													)
+												} else {
+													batch.set(
+														doc(persona.ref, `Responsibilities`, item.id).withConverter(ResponsibilityConverter),
+														{
+															text: item.text,
+														},
+													)
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)
@@ -217,9 +244,15 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(doc(persona.ref, `Priorities`, item.id).withConverter(PriorityConverter), {
-													text: item.text,
-												})
+												if (priorities.docs.find((priority) => priority.id === item.id)) {
+													batch.update(doc(persona.ref, `Priorities`, item.id).withConverter(PriorityConverter), {
+														text: item.text,
+													})
+												} else {
+													batch.set(doc(persona.ref, `Priorities`, item.id).withConverter(PriorityConverter), {
+														text: item.text,
+													})
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)
@@ -236,9 +269,15 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(doc(persona.ref, `Frustrations`, item.id).withConverter(FrustrationConverter), {
-													text: item.text,
-												})
+												if (frustrations.docs.find((frustration) => frustration.id === item.id)) {
+													batch.update(doc(persona.ref, `Frustrations`, item.id).withConverter(FrustrationConverter), {
+														text: item.text,
+													})
+												} else {
+													batch.set(doc(persona.ref, `Frustrations`, item.id).withConverter(FrustrationConverter), {
+														text: item.text,
+													})
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)
@@ -255,9 +294,15 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(doc(persona.ref, `Changes`, item.id).withConverter(ChangeConverter), {
-													text: item.text,
-												})
+												if (changes.docs.find((change) => change.id === item.id)) {
+													batch.update(doc(persona.ref, `Changes`, item.id).withConverter(ChangeConverter), {
+														text: item.text,
+													})
+												} else {
+													batch.set(doc(persona.ref, `Changes`, item.id).withConverter(ChangeConverter), {
+														text: item.text,
+													})
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)
@@ -279,9 +324,18 @@ const PersonasClientPage: FC = () => {
 										onCommit={async (list) => {
 											const batch = writeBatch(db)
 											list.forEach((item) => {
-												batch.update(doc(persona.ref, `DaysInTheLife`, item.id).withConverter(DayInTheLifeConverter), {
-													text: item.text,
-												})
+												if (daysInTheLife.docs.find((dayInTheLife) => dayInTheLife.id === item.id)) {
+													batch.update(
+														doc(persona.ref, `DaysInTheLife`, item.id).withConverter(DayInTheLifeConverter),
+														{
+															text: item.text,
+														},
+													)
+												} else {
+													batch.set(doc(persona.ref, `DaysInTheLife`, item.id).withConverter(DayInTheLifeConverter), {
+														text: item.text,
+													})
+												}
 											})
 											await batch.commit()
 											setIsEditingCard(undefined)

@@ -5,7 +5,7 @@ import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
-import {getFeatures, getStories} from "~/utils/storyMap"
+import {getEpics, getFeatures, getStories} from "~/utils/storyMap"
 
 export type StoryCardProps = {
 	storyMapItems: QuerySnapshot<StoryMapItem>
@@ -16,7 +16,7 @@ export type StoryCardProps = {
 const StoryCard: FC<StoryCardProps> = ({storyMapItems, onDrawerOpen, storyId}) => {
 	const story = getStories(storyMapItems).find((story) => story.id === storyId)!
 	const feature = getFeatures(storyMapItems).find(({id}) => id === story.data().parentId)!
-	const epic = getFeatures(storyMapItems).find(({id}) => id === feature.data().parentId)!
+	const epic = getEpics(storyMapItems).find(({id}) => id === feature.data().parentId)!
 
 	return (
 		<Card

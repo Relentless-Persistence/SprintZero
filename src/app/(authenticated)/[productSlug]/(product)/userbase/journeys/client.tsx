@@ -30,12 +30,11 @@ const JourneysClientPage: FC = () => {
 
 	const [journeyEvents, , journeyEventsError] = useCollection(
 		activeJourney !== undefined && activeJourney !== `new`
-			? collection(product.ref, `Journeys`, activeJourney, `JourneyEvents`).withConverter(EventConverter)
+			? collection(product.ref, `Journeys`, activeJourney, `Events`).withConverter(EventConverter)
 			: undefined,
 	)
 	useErrorHandler(journeyEventsError)
 
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const [activeEventId, setActiveEventId] = useState<string | undefined>(undefined)
 	const activeEvent = journeyEvents?.docs.find((event) => event.id === activeEventId)
 
@@ -50,9 +49,9 @@ const JourneysClientPage: FC = () => {
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="flex h-full flex-col gap-6 px-12 py-8">
 				<div className="flex justify-between">
-					<Breadcrumb items={[{title: `Userbae`}, {title: `Journeys`}]} />
+					<Breadcrumb items={[{title: `Userbase`}, {title: `Journeys`}]} />
 
-					<Button onClick={() => setIsDrawerOpen(true)}>Add Event</Button>
+					<Button onClick={() => setActiveEventId(`new`)}>Add Event</Button>
 				</div>
 
 				<div className="relative grow">
@@ -117,10 +116,7 @@ const JourneysClientPage: FC = () => {
 								<button
 									key={event.id}
 									type="button"
-									onClick={() => {
-										setActiveEventId(event.id)
-										setIsDrawerOpen(true)
-									}}
+									onClick={() => setActiveEventId(event.id)}
 									className="pointer-events-auto absolute flex -translate-y-1/2 items-center gap-1 text-left"
 									style={{top: `${((event.data().start + event.data().end) / 2 / journey.data().duration) * 100}%`}}
 								>
@@ -146,19 +142,19 @@ const JourneysClientPage: FC = () => {
 				/>
 			)}
 
-			{journey && isDrawerOpen && (
+			{journey && activeEventId && (
 				<EventDrawer
 					journey={journey}
 					activeEvent={activeEvent}
-					onClose={() => setIsDrawerOpen(false)}
+					onClose={() => setActiveEventId(undefined)}
 					onCommit={async (data) => {
-						if (activeEventId === undefined)
-							await addDoc(collection(product.ref, `Journeys`, journey.id, `JourneyEvents`), data)
-						else await updateDoc(doc(product.ref, `Journeys`, journey.id, `JourneyEvents`, activeEventId), data)
+						if (!activeEventId) return
+						if (activeEventId === `new`) await addDoc(collection(product.ref, `Journeys`, journey.id, `Events`), data)
+						else await updateDoc(doc(product.ref, `Journeys`, journey.id, `Events`, activeEventId), data)
 					}}
 					onDelete={async () => {
-						if (activeEventId !== undefined && activeEventId !== `new`)
-							await deleteDoc(doc(product.ref, `Journeys`, journey.id, `JourneyEvents`, activeEventId))
+						if (activeEventId !== `new`)
+							await deleteDoc(doc(product.ref, `Journeys`, journey.id, `Events`, activeEventId))
 					}}
 				/>
 			)}

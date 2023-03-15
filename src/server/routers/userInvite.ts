@@ -1,10 +1,11 @@
 import {TRPCError} from "@trpc/server"
-import {FieldPath} from "firebase-admin/firestore"
+import {FieldPath, Timestamp} from "firebase-admin/firestore"
 import {z} from "zod"
 
 import {procedure, router} from "../trpc"
 import {genAdminConverter} from "~/types"
 import {ProductSchema} from "~/types/db/Products"
+import {HuddleSchema} from "~/types/db/Products/Huddles"
 import {InviteSchema} from "~/types/db/Products/Invites"
 import {MemberSchema} from "~/types/db/Products/Members"
 import {dbAdmin} from "~/utils/firebaseAdmin"
@@ -52,16 +53,33 @@ export const userInviteRouter = router({
 			if (productInvite.docs.length === 0) throw new TRPCError({code: `UNAUTHORIZED`})
 			const invite = productInvite.docs[0]!
 
-			await dbAdmin
-				.doc(invite.ref.parent.parent!.path)
-				.collection(`Members`)
-				.doc(userId)
-				.withConverter(genAdminConverter(MemberSchema))
-				.set({
+			const batch = dbAdmin.batch()
+			batch.set(
+				dbAdmin
+					.doc(invite.ref.parent.parent!.path)
+					.collection(`Members`)
+					.doc(userId)
+					.withConverter(genAdminConverter(MemberSchema)),
+				{
 					name: userName,
 					avatar: userAvatar,
 					type: `editor`,
 					id: userId,
-				})
+				},
+			)
+			batch.set(
+				dbAdmin
+					.doc(invite.ref.parent.parent!.path)
+					.collection(`Huddles`)
+					.doc(userId)
+					.withConverter(genAdminConverter(HuddleSchema)),
+				{
+					blockerStoryIds: [],
+					todayStoryIds: [],
+					updatedAt: Timestamp.now(),
+					yesterdayStoryIds: [],
+				},
+			)
+			await batch.commit()
 		}),
 })

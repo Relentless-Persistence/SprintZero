@@ -11,7 +11,7 @@ export type StoryProps = {
 	storyMapItems: QuerySnapshot<StoryMapItem>
 	versions: QuerySnapshot<Version>
 	storyId: string
-	onRemove: () => Promisable<void>
+	onRemove: (() => Promisable<void>) | undefined
 }
 
 const Story: FC<StoryProps> = ({storyMapItems, versions, storyId, onRemove}) => {
@@ -38,14 +38,16 @@ const Story: FC<StoryProps> = ({storyMapItems, versions, storyId, onRemove}) => 
 						</Tag>
 					</div>
 				</div>
-				<button
-					type="button"
-					onClick={() => {
-						Promise.resolve(onRemove()).catch(console.error)
-					}}
-				>
-					<CloseOutlined />
-				</button>
+				{onRemove && (
+					<button
+						type="button"
+						onClick={() => {
+							Promise.resolve(onRemove()).catch(console.error)
+						}}
+					>
+						<CloseOutlined />
+					</button>
+				)}
 			</div>
 		</div>
 	)

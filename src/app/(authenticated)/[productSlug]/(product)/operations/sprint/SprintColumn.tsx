@@ -32,7 +32,7 @@ const SprintColumn: FC<SprintColumnProps> = ({
 		getStories(storyMapItems)
 			.filter((story) => story.data().sprintColumn === columnName)
 			.filter((story) => (currentVersionId === AllVersions ? true : story.data().versionId === currentVersionId))
-			.filter((story) => myStoriesOnly && story.data().peopleIds.includes(user.id)),
+			.filter((story) => (myStoriesOnly ? story.data().peopleIds.includes(user.id) : true)),
 		[(el) => el.data().updatedAt.toMillis()],
 	)
 

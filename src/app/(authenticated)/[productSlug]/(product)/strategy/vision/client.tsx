@@ -42,7 +42,7 @@ const VisionsClientPage: FC = () => {
 	const [editMode, setEditMode] = useState(false)
 	const [currentStep, setCurrentStep] = useState(0)
 
-	const [dbFeatures, dbFeaturesLoading, dbFeaturesError] = useCollection(
+	const [dbFeatures, , dbFeaturesError] = useCollection(
 		collection(product.ref, `Features`).withConverter(FeatureConverter),
 	)
 	useErrorHandler(dbFeaturesError)
@@ -60,37 +60,10 @@ const VisionsClientPage: FC = () => {
 		resolver: zodResolver(formSchema),
 	})
 
-	const hasSetDefaultValues = useRef(false)
-	useEffect(() => {
-		if (hasSetDefaultValues.current) return
-		if (!dbFeaturesLoading) {
-			reset({
-				productTypes: product.data().productTypes,
-				valueProposition: product.data().valueProposition ?? ``,
-				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
-					{id: nanoid(), text: ``},
-				],
-			})
-			setEditMode(true)
-			hasSetDefaultValues.current = true
-		}
-	}, [dbFeatures?.docs, dbFeaturesLoading, product, reset])
-
 	const hasSetInitial = useRef(false)
 	useEffect(() => {
 		if (hasSetInitial.current) return
 		if (!product.data().finalVision) {
-			reset({
-				productTypes: product.data().productTypes,
-				valueProposition: product.data().valueProposition ?? ``,
-				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
-					{id: nanoid(), text: ``},
-				],
-				finalVision: product.data().finalVision,
-			})
-			setEditMode(true)
-			hasSetInitial.current = true
-		} else if (product.data().finalVision !== ``) {
 			reset({
 				productTypes: product.data().productTypes,
 				valueProposition: product.data().valueProposition ?? ``,
