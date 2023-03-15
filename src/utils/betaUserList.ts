@@ -73,6 +73,7 @@ export const betaUsers = [
 	`mail@albertjfoo.com`,
 	`mark@fischermanagement.com`,
 	`marklindop@gmail.com`,
+	`mary.gower@shoonyadigital.com`,
 	`maryam.ndope@gmail.com`,
 	`matthias.ostermann@gmail.com`,
 	`meeshellxia@gmail.com`,
