@@ -42,38 +42,44 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 		getStories(storyMapItems).filter((story) => !itemsToBeDeleted.includes(story.id)),
 		versions,
 	)
-	const stories = _stories.map((story) => {
-		const siblings = sortStories(
-			_stories.filter((sibling) => sibling.parentId === story.parentId),
-			versions,
-		)
-		const position = siblings.findIndex((sibling) => sibling.id === story.id)
+	const stories = _stories
+		.map((story) => {
+			const siblings = sortStories(
+				_stories.filter((sibling) => sibling.parentId === story.parentId),
+				versions,
+			)
+			const position = siblings.findIndex((sibling) => sibling.id === story.id)
 
-		return {
-			...story,
-			id: story.id,
-			position,
-		}
-	})
+			return {
+				...story,
+				id: story.id,
+				position,
+			}
+		})
+		.filter((story) => !story.deleted)
 	const _features = sortFeatures(getFeatures(storyMapItems).filter((feature) => !itemsToBeDeleted.includes(feature.id)))
-	const features = _features.map((feature) => {
-		const siblings = _features.filter((sibling) => sibling.parentId === feature.parentId)
-		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
+	const features = _features
+		.map((feature) => {
+			const siblings = _features.filter((sibling) => sibling.parentId === feature.parentId)
+			const position = siblings.findIndex((sibling) => sibling.id === feature.id)
 
-		return {
-			...feature,
-			id: feature.id,
-			childrenIds: _stories.filter((story) => story.parentId === feature.id).map((story) => story.id),
-			position,
-		}
-	})
+			return {
+				...feature,
+				id: feature.id,
+				childrenIds: _stories.filter((story) => story.parentId === feature.id).map((story) => story.id),
+				position,
+			}
+		})
+		.filter((feature) => !feature.deleted)
 	const _epics = sortEpics(getEpics(storyMapItems).filter((epic) => !itemsToBeDeleted.includes(epic.id)))
-	const epics = _epics.map((epic) => ({
-		...epic,
-		id: epic.id,
-		childrenIds: _features.filter((feature) => feature.parentId === epic.id).map((feature) => feature.id),
-		position: _epics.findIndex((sibling) => sibling.id === epic.id),
-	}))
+	const epics = _epics
+		.map((epic) => ({
+			...epic,
+			id: epic.id,
+			childrenIds: _features.filter((feature) => feature.parentId === epic.id).map((feature) => feature.id),
+			position: _epics.findIndex((sibling) => sibling.id === epic.id),
+		}))
+		.filter((epic) => !epic.deleted)
 
 	const [dragInfo, setDragInfo] = useState<DragInfo>({
 		mousePos: [useMotionValue(0), useMotionValue(0)],

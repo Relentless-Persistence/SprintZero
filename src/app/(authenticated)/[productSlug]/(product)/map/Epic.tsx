@@ -25,7 +25,9 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
 
 	const epic = storyMapItems.find((item) => item.id === epicId)!
-	const children = sortFeatures(storyMapItems.filter((item) => item.parentId === epicId))
+	const children = sortFeatures(
+		storyMapItems.filter((item) => item.parentId === epicId).filter((item) => !item.deleted),
+	)
 	const grandchildren = storyMapItems.filter((item) => children.some((child) => child.id === item.parentId))
 
 	const containerRef = useRef<HTMLDivElement>(null)

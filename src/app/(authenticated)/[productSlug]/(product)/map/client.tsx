@@ -188,7 +188,7 @@ const StoryMapClientPage: FC = () => {
 			})
 		})
 		versionsToBeDeleted.forEach((id) => {
-			batch.update(doc(product.ref, `StoryMapVersions`, id).withConverter(VersionConverter), {
+			batch.update(doc(product.ref, `Versions`, id).withConverter(VersionConverter), {
 				deleted: true,
 			})
 		})

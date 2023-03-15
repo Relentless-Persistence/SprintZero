@@ -28,7 +28,8 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 	const children = sortStories(
 		storyMapItems
 			.filter((item) => item.parentId === featureId)
-			.filter((item) => item.versionId === currentVersionId || currentVersionId === AllVersions),
+			.filter((item) => item.versionId === currentVersionId || currentVersionId === AllVersions)
+			.filter((item) => !item.deleted),
 		versions,
 	)
 
