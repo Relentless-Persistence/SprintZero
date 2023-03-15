@@ -71,6 +71,7 @@ const ProductSetupClientPage: FC = () => {
 				email: recipient,
 				productId,
 				userIdToken: await user.getIdToken(),
+				userType: `member`,
 			})
 		}
 

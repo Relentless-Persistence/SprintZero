@@ -64,6 +64,7 @@ const TeamSettingsClientPage: FC = () => {
 				email,
 				productId: product.id,
 				userIdToken: token,
+				userType: currentTab,
 			})
 			setAddNew(false)
 			setEmail(``)

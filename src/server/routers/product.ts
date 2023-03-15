@@ -199,9 +199,10 @@ export const productRouter = router({
 				email: z.string().email(),
 				productId: z.string(),
 				userIdToken: z.string(),
+				userType: z.string(),
 			}),
 		)
-		.mutation(async ({input: {email, productId, userIdToken}}) => {
+		.mutation(async ({input: {email, productId, userIdToken, userType}}) => {
 			const user = await authAdmin.verifyIdToken(userIdToken)
 			const member = await dbAdmin
 				.collection(`Products`)
@@ -224,6 +225,7 @@ export const productRouter = router({
 			await product.ref.collection(`Invites`).doc(inviteToken).withConverter(genAdminConverter(InviteSchema)).set({
 				email,
 				id: inviteToken,
+				userType,
 			})
 
 			const queryParams = querystring.stringify({invite_token: inviteToken})
