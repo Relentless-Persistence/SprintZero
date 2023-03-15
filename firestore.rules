@@ -144,7 +144,7 @@ service cloud.firestore {
 
     match /Users/{userId} {
       allow get: if request.auth != null;
-      allow create, update: if userId == request.auth.uid && request.resource.data.email == request.auth.token.email;
+      allow create, update: if userId == request.auth.uid && request.resource.data.email == request.auth.token.email && request.resource.data.type == "user";
       allow delete: if userId == request.auth.uid;
     }
 

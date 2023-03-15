@@ -6,7 +6,7 @@ import {useState} from "react"
 import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
 
-import type {QueryDocumentSnapshot, Timestamp} from "firebase/firestore"
+import type {Timestamp} from "firebase/firestore"
 import type {FC} from "react"
 import type {Promisable} from "type-fest"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
@@ -17,7 +17,7 @@ import {MemberConverter} from "~/types/db/Products/Members"
 import {CommentConverter} from "~/types/db/Products/StoryMapItems/Comments"
 
 export type CommentsProps = {
-	storyMapItem: QueryDocumentSnapshot<StoryMapItem>
+	storyMapItem: StoryMapItem
 	commentType: `code` | `design`
 	flagged?: boolean
 	onFlag?: () => Promisable<void>
@@ -35,13 +35,13 @@ const Comments: FC<CommentsProps> = ({storyMapItem, commentType, flagged, onFlag
 			type: commentType,
 			authorId: user.id,
 		}
-		await addDoc(collection(storyMapItem.ref, `Comments`), data)
+		await addDoc(collection(product.ref, `StoryMapItems`, storyMapItem.id, `Comments`), data)
 		setCommentDraft(``)
 	}
 
 	const [comments, , commentsError] = useCollection(
 		query(
-			collection(storyMapItem.ref, `Comments`),
+			collection(product.ref, `StoryMapItems`, storyMapItem.id, `Comments`),
 			where(`type`, `==`, commentType),
 			orderBy(`createdAt`, `asc`),
 		).withConverter(CommentConverter),

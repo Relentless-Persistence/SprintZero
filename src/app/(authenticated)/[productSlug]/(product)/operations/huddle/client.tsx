@@ -102,9 +102,9 @@ const HuddleClientPage: FC = () => {
 										{member.id === user.id &&
 											storyMapItems &&
 											(() => {
-												const blockerStoryOptions = getStories(storyMapItems)
+												const blockerStoryOptions = getStories(storyMapItems.docs.map((item) => item.data()))
 													.filter(({id}) => !huddle?.data().blockerStoryIds.includes(id))
-													.filter((story) => story.data().peopleIds.includes(user.id))
+													.filter((story) => story.peopleIds.includes(user.id))
 
 												return (
 													<Dropdown
@@ -120,7 +120,7 @@ const HuddleClientPage: FC = () => {
 																	  ]
 																	: blockerStoryOptions.map((item) => ({
 																			key: item.id,
-																			label: item.data().name,
+																			label: item.name,
 																			onClick: async () => {
 																				if (!huddle) return
 																				await updateDoc(huddle.ref, {
@@ -146,7 +146,9 @@ const HuddleClientPage: FC = () => {
 										{(storyMapItems &&
 											versions &&
 											huddle?.data().todayStoryIds.map((storyId) => {
-												const story = getStories(storyMapItems).find(({id}) => id === storyId)
+												const story = getStories(storyMapItems.docs.map((item) => item.data())).find(
+													({id}) => id === storyId,
+												)
 												if (!story) return null
 
 												return (
@@ -171,9 +173,9 @@ const HuddleClientPage: FC = () => {
 										{member.id === user.id &&
 											storyMapItems &&
 											(() => {
-												const todayStoryOptions = getStories(storyMapItems)
+												const todayStoryOptions = getStories(storyMapItems.docs.map((item) => item.data()))
 													.filter(({id}) => !huddle?.data().todayStoryIds.includes(id))
-													.filter((story) => story.data().peopleIds.includes(user.id))
+													.filter((story) => story.peopleIds.includes(user.id))
 
 												return (
 													<Dropdown
@@ -189,7 +191,7 @@ const HuddleClientPage: FC = () => {
 																	  ]
 																	: todayStoryOptions.map((item) => ({
 																			key: item.id,
-																			label: item.data().name,
+																			label: item.name,
 																			onClick: async () => {
 																				if (!huddle) return
 																				await updateDoc(huddle.ref, {
@@ -215,7 +217,9 @@ const HuddleClientPage: FC = () => {
 										{(storyMapItems &&
 											versions &&
 											huddle?.data().yesterdayStoryIds.map((storyId) => {
-												const story = getStories(storyMapItems).find(({id}) => id === storyId)
+												const story = getStories(storyMapItems.docs.map((item) => item.data())).find(
+													({id}) => id === storyId,
+												)
 												if (!story) return null
 
 												return (
@@ -240,9 +244,9 @@ const HuddleClientPage: FC = () => {
 										{member.id === user.id &&
 											storyMapItems &&
 											(() => {
-												const yesterdayStoryOptions = getStories(storyMapItems)
+												const yesterdayStoryOptions = getStories(storyMapItems.docs.map((item) => item.data()))
 													.filter(({id}) => !huddle?.data().yesterdayStoryIds.includes(id))
-													.filter((story) => story.data().peopleIds.includes(user.id))
+													.filter((story) => story.peopleIds.includes(user.id))
 
 												return (
 													<Dropdown
@@ -258,7 +262,7 @@ const HuddleClientPage: FC = () => {
 																	  ]
 																	: yesterdayStoryOptions.map((item) => ({
 																			key: item.id,
-																			label: item.data().name,
+																			label: item.name,
 																			onClick: async () => {
 																				if (!huddle) return
 																				await updateDoc(huddle.ref, {

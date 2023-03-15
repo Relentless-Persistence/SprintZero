@@ -25,8 +25,16 @@ const PrioritiesClientPage: FC = () => {
 			<Tabs
 				tabPosition="right"
 				items={[
-					{key: `epics`, label: `Epics`, children: <EpicsTab storyMapItems={storyMapItems} />},
-					{key: `features`, label: `Features`, children: <FeaturesTab storyMapItems={storyMapItems} />},
+					{
+						key: `epics`,
+						label: `Epics`,
+						children: <EpicsTab storyMapItems={storyMapItems.docs.map((item) => item.data())} />,
+					},
+					{
+						key: `features`,
+						label: `Features`,
+						children: <FeaturesTab storyMapItems={storyMapItems.docs.map((item) => item.data())} />,
+					},
 				]}
 				style={{height: `100%`}}
 			/>

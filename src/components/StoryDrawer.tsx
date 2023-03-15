@@ -57,7 +57,7 @@ const formSchema = StoryMapItemSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 export type StoryDrawerProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	versions: QuerySnapshot<Version>
 	storyId: string
 	isOpen: boolean
@@ -69,8 +69,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 	const [editMode, setEditMode] = useState(false)
 	const [newAcceptanceCriterionInput, setNewAcceptanceCriterionInput] = useState(``)
 	const [newBugInput, setNewBugInput] = useState(``)
-	const story = storyMapItems.docs.find((story) => story.id === storyId)!
-	const storyData = story.data()
+	const story = storyMapItems.find((story) => story.id === storyId)!
 	const [commentType, setCommentType] = useState<`code` | `design`>(`design`)
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
@@ -78,31 +77,31 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
-		setLastModifiedText(dayjs(storyData.updatedAt.toMillis()).fromNow())
+		setLastModifiedText(dayjs(story.updatedAt.toMillis()).fromNow())
 	}, 200)
 
-	const [localStoryName, setLocalStoryName] = useState(storyData.name)
+	const [localStoryName, setLocalStoryName] = useState(story.name)
 	useEffect(() => {
-		setLocalStoryName(storyData.name)
-	}, [storyData.name])
+		setLocalStoryName(story.name)
+	}, [story.name])
 
-	const [description, setDescription] = useState(storyData.description)
+	const [description, setDescription] = useState(story.description)
 	useEffect(() => {
-		setDescription(storyData.description)
-	}, [storyData.description])
+		setDescription(story.description)
+	}, [story.description])
 
 	const {control, handleSubmit, getFieldState, formState, reset} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			branchName: storyData.branchName,
-			designLink: storyData.designLink,
-			designEffort: storyData.designEffort,
-			engineeringEffort: storyData.engineeringEffort,
-			pageLink: storyData.pageLink,
-			sprintColumn: storyData.sprintColumn,
-			peopleIds: storyData.peopleIds,
-			versionId: storyData.versionId,
+			branchName: story.branchName,
+			designLink: story.designLink,
+			designEffort: story.designEffort,
+			engineeringEffort: story.engineeringEffort,
+			pageLink: story.pageLink,
+			sprintColumn: story.sprintColumn,
+			peopleIds: story.peopleIds,
+			versionId: story.versionId,
 		},
 	})
 
@@ -113,7 +112,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
 		await updateItem(product, storyMapItems, versions, story.id, {
-			acceptanceCriteria: produce(storyData.acceptanceCriteria, (draft) => {
+			acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
 				const index = draft.findIndex((criterion) => criterion.id === id)
 				draft[index]!.checked = checked
 			}),
@@ -124,7 +123,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 		if (!newAcceptanceCriterionInput) return
 		await updateItem(product, storyMapItems, versions, story.id, {
 			acceptanceCriteria: [
-				...storyData.acceptanceCriteria,
+				...story.acceptanceCriteria,
 				{id: nanoid(), name: newAcceptanceCriterionInput, checked: false},
 			],
 		})
@@ -132,7 +131,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 
 	const toggleBug = async (id: string, checked: boolean) => {
 		await updateItem(product, storyMapItems, versions, story.id, {
-			bugs: produce(storyData.bugs, (draft) => {
+			bugs: produce(story.bugs, (draft) => {
 				const index = draft.findIndex((bug) => bug.id === id)
 				draft[index]!.checked = checked
 			}),
@@ -142,15 +141,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 	const addBug = async () => {
 		if (!newBugInput) return
 		await updateItem(product, storyMapItems, versions, story.id, {
-			bugs: [...storyData.bugs, {id: nanoid(), name: newBugInput, checked: false}],
+			bugs: [...story.bugs, {id: nanoid(), name: newBugInput, checked: false}],
 		})
 	}
 
-	const totalEffort = storyData.designEffort + storyData.engineeringEffort
+	const totalEffort = story.designEffort + story.engineeringEffort
 
-	const peoplePopoverItems = story
-		.data()
-		.peopleIds.map((userId) => members?.docs.find((user) => user.id === userId))
+	const peoplePopoverItems = story.peopleIds
+		.map((userId) => members?.docs.find((user) => user.id === userId))
 		.filter((member): member is QueryDocumentSnapshot<Member> => member?.exists() ?? false)
 		.map((member) => (
 			<div key={member.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
@@ -198,7 +196,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 							{lastModifiedText && members && (
 								<p className="text-sm font-normal text-textTertiary">
 									Last modified {lastModifiedText} by{` `}
-									{members.docs.find((user) => user.id === storyData.updatedAtUserId)?.data().name ?? `unknown user`}
+									{members.docs.find((user) => user.id === story.updatedAtUserId)?.data().name ?? `unknown user`}
 								</p>
 							)}
 						</div>
@@ -224,7 +222,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 									{dollarFormat((product.data().effortCost ?? 0) * totalEffort)}
 								</Tag>
 								<Tag color="#585858" icon={<FlagOutlined />}>
-									{sprintColumns[storyData.sprintColumn]}
+									{sprintColumns[story.sprintColumn]}
 								</Tag>
 								<Popover
 									placement="bottom"
@@ -239,33 +237,33 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 									}
 								>
 									<Tag color="#585858" icon={<UserOutlined />} className="text-sm">
-										{storyData.peopleIds.length}
+										{story.peopleIds.length}
 									</Tag>
 								</Popover>
 
 								<div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
 									<Tag
-										color={storyData.branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+										color={story.branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 										icon={<CodeOutlined />}
-										className={clsx(!storyData.branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+										className={clsx(!story.branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 									>
-										{storyData.branchName ?? `No branch`}
+										{story.branchName ?? `No branch`}
 									</Tag>
-									<LinkTo href={storyData.designLink} openInNewTab>
+									<LinkTo href={story.designLink} openInNewTab>
 										<Tag
-											color={storyData.designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+											color={story.designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<BlockOutlined />}
-											className={clsx(!storyData.designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+											className={clsx(!story.designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 										>
 											Design
 										</Tag>
 									</LinkTo>
-									<LinkTo href={storyData.pageLink} openInNewTab>
+									<LinkTo href={story.pageLink} openInNewTab>
 										<Tag
-											color={storyData.pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
+											color={story.pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
 											icon={<LinkOutlined />}
-											style={storyData.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
-											className={clsx(!storyData.pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
+											style={story.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+											className={clsx(!story.pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
 										>
 											Page
 										</Tag>
@@ -284,14 +282,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 								onClick={() => {
 									setEditMode(false)
 									reset({
-										branchName: storyData.branchName,
-										designLink: storyData.designLink,
-										designEffort: storyData.designEffort,
-										engineeringEffort: storyData.engineeringEffort,
-										pageLink: storyData.pageLink,
-										sprintColumn: storyData.sprintColumn,
-										peopleIds: storyData.peopleIds,
-										versionId: storyData.versionId,
+										branchName: story.branchName,
+										designLink: story.designLink,
+										designEffort: story.designEffort,
+										engineeringEffort: story.engineeringEffort,
+										pageLink: story.pageLink,
+										sprintColumn: story.sprintColumn,
+										peopleIds: story.peopleIds,
+										versionId: story.versionId,
 									})
 								}}
 							>
@@ -405,7 +403,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 							<div className="flex min-h-0 flex-col gap-2">
 								<p className="text-lg font-semibold">Acceptance Criteria</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
-									{storyData.acceptanceCriteria.map((criterion) => (
+									{story.acceptanceCriteria.map((criterion) => (
 										<Checkbox
 											key={criterion.id}
 											checked={criterion.checked}
@@ -437,7 +435,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 							<div className="flex min-h-0 flex-col gap-2 overflow-auto">
 								<p className="text-lg font-semibold">Bugs</p>
 								<div className="flex flex-col gap-2 overflow-auto p-0.5">
-									{storyData.bugs.map((bug) => (
+									{story.bugs.map((bug) => (
 										<Checkbox
 											key={bug.id}
 											checked={bug.checked}
@@ -485,7 +483,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, versions, storyId, is
 						<div className="relative grow">
 							<Comments
 								storyMapItem={story}
-								flagged={storyData.ethicsColumn !== null}
+								flagged={story.ethicsColumn !== null}
 								commentType={commentType}
 								onFlag={() => {
 									updateItem(product, storyMapItems, versions, story.id, {ethicsColumn: `underReview`}).catch(

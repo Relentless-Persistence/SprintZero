@@ -13,7 +13,7 @@ import {AllVersions, getStories} from "~/utils/storyMap"
 export type SprintColumnProps = {
 	columnName: string
 	title: string
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	versions: QuerySnapshot<Version>
 	currentVersionId: string | typeof AllVersions
 	myStoriesOnly: boolean
@@ -30,10 +30,10 @@ const SprintColumn: FC<SprintColumnProps> = ({
 	const {user} = useAppContext()
 	const stories = sortBy(
 		getStories(storyMapItems)
-			.filter((story) => story.data().sprintColumn === columnName)
-			.filter((story) => (currentVersionId === AllVersions ? true : story.data().versionId === currentVersionId))
-			.filter((story) => (myStoriesOnly ? story.data().peopleIds.includes(user.id) : true)),
-		[(el) => el.data().updatedAt.toMillis()],
+			.filter((story) => story.sprintColumn === columnName)
+			.filter((story) => (currentVersionId === AllVersions ? true : story.versionId === currentVersionId))
+			.filter((story) => (myStoriesOnly ? story.peopleIds.includes(user.id) : true)),
+		[(el) => el.updatedAt.toMillis()],
 	)
 
 	return (

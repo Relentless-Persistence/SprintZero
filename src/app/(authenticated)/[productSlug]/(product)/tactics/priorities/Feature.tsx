@@ -1,42 +1,48 @@
 "use client"
 
 import {CopyOutlined} from "@ant-design/icons"
-import {Timestamp, updateDoc} from "firebase/firestore"
+import {Timestamp, doc, updateDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
-import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
+import type {DocumentReference, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {matrixRect} from "./globals"
+import {useAppContext} from "../../../AppContext"
+import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {getFeatures} from "~/utils/storyMap"
 
 export type FeatureProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	featureId: string
 }
 
 const Feature: FC<FeatureProps> = ({storyMapItems, featureId}) => {
+	const {product} = useAppContext()
 	const features = getFeatures(storyMapItems)
 	const feature = features.find(({id}) => id === featureId)!
 
-	const x = useMotionValue(feature.data().effort)
-	const y = useMotionValue(feature.data().userValue)
+	const x = useMotionValue(feature.effort)
+	const y = useMotionValue(feature.userValue)
 
 	useEffect(() => {
-		x.set(feature.data().effort)
-		y.set(feature.data().userValue)
+		x.set(feature.effort)
+		y.set(feature.userValue)
 	}, [feature, x, y])
 
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
 	const moveFeature = async (x: number, y: number) => {
-		await debouncedUpdateStoryMapItem(feature, {
-			effort: x,
-			userValue: y,
-		})
+		await debouncedUpdateStoryMapItem(
+			doc(product.ref, `StoryMapItems`, feature.id).withConverter(StoryMapItemConverter),
+			{
+				effort: x,
+				userValue: y,
+			},
+		)
 	}
 
 	return (
@@ -62,7 +68,7 @@ const Feature: FC<FeatureProps> = ({storyMapItems, featureId}) => {
 			ref={ref}
 		>
 			<CopyOutlined />
-			<p className="w-max font-medium">{feature.data().name}</p>
+			<p className="w-max font-medium">{feature.name}</p>
 		</motion.div>
 	)
 }
@@ -70,8 +76,8 @@ const Feature: FC<FeatureProps> = ({storyMapItems, featureId}) => {
 export default Feature
 
 const debouncedUpdateStoryMapItem = debounce(
-	async (storyMapItems: QueryDocumentSnapshot<StoryMapItem>, data: WithFieldValue<Partial<StoryMapItem>>) => {
-		await updateDoc(storyMapItems.ref, {
+	async (storyMapItemRef: DocumentReference<StoryMapItem>, data: WithFieldValue<Partial<StoryMapItem>>) => {
+		await updateDoc(storyMapItemRef, {
 			...data,
 			updatedAt: Timestamp.now(),
 		})

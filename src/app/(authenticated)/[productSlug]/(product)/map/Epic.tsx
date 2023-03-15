@@ -1,6 +1,6 @@
 import {CopyOutlined, MinusCircleOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {updateDoc} from "firebase/firestore"
+import {doc, updateDoc} from "firebase/firestore"
 import {useAnimationFrame} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
@@ -24,10 +24,9 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 	const {product, user} = useAppContext()
 	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
 
-	const epic = storyMapItems.docs.find((item) => item.id === epicId)!
-	const epicData = epic.data()
-	const children = sortFeatures(storyMapItems.docs.filter((item) => item.data().parentId === epicId))
-	const grandchildren = storyMapItems.docs.filter((item) => children.some((child) => child.id === item.data().parentId))
+	const epic = storyMapItems.find((item) => item.id === epicId)!
+	const children = sortFeatures(storyMapItems.filter((item) => item.parentId === epicId))
+	const grandchildren = storyMapItems.filter((item) => children.some((child) => child.id === item.parentId))
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
@@ -38,10 +37,10 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 		}
 	})
 
-	const [localEpicName, setLocalEpicName] = useState(epic.data().name)
+	const [localEpicName, setLocalEpicName] = useState(epic.name)
 	useEffect(() => {
-		setLocalEpicName(epicData.name)
-	}, [epicData.name])
+		setLocalEpicName(epic.name)
+	}, [epic.name])
 
 	return (
 		<div
@@ -60,20 +59,22 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 				ref={contentRef}
 			>
 				<ReadOutlined />
-				{(epic.data().initialRenameDone || inert) && !editMode ? (
+				{(epic.initialRenameDone || inert) && !editMode ? (
 					<p className={clsx(`m-0.5`, localEpicName === `` && `invisible`)}>{localEpicName || `_`}</p>
 				) : (
 					<div className="relative my-0.5 min-w-[1rem]">
 						<p className="px-0.5">{localEpicName || `_`}</p>
 						<input
 							value={localEpicName}
-							autoFocus={!epic.data().initialRenameDone && !editMode}
+							autoFocus={!epic.initialRenameDone && !editMode}
 							onFocus={(e) => e.target.select()}
 							onBlur={() => {
-								if (localEpicName !== ``) updateDoc(epic.ref, {initialRenameDone: true}).catch(console.error)
+								if (localEpicName !== ``)
+									updateDoc(doc(product.ref, `StoryMapItems`, epicId), {initialRenameDone: true}).catch(console.error)
 							}}
 							onKeyDown={(e) => {
-								if (e.key === `Enter`) updateDoc(epic.ref, {initialRenameDone: true}).catch(console.error)
+								if (e.key === `Enter`)
+									updateDoc(doc(product.ref, `StoryMapItems`, epicId), {initialRenameDone: true}).catch(console.error)
 							}}
 							className={clsx(
 								`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
@@ -144,7 +145,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 				))}
 
 			{children
-				.filter((feature) => feature.data().parentId === epic.id)
+				.filter((feature) => feature.parentId === epic.id)
 				.map((feature) => (
 					<Feature
 						key={feature.id}

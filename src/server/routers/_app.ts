@@ -32,11 +32,19 @@ export const appRouter = router({
 		}
 	}),
 	migrateSchema: procedure.mutation(async () => {
-		const users = await dbAdmin.collection(`Users`).get()
+		// const users = await dbAdmin.collection(`Users`).get()
+		const storyMapItems = await dbAdmin.collectionGroup(`StoryMapItems`).get()
+		// const batch1 = dbAdmin.batch()
+		// users.forEach((user) => {
+		// 	batch1.update(user.ref, {
+		// 		type: `user`,
+		// 	})
+		// })
+		// await batch1.commit()
 		const batch = dbAdmin.batch()
-		users.forEach((user) => {
-			batch.update(user.ref, {
-				type: `user`,
+		storyMapItems.forEach((storyMapItem) => {
+			batch.update(storyMapItem.ref, {
+				id: storyMapItem.id,
 			})
 		})
 		await batch.commit()

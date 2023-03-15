@@ -113,7 +113,7 @@ const SprintClientPage: FC = () => {
 												key={columnName}
 												columnName={columnName}
 												title={title}
-												storyMapItems={storyMapItems}
+												storyMapItems={storyMapItems.docs.map((item) => item.data())}
 												versions={versions}
 												currentVersionId={currentVersionId}
 												myStoriesOnly={myStoriesOnly}

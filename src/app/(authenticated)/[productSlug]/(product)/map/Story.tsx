@@ -1,6 +1,6 @@
 import {MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {updateDoc} from "firebase/firestore"
+import {doc, updateDoc} from "firebase/firestore"
 import {useAnimationFrame} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
@@ -24,21 +24,20 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 	const {product} = useAppContext()
 	const {storyMapItems, versions, editMode} = useStoryMapContext()
 
-	const story = storyMapItems.docs.find((story) => story.id === storyId)!
-	const storyData = story.data()
+	const story = storyMapItems.find((story) => story.id === storyId)!
 
 	const contentRef = useRef<HTMLDivElement>(null)
 	useAnimationFrame(() => {
 		elementRegistry[storyId] = {container: contentRef.current ?? undefined, content: contentRef.current ?? undefined}
 	})
 
-	const version = versions.docs.find((version) => version.id === story.data().versionId)
+	const version = versions.docs.find((version) => version.id === story.versionId)
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-	const [localStoryName, setLocalStoryName] = useState(story.data().name)
+	const [localStoryName, setLocalStoryName] = useState(story.name)
 	useEffect(() => {
-		setLocalStoryName(storyData.name)
-	}, [storyData.name])
+		setLocalStoryName(story.name)
+	}, [story.name])
 
 	return (
 		<div
@@ -59,20 +58,22 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 				<p className="max-h-8 w-[1em] truncate leading-none [writing-mode:vertical-lr]">{version?.data().name}</p>
 			</button>
 			<div className="flex items-center gap-2 px-2 leading-tight">
-				{(story.data().initialRenameDone || inert) && !editMode ? (
+				{(story.initialRenameDone || inert) && !editMode ? (
 					<p className={clsx(`m-0.5`, localStoryName === `` && `invisible`)}>{localStoryName || `_`}</p>
 				) : (
 					<div className="relative my-0.5 mx-auto min-w-[1rem]">
 						<p className="px-0.5">{localStoryName || `_`}</p>
 						<input
 							value={localStoryName}
-							autoFocus={!story.data().initialRenameDone && !editMode}
+							autoFocus={!story.initialRenameDone && !editMode}
 							onFocus={(e) => e.target.select()}
 							onBlur={() => {
-								if (localStoryName !== ``) updateDoc(story.ref, {initialRenameDone: true}).catch(console.error)
+								if (localStoryName !== ``)
+									updateDoc(doc(product.ref, `StoryMapItems`, storyId), {initialRenameDone: true}).catch(console.error)
 							}}
 							onKeyDown={(e) => {
-								if (e.key === `Enter`) updateDoc(story.ref, {initialRenameDone: true}).catch(console.error)
+								if (e.key === `Enter`)
+									updateDoc(doc(product.ref, `StoryMapItems`, storyId), {initialRenameDone: true}).catch(console.error)
 							}}
 							className={clsx(
 								`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,

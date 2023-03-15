@@ -4,7 +4,6 @@ import {motion, useAnimationFrame, useMotionValue, useTransform} from "framer-mo
 import {useEffect, useRef, useState} from "react"
 
 import type {DragInfo} from "./types"
-import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
@@ -45,34 +44,34 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 	)
 	const stories = _stories.map((story) => {
 		const siblings = sortStories(
-			_stories.filter((sibling) => sibling.data().parentId === story.data().parentId),
+			_stories.filter((sibling) => sibling.parentId === story.parentId),
 			versions,
 		)
 		const position = siblings.findIndex((sibling) => sibling.id === story.id)
 
 		return {
-			...story.data(),
+			...story,
 			id: story.id,
 			position,
 		}
 	})
 	const _features = sortFeatures(getFeatures(storyMapItems).filter((feature) => !itemsToBeDeleted.includes(feature.id)))
 	const features = _features.map((feature) => {
-		const siblings = _features.filter((sibling) => sibling.data().parentId === feature.data().parentId)
+		const siblings = _features.filter((sibling) => sibling.parentId === feature.parentId)
 		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
 
 		return {
-			...feature.data(),
+			...feature,
 			id: feature.id,
-			childrenIds: _stories.filter((story) => story.data().parentId === feature.id).map((story) => story.id),
+			childrenIds: _stories.filter((story) => story.parentId === feature.id).map((story) => story.id),
 			position,
 		}
 	})
 	const _epics = sortEpics(getEpics(storyMapItems).filter((epic) => !itemsToBeDeleted.includes(epic.id)))
 	const epics = _epics.map((epic) => ({
-		...epic.data(),
+		...epic,
 		id: epic.id,
-		childrenIds: _features.filter((feature) => feature.data().parentId === epic.id).map((feature) => feature.id),
+		childrenIds: _features.filter((feature) => feature.parentId === epic.id).map((feature) => feature.id),
 		position: _epics.findIndex((sibling) => sibling.id === epic.id),
 	}))
 
@@ -120,9 +119,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 
 	// When I send an update to the server, I want to wait until the operation is complete before allowing drag events to
 	// be processed again.
-	const operationCompleteCondition = useRef<((storyMapItems: QuerySnapshot<StoryMapItem>) => boolean) | undefined>(
-		undefined,
-	)
+	const operationCompleteCondition = useRef<((storyMapItems: StoryMapItem[]) => boolean) | undefined>(undefined)
 	const onPan = async () => {
 		if (dragInfo.itemBeingDraggedId === undefined || !product.exists()) return
 
@@ -222,10 +219,9 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 						features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex])?.userValue ?? 1
 
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems.docs.find((item) => item.id === itemBeingDragged.id)
+						const item = storyMapItems.find((item) => item.id === itemBeingDragged.id)
 						return (
-							getItemType(storyMapItems, itemBeingDragged.id) === `feature` &&
-							item?.data().parentId === boundaryItemParentId
+							getItemType(storyMapItems, itemBeingDragged.id) === `feature` && item?.parentId === boundaryItemParentId
 						)
 					}
 					await Promise.all([
@@ -311,9 +307,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 						const newParentRect = elementRegistry[newParent?.id ?? ``]?.container?.getBoundingClientRect()
 						if (!newParent || !newParentRect) return
 						const siblings = sortFeatures(
-							storyMapItems.docs.filter(
-								(item) => item.data().parentId === newParent.id && item.data().deleted === false,
-							),
+							storyMapItems.filter((item) => item.parentId === newParent.id && item.deleted === false),
 						)
 
 						if (x < parentRect.left) {
@@ -328,13 +322,10 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 								currentFeatureRect.left + currentFeatureRect.width / 2,
 							)
 							if (x > boundary) return
-							const prevFeatureUserValue = siblings.at(-1)?.data().userValue ?? 0
+							const prevFeatureUserValue = siblings.at(-1)?.userValue ?? 0
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems.docs.find((item) => item.id === itemBeingDragged.id)
-								return (
-									getItemType(storyMapItems, itemBeingDragged.id) === `feature` &&
-									item?.data().parentId === newParent.id
-								)
+								const item = storyMapItems.find((item) => item.id === itemBeingDragged.id)
+								return getItemType(storyMapItems, itemBeingDragged.id) === `feature` && item?.parentId === newParent.id
 							}
 							await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {
 								effort: 0.5,
@@ -353,10 +344,10 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 									: newParentRect.left + newParentRect.width / 2,
 							)
 							if (x < boundary) return
-							const nextFeatureUserValue = siblings[currentFeature.position]?.data().userValue ?? 1
+							const nextFeatureUserValue = siblings[currentFeature.position]?.userValue ?? 1
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems.docs.find((item) => item.id === itemBeingDragged.id)!
-								return getItemType(storyMapItems, item.id) === `feature` && item.data().parentId === newParent.id
+								const item = storyMapItems.find((item) => item.id === itemBeingDragged.id)!
+								return getItemType(storyMapItems, item.id) === `feature` && item.parentId === newParent.id
 							}
 							await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {
 								effort: 0.5,
@@ -366,9 +357,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 						}
 					} else {
 						// Reorder within epic
-						const siblings = sortFeatures(
-							storyMapItems.docs.filter((item) => item.data().parentId === currentFeature.parentId),
-						)
+						const siblings = sortFeatures(storyMapItems.filter((item) => item.parentId === currentFeature.parentId))
 						const prevFeature = siblings[currentFeature.position - 1]
 						const nextFeature = siblings[currentFeature.position + 1]
 						const currentFeatureRect = elementRegistry[dragInfo.itemBeingDraggedId]?.container?.getBoundingClientRect()
@@ -384,26 +373,26 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 
 						if (x < leftBoundary) {
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems.docs.find((item) => item.id === currentFeature.id)
+								const item = storyMapItems.find((item) => item.id === currentFeature.id)
 								if (getItemType(storyMapItems, currentFeature.id) !== `feature`) return false
-								return item?.data().userValue === prevFeature?.data().userValue
+								return item?.userValue === prevFeature?.userValue
 							}
 							await Promise.all([
 								updateItem(product, storyMapItems, versions, prevFeature!.id, {userValue: currentFeature.userValue}),
 								updateItem(product, storyMapItems, versions, currentFeature.id, {
-									userValue: prevFeature!.data().userValue,
+									userValue: prevFeature!.userValue,
 								}),
 							])
 						} else if (x > rightBoundary) {
 							operationCompleteCondition.current = (storyMapItems) => {
-								const item = storyMapItems.docs.find((item) => item.id === currentFeature.id)
+								const item = storyMapItems.find((item) => item.id === currentFeature.id)
 								if (getItemType(storyMapItems, currentFeature.id) !== `feature`) return false
-								return item!.data().userValue === nextFeature!.data().userValue
+								return item?.userValue === nextFeature!.userValue
 							}
 							await Promise.all([
 								updateItem(product, storyMapItems, versions, nextFeature!.id, {userValue: currentFeature.userValue}),
 								updateItem(product, storyMapItems, versions, currentFeature.id, {
-									userValue: nextFeature!.data().userValue,
+									userValue: nextFeature!.userValue,
 								}),
 							])
 						}
@@ -499,9 +488,9 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) return
 
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems.docs.find((item) => item.id === storyBeingDragged.id)!
+						const item = storyMapItems.find((item) => item.id === storyBeingDragged.id)!
 						if (getItemType(storyMapItems, storyBeingDragged.id) !== `story`) return false
-						return item.data().parentId === hoveringFeatureId
+						return item.parentId === hoveringFeatureId
 					}
 					await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {parentId: hoveringFeatureId})
 				} else {
@@ -546,8 +535,8 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 
 					const id = dragInfo.itemBeingDraggedId
 					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems.docs.find((item) => item.id === id)
-						return getItemType(storyMapItems, id) === `feature` && item?.data().parentId === parentId
+						const item = storyMapItems.find((item) => item.id === id)
+						return getItemType(storyMapItems, id) === `feature` && item?.parentId === parentId
 					}
 
 					await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {

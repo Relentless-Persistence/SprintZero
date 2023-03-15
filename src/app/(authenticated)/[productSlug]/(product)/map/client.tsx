@@ -217,7 +217,7 @@ const StoryMapClientPage: FC = () => {
 	return (
 		<StoryMapContext.Provider
 			value={{
-				storyMapItems,
+				storyMapItems: storyMapItems.docs.map((item) => item.data()),
 				versions,
 				editMode,
 				currentVersionId,

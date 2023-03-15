@@ -3,6 +3,8 @@ import {z} from "zod"
 import {genConverter, timestampSchema} from "~/types"
 
 export const StoryMapItemSchema = z.object({
+	id: z.string(),
+
 	acceptanceCriteria: z
 		.array(
 			z.object({

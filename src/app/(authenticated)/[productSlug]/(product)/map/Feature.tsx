@@ -1,6 +1,6 @@
 import {CopyOutlined, FileOutlined, MinusCircleOutlined} from "@ant-design/icons"
 import clsx from "clsx"
-import {updateDoc} from "firebase/firestore"
+import {doc, updateDoc} from "firebase/firestore"
 import {useAnimationFrame} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 
@@ -24,12 +24,11 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 	const {product, user} = useAppContext()
 	const {storyMapItems, versions, editMode, currentVersionId, setItemsToBeDeleted} = useStoryMapContext()
 
-	const feature = storyMapItems.docs.find((feature) => feature.id === featureId)!
-	const featureData = feature.data()
+	const feature = storyMapItems.find((feature) => feature.id === featureId)!
 	const children = sortStories(
-		storyMapItems.docs
-			.filter((item) => item.data().parentId === featureId)
-			.filter((item) => item.data().versionId === currentVersionId || currentVersionId === AllVersions),
+		storyMapItems
+			.filter((item) => item.parentId === featureId)
+			.filter((item) => item.versionId === currentVersionId || currentVersionId === AllVersions),
 		versions,
 	)
 
@@ -42,10 +41,10 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 		}
 	})
 
-	const [localFeatureName, setLocalFeatureName] = useState(feature.data().name)
+	const [localFeatureName, setLocalFeatureName] = useState(feature.name)
 	useEffect(() => {
-		setLocalFeatureName(featureData.name)
-	}, [featureData.name])
+		setLocalFeatureName(feature.name)
+	}, [feature.name])
 
 	return (
 		<div
@@ -64,20 +63,26 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 				ref={contentRef}
 			>
 				<CopyOutlined />
-				{(feature.data().initialRenameDone || inert) && !editMode ? (
+				{(feature.initialRenameDone || inert) && !editMode ? (
 					<p className={clsx(`m-0.5`, localFeatureName === `` && `invisible`)}>{localFeatureName || `_`}</p>
 				) : (
 					<div className="relative my-0.5 min-w-[1rem]">
 						<p className="px-0.5">{localFeatureName || `_`}</p>
 						<input
 							value={localFeatureName}
-							autoFocus={!feature.data().initialRenameDone && !editMode}
+							autoFocus={!feature.initialRenameDone && !editMode}
 							onFocus={(e) => e.target.select()}
 							onBlur={() => {
-								if (localFeatureName !== ``) updateDoc(feature.ref, {initialRenameDone: true}).catch(console.error)
+								if (localFeatureName !== ``)
+									updateDoc(doc(product.ref, `StoryMapItems`, featureId), {initialRenameDone: true}).catch(
+										console.error,
+									)
 							}}
 							onKeyDown={(e) => {
-								if (e.key === `Enter`) updateDoc(feature.ref, {initialRenameDone: true}).catch(console.error)
+								if (e.key === `Enter`)
+									updateDoc(doc(product.ref, `StoryMapItems`, featureId), {initialRenameDone: true}).catch(
+										console.error,
+									)
 							}}
 							className={clsx(
 								`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
