@@ -565,8 +565,6 @@ export const appRouter = router({
 				for (const memberId in product.data().members) {
 					const member = product.data().members[memberId]!
 					const user = allUsers.docs.find((user) => user.id === memberId)!
-					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-					console.log(memberId, user?.data())
 					transaction.set(
 						dbAdmin
 							.doc(product.ref.path)
@@ -673,7 +671,10 @@ export const appRouter = router({
 					)
 				})
 			})
+		})
 
+		// eslint-disable-next-line @typescript-eslint/require-await
+		await dbAdmin.runTransaction(async (transaction) => {
 			allUsers.forEach((user) => {
 				transaction.update(dbAdmin.doc(user.ref.path), {
 					// @ts-ignore -- Legacy field
