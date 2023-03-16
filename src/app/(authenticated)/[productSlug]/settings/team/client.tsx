@@ -95,13 +95,7 @@ const TeamSettingsClientPage: FC = () => {
 										<Card
 											key={member.id}
 											actions={[
-												<div
-													key="setting"
-													className="space-x-[10px]"
-													onClick={() => {
-														removeMember(member.id).catch(console.error)
-													}}
-												>
+												<div key="setting" className="space-x-[10px]">
 													<span>
 														<DeleteOutlined />
 													</span>
