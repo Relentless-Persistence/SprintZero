@@ -83,7 +83,7 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 							)}
 							onChange={(e) => {
 								setLocalStoryName(e.target.value)
-								if (localStoryName !== ``) return
+								if (e.target.value === ``) return
 								updateItem(product, storyMapItems, versions, story.id, {name: e.target.value}).catch(console.error)
 							}}
 							onPointerDownCapture={(e) => e.stopPropagation()}

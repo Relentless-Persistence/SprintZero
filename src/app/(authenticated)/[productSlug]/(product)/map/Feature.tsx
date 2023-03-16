@@ -93,7 +93,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 							)}
 							onChange={(e) => {
 								setLocalFeatureName(e.target.value)
-								if (e.target.value !== ``) return
+								if (e.target.value === ``) return
 								updateItem(product, storyMapItems, versions, feature.id, {name: e.target.value}).catch(console.error)
 							}}
 							onPointerDownCapture={(e) => e.stopPropagation()}
