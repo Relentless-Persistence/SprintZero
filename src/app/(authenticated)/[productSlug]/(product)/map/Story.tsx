@@ -1,4 +1,5 @@
 import {MinusCircleOutlined} from "@ant-design/icons"
+import {useMutation} from "@tanstack/react-query"
 import clsx from "clsx"
 import {doc, updateDoc} from "firebase/firestore"
 import {useAnimationFrame} from "framer-motion"
@@ -12,6 +13,7 @@ import {useStoryMapContext} from "./StoryMapContext"
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import StoryDrawer from "~/components/StoryDrawer"
 import {updateItem} from "~/utils/storyMap"
+import {trpc} from "~/utils/trpc"
 
 export type StoryProps = {
 	storyId: string
@@ -23,6 +25,7 @@ export type StoryProps = {
 const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = false}) => {
 	const {product} = useAppContext()
 	const {storyMapItems, versions, editMode} = useStoryMapContext()
+	const userStoryDescGen = trpc.gpt.useMutation()
 
 	const story = storyMapItems.find((story) => story.id === storyId)!
 
@@ -38,6 +41,27 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 	useEffect(() => {
 		setLocalStoryName(story.name)
 	}, [story.name])
+
+	const sgGenUserStory = async () => {
+		const storyName = localStoryName
+		const feature = storyMapItems.find((item) => item.id === story.parentId)
+		const featureName = feature?.name
+		const epicName = storyMapItems.find((item) => item.id === feature?.parentId)?.name
+		console.log({storyName, featureName, epicName})
+
+		const newDescRaw = await userStoryDescGen.mutateAsync({
+			prompt: `Write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName}". And the feature belongs to an epic called "${epicName}". And the user story has a short name "${storyName}" Your output should include only one sentence.`,
+		})
+		console.log(newDescRaw)
+		const newDesc = newDescRaw.response
+			?.split(`\n`)
+			.map((s) => s.replace(/^[0-9]+\. */, ``))
+			.filter((s) => s !== ``)[0]
+
+		if (!story.description && newDesc) {
+			updateItem(product, storyMapItems, versions, story.id, {description: newDesc}).catch(console.error)
+		}
+	}
 
 	return (
 		<div
@@ -72,8 +96,10 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 									updateDoc(doc(product.ref, `StoryMapItems`, storyId), {initialRenameDone: true}).catch(console.error)
 							}}
 							onKeyDown={(e) => {
-								if (e.key === `Enter`)
+								if (e.key === `Enter`) {
 									updateDoc(doc(product.ref, `StoryMapItems`, storyId), {initialRenameDone: true}).catch(console.error)
+									sgGenUserStory()
+								}
 							}}
 							className={clsx(
 								`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
