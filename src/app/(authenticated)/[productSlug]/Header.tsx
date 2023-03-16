@@ -25,7 +25,7 @@ const Header: FC = () => {
 		query(
 			collectionGroup(db, `Members`),
 			where(`id`, `==`, member.id),
-			where(`type`, `in`, [`owner`, `editor`]),
+			where(`type`, `in`, [`owner`, `editor`, `viewer`]),
 		).withConverter(MemberConverter),
 	)
 	useErrorHandler(membersError)
