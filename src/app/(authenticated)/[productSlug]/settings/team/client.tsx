@@ -21,6 +21,7 @@ const TeamSettingsClientPage: FC = () => {
 	const {product} = useAppContext()
 
 	const inviteUser = trpc.product.inviteUser.useMutation()
+	const inviteReminder = trpc.product.inviteReminder.useMutation()
 
 	const [currentTab, setcurrentTab] = useState<`editor` | `viewer`>(`editor`)
 
@@ -68,6 +69,23 @@ const TeamSettingsClientPage: FC = () => {
 			})
 			setAddNew(false)
 			setEmail(``)
+			notification.success({
+				message: `Invite sent`,
+				placement: `topRight`,
+			})
+		} catch (error) {
+			console.error(error)
+		}
+	}
+
+	const sendReminder = async (email: string) => {
+		if (!token) return
+		try {
+			await inviteReminder.mutateAsync({
+				email,
+				productId: product.id,
+				userIdToken: token,
+			})
 			notification.success({
 				message: `Invite sent`,
 				placement: `topRight`,
@@ -180,7 +198,14 @@ const TeamSettingsClientPage: FC = () => {
 													<span>Remove</span>
 												</div>,
 												<div key="reminder" className="px-2">
-													<Button icon={<SendOutlined />} block className="flex items-center justify-center">
+													<Button
+														icon={<SendOutlined />}
+														block
+														className="flex items-center justify-center"
+														onClick={() => {
+															sendReminder(invitee.data().email).catch(console.error)
+														}}
+													>
 														Send Reminder
 													</Button>
 												</div>,
@@ -312,7 +337,14 @@ const TeamSettingsClientPage: FC = () => {
 													<span>Remove</span>
 												</div>,
 												<div key="reminder" className="px-2">
-													<Button icon={<SendOutlined />} block className="flex items-center justify-center">
+													<Button
+														icon={<SendOutlined />}
+														block
+														className="flex items-center justify-center"
+														onClick={() => {
+															sendReminder(invitee.data().email).catch(console.error)
+														}}
+													>
 														Send Reminder
 													</Button>
 												</div>,

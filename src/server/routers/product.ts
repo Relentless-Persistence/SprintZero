@@ -237,4 +237,43 @@ export const productRouter = router({
 				body: `<b>${memberData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
 			})
 		}),
+
+	inviteReminder: procedure
+		.input(
+			z.object({
+				email: z.string().email(),
+				productId: z.string(),
+				userIdToken: z.string(),
+			}),
+		)
+		.mutation(async ({input: {email, productId, userIdToken}}) => {
+			const user = await authAdmin.verifyIdToken(userIdToken)
+			const member = await dbAdmin
+				.collection(`Products`)
+				.doc(productId)
+				.collection(`Members`)
+				.doc(user.uid)
+				.withConverter(genAdminConverter(MemberSchema))
+				.get()
+			const memberData = member.data()
+			invariant(memberData)
+			const product = await dbAdmin
+				.collection(`Products`)
+				.doc(productId)
+				.withConverter(genAdminConverter(ProductSchema))
+				.get()
+			const productData = product.data()
+			invariant(productData)
+
+			const inviteToken = crypto.randomBytes(16).toString(`hex`)
+
+			const queryParams = querystring.stringify({invite_token: inviteToken})
+			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
+			await sendEmail({
+				to: email,
+				from: `no-reply@sprintzero.app`,
+				subject: `SprintZero | Member Invite`,
+				body: `<b>${memberData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
+			})
+		}),
 })

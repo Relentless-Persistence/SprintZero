@@ -6,6 +6,8 @@ export const betaUsers = [
 	`femzytest@gmail.com`,
 	`mvoshell@gmail.com`,
 
+	`jackiechan@gmail.com`,
+
 	`aaronmirizarry@gmail.com`,
 	`aaronrichardbutler@gmail.com`,
 	`adam.drici@gmail.com`,
