@@ -11,115 +11,143 @@ service cloud.firestore {
 
     match /Products/{productId} {
       allow read, update: if resource != null && isEditorOnProduct(resource.data.id);
+      allow read: if resource != null && isViewerOnProduct(resource.data.id);
       allow delete: if get(/databases/$(database)/documents/Products/$(productId)/Members/$(request.auth.uid)).data.type == "owner";
 
       match /BusinessOutcomes/{businessOutcomeId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /DialogueParticipants/{dialogueParticipantId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /Features/{featureId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /Huddles/{huddleId} {
         allow read: if isEditorOnProduct(productId);
         allow write: if isEditorOnProduct(productId) && request.auth.uid == huddleId;
+        allow read: if isViewerOnProduct(productId) && request.auth.uid == huddleId;
       }
 
       match /Insights/{insightId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /Invites/{inviteId} {
         allow read: if isEditorOnProduct(productId) || request.auth.token.email == resource.data.email;
         allow write: if isEditorOnProduct(productId)
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /Journeys/{journeyId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
 
         match /Events/{eventId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
       }
 
       match /MarketLeaders/{marketLeaderId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /Members/{memberId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /Objectives/{objectiveId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
 
         match /Results/{resultId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
       }
 
       match /Personas/{personaId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
 
         match /Changes/{changeId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
 
         match /DaysInTheLife/{dayInTheLifeId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
 
         match /Frustrations/{frustrationId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
 
         match /Goals/{goalId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
 
         match /Interactions/{interactionId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
 
         match /PersonaTasks/{personaTaskId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
 
         match /Priorities/{priorityId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
 
         match /Responsibilities/{responsibilityId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
       }
 
       match /PotentialRisks/{potentialRiskId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /RetrospectiveItems/{retrospectiveItemId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /StoryMapHistories/{storyMapHistoryId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
 
         match /HistoryItems/{historyItemId} {
           allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
         }
       }
 
       match /StoryMapItems/{storyMapItemId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
 
         match /Comments/{storyMapCommentId} {
           allow read: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
           allow create: if isEditorOnProduct(productId) && request.auth.uid == request.resource.data.authorId;
           allow update, delete: if isEditorOnProduct(productId) && request.auth.uid == resource.data.authorId;
         }
@@ -127,18 +155,22 @@ service cloud.firestore {
 
       match /Tasks/{taskId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /UserPriorities/{userPriorityId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /Versions/{versionId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
 
       match /VisionUpdates/{visionUpdateId} {
         allow read, write: if isEditorOnProduct(productId);
+        allow read: if isViewerOnProduct(productId);
       }
     }
 
@@ -155,6 +187,11 @@ service cloud.firestore {
     function isEditorOnProduct(productId) {
       let member = getAfter(/databases/$(database)/documents/Products/$(productId)/Members/$(request.auth.uid));
       return member.data.type == "editor" || member.data.type == "owner"
+    }
+
+    function isViewerOnProduct(productId) {
+      let member = getAfter(/databases/$(database)/documents/Products/$(productId)/Members/$(request.auth.uid));
+      return member.data.type == "viewer"
     }
   }
 }
