@@ -118,6 +118,9 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 			}
 		})
 	}
+	useAnimationFrame(() => {
+		updateMeasurements()
+	})
 
 	const pointerDownTarget = useRef<HTMLElement | null>(null)
 	const onPanStart = () => {
@@ -129,7 +132,6 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 		const containerBox = registryEntry?.[1]?.container?.getBoundingClientRect()
 		if (!id || !element || !containerBox) return
 
-		updateMeasurements()
 		setDragInfo((prev) => ({
 			...prev,
 			itemBeingDraggedId: id,
@@ -149,10 +151,8 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 
 		if (operationCompleteCondition.current) {
 			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
-			if (isOperationComplete) {
-				operationCompleteCondition.current = undefined
-				updateMeasurements()
-			} else return
+			if (isOperationComplete) operationCompleteCondition.current = undefined
+			else return
 		}
 
 		const x = dragInfo.mousePos[0].get() + dragInfo.offsetToMiddle[0]

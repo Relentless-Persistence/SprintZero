@@ -53,8 +53,8 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 	return (
 		<div ref={containerRef}>
 			<motion.div
-				layoutId={epicId}
-				layout="position"
+				// layoutId={dragInfo.itemBeingDraggedId === epicId ? undefined : epicId}
+				// layout="position"
 				className={clsx(
 					`grid justify-items-center gap-x-6`,
 					dragInfo.itemBeingDraggedId === epic.id && !inert && `invisible`,

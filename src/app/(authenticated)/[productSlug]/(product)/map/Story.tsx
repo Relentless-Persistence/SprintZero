@@ -24,12 +24,16 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, inert = false}) => {
 	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
 
 	const story = storyMapItems.find((story) => story.id === storyId)!
-	const feature = storyMapItems.find((feature) => feature.id === story.parentId)!
+	// const feature = storyMapItems.find((feature) => feature.id === story.parentId)!
 
+	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
 	useAnimationFrame(() => {
 		if (dragInfo.itemBeingDraggedId === undefined || inert)
-			elementRegistry[storyId] = {container: contentRef.current ?? undefined, content: contentRef.current ?? undefined}
+			elementRegistry[storyId] = {
+				container: containerRef.current ?? undefined,
+				content: contentRef.current ?? undefined,
+			}
 	})
 
 	const version = versions.docs.find((version) => version.id === story.versionId)
@@ -40,20 +44,21 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, inert = false}) => {
 		setLocalStoryName(story.name)
 	}, [story.name])
 
-	const isParentMoving =
-		dragInfo.itemBeingDraggedId === story.parentId || dragInfo.itemBeingDraggedId === feature.parentId
+	// const isParentMoving =
+	// 	dragInfo.itemBeingDraggedId === story.parentId || dragInfo.itemBeingDraggedId === feature.parentId
 
 	return (
-		<div ref={contentRef}>
+		<div ref={containerRef}>
 			<motion.div
-				layoutId={storyId}
-				layout={isParentMoving ? false : `position`}
+				// layoutId={storyId}
+				// layout={isParentMoving ? false : `position`}
 				className={clsx(
 					`flex touch-none select-none items-center overflow-hidden rounded border border-[#d9d9d9] bg-white font-medium dark:border-[#757575] dark:bg-black`,
 					inert && `cursor-grabbing`,
 					!editMode && `cursor-grab  active:cursor-grabbing`,
 					dragInfo.itemBeingDraggedId === story.id && !inert && `invisible`,
 				)}
+				ref={contentRef}
 			>
 				<button
 					type="button"

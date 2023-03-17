@@ -49,13 +49,13 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, inert = false}) => {
 		setLocalFeatureName(feature.name)
 	}, [feature.name])
 
-	const isParentMoving = dragInfo.itemBeingDraggedId === feature.parentId
+	// const isParentMoving = dragInfo.itemBeingDraggedId === feature.parentId
 
 	return (
 		<div ref={containerRef}>
 			<motion.div
-				layoutId={featureId}
-				layout={isParentMoving ? false : `position`}
+				// layoutId={featureId}
+				// layout={isParentMoving ? false : `position`}
 				className={clsx(
 					`flex flex-col items-center`,
 					dragInfo.itemBeingDraggedId === feature.id && !inert && `invisible`,
