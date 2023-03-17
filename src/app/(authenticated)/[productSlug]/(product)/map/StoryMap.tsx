@@ -147,21 +147,23 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 	// be processed again.
 	const operationCompleteCondition = useRef<((storyMapItems: StoryMapItem[]) => boolean) | undefined>(undefined)
 	const onPan = async () => {
+		console.log(`reached A`)
 		if (dragInfo.itemBeingDraggedId === undefined || !product.exists()) return
-
+		console.log(`reached B`)
 		if (operationCompleteCondition.current) {
+			console.log(`reached X`)
 			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
 			if (isOperationComplete) operationCompleteCondition.current = undefined
 			else return
 		}
-
+		console.log(`reached C`)
 		const x = dragInfo.mousePos[0].get() + dragInfo.offsetToMiddle[0]
 		const y = dragInfo.mousePos[1].get()
-
 		// All the logic for moving items around are in this switch statement
 		switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 			case `epic`: {
 				const itemBeingDragged = epics.find((epic) => epic.id === dragInfo.itemBeingDraggedId)!
+				//console.log(`epic`, {itemBeingDragged})
 				if (y <= layerBoundaries[0]) {
 					// === Reorder epics ===
 
@@ -172,22 +174,30 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					const prevEpicMeasurements = measurements.current[prevEpic?.id ?? ``]
 					const nextEpicMeasurements = measurements.current[nextEpic?.id ?? ``]
 
+					//console.log(`epic`, {currentEpic, prevEpic, nextEpic})
+
+					console.log(prevEpicMeasurements)
 					const boundaryLeft =
 						prevEpicMeasurements && currentEpicMeasurements
-							? avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
-							: -Infinity
+							? prevEpicMeasurements.left + prevEpicMeasurements.width / 2
+							: //? avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
+							  -Infinity
 					const boundaryRight =
 						currentEpicMeasurements && nextEpicMeasurements
-							? avg(currentEpicMeasurements.left, nextEpicMeasurements.right)
+							? //? (currentEpicMeasurements.left, nextEpicMeasurements.right)
+							  nextEpicMeasurements.right - nextEpicMeasurements.width / 2
 							: Infinity
 
+					console.log(`epic`, {boundaryLeft, boundaryRight}, {x, y})
 					if (x < boundaryLeft) {
 						operationCompleteCondition.current = (storyMapItems) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
 							const prevEpicNewPos = storyMapShape.findIndex((epic) => epic.id === prevEpic!.id)
+							console.log(`operation complete`, {currentEpicNewPos, prevEpicNewPos}, storyMapShape)
 							return currentEpicNewPos < prevEpicNewPos
 						}
+						console.log(`epic reordering`)
 						await Promise.all([
 							updateItem(product, storyMapItems, versions, prevEpic!.id, {userValue: currentEpic.userValue}),
 							updateItem(product, storyMapItems, versions, currentEpic.id, {userValue: prevEpic!.userValue}),
@@ -197,6 +207,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
 							const nextEpicNewPos = storyMapShape.findIndex((epic) => epic.id === nextEpic!.id)
+							console.log(`epic`, {currentEpicNewPos, nextEpic}, storyMapShape)
 							return currentEpicNewPos > nextEpicNewPos
 						}
 						await Promise.all([
