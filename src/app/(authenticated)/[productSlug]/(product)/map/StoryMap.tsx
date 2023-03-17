@@ -35,51 +35,54 @@ export type StoryMapProps = {
 
 const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 	const {product, user} = useAppContext()
-	const {storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted, setItemsToBeDeleted} =
-		useStoryMapContext()
+	const {storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted} = useStoryMapContext()
 
 	const _stories = sortStories(
-		getStories(storyMapItems).filter((story) => !itemsToBeDeleted.includes(story.id)),
+		getStories(storyMapItems)
+			.filter((story) => !itemsToBeDeleted.includes(story.id))
+			.filter((story) => !story.deleted),
 		versions,
 	)
-	const stories = _stories
-		.map((story) => {
-			const siblings = sortStories(
-				_stories.filter((sibling) => sibling.parentId === story.parentId),
-				versions,
-			)
-			const position = siblings.findIndex((sibling) => sibling.id === story.id)
+	const stories = _stories.map((story) => {
+		const siblings = sortStories(
+			_stories.filter((sibling) => sibling.parentId === story.parentId),
+			versions,
+		)
+		const position = siblings.findIndex((sibling) => sibling.id === story.id)
 
-			return {
-				...story,
-				id: story.id,
-				position,
-			}
-		})
-		.filter((story) => !story.deleted)
-	const _features = sortFeatures(getFeatures(storyMapItems).filter((feature) => !itemsToBeDeleted.includes(feature.id)))
-	const features = _features
-		.map((feature) => {
-			const siblings = _features.filter((sibling) => sibling.parentId === feature.parentId)
-			const position = siblings.findIndex((sibling) => sibling.id === feature.id)
+		return {
+			...story,
+			id: story.id,
+			position,
+		}
+	})
+	const _features = sortFeatures(
+		getFeatures(storyMapItems)
+			.filter((feature) => !itemsToBeDeleted.includes(feature.id))
+			.filter((feature) => !feature.deleted),
+	)
+	const features = _features.map((feature) => {
+		const siblings = _features.filter((sibling) => sibling.parentId === feature.parentId)
+		const position = siblings.findIndex((sibling) => sibling.id === feature.id)
 
-			return {
-				...feature,
-				id: feature.id,
-				childrenIds: _stories.filter((story) => story.parentId === feature.id).map((story) => story.id),
-				position,
-			}
-		})
-		.filter((feature) => !feature.deleted)
-	const _epics = sortEpics(getEpics(storyMapItems).filter((epic) => !itemsToBeDeleted.includes(epic.id)))
-	const epics = _epics
-		.map((epic) => ({
-			...epic,
-			id: epic.id,
-			childrenIds: _features.filter((feature) => feature.parentId === epic.id).map((feature) => feature.id),
-			position: _epics.findIndex((sibling) => sibling.id === epic.id),
-		}))
-		.filter((epic) => !epic.deleted)
+		return {
+			...feature,
+			id: feature.id,
+			childrenIds: _stories.filter((story) => story.parentId === feature.id).map((story) => story.id),
+			position,
+		}
+	})
+	const _epics = sortEpics(
+		getEpics(storyMapItems)
+			.filter((epic) => !itemsToBeDeleted.includes(epic.id))
+			.filter((epic) => !epic.deleted),
+	)
+	const epics = _epics.map((epic) => ({
+		...epic,
+		id: epic.id,
+		childrenIds: _features.filter((feature) => feature.parentId === epic.id).map((feature) => feature.id),
+		position: _epics.findIndex((sibling) => sibling.id === epic.id),
+	}))
 
 	const [dragInfo, setDragInfo] = useState<DragInfo>({
 		mousePos: [useMotionValue(0), useMotionValue(0)],
@@ -179,7 +182,6 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 							: Infinity
 
 					if (x < boundaryLeft) {
-						console.log(`moved left`)
 						operationCompleteCondition.current = (storyMapItems) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
@@ -191,7 +193,6 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 							updateItem(product, storyMapItems, versions, currentEpic.id, {userValue: prevEpic!.userValue}),
 						])
 					} else if (x > boundaryRight) {
-						console.log(`moved right`)
 						operationCompleteCondition.current = (storyMapItems) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
@@ -627,14 +628,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 			onPanEnd={onPanEnd}
 		>
 			{epics.map((epic) => (
-				<Epic
-					key={epic.id}
-					epicId={epic.id}
-					dragInfo={dragInfo}
-					onMarkForDeletion={(id: string) => {
-						setItemsToBeDeleted((prev) => [...prev, id])
-					}}
-				/>
+				<Epic key={epic.id} epicId={epic.id} dragInfo={dragInfo} />
 			))}
 
 			{!editMode && (
@@ -657,38 +651,11 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					if (!dragInfo.itemBeingDraggedId) return null
 					switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 						case `epic`:
-							return (
-								<Epic
-									epicId={dragInfo.itemBeingDraggedId}
-									dragInfo={dragInfo}
-									onMarkForDeletion={(id: string) => {
-										setItemsToBeDeleted((prev) => [...prev, id])
-									}}
-									inert
-								/>
-							)
+							return <Epic epicId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} inert />
 						case `feature`:
-							return (
-								<Feature
-									featureId={dragInfo.itemBeingDraggedId}
-									dragInfo={dragInfo}
-									onMarkForDeletion={(id: string) => {
-										setItemsToBeDeleted((prev) => [...prev, id])
-									}}
-									inert
-								/>
-							)
+							return <Feature featureId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} inert />
 						case `story`:
-							return (
-								<Story
-									storyId={dragInfo.itemBeingDraggedId}
-									dragInfo={dragInfo}
-									onMarkForDeletion={() => {
-										setItemsToBeDeleted((prev) => [...prev, dragInfo.itemBeingDraggedId!])
-									}}
-									inert
-								/>
-							)
+							return <Story storyId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} inert />
 					}
 				})()}
 			</motion.div>

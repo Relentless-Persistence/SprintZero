@@ -16,19 +16,24 @@ import {addFeature, sortFeatures, updateItem} from "~/utils/storyMap"
 export type EpicProps = {
 	epicId: string
 	dragInfo: DragInfo
-	onMarkForDeletion: (id: string) => void
 	inert?: boolean
 }
 
-const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false}) => {
+const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 	const {product, user} = useAppContext()
-	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
+	const {storyMapItems, versions, editMode, itemsToBeDeleted, setItemsToBeDeleted} = useStoryMapContext()
 
 	const epic = storyMapItems.find((item) => item.id === epicId)!
 	const children = sortFeatures(
-		storyMapItems.filter((item) => item.parentId === epicId).filter((item) => !item.deleted),
+		storyMapItems
+			.filter((item) => item.parentId === epicId)
+			.filter((item) => !itemsToBeDeleted.includes(item.id))
+			.filter((item) => !item.deleted),
 	)
-	const grandchildren = storyMapItems.filter((item) => children.some((child) => child.id === item.parentId))
+	const grandchildren = storyMapItems
+		.filter((item) => children.some((child) => child.id === item.parentId))
+		.filter((item) => !itemsToBeDeleted.includes(item.id))
+		.filter((item) => !item.deleted)
 
 	const containerRef = useRef<HTMLDivElement>(null)
 	const contentRef = useRef<HTMLDivElement>(null)
@@ -101,9 +106,12 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 						<button
 							type="button"
 							onClick={() => {
-								onMarkForDeletion(epic.id)
-								children.forEach((feature) => onMarkForDeletion(feature.id))
-								grandchildren.forEach((story) => onMarkForDeletion(story.id))
+								setItemsToBeDeleted((prev) => [
+									...prev,
+									epic.id,
+									...children.map((child) => child.id),
+									...grandchildren.map((grandchild) => grandchild.id),
+								])
 							}}
 						>
 							<MinusCircleOutlined className="text-sm text-error" />
@@ -153,15 +161,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, onMarkForDeletion, inert = false
 				{children
 					.filter((feature) => feature.parentId === epic.id)
 					.map((feature) => (
-						<Feature
-							key={feature.id}
-							featureId={feature.id}
-							inert={inert}
-							dragInfo={dragInfo}
-							onMarkForDeletion={(id: string) => {
-								setItemsToBeDeleted((prev) => [...prev, id])
-							}}
-						/>
+						<Feature key={feature.id} featureId={feature.id} inert={inert} dragInfo={dragInfo} />
 					))}
 
 				{children.length === 0 && !editMode && (

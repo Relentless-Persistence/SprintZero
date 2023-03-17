@@ -16,13 +16,12 @@ import {updateItem} from "~/utils/storyMap"
 export type StoryProps = {
 	storyId: string
 	dragInfo: DragInfo
-	onMarkForDeletion: () => void
 	inert?: boolean
 }
 
-const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = false}) => {
+const Story: FC<StoryProps> = ({storyId, dragInfo, inert = false}) => {
 	const {product} = useAppContext()
-	const {storyMapItems, versions, editMode} = useStoryMapContext()
+	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
 
 	const story = storyMapItems.find((story) => story.id === storyId)!
 	const feature = storyMapItems.find((feature) => feature.id === story.parentId)!
@@ -102,7 +101,7 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, onMarkForDeletion, inert = fa
 						</div>
 					)}
 					{editMode && (
-						<button type="button" onClick={() => onMarkForDeletion()}>
+						<button type="button" onClick={() => setItemsToBeDeleted((prev) => [...prev, storyId])}>
 							<MinusCircleOutlined className="text-sm text-error" />
 						</button>
 					)}

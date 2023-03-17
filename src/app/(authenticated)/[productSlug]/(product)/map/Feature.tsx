@@ -16,20 +16,21 @@ import {AllVersions, addStory, sortStories, updateItem} from "~/utils/storyMap"
 export type FeatureProps = {
 	featureId: string
 	dragInfo: DragInfo
-	onMarkForDeletion: (id: string) => void
 	inert?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, inert = false}) => {
+const Feature: FC<FeatureProps> = ({featureId, dragInfo, inert = false}) => {
 	const {product, user} = useAppContext()
-	const {storyMapItems, versions, editMode, currentVersionId, setItemsToBeDeleted} = useStoryMapContext()
+	const {storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted, setItemsToBeDeleted} =
+		useStoryMapContext()
 
 	const feature = storyMapItems.find((feature) => feature.id === featureId)!
 	const children = sortStories(
 		storyMapItems
 			.filter((item) => item.parentId === featureId)
 			.filter((item) => item.versionId === currentVersionId || currentVersionId === AllVersions)
-			.filter((item) => !item.deleted),
+			.filter((item) => !item.deleted)
+			.filter((item) => !itemsToBeDeleted.includes(item.id)),
 		versions,
 	)
 
@@ -109,8 +110,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 						<button
 							type="button"
 							onClick={() => {
-								onMarkForDeletion(featureId)
-								children.forEach((story) => onMarkForDeletion(story.id))
+								setItemsToBeDeleted((prev) => [...prev, featureId, ...children.map((child) => child.id)])
 							}}
 						>
 							<MinusCircleOutlined className="text-sm text-error" />
@@ -141,15 +141,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, onMarkForDeletion, iner
 				{children.length > 0 && (
 					<div className="flex flex-col items-start gap-3 rounded-lg border-2 border-border p-3">
 						{children.map((story) => (
-							<Story
-								key={story.id}
-								storyId={story.id}
-								inert={inert}
-								dragInfo={dragInfo}
-								onMarkForDeletion={() => {
-									setItemsToBeDeleted((prev) => [...prev, story.id])
-								}}
-							/>
+							<Story key={story.id} storyId={story.id} inert={inert} dragInfo={dragInfo} />
 						))}
 
 						{currentVersionId !== AllVersions && !editMode && (
