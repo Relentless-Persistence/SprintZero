@@ -2,7 +2,6 @@ import {CopyOutlined, DislikeOutlined, LikeOutlined, ReadOutlined} from "@ant-de
 import {Button, Card, Tag} from "antd"
 import {useState} from "react"
 
-import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
@@ -10,14 +9,14 @@ import StoryDrawer from "~/app/(authenticated)/[productSlug]/(product)/tactics/e
 import {getEpics, getFeatures, getStories} from "~/utils/storyMap"
 
 export type StoryProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	storyId: string
 }
 
 const Story: FC<StoryProps> = ({storyMapItems, storyId}) => {
 	const story = getStories(storyMapItems).find((story) => story.id === storyId)!
-	const feature = getFeatures(storyMapItems).find((feature) => feature.id === story.data().parentId)!
-	const epic = getEpics(storyMapItems).find((epic) => epic.id === feature.data().parentId)!
+	const feature = getFeatures(storyMapItems).find((feature) => feature.id === story.parentId)!
+	const epic = getEpics(storyMapItems).find((epic) => epic.id === feature.parentId)!
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
 	return (
@@ -25,18 +24,18 @@ const Story: FC<StoryProps> = ({storyMapItems, storyId}) => {
 			<Card
 				type="inner"
 				size="small"
-				title={story.data().name}
+				title={story.name}
 				extra={<Button onClick={() => setIsDrawerOpen(true)}>View</Button>}
 			>
 				<div className="flex gap-1">
 					<Tag color="purple" icon={<ReadOutlined />}>
-						{epic.data().name}
+						{epic.name}
 					</Tag>
 					<Tag color="cyan" icon={<CopyOutlined />}>
-						{feature.data().name}
+						{feature.name}
 					</Tag>
-					{story.data().ethicsColumn === `adjudicated` &&
-						(story.data().ethicsApproved ? (
+					{story.ethicsColumn === `adjudicated` &&
+						(story.ethicsApproved ? (
 							<Tag icon={<LikeOutlined />} color="green">
 								Approved
 							</Tag>

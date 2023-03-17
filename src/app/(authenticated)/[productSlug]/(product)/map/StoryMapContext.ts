@@ -6,7 +6,7 @@ import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 import type {Version} from "~/types/db/Products/Versions"
 
 export const StoryMapContext = createContext<{
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	versions: QuerySnapshot<Version>
 	editMode: boolean
 

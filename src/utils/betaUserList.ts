@@ -1,3 +1,5 @@
+// Keep this list alphabetized please!!!
+
 export const betaUsers = [
 	`adil.gurban@gmail.com`,
 	`brandononline2@gmail.com`,
@@ -71,10 +73,12 @@ export const betaUsers = [
 	`mail@albertjfoo.com`,
 	`mark@fischermanagement.com`,
 	`marklindop@gmail.com`,
+	`mary.gower@shoonyadigital.com`,
 	`maryam.ndope@gmail.com`,
 	`matthias.ostermann@gmail.com`,
 	`meeshellxia@gmail.com`,
 	`mgower1@uw.edu`,
+	`mincho.kavaldzhiev@gmail.com`,
 	`mosopeadebowale@gmail.com`,
 	`mtmandler@gmail.com`,
 	`n.muther@gmail.com`,

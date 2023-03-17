@@ -1,7 +1,6 @@
 import {Breadcrumb} from "antd"
 import {useEffect, useRef} from "react"
 
-import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
@@ -11,7 +10,7 @@ import PrioritiesMatrix from "./PrioritiesMatrix"
 import {getEpics} from "~/utils/storyMap"
 
 export type EpicsTabProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 }
 
 const EpicsTab: FC<EpicsTabProps> = ({storyMapItems}) => {

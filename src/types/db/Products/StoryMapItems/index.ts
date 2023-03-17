@@ -3,6 +3,8 @@ import {z} from "zod"
 import {genConverter, timestampSchema} from "~/types"
 
 export const StoryMapItemSchema = z.object({
+	id: z.string(),
+
 	acceptanceCriteria: z
 		.array(
 			z.object({
@@ -32,7 +34,7 @@ export const StoryMapItemSchema = z.object({
 	ethicsApproved: z.boolean().nullable().default(null),
 	ethicsColumn: z.enum([`underReview`, `adjudicated`]).nullable().default(null),
 	ethicsVotes: z.record(z.string(), z.boolean()).default({}),
-	initialRenameDone: z.boolean().default(true),
+	initialRenameDone: z.boolean(),
 	name: z.string().min(1),
 	pageLink: z.string().url().nullable().default(null),
 	sprintColumn: z

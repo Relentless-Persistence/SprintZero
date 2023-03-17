@@ -1,37 +1,40 @@
 import {ReadOutlined} from "@ant-design/icons"
-import {Timestamp, updateDoc} from "firebase/firestore"
+import {Timestamp, doc, updateDoc} from "firebase/firestore"
 import {motion, useMotionTemplate, useMotionValue} from "framer-motion"
 import {clamp, debounce} from "lodash"
 import {useEffect, useRef} from "react"
 
-import type {QueryDocumentSnapshot, QuerySnapshot, WithFieldValue} from "firebase/firestore"
+import type {DocumentReference, WithFieldValue} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
 import {matrixRect} from "./globals"
+import {useAppContext} from "../../../AppContext"
+import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
 import {getEpics} from "~/utils/storyMap"
 
 export type EpicProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	epicId: string
 }
 
 const Epic: FC<EpicProps> = ({storyMapItems, epicId}) => {
+	const {product} = useAppContext()
 	const epics = getEpics(storyMapItems)
 	const epic = epics.find((e) => e.id === epicId)!
 
-	const x = useMotionValue(epic.data().effort)
-	const y = useMotionValue(epic.data().userValue)
+	const x = useMotionValue(epic.effort)
+	const y = useMotionValue(epic.userValue)
 
 	useEffect(() => {
-		x.set(epics.find(({id}) => id === epic.id)!.data().effort)
-		y.set(epics.find(({id}) => id === epic.id)!.data().userValue)
+		x.set(epics.find(({id}) => id === epic.id)!.effort)
+		y.set(epics.find(({id}) => id === epic.id)!.userValue)
 	}, [epic.id, epics, x, y])
 
 	const ref = useRef<HTMLDivElement | null>(null)
 	const pointerOffset = useRef<[number, number]>([0, 0])
 	const moveEpic = async (x: number, y: number) => {
-		await debouncedUpdateStoryMapItem(epic, {
+		await debouncedUpdateStoryMapItem(doc(product.ref, `StoryMapItems`, epic.id).withConverter(StoryMapItemConverter), {
 			effort: x,
 			userValue: y,
 		})
@@ -60,7 +63,7 @@ const Epic: FC<EpicProps> = ({storyMapItems, epicId}) => {
 			ref={ref}
 		>
 			<ReadOutlined />
-			<p className="w-max font-medium">{epic.data().name}</p>
+			<p className="w-max font-medium">{epic.name}</p>
 		</motion.div>
 	)
 }
@@ -68,8 +71,8 @@ const Epic: FC<EpicProps> = ({storyMapItems, epicId}) => {
 export default Epic
 
 const debouncedUpdateStoryMapItem = debounce(
-	async (storyMapItems: QueryDocumentSnapshot<StoryMapItem>, data: WithFieldValue<Partial<StoryMapItem>>) => {
-		await updateDoc(storyMapItems.ref, {
+	async (storyMapItemRef: DocumentReference<StoryMapItem>, data: WithFieldValue<Partial<StoryMapItem>>) => {
+		await updateDoc(storyMapItemRef, {
 			...data,
 			updatedAt: Timestamp.now(),
 		})

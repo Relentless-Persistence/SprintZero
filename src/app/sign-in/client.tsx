@@ -93,6 +93,7 @@ const SignInClientPage: FC = () => {
 					email: credential.user.email,
 					hasAcceptedTos: false,
 					preferredMusicClient: `appleMusic`,
+					type: `user`,
 				})
 				router.push(`/accept-terms`)
 			} else if (!user.hasAcceptedTos) {

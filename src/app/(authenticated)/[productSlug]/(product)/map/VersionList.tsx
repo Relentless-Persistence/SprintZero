@@ -79,8 +79,8 @@ const VersionList: FC = () => {
 										e.stopPropagation()
 										if (currentVersionId === version.id) setCurrentVersionId(AllVersions)
 										setVersionsToBeDeleted((versions) => [...versions, version.id])
-										const itemsWithVersion = storyMapItems.docs
-											.filter((item) => item.data().versionId === version.id)
+										const itemsWithVersion = storyMapItems
+											.filter((item) => item.versionId === version.id)
 											.map((item) => item.id)
 										itemsWithVersion.forEach((id) => {
 											setItemsToBeDeleted((items) => [...items, id])

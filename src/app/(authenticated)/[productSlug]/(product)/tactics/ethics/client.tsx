@@ -20,13 +20,13 @@ const EthicsClientPage: FC = () => {
 		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
 	useErrorHandler(storyMapItemsError)
-	const stories = storyMapItems ? getStories(storyMapItems) : []
+	const stories = storyMapItems ? getStories(storyMapItems.docs.map((item) => item.data())) : []
 
 	const [filter, setFilter] = useState<`approved` | `rejected` | `all`>(`all`)
 
 	return (
 		<>
-			{stories.filter((story) => story.data().ethicsColumn !== null).length === 0 && (
+			{stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
 				<Alert
 					type="error"
 					showIcon
@@ -41,13 +41,19 @@ const EthicsClientPage: FC = () => {
 				<div className="grid w-full grow grid-cols-2 gap-6">
 					<Card
 						title="Under Review"
-						extra={<p>{stories.filter((story) => story.data().ethicsColumn === `underReview`).length}</p>}
+						extra={<p>{stories.filter((story) => story.ethicsColumn === `underReview`).length}</p>}
 					>
 						<div className="flex flex-col gap-4">
 							{storyMapItems &&
 								stories
-									.filter((story) => story.data().ethicsColumn === `underReview`)
-									.map((story) => <Story key={story.id} storyMapItems={storyMapItems} storyId={story.id} />)}
+									.filter((story) => story.ethicsColumn === `underReview`)
+									.map((story) => (
+										<Story
+											key={story.id}
+											storyMapItems={storyMapItems.docs.map((item) => item.data())}
+											storyId={story.id}
+										/>
+									))}
 						</div>
 					</Card>
 					<Card
@@ -90,9 +96,15 @@ const EthicsClientPage: FC = () => {
 						<div className="flex flex-col gap-4">
 							{storyMapItems &&
 								stories
-									.filter((story) => story.data().ethicsColumn === `adjudicated`)
-									.filter((story) => filter === `all` || (filter === `approved` && story.data().ethicsApproved))
-									.map((story) => <Story key={story.id} storyMapItems={storyMapItems} storyId={story.id} />)}
+									.filter((story) => story.ethicsColumn === `adjudicated`)
+									.filter((story) => filter === `all` || (filter === `approved` && story.ethicsApproved))
+									.map((story) => (
+										<Story
+											key={story.id}
+											storyMapItems={storyMapItems.docs.map((item) => item.data())}
+											storyId={story.id}
+										/>
+									))}
 						</div>
 					</Card>
 				</div>

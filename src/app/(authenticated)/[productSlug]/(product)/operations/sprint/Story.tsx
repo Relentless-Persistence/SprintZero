@@ -9,7 +9,7 @@ import StoryContainer from "./StoryContainer"
 import StoryDrawer from "~/components/StoryDrawer"
 
 export type StoryProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	versions: QuerySnapshot<Version>
 	storyId: string
 }

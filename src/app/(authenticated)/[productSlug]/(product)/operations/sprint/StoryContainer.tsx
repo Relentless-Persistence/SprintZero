@@ -1,16 +1,16 @@
-import {Timestamp, updateDoc} from "firebase/firestore"
+import {Timestamp, doc, updateDoc} from "firebase/firestore"
 import {motion, useMotionValue, useTransform} from "framer-motion"
 import {useEffect, useRef, useState} from "react"
 import {createPortal} from "react-dom"
 
-import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem, sprintColumns} from "~/types/db/Products/StoryMapItems"
 
 import StoryCard from "./StoryCard"
+import {useAppContext} from "../../../AppContext"
 
 export type StoryContainerProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 	storyId: string
 	onDrawerOpen: () => void
 	isBeingDragged: boolean
@@ -26,7 +26,8 @@ const StoryContainer: FC<StoryContainerProps> = ({
 	onDragStart,
 	onDragEnd,
 }) => {
-	const story = storyMapItems.docs.find((story) => story.id === storyId)!
+	const {product} = useAppContext()
+	const story = storyMapItems.find((story) => story.id === storyId)!
 
 	const ref = useRef<HTMLDivElement>(null)
 	const [dragInfo, setDragInfo] = useState({
@@ -74,7 +75,7 @@ const StoryContainer: FC<StoryContainerProps> = ({
 					onDragStart()
 				}}
 				onPanEnd={() => {
-					updateDoc(story.ref, {
+					updateDoc(doc(product.ref, `StoryMapItems`, story.id), {
 						sprintColumn: currentColumn.current,
 						updatedAt: Timestamp.now(),
 					})

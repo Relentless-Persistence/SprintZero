@@ -3,7 +3,6 @@
 import {Breadcrumb, Select} from "antd"
 import {useEffect, useRef, useState} from "react"
 
-import type {QuerySnapshot} from "firebase/firestore"
 import type {FC} from "react"
 import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
 
@@ -13,7 +12,7 @@ import PrioritiesMatrix from "./PrioritiesMatrix"
 import {getEpics, getFeatures} from "~/utils/storyMap"
 
 export type FeaturesTabProps = {
-	storyMapItems: QuerySnapshot<StoryMapItem>
+	storyMapItems: StoryMapItem[]
 }
 
 const FeaturesTab: FC<FeaturesTabProps> = ({storyMapItems}) => {
@@ -60,7 +59,7 @@ const FeaturesTab: FC<FeaturesTabProps> = ({storyMapItems}) => {
 				<div className="h-0">
 					<Select
 						placeholder="Select an epic..."
-						options={epics.map((epic) => ({value: epic.id, label: epic.data().name}))}
+						options={epics.map((epic) => ({value: epic.id, label: epic.name}))}
 						onChange={(value: string) => setSelectedEpic(value)}
 						className="w-48"
 					/>
@@ -77,7 +76,7 @@ const FeaturesTab: FC<FeaturesTabProps> = ({storyMapItems}) => {
 					<PrioritiesMatrix>
 						{selectedEpic &&
 							features
-								.filter((feature) => feature.data().parentId === selectedEpic)
+								.filter((feature) => feature.parentId === selectedEpic)
 								.map((feature) => <Feature key={feature.id} featureId={feature.id} storyMapItems={storyMapItems} />)}
 					</PrioritiesMatrix>
 				</div>
