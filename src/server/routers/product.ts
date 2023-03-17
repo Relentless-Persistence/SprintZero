@@ -226,6 +226,7 @@ export const productRouter = router({
 				email,
 				id: inviteToken,
 				userType,
+				status: `pending`,
 			})
 
 			const queryParams = querystring.stringify({invite_token: inviteToken})

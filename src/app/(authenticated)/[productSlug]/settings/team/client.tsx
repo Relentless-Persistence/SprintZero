@@ -1,8 +1,8 @@
 "use client"
 
-import {DeleteOutlined, EditOutlined, EyeOutlined, SendOutlined, UserAddOutlined, UserOutlined} from "@ant-design/icons"
-import {Avatar, Breadcrumb, Button, Card, FloatButton, Input, Tabs, Tag, Tooltip, notification} from "antd"
-import {collection, deleteDoc, doc} from "firebase/firestore"
+import {DeleteOutlined, DownOutlined, EditOutlined, EyeOutlined, SendOutlined, UserOutlined} from "@ant-design/icons"
+import {Avatar, Breadcrumb, Button, Card, Dropdown, Input, Space, Tabs, Tag, notification} from "antd"
+import {collection, deleteDoc, doc, getDoc, getDocs, limit, query, where} from "firebase/firestore"
 import {useEffect, useState} from "react"
 import {useErrorHandler} from "react-error-boundary"
 import {useCollection} from "react-firebase-hooks/firestore"
@@ -14,7 +14,7 @@ const {Meta} = Card
 import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
 import {InviteConverter} from "~/types/db/Products/Invites"
 import {MemberConverter} from "~/types/db/Products/Members"
-import {auth} from "~/utils/firebase"
+import {auth, db} from "~/utils/firebase"
 import {trpc} from "~/utils/trpc"
 
 const TeamSettingsClientPage: FC = () => {
@@ -45,6 +45,26 @@ const TeamSettingsClientPage: FC = () => {
 		{enabled: !!token},
 	)
 
+	const checkMemberExists = async (email: string) => {
+		const userRef = collection(db, `Users`)
+		const q = query(userRef, where(`email`, `==`, email), limit(1))
+		const usersSnapshot = await getDocs(q)
+
+		if (usersSnapshot.empty) {
+			// User doesn't exist with this email, so they can't be a member
+			return false
+		}
+
+		// User exists, so check if their ID exists in the Members subcollection
+		const userId = usersSnapshot.docs[0]?.id
+		const productsRef = collection(db, `Products`)
+		const membersRef = collection(doc(productsRef, product.id), `Members`)
+		const memberRef = doc(membersRef, userId)
+		const memberSnapshot = await getDoc(memberRef)
+
+		return memberSnapshot.exists()
+	}
+
 	const removeMember = async (id: string) => {
 		const memberRef = collection(product.ref, `Members`)
 
@@ -60,6 +80,9 @@ const TeamSettingsClientPage: FC = () => {
 	const sendInvite = async () => {
 		if (!token) return
 		if (email === ``) return
+
+		// const check = await checkMemberExists(email)
+
 		try {
 			await inviteUser.mutateAsync({
 				email,
@@ -101,6 +124,40 @@ const TeamSettingsClientPage: FC = () => {
 			<Tabs
 				activeKey={currentTab}
 				onChange={(key) => setcurrentTab(key as `editor` | `viewer`)}
+				tabBarExtraContent={
+					<Dropdown
+						trigger={[`click`]}
+						menu={{
+							items: [
+								{
+									label: `Member`,
+									key: `member`,
+									icon: <EditOutlined />,
+									onClick: () => {
+										setcurrentTab(`editor`)
+										setAddNew(true)
+									},
+								},
+								{
+									label: `Viewer`,
+									key: `viewer`,
+									icon: <EyeOutlined />,
+									onClick: () => {
+										setcurrentTab(`viewer`)
+										setAddNew(true)
+									},
+								},
+							],
+						}}
+					>
+						<Button>
+							<Space>
+								Add Users
+								<DownOutlined />
+							</Space>
+						</Button>
+					</Dropdown>
+				}
 				items={[
 					{
 						label: `Members`,
@@ -179,7 +236,7 @@ const TeamSettingsClientPage: FC = () => {
 									))}
 
 								{invitees?.docs
-									.filter((invitee) => invitee.data().userType === `editor`)
+									.filter((invitee) => invitee.data().userType === `editor` && invitee.data().status === `pending`)
 									.map((invitee) => (
 										<Card
 											key={invitee.id}
@@ -215,11 +272,15 @@ const TeamSettingsClientPage: FC = () => {
 												<Meta
 													avatar={<Avatar shape="square" icon={<UserOutlined />} />}
 													title={
+														<Tag className="capitalize" color="orange">
+															{invitee.data().status}
+														</Tag>
+													}
+													description={
 														<div className="space-x-1">
 															<span>{invitee.data().email}</span>
 														</div>
 													}
-													description="."
 												/>
 											</div>
 										</Card>
@@ -318,7 +379,7 @@ const TeamSettingsClientPage: FC = () => {
 									))}
 
 								{invitees?.docs
-									.filter((invitee) => invitee.data().userType === `viewer`)
+									.filter((invitee) => invitee.data().userType === `viewer` && invitee.data().status === `pending`)
 									.map((invitee) => (
 										<Card
 											key={invitee.id}
@@ -352,13 +413,17 @@ const TeamSettingsClientPage: FC = () => {
 										>
 											<div className="flex items-center justify-between">
 												<Meta
-													avatar={<Avatar shape="square" src="" />}
+													avatar={<Avatar shape="square" icon={<UserOutlined />} />}
 													title={
+														<Tag className="capitalize" color="orange">
+															{invitee.data().status}
+														</Tag>
+													}
+													description={
 														<div className="space-x-1">
 															<span>{invitee.data().email}</span>
 														</div>
 													}
-													description="."
 												/>
 											</div>
 										</Card>
@@ -415,29 +480,6 @@ const TeamSettingsClientPage: FC = () => {
 					},
 				]}
 			/>
-
-			<Tooltip placement="left" title="Viewer">
-				<FloatButton.Group trigger="click" type="primary" style={{right: 94}} icon={<UserAddOutlined />}>
-					<Tooltip placement="left" title="Viewer">
-						<FloatButton
-							icon={<EyeOutlined />}
-							onClick={() => {
-								setcurrentTab(`viewer`)
-								setAddNew(true)
-							}}
-						/>
-					</Tooltip>
-					<Tooltip placement="left" title="Member">
-						<FloatButton
-							icon={<EditOutlined />}
-							onClick={() => {
-								setcurrentTab(`editor`)
-								setAddNew(true)
-							}}
-						/>
-					</Tooltip>
-				</FloatButton.Group>
-			</Tooltip>
 		</div>
 	)
 }
