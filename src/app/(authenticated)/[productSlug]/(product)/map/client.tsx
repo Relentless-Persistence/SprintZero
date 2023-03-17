@@ -179,7 +179,10 @@ const StoryMapClientPage: FC = () => {
 		lastUpdated = product.data().storyMapUpdatedAt
 
 	const deleteItems = async () => {
-		if (!storyMapItems || !versions || itemsToBeDeleted.length === 0) return
+		if (!storyMapItems || !versions || (itemsToBeDeleted.length === 0 && versionsToBeDeleted.length === 0)) {
+			setEditMode(false)
+			return
+		}
 		const batch = writeBatch(db)
 
 		itemsToBeDeleted.forEach((id) => {
@@ -211,6 +214,8 @@ const StoryMapClientPage: FC = () => {
 
 		await batch.commit()
 		setEditMode(false)
+		setItemsToBeDeleted([])
+		setVersionsToBeDeleted([])
 	}
 
 	if (!product.exists() || !storyMapItems || !versions || currentVersionId === undefined) return null

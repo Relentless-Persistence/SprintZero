@@ -102,6 +102,20 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 		}
 	}, [dragInfo.mousePos])
 
+	const measurements = useRef<Record<string, {left: number; right: number; width: number}>>({})
+	const updateMeasurements = () => {
+		Object.entries(elementRegistry).forEach(([id, element]) => {
+			if (element.container) {
+				const containerBox = element.container.getBoundingClientRect()
+				measurements.current[id] = {
+					left: containerBox.left,
+					right: containerBox.right,
+					width: containerBox.width,
+				}
+			}
+		})
+	}
+
 	const pointerDownTarget = useRef<HTMLElement | null>(null)
 	const onPanStart = () => {
 		const registryEntry = Object.entries(elementRegistry).find(([, element]) =>
@@ -109,16 +123,17 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 		)
 		const id = registryEntry?.[0]
 		const element = registryEntry?.[1]?.content
-		const contentBox = registryEntry?.[1]?.content?.getBoundingClientRect()
-		if (!id || !element || !contentBox) return
+		const containerBox = registryEntry?.[1]?.container?.getBoundingClientRect()
+		if (!id || !element || !containerBox) return
 
+		updateMeasurements()
 		setDragInfo((prev) => ({
 			...prev,
 			itemBeingDraggedId: id,
-			offsetToTopLeft: [prev.mousePos[0].get() - contentBox.left, prev.mousePos[1].get() - contentBox.top],
+			offsetToTopLeft: [prev.mousePos[0].get() - containerBox.left, prev.mousePos[1].get() - containerBox.top],
 			offsetToMiddle: [
-				contentBox.left + element.offsetWidth / 2 - prev.mousePos[0].get(),
-				contentBox.top + element.offsetHeight / 2 - prev.mousePos[1].get(),
+				containerBox.left + element.offsetWidth / 2 - prev.mousePos[0].get(),
+				containerBox.top + element.offsetHeight / 2 - prev.mousePos[1].get(),
 			],
 		}))
 	}
@@ -131,8 +146,10 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 
 		if (operationCompleteCondition.current) {
 			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
-			if (isOperationComplete) operationCompleteCondition.current = undefined
-			else return
+			if (isOperationComplete) {
+				operationCompleteCondition.current = undefined
+				updateMeasurements()
+			} else return
 		}
 
 		const x = dragInfo.mousePos[0].get() + dragInfo.offsetToMiddle[0]
@@ -146,16 +163,23 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					// === Reorder epics ===
 
 					const currentEpic = epics.find((epic) => epic.id === itemBeingDragged.id)!
-					const currentEpicBox = elementRegistry[currentEpic.id]?.container?.getBoundingClientRect()
+					const currentEpicMeasurements = measurements.current[currentEpic.id]
 					const prevEpic = epics.find((epic) => epic.position === currentEpic.position - 1)
 					const nextEpic = epics.find((epic) => epic.position === currentEpic.position + 1)
-					const prevEpicBox = elementRegistry[prevEpic?.id ?? ``]?.container?.getBoundingClientRect()
-					const nextEpicBox = elementRegistry[nextEpic?.id ?? ``]?.container?.getBoundingClientRect()
+					const prevEpicMeasurements = measurements.current[prevEpic?.id ?? ``]
+					const nextEpicMeasurements = measurements.current[nextEpic?.id ?? ``]
 
-					const boundaryLeft = prevEpicBox && currentEpicBox ? avg(prevEpicBox.left, currentEpicBox.right) : -Infinity
-					const boundaryRight = currentEpicBox && nextEpicBox ? avg(currentEpicBox.left, nextEpicBox.right) : Infinity
+					const boundaryLeft =
+						prevEpicMeasurements && currentEpicMeasurements
+							? avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
+							: -Infinity
+					const boundaryRight =
+						currentEpicMeasurements && nextEpicMeasurements
+							? avg(currentEpicMeasurements.left, nextEpicMeasurements.right)
+							: Infinity
 
 					if (x < boundaryLeft) {
+						console.log(`moved left`)
 						operationCompleteCondition.current = (storyMapItems) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
@@ -167,6 +191,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 							updateItem(product, storyMapItems, versions, currentEpic.id, {userValue: prevEpic!.userValue}),
 						])
 					} else if (x > boundaryRight) {
+						console.log(`moved right`)
 						operationCompleteCondition.current = (storyMapItems) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
@@ -189,18 +214,19 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
 					for (const epic of epics) {
 						for (const featureId of epic.childrenIds) {
-							const featureRect = elementRegistry[featureId]?.container?.getBoundingClientRect()
-							const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
-							if (featureRect)
+							const featureMeasurements = measurements.current[featureId]
+							const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+							if (featureMeasurements)
 								allFeatureBounds.push({
-									left: prevRect.right,
-									right: featureRect.left + featureRect.width / 2,
+									left: prevMeasurements.right,
+									right: featureMeasurements.left + featureMeasurements.width / 2,
 									id: featureId,
 								})
 						}
-						const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
-						const epicRect = elementRegistry[epic.id]?.container?.getBoundingClientRect()
-						if (epicRect) allFeatureBounds.push({id: epic.id, left: prevRect.right, right: epicRect.right})
+						const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+						const epicMeasurements = measurements.current[epic.id]
+						if (epicMeasurements)
+							allFeatureBounds.push({id: epic.id, left: prevMeasurements.right, right: epicMeasurements.right})
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
@@ -259,13 +285,13 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					 */
 					const allEpicBounds: Array<{id: string; left: number; right: number}> = []
 					for (const epic of epics) {
-						const epicRect = elementRegistry[epic.id]?.container?.getBoundingClientRect()
-						const prevRect = allEpicBounds.at(-1) ?? {right: -Infinity}
-						if (epicRect)
+						const epicMeasurements = measurements.current[epic.id]
+						const prevMeasurements = allEpicBounds.at(-1) ?? {right: -Infinity}
+						if (epicMeasurements)
 							allEpicBounds.push({
 								id: epic.id,
-								left: prevRect.right,
-								right: epicRect.left + epicRect.width / 2,
+								left: prevMeasurements.right,
+								right: epicMeasurements.left + epicMeasurements.width / 2,
 							})
 					}
 					allEpicBounds.push({id: `end`, left: allEpicBounds.at(-1)!.right, right: Infinity})
@@ -300,32 +326,32 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					// === Reorder features ===
 
 					const currentFeature = itemBeingDragged
-					const currentFeatureRect = elementRegistry[currentFeature.id]?.container?.getBoundingClientRect()
-					const parentRect = elementRegistry[currentFeature.parentId!]?.container?.getBoundingClientRect()
+					const currentFeatureMeasurements = measurements.current[currentFeature.id]
+					const parentMeasurements = measurements.current[currentFeature.parentId!]
 
-					if (!parentRect || !currentFeatureRect) return
-					if (x < parentRect.left || x > parentRect.right) {
+					if (!parentMeasurements || !currentFeatureMeasurements) return
+					if (x < parentMeasurements.left || x > parentMeasurements.right) {
 						// Move to another epic
 
 						const currentParent = epics.find((epic) => epic.id === currentFeature.parentId)!
 						const newParent =
-							x < parentRect.left ? epics[currentParent.position - 1] : epics[currentParent.position + 1]
-						const newParentRect = elementRegistry[newParent?.id ?? ``]?.container?.getBoundingClientRect()
-						if (!newParent || !newParentRect) return
+							x < parentMeasurements.left ? epics[currentParent.position - 1] : epics[currentParent.position + 1]
+						const newParentMeasurements = measurements.current[newParent?.id ?? ``]
+						if (!newParent || !newParentMeasurements) return
 						const siblings = sortFeatures(
 							storyMapItems.filter((item) => item.parentId === newParent.id && item.deleted === false),
 						)
 
-						if (x < parentRect.left) {
+						if (x < parentMeasurements.left) {
 							// Move to epic on the left
 
 							const prevFeature = siblings.at(-1)
-							const prevFeatureRect = elementRegistry[prevFeature?.id ?? ``]?.container?.getBoundingClientRect()
+							const prevFeatureMeasurements = measurements.current[prevFeature?.id ?? ``]
 							const boundary = avg(
-								prevFeatureRect
-									? prevFeatureRect.left + prevFeatureRect.width / 2
-									: newParentRect.left + newParentRect.width / 2,
-								currentFeatureRect.left + currentFeatureRect.width / 2,
+								prevFeatureMeasurements
+									? prevFeatureMeasurements.left + prevFeatureMeasurements.width / 2
+									: newParentMeasurements.left + newParentMeasurements.width / 2,
+								currentFeatureMeasurements.left + currentFeatureMeasurements.width / 2,
 							)
 							if (x > boundary) return
 							const prevFeatureUserValue = siblings.at(-1)?.userValue ?? 0
@@ -342,12 +368,12 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 							// Move to epic on the right
 
 							const nextFeature = siblings[currentFeature.position]
-							const nextFeatureRect = elementRegistry[nextFeature?.id ?? ``]?.container?.getBoundingClientRect()
+							const nextFeatureMeasurements = measurements.current[nextFeature?.id ?? ``]
 							const boundary = avg(
-								currentFeatureRect.right + currentFeatureRect.width / 2,
-								nextFeatureRect
-									? nextFeatureRect.left + nextFeatureRect.width / 2
-									: newParentRect.left + newParentRect.width / 2,
+								currentFeatureMeasurements.left + currentFeatureMeasurements.width / 2,
+								nextFeatureMeasurements
+									? nextFeatureMeasurements.left + nextFeatureMeasurements.width / 2
+									: newParentMeasurements.left + newParentMeasurements.width / 2,
 							)
 							if (x < boundary) return
 							const nextFeatureUserValue = siblings[currentFeature.position]?.userValue ?? 1
@@ -366,16 +392,18 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 						const siblings = sortFeatures(storyMapItems.filter((item) => item.parentId === currentFeature.parentId))
 						const prevFeature = siblings[currentFeature.position - 1]
 						const nextFeature = siblings[currentFeature.position + 1]
-						const currentFeatureRect = elementRegistry[dragInfo.itemBeingDraggedId]?.container?.getBoundingClientRect()
-						const prevFeatureRect =
-							elementRegistry[siblings[currentFeature.position - 1]?.id ?? ``]?.container?.getBoundingClientRect()
-						const nextFeatureRect =
-							elementRegistry[siblings[currentFeature.position + 1]?.id ?? ``]?.container?.getBoundingClientRect()
+						const currentFeatureMeasurements = measurements.current[dragInfo.itemBeingDraggedId]
+						const prevFeatureMeasurements = measurements.current[siblings[currentFeature.position - 1]?.id ?? ``]
+						const nextFeatureMeasurements = measurements.current[siblings[currentFeature.position + 1]?.id ?? ``]
 
 						const leftBoundary =
-							currentFeatureRect && prevFeatureRect ? avg(prevFeatureRect.left, currentFeatureRect.right) : -Infinity
+							currentFeatureMeasurements && prevFeatureMeasurements
+								? avg(prevFeatureMeasurements.left, currentFeatureMeasurements.right)
+								: -Infinity
 						const rightBoundary =
-							currentFeatureRect && nextFeatureRect ? avg(currentFeatureRect.left, nextFeatureRect.right) : Infinity
+							currentFeatureMeasurements && nextFeatureMeasurements
+								? avg(currentFeatureMeasurements.left, nextFeatureMeasurements.right)
+								: Infinity
 
 						if (x < leftBoundary) {
 							operationCompleteCondition.current = (storyMapItems) => {
@@ -412,20 +440,20 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					})
 					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
 					for (const feature of allFeaturesSorted) {
-						const featureRect = elementRegistry[feature.id]?.container?.getBoundingClientRect()
+						const featureMeasurements = measurements.current[feature.id]
 						const prevFeature = allFeaturesSorted[feature.position - 1]
 						const nextFeature = allFeaturesSorted[feature.position + 1]
-						const prevRect = elementRegistry[prevFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
+						const prevMeasurements = measurements.current[prevFeature?.id ?? ``] ?? {
 							right: -Infinity,
 						}
-						const nextRect = elementRegistry[nextFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
+						const nextMeasurements = measurements.current[nextFeature?.id ?? ``] ?? {
 							left: Infinity,
 						}
 
-						if (featureRect)
+						if (featureMeasurements)
 							allFeatureBounds.push({
-								left: prevRect.right,
-								right: avg(featureRect.right, nextRect.left),
+								left: prevMeasurements.right,
+								right: avg(featureMeasurements.right, nextMeasurements.left),
 								id: feature.id,
 							})
 					}
@@ -470,20 +498,20 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					})
 					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
 					for (const feature of allFeaturesSorted) {
-						const featureRect = elementRegistry[feature.id]?.container?.getBoundingClientRect()
+						const featureMeasurements = measurements.current[feature.id]
 						const prevFeature = allFeaturesSorted[feature.position - 1]
 						const nextFeature = allFeaturesSorted[feature.position + 1]
-						const prevRect = elementRegistry[prevFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
+						const prevMeasurements = measurements.current[prevFeature?.id ?? ``] ?? {
 							right: -Infinity,
 						}
-						const nextRect = elementRegistry[nextFeature?.id ?? ``]?.container?.getBoundingClientRect() ?? {
+						const nextMeasurements = measurements.current[nextFeature?.id ?? ``] ?? {
 							left: Infinity,
 						}
 
-						if (featureRect)
+						if (featureMeasurements)
 							allFeatureBounds.push({
-								left: prevRect.right,
-								right: avg(featureRect.right, nextRect.left),
+								left: prevMeasurements.right,
+								right: avg(featureMeasurements.right, nextMeasurements.left),
 								id: feature.id,
 							})
 					}
@@ -504,18 +532,19 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
 					for (const epic of epics) {
 						for (const featureId of epic.childrenIds) {
-							const featureRect = elementRegistry[featureId]?.container?.getBoundingClientRect()
-							const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
-							if (featureRect)
+							const featureMeasurements = measurements.current[featureId]
+							const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+							if (featureMeasurements)
 								allFeatureBounds.push({
-									left: prevRect.right,
-									right: featureRect.left + featureRect.width / 2,
+									left: prevMeasurements.right,
+									right: featureMeasurements.left + featureMeasurements.width / 2,
 									id: featureId,
 								})
 						}
-						const prevRect = allFeatureBounds.at(-1) ?? {right: -Infinity}
-						const epicRect = elementRegistry[epic.id]?.container?.getBoundingClientRect()
-						if (epicRect) allFeatureBounds.push({left: prevRect.right, right: epicRect.right, id: epic.id})
+						const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+						const epicMeasurements = measurements.current[epic.id]
+						if (epicMeasurements)
+							allFeatureBounds.push({left: prevMeasurements.right, right: epicMeasurements.right, id: epic.id})
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
