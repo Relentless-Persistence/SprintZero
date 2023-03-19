@@ -1,19 +1,19 @@
-import {ReadOutlined} from "@ant-design/icons"
-import {Timestamp} from "firebase/firestore"
-import {motion, useAnimationFrame, useMotionValue, useTransform} from "framer-motion"
-import {useEffect, useRef, useState} from "react"
+import { ReadOutlined } from "@ant-design/icons"
+import { Timestamp } from "firebase/firestore"
+import { motion, useAnimationFrame, useMotionValue, useTransform } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
-import type {DragInfo} from "./types"
-import type {FC} from "react"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type { DragInfo } from "./types"
+import type { FC } from "react"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 
 import Epic from "./Epic"
 import Feature from "./Feature"
-import {elementRegistry, layerBoundaries} from "./globals"
+import { elementRegistry, layerBoundaries } from "./globals"
 import Story from "./Story"
-import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {avg} from "~/utils/math"
+import { useStoryMapContext } from "./StoryMapContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { avg } from "~/utils/math"
 import {
 	AllVersions,
 	addEpic,
@@ -33,9 +33,9 @@ export type StoryMapProps = {
 	onScroll: (amt: number) => void
 }
 
-const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
-	const {product, user} = useAppContext()
-	const {storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted} = useStoryMapContext()
+const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
+	const { product, user } = useAppContext()
+	const { storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted } = useStoryMapContext()
 
 	const _stories = sortStories(
 		getStories(storyMapItems)
@@ -105,7 +105,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 		}
 	}, [dragInfo.mousePos])
 
-	const measurements = useRef<Record<string, {left: number; right: number; width: number}>>({})
+	const measurements = useRef<Record<string, { left: number; right: number; width: number }>>({})
 	const updateMeasurements = () => {
 		Object.entries(elementRegistry).forEach(([id, element]) => {
 			if (element.container) {
@@ -147,23 +147,18 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 	// be processed again.
 	const operationCompleteCondition = useRef<((storyMapItems: StoryMapItem[]) => boolean) | undefined>(undefined)
 	const onPan = async () => {
-		console.log(`reached A`)
 		if (dragInfo.itemBeingDraggedId === undefined || !product.exists()) return
-		console.log(`reached B`)
 		if (operationCompleteCondition.current) {
-			console.log(`reached X`)
 			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
 			if (isOperationComplete) operationCompleteCondition.current = undefined
 			else return
 		}
-		console.log(`reached C`)
 		const x = dragInfo.mousePos[0].get() + dragInfo.offsetToMiddle[0]
 		const y = dragInfo.mousePos[1].get()
 		// All the logic for moving items around are in this switch statement
 		switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 			case `epic`: {
 				const itemBeingDragged = epics.find((epic) => epic.id === dragInfo.itemBeingDraggedId)!
-				//console.log(`epic`, {itemBeingDragged})
 				if (y <= layerBoundaries[0]) {
 					// === Reorder epics ===
 
@@ -174,45 +169,39 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					const prevEpicMeasurements = measurements.current[prevEpic?.id ?? ``]
 					const nextEpicMeasurements = measurements.current[nextEpic?.id ?? ``]
 
-					//console.log(`epic`, {currentEpic, prevEpic, nextEpic})
-
-					console.log(prevEpicMeasurements)
 					const boundaryLeft =
 						prevEpicMeasurements && currentEpicMeasurements
 							? prevEpicMeasurements.left + prevEpicMeasurements.width / 2
 							: //? avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
-							  -Infinity
+							-Infinity
 					const boundaryRight =
 						currentEpicMeasurements && nextEpicMeasurements
 							? //? (currentEpicMeasurements.left, nextEpicMeasurements.right)
-							  nextEpicMeasurements.right - nextEpicMeasurements.width / 2
+							nextEpicMeasurements.right - nextEpicMeasurements.width / 2
 							: Infinity
 
-					console.log(`epic`, {boundaryLeft, boundaryRight}, {x, y})
 					if (x < boundaryLeft) {
 						operationCompleteCondition.current = (storyMapItems) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
 							const prevEpicNewPos = storyMapShape.findIndex((epic) => epic.id === prevEpic!.id)
-							console.log(`operation complete`, {currentEpicNewPos, prevEpicNewPos}, storyMapShape)
 							return currentEpicNewPos < prevEpicNewPos
 						}
-						console.log(`epic reordering`)
+
 						await Promise.all([
-							updateItem(product, storyMapItems, versions, prevEpic!.id, {userValue: currentEpic.userValue}),
-							updateItem(product, storyMapItems, versions, currentEpic.id, {userValue: prevEpic!.userValue}),
+							updateItem(product, storyMapItems, versions, prevEpic!.id, { userValue: currentEpic.userValue }),
+							updateItem(product, storyMapItems, versions, currentEpic.id, { userValue: prevEpic!.userValue }),
 						])
 					} else if (x > boundaryRight) {
 						operationCompleteCondition.current = (storyMapItems) => {
 							const storyMapShape = getStoryMapShape(storyMapItems, versions)
 							const currentEpicNewPos = storyMapShape.findIndex((epic) => epic.id === currentEpic.id)
 							const nextEpicNewPos = storyMapShape.findIndex((epic) => epic.id === nextEpic!.id)
-							console.log(`epic`, {currentEpicNewPos, nextEpic}, storyMapShape)
 							return currentEpicNewPos > nextEpicNewPos
 						}
 						await Promise.all([
-							updateItem(product, storyMapItems, versions, nextEpic!.id, {userValue: currentEpic.userValue}),
-							updateItem(product, storyMapItems, versions, currentEpic.id, {userValue: nextEpic!.userValue}),
+							updateItem(product, storyMapItems, versions, nextEpic!.id, { userValue: currentEpic.userValue }),
+							updateItem(product, storyMapItems, versions, currentEpic.id, { userValue: nextEpic!.userValue }),
 						])
 					}
 				} else {
@@ -223,11 +212,11 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					 * <- -Infinity ||   Feature 1   |              Feature 2              ||                 Feature 3                 || +Infinity ->
 					 * | Boundary, Feature 1 |   Boundary, Feature 2    | Boundary, Epic 1 || Boundary, Feature 3 |         Boundary, Epic 2          |
 					 */
-					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
+					const allFeatureBounds: Array<{ id: string; left: number; right: number }> = []
 					for (const epic of epics) {
 						for (const featureId of epic.childrenIds) {
 							const featureMeasurements = measurements.current[featureId]
-							const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+							const prevMeasurements = allFeatureBounds.at(-1) ?? { right: -Infinity }
 							if (featureMeasurements)
 								allFeatureBounds.push({
 									left: prevMeasurements.right,
@@ -235,10 +224,10 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 									id: featureId,
 								})
 						}
-						const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+						const prevMeasurements = allFeatureBounds.at(-1) ?? { right: -Infinity }
 						const epicMeasurements = measurements.current[epic.id]
 						if (epicMeasurements)
-							allFeatureBounds.push({id: epic.id, left: prevMeasurements.right, right: epicMeasurements.right})
+							allFeatureBounds.push({ id: epic.id, left: prevMeasurements.right, right: epicMeasurements.right })
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
@@ -280,7 +269,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 							stories
 								.filter((story) => story.parentId === featureId)
 								.map((story) =>
-									updateItem(product, storyMapItems, versions, story.id, {parentId: itemBeingDragged.id}),
+									updateItem(product, storyMapItems, versions, story.id, { parentId: itemBeingDragged.id }),
 								),
 						),
 					])
@@ -295,10 +284,10 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 					/* <- -Infinity |  Epic 1   |          Epic 2          | +Infinity ->
 					 * | Boundary, Epic 1 | Boundary, Epic 2 |      Boundary, end       |
 					 */
-					const allEpicBounds: Array<{id: string; left: number; right: number}> = []
+					const allEpicBounds: Array<{ id: string; left: number; right: number }> = []
 					for (const epic of epics) {
 						const epicMeasurements = measurements.current[epic.id]
-						const prevMeasurements = allEpicBounds.at(-1) ?? {right: -Infinity}
+						const prevMeasurements = allEpicBounds.at(-1) ?? { right: -Infinity }
 						if (epicMeasurements)
 							allEpicBounds.push({
 								id: epic.id,
@@ -306,7 +295,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 								right: epicMeasurements.left + epicMeasurements.width / 2,
 							})
 					}
-					allEpicBounds.push({id: `end`, left: allEpicBounds.at(-1)!.right, right: Infinity})
+					allEpicBounds.push({ id: `end`, left: allEpicBounds.at(-1)!.right, right: Infinity })
 
 					const targetEpicId = allEpicBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
 					const targetEpicIndex =
@@ -424,7 +413,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 								return item?.userValue === prevFeature?.userValue
 							}
 							await Promise.all([
-								updateItem(product, storyMapItems, versions, prevFeature!.id, {userValue: currentFeature.userValue}),
+								updateItem(product, storyMapItems, versions, prevFeature!.id, { userValue: currentFeature.userValue }),
 								updateItem(product, storyMapItems, versions, currentFeature.id, {
 									userValue: prevFeature!.userValue,
 								}),
@@ -436,7 +425,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 								return item?.userValue === nextFeature!.userValue
 							}
 							await Promise.all([
-								updateItem(product, storyMapItems, versions, nextFeature!.id, {userValue: currentFeature.userValue}),
+								updateItem(product, storyMapItems, versions, nextFeature!.id, { userValue: currentFeature.userValue }),
 								updateItem(product, storyMapItems, versions, currentFeature.id, {
 									userValue: nextFeature!.userValue,
 								}),
@@ -450,7 +439,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 						const bParent = epics.find((epic) => epic.id === b.parentId)!
 						return aParent.position - bParent.position || a.position - b.position
 					})
-					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
+					const allFeatureBounds: Array<{ id: string; left: number; right: number }> = []
 					for (const feature of allFeaturesSorted) {
 						const featureMeasurements = measurements.current[feature.id]
 						const prevFeature = allFeaturesSorted[feature.position - 1]
@@ -508,7 +497,7 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 						const bParent = epics.find((epic) => epic.id === b.parentId)!
 						return aParent.position - bParent.position || a.position - b.position
 					})
-					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
+					const allFeatureBounds: Array<{ id: string; left: number; right: number }> = []
 					for (const feature of allFeaturesSorted) {
 						const featureMeasurements = measurements.current[feature.id]
 						const prevFeature = allFeaturesSorted[feature.position - 1]
@@ -538,14 +527,14 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 						if (getItemType(storyMapItems, storyBeingDragged.id) !== `story`) return false
 						return item.parentId === hoveringFeatureId
 					}
-					await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, {parentId: hoveringFeatureId})
+					await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, { parentId: hoveringFeatureId })
 				} else {
 					// Story to feature
-					const allFeatureBounds: Array<{id: string; left: number; right: number}> = []
+					const allFeatureBounds: Array<{ id: string; left: number; right: number }> = []
 					for (const epic of epics) {
 						for (const featureId of epic.childrenIds) {
 							const featureMeasurements = measurements.current[featureId]
-							const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+							const prevMeasurements = allFeatureBounds.at(-1) ?? { right: -Infinity }
 							if (featureMeasurements)
 								allFeatureBounds.push({
 									left: prevMeasurements.right,
@@ -553,10 +542,10 @@ const StoryMap: FC<StoryMapProps> = ({onScroll}) => {
 									id: featureId,
 								})
 						}
-						const prevMeasurements = allFeatureBounds.at(-1) ?? {right: -Infinity}
+						const prevMeasurements = allFeatureBounds.at(-1) ?? { right: -Infinity }
 						const epicMeasurements = measurements.current[epic.id]
 						if (epicMeasurements)
-							allFeatureBounds.push({left: prevMeasurements.right, right: epicMeasurements.right, id: epic.id})
+							allFeatureBounds.push({ left: prevMeasurements.right, right: epicMeasurements.right, id: epic.id })
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
