@@ -9,7 +9,7 @@ import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 
 import Epic from "./Epic"
 import Feature from "./Feature"
-import { elementRegistry, layerBoundaries } from "./globals"
+import { elementRegistry, layerBoundaries, storyMapDebugMode, storyMapTop } from "./globals"
 import Story from "./Story"
 import { useStoryMapContext } from "./StoryMapContext"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
@@ -106,6 +106,11 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 	}, [dragInfo.mousePos])
 
 	const measurements = useRef<Record<string, { left: number; right: number; width: number }>>({})
+
+	// to depict measurements on the screen
+	const [measures, setMeasures] = useState<Record<string, { left: number; right: number }>>({})
+
+	// elementRegistry is updated while dragging
 	const updateMeasurements = () => {
 		Object.entries(elementRegistry).forEach(([id, element]) => {
 			if (element.container) {
@@ -115,6 +120,16 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 					right: containerBox.right,
 					width: containerBox.width,
 				}
+				// to depict measurements on the screen
+				setMeasures((prevMeasures) => {
+					return {
+						...prevMeasures,
+						[id]: {
+							left: containerBox.left,
+							right: containerBox.right,
+						},
+					}
+				})
 			}
 		})
 	}
@@ -171,9 +186,10 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 
 					const boundaryLeft =
 						prevEpicMeasurements && currentEpicMeasurements
-							? prevEpicMeasurements.left + prevEpicMeasurements.width / 2
-							: //? avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
-							-Infinity
+							? // better measurement
+							// prevEpicMeasurements.left + prevEpicMeasurements.width / 2
+							avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
+							: -Infinity
 					const boundaryRight =
 						currentEpicMeasurements && nextEpicMeasurements
 							? //? (currentEpicMeasurements.left, nextEpicMeasurements.right)
@@ -628,8 +644,26 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 			onPanEnd={onPanEnd}
 		>
 			{epics.map((epic) => (
-				<Epic key={epic.id} epicId={epic.id} dragInfo={dragInfo} />
+				<Epic key={epic.id} epicId={epic.id} dragInfo={dragInfo} measures={measures} />
 			))}
+
+			{/* depicting story map layers in debug mode */}
+			{storyMapDebugMode && (
+				<>
+					<span
+						style={{ position: `absolute`, top: layerBoundaries[0] - storyMapTop, borderColor: `orange`, zIndex: `-100` }}
+						className="w-full border-t border-dashed"
+					>
+						layer-1
+					</span>
+					<span
+						style={{ position: `absolute`, top: layerBoundaries[1] - storyMapTop, borderColor: `red`, zIndex: `-100` }}
+						className="w-full border-t border-dashed"
+					>
+						layer-2
+					</span>
+				</>
+			)}
 
 			{!editMode && (
 				<button
@@ -651,7 +685,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 					if (!dragInfo.itemBeingDraggedId) return null
 					switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 						case `epic`:
-							return <Epic epicId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} inert />
+							return <Epic epicId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} measures={measures} inert />
 						case `feature`:
 							return <Feature featureId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} inert />
 						case `story`:

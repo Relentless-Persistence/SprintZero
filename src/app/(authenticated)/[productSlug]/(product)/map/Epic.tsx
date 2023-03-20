@@ -1,27 +1,28 @@
-import {CopyOutlined, MinusCircleOutlined, PlusOutlined, ReadOutlined} from "@ant-design/icons"
+import { CopyOutlined, MinusCircleOutlined, PlusOutlined, ReadOutlined } from "@ant-design/icons"
 import clsx from "clsx"
-import {doc, updateDoc} from "firebase/firestore"
-import {motion, useAnimationFrame} from "framer-motion"
-import {useEffect, useRef, useState} from "react"
+import { doc, updateDoc } from "firebase/firestore"
+import { motion, useAnimationFrame } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
-import type {DragInfo} from "./types"
-import type {FC} from "react"
+import type { DragInfo } from "./types"
+import type { FC } from "react"
 
 import Feature from "./Feature"
-import {elementRegistry} from "./globals"
-import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {addFeature, sortFeatures, updateItem} from "~/utils/storyMap"
+import { elementRegistry, storyMapDebugMode } from "./globals"
+import { useStoryMapContext } from "./StoryMapContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { addFeature, sortFeatures, updateItem } from "~/utils/storyMap"
 
 export type EpicProps = {
 	epicId: string
 	dragInfo: DragInfo
 	inert?: boolean
+	measures: Record<string, { left: number; right: number }>
 }
 
-const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
-	const {product, user} = useAppContext()
-	const {storyMapItems, versions, editMode, itemsToBeDeleted, setItemsToBeDeleted} = useStoryMapContext()
+const Epic: FC<EpicProps> = ({ epicId, dragInfo, inert = false, measures }) => {
+	const { product, user } = useAppContext()
+	const { storyMapItems, versions, editMode, itemsToBeDeleted, setItemsToBeDeleted } = useStoryMapContext()
 
 	const epic = storyMapItems.find((item) => item.id === epicId)!
 	const children = sortFeatures(
@@ -51,7 +52,22 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 	}, [epic.name])
 
 	return (
-		<div ref={containerRef}>
+		<div ref={containerRef} className={storyMapDebugMode && `relative border border-dashed`}>
+			{storyMapDebugMode &&
+				<>
+					<span style={{ position: `absolute`, top: 0, left: 0 }}>
+						(
+						{measures[epicId]?.left.toFixed(0)}
+						)
+					</span>
+					<span style={{ position: `absolute`, top: 0, right: 0 }}>
+						(
+						{measures[epicId]?.right.toFixed(0)}
+						)
+					</span>
+				</>
+			}
+
 			<motion.div
 				// layoutId={dragInfo.itemBeingDraggedId === epicId ? undefined : epicId}
 				// layout="position"
@@ -59,7 +75,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 					`grid justify-items-center gap-x-6`,
 					dragInfo.itemBeingDraggedId === epic.id && !inert && `invisible`,
 				)}
-				style={{gridTemplateColumns: `repeat(${children.length}, auto)`}}
+				style={{ gridTemplateColumns: `repeat(${children.length}, auto)` }}
 			>
 				<div
 					className={clsx(
@@ -81,11 +97,11 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 								onFocus={(e) => e.target.select()}
 								onBlur={() => {
 									if (localEpicName !== ``)
-										updateDoc(doc(product.ref, `StoryMapItems`, epicId), {initialRenameDone: true}).catch(console.error)
+										updateDoc(doc(product.ref, `StoryMapItems`, epicId), { initialRenameDone: true }).catch(console.error)
 								}}
 								onKeyDown={(e) => {
 									if (e.key === `Enter`)
-										updateDoc(doc(product.ref, `StoryMapItems`, epicId), {initialRenameDone: true}).catch(console.error)
+										updateDoc(doc(product.ref, `StoryMapItems`, epicId), { initialRenameDone: true }).catch(console.error)
 								}}
 								className={clsx(
 									`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
@@ -96,7 +112,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 								onChange={(e) => {
 									setLocalEpicName(e.target.value)
 									if (e.target.value === ``) return
-									updateItem(product, storyMapItems, versions, epic.id, {name: e.target.value}).catch(console.error)
+									updateItem(product, storyMapItems, versions, epic.id, { name: e.target.value }).catch(console.error)
 								}}
 								onPointerDownCapture={(e) => e.stopPropagation()}
 							/>
@@ -147,7 +163,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 									<button
 										type="button"
 										onClick={() => {
-											addFeature(product, storyMapItems, versions, {parentId: epic.id}, user.id).catch(console.error)
+											addFeature(product, storyMapItems, versions, { parentId: epic.id }, user.id).catch(console.error)
 										}}
 										className="grid h-4 w-4 place-items-center rounded-full bg-primary text-[0.6rem] text-white"
 									>
@@ -168,7 +184,7 @@ const Epic: FC<EpicProps> = ({epicId, dragInfo, inert = false}) => {
 					<button
 						type="button"
 						onClick={() => {
-							addFeature(product, storyMapItems, versions, {parentId: epic.id}, user.id).catch(console.error)
+							addFeature(product, storyMapItems, versions, { parentId: epic.id }, user.id).catch(console.error)
 						}}
 						className="flex items-center gap-2 rounded border border-dashed border-current bg-white px-2 py-1 font-medium text-[#006378] dark:bg-black dark:text-[#00a2c4]"
 					>
