@@ -67,6 +67,7 @@
 		"react-firebase-hooks": "5.1.1",
 		"react-hook-form": "7.43.5",
 		"react-masonry-css": "^1.0.16",
+		"react-mentions": "4.4.7",
 		"react-use": "17.4.0",
 		"server-only": "0.0.1",
 		"sharp": "0.31.3",
