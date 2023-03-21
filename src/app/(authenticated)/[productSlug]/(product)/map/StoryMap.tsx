@@ -198,7 +198,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 							nextEpicMeasurements.right - nextEpicMeasurements.width / 2
 							: Infinity
 
-					console.log(`x`, x, `bL`, boundaryLeft, boundaryRight)
+					//console.log(`x`, x, `bL`, boundaryLeft, boundaryRight)
 
 					if (x < boundaryLeft) {
 						operationCompleteCondition.current = (storyMapItems) => {
@@ -234,7 +234,8 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 					 * <- -Infinity ||   Feature 1   |              Feature 2              ||                 Feature 3                 || +Infinity ->
 					 * | Boundary, Feature 1 |   Boundary, Feature 2    | Boundary, Epic 1 || Boundary, Feature 3 |         Boundary, Epic 2          |
 					 */
-					const allFeatureBounds: Array<{ id: string; left: number; right: number }> = []
+					const allFeatureBounds: Array<{ id: string; left: number; right: number, featureName?: string }> = []
+					const allEpicBounds: Array<{ id: string; left: number; right: number, epicName?: string }> = []
 					for (const epic of epics) {
 						for (const featureId of epic.childrenIds) {
 							const featureMeasurements = measurements.current[featureId]
@@ -249,52 +250,65 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 						const prevMeasurements = allFeatureBounds.at(-1) ?? { right: -Infinity }
 						const epicMeasurements = measurements.current[epic.id]
 						if (epicMeasurements)
-							allFeatureBounds.push({ id: epic.id, left: prevMeasurements.right, right: epicMeasurements.right })
+							//allFeatureBounds.push({ id: epic.id, left: prevMeasurements.right, right: epicMeasurements.right, epicName: epic.name })
+							allEpicBounds.push({ id: epic.id, left: epicMeasurements.left, right: epicMeasurements.right, epicName: epic.name })
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
-					const boundaryItemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)!.id
-					let boundaryItemParentId: string
-					let newFeatureIndex: number
-					if (getItemType(storyMapItems, boundaryItemId) === `epic`) {
-						boundaryItemParentId = boundaryItemId
-						const epic = epics.find((epic) => epic.id === boundaryItemId)!
-						newFeatureIndex = epic.childrenIds.length
-					} else {
-						const feature = features.find((feature) => feature.id === boundaryItemId)!
-						boundaryItemParentId = feature.parentId!
-						newFeatureIndex = feature.position
-					}
-					if (boundaryItemParentId === dragInfo.itemBeingDraggedId) return
+					//console.log(allEpicBounds)
+					//console.log(x)
 
-					const parent = epics.find((epic) => epic.id === boundaryItemParentId)!
-					const prevFeatureUserValue =
-						features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex - 1])?.userValue ?? 0
-					const nextFeatureUserValue =
-						features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex])?.userValue ?? 1
 
-					operationCompleteCondition.current = (storyMapItems) => {
-						const item = storyMapItems.find((item) => item.id === itemBeingDragged.id)
-						return (
-							getItemType(storyMapItems, itemBeingDragged.id) === `feature` && item?.parentId === boundaryItemParentId
-						)
+					const boundaryItem = allEpicBounds.find((bound) => x >= bound.left && x <= bound.right && bound.id !== dragInfo.itemBeingDraggedId)
+
+					let boundaryItemId: string;
+					if (boundaryItem !== undefined) {
+						boundaryItemId = boundaryItem.id
 					}
-					await Promise.all([
-						updateItem(product, storyMapItems, versions, itemBeingDragged.id, {
-							effort: 0.5,
-							userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
-							parentId: boundaryItemParentId,
-						}),
-						// Delete child features, keep grandchild stories
-						...itemBeingDragged.childrenIds.map((featureId) => deleteItem(product, storyMapItems, versions, featureId)),
-						...itemBeingDragged.childrenIds.flatMap((featureId) =>
-							stories
-								.filter((story) => story.parentId === featureId)
-								.map((story) =>
-									updateItem(product, storyMapItems, versions, story.id, { parentId: itemBeingDragged.id }),
-								),
-						),
-					])
+					else {
+						// same epic being dragged inside its boundaries - do nothing
+						return
+					}
+
+					const epic = epics.find((epic) => epic.id === boundaryItemId)!
+					const newFeatureIndex = epic.childrenIds.length
+					console.log(`I am inside: `, epic.name, `with `, newFeatureIndex, ` children`, `x: `, x, `y: `, y)
+
+					//else {
+					// 	const feature = features.find((feature) => feature.id === boundaryItemId)!
+					// 	boundaryItemParentId = feature.parentId!
+					// 	newFeatureIndex = feature.position
+					// }
+					// if (boundaryItemParentId === dragInfo.itemBeingDraggedId) return
+
+					// const parent = epics.find((epic) => epic.id === boundaryItemParentId)!
+					// const prevFeatureUserValue =
+					// 	features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex - 1])?.userValue ?? 0
+					// const nextFeatureUserValue =
+					// 	features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex])?.userValue ?? 1
+
+					// operationCompleteCondition.current = (storyMapItems) => {
+					// 	const item = storyMapItems.find((item) => item.id === itemBeingDragged.id)
+					// 	return (
+					// 		getItemType(storyMapItems, itemBeingDragged.id) === `feature` && item?.parentId === boundaryItemParentId
+					// 	)
+					// }
+					// await Promise.all([
+					// 	updateItem(product, storyMapItems, versions, itemBeingDragged.id, {
+					// 		effort: 0.5,
+					// 		userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
+					// 		parentId: boundaryItemParentId,
+					// 	}),
+					// 	// Delete child features, keep grandchild stories
+					// 	...itemBeingDragged.childrenIds.map((featureId) => deleteItem(product, storyMapItems, versions, featureId)),
+					// 	...itemBeingDragged.childrenIds.flatMap((featureId) =>
+					// 		stories
+					// 			.filter((story) => story.parentId === featureId)
+					// 			.map((story) =>
+					// 				updateItem(product, storyMapItems, versions, story.id, { parentId: itemBeingDragged.id }),
+					// 			),
+					// 	),
+					// ])
 				}
 				break
 			}
