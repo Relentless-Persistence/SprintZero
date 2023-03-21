@@ -186,15 +186,19 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 
 					const boundaryLeft =
 						prevEpicMeasurements && currentEpicMeasurements
-							? // better measurement
-							// prevEpicMeasurements.left + prevEpicMeasurements.width / 2
-							avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
+							? // better measurement - boundary does not move
+							prevEpicMeasurements.left + prevEpicMeasurements.width / 2
+							//avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
 							: -Infinity
 					const boundaryRight =
 						currentEpicMeasurements && nextEpicMeasurements
-							? //? (currentEpicMeasurements.left, nextEpicMeasurements.right)
+							?
+							//avg(currentEpicMeasurements.left, nextEpicMeasurements.right)
+							// better measurement - boundary does not move
 							nextEpicMeasurements.right - nextEpicMeasurements.width / 2
 							: Infinity
+
+					console.log(`x`, x, `bL`, boundaryLeft, boundaryRight)
 
 					if (x < boundaryLeft) {
 						operationCompleteCondition.current = (storyMapItems) => {
@@ -203,6 +207,8 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 							const prevEpicNewPos = storyMapShape.findIndex((epic) => epic.id === prevEpic!.id)
 							return currentEpicNewPos < prevEpicNewPos
 						}
+
+
 
 						await Promise.all([
 							updateItem(product, storyMapItems, versions, prevEpic!.id, { userValue: currentEpic.userValue }),

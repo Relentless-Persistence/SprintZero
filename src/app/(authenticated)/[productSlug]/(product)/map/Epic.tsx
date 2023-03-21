@@ -17,7 +17,7 @@ export type EpicProps = {
 	epicId: string
 	dragInfo: DragInfo
 	inert?: boolean
-	measures: Record<string, { left: number; right: number }>
+	measures?: Record<string, { left: number; right: number }>
 }
 
 const Epic: FC<EpicProps> = ({ epicId, dragInfo, inert = false, measures }) => {
@@ -57,12 +57,12 @@ const Epic: FC<EpicProps> = ({ epicId, dragInfo, inert = false, measures }) => {
 				<>
 					<span style={{ position: `absolute`, top: 0, left: 0 }}>
 						(
-						{measures[epicId]?.left.toFixed(0)}
+						{measures && measures[epicId]?.left.toFixed(0)}
 						)
 					</span>
 					<span style={{ position: `absolute`, top: 0, right: 0 }}>
 						(
-						{measures[epicId]?.right.toFixed(0)}
+						{measures && measures[epicId]?.right.toFixed(0)}
 						)
 					</span>
 				</>
