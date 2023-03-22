@@ -245,6 +245,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 									left: prevMeasurements.right,
 									right: featureMeasurements.left + featureMeasurements.width / 2,
 									id: featureId,
+									featureName: features.find((feature) => feature.id === featureId)?.name,
 								})
 						}
 						const prevMeasurements = allFeatureBounds.at(-1) ?? { right: -Infinity }
@@ -255,60 +256,80 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 					}
 					allFeatureBounds.at(-1)!.right = Infinity
 
-					//console.log(allEpicBounds)
+					//console.log(allFeatureBounds)
 					//console.log(x)
 
 
-					const boundaryItem = allEpicBounds.find((bound) => x >= bound.left && x <= bound.right && bound.id !== dragInfo.itemBeingDraggedId)
+					const boundaryParentItem = allEpicBounds.find((bound) => x >= bound.left && x <= bound.right && bound.id !== dragInfo.itemBeingDraggedId)
 
-					let boundaryItemId: string;
-					if (boundaryItem !== undefined) {
-						boundaryItemId = boundaryItem.id
+					let boundaryItemParentId: string;
+					if (boundaryParentItem !== undefined) {
+						boundaryItemParentId = boundaryParentItem.id
 					}
 					else {
 						// same epic being dragged inside its boundaries - do nothing
 						return
 					}
 
-					const epic = epics.find((epic) => epic.id === boundaryItemId)!
-					const newFeatureIndex = epic.childrenIds.length
-					console.log(`I am inside: `, epic.name, `with `, newFeatureIndex, ` children`, `x: `, x, `y: `, y)
+					const parent = epics.find((epic) => epic.id === boundaryItemParentId)!
 
-					//else {
-					// 	const feature = features.find((feature) => feature.id === boundaryItemId)!
-					// 	boundaryItemParentId = feature.parentId!
-					// 	newFeatureIndex = feature.position
-					// }
-					// if (boundaryItemParentId === dragInfo.itemBeingDraggedId) return
+					const boundaryItemId = allFeatureBounds.find((bound) => x >= bound.left && x <= bound.right)?.id
 
-					// const parent = epics.find((epic) => epic.id === boundaryItemParentId)!
-					// const prevFeatureUserValue =
-					// 	features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex - 1])?.userValue ?? 0
-					// const nextFeatureUserValue =
-					// 	features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex])?.userValue ?? 1
+					const feature = features.find((feature) => feature.id === boundaryItemId)!
+					// const newFeatureIndex = epic.childrenIds.length
+					const newFeatureIndex = feature.position;
 
-					// operationCompleteCondition.current = (storyMapItems) => {
-					// 	const item = storyMapItems.find((item) => item.id === itemBeingDragged.id)
-					// 	return (
-					// 		getItemType(storyMapItems, itemBeingDragged.id) === `feature` && item?.parentId === boundaryItemParentId
-					// 	)
-					// }
-					// await Promise.all([
-					// 	updateItem(product, storyMapItems, versions, itemBeingDragged.id, {
-					// 		effort: 0.5,
-					// 		userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
-					// 		parentId: boundaryItemParentId,
-					// 	}),
-					// 	// Delete child features, keep grandchild stories
-					// 	...itemBeingDragged.childrenIds.map((featureId) => deleteItem(product, storyMapItems, versions, featureId)),
-					// 	...itemBeingDragged.childrenIds.flatMap((featureId) =>
-					// 		stories
-					// 			.filter((story) => story.parentId === featureId)
-					// 			.map((story) =>
-					// 				updateItem(product, storyMapItems, versions, story.id, { parentId: itemBeingDragged.id }),
-					// 			),
-					// 	),
-					// ])
+					const prevFeature =
+						features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex - 1])
+					const nextFeature =
+						features.find((feature) => feature.id === parent.childrenIds[newFeatureIndex]);
+
+
+					const prevFeatureUserValue =
+						prevFeature?.userValue ?? 0
+					const nextFeatureUserValue =
+						nextFeature?.userValue ?? 1
+
+
+					const prevFeatureMeasurements = measurements.current[prevFeature?.id ?? ``]
+					const nextFeatureMeasurements = measurements.current[nextFeature?.id ?? ``]
+
+					const boundaryLeft =
+						prevFeatureMeasurements
+							? // better measurement - boundary does not move
+							prevFeatureMeasurements.left + prevFeatureMeasurements.width / 2
+							//avg(prevEpicMeasurements.left, currentEpicMeasurements.right)
+							: -Infinity
+					const boundaryRight =
+						nextFeatureMeasurements
+							?
+							//avg(currentEpicMeasurements.left, nextEpicMeasurements.right)
+							// better measurement - boundary does not move
+							nextFeatureMeasurements.right - nextFeatureMeasurements.width / 2
+							: Infinity
+
+					operationCompleteCondition.current = (storyMapItems) => {
+						const item = storyMapItems.find((item) => item.id === itemBeingDragged.id)
+						return (
+							getItemType(storyMapItems, itemBeingDragged.id) === `feature` && item?.parentId === boundaryItemParentId
+						)
+					}
+					await Promise.all([
+						updateItem(product, storyMapItems, versions, itemBeingDragged.id, {
+							effort: 0.5,
+							userValue: avg(prevFeatureUserValue, nextFeatureUserValue),
+							parentId: boundaryItemParentId,
+						}),
+						// Delete child features, keep grandchild stories
+						...itemBeingDragged.childrenIds.map((featureId) => deleteItem(product, storyMapItems, versions, featureId)),
+						...itemBeingDragged.childrenIds.flatMap((featureId) =>
+							stories
+								.filter((story) => story.parentId === featureId)
+								.map((story) =>
+									updateItem(product, storyMapItems, versions, story.id, { parentId: itemBeingDragged.id }),
+								),
+						),
+					])
 				}
 				break
 			}

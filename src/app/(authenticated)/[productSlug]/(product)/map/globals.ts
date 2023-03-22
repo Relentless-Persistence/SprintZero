@@ -17,4 +17,4 @@ export const layerBoundaries = [62 + storyMapTop, 156 + storyMapTop] as const
 // and can be used by other parts of the code, without overwriting any existing __elementRegistry object.
 export let elementRegistry = globalThis.__elementRegistry ?? {}
 
-export const storyMapDebugMode = true
+export const storyMapDebugMode = false
