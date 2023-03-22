@@ -52,7 +52,7 @@ const Epic: FC<EpicProps> = ({ epicId, dragInfo, inert = false, measures }) => {
 	}, [epic.name])
 
 	return (
-		<div ref={containerRef} className={storyMapDebugMode && `relative border border-dashed`}>
+		<div ref={containerRef} className={storyMapDebugMode ? `relative border border-dashed` : ``}>
 			{storyMapDebugMode &&
 				<>
 					<span style={{ position: `absolute`, top: 0, left: 0 }}>
