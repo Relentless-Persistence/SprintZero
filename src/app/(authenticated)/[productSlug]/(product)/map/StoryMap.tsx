@@ -120,8 +120,10 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 					right: containerBox.right,
 					width: containerBox.width,
 				}
+
+
 				// to depict measurements on the screen
-				setMeasures((prevMeasures) => {
+				storyMapDebugMode && setMeasures((prevMeasures) => {
 					return {
 						...prevMeasures,
 						[id]: {
@@ -554,26 +556,63 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 						const bParent = epics.find((epic) => epic.id === b.parentId)!
 						return aParent.position - bParent.position || a.position - b.position
 					})
+
+
+					// features.forEach(feature => {
+					// 	console.log(feature.name, feature.position)
+					// });
 					const allFeatureBounds: Array<{ id: string; left: number; right: number }> = []
+					let pos = 0
 					for (const feature of allFeaturesSorted) {
-						const featureMeasurements = measurements.current[feature.id]
+						const featureMeasurements = measurements.current[feature.id]!
+
+
 						const prevFeature = allFeaturesSorted[feature.position - 1]
 						const nextFeature = allFeaturesSorted[feature.position + 1]
+
+						//const prevFeature = allFeaturesSorted[feature.position - 1]
+						//const nextFeature = allFeaturesSorted[feature.position + 1]
 						const prevMeasurements = measurements.current[prevFeature?.id ?? ``] ?? {
 							right: -Infinity,
 						}
+
+						// if(prevMeasurements.right === -Infinity && pos !== 0) {
+						// 	prevMeasurements.right = featureMeasurements.left	
+						// }
+
+						// if(nextMeasurements. === -Infinity && pos !== 0) {
+						// 	prevMeasurements.right = featureMeasurements.left	
+						// }
+
 						const nextMeasurements = measurements.current[nextFeature?.id ?? ``] ?? {
 							left: Infinity,
 						}
 
+						//console.log(feature.name, featureMeasurements, prevFeature?.name, prevMeasurements, nextFeature?.name, nextMeasurements)
+
 						if (featureMeasurements)
 							allFeatureBounds.push({
-								left: prevMeasurements.right,
-								right: avg(featureMeasurements.right, nextMeasurements.left),
+								left: pos === 0 ? -Infinity : featureMeasurements.left,
+								right: pos !== allFeaturesSorted.length - 1 ? featureMeasurements.right : Infinity,
 								id: feature.id,
 							})
+
+						//console.log(allFeatureBounds)
+
+						// if (featureMeasurements)
+						// 	allFeatureBounds.push({
+						// 		left: prevMeasurements.right,
+						// 		right: avg(featureMeasurements.right, nextMeasurements.left),
+						// 		id: feature.id,
+						// 	})
+
+						pos++
 					}
+
+					//console.log(allFeaturesSorted)
 					allFeatureBounds.at(-1)!.right = Infinity
+
+					//console.log(allFeatureBounds)
 
 					const hoveringFeatureId = allFeatureBounds.find((feature) => x >= feature.left && x <= feature.right)?.id
 					const storyBeingDragged = stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
@@ -685,7 +724,9 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 			onPanEnd={onPanEnd}
 		>
 			{epics.map((epic) => (
-				<Epic key={epic.id} epicId={epic.id} dragInfo={dragInfo} measures={measures} />
+				<Epic key={epic.id} epicId={epic.id} dragInfo={dragInfo}
+					{...(storyMapDebugMode ? { measures } : {})}
+				/>
 			))}
 
 			{/* depicting story map layers in debug mode */}
@@ -726,7 +767,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 					if (!dragInfo.itemBeingDraggedId) return null
 					switch (getItemType(storyMapItems, dragInfo.itemBeingDraggedId)) {
 						case `epic`:
-							return <Epic epicId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} measures={measures} inert />
+							return <Epic epicId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} {...(storyMapDebugMode ? { measures } : {})} inert />
 						case `feature`:
 							return <Feature featureId={dragInfo.itemBeingDraggedId} dragInfo={dragInfo} inert />
 						case `story`:
