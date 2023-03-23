@@ -7,18 +7,18 @@ import {
 	PullRequestOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
-import {Menu} from "antd"
-import {usePathname} from "next/navigation"
-import {useState} from "react"
+import { Menu } from "antd"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
-import {useAppContext} from "../AppContext"
+import { useAppContext } from "../AppContext"
 import LinkTo from "~/components/LinkTo"
 
 const SideMenu: FC = () => {
 	const pathname = usePathname()
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 
 	const items = getItems(product.id)
 	const [openKey, setOpenKey] = useState<string | undefined>(
@@ -91,6 +91,10 @@ const getItems = (activeProductId: string) => [
 			{
 				key: `operations/huddle`,
 				label: <LinkTo href={`/${activeProductId}/operations/huddle`}>Huddle</LinkTo>,
+			},
+			{
+				key: `operations/performance`,
+				label: <LinkTo href={`/${activeProductId}/operations/performance`}>Performance</LinkTo>,
 			},
 			{
 				key: `operations/retrospective`,
