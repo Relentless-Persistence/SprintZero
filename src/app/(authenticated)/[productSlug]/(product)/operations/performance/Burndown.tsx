@@ -1,6 +1,5 @@
 import {
   Bar,
-  CartesianGrid,
   ComposedChart,
   Label,
   Legend,
@@ -44,7 +43,7 @@ const Burndown: FC = () => {
       name: `Page E`,
       uv: 1520,
       pv: 1108,
-      amt: 1100,
+      amt: 1100
     },
     {
       name: `Page F`,

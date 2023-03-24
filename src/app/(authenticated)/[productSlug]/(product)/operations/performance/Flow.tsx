@@ -5,17 +5,17 @@ import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 
 import { getStories } from "~/utils/storyMap"
 
-interface MonthlyData {
-  name: string,
-  releaseBacklog: number,
-  sprintBacklogDesign: number,
-  designing: number,
-  prototyping: number,
-  readyForDev: number,
-  developing: number,
-  userAcceptanceTesting: number,
-  shipped: number
-}
+// interface MonthlyData {
+//   name: string,
+//   releaseBacklog: number,
+//   sprintBacklogDesign: number,
+//   designing: number,
+//   prototyping: number,
+//   readyForDev: number,
+//   developing: number,
+//   userAcceptanceTesting: number,
+//   shipped: number
+// }
 
 export type SprintColumnProps = {
   storyMapItems: StoryMapItem[]
@@ -63,48 +63,69 @@ const Flow: FC<SprintColumnProps> = ({ storyMapItems }) => {
 
   // Group the data by month
 
-  const groupedData = story.reduce((result, item) => {
-    const updatedAt = new Date(item.updatedAt.seconds * 1000);
-    const monthName = new Intl.DateTimeFormat(`en-US`, { month: `long` }).format(updatedAt);
-    const year = updatedAt.getFullYear();
-    const key = `${monthName} ${year}`;
+  // const groupedData = story.reduce((result, item) => {
+  //   const updatedAt = new Date(item.updatedAt.seconds * 1000);
+  //   const monthName = new Intl.DateTimeFormat(`en-US`, { month: `long` }).format(updatedAt);
+  //   const year = updatedAt.getFullYear();
+  //   const key = `${monthName} ${year}`;
 
-    if (!result[key]) {
-      result[key] = {};
-    }
+  //   if (!result[key]) {
+  //     result[key] = {};
+  //   }
 
-    // Count the number of items in each sprintColumn
-    const sprintColumn = item.sprintColumn || `No sprintColumn`;
-    if (!result[key][sprintColumn]) {
-      result[key][sprintColumn] = 0;
-    }
-    result[key][sprintColumn]++;
+  //   // Count the number of items in each sprintColumn
+  //   const sprintColumn = item.sprintColumn || `No sprintColumn`;
+  //   if (!result[key][sprintColumn]) {
+  //     result[key][sprintColumn] = 0;
+  //   }
+  //   result[key][sprintColumn]++;
 
-    return result;
-  }, {});
+  //   return result;
+  // }, {});
+
+  // const groupedData = story.reduce((result, item) => {
+  //   const updatedAt = new Date(item.updatedAt.seconds * 1000);
+  //   const date = updatedAt.toDateString();
+
+  //   if (!result[date]) {
+  //     result[date] = {};
+  //   }
+
+  // Count the number of items in each sprintColumn
+  //   const sprintColumn = item.sprintColumn || `No sprintColumn`;
+  //   if (!result[date][sprintColumn]) {
+  //     result[date][sprintColumn] = 0;
+  //   }
+  //   result[date][sprintColumn]++;
+
+  //   return result;
+  // }, {});
+
+  // console.log(groupedData)
 
   // Convert the grouped data to the desired format
-  const monthlyData = Object.keys(groupedData).map((key) => {
-    const columns = groupedData[key];
-    const result: MonthlyData = {
-      name: key,
-      releaseBacklog: columns.releaseBacklog ?? 0,
-      sprintBacklogDesign: columns.sprintBacklogDesign ?? 0,
-      designing: columns.designing ?? 0,
-      prototyping: columns.prototyping ?? 0,
-      readyForDev: columns.readyForDev ?? 0,
-      developing: columns.developing ?? 0,
-      userAcceptanceTesting: columns.userAcceptanceTesting ?? 0,
-      shipped: columns.shipped ?? 0,
-    };
-    return result;
-  });
+  // const monthlyData = Object.keys(groupedData).map((key) => {
+  //   const columns = groupedData[key];
+  //   const result: MonthlyData = {
+  //     name: key,
+  //     releaseBacklog: columns.releaseBacklog ?? 0,
+  //     sprintBacklogDesign: columns.sprintBacklogDesign ?? 0,
+  //     designing: columns.designing ?? 0,
+  //     prototyping: columns.prototyping ?? 0,
+  //     readyForDev: columns.readyForDev ?? 0,
+  //     developing: columns.developing ?? 0,
+  //     userAcceptanceTesting: columns.userAcceptanceTesting ?? 0,
+  //     shipped: columns.shipped ?? 0,
+  //   };
+  //   return result;
+  // });
+
 
   return (
     <div className='mt-[26px] w-full h-full'>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={monthlyData}
+          data={data}
           margin={{
             top: 10,
             right: 30,
