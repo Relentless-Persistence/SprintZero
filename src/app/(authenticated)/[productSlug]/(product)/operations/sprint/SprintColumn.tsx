@@ -1,14 +1,14 @@
-import {Card} from "antd"
-import {sortBy} from "lodash"
+import { Card } from "antd"
+import { sortBy } from "lodash"
 
-import type {QuerySnapshot} from "firebase/firestore"
-import type {FC} from "react"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
-import type {Version} from "~/types/db/Products/Versions"
+import type { QuerySnapshot } from "firebase/firestore"
+import type { FC } from "react"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
+import type { Version } from "~/types/db/Products/Versions"
 
 import Story from "./Story"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {AllVersions, getStories} from "~/utils/storyMap"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { AllVersions, getStories } from "~/utils/storyMap"
 
 export type SprintColumnProps = {
 	columnName: string
@@ -27,7 +27,7 @@ const SprintColumn: FC<SprintColumnProps> = ({
 	currentVersionId,
 	myStoriesOnly,
 }) => {
-	const {user} = useAppContext()
+	const { user } = useAppContext()
 	const stories = sortBy(
 		getStories(storyMapItems)
 			.filter((story) => story.sprintColumn === columnName)

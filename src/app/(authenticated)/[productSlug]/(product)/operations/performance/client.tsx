@@ -1,18 +1,28 @@
 "use client"
 
 import { Breadcrumb, Select, Tabs } from "antd"
+import { collection } from "firebase/firestore"
 import { useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 
 import type { FC } from "react"
 
 import Burndown from "./Burndown"
 import Flow from "./Flow"
 import Velocity from "./Velocity"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 
 const PerformanceClientPage: FC = () => {
+  const { product } = useAppContext()
   const [currentTab, setcurrentTab] = useState<`flow` | `burndown` | `velocity`>(`flow`)
   // const [data, setData] = useState([]);
 
+  const [storyMapItems, , storyMapItemsError] = useCollection(
+    collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
+  )
+  useErrorHandler(storyMapItemsError)
 
 
 
@@ -43,7 +53,7 @@ const PerformanceClientPage: FC = () => {
             key: `flow`,
             children: (
               <div className="w-full h-[400px]">
-                <Flow />
+                {storyMapItems && <Flow storyMapItems={storyMapItems.docs.map((item) => item.data())} />}
               </div>
             ),
           },
