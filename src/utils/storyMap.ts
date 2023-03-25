@@ -229,7 +229,14 @@ export const addStory = async (
 	if (currentVersionId === AllVersions) return
 
 	const stories = getStories(storyMapItems)
+	const minUserValue =
+		stories.length > 0
+			? stories.reduce((min, story) => {
+					return story.userValue < min ? story.userValue : min
+			  }, stories[0].userValue)
+			: 1
 	const id = nanoid()
+	const newUserValue = stories.length > 0 ? minUserValue - 0.001 : 1
 	await setDoc(doc(product.ref, `StoryMapItems`, id).withConverter(StoryMapItemConverter), {
 		id,
 
@@ -255,7 +262,7 @@ export const addStory = async (
 		versionId: currentVersionId,
 
 		effort: 1,
-		userValue: 0.5,
+		userValue: newUserValue,
 		keeperIds: [],
 		...data,
 	})
@@ -273,7 +280,8 @@ export const getStories = (storyMapItems: StoryMapItem[]): StoryMapItem[] => {
 // Assumes all stories are siblings
 export const sortStories = (stories: StoryMapItem[], allVersions: QuerySnapshot<Version>): StoryMapItem[] =>
 	stories
-		.sort((a, b) => a.createdAt.toMillis() - b.createdAt.toMillis())
+		.sort((a, b) => b.userValue - a.userValue)
+		//.sort((a, b) => a.createdAt.toMillis() - b.createdAt.toMillis())
 		.sort((a, b) => {
 			const aVersion = allVersions.docs.find((version) => version.id === a.versionId)
 			const bVersion = allVersions.docs.find((version) => version.id === b.versionId)

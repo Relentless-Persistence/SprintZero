@@ -105,7 +105,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 		}
 	}, [dragInfo.mousePos])
 
-	const measurements = useRef<Record<string, { left: number; right: number; width: number }>>({})
+	const measurements = useRef<Record<string, { left: number; right: number; top: number; bottom: number; width: number }>>({})
 
 	// to depict measurements on the screen
 	const [measures, setMeasures] = useState<Record<string, { left: number; right: number }>>({})
@@ -118,6 +118,8 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 				measurements.current[id] = {
 					left: containerBox.left,
 					right: containerBox.right,
+					top: containerBox.top,
+					bottom: containerBox.bottom,
 					width: containerBox.width,
 				}
 
@@ -167,6 +169,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 		if (dragInfo.itemBeingDraggedId === undefined || !product.exists()) return
 		if (operationCompleteCondition.current) {
 			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
+			console.log(`isOperationComplete`, isOperationComplete)
 			if (isOperationComplete) operationCompleteCondition.current = undefined
 			else return
 		}
@@ -548,6 +551,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 				break
 			}
 			case `story`: {
+				console.log(operationCompleteCondition.current)
 				const itemBeingDragged = stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
 				if (y > layerBoundaries[1]) {
 					// Move story between features
@@ -616,7 +620,93 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 
 					const hoveringFeatureId = allFeatureBounds.find((feature) => x >= feature.left && x <= feature.right)?.id
 					const storyBeingDragged = stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
-					if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) return
+
+
+					//if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) return
+
+					stories.filter(story => story.parentId === hoveringFeatureId).map(story => {
+						console.log(story.name, `position`, story.position, `value`, story.userValue)
+					})
+					if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) {
+
+						//const storyMeasurements = measurements.current[storyBeingDragged.id]!
+						const allStoriesSorted = stories.sort((a, b) => a.position - b.position)
+						const allStoryBounds: Array<{ id: string; top: number; bottom: number, name: string, position?: number, parentId?: string | null }> = []
+						//console.log(allStoriesSorted.forEach(story => console.log(story.name, story.position)))
+						for (const story of allStoriesSorted) {
+							const storyMeasurements = measurements.current[story.id]!
+
+							if (storyMeasurements)
+								allStoryBounds.push({
+									top: storyMeasurements.top,
+									bottom: storyMeasurements.bottom,
+									id: story.id,
+									name: story.name,
+									position: story.position,
+									parentId: story.parentId,
+								})
+						}
+
+						//console.log(allStoryBounds)
+						const currentStory = itemBeingDragged
+						const prevStory = allStoriesSorted.filter(story => story.parentId === storyBeingDragged.parentId)[storyBeingDragged.position - 1]
+						const nextStory = allStoriesSorted.filter(story => story.parentId === storyBeingDragged.parentId)[storyBeingDragged.position + 1]
+						//const nextStory = allStoriesSorted[storyBeingDragged.position + 1]
+						//console.log(prevStory?.name, nextStory?.name)
+						const hoveringStory = allStoryBounds.find((story) => y >= story.top && y <= story.bottom)
+						const hoveringStoryId = hoveringStory?.id
+						//const storyBeingDragged = stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
+
+						//console.log(`moving inside boundary of same story??`, storyBeingDragged.id, hoveringStoryId)
+						if (!hoveringStoryId || hoveringStoryId === storyBeingDragged.id)
+							return
+
+						const boundaryTop = allStoryBounds.find((story) => story.id === prevStory?.id && story.parentId === storyBeingDragged.parentId)?.bottom ?? 0
+						const boundaryBottom = allStoryBounds.find((story) => story.id === nextStory?.id && story.parentId === storyBeingDragged.parentId)?.top ?? 0
+
+						console.log(prevStory?.name, nextStory?.name, boundaryTop, boundaryBottom, y)
+						if (prevStory && y < boundaryTop) {
+							console.log(`moving up`)
+
+
+							console.log(storyBeingDragged.userValue, prevStory.userValue)
+
+							operationCompleteCondition.current = (storyMapItems) => {
+								const item = storyMapItems.find((item) => item.id === currentStory.id)
+								if (getItemType(storyMapItems, currentStory.id) !== `story`) return false
+								return item?.userValue === prevStory.userValue
+							}
+
+
+
+							await Promise.all([
+								updateItem(product, storyMapItems, versions, prevStory.id, { userValue: storyBeingDragged.userValue }),
+								updateItem(product, storyMapItems, versions, storyBeingDragged.id, { userValue: prevStory.userValue }),
+							])
+						}
+						else if (nextStory && y > boundaryBottom) {
+							console.log(`moving down`)
+						}
+
+						// operationCompleteCondition.current = (storyMapItems) => {
+						// 	const item = storyMapItems.find((item) => item.id === storyBeingDragged.id)!
+						// 	if (getItemType(storyMapItems, storyBeingDragged.id) !== `story`) return false
+						// 	return item.id === hoveringStoryId
+						// }
+
+						// console.log(`ops done`)
+						// const prevStoryUserValue =
+						// 	stories.find((story) => story.id === allStoriesSorted[storyBeingDragged.position - 1]?.id)?.userValue ?? 0
+						// const nextStoryUserValue =
+						// 	stories.find((story) => story.id === allStoriesSorted[storyBeingDragged.position + 1]?.id)?.userValue ?? 0
+						// console.log(`prevStoryUserValue`, prevStoryUserValue)
+						// await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, { userValue: avg(prevStoryUserValue, nextStoryUserValue) })
+
+						return
+					}
+
+					console.log(`moving inside another feature`, hoveringFeatureId)
+
 
 					operationCompleteCondition.current = (storyMapItems) => {
 						const item = storyMapItems.find((item) => item.id === storyBeingDragged.id)!
