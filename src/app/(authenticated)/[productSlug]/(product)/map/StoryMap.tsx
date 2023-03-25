@@ -169,7 +169,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 		if (dragInfo.itemBeingDraggedId === undefined || !product.exists()) return
 		if (operationCompleteCondition.current) {
 			const isOperationComplete = operationCompleteCondition.current(storyMapItems)
-			console.log(`isOperationComplete`, isOperationComplete)
+			//console.log(`isOperationComplete`, isOperationComplete)
 			if (isOperationComplete) operationCompleteCondition.current = undefined
 			else return
 		}
@@ -551,7 +551,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 				break
 			}
 			case `story`: {
-				console.log(operationCompleteCondition.current)
+				//(operationCompleteCondition.current)
 				const itemBeingDragged = stories.find((story) => story.id === dragInfo.itemBeingDraggedId)!
 				if (y > layerBoundaries[1]) {
 					// Move story between features
@@ -625,7 +625,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 					//if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) return
 
 					stories.filter(story => story.parentId === hoveringFeatureId).map(story => {
-						console.log(story.name, `position`, story.position, `value`, story.userValue)
+						//console.log(story.name, `position`, story.position, `value`, story.userValue)
 					})
 					if (!hoveringFeatureId || hoveringFeatureId === storyBeingDragged.parentId) {
 
@@ -666,18 +666,11 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 
 						console.log(prevStory?.name, nextStory?.name, boundaryTop, boundaryBottom, y)
 						if (prevStory && y < boundaryTop) {
-							console.log(`moving up`)
-
-
-							console.log(storyBeingDragged.userValue, prevStory.userValue)
-
 							operationCompleteCondition.current = (storyMapItems) => {
 								const item = storyMapItems.find((item) => item.id === currentStory.id)
 								if (getItemType(storyMapItems, currentStory.id) !== `story`) return false
 								return item?.userValue === prevStory.userValue
 							}
-
-
 
 							await Promise.all([
 								updateItem(product, storyMapItems, versions, prevStory.id, { userValue: storyBeingDragged.userValue }),
@@ -685,28 +678,20 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 							])
 						}
 						else if (nextStory && y > boundaryBottom) {
-							console.log(`moving down`)
+							operationCompleteCondition.current = (storyMapItems) => {
+								const item = storyMapItems.find((item) => item.id === currentStory.id)
+								if (getItemType(storyMapItems, currentStory.id) !== `story`) return false
+								return item?.userValue === nextStory.userValue
+							}
+
+							await Promise.all([
+								updateItem(product, storyMapItems, versions, nextStory.id, { userValue: storyBeingDragged.userValue }),
+								updateItem(product, storyMapItems, versions, storyBeingDragged.id, { userValue: nextStory.userValue }),
+							])
 						}
-
-						// operationCompleteCondition.current = (storyMapItems) => {
-						// 	const item = storyMapItems.find((item) => item.id === storyBeingDragged.id)!
-						// 	if (getItemType(storyMapItems, storyBeingDragged.id) !== `story`) return false
-						// 	return item.id === hoveringStoryId
-						// }
-
-						// console.log(`ops done`)
-						// const prevStoryUserValue =
-						// 	stories.find((story) => story.id === allStoriesSorted[storyBeingDragged.position - 1]?.id)?.userValue ?? 0
-						// const nextStoryUserValue =
-						// 	stories.find((story) => story.id === allStoriesSorted[storyBeingDragged.position + 1]?.id)?.userValue ?? 0
-						// console.log(`prevStoryUserValue`, prevStoryUserValue)
-						// await updateItem(product, storyMapItems, versions, dragInfo.itemBeingDraggedId, { userValue: avg(prevStoryUserValue, nextStoryUserValue) })
 
 						return
 					}
-
-					console.log(`moving inside another feature`, hoveringFeatureId)
-
 
 					operationCompleteCondition.current = (storyMapItems) => {
 						const item = storyMapItems.find((item) => item.id === storyBeingDragged.id)!
