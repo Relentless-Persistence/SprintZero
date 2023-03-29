@@ -55,6 +55,46 @@ export const ProductSchema = z.object({
 	finalVision: z.string(),
 	productTypes: z.array(z.enum(productTypes.map(([value]) => value) as [string])),
 	valueProposition: z.string({invalid_type_error: `Required`}).min(1, `Required`).nullable(),
+
+	// Voice info
+	voice: z.object({
+		columns: z.array(
+			z.object({
+				title: z.string(),
+				dataIndex: z.string(),
+				key: z.string(),
+				editable: z.boolean(),
+			}),
+		),
+		rows: z.array(
+			z.object({
+				key: z.string().optional(),
+				col1: z.string(),
+				col2: z.string(),
+				col3: z.string(),
+			}),
+		),
+	}),
+
+	// Tone info
+	tone: z.object({
+		columns: z.array(
+			z.object({
+				title: z.string(),
+				dataIndex: z.string(),
+				key: z.string(),
+				editable: z.boolean(),
+			}),
+		),
+		rows: z.array(
+			z.object({
+				key: z.string().optional(),
+				col1: z.string(),
+				col2: z.string(),
+				col3: z.string(),
+			}),
+		),
+	}),
 })
 
 export type Product = z.infer<typeof ProductSchema>

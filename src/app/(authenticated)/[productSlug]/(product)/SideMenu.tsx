@@ -81,6 +81,10 @@ const getItems = (activeProductId: string) => [
 				key: `tactics/priorities`,
 				label: <LinkTo href={`/${activeProductId}/tactics/priorities`}>Priorities</LinkTo>,
 			},
+			{
+				key: `tactics/voice`,
+				label: <LinkTo href={`/${activeProductId}/tactics/voice`}>Voice</LinkTo>,
+			},
 		],
 	},
 	{
