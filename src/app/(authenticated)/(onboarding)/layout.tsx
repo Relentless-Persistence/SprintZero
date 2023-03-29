@@ -25,7 +25,7 @@ const OnboardingLayout: FC<OnboardingLayoutProps> = ({ children }) => {
 				<Image src="/images/logo-light.svg" alt="SprintZero logo" width={160} height={35} priority />
 				{/* <Image src="/images/logo-light.svg" alt="SprintZero logo" width={214} height={48} priority /> */}
 			</div>
-			<div className="mx-auto flex h-full max-w-7xl flex-col gap-6 p-8">
+			<div className="mx-auto flex h-full w-8/12 flex-col gap-6 p-8">
 				<div className="grow">{children}</div>
 			</div>
 		</div>

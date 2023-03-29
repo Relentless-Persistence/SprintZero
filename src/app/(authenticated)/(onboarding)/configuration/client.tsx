@@ -1,108 +1,116 @@
 "use client"
 
-import { Divider, Form, Input, Steps } from "antd";
+import { CloseCircleOutlined, LoadingOutlined } from "@ant-design/icons";
+import { Button, Divider, Form, Steps } from "antd"
+import { useState } from "react"
 
 import type { FC } from "react";
 
+import Configuration from "./Configuration"
+import CustomStepsActions from "./CustomStepsActions";
+import Finalize from "./Finalize"
+import Information from "./Information"
+import Payment from "./Payment"
+import Tier from "./Tier"
+
 interface StepData {
-    title: string;
-    description: string;
+    title: string
+    description: string,
+    status?: "process" | "wait" | "finish" | "error" | undefined,
+    icon?: JSX.Element | undefined,
 }
 
 const steps: StepData[] = [
     {
         title: `Tier`,
         description: `How many you got?`,
+        status: undefined,
+        icon: undefined
     },
     {
         title: `Information`,
         description: `Got those digits?`,
+        status: undefined,
+        icon: undefined
     },
     {
         title: `Payment`,
         description: `C.R.E.A.M`,
+        status: undefined,
+        icon: undefined
     },
     {
         title: `Finalize`,
         description: `Wrap it up B`,
+        status: undefined,
+        icon: undefined
     },
     {
         title: `Configuration`,
         description: `How you like it?`,
+        status: undefined,
+        icon: undefined
     },
-];
+]
 
 const ConfigurationPageClientPage: FC = () => {
+    const [currentStep, setCurrentStep] = useState<number>(0)
+    const [paymentStatus, setPaymentStatus] = useState(`pending`);
+    const [stepItems, setStepItems] = useState<StepData[]>(steps);
+
+    const handleNext = () => {
+        setCurrentStep(currentStep + 1)
+    }
+
+    const handlePrevious = () => {
+        setCurrentStep(currentStep - 1)
+    }
+
+    const handlePaymentStatus = (status: "process" | "wait" | "finish" | "error" | undefined) => {
+        console.log(`Payment status: ${status}`)
+        const newSteps = [...steps];
+
+        let statusIcon = undefined
+        if (status === `process`)
+            statusIcon = <LoadingOutlined />;
+        else if (status === `error`)
+            statusIcon = <CloseCircleOutlined />
+
+        newSteps[3] = {
+            ...newSteps[3],
+            status,
+            icon: undefined,
+        };
+        setStepItems(newSteps);
+    };
+
+    const stepsContent = [
+        <Tier key="tier-step" />,
+        <Information key="information-step" />,
+        <Payment key="payment-step" />,
+        <Finalize key="finalize-step" />,
+        <Configuration key="configuration-step" />,
+    ]
+
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 w-full">
             <div className="leading-normal">
                 <h1 className="text-5xl font-semibold">Sorry...but we gotta keep the lights on</h1>
                 <p className="text-lg text-textSecondary">
                     Please provide your information below so we can keep our internet overlords happy
                 </p>
             </div>
-            <Steps
-                size="small"
-                current={1}
-                items={steps}
+            <Steps size="small" current={currentStep} items={stepItems} />
+            {stepsContent[currentStep]}
+            <CustomStepsActions
+                currentStep={currentStep}
+                totalSteps={5}
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+                items={stepItems}
+                onPaymentStatus={handlePaymentStatus}
             />
-            <div className="flex">
-                <div className="w-2/6"></div>
-                <div className="w-1/6"><Divider plain>OR</Divider></div>
-                <div className="w-3/6">
-                    <Form className="mt-8" labelCol={{ span: 24 }}>
-                        <h2 className="text-lg font-semibold">Contact Information</h2>
-                        <Form.Item name="email" label="Email Address">
-                            <Input type="email" placeholder="Enter your email" />
-                        </Form.Item>
-                        <h2 className="text-lg font-semibold mt-4">Home Address</h2>
-                        <div className="flex flex-wrap mb-0">
-                            <div className="w-full md:w-1/2 mb-4 md:mb-0 pr-4">
-                                <Form.Item name="firstName" label="First Name">
-                                    <Input placeholder="Enter your first name" />
-                                </Form.Item>
-                            </div>
-                            <div className="w-full md:w-1/2 mb-4 md:mb-0 pl-4">
-                                <Form.Item name="lastName" label="Last Name">
-                                    <Input placeholder="Enter your last name" />
-                                </Form.Item>
-                            </div>
-                            <div className="w-full md:w-4/5 mb-4 md:mb-0 pr-3">
-                                <Form.Item name="streetAddress" label="Street Address">
-                                    <Input placeholder="Enter your street address" />
-                                </Form.Item>
-                            </div>
-                            <div className="w-full md:w-1/5 mb-4 md:mb-0">
-                                <Form.Item name="unit" label="Unit #">
-                                    <Input placeholder="Unit #" />
-                                </Form.Item>
-                            </div>
-                            <div className="w-full">
-                                <Form.Item name="city" label="City">
-                                    <Input type="city" placeholder="Enter your city" />
-                                </Form.Item>
-                            </div>
-                            <div className="w-3/6 pr-3">
-                                <Form.Item name="country" label="Country / Region">
-                                    <Input placeholder="Country / Region" />
-                                </Form.Item>
-                            </div>
-                            <div className="w-2/6 pr-3">
-                                <Form.Item name="state" label="State / Province">
-                                    <Input placeholder="State / Province" />
-                                </Form.Item>
-                            </div>
-                            <div className="w-1/6 pr-3">
-                                <Form.Item name="postalCode" label="Postal Code">
-                                    <Input placeholder="Postal Code" />
-                                </Form.Item>
-                            </div>
-                        </div>
-                    </Form>
-                </div>
-            </div>
         </div>
-
     )
 }
 
