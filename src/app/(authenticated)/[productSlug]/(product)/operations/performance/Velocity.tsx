@@ -1,13 +1,17 @@
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import type { FC } from "react"
-import type { Payload } from 'recharts/types/component/DefaultLegendContent';
 
 
 type Entry = {
   value: number,
   color: string,
   name: string
+}
+
+type TooltipPayload = {
+  payload: Entry[];
+  label: string;
 }
 
 const data = [
@@ -79,7 +83,7 @@ const getPercent = (value: number, total: number): string => {
   return toPercent(ratio, 2);
 };
 
-const renderTooltipContent = (o): JSX.Element => {
+const renderTooltipContent = (o: TooltipPayload): JSX.Element => {
   const { payload, label } = o;
 
   const total: number = payload.reduce((result: number, entry: Entry) => result + entry.value, 0);
