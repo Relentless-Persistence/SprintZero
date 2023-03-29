@@ -11,6 +11,33 @@ import { db } from "~/utils/firebase"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
+interface VoiceDataRow {
+  key?: string;
+  col1: string;
+  col2: string;
+  col3: string;
+}
+
+interface VoiceDataColumn {
+  title: string;
+  dataIndex: string;
+  key: string;
+  editable: boolean;
+}
+
+interface VoiceData {
+  voice: {
+    columns: VoiceDataColumn[];
+    rows: VoiceDataRow[];
+  };
+  tone: {
+    columns: VoiceDataColumn[];
+    rows: VoiceDataRow[];
+  };
+}
+interface VoiceTabProps {
+  data: VoiceData;
+}
 interface Item {
   key?: string;
   col1: string;
@@ -73,7 +100,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       toggleEdit();
       handleSave({ ...record, ...values } as Item);
     } catch (errInfo) {
-      console.log(`Save failed:`, errInfo);
+      console.error(`Save failed:`, errInfo);
     }
   };
 
@@ -116,9 +143,9 @@ interface DataType {
 
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 
-const VoiceTab: React.FC = () => {
+const VoiceTab: React.FC<VoiceTabProps> = ({ data }) => {
   const { product } = useAppContext()
-  const voiceData = product.data().voice
+  const voiceData = data.voice
 
   const dataSource: DataType[] = voiceData.rows
 
@@ -137,9 +164,12 @@ const VoiceTab: React.FC = () => {
     });
 
     await updateDoc(doc(db, `Products`, product.id), {
-      voice: {
-        columns: voiceData.columns,
-        rows: newData
+      voiceData: {
+        voice: {
+          columns: voiceData.columns,
+          rows: newData
+        },
+        tone: data.tone
       }
     })
   };
