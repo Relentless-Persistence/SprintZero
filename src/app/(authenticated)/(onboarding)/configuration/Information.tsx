@@ -1,65 +1,79 @@
-import { Divider, Form, Input } from "antd";
+import { Button, Divider, Input } from "antd"
+import { useForm } from "react-hook-form"
 
-import type { FC } from "react";
+import type { FC } from "react"
+
+import { useOnboardingContext } from "./OnboardingContext"
+import { OnboardingBillingInfo, onboardingBillingInfoSchema } from "./types"
 
 const Information: FC = () => {
+    const { register, handleSubmit } = useForm()
+    const { currentStep, setCurrentStep } = useOnboardingContext()
+
+    const handlePreviousButton = () => {
+        setCurrentStep(currentStep - 1)
+    }
+    const handleNextButton = async (data) => {
+        try {
+            //const billingInfo = onboardingBillingInfoSchema.parse(data)
+            console.log(`billingInfo`, data)
+            setCurrentStep(currentStep + 1)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
-        <div className="flex">
-            <div className="w-2/6"></div>
-            <div className="w-1/6"><Divider plain>OR</Divider></div>
-            <div className="w-3/6">
-                <Form className="mt-8" labelCol={{ span: 24 }}>
+        <>
+            <div className="flex">
+                <div className="w-2/6"></div>
+                <div className="w-1/6">
+                    <Divider plain>OR</Divider>
+                </div>
+                <div className="w-3/6">
                     <h2 className="text-lg font-semibold">Contact Information</h2>
-                    <Form.Item name="email" label="Email Address">
-                        <Input type="email" placeholder="Enter your email" />
-                    </Form.Item>
-                    <h2 className="text-lg font-semibold mt-4">Home Address</h2>
-                    <div className="flex flex-wrap mb-0">
-                        <div className="w-full md:w-1/2 mb-4 md:mb-0 pr-4">
-                            <Form.Item name="firstName" label="First Name">
-                                <Input placeholder="Enter your first name" />
-                            </Form.Item>
+                    <Input type="email" placeholder="Enter your email" {...register(`email`)} />
+                    <h2 className="mt-4 text-lg font-semibold">Home Address</h2>
+                    <div className="mb-0 flex flex-wrap">
+                        <div className="mb-4 w-full pr-4 md:mb-0 md:w-1/2">
+                            <Input placeholder="Enter your first name" {...register(`firstName`)} />
                         </div>
-                        <div className="w-full md:w-1/2 mb-4 md:mb-0 pl-4">
-                            <Form.Item name="lastName" label="Last Name">
-                                <Input placeholder="Enter your last name" />
-                            </Form.Item>
+                        <div className="mb-4 w-full pl-4 md:mb-0 md:w-1/2">
+                            <Input placeholder="Enter your last name" {...register(`lastName`)} />
                         </div>
-                        <div className="w-full md:w-4/5 mb-4 md:mb-0 pr-3">
-                            <Form.Item name="streetAddress" label="Street Address">
-                                <Input placeholder="Enter your street address" />
-                            </Form.Item>
+                        <div className="mb-4 w-full pr-3 md:mb-0 md:w-4/5">
+                            <Input placeholder="Enter your street address" {...register(`streetAddress`)} />
                         </div>
-                        <div className="w-full md:w-1/5 mb-4 md:mb-0">
-                            <Form.Item name="unit" label="Unit #">
-                                <Input placeholder="Unit #" />
-                            </Form.Item>
+                        <div className="mb-4 w-full md:mb-0 md:w-1/5">
+                            <Input placeholder="Unit #" {...register(`unitNumber`)} />
                         </div>
                         <div className="w-full">
-                            <Form.Item name="city" label="City">
-                                <Input type="city" placeholder="Enter your city" />
-                            </Form.Item>
+                            <Input type="city" placeholder="Enter your city" {...register(`city`)} />
                         </div>
                         <div className="w-3/6 pr-3">
-                            <Form.Item name="country" label="Country / Region">
-                                <Input placeholder="Country / Region" />
-                            </Form.Item>
+                            <Input placeholder="Country / Region" {...register(`country`)} />
                         </div>
                         <div className="w-2/6 pr-3">
-                            <Form.Item name="state" label="State / Province">
-                                <Input placeholder="State / Province" />
-                            </Form.Item>
+                            <Input placeholder="State / Province" {...register(`state`)} />
                         </div>
                         <div className="w-1/6 pr-3">
-                            <Form.Item name="postalCode" label="Postal Code">
-                                <Input placeholder="Postal Code" />
-                            </Form.Item>
+                            <Input placeholder="Postal Code" {...register(`postalCode`)} />
                         </div>
                     </div>
-                </Form>
+                </div>
             </div>
-        </div>
+            <div className="flex justify-between">
+                <Button className="bg-white" onClick={handlePreviousButton}>
+                    Previous
+                </Button>
+                <Button type="primary" onClick={async () => {
+                    const data = await handleSubmit(handleNextButton)();
+                }}>
+                    Next
+                </Button>
+            </div>
+        </>
     )
 }
 
-export default Information;
+export default Information

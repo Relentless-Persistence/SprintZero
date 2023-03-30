@@ -7,9 +7,10 @@ import { useState } from "react"
 import type { FC } from "react";
 
 import Configuration from "./Configuration"
-import CustomStepsActions from "./CustomStepsActions";
+import CustomStepsActions from "./CustomStepsActions"
 import Finalize from "./Finalize"
 import Information from "./Information"
+import { OnboardingContext } from "./OnboardingContext";
 import Payment from "./Payment"
 import Tier from "./Tier"
 
@@ -54,17 +55,26 @@ const steps: StepData[] = [
 ]
 
 const ConfigurationPageClientPage: FC = () => {
+    const [formData, setFormData] = useState({
+        name: ``,
+        email: ``,
+    });
+
+
+
+    // Onboarding context
+    const [tier, setTier] = useState(undefined);
+    const [billingInfo, setContactInfo] = useState(undefined);
+    const [paymentInformation, setPaymentInfo] = useState(undefined);
+
     const [currentStep, setCurrentStep] = useState<number>(0)
     const [paymentStatus, setPaymentStatus] = useState(`pending`);
     const [stepItems, setStepItems] = useState<StepData[]>(steps);
 
-    const handleNext = () => {
-        setCurrentStep(currentStep + 1)
-    }
-
-    const handlePrevious = () => {
-        setCurrentStep(currentStep - 1)
-    }
+    // const handleFormSubmit = (values: FormData) => {
+    //     console.log(`hello `, values)
+    //     setFormData({ ...values, [`step${currentStep + 1}`]: values });
+    // };
 
     const handlePaymentStatus = (status: "process" | "wait" | "finish" | "error" | undefined) => {
         console.log(`Payment status: ${status}`)
@@ -92,25 +102,44 @@ const ConfigurationPageClientPage: FC = () => {
         <Configuration key="configuration-step" />,
     ]
 
+    interface FormData {
+        name: string;
+        email: string;
+    }
+
     return (
-        <div className="flex flex-col gap-6 w-full">
-            <div className="leading-normal">
-                <h1 className="text-5xl font-semibold">Sorry...but we gotta keep the lights on</h1>
-                <p className="text-lg text-textSecondary">
-                    Please provide your information below so we can keep our internet overlords happy
-                </p>
+        <OnboardingContext.Provider
+            value={{
+                currentStep,
+                setCurrentStep,
+                tier,
+                setTier,
+                billingInfo,
+                setContactInfo,
+                paymentInformation,
+                setPaymentInfo,
+            }}
+        >
+            <div className="flex flex-col gap-6 w-full">
+                <div className="leading-normal">
+                    <h1 className="text-5xl font-semibold">Sorry...but we gotta keep the lights on</h1>
+                    <p className="text-lg text-textSecondary">
+                        Please provide your information below so we can keep our internet overlords happy
+                    </p>
+                </div>
+                <Steps size="small" current={currentStep} items={stepItems} />
+                {stepsContent[currentStep]}
+                {/* <CustomStepsActions
+                        currentStep={currentStep}
+                        totalSteps={5}
+                        onPrevious={handlePrevious}
+                        onNext={handleNext}
+                        items={stepItems}
+                        onPaymentStatus={handlePaymentStatus}
+                        formData={formData}
+                    /> */}
             </div>
-            <Steps size="small" current={currentStep} items={stepItems} />
-            {stepsContent[currentStep]}
-            <CustomStepsActions
-                currentStep={currentStep}
-                totalSteps={5}
-                onPrevious={handlePrevious}
-                onNext={handleNext}
-                items={stepItems}
-                onPaymentStatus={handlePaymentStatus}
-            />
-        </div>
+        </OnboardingContext.Provider>
     )
 }
 

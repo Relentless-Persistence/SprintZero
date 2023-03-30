@@ -1,12 +1,7 @@
-import { loadStripe } from '@stripe/stripe-js';
 import { Button } from 'antd';
 import { useState } from "react";
 
 import type { FC } from "react";
-
-// Make sure to call `loadStripe` outside of a component’s render to avoid
-// recreating the `Stripe` object on every render.
-const stripePromise = loadStripe(`pk_test_VOOyyYjgzqdm8I3SrBqmh9qY`);
 
 interface Props {
     currentStep: number;
@@ -15,6 +10,7 @@ interface Props {
     onPrevious: () => void;
     onNext: () => void;
     onPaymentStatus?: (status: "process" | "wait" | "finish" | "error" | undefined) => void;
+    formData: any;
 }
 
 interface StepData {
@@ -26,44 +22,17 @@ interface StepData {
 
 import type { PaymentIntent, Stripe } from 'stripe';
 
-const handlePay = async () => {
-    // Retrieve a Stripe instance from the stripePromise
-    const stripe: Stripe = await stripePromise;
-
-    // Create a payment intent for the customer's order
-    const { data: { client_secret } }: PaymentIntent = await stripe.paymentIntents.create({
-        amount: 1000, // amount in cents
-        currency: `usd`,
-        payment_method_types: [`card`],
-    });
-
-    // Use the client_secret to confirm the payment on the client side
-    const { error } = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-            card: {
-                number: `4242424242424242`,
-                exp_month: 12,
-                exp_year: 24,
-                cvc: `123`,
-            },
-        },
-    });
-
-    if (error) {
-        console.log(error);
-        return false
-    } else {
-        console.log(`Payment succeeded!`);
-        return true
-    }
-};
-
+import { useOnboardingContext } from './OnboardingContext';
 
 const CustomStepsActions: FC = (props: Props) => {
-    const { onPrevious, onNext, onPaymentStatus, currentStep, totalSteps } = props;
+    const { onPrevious, onNext, onPaymentStatus, currentStep, totalSteps, formData } = props;
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
+    const [] = useOnboardingContext();
+
     const isFirstStep = currentStep === 0;
+    const isSecondStep = currentStep === 1;
+    const isThirdStep = currentStep === 2;
     const isLastStep = currentStep === totalSteps - 1;
     const isFourthStep = currentStep === 3;
     const isFifthStep = currentStep === 4;
@@ -72,15 +41,31 @@ const CustomStepsActions: FC = (props: Props) => {
     const rightButtonText = isFifthStep ? `Start` : isFourthStep ? `Pay` : `Next`;
 
     const handleNextButton = async () => {
-        if (isLastStep) {
+        if (isFirstStep) {
+
+            onNext();
+        }
+        else if (isLastStep) {
             // Handle Start button click
             console.log(`Start clicked`);
         }
+        else if (isThirdStep) {
+            console.log(`formData hehe`, formData);
+
+            onNext();
+        }
         else if (isFourthStep) {
             // Handle Pay button click
+            let paymentSuccessful = false;
             setIsProcessingPayment(true);
             onPaymentStatus(`process`);
-            const paymentSuccessful = await handlePay();
+            setTimeout(() => {
+                setIsProcessingPayment(false);
+                onPaymentStatus(undefined);
+                paymentSuccessful = true;
+                onNext();
+                //onPayment();
+            }, 2000);
 
             if (paymentSuccessful) {
                 setIsProcessingPayment(false);
@@ -91,15 +76,6 @@ const CustomStepsActions: FC = (props: Props) => {
                 setIsProcessingPayment(false);
                 onPaymentStatus(`error`);
             }
-
-
-
-            // setTimeout(() => {
-            //     setIsProcessingPayment(false);
-            //     onPaymentStatus(undefined);
-            //     onNext();
-            //     //onPayment();
-            // }, 2000);
         }
         else {
             onNext();
@@ -118,10 +94,10 @@ const CustomStepsActions: FC = (props: Props) => {
 
     return (
         <div className="flex justify-between">
-            <Button className="bg-white" onClick={handlePreviousButton}>
+            <Button htmlType='submit' className="bg-white" onClick={handlePreviousButton}>
                 {leftButtonText}
             </Button>
-            <Button type="primary" onClick={handleNextButton}>
+            <Button htmlType='submit' type="primary" onClick={handleNextButton}>
                 {rightButtonText}
             </Button>
         </div>
