@@ -1,11 +1,7 @@
 import {createContext, useContext} from "react"
 
 import type {OnboardingBillingInfo, OnboardingPaymentInfo, OnboardingTier} from "./types"
-import type {QuerySnapshot} from "firebase/firestore"
 import type {Dispatch, SetStateAction} from "react"
-
-// import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
-// import type {Version} from "~/types/db/Products/Versions"
 
 export const OnboardingContext = createContext<{
 	currentStep: number
@@ -13,8 +9,8 @@ export const OnboardingContext = createContext<{
 	tier: OnboardingTier
 	setTier: Dispatch<SetStateAction<OnboardingTier>>
 	billingInfo: OnboardingBillingInfo
-	setContactInfo: Dispatch<SetStateAction<OnboardingBillingInfo>>
-	paymentInformation: OnboardingPaymentInfo
+	setBillingInfo: Dispatch<SetStateAction<OnboardingBillingInfo>>
+	paymentInfo: OnboardingPaymentInfo
 	setPaymentInfo: Dispatch<SetStateAction<OnboardingPaymentInfo>>
 }>(undefined as never)
 

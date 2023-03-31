@@ -1,8 +1,20 @@
-import { Divider, Form, Input } from "antd"
+import { Button, Divider, Form, Input } from "antd"
 
 import type { FC } from "react"
+import { useOnboardingContext } from "./OnboardingContext"
 
 const Configuration: FC = () => {
+
+    const { currentStep, setCurrentStep } = useOnboardingContext()
+    const handlePreviousButton = () => {
+        setCurrentStep(currentStep - 1)
+    }
+    const handleStartButton = async () => {
+        //setCurrentStep(currentStep + 1)
+        console.log('start clicked')
+    }
+
+
     return (
         <>
             <div className="flex">
@@ -33,6 +45,14 @@ const Configuration: FC = () => {
                         <p className="text-base text-textTertiary">Who's gonna saddle up with you?</p>
                     </div>
                 </div>
+            </div>
+            <div className="flex justify-between">
+                <Button className="bg-white" onClick={handlePreviousButton}>
+                    Previous
+                </Button>
+                <Button type="primary" onClick={handleStartButton}>
+                    Start
+                </Button>
             </div>
         </>
     )

@@ -13,14 +13,8 @@ const Information: FC = () => {
     const handlePreviousButton = () => {
         setCurrentStep(currentStep - 1)
     }
-    const handleNextButton = async (data) => {
-        try {
-            //const billingInfo = onboardingBillingInfoSchema.parse(data)
-            console.log(`billingInfo`, data)
-            setCurrentStep(currentStep + 1)
-        } catch (error) {
-            console.log(error)
-        }
+    const handleNextButton = () => {
+        setCurrentStep(currentStep + 1)
     }
 
     return (

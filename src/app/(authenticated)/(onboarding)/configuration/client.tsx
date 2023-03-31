@@ -2,8 +2,7 @@
 
 import { CloseCircleOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Steps } from "antd"
-import { useState } from "react"
-
+import { useEffect, useState } from "react"
 import type { FC } from "react";
 
 import Configuration from "./Configuration"
@@ -13,6 +12,8 @@ import Information from "./Information"
 import { OnboardingContext } from "./OnboardingContext";
 import Payment from "./Payment"
 import Tier from "./Tier"
+import CheckoutForm from "./CheckoutForm";
+import Billing from "./Billing";
 
 interface StepData {
     title: string
@@ -55,6 +56,29 @@ const steps: StepData[] = [
 ]
 
 const ConfigurationPageClientPage: FC = () => {
+
+    const [clientSecret, setClientSecret] = useState("");
+
+
+    useEffect(() => {
+        // Create PaymentIntent as soon as the page loads
+        fetch("/api/payment_intents", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items: [{ id: "xl-tshirt" }] }),
+        })
+            .then((res) => res.json())
+            .then((data) => setClientSecret(data.clientSecret));
+    }, []);
+
+    const appearance = {
+        theme: 'stripe',
+    };
+    const options = {
+        clientSecret,
+        appearance,
+    };
+
     const [formData, setFormData] = useState({
         name: ``,
         email: ``,
@@ -64,17 +88,21 @@ const ConfigurationPageClientPage: FC = () => {
 
     // Onboarding context
     const [tier, setTier] = useState(undefined);
-    const [billingInfo, setContactInfo] = useState(undefined);
-    const [paymentInformation, setPaymentInfo] = useState(undefined);
+    const [billingInfo, setBillingInfo] = useState(undefined);
+    const [paymentInfo, setPaymentInfo] = useState(undefined);
 
     const [currentStep, setCurrentStep] = useState<number>(0)
     const [paymentStatus, setPaymentStatus] = useState(`pending`);
     const [stepItems, setStepItems] = useState<StepData[]>(steps);
 
+
+
     // const handleFormSubmit = (values: FormData) => {
     //     console.log(`hello `, values)
     //     setFormData({ ...values, [`step${currentStep + 1}`]: values });
     // };
+
+
 
     const handlePaymentStatus = (status: "process" | "wait" | "finish" | "error" | undefined) => {
         console.log(`Payment status: ${status}`)
@@ -115,8 +143,8 @@ const ConfigurationPageClientPage: FC = () => {
                 tier,
                 setTier,
                 billingInfo,
-                setContactInfo,
-                paymentInformation,
+                setBillingInfo,
+                paymentInfo,
                 setPaymentInfo,
             }}
         >
@@ -127,19 +155,54 @@ const ConfigurationPageClientPage: FC = () => {
                         Please provide your information below so we can keep our internet overlords happy
                     </p>
                 </div>
+
                 <Steps size="small" current={currentStep} items={stepItems} />
                 {stepsContent[currentStep]}
-                {/* <CustomStepsActions
-                        currentStep={currentStep}
-                        totalSteps={5}
-                        onPrevious={handlePrevious}
-                        onNext={handleNext}
-                        items={stepItems}
-                        onPaymentStatus={handlePaymentStatus}
-                        formData={formData}
-                    /> */}
+
             </div>
         </OnboardingContext.Provider>
+
+
+        // <div className="flex justify-center" style={{ width: "400px" }}>
+        //     {clientSecret && (
+        //         <Elements options={options} stripe={stripePromise}>
+        //             <CheckoutForm />
+        //         </Elements>
+        //     )}
+        // </div>
+
+        // <OnboardingContext.Provider
+        //     value={{
+        //         currentStep,
+        //         setCurrentStep,
+        //         tier,
+        //         setTier,
+        //         billingInfo,
+        //         setContactInfo,
+        //         paymentInformation,
+        //         setPaymentInfo,
+        //     }}
+        // >
+        //     <div className="flex flex-col gap-6 w-full">
+        //         <div className="leading-normal">
+        //             <h1 className="text-5xl font-semibold">Sorry...but we gotta keep the lights on</h1>
+        //             <p className="text-lg text-textSecondary">
+        //                 Please provide your information below so we can keep our internet overlords happy
+        //             </p>
+        //         </div>
+        //         <Steps size="small" current={currentStep} items={stepItems} />
+        //         {stepsContent[currentStep]}
+        //         {/* <CustomStepsActions
+        //                 currentStep={currentStep}
+        //                 totalSteps={5}
+        //                 onPrevious={handlePrevious}
+        //                 onNext={handleNext}
+        //                 items={stepItems}
+        //                 onPaymentStatus={handlePaymentStatus}
+        //                 formData={formData}
+        //             /> */}
+        //     </div>
+        // </OnboardingContext.Provider>
     )
 }
 
