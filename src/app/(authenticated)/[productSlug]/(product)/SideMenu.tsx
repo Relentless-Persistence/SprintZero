@@ -116,6 +116,10 @@ const getItems = (activeProductId: string) => [
 				key: `operations/tasks`,
 				label: <LinkTo href={`/${activeProductId}/operations/tasks`}>Tasks</LinkTo>,
 			},
+			{
+				key: `operations/updates`,
+				label: <LinkTo href={`/${activeProductId}/operations/updates`}>Updates</LinkTo>,
+			},
 		],
 	},
 	{
