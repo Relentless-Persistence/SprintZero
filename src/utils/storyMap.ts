@@ -145,6 +145,7 @@ export const addEpic = async (
 		ethicsColumn: null,
 		ethicsVotes: {},
 		pageLink: null,
+		roadmap: {x: 0, y: 0},
 		sprintColumn: `releaseBacklog`,
 		updatedAt: Timestamp.now(),
 		parentId: null,

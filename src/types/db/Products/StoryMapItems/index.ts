@@ -55,6 +55,12 @@ export const StoryMapItemSchema = z.object({
 			`shipped`,
 		])
 		.default(`releaseBacklog`),
+	roadmap: z
+		.object({
+			x: z.number(),
+			y: z.number(),
+		})
+		.optional(),
 	updatedAt: timestampSchema,
 	userValue: z.number().min(0).max(1).default(0.5),
 
