@@ -1,6 +1,6 @@
 import React from "react";
 import { Typography, Card, Row, Col, Button } from "antd";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
 
@@ -42,9 +42,16 @@ const Plans = () => {
                                 <Text style={{ fontSize: "14px" }}>Per Month</Text>
                             </div>
                             <div style={{ textAlign: "center" }}>
-                                <Button onClick={() => router.push("/payment/basic")}>
+                                <form action="/api/checkout_sessions" method="POST">
+                                    <section>
+                                        <Button htmlType="submit" role="link">
+                                            Select
+                                        </Button>
+                                    </section>
+                                </form>
+                                {/* <Button onClick={() => router.push("/payment/basic")}>
                                     Select
-                                </Button>
+                                </Button> */}
                             </div>
                         </Card>
                     </Col>
