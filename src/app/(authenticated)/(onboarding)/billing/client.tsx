@@ -22,7 +22,8 @@ const PricingClientPage: FC = () => {
             {/* Add the Stripe pricing table element to the page */}
             <stripe-pricing-table
                 pricing-table-id="prctbl_1MsFVIIUry2flRTcmQWTzv9C"
-                publishable-key="pk_test_51Ji035IUry2flRTc8XUkfCQqzwcBBHiMCDLPmhJNTpDovjA7LnKQTELrmqiw6gy9eaWs973iEEDMKmKxwdj9vt4s00lcvsFZ0i">
+                publishable-key="pk_test_51Ji035IUry2flRTc8XUkfCQqzwcBBHiMCDLPmhJNTpDovjA7LnKQTELrmqiw6gy9eaWs973iEEDMKmKxwdj9vt4s00lcvsFZ0i"
+            >
             </stripe-pricing-table>
         </div>
     );
