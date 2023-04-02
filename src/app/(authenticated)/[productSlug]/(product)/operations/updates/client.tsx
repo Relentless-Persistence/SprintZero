@@ -14,7 +14,7 @@ import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 import { getEpics } from "~/utils/storyMap"
 
 
-const RoadmapClientPage: FC = () => {
+const UpdatesClientPage: FC = () => {
   const { product } = useAppContext()
   const [currentTab, setCurrentTab] = useState(`1.0`)
   const [storyMapItems, , storyMapItemsError] = useCollection(
@@ -36,10 +36,10 @@ const RoadmapClientPage: FC = () => {
         <p className="text-textTertiary">No hot sauce required but if you’re a little spicy, that’s cool too.</p>
       </div>
 
-
+      Versions
 
     </div>
   )
 }
 
-export default RoadmapClientPage
+export default UpdatesClientPage
