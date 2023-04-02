@@ -7,6 +7,7 @@ export const metadata = {
 }
 
 const ConfigurationPage: FC = () => {
+
     return <ConfigurationPageClientPage />
 }
 

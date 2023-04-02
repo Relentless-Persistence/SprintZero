@@ -29,24 +29,24 @@ const steps: StepData[] = [
         status: undefined,
         icon: undefined
     },
-    {
-        title: `Information`,
-        description: `Got those digits?`,
-        status: undefined,
-        icon: undefined
-    },
+    // {
+    //     title: `Information`,
+    //     description: `Got those digits?`,
+    //     status: undefined,
+    //     icon: undefined
+    // },
     {
         title: `Payment`,
         description: `C.R.E.A.M`,
         status: undefined,
         icon: undefined
     },
-    {
-        title: `Finalize`,
-        description: `Wrap it up B`,
-        status: undefined,
-        icon: undefined
-    },
+    // {
+    //     title: `Finalize`,
+    //     description: `Wrap it up B`,
+    //     status: undefined,
+    //     icon: undefined
+    // },
     {
         title: `Configuration`,
         description: `How you like it?`,
@@ -60,16 +60,16 @@ const ConfigurationPageClientPage: FC = () => {
     const [clientSecret, setClientSecret] = useState("");
 
 
-    useEffect(() => {
-        // Create PaymentIntent as soon as the page loads
-        fetch("/api/payment_intents", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ items: [{ id: "xl-tshirt" }] }),
-        })
-            .then((res) => res.json())
-            .then((data) => setClientSecret(data.clientSecret));
-    }, []);
+    // useEffect(() => {
+    //     // Create PaymentIntent as soon as the page loads
+    //     fetch("/api/payment_intents", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({ items: [{ id: "xl-tshirt" }] }),
+    //     })
+    //         .then((res) => res.json())
+    //         .then((data) => setClientSecret(data.clientSecret));
+    // }, []);
 
     const appearance = {
         theme: 'stripe',
@@ -124,9 +124,9 @@ const ConfigurationPageClientPage: FC = () => {
 
     const stepsContent = [
         <Tier key="tier-step" />,
-        <Information key="information-step" />,
+        // <Information key="information-step" />,
         <Payment key="payment-step" />,
-        <Finalize key="finalize-step" />,
+        // <Finalize key="finalize-step" />,
         <Configuration key="configuration-step" />,
     ]
 

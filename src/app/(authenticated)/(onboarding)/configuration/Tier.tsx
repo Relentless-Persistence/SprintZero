@@ -4,15 +4,21 @@ import type { FC } from "react"
 
 import { useOnboardingContext } from "./OnboardingContext"
 
+import React, { useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY');
+
 type PackageCardProps = {
     title: string
     price: string
     features: string[]
     selected: boolean
     onClick: () => void
+    loading: boolean
 }
 
-const PackageCard: FC<PackageCardProps> = ({ title, price, features, selected, onClick }) => {
+const PackageCard: FC<PackageCardProps> = ({ title, price, features, selected, loading, onClick }) => {
     return (
         <div className="my-24 flex items-center justify-center" style={{ height: `430px` }}>
             <div className={`mx-12 w-full ${selected ? `bg-green-500 border-green-700` : `border-gray-200 bg-white`}`}>
@@ -29,9 +35,13 @@ const PackageCard: FC<PackageCardProps> = ({ title, price, features, selected, o
                         <h2 className="mb-2">${price}</h2>
                         <span>Per Month</span>
                     </div>
-                    <Button className="mt-8" onClick={onClick}>
-                        {selected ? `Selected` : `Select`}
-                    </Button>
+                    <form action="/api/checkout_sessions" method="POST">
+                        <Button htmlType="submit" role="link" className="mt-8" onClick={onClick} disabled={loading}>
+                            {/* {selected ? `Selected` : `Select`} */}
+                            {/* {loading ? 'Loading...' : 'Checkout'} */}
+                            Checkout
+                        </Button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -54,6 +64,7 @@ const professionalPackageFeatures = [
 ]
 
 const Tier: FC = () => {
+    const [loading, setLoading] = useState(false);
     const { currentStep, setCurrentStep, tier, setTier } = useOnboardingContext()
 
     const handlePreviousButton = () => {
@@ -63,9 +74,24 @@ const Tier: FC = () => {
         setCurrentStep(currentStep + 1)
     }
 
-    const handlePackageSelect = (packageName: "basic" | "professional") => {
+    const handlePackageSelect = async (packageName: "basic" | "professional") => {
         setTier(packageName)
+        //await handleCheckout()
     }
+
+    // const handleCheckout = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const response = await fetch('/api/checkout_sessions', { method: 'POST' });
+    //         if (!response.ok) {
+    //             throw new Error('Failed to initiate checkout session');
+    //         }
+    //         window.location.href = response.url;
+    //     } catch (err) {
+    //         console.error(err);
+    //     }
+    //     setLoading(false);
+    // };
 
     return (
         <>
@@ -77,6 +103,7 @@ const Tier: FC = () => {
                         features={basicPackageFeatures}
                         selected={tier === `basic`}
                         onClick={() => handlePackageSelect(`basic`)}
+                        loading={loading}
                     />
                 </div>
                 <div className="w-full px-12 md:w-1/2 md:px-0">
@@ -86,17 +113,18 @@ const Tier: FC = () => {
                         features={professionalPackageFeatures}
                         selected={tier === `professional`}
                         onClick={() => handlePackageSelect(`professional`)}
+                        loading={loading}
                     />
                 </div>
             </div>
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
                 <Button htmlType='submit' className="bg-white" onClick={handlePreviousButton}>
                     Cancel
                 </Button>
                 <Button htmlType='submit' type="primary" onClick={handleNextButton}>
                     Next
                 </Button>
-            </div>
+            </div> */}
         </>
     )
 }
