@@ -1,10 +1,16 @@
-import type {AppProps} from "next/app"
-import type {ReactElement} from "react"
+import type { AppProps } from "next/app"
+import Script from "next/script"
+import type { ReactElement } from "react"
 
 import "../app/styles.css"
 
-const CustomApp = ({Component, pageProps}: AppProps): ReactElement | null => {
-	return <Component {...pageProps} />
+const CustomApp = ({ Component, pageProps }: AppProps): ReactElement | null => {
+	return (
+		<>
+
+			<Component {...pageProps} />
+		</>
+	)
 }
 
 export default CustomApp
