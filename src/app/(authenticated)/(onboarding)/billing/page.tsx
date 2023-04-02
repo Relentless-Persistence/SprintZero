@@ -1,4 +1,5 @@
 import Script from "next/script"
+
 import type { FC } from "react"
 
 import PricingClientPage from "./client"
@@ -10,8 +11,7 @@ export const metadata = {
 const PricingPage: FC = () => {
     return (
         <>
-            {/* <Script src="https://js.stripe.com/v3/" strategy="beforeInteractive" /> */}
-            <Script src="https://js.stripe.com/v3/" strategy="beforeInteractive" />
+            <Script async src="https://js.stripe.com/v3/pricing-table.js"></Script>
             <PricingClientPage />
         </>
     )
