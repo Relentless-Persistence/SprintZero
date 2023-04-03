@@ -7,27 +7,27 @@ import {
 	FileSearchOutlined,
 	OrderedListOutlined,
 } from "@ant-design/icons"
-import {Breadcrumb, Select, Switch, Tabs, Tag} from "antd"
+import { Breadcrumb, Select, Switch, Tabs, Tag } from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {collection, orderBy, query} from "firebase/firestore"
-import {useMemo, useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { collection, orderBy, query } from "firebase/firestore"
+import { useMemo, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 
-import type {Dayjs} from "dayjs"
-import type {FC} from "react"
+import type { Dayjs } from "dayjs"
+import type { FC } from "react"
 
 import SprintColumn from "./SprintColumn"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {StoryMapItemConverter, sprintColumns} from "~/types/db/Products/StoryMapItems"
-import {VersionConverter} from "~/types/db/Products/Versions"
-import {AllVersions} from "~/utils/storyMap"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { StoryMapItemConverter, sprintColumns } from "~/types/db/Products/StoryMapItems"
+import { VersionConverter } from "~/types/db/Products/Versions"
+import { AllVersions } from "~/utils/storyMap"
 
 dayjs.extend(relativeTime)
 
 const SprintClientPage: FC = () => {
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 	const [storyMapItems, , storyMapItemsError] = useCollection(
 		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
@@ -40,14 +40,14 @@ const SprintClientPage: FC = () => {
 	)
 	const sprints = useMemo(() => {
 		if (!product.exists()) return []
-		const sprints: Array<{startDate: string; endDate: string}> = []
+		const sprints: Array<{ startDate: string; endDate: string }> = []
 		let dateCursor = firstSprintStartDate
 		while (dateCursor.isBefore(dayjs())) {
 			const sprintStartDate = dateCursor.format(`YYYY-MM-DD`)
 			dateCursor = dateCursor.add(product.data().cadence - 1, `week`)
 			dateCursor = dateCursor.add(6, `day`)
 			const sprintEndDate = dateCursor.format(`YYYY-MM-DD`)
-			sprints.push({startDate: sprintStartDate, endDate: sprintEndDate})
+			sprints.push({ startDate: sprintStartDate, endDate: sprintEndDate })
 			dateCursor = dateCursor.add(1, `day`)
 		}
 		return sprints
@@ -64,7 +64,7 @@ const SprintClientPage: FC = () => {
 	return (
 		<div className="flex h-full flex-col gap-4">
 			<div className="mx-12 mt-8 flex flex-col gap-4">
-				<Breadcrumb items={[{title: `Operations`}, {title: `Sprint`}]} />
+				<Breadcrumb items={[{ title: `Operations` }, { title: `Sprint` }]} />
 
 				<div className="flex justify-between">
 					<div className="flex items-center gap-4">
@@ -80,7 +80,7 @@ const SprintClientPage: FC = () => {
 								value={currentVersionId}
 								onChange={(value) => setCurrentVersionId(value)}
 								options={[
-									{label: `All versions`, value: AllVersions},
+									{ label: `All versions`, value: AllVersions },
 									...versions.docs.map((version) => ({
 										label: `Version ${version.data().name}`,
 										value: version.id,

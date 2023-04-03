@@ -7,18 +7,18 @@ import {
 	PullRequestOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
-import {Menu} from "antd"
-import {usePathname} from "next/navigation"
-import {useState} from "react"
+import { Menu } from "antd"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
-import {useAppContext} from "../AppContext"
+import { useAppContext } from "../AppContext"
 import LinkTo from "~/components/LinkTo"
 
 const SideMenu: FC = () => {
 	const pathname = usePathname()
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 
 	const items = getItems(product.id)
 	const [openKey, setOpenKey] = useState<string | undefined>(
@@ -81,6 +81,14 @@ const getItems = (activeProductId: string) => [
 				key: `tactics/priorities`,
 				label: <LinkTo href={`/${activeProductId}/tactics/priorities`}>Priorities</LinkTo>,
 			},
+			{
+				key: `tactics/roadmap`,
+				label: <LinkTo href={`/${activeProductId}/tactics/roadmap`}>Roadmap</LinkTo>,
+			},
+			{
+				key: `tactics/voice`,
+				label: <LinkTo href={`/${activeProductId}/tactics/voice`}>Voice</LinkTo>,
+			},
 		],
 	},
 	{
@@ -93,6 +101,10 @@ const getItems = (activeProductId: string) => [
 				label: <LinkTo href={`/${activeProductId}/operations/huddle`}>Huddle</LinkTo>,
 			},
 			{
+				key: `operations/performance`,
+				label: <LinkTo href={`/${activeProductId}/operations/performance`}>Performance</LinkTo>,
+			},
+			{
 				key: `operations/retrospective`,
 				label: <LinkTo href={`/${activeProductId}/operations/retrospective`}>Retrospective</LinkTo>,
 			},
@@ -103,6 +115,10 @@ const getItems = (activeProductId: string) => [
 			{
 				key: `operations/tasks`,
 				label: <LinkTo href={`/${activeProductId}/operations/tasks`}>Tasks</LinkTo>,
+			},
+			{
+				key: `operations/updates`,
+				label: <LinkTo href={`/${activeProductId}/operations/updates`}>Updates</LinkTo>,
 			},
 		],
 	},

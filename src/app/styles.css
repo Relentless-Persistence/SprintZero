@@ -93,6 +93,51 @@ button.ant-btn-link {
 	font-weight: 600;
 }
 
+.editable-cell {
+	position: relative;
+}
+
+.editable-cell-value-wrap {
+	padding: 5px 12px;
+	cursor: pointer;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+	padding: 4px 11px;
+	border: 1px solid #d9d9d9;
+	border-radius: 2px;
+}
+
+#voiceTable .ant-table-row-level-0:first-child {
+	background: rgba(0, 0, 0, 0.02);
+	font-weight: bold;
+}
+
+.gradient-bg {
+	background-color: #d9f7be;
+	background-image: radial-gradient(
+		circle at top left,
+		#aee58e 0%,
+		#aee58e 20%,
+		#c5edab 20%,
+		#c5edab 40%,
+		#d9f4c6 40%,
+		#d9f4c6 60%,
+		#eaf9de 60%,
+		#eaf9de 80%,
+		#f7fdf2 80%
+	);
+}
+
+.circles-container {
+	border: 1px solid black;
+}
+
+circle {
+	stroke: black;
+	stroke-width: 1;
+}
+
 @layer base {
 	html.light {
 		--color-primary-bg: 221 227 213;

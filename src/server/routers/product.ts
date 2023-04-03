@@ -82,6 +82,124 @@ export const productRouter = router({
 					finalVision: ``,
 					productTypes: [],
 					valueProposition: null,
+
+					voiceData: {
+						voice: {
+							columns: [
+								{
+									title: `Theme A`,
+									dataIndex: `col1`,
+									key: `col1`,
+									editable: true,
+								},
+								{
+									title: `Theme B`,
+									dataIndex: `col2`,
+									key: `col2`,
+									editable: true,
+								},
+								{
+									title: `Theme C`,
+									dataIndex: `col3`,
+									key: `col3`,
+									editable: true,
+								},
+							],
+							rows: [
+								{
+									key: ``,
+									col1: `Theme A`,
+									col2: `Theme B`,
+									col3: `Theme C`,
+								},
+								{
+									key: `Concepts`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+								{
+									key: `Vocabulary`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+								{
+									key: `Verbosity`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+								{
+									key: `Grammar`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+								{
+									key: `Punctuation`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+								{
+									key: `Casing`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+							],
+						},
+
+						tone: {
+							columns: [
+								{
+									title: `Theme A`,
+									dataIndex: `col1`,
+									key: `col1`,
+									editable: true,
+								},
+								{
+									title: `Theme B`,
+									dataIndex: `col2`,
+									key: `col2`,
+									editable: true,
+								},
+								{
+									title: `Theme C`,
+									dataIndex: `col3`,
+									key: `col3`,
+									editable: true,
+								},
+							],
+							rows: [
+								{
+									key: ``,
+									col1: `Theme A`,
+									col2: `Theme B`,
+									col3: `Theme C`,
+								},
+								{
+									key: `Concepts`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+								{
+									key: `Use Cases`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+								{
+									key: `Desired Effect`,
+									col1: ``,
+									col2: ``,
+									col3: ``,
+								},
+							],
+						},
+					},
 				})
 				batch.set(product.collection(`Members`).doc(user.uid).withConverter(genAdminConverter(MemberSchema)), {
 					avatar: userAvatar,

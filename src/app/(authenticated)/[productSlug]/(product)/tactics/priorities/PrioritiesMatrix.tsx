@@ -1,12 +1,12 @@
-import {RightOutlined, UpOutlined} from "@ant-design/icons"
+import { RightOutlined, UpOutlined } from "@ant-design/icons"
 
-import type {FC, ReactNode} from "react"
+import type { FC, ReactNode } from "react"
 
 export type PrioritiesMatrixProps = {
 	children: ReactNode
 }
 
-const PrioritiesMatrix: FC<PrioritiesMatrixProps> = ({children}) => {
+const PrioritiesMatrix: FC<PrioritiesMatrixProps> = ({ children }) => {
 	return (
 		<div className="relative h-full">
 			<div className="relative h-full w-0 text-[0.6rem] text-textTertiary">
