@@ -1,20 +1,20 @@
 "use client"
 
-import {doc, getDoc} from "firebase/firestore"
-import {usePathname, useRouter} from "next/navigation"
-import {useEffect, useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
+import { doc, getDoc } from "firebase/firestore"
+import { usePathname, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useAuthState } from "react-firebase-hooks/auth"
 
-import type {FC, ReactNode} from "react"
+import type { FC, ReactNode } from "react"
 
-import {UserConverter} from "~/types/db/Users"
-import {auth, db} from "~/utils/firebase"
+import { UserConverter } from "~/types/db/Users"
+import { auth, db } from "~/utils/firebase"
 
 export type AuthenticatedLayoutProps = {
 	children: ReactNode
 }
 
-const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({children}) => {
+const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({ children }) => {
 	const router = useRouter()
 	const pathname = usePathname()
 	const [user, loading] = useAuthState(auth)

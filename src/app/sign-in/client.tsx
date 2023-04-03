@@ -96,9 +96,12 @@ const SignInClientPage: FC = () => {
 					type: `user`,
 				})
 				router.push(`/accept-terms`)
-			} else if (!user.hasAcceptedTos) {
+				//router.push(`/billing`)
+			}
+			else if (!user.hasAcceptedTos) {
 				router.push(`/accept-terms`)
-			} else {
+			}
+			else {
 				// Nothing special to do, redirect to one of their products
 
 				const members = await getDocs(
@@ -196,7 +199,7 @@ const SignInClientPage: FC = () => {
 					wrapperClassName="grow [&>.ant-spin-container]:flex [&>.ant-spin-container]:flex-col [&>.ant-spin-container]:gap-8 [&>.ant-spin-container]:h-full"
 				>
 					<div className="flex flex-col gap-2">
-						<h1 className="text-4xl font-semibold">We don't want you managing yet <i>another</i> account</h1>
+						<h1 className="text-4xl font-semibold">We don&apos;t want you managing yet <i>another</i> account</h1>
 						<p className="text-xl text-textSecondary">Log in with any service below to get started</p>
 					</div>
 

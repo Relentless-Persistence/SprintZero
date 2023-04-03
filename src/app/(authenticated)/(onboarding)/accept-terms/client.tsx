@@ -38,7 +38,7 @@ const AcceptTermsClientPage: FC = () => {
 					MemberConverter,
 				),
 			)
-			if (members.length === 0) router.push(`/product`)
+			if (members.length === 0) router.push(`/billing`)
 			else router.push(`/${members[0]!.ref.parent.parent!.id}/map`)
 		} catch (e) {
 			setHasAccepted(false)
@@ -68,11 +68,11 @@ const AcceptTermsClientPage: FC = () => {
 					<div className="flex min-w-0 flex-1 flex-col items-end gap-1">
 						<div className="flex w-full flex-1 items-center gap-3">
 							<div className="min-w-0 flex-1 text-end leading-normal">
-								<p className="font-semibold">{user.displayName}</p>
-								<p className="truncate text-sm text-textTertiary">{user.email}</p>
+								<p className="font-semibold">{user?.displayName}</p>
+								<p className="truncate text-sm text-textTertiary">{user?.email}</p>
 							</div>
 							<Avatar
-								src={user.photoURL}
+								src={user?.photoURL}
 								size={48}
 								alt="Avatar"
 								className="shrink-0 basis-auto border border-primary"

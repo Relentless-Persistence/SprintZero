@@ -47,7 +47,10 @@ export const productRouter = router({
 					userAvatar,
 				},
 			}) => {
+
+				console.log("user - 1", userIdToken)
 				const user = await authAdmin.verifyIdToken(userIdToken)
+				console.log("user - 2", user)
 
 				const slug = `${name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}`
 				const storyMapHistoryId = nanoid()

@@ -1,117 +1,232 @@
 "use client"
 
-import { Button, Input, Tag } from "antd"
-import type { FC } from "react"
-import MultipleSelection from "~/components/MultipleSelection"
+import { Button, Form, Input, Select, Space, Tag } from "antd"
+import { doc } from "firebase/firestore"
+import { useRouter } from "next/navigation"
+import { FC, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { useDocument } from "react-firebase-hooks/firestore"
+import { UserConverter } from "~/types/db/Users"
+import { auth, db } from "~/utils/firebase"
+import { trpc } from "~/utils/trpc"
+import type { SelectProps } from 'antd';
 
 const ConfigurationPageClientPage: FC = () => {
+    const router = useRouter()
+    const createProduct = trpc.product.create.useMutation()
+    const inviteUser = trpc.product.inviteUser.useMutation()
+
+    const [user, , userError] = useAuthState(auth)
+
+    console.log("A point")
+
+    useErrorHandler(userError)
+    const [dbUser, , dbUserError] = useDocument(
+        user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined,
+    )
+
+    console.log("B point")
+    useErrorHandler(dbUserError)
+
+    const [sprintLength, setSprintLength] = useState<1 | 2 | 3>(2)
+    const [sprintGate, setSprintGate] = useState<1 | 2 | 3 | 4 | 5>(2)
+    const [hasSubmitted, setHasSubmitted] = useState(false)
+
+
+    /* eslint-disable no-template-curly-in-string */
+    const validateMessages = {
+        required: '${label} is required!',
+        types: {
+            email: 'Please enter a valid email',
+        },
+    };
+
+    const productTypeOptions: SelectProps['options'] = [
+        { label: `Mobile`, value: `mobile` },
+        { label: `Tablet`, value: `tablet` },
+        { label: `Desktop`, value: `desktop` },
+        { label: `Watch`, value: `watch` },
+        { label: `Web`, value: `web` },
+        { label: `Augmented Reality`, value: `augmentedReality` },
+        { label: `Virtual Reality`, value: `virtualReality` },
+        { label: `Artificial Intelligence`, value: `artificialIntelligence` },
+        { label: `Humanoid`, value: `humanoid` },
+        { label: `API`, value: `api` },
+    ];
+
+    const onFinish = async (values: { productName: string, members: { email1: string | null, email2?: string | null, email3?: string | null } }) => {
+        if (hasSubmitted || !dbUser?.exists() || !user) return
+        setHasSubmitted(true)
+
+        const { productId } = await createProduct.mutateAsync({
+            cadence: sprintLength,
+            effortCost: null,
+            effortCostCurrencySymbol: null,
+            name: values.productName,
+            // type: values.productType,
+            sprintStartDayOfWeek: sprintGate,
+            userIdToken: await user.getIdToken(true),
+            userAvatar: user.photoURL,
+            userName: user.displayName ?? user.email ?? `Unknown User`,
+        })
+
+        let { email1, email2, email3 } = values.members
+        if (email1 === email2) email2 = null
+        if (email1 === email3) email3 = null
+        if (email2 === email3) email3 = null
+
+        for (const recipient of [email1, email2, email3]) {
+            if (!recipient) continue
+            await inviteUser.mutateAsync({
+                email: recipient,
+                productId,
+                userIdToken: await user.getIdToken(),
+                userType: `member`,
+            })
+        }
+
+        router.push(`/${productId}/map`)
+    };
+
     return (
-        <div className="">
-            <div className="flex flex-col gap-6 w-full mb-8">
-                <div className="leading-normal">
-                    <h1 className="text-4xl font-semibold">Let’s get this party started!</h1>
-                    <p className="text-base text-textSecondary">
-                        Please provide your information below so we can keep our internet overlords happy
-                    </p>
-                </div>
-            </div>
-            <div className="flex gap-4 mb-7">
-                <div className="w-1/2">
-                    <div className="leading-normal mb-2">
-                        <p className="text-lg font-medium">Product name</p>
-                        <p className="text-base text-xs text-textSecondary">What are we gonna call this thing?</p>
-                    </div>
-                    <Input placeholder="eg. Netflix, Headspace, Spotify" />
-                </div>
-                <div className="w-1/2">
-                    <div className="leading-normal mb-2">
-                        <p className="text-lg font-medium">Product type</p>
-                        <p className="text-base text-xs text-textSecondary">How will users typically access your product?</p>
-                    </div>
-                    <MultipleSelection />
-                </div>
-            </div>
-            <div className="flex">
-                <div className="leading-normal mb-2">
-                    <p className="text-lg font-medium">Team members <Tag>Optional</Tag></p>
-                    <p className="text-base text-xs text-textSecondary">Who’s gonna saddle up with you?</p>
-                </div>
-            </div>
-            <div className="flex gap-4 mb-7">
-                <div className="w-1/3">
-                    <Input addonBefore="Email" placeholder="username@domain.com" />
-                </div>
-                <div className="w-1/3">
-                    <Input addonBefore="Email" placeholder="username@domain.com" />
-                </div>
-                <div className="w-1/3">
-                    <Input addonBefore="Email" placeholder="username@domain.com" />
+        <Form
+            name="product-configuration"
+            onFinish={onFinish}
+            validateMessages={validateMessages}
+        >
 
+            <div className="">
+                <div className="flex flex-col gap-6 w-full mb-8">
+                    <div className="leading-normal">
+                        <h1 className="text-4xl font-semibold">Let’s get this party started!</h1>
+                        <p className="text-base text-textSecondary">
+                            Please provide your information below so we can keep our internet overlords happy
+                        </p>
+                    </div>
                 </div>
-            </div>
-            <div className="flex">
-                <div className="leading-normal mb-2">
-                    <p className="text-lg font-medium">Sprint length</p>
-                    <p className="text-base text-xs text-textSecondary">How many weeks does it take?</p>
-                </div>
-            </div>
-            <div className="flex gap-4 mb-7">
-                <div className="w-1/3">
-                    <Button className="w-full" disabled={false}>
-                        One week
-                    </Button>
-                </div>
-                <div className="w-1/3">
-                    <Button className="w-full" disabled={false}>
-                        One week
-                    </Button>
-                </div>
-                <div className="w-1/3">
-                    <Button className="w-full" disabled={false}>
-                        One week
-                    </Button>
+                <div className="flex gap-4 mb-7">
+                    <div className="w-1/2">
+                        <div className="leading-normal mb-2">
+                            <p className="text-lg font-medium">Product name</p>
+                            <p className="text-base text-xs text-textSecondary">What are we gonna call this thing?</p>
+                        </div>
+                        <Form.Item
+                            name="productName"
+                            rules={[{ required: true, message: 'Please input a product name' }]}
+                        >
+                            <Input placeholder="eg. Netflix, Headspace, Spotify" />
+                        </Form.Item>
 
+                    </div>
+                    <div className="w-1/2">
+                        <div className="leading-normal mb-2">
+                            <p className="text-lg font-medium">Product type</p>
+                            <p className="text-base text-xs text-textSecondary">How will users typically access your product?</p>
+                        </div>
+                        <Form.Item
+                            name="productType"
+                            rules={[{ required: true, message: 'Please select a product type' }]}
+                        >
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                style={{ width: '100%' }}
+                                placeholder="eg. Tablet, Mobile, Web"
+                                //defaultValue={['mobile', 'web']}
+                                //onChange={handleChange}
+                                options={productTypeOptions}
+                            />
+                        </Form.Item>
+                    </div>
+                </div>
+                <div className="flex">
+                    <div className="leading-normal mb-2">
+                        <p className="text-lg font-medium">Team members <Tag>Optional</Tag></p>
+                        <p className="text-base text-xs text-textSecondary">Who’s gonna saddle up with you?</p>
+                    </div>
+                </div>
+                <div className="flex gap-4 mb-7">
+                    <div className="w-1/3">
+                        <Form.Item name={['members', 'email1']} rules={[{ type: 'email' }]}>
+                            <Input addonBefore="Email" placeholder="username@domain.com" />
+                        </Form.Item>
+                    </div>
+                    <div className="w-1/3">
+                        <Form.Item name={['members', 'email2']} rules={[{ type: 'email' }]}>
+                            <Input addonBefore="Email" placeholder="username@domain.com" />
+                        </Form.Item>
+                    </div>
+                    <div className="w-1/3">
+                        <Form.Item name={['members', 'email3']} rules={[{ type: 'email' }]}>
+                            <Input addonBefore="Email" placeholder="username@domain.com" />
+                        </Form.Item>
+                    </div>
+                </div>
+                <div className="flex">
+                    <div className="leading-normal mb-2">
+                        <p className="text-lg font-medium">Sprint length</p>
+                        <p className="text-base text-xs text-textSecondary">How many weeks does it take?</p>
+                    </div>
+                </div>
+                <div className="flex gap-4 mb-7">
+                    <div className="w-1/3">
+                        <Button onClick={() => setSprintLength(1)} type={sprintLength === 1 ? `primary` : `default`} className="w-full" disabled={false}>
+                            One week
+                        </Button>
+                    </div>
+                    <div className="w-1/3">
+                        <Button onClick={() => setSprintLength(2)} type={sprintLength === 2 ? `primary` : `default`} className="w-full" disabled={false}>
+                            Two weeks
+                        </Button>
+                    </div>
+                    <div className="w-1/3">
+                        <Button onClick={() => setSprintLength(3)} type={sprintLength === 3 ? `primary` : `default`} className="w-full" disabled={false}>
+                            Three weeks
+                        </Button>
+
+                    </div>
+                </div>
+                <div className="flex">
+                    <div className="leading-normal mb-2">
+                        <p className="text-lg font-medium">Gate</p>
+                        <p className="text-base text-xs text-textSecondary">What day do you start one?</p>
+                    </div>
+                </div>
+                <div className="flex gap-4 mb-7">
+                    <div className="w-1/5">
+                        <Button onClick={() => setSprintGate(1)} type={sprintGate === 1 ? `primary` : `default`} className="w-full" disabled={false}>
+                            Monday
+                        </Button>
+                    </div>
+                    <div className="w-1/5">
+                        <Button onClick={() => setSprintGate(2)} type={sprintGate === 2 ? `primary` : `default`} className="w-full" disabled={false}>
+                            Tuesday
+                        </Button>
+                    </div>
+                    <div className="w-1/5">
+                        <Button onClick={() => setSprintGate(3)} type={sprintGate === 3 ? `primary` : `default`} className="w-full" disabled={false}>
+                            Wednesday
+                        </Button>
+                    </div>
+                    <div className="w-1/5">
+                        <Button onClick={() => setSprintGate(4)} type={sprintGate === 4 ? `primary` : `default`} className="w-full" disabled={false}>
+                            Thursday
+                        </Button>
+                    </div>
+                    <div className="w-1/5">
+                        <Button onClick={() => setSprintGate(5)} type={sprintGate === 5 ? `primary` : `default`} className="w-full" disabled={false}>
+                            Friday
+                        </Button>
+                    </div>
+                </div>
+                <div className="flex justify-end">
+                    <Button type="primary" htmlType="submit" loading={hasSubmitted}>
+                        Start
+                    </Button>
                 </div>
             </div>
-            <div className="flex">
-                <div className="leading-normal mb-2">
-                    <p className="text-lg font-medium">Gate</p>
-                    <p className="text-base text-xs text-textSecondary">What day do you start one?</p>
-                </div>
-            </div>
-            <div className="flex gap-4 mb-7">
-                <div className="w-1/5">
-                    <Button className="w-full" disabled={false}>
-                        Monday
-                    </Button>
-                </div>
-                <div className="w-1/5">
-                    <Button className="w-full" disabled={false}>
-                        Tuesday
-                    </Button>
-                </div>
-                <div className="w-1/5">
-                    <Button className="w-full" disabled={false}>
-                        Wednesday
-                    </Button>
-                </div>
-                <div className="w-1/5">
-                    <Button className="w-full" disabled={false}>
-                        Thursday
-                    </Button>
-                </div>
-                <div className="w-1/5">
-                    <Button className="w-full" disabled={false}>
-                        Friday
-                    </Button>
-                </div>
-            </div>
-            <div className="flex justify-end">
-                <Button type="primary">
-                    Start
-                </Button>
-            </div>
-        </div>
+        </Form>
     )
 }
 

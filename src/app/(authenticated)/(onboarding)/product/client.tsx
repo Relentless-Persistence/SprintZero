@@ -1,24 +1,24 @@
 "use client"
 
-import {Button} from "antd"
-import {doc} from "firebase/firestore"
-import {motion} from "framer-motion"
-import {useRouter} from "next/navigation"
-import {useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useAuthState} from "react-firebase-hooks/auth"
-import {useDocument} from "react-firebase-hooks/firestore"
+import { Button } from "antd"
+import { doc } from "firebase/firestore"
+import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { useDocument } from "react-firebase-hooks/firestore"
 
-import type {FC} from "react"
-import type {Product} from "~/types/db/Products"
+import type { FC } from "react"
+import type { Product } from "~/types/db/Products"
 
 import Slide1 from "./Slide1"
 import Slide2 from "./Slide2"
 import Slide3 from "./Slide3"
 import Slide4 from "./Slide4"
-import {UserConverter} from "~/types/db/Users"
-import {auth, db} from "~/utils/firebase"
-import {trpc} from "~/utils/trpc"
+import { UserConverter } from "~/types/db/Users"
+import { auth, db } from "~/utils/firebase"
+import { trpc } from "~/utils/trpc"
 
 type FormInputs = Pick<
 	Product,
@@ -49,7 +49,7 @@ const ProductSetupClientPage: FC = () => {
 		if (hasSubmitted || !dbUser?.exists() || !user) return
 		setHasSubmitted(true)
 
-		const {productId} = await createProduct.mutateAsync({
+		const { productId } = await createProduct.mutateAsync({
 			cadence: data.cadence,
 			effortCost: data.effortCost,
 			effortCostCurrencySymbol: data.effortCostCurrencySymbol,
@@ -60,7 +60,7 @@ const ProductSetupClientPage: FC = () => {
 			userName: user.displayName ?? user.email ?? `Unknown User`,
 		})
 
-		let {email1, email2, email3} = data
+		let { email1, email2, email3 } = data
 		if (email1 === email2) email2 = null
 		if (email1 === email3) email3 = null
 		if (email2 === email3) email3 = null
@@ -90,14 +90,14 @@ const ProductSetupClientPage: FC = () => {
 				<div className="shrink-0 basis-[calc(50%-12rem)]" />
 				<motion.div
 					className="flex h-fit w-max gap-24"
-					animate={{x: `calc(-${currentSlide} * 30rem)`}}
-					transition={{duration: 0.3, ease: [0.65, 0, 0.35, 1]}}
+					animate={{ x: `calc(-${currentSlide} * 30rem)` }}
+					transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
 				>
 					<Slide1
 						currentSlide={currentSlide}
 						setCanProceed={setCanProceed}
 						onComplete={(data) => {
-							setFormData((cur) => ({...cur, ...data}))
+							setFormData((cur) => ({ ...cur, ...data }))
 							setCurrentSlide(1)
 						}}
 					/>
@@ -105,7 +105,7 @@ const ProductSetupClientPage: FC = () => {
 						currentSlide={currentSlide}
 						setCanProceed={setCanProceed}
 						onComplete={(data) => {
-							setFormData((cur) => ({...cur, ...data}))
+							setFormData((cur) => ({ ...cur, ...data }))
 							setCurrentSlide(2)
 						}}
 					/>
@@ -113,7 +113,7 @@ const ProductSetupClientPage: FC = () => {
 						currentSlide={currentSlide}
 						setCanProceed={setCanProceed}
 						onComplete={(data) => {
-							setFormData((cur) => ({...cur, ...data}))
+							setFormData((cur) => ({ ...cur, ...data }))
 							setCurrentSlide(3)
 						}}
 					/>
@@ -121,8 +121,8 @@ const ProductSetupClientPage: FC = () => {
 						currentSlide={currentSlide}
 						setCanProceed={setCanProceed}
 						onComplete={(data) => {
-							setFormData((cur) => ({...cur, ...data}))
-							submitForm({...formData, ...data} as FormInputs).catch((err) => {
+							setFormData((cur) => ({ ...cur, ...data }))
+							submitForm({ ...formData, ...data } as FormInputs).catch((err) => {
 								setHasSubmitted(false)
 								console.error(err)
 							})
