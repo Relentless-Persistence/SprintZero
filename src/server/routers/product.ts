@@ -223,6 +223,20 @@ export const productRouter = router({
 				batch.set(product.collection(`Versions`).doc(nanoid()).withConverter(genAdminConverter(VersionSchema)), {
 					deleted: false,
 					name: `1.0`,
+					updates: {
+						changed: {
+							description: ``,
+							updatedAt: new Date().toISOString(),
+						},
+						change: {
+							description: ``,
+							updatedAt: new Date().toISOString(),
+						},
+						impact: {
+							description: ``,
+							updatedAt: new Date().toISOString(),
+						},
+					},
 				})
 				batch.set(product.collection(`Objectives`).doc(nanoid()).withConverter(genAdminConverter(ObjectiveSchema)), {
 					name: `001`,
