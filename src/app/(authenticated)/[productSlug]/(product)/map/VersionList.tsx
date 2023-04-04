@@ -1,21 +1,21 @@
 "use client"
 
-import {MinusCircleOutlined} from "@ant-design/icons"
-import {Button, Input, Tabs} from "antd"
-import {addDoc, collection, getDocs, query, where} from "firebase/firestore"
-import {useState} from "react"
+import { MinusCircleOutlined } from "@ant-design/icons"
+import { Button, Input, Tabs } from "antd"
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
+import { useState } from "react"
 
-import type {DocumentReference} from "firebase/firestore"
-import type {FC} from "react"
-import type {Version} from "~/types/db/Products/Versions"
+import type { DocumentReference } from "firebase/firestore"
+import type { FC } from "react"
+import type { Version } from "~/types/db/Products/Versions"
 
-import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {VersionConverter} from "~/types/db/Products/Versions"
-import {AllVersions} from "~/utils/storyMap"
+import { useStoryMapContext } from "./StoryMapContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { VersionConverter } from "~/types/db/Products/Versions"
+import { AllVersions } from "~/utils/storyMap"
 
 const VersionList: FC = () => {
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 	const {
 		versions,
 		currentVersionId,
@@ -53,6 +53,20 @@ const VersionList: FC = () => {
 		const data: Version = {
 			deleted: false,
 			name: newVersionInputValue,
+			updates: {
+				changed: {
+					description: ``,
+					updatedAt: new Date().toISOString(),
+				},
+				change: {
+					description: ``,
+					updatedAt: new Date().toISOString(),
+				},
+				impact: {
+					description: ``,
+					updatedAt: new Date().toISOString(),
+				},
+			},
 		}
 		return await addDoc(collection(product.ref, `Versions`).withConverter(VersionConverter), data)
 	}
@@ -106,41 +120,41 @@ const VersionList: FC = () => {
 				.concat(
 					newVersionInputValue !== undefined
 						? [
-								{
-									key: `__NEW_VERSION__`,
-									label: (
-										<Input.Group compact className="-mx-2 -my-2 w-[calc(100%+1rem)]">
-											<Input
-												size="small"
-												autoFocus
-												value={newVersionInputValue}
-												onChange={(e) => setNewVersionInputValue(e.target.value)}
-												status={isVersionValid ? `` : `error`}
-												//help={!isVersionValid && `Please enter a valid semantic version number`}
-												onPressEnter={() => {
-													if (newVersionInputValue)
-														addVersion()
-															.then((doc) => {
-																setNewVersionInputValue(undefined)
-																setCurrentVersionId(doc.id)
-															})
-															.catch(console.error)
-												}}
-												onKeyDown={(e) => {
-													if (e.key === `Escape`) setNewVersionInputValue(undefined)
-												}}
-												className="!w-12"
-											/>
-											<Button
-												size="small"
-												icon={<MinusCircleOutlined className="!mr-0" />}
-												onClick={() => setNewVersionInputValue(undefined)}
-												className="!inline-grid place-items-center !text-xs"
-											/>
-										</Input.Group>
-									),
-								},
-						  ]
+							{
+								key: `__NEW_VERSION__`,
+								label: (
+									<Input.Group compact className="-mx-2 -my-2 w-[calc(100%+1rem)]">
+										<Input
+											size="small"
+											autoFocus
+											value={newVersionInputValue}
+											onChange={(e) => setNewVersionInputValue(e.target.value)}
+											status={isVersionValid ? `` : `error`}
+											//help={!isVersionValid && `Please enter a valid semantic version number`}
+											onPressEnter={() => {
+												if (newVersionInputValue)
+													addVersion()
+														.then((doc) => {
+															setNewVersionInputValue(undefined)
+															setCurrentVersionId(doc.id)
+														})
+														.catch(console.error)
+											}}
+											onKeyDown={(e) => {
+												if (e.key === `Escape`) setNewVersionInputValue(undefined)
+											}}
+											className="!w-12"
+										/>
+										<Button
+											size="small"
+											icon={<MinusCircleOutlined className="!mr-0" />}
+											onClick={() => setNewVersionInputValue(undefined)}
+											className="!inline-grid place-items-center !text-xs"
+										/>
+									</Input.Group>
+								),
+							},
+						]
 						: [],
 				)}
 			className="h-full min-w-0 [&>.ant-tabs-nav]:w-full [&_.ant-tabs-tab-btn]:w-full"
