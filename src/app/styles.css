@@ -285,3 +285,19 @@ circle {
 		--color-bg-mask: rgb(0 0 0 / 0.45);
 	}
 }
+
+.ant-tabs-nav {
+	width: 100% !important;
+  }
+  
+  .ant-tabs-tab {
+	display: block; /* centers text inside tabs */
+	flex: 1;
+	text-align: center;
+  }
+  
+  .ant-tabs-nav > div:nth-of-type(1) {
+	display: unset !important;
+	width: 100% !important;
+  }
+  

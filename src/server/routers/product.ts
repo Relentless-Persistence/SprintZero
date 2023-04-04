@@ -242,23 +242,27 @@ export const productRouter = router({
 					},
 				})
 				batch.set(product.collection(`Objectives`).doc(nanoid()).withConverter(genAdminConverter(ObjectiveSchema)), {
-					name: `001`,
+					name: `One`,
 					statement: ``,
 				})
 				batch.set(product.collection(`Objectives`).doc(nanoid()).withConverter(genAdminConverter(ObjectiveSchema)), {
-					name: `002`,
+					name: `Two`,
 					statement: ``,
 				})
 				batch.set(product.collection(`Objectives`).doc(nanoid()).withConverter(genAdminConverter(ObjectiveSchema)), {
-					name: `003`,
+					name: `Three`,
 					statement: ``,
 				})
 				batch.set(product.collection(`Objectives`).doc(nanoid()).withConverter(genAdminConverter(ObjectiveSchema)), {
-					name: `004`,
+					name: `Four`,
 					statement: ``,
 				})
 				batch.set(product.collection(`Objectives`).doc(nanoid()).withConverter(genAdminConverter(ObjectiveSchema)), {
-					name: `005`,
+					name: `Five`,
+					statement: ``,
+				})
+				batch.set(product.collection(`Objectives`).doc(nanoid()).withConverter(genAdminConverter(ObjectiveSchema)), {
+					name: `Six`,
 					statement: ``,
 				})
 				await batch.commit()

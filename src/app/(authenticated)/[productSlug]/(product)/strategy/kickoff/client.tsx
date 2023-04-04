@@ -1,27 +1,28 @@
 "use client"
 
-import {Breadcrumb} from "antd"
-import {Timestamp, collection, doc, orderBy, query, setDoc, updateDoc, writeBatch} from "firebase/firestore"
-import {useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { Breadcrumb } from "antd"
+import { Timestamp, collection, doc, orderBy, query, setDoc, updateDoc, writeBatch } from "firebase/firestore"
+import { useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
 import EditableTextCard from "./EditableTextCard"
 import EditableTextListCard from "./EditableTextListCard"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {BusinessOutcomeConverter} from "~/types/db/Products/BusinessOutcomes"
-import {MarketLeaderConverter} from "~/types/db/Products/MarketLeaders"
-import {PersonaConverter} from "~/types/db/Products/Personas"
-import {PotentialRiskConverter} from "~/types/db/Products/PotentialRisks"
-import {UserPriorityConverter} from "~/types/db/Products/UserPriorities"
-import {db} from "~/utils/firebase"
-import {trpc} from "~/utils/trpc"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { BusinessOutcomeConverter } from "~/types/db/Products/BusinessOutcomes"
+import { MarketLeaderConverter } from "~/types/db/Products/MarketLeaders"
+import { PersonaConverter } from "~/types/db/Products/Personas"
+import { PotentialRiskConverter } from "~/types/db/Products/PotentialRisks"
+import { UserPriorityConverter } from "~/types/db/Products/UserPriorities"
+import { db } from "~/utils/firebase"
+import { trpc } from "~/utils/trpc"
+import TextareaCard from "./TextAreaCard"
 
 const KickoffClientPage: FC = () => {
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 	const [editingSection, setEditingSection] = useState<
 		| `problemStatement`
 		| `personas`
@@ -60,7 +61,7 @@ const KickoffClientPage: FC = () => {
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
 			<div className="sticky top-0 z-10 flex flex-col gap-2 bg-bgLayout pt-8 pb-6">
-				<Breadcrumb items={[{title: `Strategy`}, {title: `Kickoff`}]} />
+				<Breadcrumb items={[{ title: `Strategy` }, { title: `Kickoff` }]} />
 				<div className="leading-normal">
 					<h1 className="text-3xl font-bold">Let&apos;s Get This Party Started</h1>
 					<h2 className="text-textTertiary">Complete the cards below to inform other sections throughout the app</h2>
@@ -68,11 +69,11 @@ const KickoffClientPage: FC = () => {
 			</div>
 
 			<Masonry
-				breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
+				breakpointCols={{ default: 4, 1700: 3, 1300: 2, 1000: 1 }}
 				className="flex gap-8"
 				columnClassName="flex flex-col gap-8"
 			>
-				<EditableTextCard
+				{/* <EditableTextCard
 					title="Problem Statement"
 					text={product.data().problemStatement}
 					isEditing={editingSection === `problemStatement`}
@@ -81,11 +82,22 @@ const KickoffClientPage: FC = () => {
 					onCommit={async (text) => {
 						await updateDoc(product.ref, {problemStatement: text})
 					}}
+				/> */}
+
+				<TextareaCard
+					title="Problem Statement"
+					text={product.data().problemStatement}
+					isEditing={editingSection === `problemStatement`}
+					onEditStart={() => setEditingSection(`problemStatement`)}
+					onEditEnd={() => setEditingSection(undefined)}
+					onCommit={async (text) => {
+						await updateDoc(product.ref, { problemStatement: text })
+					}}
 				/>
 
 				<EditableTextListCard
 					title="Personas"
-					textList={personas?.docs.map((doc) => ({id: doc.id, text: doc.data().name})) ?? []}
+					textList={personas?.docs.map((doc) => ({ id: doc.id, text: doc.data().name })) ?? []}
 					isEditing={editingSection === `personas`}
 					onEditStart={() => setEditingSection(`personas`)}
 					onEditEnd={() => setEditingSection(undefined)}
@@ -106,11 +118,10 @@ const KickoffClientPage: FC = () => {
 									// Generate description asynchonously
 									gpt
 										.mutateAsync({
-											prompt: `Below is a vision statement for an app I'm building:\n\n"${
-												product.data().finalVision
-											}"\n\nDescribe the user persona "${item.text}" in a paragraph.`,
+											prompt: `Below is a vision statement for an app I'm building:\n\n"${product.data().finalVision
+												}"\n\nDescribe the user persona "${item.text}" in a paragraph.`,
 										})
-										.then(({response}) => {
+										.then(({ response }) => {
 											const description = response?.replace(/^\\n+/, ``).replace(/\\n+$/, ``)
 											updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
 												description,
@@ -125,7 +136,7 @@ const KickoffClientPage: FC = () => {
 
 				<EditableTextListCard
 					title="Business Outcomes"
-					textList={businessOutcomes?.docs.map((item) => ({id: item.id, text: item.data().text}))}
+					textList={businessOutcomes?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `businessOutcomes`}
 					onEditStart={() => setEditingSection(`businessOutcomes`)}
 					onEditEnd={() => setEditingSection(undefined)}
@@ -142,7 +153,7 @@ const KickoffClientPage: FC = () => {
 
 				<EditableTextListCard
 					title="User Priorities"
-					textList={userPriorities?.docs.map((item) => ({id: item.id, text: item.data().text}))}
+					textList={userPriorities?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `userPriorities`}
 					onEditStart={() => setEditingSection(`userPriorities`)}
 					onEditEnd={() => setEditingSection(undefined)}
@@ -159,7 +170,7 @@ const KickoffClientPage: FC = () => {
 
 				<EditableTextListCard
 					title="Potential Risks"
-					textList={potentialRisks?.docs.map((item) => ({id: item.id, text: item.data().text}))}
+					textList={potentialRisks?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `potentialRisks`}
 					onEditStart={() => setEditingSection(`potentialRisks`)}
 					onEditEnd={() => setEditingSection(undefined)}
@@ -176,7 +187,7 @@ const KickoffClientPage: FC = () => {
 
 				<EditableTextListCard
 					title="Market Leaders"
-					textList={marketLeaders?.docs.map((item) => ({id: item.id, text: item.data().text}))}
+					textList={marketLeaders?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `marketLeaders`}
 					onEditStart={() => setEditingSection(`marketLeaders`)}
 					onEditEnd={() => setEditingSection(undefined)}

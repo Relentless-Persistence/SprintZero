@@ -1,8 +1,8 @@
-import {Button, Card, Empty} from "antd"
-import {useState} from "react"
+import { Button, Card, Empty } from "antd"
+import { useState } from "react"
 
-import type {FC} from "react"
-import type {Promisable} from "type-fest"
+import type { FC } from "react"
+import type { Promisable } from "type-fest"
 
 import StretchyTextArea from "~/components/StretchyTextArea"
 
@@ -15,7 +15,7 @@ export type EditableTextCardProps = {
 	onCommit: (text: string) => Promisable<void>
 }
 
-const EditableTextCard: FC<EditableTextCardProps> = ({title, text, isEditing, onEditStart, onEditEnd, onCommit}) => {
+const EditableTextCard: FC<EditableTextCardProps> = ({ title, text, isEditing, onEditStart, onEditEnd, onCommit }) => {
 	const [textDraft, setTextDraft] = useState(text ?? ``)
 
 	return (

@@ -1,23 +1,23 @@
 "use client"
 
-import {AimOutlined, PlusOutlined} from "@ant-design/icons"
-import {Breadcrumb, Empty, FloatButton, Input, Tabs} from "antd"
-import {collection, doc, orderBy, query, updateDoc} from "firebase/firestore"
-import {useEffect, useRef, useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { AimOutlined, PlusOutlined } from "@ant-design/icons"
+import { Breadcrumb, Empty, FloatButton, Input, Tabs } from "antd"
+import { collection, doc, orderBy, query, updateDoc } from "firebase/firestore"
+import { useEffect, useRef, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
-import {useDebounce} from "react-use"
+import { useDebounce } from "react-use"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
 import ResultCard from "./ResultCard"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {ObjectiveConverter} from "~/types/db/Products/Objectives"
-import {ResultConverter} from "~/types/db/Products/Objectives/Results"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { ObjectiveConverter } from "~/types/db/Products/Objectives"
+import { ResultConverter } from "~/types/db/Products/Objectives/Results"
 
 const ObjectivesClientPage: FC = () => {
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<string | undefined>(undefined)
 
 	const [objectives, , objectivesError] = useCollection(
@@ -37,9 +37,9 @@ const ObjectivesClientPage: FC = () => {
 	const [results, , resultsError] = useCollection(
 		currentObjectiveId
 			? query(
-					collection(product.ref, `Objectives`, currentObjectiveId, `Results`),
-					orderBy(`createdAt`, `asc`),
-			  ).withConverter(ResultConverter)
+				collection(product.ref, `Objectives`, currentObjectiveId, `Results`),
+				orderBy(`createdAt`, `asc`),
+			).withConverter(ResultConverter)
 			: undefined,
 	)
 	useErrorHandler(resultsError)
@@ -73,8 +73,22 @@ const ObjectivesClientPage: FC = () => {
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="relative flex w-full flex-col gap-6 overflow-auto px-12 py-8">
-				<Breadcrumb items={[{title: `Strategy`}, {title: `Objectives`}, {title: currentObjective?.data().name}]} />
-
+				<Breadcrumb items={[{ title: `Strategy` }, { title: `Objectives` }, { title: currentObjective?.data().name }]} />
+				<div className="leading-normal">
+					<h1 className="text-4xl font-semibold">Objectives + key results</h1>
+					<p className="text-base text-textSecondary">
+						Define the measurable outcomes that will define success
+					</p>
+				</div>
+				<Tabs
+					tabPosition="top"
+					activeKey={currentObjectiveId}
+					onChange={(key) => {
+						setCurrentObjectiveId(key)
+						setStatement(objectives?.docs.find((objective) => objective.id === key)?.data().statement || ``)
+					}}
+					items={objectives?.docs.map((objective) => ({ key: objective.id, label: objective.data().name }))}
+				/>
 				{currentObjectiveId && (
 					<Input
 						addonBefore={<AimOutlined />}
@@ -89,7 +103,7 @@ const ObjectivesClientPage: FC = () => {
 
 				{currentObjectiveId && (
 					<Masonry
-						breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
+						breakpointCols={{ default: 4, 1700: 3, 1300: 2, 1000: 1 }}
 						className="flex gap-8"
 						columnClassName="flex flex-col gap-8"
 					>
@@ -133,16 +147,6 @@ const ObjectivesClientPage: FC = () => {
 					className="absolute right-12 bottom-8"
 				/>
 			</div>
-
-			<Tabs
-				tabPosition="right"
-				activeKey={currentObjectiveId}
-				onChange={(key) => {
-					setCurrentObjectiveId(key)
-					setStatement(objectives?.docs.find((objective) => objective.id === key)?.data().statement || ``)
-				}}
-				items={objectives?.docs.map((objective) => ({key: objective.id, label: objective.data().name}))}
-			/>
 		</div>
 	)
 }
