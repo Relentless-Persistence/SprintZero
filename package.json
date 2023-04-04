@@ -84,6 +84,7 @@
 		"zod": "3.21.4"
 	},
 	"devDependencies": {
+		"@types/core-js": "2.5.5",
 		"@types/react-mentions": "4.1.8"
 	}
 }
