@@ -95,12 +95,12 @@ const SignInClientPage: FC = () => {
 					preferredMusicClient: `appleMusic`,
 					type: `user`,
 				})
-				router.push(`/accept-terms`)
-				//router.push(`/billing`)
+				//router.push(`/accept-terms`)
+				router.push(`/billing`)
 			}
-			else if (!user.hasAcceptedTos) {
-				router.push(`/accept-terms`)
-			}
+			// else if (!user.hasAcceptedTos) {
+			// 	router.push(`/accept-terms`)
+			// }
 			else {
 				// Nothing special to do, redirect to one of their products
 
@@ -112,7 +112,7 @@ const SignInClientPage: FC = () => {
 					).withConverter(MemberConverter),
 				)
 				if (members.docs.length === 0) {
-					router.push(`/product`)
+					router.push(`/billing`)
 				} else {
 					const productId = members.docs[0]!.ref.parent.parent!.id
 					router.push(`/${productId}/map`)

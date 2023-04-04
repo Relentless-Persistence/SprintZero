@@ -1,15 +1,15 @@
 "use client"
 
-import {collectionGroup, query, where} from "firebase/firestore"
-import {useRouter} from "next/navigation"
-import {useEffect} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useAuthState} from "react-firebase-hooks/auth"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { collectionGroup, query, where } from "firebase/firestore"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { useCollection } from "react-firebase-hooks/firestore"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
-import {auth, db} from "~/utils/firebase"
+import { auth, db } from "~/utils/firebase"
 
 const HomePage: FC = () => {
 	const router = useRouter()
@@ -26,7 +26,7 @@ const HomePage: FC = () => {
 
 		const firstProduct = members.docs[0]?.ref.parent.parent
 		if (firstProduct) router.replace(`/${firstProduct.id}/map`)
-		else router.replace(`/product`)
+		else router.replace(`/billing`)
 	}, [members, router, user, userLoading])
 
 	return (

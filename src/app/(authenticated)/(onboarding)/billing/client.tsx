@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
 // import type * as React from 'react';
 import type { FC } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+
 
 // declare global {
 //     namespace JSX {
@@ -20,15 +21,9 @@ const PricingClientPage: FC = () => {
     const searchParams = useSearchParams();
     const session_id = searchParams?.get('session_id');
 
-    useEffect(() => {
-        // Do something with the session_id parameter
-        // ...
-
-        if (session_id) {
-            router.push(`/configuration`)
-        }
-    });
-
+    if (session_id) {
+        router.push(`/configuration`)
+    }
 
     return (
         <div className='w-full'>

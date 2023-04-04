@@ -32,10 +32,10 @@ const AuthenticatedLayout: FC<AuthenticatedLayoutProps> = ({ children }) => {
 					router.replace(`/sign-out`)
 					return
 				}
-				if (!dbUser.data().hasAcceptedTos && pathname !== `/accept-terms`) {
-					router.replace(`/accept-terms`)
-					return
-				}
+				// if (!dbUser.data().hasAcceptedTos && pathname !== `/accept-terms`) {
+				// 	router.replace(`/accept-terms`)
+				// 	return
+				// }
 				setUserCanAccessApp(true)
 			})
 			.catch(console.error)
