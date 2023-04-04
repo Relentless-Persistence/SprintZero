@@ -1,8 +1,8 @@
 "use client"
 
-import {AppleFilled, AppstoreFilled, GithubOutlined, GoogleOutlined} from "@ant-design/icons"
-import {Alert, Spin, notification} from "antd"
-import {FirebaseError} from "firebase/app"
+import { AppleFilled, AppstoreFilled, GithubOutlined, GoogleOutlined } from "@ant-design/icons"
+import { Alert, Spin, notification } from "antd"
+import { FirebaseError } from "firebase/app"
 import {
 	GithubAuthProvider,
 	GoogleAuthProvider,
@@ -13,19 +13,19 @@ import {
 	signInWithPopup,
 	signOut,
 } from "firebase/auth"
-import {collectionGroup, doc, getDoc, getDocs, query, setDoc, where} from "firebase/firestore"
+import { collectionGroup, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore"
 import Image from "next/image"
-import {useRouter, useSearchParams} from "next/navigation"
-import {useEffect, useState} from "react"
-import {useAuthState} from "react-firebase-hooks/auth"
-import {z} from "zod"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { z } from "zod"
 
-import type {AuthProvider, UserCredential} from "firebase/auth"
-import type {FC} from "react"
+import type { AuthProvider, UserCredential } from "firebase/auth"
+import type { FC } from "react"
 
-import {MemberConverter} from "~/types/db/Products/Members"
-import {UserConverter} from "~/types/db/Users"
-import {betaUsers} from "~/utils/betaUserList"
+import { MemberConverter } from "~/types/db/Products/Members"
+import { UserConverter } from "~/types/db/Users"
+import { betaUsers } from "~/utils/betaUserList"
 import {
 	appleAuthProvider,
 	auth,
@@ -34,7 +34,7 @@ import {
 	googleAuthProvider,
 	microsoftAuthProvider,
 } from "~/utils/firebase"
-import {trpc} from "~/utils/trpc"
+import { trpc } from "~/utils/trpc"
 
 const SignInClientPage: FC = () => {
 	const router = useRouter()
@@ -50,8 +50,8 @@ const SignInClientPage: FC = () => {
 	const searchParams = useSearchParams()
 	const inviteToken = searchParams?.get(`invite_token`)
 	const productName = trpc.userInvite.getProductInviteInfo.useQuery(
-		{inviteToken: inviteToken!},
-		{enabled: !!inviteToken},
+		{ inviteToken: inviteToken! },
+		{ enabled: !!inviteToken },
 	).data?.productName
 
 	const putUserOnProduct = trpc.userInvite.putUserOnProduct.useMutation()
@@ -95,10 +95,13 @@ const SignInClientPage: FC = () => {
 					preferredMusicClient: `appleMusic`,
 					type: `user`,
 				})
-				router.push(`/accept-terms`)
-			} else if (!user.hasAcceptedTos) {
-				router.push(`/accept-terms`)
-			} else {
+				//router.push(`/accept-terms`)
+				router.push(`/billing`)
+			}
+			// else if (!user.hasAcceptedTos) {
+			// 	router.push(`/accept-terms`)
+			// }
+			else {
 				// Nothing special to do, redirect to one of their products
 
 				const members = await getDocs(
@@ -109,14 +112,14 @@ const SignInClientPage: FC = () => {
 					).withConverter(MemberConverter),
 				)
 				if (members.docs.length === 0) {
-					router.push(`/product`)
+					router.push(`/billing`)
 				} else {
 					const productId = members.docs[0]!.ref.parent.parent!.id
 					router.push(`/${productId}/map`)
 				}
 			}
 		} else {
-			notification.error({message: `Sorry, you are not yet enrolled in the beta.`})
+			notification.error({ message: `Sorry, you are not yet enrolled in the beta.` })
 			await signOut(auth)
 			setHasSignedIn(false)
 		}
@@ -167,7 +170,7 @@ const SignInClientPage: FC = () => {
 							throw new Error(`Unsupported sign in method: ${signInMethod}`)
 						}
 					}
-					provider.setCustomParameters({login_hint: _tokenResponse.email})
+					provider.setCustomParameters({ login_hint: _tokenResponse.email })
 					const result = await signInWithPopup(auth, provider)
 					const user = result.user
 					const credential = OAuthProvider.credentialFromError(error)
@@ -178,7 +181,7 @@ const SignInClientPage: FC = () => {
 					throw error
 				}
 			} catch (error) {
-				notification.error({message: `An error occurred while trying to log you in.`})
+				notification.error({ message: `An error occurred while trying to log you in.` })
 				throw error
 			}
 		}
@@ -186,19 +189,21 @@ const SignInClientPage: FC = () => {
 
 	return (
 		<div className="h-full w-full px-12">
-			<div className="mx-auto flex h-full max-w-5xl flex-col gap-6 py-8">
+			<div className="flex grow flex-col items-center justify-center mt-10">
 				<Image src="/images/logo-light.svg" alt="SprintZero logo" width={214} height={48} priority />
+			</div>
+			<div className="mx-auto flex h-full max-w-5xl flex-col gap-6 py-8">
 				<Spin
 					spinning={hasSignedIn}
 					size="large"
 					wrapperClassName="grow [&>.ant-spin-container]:flex [&>.ant-spin-container]:flex-col [&>.ant-spin-container]:gap-8 [&>.ant-spin-container]:h-full"
 				>
 					<div className="flex flex-col gap-2">
-						<h1 className="text-3xl font-semibold">Authenticate Yourself Before You Wreck Yourself</h1>
-						<p className="text-xl text-textSecondary">Select a provider below to create an account</p>
+						<h1 className="text-4xl font-semibold">We don&apos;t want you managing yet <i>another</i> account</h1>
+						<p className="text-xl text-textSecondary">Log in with any service below to get started</p>
 					</div>
 
-					<div className="flex grow flex-col items-center justify-center gap-4">
+					<div className="flex flex-col items-center justify-center gap-4 mt-20">
 						<button
 							type="button"
 							className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"

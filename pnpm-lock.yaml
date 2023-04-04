@@ -16,6 +16,15 @@ dependencies:
   '@react-google-maps/api':
     specifier: 2.18.1
     version: 2.18.1(react-dom@18.2.0)(react@18.2.0)
+<<<<<<< HEAD
+=======
+  '@stripe/react-stripe-js':
+    specifier: 2.1.0
+    version: 2.1.0(@stripe/stripe-js@1.52.0)(react-dom@18.2.0)(react@18.2.0)
+  '@stripe/stripe-js':
+    specifier: 1.52.0
+    version: 1.52.0
+>>>>>>> onboarding
   '@svgr/webpack':
     specifier: 6.5.1
     version: 6.5.1
@@ -184,6 +193,12 @@ dependencies:
   sharp:
     specifier: 0.31.3
     version: 0.31.3
+<<<<<<< HEAD
+=======
+  stripe:
+    specifier: 11.16.0
+    version: 11.16.0
+>>>>>>> onboarding
   tailwindcss:
     specifier: 3.2.7
     version: 3.2.7(postcss@8.4.21)
@@ -2705,6 +2720,26 @@ packages:
     resolution: {integrity: sha512-sXo/qW2/pAcmT43VoRKOJbDOfV3cYpq3szSVfIThQXNt+E4DfKj361vaAt3c88U5tPUxzEswam7GW48PJqtKAg==}
     dev: false
 
+<<<<<<< HEAD
+=======
+  /@stripe/react-stripe-js@2.1.0(@stripe/stripe-js@1.52.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Zb6Ycrj5QuhYkvtlvvLzo+cysUyA6wkx3zWHQ7uVnHRYRM/n1jtQD6VGBrdmptC8e8PJN6L091gBCyB5P0FqmA==}
+    peerDependencies:
+      '@stripe/stripe-js': ^1.44.1
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@stripe/stripe-js': 1.52.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@stripe/stripe-js@1.52.0:
+    resolution: {integrity: sha512-Ja2VlaTf3kM5tN4Y0sC8T3ibZAnfGUU/QzMAlk/G+Adz2fF1ycTabtSkdSuVP4/adXox8NkPPV4Xndx/EP4fMg==}
+    dev: false
+
+>>>>>>> onboarding
   /@svgr/babel-plugin-add-jsx-attribute@6.5.1(@babel/core@7.21.4):
     resolution: {integrity: sha512-9PYGcXrAxitycIjRmZB+Q0JaN07GZIWaTBIGQzfaZv+qr1n8X1XUEJ5rZ/vx6OVD9RRYlrNnXWExQXcmZeD/BQ==}
     engines: {node: '>=10'}
@@ -10082,6 +10117,17 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
+<<<<<<< HEAD
+=======
+  /stripe@11.16.0:
+    resolution: {integrity: sha512-Ej1ZtbrMw+Z7L8Kxj80sDNF0E/lPypY2nwymU/wGcOjn7CppTa2HXxPTsQRQ8U0MSVRcwRWyGMrizQWuaUqVGw==}
+    engines: {node: '>=12.*'}
+    dependencies:
+      '@types/node': 18.15.3
+      qs: 6.11.1
+    dev: false
+
+>>>>>>> onboarding
   /stubs@3.0.0:
     resolution: {integrity: sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==}
     dev: false

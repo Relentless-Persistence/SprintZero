@@ -234,7 +234,7 @@ export const addStory = async (
 		stories.length > 0
 			? stories.reduce((min, story) => {
 					return story.userValue < min ? story.userValue : min
-			  }, stories[0].userValue)
+			  }, stories[0]!.userValue)
 			: 1
 	const id = nanoid()
 	const newUserValue = stories.length > 0 ? minUserValue - 0.001 : 1
