@@ -1,4 +1,4 @@
-import { Button, Card, Empty } from "antd"
+import { Button, Card, Empty, Input } from "antd"
 import { useState } from "react"
 
 import type { FC } from "react"
@@ -25,7 +25,8 @@ const TextareaCard: FC<TextareaCardProps> = ({ title, text, isEditing, onEditSta
 			onClick={(e) => e.stopPropagation()}
 		>
 			{
-				<StretchyTextArea value={textDraft} onChange={(e) => setTextDraft(e.target.value)}
+				<Input.TextArea autoSize={{ minRows: 2, maxRows: 5 }}
+					value={textDraft} onChange={(e) => setTextDraft(e.target.value)}
 					onBlur={() => {
 						Promise.resolve(onCommit(textDraft)).catch(console.error)
 					}}

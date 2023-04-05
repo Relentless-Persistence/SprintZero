@@ -1,6 +1,6 @@
 "use client"
 
-import { Breadcrumb } from "antd"
+import { Breadcrumb, Card, Input } from "antd"
 import { Timestamp, collection, doc, orderBy, query, setDoc, updateDoc, writeBatch } from "firebase/firestore"
 import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
@@ -19,7 +19,10 @@ import { PotentialRiskConverter } from "~/types/db/Products/PotentialRisks"
 import { UserPriorityConverter } from "~/types/db/Products/UserPriorities"
 import { db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
-import TextareaCard from "./TextAreaCard"
+import TextareaCard from "./TextareaCard"
+import TextListCard from "./TextListCard"
+import TextListEditor from "~/components/TextListEditor"
+import { CloseCircleFilled, CloseCircleOutlined } from "@ant-design/icons"
 
 const KickoffClientPage: FC = () => {
 	const { product } = useAppContext()
@@ -63,13 +66,15 @@ const KickoffClientPage: FC = () => {
 			<div className="sticky top-0 z-10 flex flex-col gap-2 bg-bgLayout pt-8 pb-6">
 				<Breadcrumb items={[{ title: `Strategy` }, { title: `Kickoff` }]} />
 				<div className="leading-normal">
-					<h1 className="text-3xl font-bold">Let&apos;s Get This Party Started</h1>
-					<h2 className="text-textTertiary">Complete the cards below to inform other sections throughout the app</h2>
+					<h1 className="text-4xl font-semibold">Let’s get this party started!</h1>
+					<p className="text-base text-textSecondary">
+						What are the stakeholders trying to accomplish?
+					</p>
 				</div>
 			</div>
 
 			<Masonry
-				breakpointCols={{ default: 4, 1700: 3, 1300: 2, 1000: 1 }}
+				breakpointCols={{ default: 3, 1700: 2, 1300: 2, 1000: 1 }}
 				className="flex gap-8"
 				columnClassName="flex flex-col gap-8"
 			>
@@ -95,7 +100,24 @@ const KickoffClientPage: FC = () => {
 					}}
 				/>
 
-				<EditableTextListCard
+				<Card
+					type="inner"
+					title="Problem Statement"
+				>
+
+					{['1.', '2.', '3.', '4.', '5.'].map((input, index) => (
+						<Input className="mb-3"
+							key={index}
+							prefix={input}
+							suffix={
+								<CloseCircleOutlined />
+							}
+						/>
+					))}
+					{/* <TextListEditor textList={draftTextList} onChange={setDraftTextList} /> */}
+				</Card>
+
+				{/* <TextListCard
 					title="Personas"
 					textList={personas?.docs.map((doc) => ({ id: doc.id, text: doc.data().name })) ?? []}
 					isEditing={editingSection === `personas`}
@@ -132,9 +154,9 @@ const KickoffClientPage: FC = () => {
 							}),
 						)
 					}}
-				/>
+				/> */}
 
-				<EditableTextListCard
+				<TextListCard
 					title="Business Outcomes"
 					textList={businessOutcomes?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `businessOutcomes`}
