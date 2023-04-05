@@ -102,7 +102,7 @@ const KickoffClientPage: FC = () => {
 
 				<Card
 					type="inner"
-					title="Problem Statement"
+					title="Personas"
 				>
 
 					{['1.', '2.', '3.', '4.', '5.'].map((input, index) => (
@@ -163,17 +163,37 @@ const KickoffClientPage: FC = () => {
 					onEditStart={() => setEditingSection(`businessOutcomes`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						const batch = writeBatch(db)
-						textList.forEach((item) => {
-							batch.update(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
-								text: item.text,
-							})
-						})
-						await batch.commit()
+						console.log('saving to db')
+						await Promise.all(
+							textList.map(async (item) => {
+								if (businessOutcomes?.docs.some((doc) => doc.id === item.id)) {
+									console.log('updating doc')
+									await updateDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
+										text: item.text,
+									}).catch(console.error)
+								} else {
+									console.log('setting doc')
+									await setDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
+										createdAt: Timestamp.now(),
+										text: item.text,
+									}).catch(console.error)
+								}
+							}),
+						)
 					}}
+				// onCommit={async (textList) => {
+				// 	console.log(textList)
+				// 	const batch = writeBatch(db)
+				// 	textList.forEach((item) => {
+				// 		batch.update(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
+				// 			text: item.text,
+				// 		})
+				// 	})
+				// 	await batch.commit()
+				// }}
 				/>
 
-				<EditableTextListCard
+				<TextListCard
 					title="User Priorities"
 					textList={userPriorities?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `userPriorities`}
@@ -190,7 +210,7 @@ const KickoffClientPage: FC = () => {
 					}}
 				/>
 
-				<EditableTextListCard
+				<TextListCard
 					title="Potential Risks"
 					textList={potentialRisks?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `potentialRisks`}
@@ -207,7 +227,7 @@ const KickoffClientPage: FC = () => {
 					}}
 				/>
 
-				<EditableTextListCard
+				<TextListCard
 					title="Market Leaders"
 					textList={marketLeaders?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
 					isEditing={editingSection === `marketLeaders`}

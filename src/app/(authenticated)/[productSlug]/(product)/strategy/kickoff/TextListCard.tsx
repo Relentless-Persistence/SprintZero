@@ -1,5 +1,5 @@
 import { Button, Card, Empty, Input, Space } from "antd"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import type { FC } from "react"
 import type { Promisable } from "type-fest"
@@ -24,21 +24,33 @@ const TextListCard: FC<TextListCardProps> = ({
 	onEditEnd,
 	onCommit,
 }) => {
+	console.log("receiving textList:", textList)
 	const [draftTextList, setDraftTextList] = useState<Array<{ id: string; text: string }>>([])
+
+	// useEffect(() => {
+	// 	if (textList) {
+	// 		setDraftTextList(textList)
+	// 	}
+
+	// }, [textList])
 
 	return (
 		<Card
 			type="inner"
 			title={title}
-			onBlur={() => {
-				Promise.resolve(onCommit(draftTextList.filter((item) => item.text.trim() !== ``)))
-					.then(() => {
-						onEditEnd()
-					})
-					.catch(console.error)
-			}}
 		>
-			<TextListEditor textList={draftTextList} onChange={setDraftTextList} />
+			<TextListEditor textList={draftTextList} onChange={
+				setDraftTextList
+			}
+
+				onBlur={() => {
+					Promise.resolve(onCommit(draftTextList.filter((item) => item.text.trim() !== ``)))
+						.then(() => {
+							onEditEnd()
+						})
+						.catch(console.error)
+				}}
+			/>
 		</Card>
 	)
 }
