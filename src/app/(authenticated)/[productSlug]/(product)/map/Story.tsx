@@ -1,17 +1,18 @@
-import {MinusCircleOutlined} from "@ant-design/icons"
+import { MinusCircleOutlined } from "@ant-design/icons"
 import clsx from "clsx"
-import {doc, updateDoc} from "firebase/firestore"
-import {motion, useAnimationFrame} from "framer-motion"
-import {useEffect, useRef, useState} from "react"
+import { doc, updateDoc } from "firebase/firestore"
+import { motion, useAnimationFrame } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
-import type {DragInfo} from "./types"
-import type {FC} from "react"
+import type { DragInfo } from "./types"
+import type { FC } from "react"
 
-import {elementRegistry} from "./globals"
-import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import { elementRegistry } from "./globals"
+import { useStoryMapContext } from "./StoryMapContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import StoryDrawer from "~/components/StoryDrawer"
-import {updateItem} from "~/utils/storyMap"
+import { updateItem } from "~/utils/storyMap"
+import { trpc } from "~/utils/trpc"
 
 export type StoryProps = {
 	storyId: string
@@ -19,9 +20,10 @@ export type StoryProps = {
 	inert?: boolean
 }
 
-const Story: FC<StoryProps> = ({storyId, dragInfo, inert = false}) => {
-	const {product} = useAppContext()
-	const {storyMapItems, versions, editMode, setItemsToBeDeleted} = useStoryMapContext()
+const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
+	const { product } = useAppContext()
+	const { storyMapItems, versions, editMode, setItemsToBeDeleted } = useStoryMapContext()
+	const genStoryDesc = trpc.gpt4.useMutation()
 
 	const story = storyMapItems.find((story) => story.id === storyId)!
 	// const feature = storyMapItems.find((feature) => feature.id === story.parentId)!
@@ -35,6 +37,31 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, inert = false}) => {
 				content: contentRef.current ?? undefined,
 			}
 	})
+
+	// ScrumGenie: Generate a user story description
+	const sgGenUserStory = async () => {
+		const storyName = localStoryName
+		const feature = storyMapItems.find((item) => item.id === story.parentId)
+		const featureName = feature?.name
+		const epicName = storyMapItems.find((item) => item.id === feature?.parentId)?.name
+
+		const newStoryDescRaw = await genStoryDesc.mutateAsync({
+			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName}". And the feature belongs to an epic called "${epicName}". And the user story has a short name "${storyName}" Your output should include only one sentence.`,
+		})
+
+		console.log(newStoryDescRaw)
+
+		const newStoryDesc = newStoryDescRaw.response
+			?.split(`\n`)
+			.map((s) => s.replace(/^[0-9]+\. */, ``))
+			.filter((s) => s !== ``)[0]
+
+		console.log(newStoryDesc)
+
+		if (!story.description && newStoryDesc) {
+			updateItem(product, storyMapItems, versions, story.id, { description: newStoryDesc }).catch(console.error)
+		}
+	}
 
 	const version = versions.docs.find((version) => version.id === story.versionId)
 
@@ -80,15 +107,17 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, inert = false}) => {
 								onFocus={(e) => e.target.select()}
 								onBlur={() => {
 									if (localStoryName !== ``)
-										updateDoc(doc(product.ref, `StoryMapItems`, storyId), {initialRenameDone: true}).catch(
+										updateDoc(doc(product.ref, `StoryMapItems`, storyId), { initialRenameDone: true }).catch(
 											console.error,
 										)
 								}}
 								onKeyDown={(e) => {
-									if (e.key === `Enter`)
-										updateDoc(doc(product.ref, `StoryMapItems`, storyId), {initialRenameDone: true}).catch(
+									if (e.key === `Enter`) {
+										updateDoc(doc(product.ref, `StoryMapItems`, storyId), { initialRenameDone: true }).catch(
 											console.error,
 										)
+										sgGenUserStory()
+									}
 								}}
 								className={clsx(
 									`absolute inset-0 w-full rounded-sm bg-bgContainer px-0.5 outline-none`,
@@ -99,7 +128,7 @@ const Story: FC<StoryProps> = ({storyId, dragInfo, inert = false}) => {
 								onChange={(e) => {
 									setLocalStoryName(e.target.value)
 									if (e.target.value === ``) return
-									updateItem(product, storyMapItems, versions, story.id, {name: e.target.value}).catch(console.error)
+									updateItem(product, storyMapItems, versions, story.id, { name: e.target.value }).catch(console.error)
 								}}
 								onPointerDownCapture={(e) => e.stopPropagation()}
 							/>

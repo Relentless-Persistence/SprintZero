@@ -31,6 +31,21 @@ export const appRouter = router({
 			response: response.data.choices[0]?.text,
 		}
 	}),
+	gpt4: procedure.input(z.object({prompt: z.string()})).mutation(async ({input: {prompt}}) => {
+		const response = await openai.createChatCompletion({
+			model: `gpt-4`,
+			messages: [{"role": "assistant", "content": prompt}],
+			//prompt,
+			// temperature: 0.8,
+			// max_tokens: 3000,
+			// top_p: 0.8,
+			// frequency_penalty: 1,
+			// presence_penalty: 0,
+		})
+		return {
+			response: response.data.choices[0]?.message?.content
+		}
+	}),
 	migrateSchema: procedure.mutation(async () => {
 		const users = await dbAdmin.collection(`Users`).get()
 		// const storyMapItems = await dbAdmin.collectionGroup(`StoryMapItems`).get()
