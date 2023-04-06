@@ -49,6 +49,15 @@ export const ProductSchema = z.object({
 			z.boolean(),
 			z.boolean(),
 		]),
+		mobile: z.tuple([
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+			z.boolean(),
+		]),
 	}),
 
 	// Vision info

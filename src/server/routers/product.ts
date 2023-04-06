@@ -77,6 +77,7 @@ export const productRouter = router({
 						physical: [false, false, false, false, false],
 						speech: [false, false],
 						visual: [false, false, false, false, false, false, false, false],
+						mobile: [false, false, false, false, false, false, false],
 					},
 
 					finalVision: ``,

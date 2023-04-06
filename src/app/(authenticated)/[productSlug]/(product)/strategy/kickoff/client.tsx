@@ -76,7 +76,7 @@ const KickoffClientPage: FC = () => {
 			<Masonry
 				breakpointCols={{ default: 3, 1700: 2, 1300: 2, 1000: 1 }}
 				className="flex gap-8"
-				columnClassName="flex flex-col gap-8"
+				columnClassName="flex flex-col gap-5"
 			>
 				{/* <EditableTextCard
 					title="Problem Statement"
