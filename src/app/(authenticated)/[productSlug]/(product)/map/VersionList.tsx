@@ -1,7 +1,7 @@
 "use client"
 
 import { MinusCircleOutlined } from "@ant-design/icons"
-import { Button, Input, Tabs } from "antd"
+import { Button, Input, Tabs, Tag } from "antd"
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
 import { useState } from "react"
 
@@ -12,7 +12,7 @@ import type { Version } from "~/types/db/Products/Versions"
 import { useStoryMapContext } from "./StoryMapContext"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { VersionConverter } from "~/types/db/Products/Versions"
-import { AllVersions } from "~/utils/storyMap"
+import { AllVersions, getStories } from "~/utils/storyMap"
 
 const VersionList: FC = () => {
 	const { product } = useAppContext()
@@ -71,6 +71,13 @@ const VersionList: FC = () => {
 		return await addDoc(collection(product.ref, `Versions`).withConverter(VersionConverter), data)
 	}
 
+	const stories = getStories(storyMapItems)
+
+	const storyLength = (id: string) => {
+		const story = stories.filter(story => story.versionId === id)
+		return story.length
+	}
+
 	return (
 		<Tabs
 			tabPosition="right"
@@ -84,8 +91,11 @@ const VersionList: FC = () => {
 				.map((version) => ({
 					key: version.id,
 					label: (
-						<div className="flex w-full justify-between gap-1">
-							<p className="overflow-hidden truncate">{version.data().name}</p>
+						<div className="flex justify-between">
+							<div className="flex items-center justify-between space-x-3">
+								<p className="overflow-hidden truncate">{version.data().name}</p>
+								<Tag className="text-right">{storyLength(version.id)}</Tag>
+							</div>
 							{editMode && (
 								<button
 									type="button"
