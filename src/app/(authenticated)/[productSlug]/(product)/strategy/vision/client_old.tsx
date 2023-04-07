@@ -1,43 +1,43 @@
 "use client"
 
-import {zodResolver} from "@hookform/resolvers/zod"
-import {Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline} from "antd"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Breadcrumb, Button, Card, Empty, Skeleton, Steps, Tag, Timeline } from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {diffArrays} from "diff"
-import {Timestamp, collection, doc, writeBatch} from "firebase/firestore"
-import {nanoid} from "nanoid"
-import {useEffect, useRef, useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
-import {useForm} from "react-hook-form"
-import {z} from "zod"
+import { diffArrays } from "diff"
+import { Timestamp, collection, doc, writeBatch } from "firebase/firestore"
+import { nanoid } from "nanoid"
+import { useEffect, useRef, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
 import RhfTextListEditor from "~/components/rhf/RhfTextListEditor"
-import {ProductSchema, productTypes as productTypesEnum} from "~/types/db/Products"
-import {FeatureConverter, FeatureSchema} from "~/types/db/Products/Features"
-import {MemberConverter} from "~/types/db/Products/Members"
-import {VisionUpdateConverter} from "~/types/db/Products/VisionUpdates"
-import {db} from "~/utils/firebase"
-import {trpc} from "~/utils/trpc"
+import { ProductSchema, productTypes as productTypesEnum } from "~/types/db/Products"
+import { FeatureConverter, FeatureSchema } from "~/types/db/Products/Features"
+import { MemberConverter } from "~/types/db/Products/Members"
+import { VisionUpdateConverter } from "~/types/db/Products/VisionUpdates"
+import { db } from "~/utils/firebase"
+import { trpc } from "~/utils/trpc"
 
 dayjs.extend(relativeTime)
 
 const formSchema = z.object({
 	productTypes: ProductSchema.shape.productTypes,
 	valueProposition: ProductSchema.shape.valueProposition.unwrap(),
-	features: z.array(z.object({id: z.string(), text: FeatureSchema.shape.text})),
+	features: z.array(z.object({ id: z.string(), text: FeatureSchema.shape.text })),
 	finalVision: ProductSchema.shape.finalVision,
 })
 type FormInputs = z.infer<typeof formSchema>
 
 const VisionsClientPage: FC = () => {
-	const {product, user} = useAppContext()
+	const { product, user } = useAppContext()
 
 	const [editMode, setEditMode] = useState(false)
 	const [currentStep, setCurrentStep] = useState(0)
@@ -54,7 +54,7 @@ const VisionsClientPage: FC = () => {
 		watch,
 		setValue,
 		trigger,
-		formState: {errors},
+		formState: { errors },
 	} = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
@@ -67,8 +67,8 @@ const VisionsClientPage: FC = () => {
 			reset({
 				productTypes: product.data().productTypes,
 				valueProposition: product.data().valueProposition ?? ``,
-				features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
-					{id: nanoid(), text: ``},
+				features: dbFeatures?.docs.map((feature) => ({ id: feature.id, text: feature.data().text })) ?? [
+					{ id: nanoid(), text: `` },
 				],
 				finalVision: product.data().finalVision,
 			})
@@ -109,7 +109,7 @@ const VisionsClientPage: FC = () => {
 		<div className="grid h-full grid-cols-[2fr_16rem] gap-8">
 			<div className="ml-12 mt-8 overflow-auto" ref={scrollerRef}>
 				<div id="heading" className="sticky top-0 z-10 flex flex-col gap-2 bg-bgLayout pb-6">
-					<Breadcrumb items={[{title: `Strategy`}, {title: `Vision`}]} />
+					<Breadcrumb items={[{ title: `Strategy` }, { title: `Vision` }]} />
 					<div className="leading-normal">
 						<h1 className="text-3xl font-bold">Vision Statement</h1>
 						<p className="text-textTertiary">
@@ -139,16 +139,16 @@ const VisionsClientPage: FC = () => {
 												disabled={currentStep !== 0}
 												className="w-full"
 												options={[
-													{label: `Mobile`, value: `mobile`},
-													{label: `Tablet`, value: `tablet`},
-													{label: `Desktop`, value: `desktop`},
-													{label: `Watch`, value: `watch`},
-													{label: `Web`, value: `web`},
-													{label: `Augmented Reality`, value: `augmentedReality`},
-													{label: `Virtual Reality`, value: `virtualReality`},
-													{label: `Artificial Intelligence`, value: `artificialIntelligence`},
-													{label: `Humanoid`, value: `humanoid`},
-													{label: `API`, value: `api`},
+													{ label: `Mobile`, value: `mobile` },
+													{ label: `Tablet`, value: `tablet` },
+													{ label: `Desktop`, value: `desktop` },
+													{ label: `Watch`, value: `watch` },
+													{ label: `Web`, value: `web` },
+													{ label: `Augmented Reality`, value: `augmentedReality` },
+													{ label: `Virtual Reality`, value: `virtualReality` },
+													{ label: `Artificial Intelligence`, value: `artificialIntelligence` },
+													{ label: `Humanoid`, value: `humanoid` },
+													{ label: `API`, value: `api` },
 												]}
 											/>
 
@@ -309,32 +309,9 @@ const VisionsClientPage: FC = () => {
 															if (product.data().valueProposition !== data.valueProposition)
 																operations.push(`changed the value proposition to "${data.valueProposition}"`)
 
-															// Calculate product type diffs
-															if (product.data().productTypes !== data.productTypes) {
-																const differences = diffArrays(product.data().productTypes, data.productTypes)
-																const removals = differences
-																	.filter((difference) => difference.removed)
-																	.flatMap((difference) => difference.value)
-																	.map((removal) => `"${productTypes.find((type) => type[0] === removal)![1]!}"`)
-																let removalsText = removals.length > 0 ? listToSentence(removals) : undefined
-																removalsText = removalsText
-																	? `removed the product type${removals.length === 1 ? `` : `s`} ${removalsText}`
-																	: undefined
-																if (removalsText) operations.push(removalsText)
-																const additions = differences
-																	.filter((difference) => difference.added)
-																	.flatMap((difference) => difference.value)
-																	.map((addition) => `"${productTypes.find((type) => type[0] === addition)![1]!}"`)
-																let additionsText = additions.length > 0 ? listToSentence(additions) : undefined
-																additionsText = additionsText
-																	? `added the product type${additions.length === 1 ? `` : `s`} ${additionsText}`
-																	: undefined
-																if (additionsText) operations.push(additionsText)
-															}
-
 															// Calculate feature diffs
 															if (
-																dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) !==
+																dbFeatures?.docs.map((feature) => ({ id: feature.id, text: feature.data().text })) !==
 																data.features
 															) {
 																const differences = diffArrays(
@@ -419,8 +396,8 @@ const VisionsClientPage: FC = () => {
 										reset({
 											productTypes: product.data().productTypes,
 											valueProposition: product.data().valueProposition ?? ``,
-											features: dbFeatures?.docs.map((feature) => ({id: feature.id, text: feature.data().text})) ?? [
-												{id: nanoid(), text: ``},
+											features: dbFeatures?.docs.map((feature) => ({ id: feature.id, text: feature.data().text })) ?? [
+												{ id: nanoid(), text: `` },
 											],
 										})
 										setCurrentStep(0)
