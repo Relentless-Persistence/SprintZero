@@ -4,10 +4,14 @@ import { CloseCircleOutlined, CloseOutlined, RobotOutlined } from "@ant-design/i
 import { Breadcrumb, Button, Card, Input, Space, Steps, Typography } from "antd";
 import { Timestamp, doc, writeBatch } from "firebase/firestore";
 import { nanoid } from "nanoid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import type { LogEntry } from "~/utils/logger";
+
 
 import { useAppContext } from "../../../AppContext";
 import { VisionUpdateConverter } from "~/types/db/Products/VisionUpdates";
+import { fetchLogs, logAction } from "~/utils/logger";
 import { trpc } from "~/utils/trpc";
 
 const { TextArea } = Input;
@@ -29,6 +33,7 @@ const steps = [
 
 const VisionsClientPage = () => {
 	const { product, user } = useAppContext()
+	const [logs, setLogs] = useState<LogEntry[]>()
 	const [current, setCurrent] = useState(0);
 	const [statementEditMode, setStatementEditMode] = useState(false);
 
@@ -57,6 +62,14 @@ const VisionsClientPage = () => {
 		setCurrent(0);
 		setProductVision(``);
 	};
+
+	useEffect(() => {
+		fetchLogs(product.ref, `VISION`).then(data => {
+			setLogs(data)
+		}).catch(error => {
+			console.error(`Error fetching logs:`, error)
+		});
+	});
 
 	return (
 
@@ -264,6 +277,14 @@ const VisionsClientPage = () => {
 												});
 												setProductVision(data.response?.trim())
 												setGeneratingVision(false)
+												const log: LogEntry = {
+													userId: user.id,
+													timestamp: new Date(),
+													actionName: `GENERATE_VISION_STATEMENT`,
+													actionGroup: `VISION`,
+													actionType: `CREATE`
+												}
+												logAction(product.ref, log)
 											} catch (error) {
 												console.error(error);
 											}
@@ -279,7 +300,11 @@ const VisionsClientPage = () => {
 						</div>
 					</div>
 				</div>
-				<div className="w-1/3"></div>
+				<div className="w-1/3">{
+					fetchLogs(product.ref, `VISION`).then(data => {
+						<>Hello</>
+					})
+				}</div>
 			</div>
 		</div>
 	);
