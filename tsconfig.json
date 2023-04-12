@@ -28,7 +28,7 @@
 			}
 		]
 	},
-	"include": ["**/*.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/webhooks/githubWebhook.js"],
+	"include": ["**/*.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/webhooks/githubWebhook.ts"],
 	"exclude": ["node_modules"],
 	"types": ["node"]
 }
