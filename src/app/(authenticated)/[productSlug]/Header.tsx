@@ -1,25 +1,28 @@
-import {CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined} from "@ant-design/icons"
-import {Avatar, Layout, Menu, Popover, Segmented} from "antd"
-import {collection, collectionGroup, query, where} from "firebase/firestore"
+import { CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined } from "@ant-design/icons"
+import { Avatar, Layout, Menu, Popover, Segmented } from "antd"
+import { collection, collectionGroup, query, where } from "firebase/firestore"
 import Image from "next/image"
-import {usePathname} from "next/navigation"
-import {useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection, useCollectionOnce} from "react-firebase-hooks/firestore"
+import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection, useCollectionOnce } from "react-firebase-hooks/firestore"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
-import {useAppContext} from "./AppContext"
+import { useAppContext } from "./AppContext"
 import LinkTo from "~/components/LinkTo"
-import {MemberConverter} from "~/types/db/Products/Members"
-import {db} from "~/utils/firebase"
-import {useSetTheme, useTheme} from "~/utils/ThemeContext"
+import { MemberConverter } from "~/types/db/Products/Members"
+import { db } from "~/utils/firebase"
+import { useSetTheme, useTheme } from "~/utils/ThemeContext"
 import MoonIcon from "~public/icons/moon.svg"
 import SunIcon from "~public/icons/sun.svg"
 
+type OnlineStatus = "idle" | "online";
+
 const Header: FC = () => {
-	const {product, member} = useAppContext()
+	const { product, member } = useAppContext()
 	const pathname = usePathname()
+	const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(`online`);
 
 	const [members, , membersError] = useCollectionOnce(
 		query(
@@ -32,13 +35,13 @@ const Header: FC = () => {
 	const [products, , productsError] = useCollection(
 		members
 			? query(
-					collection(db, `Products`),
-					where(
-						`id`,
-						`in`,
-						members.docs.map((member) => member.ref.parent.parent!.id),
-					),
-			  )
+				collection(db, `Products`),
+				where(
+					`id`,
+					`in`,
+					members.docs.map((member) => member.ref.parent.parent!.id),
+				),
+			)
 			: undefined,
 	)
 	useErrorHandler(productsError)
@@ -50,6 +53,46 @@ const Header: FC = () => {
 	const setTheme = useSetTheme()
 
 	const isCurrentPageSettings = pathname?.startsWith(`/${product.id}/settings`) ?? false
+
+	useEffect(() => {
+		let timeoutId: NodeJS.Timeout | null = null;
+
+		const resetTimeout = () => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+
+			timeoutId = setTimeout(() => {
+				setOnlineStatus(`idle`);
+			}, 5 * 60 * 1000); // 2 minutes
+		};
+
+		resetTimeout();
+
+		const handleActivity = () => {
+			setOnlineStatus(`online`);
+			resetTimeout();
+		};
+
+		document.addEventListener(`mousemove`, handleActivity);
+		document.addEventListener(`keydown`, handleActivity);
+
+		const intervalId = setInterval(() => {
+			resetTimeout();
+		}, 2 * 60 * 1000); // 2 minutes
+
+		return () => {
+			if (timeoutId) {
+				clearTimeout(timeoutId);
+			}
+
+			document.removeEventListener(`mousemove`, handleActivity);
+			document.removeEventListener(`keydown`, handleActivity);
+
+			clearInterval(intervalId);
+		};
+	}, []);
+
 
 	return (
 		<Layout.Header className="flex items-center gap-8 !bg-[#161e12] !px-4">
@@ -73,7 +116,7 @@ const Header: FC = () => {
 					),
 				}))}
 				className="grow [&>.ant-menu-item-selected]:shadow-[inset_0px_-4px_0px_0px_theme(colors.primary)] [&>.ant-menu-item]:cursor-default"
-				style={{background: `transparent`}}
+				style={{ background: `transparent` }}
 			/>
 
 			<Popover
@@ -94,8 +137,8 @@ const Header: FC = () => {
 									document.cookie = `theme=${theme};path=/`
 								}}
 								options={[
-									{icon: <SunIcon className="inline-block" />, label: `Light`, value: `light`},
-									{icon: <MoonIcon className="inline-block" />, label: `Dark`, value: `dark`},
+									{ icon: <SunIcon className="inline-block" />, label: `Light`, value: `light` },
+									{ icon: <MoonIcon className="inline-block" />, label: `Dark`, value: `dark` },
 								]}
 							/>
 						</div>
@@ -107,20 +150,20 @@ const Header: FC = () => {
 								items={[
 									...(currentProductMember?.data()?.type === `owner`
 										? ([
-												{
-													key: `configuration`,
-													icon: <SettingOutlined />,
-													label: <LinkTo href={`/${product.id}/settings/configuration`}>Configuration</LinkTo>,
-													onClick: () => setIsPopoverOpen(false),
-												},
-												{
-													key: `team`,
-													icon: <TeamOutlined />,
-													label: <LinkTo href={`/${product.id}/settings/team`}>Team</LinkTo>,
-													onClick: () => setIsPopoverOpen(false),
-												},
-												{type: `divider`, className: `mx-3`},
-										  ] as const)
+											{
+												key: `configuration`,
+												icon: <SettingOutlined />,
+												label: <LinkTo href={`/${product.id}/settings/configuration`}>Configuration</LinkTo>,
+												onClick: () => setIsPopoverOpen(false),
+											},
+											{
+												key: `team`,
+												icon: <TeamOutlined />,
+												label: <LinkTo href={`/${product.id}/settings/team`}>Team</LinkTo>,
+												onClick: () => setIsPopoverOpen(false),
+											},
+											{ type: `divider`, className: `mx-3` },
+										] as const)
 										: []),
 									...[
 										{
@@ -143,7 +186,10 @@ const Header: FC = () => {
 								]}
 							/>
 						</div>
-						<p className="text-end text-sm text-textTertiary">v0.45</p>
+						<div className="flex items-center justify-between border-t border-border pt-[4px]">
+							<p className="text-end text-sm text-primary italic capitalize">{onlineStatus}</p>
+							<p className="text-end text-sm text-textTertiary">v1.0</p>
+						</div>
 					</div>
 				}
 			>
