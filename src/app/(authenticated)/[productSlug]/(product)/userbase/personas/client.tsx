@@ -18,9 +18,6 @@ import { useAppContext } from "../../../AppContext"
 import { DialogueParticipantConverter } from "~/types/db/Products/DialogueParticipants";
 import { PersonaConverter } from "~/types/db/Products/Personas";
 import { GoalConverter } from "~/types/db/Products/Personas/Goals";
-import BoneIcon from "~public/icons/bone.svg"
-import CognitionIcon from "~public/icons/cognition.svg"
-import EarIcon from "~public/icons/ear.svg"
 
 const items: MenuProps['items'] = [
     {
@@ -128,7 +125,7 @@ const PersonasClientPage: FC = () => {
                                                 onEditStart={() => setGoalEditingItem(goal.id)}
                                                 onEditEnd={() => setGoalEditingItem(undefined)}
                                                 onCommit={async (text) => {
-                                                    const goalRef = goals.docs.find(doc => doc.id === goal.id)?.ref
+                                                    const goalRef = goals.docs.find(doc => doc.id === goal.id)!.ref
                                                     await updateDoc(goalRef, { text })
                                                 }}
                                             />
@@ -137,12 +134,12 @@ const PersonasClientPage: FC = () => {
                                 })}
                                 <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                     <Button block={false} type="text" onClick={async () => {
-                                        const personaRef = personas?.docs.find(doc => doc.id === currentPersona)?.ref;
+                                        const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
                                         const goalsCollectionRef = collection(personaRef, `Goals`);
                                         const newGoalDocRef = doc(goalsCollectionRef, nanoid());
 
                                         await setDoc(newGoalDocRef, {
-                                            name: `Goal #${goals?.docs.length + 1}`,
+                                            name: `Goal #${goals!.docs.length + 1}`,
                                             text: ``
                                         });
                                     }}>Add Goal</Button>

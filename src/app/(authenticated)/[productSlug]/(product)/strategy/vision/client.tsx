@@ -301,9 +301,9 @@ const VisionsClientPage = () => {
 					</div>
 				</div>
 				<div className="w-1/3">{
-					fetchLogs(product.ref, `VISION`).then(data => {
-						<>Hello</>
-					})
+					// fetchLogs(product.ref, `VISION`).then(data => {
+					// 	<>Hello</>
+					// })
 				}</div>
 			</div>
 		</div>
