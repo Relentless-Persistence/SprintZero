@@ -128,6 +128,10 @@ const getItems = (activeProductId: string) => [
 		label: `Userbase`,
 		children: [
 			{
+				key: `userbase/participants`,
+				label: <LinkTo href={`/${activeProductId}/userbase/participants`}>Participants</LinkTo>,
+			},
+			{
 				key: `userbase/dialogue`,
 				label: <LinkTo href={`/${activeProductId}/userbase/dialogue`}>Dialogue</LinkTo>,
 			},

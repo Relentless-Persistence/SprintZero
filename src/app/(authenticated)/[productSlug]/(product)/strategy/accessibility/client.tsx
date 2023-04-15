@@ -4,16 +4,18 @@ import { CheckOutlined, CloseOutlined } from "@ant-design/icons"
 import { Breadcrumb, Card, Switch, Tabs } from "antd"
 import { updateDoc } from "firebase/firestore"
 import produce from "immer"
+import { useState } from "react"
 import Masonry from "react-masonry-css"
 
-import { FC, useState } from "react"
+import type { FC } from "react";
+
 
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import LinkTo from "~/components/LinkTo"
 
 const AccessibilityClientPage: FC = () => {
 	const { product } = useAppContext()
-	const [currentAccessibilityId, setCurrentAccessibilityId] = useState<string | undefined>('auditory')
+	const [currentAccessibilityId, setCurrentAccessibilityId] = useState<string | undefined>(`auditory`)
 
 
 	return (
@@ -173,6 +175,7 @@ const AccessibilityClientPage: FC = () => {
 
 			<div className="flex flex-col overflow-auto px-12 py-0">
 				<Tabs
+					className="centered-tab"
 					tabPosition="top"
 					activeKey={currentAccessibilityId}
 					onChange={(key) => {
@@ -181,28 +184,28 @@ const AccessibilityClientPage: FC = () => {
 					items={
 						[
 							{
-								key: 'auditory',
-								label: 'Auditory'
+								key: `auditory`,
+								label: `Auditory`
 							},
 							{
-								key: 'cognitive',
-								label: 'Cognitive'
+								key: `cognitive`,
+								label: `Cognitive`
 							},
 							{
-								key: 'physical',
-								label: 'Physical'
+								key: `physical`,
+								label: `Physical`
 							},
 							{
-								key: 'speech',
-								label: 'Speech'
+								key: `speech`,
+								label: `Speech`
 							},
 							{
-								key: 'visual',
-								label: 'Visual'
+								key: `visual`,
+								label: `Visual`
 							},
 							{
-								key: 'mobile',
-								label: 'Mobile'
+								key: `mobile`,
+								label: `Mobile`
 							},
 						]
 					}

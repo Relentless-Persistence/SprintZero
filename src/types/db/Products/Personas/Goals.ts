@@ -3,6 +3,7 @@ import {z} from "zod"
 import {genConverter} from "~/types"
 
 export const GoalSchema = z.object({
+	name: z.string(),
 	text: z.string(),
 })
 

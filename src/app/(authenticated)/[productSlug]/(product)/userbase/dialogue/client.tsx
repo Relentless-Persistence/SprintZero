@@ -1,25 +1,25 @@
 "use client"
 
-import {EyeOutlined, PhoneOutlined, PlusOutlined, SoundOutlined, UserOutlined} from "@ant-design/icons"
-import {Avatar, Breadcrumb, Button, Card, Empty, FloatButton, Spin, Tabs, Tag} from "antd"
-import {Timestamp, addDoc, collection} from "firebase/firestore"
-import {useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { EyeOutlined, PhoneOutlined, PlusOutlined, SoundOutlined, UserOutlined } from "@ant-design/icons"
+import { Avatar, Breadcrumb, Button, Card, Empty, FloatButton, Spin, Tabs, Tag } from "antd"
+import { Timestamp, addDoc, collection } from "firebase/firestore"
+import { useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
 import ParticipantDrawer from "./ParticipantDrawer"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {DialogueParticipantConverter} from "~/types/db/Products/DialogueParticipants"
-import {PersonaConverter} from "~/types/db/Products/Personas"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { DialogueParticipantConverter } from "~/types/db/Products/DialogueParticipants"
+import { PersonaConverter } from "~/types/db/Products/Personas"
 import BoneIcon from "~public/icons/bone.svg"
 import CognitionIcon from "~public/icons/cognition.svg"
 import EarIcon from "~public/icons/ear.svg"
 
 const DialogueClientPage: FC = () => {
-	const {product, user} = useAppContext()
+	const { product, user } = useAppContext()
 	const [currentTab, setCurrentTab] = useState<(typeof tabs)[number][0]>(`identified`)
 	const [activeParticipant, setActiveParticipant] = useState<string | undefined>(undefined)
 
@@ -34,7 +34,7 @@ const DialogueClientPage: FC = () => {
 		<div className="grid h-full grid-cols-[1fr_auto]">
 			<div className="relative flex flex-col gap-4 overflow-auto px-12 py-8">
 				<Breadcrumb
-					items={[{title: `Userbase`}, {title: `Dialogue`}, {title: tabs.find(([key]) => key === currentTab)![1]}]}
+					items={[{ title: `Userbase` }, { title: `Dialogue` }, { title: tabs.find(([key]) => key === currentTab)![1] }]}
 				/>
 
 				{participants ? (
@@ -44,7 +44,7 @@ const DialogueClientPage: FC = () => {
 						</div>
 					) : (
 						<Masonry
-							breakpointCols={{default: 4, 1700: 3, 1300: 2, 1000: 1}}
+							breakpointCols={{ default: 4, 1700: 3, 1300: 2, 1000: 1 }}
 							className="flex gap-8"
 							columnClassName="flex flex-col gap-8"
 						>
@@ -124,6 +124,11 @@ const DialogueClientPage: FC = () => {
 														{participant.data().phoneNumber}
 													</Tag>
 												)}
+												{participant.data().phoneNumber && (
+													<Tag color="red" icon={<PhoneOutlined />}>
+														{participant.data().phoneNumber}
+													</Tag>
+												)}
 											</div>
 										</Card>
 									)
@@ -173,7 +178,7 @@ const DialogueClientPage: FC = () => {
 				activeKey={currentTab}
 				onChange={(tab: (typeof tabs)[number][0]) => setCurrentTab(tab)}
 				className="h-full"
-				items={tabs.map(([key, label]) => ({key, label}))}
+				items={tabs.map(([key, label]) => ({ key, label }))}
 			/>
 
 			{activeParticipant !== undefined && (
