@@ -20,6 +20,7 @@ steps:
       - "OPENAI_API_KEY=${_OPENAI_API_KEY}"
       - "SPOTIFY_CLIENT_ID=${_SPOTIFY_CLIENT_ID}"
       - "SPOTIFY_CLIENT_SECRET=${_SPOTIFY_CLIENT_SECRET}"
+      - "PEXELS_API_KEY=${_PEXELS_API_KEY}"
   - name: "gcr.io/kaniko-project/executor:latest"
     args:
       - --destination=gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA
