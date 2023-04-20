@@ -55,6 +55,12 @@ const RoadmapClientPage: FC = () => {
               </div>
             </Badge.Ribbon>
           </div>
+          <div className="w-1/5 ml-3">
+            <Badge.Ribbon text="Future" color="black">
+              <div className="m-[-6px]">
+              </div>
+            </Badge.Ribbon>
+          </div>
         </div>
 
         <div className="h-full">
