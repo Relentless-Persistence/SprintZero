@@ -28,7 +28,14 @@
 			}
 		]
 	},
-	"include": ["**/*.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/webhooks/githubWebhook.ts"],
+	"include": [
+		"**/*.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		".next/types/**/*.ts",
+		"src/pages/api/webhooks/githubWebhook.ts",
+		"src/pages/api/google/speechToText.js"
+	],
 	"exclude": ["node_modules"],
 	"types": ["node"]
 }
