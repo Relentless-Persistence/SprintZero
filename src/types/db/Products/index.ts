@@ -49,21 +49,14 @@ export const ProductSchema = z.object({
 			z.boolean(),
 			z.boolean(),
 		]),
-		mobile: z.tuple([
-			z.boolean(),
-			z.boolean(),
-			z.boolean(),
-			z.boolean(),
-			z.boolean(),
-			z.boolean(),
-			z.boolean(),
-		]),
+		mobile: z.tuple([z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean(), z.boolean()]),
 	}),
 
 	// Vision info
 	finalVision: z.string(),
 	productTypes: z.array(z.enum(productTypes.map(([value]) => value) as [string])),
-	valueProposition: z.string({invalid_type_error: `Required`}).min(1, `Required`).nullable(),
+	valueProposition: z.string({invalid_type_error: `Required`}),
+	features: z.array(z.string({invalid_type_error: `Required`})),
 
 	voiceData: z.object({
 		// Voice info
