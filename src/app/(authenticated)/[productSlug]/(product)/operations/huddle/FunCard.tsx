@@ -1,42 +1,65 @@
-import {AppleFilled, NotificationOutlined, SettingOutlined} from "@ant-design/icons"
-import {Button, Card, DatePicker, Dropdown, Skeleton} from "antd"
+import { AppleFilled, NotificationOutlined, SettingOutlined } from "@ant-design/icons"
+import { Button, Card, DatePicker, Dropdown, Skeleton } from "antd"
 import dayjs from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
-import {doc, updateDoc} from "firebase/firestore"
-import {random} from "lodash"
-import {useState} from "react"
+import { doc, updateDoc } from "firebase/firestore"
+import { random } from "lodash"
+import { useState } from "react"
 
-import type {Dayjs} from "dayjs"
-import type {FC} from "react"
+import type { Dayjs } from "dayjs"
+import type { FC } from "react"
 
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {UserConverter} from "~/types/db/Users"
-import {db} from "~/utils/firebase"
-import {trpc} from "~/utils/trpc"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { UserConverter } from "~/types/db/Users"
+import { db } from "~/utils/firebase"
+import { trpc } from "~/utils/trpc"
 import ShuffleIcon from "~public/icons/shuffle.svg"
 import SpotifyIcon from "~public/icons/spotify.svg"
 
 dayjs.extend(isBetween)
 
 const FunCard: FC = () => {
-	const {user} = useAppContext()
+	const { user } = useAppContext()
 	const [date, setDate] = useState<Dayjs | null>(null)
 	const [songName, setSongName] = useState<string | undefined>(undefined)
 	const [clues, setClues] = useState<string[] | undefined>(undefined)
 	const [showSong, setShowSong] = useState(false)
 
-	const generateRandomDate = () => {
+	const generateRandomDate = async () => {
 		const randomYear = Math.floor(random(1960, 2020))
 		const randomMonth = Math.floor(random(0, 11))
 		const randomDate = Math.floor(random(1, dayjs(`${randomYear}-${randomMonth + 1}`).daysInMonth()))
+		const date = dayjs(`${randomYear}-${randomMonth}-${randomDate}`)
 
 		// Output the random date in ISO format
 		setDate(dayjs(`${randomYear}-${randomMonth}-${randomDate}`))
+
+
+		await songGpt
+			.mutateAsync({
+				prompt: `What was the #1 song on the Billboard Top 100 list on ${date.format(`MMMM D, YYYY`) ?? ``
+					}? Give in the format "Artist - Song name".`,
+			})
+			.then(async (data) => {
+				const song = data.response!.replace(/^"/, ``).replace(/"$/, ``).replaceAll(`\n`, ``)
+				setSongName(song)
+
+				const clues = (
+					await cluesGpt.mutateAsync({
+						prompt: `I'm playing a song guessing game. Generate three clues for the song "${song}". Make sure no names or song/album titles are used in any of the clues. Also try not to quote any lyrics from the song.`,
+					})
+				).response
+					?.split(`\n`)
+					.map((s) => s.replace(/^[0-9]+\. */, ``))
+					.filter((s) => s !== ``)
+				setClues(clues)
+			})
+
 	}
 
 	const songGpt = trpc.gpt.useMutation()
 	const cluesGpt = trpc.gpt.useMutation()
-	const {data: songUrl} = trpc.funCard.getSongUrl.useQuery(
+	const { data: songUrl } = trpc.funCard.getSongUrl.useQuery(
 		{
 			songName: encodeURIComponent(songName!),
 			service: user.data().preferredMusicClient,
@@ -141,7 +164,9 @@ const FunCard: FC = () => {
 							icon={<ShuffleIcon />}
 							disabled={!!songName || songGpt.isLoading}
 							className="flex items-center gap-2"
-							onClick={generateRandomDate}
+							onClick={() => {
+								generateRandomDate().catch(console.error)
+							}}
 						>
 							Randomize
 						</Button>
@@ -155,9 +180,8 @@ const FunCard: FC = () => {
 								onClick={() => {
 									songGpt
 										.mutateAsync({
-											prompt: `What was the #1 song on the Billboard Top 100 list on ${
-												date?.format(`MMMM D, YYYY`) ?? ``
-											}? Give in the format "Artist - Song name".`,
+											prompt: `What was the #1 song on the Billboard Top 100 list on ${date?.format(`MMMM D, YYYY`) ?? ``
+												}? Give in the format "Artist - Song name".`,
 										})
 										.then(async (data) => {
 											const song = data.response!.replace(/^"/, ``).replace(/"$/, ``).replaceAll(`\n`, ``)
@@ -205,13 +229,13 @@ const FunCard: FC = () => {
 							<iframe
 								allow="autoplay *; encrypted-media *;"
 								height="192"
-								style={{width: `100%`, maxWidth: `660px`, background: `transparent`}}
+								style={{ width: `100%`, maxWidth: `660px`, background: `transparent` }}
 								sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
 								src={songUrl}
 							/>
 						) : (
 							<iframe
-								style={{borderRadius: `12px`}}
+								style={{ borderRadius: `12px` }}
 								src={songUrl}
 								width="100%"
 								height="112"
