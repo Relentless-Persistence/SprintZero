@@ -1,115 +1,108 @@
 "use client"
 
-import {PlusOutlined} from "@ant-design/icons"
-import {Breadcrumb, FloatButton, Tabs} from "antd"
+import { Breadcrumb, Button, Tabs } from "antd"
 import dayjs from "dayjs"
-import {Timestamp, addDoc, collection, doc, query, updateDoc, where} from "firebase/firestore"
-import {useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { Timestamp, addDoc, collection, doc, query, updateDoc, where } from "firebase/firestore"
+import { useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 
-import type {ComponentProps, FC} from "react"
+import type { ComponentProps, FC } from "react"
+import type { Task } from "~/types/db/Products/Tasks"
 
-import TaskColumn from "./TaskColumn"
+import GeneralTasks from "./GeneralTask"
 import TaskDrawer from "./TaskDrawer"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {TaskConverter} from "~/types/db/Products/Tasks"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { TaskConverter } from "~/types/db/Products/Tasks"
+
+interface MyTask extends Task {
+  id: string
+}
 
 const TasksClientPage: FC = () => {
-	const {product} = useAppContext()
-	const [activeBoard, setActiveBoard] = useState(`one`)
-	const [editingTask, setEditingTask] = useState<string | `new` | undefined>(undefined)
+  const { product } = useAppContext()
+  const [currentTab, setCurrentTab] = useState(`acceptance criteria`)
+  const [newTask, setNewTask] = useState(false)
 
-	const [tasks, tasksLoading, tasksError] = useCollection(
-		query(collection(product.ref, `Tasks`), where(`board`, `==`, activeBoard)).withConverter(TaskConverter),
-	)
-	useErrorHandler(tasksError)
+  const [tasks, tasksLoading, tasksError] = useCollection(
+    query(collection(product.ref, `Tasks`), where(`type`, `==`, currentTab)).withConverter(TaskConverter),
+  )
+  useErrorHandler(tasksError)
 
-	return (
-		<div className="grid h-full grid-cols-[1fr_max-content]">
-			<div className="relative flex h-full w-full flex-col overflow-auto pb-8">
-				<div className="sticky left-0 flex w-full justify-between px-12 py-8">
-					<Breadcrumb items={[{title: `Operations`}, {title: `Tasks`}, {title: activeBoard}]} />
-				</div>
 
-				<div className="ml-12 grid grow auto-cols-[286px] grid-flow-col gap-4">
-					{tasks && (
-						<>
-							<TaskColumn id="todo" title="To Do" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
-							<TaskColumn id="inProgress" title="In Progress" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
-							<TaskColumn id="review" title="Review" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
-							<TaskColumn id="done" title="Done" tasks={tasks} onEdit={(id) => setEditingTask(id)} />
-						</>
-					)}
 
-					{/* Spacer */}
-					<div className="w-8" />
-				</div>
+  return (
+    <div className="flex flex-col px-12 py-8">
+      <div className="">
+        <Breadcrumb className="capitalize mb-3" items={[{ title: `Tactics` }, { title: `Tasks` }, { title: currentTab }]} />
+        <h1 className="text-4xl font-semibold capitalize mb-1">Get.Stuff.Done.</h1>
+        <p className="text-textTertiary">Track specific activity that needs to be completed to achieve a certain goal or objective.</p>
+      </div>
 
-				<FloatButton
-					icon={<PlusOutlined />}
-					tooltip="Add Item"
-					onClick={() => setEditingTask(`new`)}
-					className="fixed bottom-8 right-24"
-				/>
-			</div>
+      <div className="flex-grow mt-6">
+        <Tabs
+          activeKey={currentTab}
+          onChange={(key) => setCurrentTab(key)}
+          tabBarExtraContent={currentTab !== `acceptance criteria` && currentTab !== `bugs` ? <Button onClick={() => setNewTask(true)}>Add Task</Button> : null}
+          items={[
+            {
+              label: `Acceptance Criteria`,
+              key: `acceptance criteria`,
+              children: (
+                <div className="w-full">
+                  Acceptance Criteria
+                </div>
+              ),
+            },
+            {
+              label: `Bugs`,
+              key: `bugs`,
+              children: (
+                <div className="w-full">
+                  Bugs
+                </div>
+              ),
+            },
+            {
+              label: `Data Science`,
+              key: `data science`,
+              children: (
+                <div className="w-full">
+                  <GeneralTasks tasks={tasks?.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(task => task.type === `data science`)} />
+                </div>
+              ),
+            },
+            {
+              label: `Pipelines`,
+              key: `pipelines`,
+              children: (
+                <div className="w-full">
+                  <GeneralTasks tasks={tasks?.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(task => task.type === `pipelines`)} />
+                </div>
+              ),
+            },
+            {
+              label: `Random`,
+              key: `random`,
+              children: (
+                <div className="w-full">
+                  <GeneralTasks tasks={tasks?.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(task => task.type === `random`)} />
+                </div>
+              ),
+            },
+          ]}
+        />
+      </div>
 
-			<Tabs
-				tabPosition="right"
-				activeKey={activeBoard}
-				onChange={(key) => setActiveBoard(key)}
-				items={[
-					{key: `one`, label: `One`},
-					{key: `two`, label: `Two`},
-					{key: `three`, label: `Three`},
-					{key: `four`, label: `Four`},
-					{key: `five`, label: `Five`},
-				]}
-			/>
-
-			{editingTask && !tasksLoading && (
-				<TaskDrawer
-					initialValues={(() => {
-						let initialValues: ComponentProps<typeof TaskDrawer>["initialValues"]
-						if (editingTask === `new`) {
-							initialValues = {
-								board: activeBoard,
-								dueDate: dayjs(),
-								notes: ``,
-								status: `todo`,
-								subtasks: [],
-								title: ``,
-								assigneeIds: [],
-							}
-						} else {
-							const task = tasks!.docs.find((task) => task.id === editingTask)!
-							initialValues = {
-								...task.data(),
-								dueDate: dayjs(task.data().dueDate.toDate()),
-							}
-						}
-						return initialValues
-					})()}
-					onCancel={() => setEditingTask(undefined)}
-					onCommit={async (data) => {
-						if (editingTask === `new`) {
-							await addDoc(collection(product.ref, `Tasks`).withConverter(TaskConverter), {
-								...data,
-								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
-								board: activeBoard,
-							})
-						} else {
-							await updateDoc(doc(product.ref, `Tasks`, editingTask).withConverter(TaskConverter), {
-								...data,
-								dueDate: Timestamp.fromMillis(data.dueDate.valueOf()),
-							})
-						}
-						setEditingTask(undefined)
-					}}
-				/>
-			)}
-		</div>
-	)
+      {newTask && (
+        <TaskDrawer
+          isOpen={newTask}
+          setNewTask={setNewTask}
+          type={currentTab}
+        />
+      )}
+    </div>
+  )
 }
 
 export default TasksClientPage

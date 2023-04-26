@@ -3,7 +3,6 @@ import {z} from "zod"
 import {genConverter, timestampSchema} from "~/types"
 
 export const TaskSchema = z.object({
-	board: z.string(),
 	dueDate: timestampSchema,
 	notes: z.string(),
 	status: z.enum([`todo`, `inProgress`, `review`, `done`]),
@@ -15,6 +14,7 @@ export const TaskSchema = z.object({
 		}),
 	),
 	title: z.string(),
+	type: z.string(),
 
 	assigneeIds: z.array(z.string()),
 })
