@@ -156,6 +156,13 @@ service cloud.firestore {
       match /Tasks/{taskId} {
         allow read, write: if isEditorOnProduct(productId);
         allow read: if isViewerOnProduct(productId);
+
+        match /Comments/{taskCommentId} {
+          allow read: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
+          allow create: if isEditorOnProduct(productId) && request.auth.uid == request.resource.data.authorId;
+          allow update, delete: if isEditorOnProduct(productId) && request.auth.uid == resource.data.authorId;
+        }
       }
 
       match /UserPriorities/{userPriorityId} {

@@ -11,6 +11,7 @@ import type { Dayjs } from "dayjs"
 import type { FC } from "react"
 import type { Task } from "~/types/db/Products/Tasks";
 
+import Comments from "./Comment"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { TaskConverter } from "~/types/db/Products/Tasks"
@@ -35,6 +36,7 @@ export type TaskDrawerProps = {
 };
 
 const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => {
+	const { product } = useAppContext()
 	const [title, setTitle] = useState(``)
 	const [notes, setNotes] = useState(``)
 	const [assign, setAssign] = useState<string[]>([])
@@ -51,13 +53,10 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 		}
 	}, [data])
 
-	const { product } = useAppContext()
-
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
 
 	const [newActionInput, setNewActionInput] = useState(``)
-
 
 	const onSubmit = async () => {
 		const updatedTask = {
@@ -110,7 +109,10 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 					>
 						Cancel
 					</Button>
-					<Button type="primary" htmlType="submit" form="task-form">
+					<Button type="primary" onClick={(e) => {
+						e.preventDefault()
+						onSubmit().catch(console.error)
+					}}>
 						Done
 					</Button>
 				</div>
@@ -120,14 +122,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 			closable={false}
 			maskClosable={false}
 		>
-			<form
-				id="task-form"
-				onSubmit={(e) => {
-					e.preventDefault()
-					onSubmit().catch(console.error)
-				}}
-				className="grid h-full grid-cols-3 gap-8"
-			>
+			<div className="grid h-full grid-cols-3 gap-8">
 				{/* Column 1 */}
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
@@ -189,8 +184,12 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 				</div>
 
 				{/* Column 3 */}
-				<div className="flex h-full flex-col gap-6"></div>
-			</form>
+				<div className="flex h-full flex-col gap-6">
+					<p className="text-lg font-semibold">Comments</p>
+					<Comments id={data?.id} />
+				</div>
+			</div>
+
 		</Drawer>
 	)
 }
