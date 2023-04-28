@@ -1,70 +1,82 @@
+import type { FC } from "react";
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems";
 
-import { useState } from "react"
-
-import type { FC } from "react"
-import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
-
-import StoryTaskColumn from "./StoryTaskColumn"
-import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
-
-export type Props = {
-  storyMapItems: StoryMapItem[];
-  tab: string
-}
+import StoryTaskColumn from "./StoryTaskColumn";
 
 interface AcceptanceCriteria {
   id: string;
   name: string;
   checked: boolean;
-  status: string
+  status: string;
 }
 
 interface Bug {
   id: string;
   name: string;
   checked: boolean;
-  status: string
+  status: string;
 }
 
+type Props = {
+  storyMapItems: StoryMapItem[];
+  tab: string;
+};
+
 const StoryTask: FC<Props> = ({ storyMapItems, tab }) => {
-  const { product } = useAppContext()
-  const [viewStory, setViewStory] = useState(false)
 
-  const acceptanceCriterias: AcceptanceCriteria[] = storyMapItems.reduce((acc, item) => {
-    if (item.acceptanceCriteria.length) {
-      acc.push(...item.acceptanceCriteria);
-    }
-    return acc;
-  }, [])
+  const acceptanceCriterias: AcceptanceCriteria[] = storyMapItems.reduce(
+    (acc: AcceptanceCriteria[], item) => {
+      if (item.acceptanceCriteria.length) {
+        acc.push(...item.acceptanceCriteria);
+      }
+      return acc;
+    },
+    []
+  );
 
-  const bugs: Bug[] = storyMapItems.reduce((acc, item) => {
+  const bugs: Bug[] = storyMapItems.reduce((acc: Bug[], item) => {
     if (item.bugs.length) {
       acc.push(...item.bugs);
     }
     return acc;
-  }, [])
-
-  // const result = storyMapItems.filter((storyMapItem) => storyMapItem.acceptanceCriteria.length > 0).map((storyMapItem) => ({
-  //   storyId: storyMapItem.id,
-  // }));
-
+  }, []);
 
   return (
     <div className="">
-
-      {acceptanceCriterias && bugs && <div className="h-full grid grow auto-cols-[286px] grid-flow-col gap-4">
-
-        <StoryTaskColumn id="todo" title="To Do" tasks={tab === `bugs` ? bugs : acceptanceCriterias} storyMapItems={storyMapItems} tab={tab} />
-        <StoryTaskColumn id="inProgress" title="In Progress" tasks={tab === `bugs` ? bugs : acceptanceCriterias} storyMapItems={storyMapItems} tab={tab} />
-
-        <StoryTaskColumn id="review" title="Review" tasks={tab === `bugs` ? bugs : acceptanceCriterias} storyMapItems={storyMapItems} tab={tab} />
-
-        <StoryTaskColumn id="done" title="Done" tasks={tab === `bugs` ? bugs : acceptanceCriterias} storyMapItems={storyMapItems} tab={tab} />
-
-      </div>}
-
+      {acceptanceCriterias.length > 0 && bugs.length > 0 && (
+        <div className="h-full grid grow auto-cols-[286px] grid-flow-col gap-4">
+          <StoryTaskColumn
+            id="todo"
+            title="To Do"
+            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+            storyMapItems={storyMapItems}
+            tab={tab}
+          />
+          <StoryTaskColumn
+            id="inProgress"
+            title="In Progress"
+            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+            storyMapItems={storyMapItems}
+            tab={tab}
+          />
+          <StoryTaskColumn
+            id="review"
+            title="Review"
+            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+            storyMapItems={storyMapItems}
+            tab={tab}
+          />
+          <StoryTaskColumn
+            id="done"
+            title="Done"
+            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+            storyMapItems={storyMapItems}
+            tab={tab}
+          />
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default StoryTask
+export default StoryTask;

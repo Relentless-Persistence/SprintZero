@@ -1,13 +1,12 @@
 "use client"
 
 import { Breadcrumb, Button, Tabs } from "antd"
-import dayjs from "dayjs"
-import { Timestamp, addDoc, collection, doc, query, updateDoc, where } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
 
-import type { ComponentProps, FC } from "react"
+import type { FC } from "react"
 import type { Task } from "~/types/db/Products/Tasks"
 
 import GeneralTasks from "./GeneralTask"
@@ -26,7 +25,7 @@ const TasksClientPage: FC = () => {
   const [currentTab, setCurrentTab] = useState(`acceptance criteria`)
   const [newTask, setNewTask] = useState(false)
 
-  const [tasks, tasksLoading, tasksError] = useCollection(
+  const [tasks, , tasksError] = useCollection(
     query(collection(product.ref, `Tasks`), where(`type`, `==`, currentTab)).withConverter(TaskConverter),
   )
   useErrorHandler(tasksError)
@@ -38,6 +37,11 @@ const TasksClientPage: FC = () => {
 
   if (!storyMapItems) return null
 
+  const filteredTasks: MyTask[] = tasks
+    ? tasks.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((task) => task.type === currentTab)
+    : [];
 
   return (
     <div className="flex flex-col px-12 py-8">
@@ -76,7 +80,7 @@ const TasksClientPage: FC = () => {
               key: `data science`,
               children: (
                 <div className="w-full">
-                  <GeneralTasks tasks={tasks?.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(task => task.type === `data science`)} />
+                  <GeneralTasks tasks={filteredTasks} />
                 </div>
               ),
             },
@@ -85,7 +89,7 @@ const TasksClientPage: FC = () => {
               key: `pipelines`,
               children: (
                 <div className="w-full">
-                  <GeneralTasks tasks={tasks?.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(task => task.type === `pipelines`)} />
+                  <GeneralTasks tasks={filteredTasks} />
                 </div>
               ),
             },
@@ -94,7 +98,7 @@ const TasksClientPage: FC = () => {
               key: `random`,
               children: (
                 <div className="w-full">
-                  <GeneralTasks tasks={tasks?.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(task => task.type === `random`)} />
+                  <GeneralTasks tasks={filteredTasks} />
                 </div>
               ),
             },

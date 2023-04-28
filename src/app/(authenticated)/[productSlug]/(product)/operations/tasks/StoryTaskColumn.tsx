@@ -1,11 +1,9 @@
-import { Button, Card, Tag } from "antd"
-import dayjs from "dayjs"
+import { Card, Tag } from "antd"
 import { collection, orderBy, query } from "firebase/firestore"
 import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
 
-import type { QuerySnapshot } from "firebase/firestore"
 import type { FC } from "react"
 import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 
@@ -32,8 +30,9 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
   const { product } = useAppContext()
   const [viewStory, setViewStory] = useState(false)
   const [storyId, setStoryId] = useState<string | undefined>(``)
-
-  console.log(storyMapItems)
+  const [storyName, setStoryName] = useState<string | undefined>(``)
+  const [FeatureName, setFeatureName] = useState<string | undefined>(``)
+  const [epicName, setEpicName] = useState<string | undefined>(``)
 
   const [versions, , versionsError] = useCollection(
     query(collection(product.ref, `Versions`), orderBy(`name`, `asc`)).withConverter(VersionConverter),
@@ -50,8 +49,18 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
     );
 
     const storyId = tab === `bugs` ? storyBugIndex : storyAcceptanceIndex
+    const featureId = storyMapItems[storyId]?.parentId
+    const epicId = storyMapItems[featureId]?.id
 
     setStoryId(storyMapItems[storyId]?.id)
+    setStoryName(storyMapItems[storyId]?.name)
+
+    // setFeatureName(storyMapItems[featureId]?.name)
+    // console.log(`fname`, storyMapItems[featureId]?.name)
+
+    // setEpicName(storyMapItems[epicId]?.name)
+    // console.log(`epic`, storyMapItems[epicId]?.name)
+
     setViewStory(true)
   }
 
@@ -59,7 +68,7 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
     <div>
       <Card title={title} className="h-[463px] lg-h-[600px]">
         <div className="flex flex-col gap-4">
-          {tasks && tasks.length > 0 ? tasks
+          {tasks.length > 0 ? tasks
             .filter((task) => task.status === id)
             .map((task) => (
               <Card
@@ -75,7 +84,7 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
               //   </Button>
               // }
               >
-                {/* <Tag>{dayjs(task.dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}</Tag> */}
+                <Tag>{storyName && storyName}</Tag>
               </Card>
             )) : null}
         </div>
