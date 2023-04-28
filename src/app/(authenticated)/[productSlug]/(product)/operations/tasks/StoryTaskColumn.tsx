@@ -49,8 +49,8 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
     );
 
     const storyId = tab === `bugs` ? storyBugIndex : storyAcceptanceIndex
-    const featureId = storyMapItems[storyId]?.parentId
-    const epicId = storyMapItems[featureId]?.id
+    // const featureId = storyMapItems[storyId]?.parentId
+    // const epicId = storyMapItems[featureId]?.id
 
     setStoryId(storyMapItems[storyId]?.id)
     setStoryName(storyMapItems[storyId]?.name)
