@@ -124,7 +124,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		await updateItem(product, storyMapItems, versions, story.id, {
 			acceptanceCriteria: [
 				...story.acceptanceCriteria,
-				{ id: nanoid(), name: newAcceptanceCriterionInput, checked: false },
+				{ id: nanoid(), name: newAcceptanceCriterionInput, checked: false, status: `todo` },
 			],
 		})
 	}
@@ -141,7 +141,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const addBug = async () => {
 		if (!newBugInput) return
 		await updateItem(product, storyMapItems, versions, story.id, {
-			bugs: [...story.bugs, { id: nanoid(), name: newBugInput, checked: false }],
+			bugs: [...story.bugs, { id: nanoid(), name: newBugInput, checked: false, status: `todo` }],
 		})
 	}
 

@@ -184,10 +184,10 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 				</div>
 
 				{/* Column 3 */}
-				<div className="flex h-full flex-col gap-6">
+				{data ? <div className="flex h-full flex-col gap-6">
 					<p className="text-lg font-semibold">Comments</p>
-					<Comments id={data?.id} />
-				</div>
+					<Comments id={data.id} />
+				</div> : null}
 			</div>
 
 		</Drawer>

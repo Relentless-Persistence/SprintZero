@@ -11,6 +11,7 @@ export const StoryMapItemSchema = z.object({
 				id: z.string(),
 				name: z.string(),
 				checked: z.boolean(),
+				status: z.string(),
 			}),
 		)
 		.default([]),
@@ -21,6 +22,7 @@ export const StoryMapItemSchema = z.object({
 				id: z.string(),
 				name: z.string(),
 				checked: z.boolean(),
+				status: z.string(),
 			}),
 		)
 		.default([]),

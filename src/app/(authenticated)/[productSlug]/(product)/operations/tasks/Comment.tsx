@@ -125,6 +125,8 @@ const Comments: FC<CommentsProps> = ({ id }) => {
     }
   }, [members])
 
+  if (comments) return
+
   return (
     <div className="">
       <div className="flex grow flex-col-reverse overflow-auto">

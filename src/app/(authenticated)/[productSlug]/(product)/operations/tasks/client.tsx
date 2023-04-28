@@ -11,8 +11,10 @@ import type { ComponentProps, FC } from "react"
 import type { Task } from "~/types/db/Products/Tasks"
 
 import GeneralTasks from "./GeneralTask"
+import StoryTask from "./StoryTask"
 import TaskDrawer from "./TaskDrawer"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 import { TaskConverter } from "~/types/db/Products/Tasks"
 
 interface MyTask extends Task {
@@ -29,6 +31,12 @@ const TasksClientPage: FC = () => {
   )
   useErrorHandler(tasksError)
 
+  const [storyMapItems, , storyMapItemsError] = useCollection(
+    collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
+  )
+  useErrorHandler(storyMapItemsError)
+
+  if (!storyMapItems) return null
 
 
   return (
@@ -50,7 +58,7 @@ const TasksClientPage: FC = () => {
               key: `acceptance criteria`,
               children: (
                 <div className="w-full">
-                  Acceptance Criteria
+                  <StoryTask storyMapItems={storyMapItems.docs.map((item) => item.data())} tab={currentTab} />
                 </div>
               ),
             },
@@ -59,7 +67,7 @@ const TasksClientPage: FC = () => {
               key: `bugs`,
               children: (
                 <div className="w-full">
-                  Bugs
+                  <StoryTask storyMapItems={storyMapItems.docs.map((item) => item.data())} tab={currentTab} />
                 </div>
               ),
             },
