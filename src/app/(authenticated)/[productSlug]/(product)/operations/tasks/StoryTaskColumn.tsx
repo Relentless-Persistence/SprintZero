@@ -1,3 +1,4 @@
+import { ArrowRightOutlined, CopyOutlined, FileTextOutlined, ReadOutlined } from "@ant-design/icons"
 import { Card, Tag } from "antd"
 import { collection, orderBy, query } from "firebase/firestore"
 import { useState } from "react"
@@ -39,54 +40,71 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
   )
   useErrorHandler(versionsError)
 
-  const openStoryDrawer = (data: AcceptanceCriteria): void => {
+  function getFeatureName(id: string): string {
+    const feature = storyMapItems.find(story => story.id === id);
+    return feature ? feature : ``;
+  }
 
-    const storyAcceptanceIndex = storyMapItems.findIndex(
-      (obj) => obj.acceptanceCriteria.some((item) => item.id === data.id)
-    );
-    const storyBugIndex = storyMapItems.findIndex(
-      (obj) => obj.bugs.some((item) => item.id === data.id)
-    );
-
-    const storyId = tab === `bugs` ? storyBugIndex : storyAcceptanceIndex
-    // const featureId = storyMapItems[storyId]?.parentId
-    // const epicId = storyMapItems[featureId]?.id
-
-    setStoryId(storyMapItems[storyId]?.id)
-    setStoryName(storyMapItems[storyId]?.name)
-
-    // setFeatureName(storyMapItems[featureId]?.name)
-    // console.log(`fname`, storyMapItems[featureId]?.name)
-
-    // setEpicName(storyMapItems[epicId]?.name)
-    // console.log(`epic`, storyMapItems[epicId]?.name)
-
-    setViewStory(true)
+  function getEpicName(featureName: string): string {
+    const epic = storyMapItems.find(story => story.name === featureName);
+    return epic ? epic.name : ``;
   }
 
   return (
     <div>
-      <Card title={title} className="h-[463px] lg-h-[600px]">
+      <Card title={title} className="w-[360px] h-[463px] lg-h-[600px] overflow-y-auto">
         <div className="flex flex-col gap-4">
           {tasks.length > 0 ? tasks
             .filter((task) => task.status === id)
-            .map((task) => (
-              <Card
-                key={task.id}
-                type="inner"
-                title=<span className="cursor-pointer" onClick={() => openStoryDrawer(task)}>{task.name}</span>
-              // extra={
-              //   <Button size="small" onClick={() => {
-              //     setSelectedTask(task)
-              //     setEditTask(true)
-              //   }}>
-              //     Edit
-              //   </Button>
-              // }
-              >
-                <Tag>{storyName && storyName}</Tag>
-              </Card>
-            )) : null}
+            .map((task) => {
+              const storyAcceptanceIndex = storyMapItems.findIndex(
+                (obj) => obj.acceptanceCriteria.some((item) => item.id === task.id)
+              );
+              const storyBugIndex = storyMapItems.findIndex(
+                (obj) => obj.bugs.some((item) => item.id === task.id)
+              );
+              const storyId = tab === `bugs` ? storyBugIndex : storyAcceptanceIndex;
+              const selectedStory = storyMapItems[storyId];
+              const selectedStoryId = selectedStory?.id;
+              const selectedStoryName = selectedStory?.name;
+              const openDrawer = () => {
+                setStoryId(selectedStoryId)
+                setViewStory(true)
+              };
+
+              const selectedFeatureId: string = selectedStory?.parentId
+              const feature = storyMapItems.find(story => story.id === selectedFeatureId);
+              const featureName = feature?.name
+
+              const epic = storyMapItems.find(story => story.id === feature?.parentId);
+              const epicName = epic?.name
+
+
+              return (
+                <Card
+                  key={task.id}
+                  type="inner"
+                  className=""
+                  title=<span className="cursor-pointer" onClick={() => openDrawer()}>{task.name}</span>
+                // extra={
+                //   <Button size="small" onClick={() => {
+                //     setSelectedTask(task)
+                //     setEditTask(true)
+                //   }}>
+                //     Edit
+                //   </Button>
+                // }
+                >
+                  <div className="flex flex-wrap item-center gap-1">
+                    <Tag icon={<ReadOutlined />}>{epicName}</Tag>
+                    <ArrowRightOutlined />
+                    <Tag icon={<CopyOutlined />}>{featureName}</Tag>
+                    <ArrowRightOutlined />
+                    <Tag icon={<FileTextOutlined />}>{selectedStoryName}</Tag>
+                  </div>
+                </Card>
+              )
+            }) : null}
         </div>
       </Card>
 

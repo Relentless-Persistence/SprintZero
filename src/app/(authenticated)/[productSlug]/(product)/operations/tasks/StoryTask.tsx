@@ -44,7 +44,7 @@ const StoryTask: FC<Props> = ({ storyMapItems, tab }) => {
   return (
     <div className="">
       {acceptanceCriterias.length > 0 && bugs.length > 0 && (
-        <div className="h-full grid grow auto-cols-[286px] grid-flow-col gap-4">
+        <div className="h-full grid grow auto-cols-[360px] grid-flow-col gap-4">
           <StoryTaskColumn
             id="todo"
             title="To Do"
