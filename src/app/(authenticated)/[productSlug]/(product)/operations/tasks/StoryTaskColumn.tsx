@@ -31,24 +31,11 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
   const { product } = useAppContext()
   const [viewStory, setViewStory] = useState(false)
   const [storyId, setStoryId] = useState<string | undefined>(``)
-  const [storyName, setStoryName] = useState<string | undefined>(``)
-  const [FeatureName, setFeatureName] = useState<string | undefined>(``)
-  const [epicName, setEpicName] = useState<string | undefined>(``)
 
   const [versions, , versionsError] = useCollection(
     query(collection(product.ref, `Versions`), orderBy(`name`, `asc`)).withConverter(VersionConverter),
   )
   useErrorHandler(versionsError)
-
-  function getFeatureName(id: string): string {
-    const feature = storyMapItems.find(story => story.id === id);
-    return feature ? feature : ``;
-  }
-
-  function getEpicName(featureName: string): string {
-    const epic = storyMapItems.find(story => story.name === featureName);
-    return epic ? epic.name : ``;
-  }
 
   return (
     <div>
@@ -72,7 +59,7 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
                 setViewStory(true)
               };
 
-              const selectedFeatureId: string = selectedStory?.parentId
+              const selectedFeatureId: string = selectedStory?.parentId ?? ``;
               const feature = storyMapItems.find(story => story.id === selectedFeatureId);
               const featureName = feature?.name
 
