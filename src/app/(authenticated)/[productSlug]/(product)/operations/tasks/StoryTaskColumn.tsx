@@ -86,14 +86,6 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
                   type="inner"
                   className=""
                   title=<span className="cursor-pointer" onClick={() => openDrawer()}>{task.name}</span>
-                // extra={
-                //   <Button size="small" onClick={() => {
-                //     setSelectedTask(task)
-                //     setEditTask(true)
-                //   }}>
-                //     Edit
-                //   </Button>
-                // }
                 >
                   <div className="flex flex-wrap item-center gap-1">
                     <Tag icon={<ReadOutlined />}>{epicName}</Tag>

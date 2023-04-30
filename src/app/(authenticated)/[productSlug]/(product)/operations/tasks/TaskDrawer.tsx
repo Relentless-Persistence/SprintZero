@@ -1,6 +1,6 @@
-import { Button, Checkbox, DatePicker, Drawer, Input, Select, TimePicker } from "antd"
+import { Button, Checkbox, DatePicker, Drawer, Input, Select } from "antd"
 import dayjs from "dayjs"
-import { Timestamp, addDoc, collection, doc, updateDoc } from "firebase/firestore"
+import { Timestamp, addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
@@ -14,9 +14,9 @@ import type { Task } from "~/types/db/Products/Tasks";
 import Comments from "./Comment"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { MemberConverter } from "~/types/db/Products/Members"
-import { TaskConverter } from "~/types/db/Products/Tasks"
+// import { TaskConverter } from "~/types/db/Products/Tasks"
 
-const dateFormat = `YYYY/MM/DD`;
+const dateFormat = `MMMM D, YYYY`;
 
 interface Subtask {
 	id: string;
@@ -40,7 +40,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 	const [title, setTitle] = useState(``)
 	const [notes, setNotes] = useState(``)
 	const [assign, setAssign] = useState<string[]>([])
-	const [dueDate, setDueDate] = useState<Dayjs>(dayjs())
+	const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs())
 	const [subtasks, setSubtasks] = useState<Subtask[]>([])
 
 	useEffect(() => {
@@ -48,7 +48,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 			setTitle(data.title)
 			setNotes(data.notes)
 			setAssign(data.assigneeIds)
-			setDueDate(data.dueDate)
+			setDueDate(dayjs(data.dueDate.toMillis()))
 			setSubtasks(data.subtasks)
 		}
 	}, [data])
@@ -64,19 +64,19 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 			notes,
 			assigneeIds: assign,
 			subtasks,
-			dueDate,
+			dueDate: Timestamp.fromDate(dayjs(dueDate).toDate()),
 		}
 		if (data) {
 			await updateDoc(doc(product.ref, `Tasks`, data.id), {
 				...updatedTask,
 			})
 		} else {
-			await addDoc(collection(product.ref, `Tasks`).withConverter(TaskConverter), {
+			await addDoc(collection(product.ref, `Tasks`), {
 				title,
 				notes,
 				assigneeIds: assign,
 				subtasks,
-				dueDate: Timestamp.fromMillis(dueDate.valueOf()),
+				dueDate: Timestamp.fromDate(dayjs(dueDate).toDate()),
 				type,
 				status: `todo`
 			})
@@ -84,21 +84,35 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 		setNewTask(false)
 	}
 
-	const onChangeDate: DatePickerProps['onChange'] = (date, dateString) => {
-		setDueDate(date ? date.valueOf() : null)
-		console.log(date?.valueOf())
+	const onChangeDate: DatePickerProps['onChange'] = (date) => {
+		setDueDate(dayjs(date, dateFormat))
 	}
 
-	const onChangeSubtask = (index: number) => {
+	const onChangeSubtask = (index: number): void => {
 		const newSubtasks = [...subtasks]
-		newSubtasks[index].checked = !newSubtasks[index].checked
-		// console.log(newSubtasks)
-		setSubtasks(newSubtasks)
+		if (newSubtasks[index]) {
+			newSubtasks[index]!.checked = !newSubtasks[index]!.checked;
+			setSubtasks(newSubtasks);
+		}
 	}
+
+	const deleteTask = async (): Promise<void> => {
+		if (data) {
+			const taskRef = doc(product.ref, `Tasks`, data.id);
+			try {
+				await deleteDoc(taskRef);
+				setNewTask(false)
+			} catch (error) {
+				console.error(`Error deleting task: `, error);
+			}
+		}
+	};
 
 	return (
 		<Drawer
-			title="Task"
+			title={data ? <Button type="primary" size="small" danger onClick={() => {
+				deleteTask().catch(console.error)
+			}}>Delete</Button> : `New Task`}
 			placement="bottom"
 			extra={
 				<div className="flex items-center gap-2">
@@ -150,7 +164,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
 						<p className="text-lg font-semibold">Due Date / Time</p>
-						<DatePicker value={dayjs(new Date(dueDate))} onChange={onChangeDate} format={dateFormat} />
+						<DatePicker value={dueDate} format={dateFormat} onChange={onChangeDate} />
 						{/* <TimePicker /> */}
 					</div>
 

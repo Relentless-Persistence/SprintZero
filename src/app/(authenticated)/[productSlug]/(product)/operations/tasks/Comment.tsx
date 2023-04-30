@@ -1,19 +1,16 @@
 import { SendOutlined } from "@ant-design/icons"
 import { Avatar, Button } from "antd"
-import dayjs from "dayjs"
-import { addDoc, collection, orderBy, query, serverTimestamp, where } from "firebase/firestore"
+import { addDoc, collection, orderBy, query, serverTimestamp } from "firebase/firestore"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
 import { Mention, MentionsInput } from "react-mentions";
 
-import type { Timestamp } from "firebase/firestore"
 import type { FC, SetStateAction } from "react"
 import type { Comment } from "~/types/db/Products/StoryMapItems/Comments"
 
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { MemberConverter } from "~/types/db/Products/Members"
-import { CommentConverter } from "~/types/db/Products/StoryMapItems/Comments"
 
 export type CommentsProps = {
   id: string
@@ -125,8 +122,6 @@ const Comments: FC<CommentsProps> = ({ id }) => {
     }
   }, [members])
 
-  if (comments) return
-
   return (
     <div className="">
       <div className="flex grow flex-col-reverse overflow-auto">
@@ -142,12 +137,6 @@ const Comments: FC<CommentsProps> = ({ id }) => {
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <p className="text-sm font-medium">
                       {author?.data()?.name}
-                      {` `}
-                      {/* <span className="ml-1 font-normal text-textTertiary">
-                        {comment.data().createdAt
-                          ? dayjs((comment.data().createdAt as Timestamp).toDate()).fromNow()
-                          : null}
-                      </span> */}
                     </p>
                     <p className="leading-normal">{comment.data().text}</p>
                   </div>

@@ -1,7 +1,7 @@
 "use client"
 
-import { Breadcrumb, Button, Tabs } from "antd"
-import { collection, query, where } from "firebase/firestore"
+import { Breadcrumb, Button, Tabs, Tag } from "antd"
+import { collection, query } from "firebase/firestore"
 import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
@@ -26,7 +26,7 @@ const TasksClientPage: FC = () => {
   const [newTask, setNewTask] = useState(false)
 
   const [tasks, , tasksError] = useCollection(
-    query(collection(product.ref, `Tasks`), where(`type`, `==`, currentTab)).withConverter(TaskConverter),
+    query(collection(product.ref, `Tasks`)).withConverter(TaskConverter),
   )
   useErrorHandler(tasksError)
 
@@ -37,10 +37,32 @@ const TasksClientPage: FC = () => {
 
   if (!storyMapItems) return null
 
-  const filteredTasks: MyTask[] = tasks
+  const storyMaps = storyMapItems.docs.map((item) => item.data())
+
+  const totalAcceptanceCriteria = storyMaps.reduce((sum, item) => {
+    return sum + item.acceptanceCriteria.length;
+  }, 0);
+
+  const totalBugs = storyMaps.reduce((sum, item) => {
+    return sum + item.bugs.length;
+  }, 0);
+
+  const dSTasks: MyTask[] = tasks
     ? tasks.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter((task) => task.type === currentTab)
+      .filter((task) => task.type === `data science`)
+    : [];
+
+  const pipeTasks: MyTask[] = tasks
+    ? tasks.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((task) => task.type === `pipelines`)
+    : [];
+
+  const randomTasks: MyTask[] = tasks
+    ? tasks.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((task) => task.type === `random`)
     : [];
 
   return (
@@ -58,7 +80,7 @@ const TasksClientPage: FC = () => {
           tabBarExtraContent={currentTab !== `acceptance criteria` && currentTab !== `bugs` ? <Button onClick={() => setNewTask(true)}>Add Task</Button> : null}
           items={[
             {
-              label: `Acceptance Criteria`,
+              label: <div className="space-x-2"><Tag>{totalAcceptanceCriteria}</Tag><span>Acceptance Criteria</span></div>,
               key: `acceptance criteria`,
               children: (
                 <div className="w-full">
@@ -67,7 +89,7 @@ const TasksClientPage: FC = () => {
               ),
             },
             {
-              label: `Bugs`,
+              label: <div className="space-x-2"><Tag>{totalBugs}</Tag><span>Bugs</span></div>,
               key: `bugs`,
               children: (
                 <div className="w-full">
@@ -76,29 +98,29 @@ const TasksClientPage: FC = () => {
               ),
             },
             {
-              label: `Data Science`,
+              label: <div className="space-x-2"><Tag>{dSTasks.length}</Tag><span>Data Science</span></div>,
               key: `data science`,
               children: (
                 <div className="w-full">
-                  <GeneralTasks tasks={filteredTasks} />
+                  <GeneralTasks tasks={dSTasks} />
                 </div>
               ),
             },
             {
-              label: `Pipelines`,
+              label: <div className="space-x-2"><Tag>{pipeTasks.length}</Tag><span>Pipelines</span></div>,
               key: `pipelines`,
               children: (
                 <div className="w-full">
-                  <GeneralTasks tasks={filteredTasks} />
+                  <GeneralTasks tasks={pipeTasks} />
                 </div>
               ),
             },
             {
-              label: `Random`,
+              label: <div className="space-x-2"><Tag>{randomTasks.length}</Tag><span>Random</span></div>,
               key: `random`,
               children: (
                 <div className="w-full">
-                  <GeneralTasks tasks={filteredTasks} />
+                  <GeneralTasks tasks={randomTasks} />
                 </div>
               ),
             },

@@ -2,7 +2,6 @@ import { Button, Card, Tag } from "antd"
 import dayjs from "dayjs"
 import { useState } from "react"
 
-import type { QuerySnapshot } from "firebase/firestore"
 import type { FC } from "react"
 import type { Task } from "~/types/db/Products/Tasks"
 
@@ -16,7 +15,6 @@ export type TaskColumnProps = {
 	id: string
 	title: string
 	tasks: MyTask[]
-	onEdit: (id: string) => void
 }
 
 const TaskColumn: FC<TaskColumnProps> = ({ id, title, tasks }) => {
@@ -25,9 +23,10 @@ const TaskColumn: FC<TaskColumnProps> = ({ id, title, tasks }) => {
 
 	return (
 		<div>
-			<Card title={title} className="h-[463px] lg-h-[600px]">
+			<Card title={title} className="h-[463px] lg-h-[600px]" extra=<Tag>{tasks.length > 0 ? tasks
+				.filter((task) => task.status === id).length : 0}</Tag>>
 				<div className="flex flex-col gap-4">
-					{tasks && tasks.length > 0 ? tasks
+					{tasks.length > 0 ? tasks
 						.filter((task) => task.status === id)
 						.map((task) => (
 							<Card
