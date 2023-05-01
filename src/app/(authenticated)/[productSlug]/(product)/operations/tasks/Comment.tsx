@@ -170,6 +170,7 @@ const Comments: FC<CommentsProps> = ({ id }) => {
                 </div>
               )}
               appendSpaceOnAdd
+              markup="@*__display__*"
             />
           </MentionsInput>
 
