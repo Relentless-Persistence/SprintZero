@@ -95,9 +95,11 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
+		const regex = /@\*@(.+?)\*/g;
+		const outputString = commentDraft.replace(regex, `@$1`);
 		const data: Comment = {
 			createdAt: serverTimestamp(),
-			text: commentDraft,
+			text: outputString,
 			type: commentType,
 			authorId: user.id,
 		}
@@ -123,7 +125,7 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 			if (memberDocs.length) {
 				const commentUsers: MentionData[] = memberDocs.map((member) => ({
 					id: member.id,
-					display: `@${member.name}`,
+					display: `@${member.name.split(` `).join(`.`)}`,
 				}));
 
 				setMentions(commentUsers)
@@ -185,6 +187,7 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 								</div>
 							)}
 							appendSpaceOnAdd
+							markup="@*__display__*"
 						/>
 					</MentionsInput>
 
