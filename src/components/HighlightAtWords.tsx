@@ -10,7 +10,7 @@ const HighlightAtWords: FC<Props> = ({ text }) => {
   const highlightedWords = words.map((word, index) => {
     if (word.startsWith(`@`)) {
       return (
-        <span key={index} className="text-primary">
+        <span key={index} className="font-semibold text-infoActive">
           {word}{` `}
         </span>
       );

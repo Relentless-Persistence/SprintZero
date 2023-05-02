@@ -89,6 +89,7 @@ const Comments: FC<CommentsProps> = ({ id }) => {
     e.preventDefault()
     const regex = /@\*@(.+?)\*/g;
     const outputString = commentDraft.replace(regex, `@$1`);
+
     const data: Partial<Comment> = {
       createdAt: serverTimestamp(),
       text: outputString,
@@ -117,7 +118,7 @@ const Comments: FC<CommentsProps> = ({ id }) => {
       if (memberDocs.length) {
         const commentUsers: MentionData[] = memberDocs.map((member) => ({
           id: member.id,
-          display: `@${member.name}`,
+          display: `@${member.name.split(` `).join(`.`)}`,
         }));
 
         setMentions(commentUsers)
