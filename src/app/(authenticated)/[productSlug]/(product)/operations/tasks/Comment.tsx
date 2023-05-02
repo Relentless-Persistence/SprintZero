@@ -10,6 +10,7 @@ import type { FC, SetStateAction } from "react"
 import type { Comment } from "~/types/db/Products/StoryMapItems/Comments"
 
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import HighlightAtWords from "~/components/HighlightAtWords"
 import { MemberConverter } from "~/types/db/Products/Members"
 
 export type CommentsProps = {
@@ -86,9 +87,11 @@ const Comments: FC<CommentsProps> = ({ id }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const regex = /@\*@(.+?)\*/g;
+    const outputString = commentDraft.replace(regex, `@$1`);
     const data: Partial<Comment> = {
       createdAt: serverTimestamp(),
-      text: commentDraft,
+      text: outputString,
       authorId: user.id,
     }
     await addDoc(collection(product.ref, `Tasks`, id, `Comments`), data)
@@ -122,9 +125,14 @@ const Comments: FC<CommentsProps> = ({ id }) => {
     }
   }, [members])
 
+  // const parseMessage = (text: string) => {
+  //   const outputString = text.replace(/@\[@(.*?)\]\(.*?\)/g, `@$1`);
+  //   console.log(outputString)
+  // }
+
   return (
     <div className="">
-      <div className="flex grow flex-col-reverse overflow-auto">
+      <div className="flex grow flex-col-reverse p-1 overflow-auto">
         <div className="flex flex-col gap-4">
           {comments?.docs.length === 0 ? (
             <p className="italic leading-normal text-textTertiary">Nothing here yet</p>
@@ -138,7 +146,8 @@ const Comments: FC<CommentsProps> = ({ id }) => {
                     <p className="text-sm font-medium">
                       {author?.data()?.name}
                     </p>
-                    <p className="leading-normal">{comment.data().text}</p>
+                    {/* <p className="leading-normal">{comment.data().text}</p> */}
+                    <HighlightAtWords text={comment.data().text as string} />
                   </div>
                 </div>
               )

@@ -13,6 +13,7 @@ import type { Promisable } from "type-fest"
 import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 import type { Comment } from "~/types/db/Products/StoryMapItems/Comments"
 
+import HighlightAtWords from "./HighlightAtWords"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { CommentConverter } from "~/types/db/Products/StoryMapItems/Comments"
@@ -152,7 +153,7 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 													: null}
 											</span>
 										</p>
-										<p className="leading-normal">{comment.data().text}</p>
+										<HighlightAtWords text={comment.data().text} />
 									</div>
 								</div>
 							)
