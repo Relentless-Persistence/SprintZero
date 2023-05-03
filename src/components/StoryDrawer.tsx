@@ -115,6 +115,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
 				const index = draft.findIndex((criterion) => criterion.id === id)
 				draft[index]!.checked = checked
+				if (checked === true) {
+					draft[index]!.status = `done`
+				} else {
+					draft[index]!.status = `todo`
+				}
 			}),
 		})
 	}
@@ -134,6 +139,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			bugs: produce(story.bugs, (draft) => {
 				const index = draft.findIndex((bug) => bug.id === id)
 				draft[index]!.checked = checked
+				if (checked === true) {
+					draft[index]!.status = `done`
+				} else {
+					draft[index]!.status = `todo`
+				}
 			}),
 		})
 	}
