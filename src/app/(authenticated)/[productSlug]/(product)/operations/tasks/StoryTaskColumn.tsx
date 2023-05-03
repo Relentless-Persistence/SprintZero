@@ -52,12 +52,12 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
               );
               const storyId = tab === `bugs` ? storyBugIndex : storyAcceptanceIndex;
               const selectedStory = storyMapItems[storyId];
-              const selectedStoryId = selectedStory?.id;
+              // const selectedStoryId = selectedStory?.id;
               const selectedStoryName = selectedStory?.name;
-              const openDrawer = () => {
-                setStoryId(selectedStoryId)
-                setViewStory(true)
-              };
+              // const openDrawer = () => {
+              //   setStoryId(selectedStoryId)
+              //   setViewStory(true)
+              // };
 
               const selectedFeatureId: string = selectedStory?.parentId ?? ``;
               const feature = storyMapItems.find(story => story.id === selectedFeatureId);
@@ -72,7 +72,7 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
                   key={task.id}
                   type="inner"
                   className=""
-                  title=<span className="cursor-pointer" onClick={() => openDrawer()}>{task.name}</span>
+                  title=<span className="cursor-pointer">{task.name}</span>
                 >
                   <div className="flex flex-wrap item-center gap-1">
                     <Tag icon={<ReadOutlined />}>{epicName}</Tag>
