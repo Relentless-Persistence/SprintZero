@@ -1,116 +1,111 @@
 "use client"
 
-import {CloseOutlined, DislikeOutlined, FilterOutlined, LikeOutlined} from "@ant-design/icons"
-import {Alert, Breadcrumb, Button, Card, Dropdown, Tag} from "antd"
-import {collection} from "firebase/firestore"
-import {useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { DislikeOutlined, LikeOutlined } from "@ant-design/icons"
+import { Breadcrumb, Segmented, Tabs } from "antd"
+import { collection } from "firebase/firestore"
+import { useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 
-import type {FC} from "react"
+import type { FC } from "react"
+import type { Member } from "~/types/db/Products/Members";
 
 import Story from "./Story"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
-import {getStories} from "~/utils/storyMap"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { MemberConverter } from "~/types/db/Products/Members"
+import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
+import { getStories } from "~/utils/storyMap"
 
 const EthicsClientPage: FC = () => {
-	const {product} = useAppContext()
-	const [storyMapItems, , storyMapItemsError] = useCollection(
-		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
-	)
-	useErrorHandler(storyMapItemsError)
-	const stories = storyMapItems ? getStories(storyMapItems.docs.map((item) => item.data())) : []
+  const { product } = useAppContext()
+  const [currentTab, setcurrentTab] = useState<`flagged` | `adjudicated`>(`flagged`)
+  const [approved, setApproved] = useState<`accepted` | `rejected`>(`accepted`)
+  const [storyMapItems, , storyMapItemsError] = useCollection(
+    collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
+  )
+  useErrorHandler(storyMapItemsError)
+  const stories = storyMapItems ? getStories(storyMapItems.docs.map((item) => item.data())) : []
 
-	const [filter, setFilter] = useState<`approved` | `rejected` | `all`>(`all`)
+  const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
+  useErrorHandler(membersError)
 
-	return (
-		<>
-			{stories.filter((story) => story.ethicsColumn !== null).length === 0 && (
-				<Alert
-					type="error"
-					showIcon
-					message="No elements present; flag a user story to populate"
-					className="absolute bottom-8 right-12 z-10"
-				/>
-			)}
+  const membersData = members && members.docs.map(doc => ({ ...doc.data() }));
 
-			<div className="flex h-full flex-col gap-6 px-12 py-8">
-				<Breadcrumb items={[{title: `Tactics`}, {title: `Ethics`}]} />
+  const isApproved = approved === `accepted` ? true : false
 
-				<div className="grid w-full grow grid-cols-2 gap-6">
-					<Card
-						title="Under Review"
-						extra={<p>{stories.filter((story) => story.ethicsColumn === `underReview`).length}</p>}
-					>
-						<div className="flex flex-col gap-4">
-							{storyMapItems &&
-								stories
-									.filter((story) => story.ethicsColumn === `underReview`)
-									.map((story) => (
-										<Story
-											key={story.id}
-											storyMapItems={storyMapItems.docs.map((item) => item.data())}
-											storyId={story.id}
-										/>
-									))}
-						</div>
-					</Card>
-					<Card
-						title="Adjudicated"
-						extra={
-							<div className="flex gap-1">
-								{filter === `approved` && (
-									<button type="button" onClick={() => setFilter(`all`)}>
-										<Tag icon={<LikeOutlined />} color="green">
-											Approved <CloseOutlined className="ml-0.5" />
-										</Tag>
-									</button>
-								)}
-								{filter === `rejected` && (
-									<button type="button" onClick={() => setFilter(`all`)}>
-										<Tag icon={<DislikeOutlined />} color="red">
-											Rejected <CloseOutlined className="ml-0.5" />
-										</Tag>
-									</button>
-								)}
-								<Dropdown
-									trigger={[`click`]}
-									menu={{
-										items: [
-											{label: `Approved`, key: `approved`, onClick: () => setFilter(`approved`)},
-											{label: `Rejected`, key: `rejected`, onClick: () => setFilter(`rejected`)},
-											{label: `All`, key: `all`, onClick: () => setFilter(`all`)},
-										],
-										selectable: true,
-										defaultSelectedKeys: [`all`],
-									}}
-								>
-									<Button size="small" icon={<FilterOutlined />} className="flex items-center">
-										Filter
-									</Button>
-								</Dropdown>
-							</div>
-						}
-					>
-						<div className="flex flex-col gap-4">
-							{storyMapItems &&
-								stories
-									.filter((story) => story.ethicsColumn === `adjudicated`)
-									.filter((story) => filter === `all` || (filter === `approved` && story.ethicsApproved))
-									.map((story) => (
-										<Story
-											key={story.id}
-											storyMapItems={storyMapItems.docs.map((item) => item.data())}
-											storyId={story.id}
-										/>
-									))}
-						</div>
-					</Card>
-				</div>
-			</div>
-		</>
-	)
+  return (
+    <div className="flex flex-col gap-6 px-12 py-8">
+      <div className="">
+        <Breadcrumb className="capitalize mb-3" items={[{ title: `Tactics` }, { title: `Ethics` }, { title: currentTab }]} />
+        <h1 className="text-4xl font-semibold capitalize mb-1">Technically yes, but should we?</h1>
+        <p className="text-textTertiary">Participate in reviewing and voting on user stories that have been flagged by our team members for potential ethical concerns.</p>
+      </div>
+
+      <Tabs
+        activeKey={currentTab}
+        onChange={(key) => setcurrentTab(key as `flagged` | `adjudicated`)}
+        tabBarExtraContent={
+          currentTab === `adjudicated` ? <Segmented options={[
+            {
+              label: `Accepted`,
+              value: `accepted`,
+              icon: <LikeOutlined />,
+            },
+            {
+              label: `Rejected`,
+              value: `rejected`,
+              icon: <DislikeOutlined />,
+            },
+          ]}
+            value={approved}
+            onChange={value => setApproved(value as `accepted` | `rejected`)}
+          /> : null
+        }
+        items={[
+          {
+            label: `Flagged`,
+            key: `flagged`,
+            children: (
+              <div id="voiceTable" className="grid w-full grow grid-cols-2 gap-6">
+
+                {storyMapItems &&
+                  stories
+                    .map((story) => (
+                      <Story
+                        key={story.id}
+                        storyMapItems={storyMapItems.docs.map((item) => item.data())}
+                        storyId={story.id}
+                        members={membersData as Member[]}
+                        tab={currentTab}
+                      />
+                    ))}
+              </div>
+            ),
+          },
+          {
+            label: `Adjudicated`,
+            key: `adjudicated`,
+            children: (
+              <div id="voiceTable" className="grid w-full grow grid-cols-2 gap-6">
+                {storyMapItems &&
+                  stories
+                    .filter((story) => story.ethicsApproved === isApproved)
+                    .map((story) => (
+                      <Story
+                        key={story.id}
+                        storyMapItems={storyMapItems.docs.map((item) => item.data())}
+                        storyId={story.id}
+                        members={membersData as Member[]}
+                        tab={currentTab}
+                      />
+                    ))}
+              </div>
+            ),
+          },
+        ]}
+      />
+    </div>
+  )
 }
 
 export default EthicsClientPage
