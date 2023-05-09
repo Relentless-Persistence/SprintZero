@@ -1,30 +1,30 @@
 "use client"
 
+import { CloseCircleFilled, CloseCircleOutlined } from "@ant-design/icons"
 import { Breadcrumb, Card, Input, Tabs } from "antd"
 import { Timestamp, collection, doc, orderBy, query, setDoc, updateDoc, writeBatch } from "firebase/firestore"
 import { useEffect, useRef, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
+import { useDebounce } from "react-use"
 
 import type { FC } from "react"
 
+import TextareaCard from "../kickoff/TextareaCard"
+import TextListCard from "../kickoff/TextListCard"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import TextListEditor from "~/components/TextListEditor"
 import { BusinessOutcomeConverter } from "~/types/db/Products/BusinessOutcomes"
 import { MarketLeaderConverter } from "~/types/db/Products/MarketLeaders"
+import { ObjectiveConverter } from "~/types/db/Products/Objectives"
+import { ResultConverter } from "~/types/db/Products/Objectives/Results"
 import { PersonaConverter } from "~/types/db/Products/Personas"
 import { PotentialRiskConverter } from "~/types/db/Products/PotentialRisks"
 import { UserPriorityConverter } from "~/types/db/Products/UserPriorities"
 import { db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
 
-import TextListEditor from "~/components/TextListEditor"
-import TextareaCard from "../kickoff/TextareaCard"
-import { CloseCircleFilled, CloseCircleOutlined } from "@ant-design/icons"
-import TextListCard from "../kickoff/TextListCard"
-import { ResultConverter } from "~/types/db/Products/Objectives/Results"
-import { useDebounce } from "react-use"
-import { ObjectiveConverter } from "~/types/db/Products/Objectives"
 
 const ObjectivesClientPage: FC = () => {
 
@@ -32,7 +32,7 @@ const ObjectivesClientPage: FC = () => {
 	const [currentObjectiveId, setCurrentObjectiveId] = useState<string | undefined>(undefined)
 
 	const [objectives, , objectivesError] = useCollection(
-		query(collection(product.ref, `Objectives`), orderBy(`name`, `asc`)).withConverter(ObjectiveConverter),
+		query(collection(product.ref, `Objectives`)).withConverter(ObjectiveConverter),
 	)
 	useErrorHandler(objectivesError)
 
@@ -81,8 +81,6 @@ const ObjectivesClientPage: FC = () => {
 
 	const [activeResultId, setActiveResultId] = useState<string | `new` | undefined>(undefined)
 
-
-
 	// kickoff stuff
 	const [editingSection, setEditingSection] = useState<
 		| `okrHowMightWeStatement`
@@ -121,6 +119,8 @@ const ObjectivesClientPage: FC = () => {
 	)
 	useErrorHandler(okrBlockersDependenciesError)
 
+	const order = [`One`, `Two`, `Three`, `Four`, `Five`, `Six`];
+
 	return (
 		<div className="grid h-full grid-cols-[1fr_max-content]">
 			<div className="relative flex w-full flex-col gap-2 overflow-auto px-12 py-8">
@@ -138,7 +138,9 @@ const ObjectivesClientPage: FC = () => {
 						setCurrentObjectiveId(key)
 						setStatement(objectives?.docs.find((objective) => objective.id === key)?.data().statement || ``)
 					}}
-					items={objectives?.docs.map((objective) => ({ key: objective.id, label: objective.data().name }))}
+					items={objectives?.docs
+						.map((objective) => ({ key: objective.id, label: objective.data().name }))
+						.sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label))}
 				/>
 
 				{currentObjectiveId && (
@@ -187,7 +189,7 @@ const ObjectivesClientPage: FC = () => {
 						title="Target Personas"
 					>
 
-						{['1.', '2.', '3.', '4.', '5.'].map((input, index) => (
+						{[`1.`, `2.`, `3.`, `4.`, `5.`].map((input, index) => (
 							<Input className="mb-3"
 								key={index}
 								prefix={input}
@@ -245,16 +247,16 @@ const ObjectivesClientPage: FC = () => {
 						onEditStart={() => setEditingSection(`okrJobToBeDone`)}
 						onEditEnd={() => setEditingSection(undefined)}
 						onCommit={async (textList) => {
-							console.log('saving to db')
+							console.log(`saving to db`)
 							await Promise.all(
 								textList.map(async (item) => {
 									if (okrJobToBeDone?.docs.some((doc) => doc.id === item.id)) {
-										console.log('updating doc')
+										console.log(`updating doc`)
 										await updateDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
 											text: item.text,
 										}).catch(console.error)
 									} else {
-										console.log('setting doc')
+										console.log(`setting doc`)
 										await setDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
 											createdAt: Timestamp.now(),
 											text: item.text,
