@@ -1,28 +1,36 @@
 "use client"
 
+import { CloseCircleOutlined } from "@ant-design/icons"
 import { Breadcrumb, Card, Input } from "antd"
-import { Timestamp, collection, doc, orderBy, query, setDoc, updateDoc, writeBatch } from "firebase/firestore"
-import { useState } from "react"
+import { Timestamp, addDoc, collection, doc, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from "firebase/firestore"
+import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
 
 import type { FC } from "react"
+// import type { Persona } from "~/types/db/Products/Personas"
 
 import EditableTextCard from "./EditableTextCard"
 import EditableTextListCard from "./EditableTextListCard"
+import TextareaCard from "./TextareaCard"
+import TextListCard from "./TextListCard"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import TextListEditor from "~/components/TextListEditor"
 import { BusinessOutcomeConverter } from "~/types/db/Products/BusinessOutcomes"
 import { MarketLeaderConverter } from "~/types/db/Products/MarketLeaders"
-import { PersonaConverter } from "~/types/db/Products/Personas"
+import { PersonaConverter } from "~/types/db/Products/Personas";
 import { PotentialRiskConverter } from "~/types/db/Products/PotentialRisks"
 import { UserPriorityConverter } from "~/types/db/Products/UserPriorities"
 import { db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
-import TextareaCard from "./TextareaCard"
-import TextListCard from "./TextListCard"
-import TextListEditor from "~/components/TextListEditor"
-import { CloseCircleFilled, CloseCircleOutlined } from "@ant-design/icons"
+
+interface MyPersona {
+	id?: string;
+	name: string;
+	description?: string;
+	createdAt?: Timestamp;
+}
 
 const KickoffClientPage: FC = () => {
 	const { product } = useAppContext()
@@ -36,30 +44,91 @@ const KickoffClientPage: FC = () => {
 		| undefined
 	>(undefined)
 
+	const [personaList, setPersonaList] = useState<MyPersona[]>([])
+
 	const [personas, , personasError] = useCollection(
 		query(collection(product.ref, `Personas`), orderBy(`createdAt`, `asc`)).withConverter(PersonaConverter),
 	)
 	useErrorHandler(personasError)
+
+	useEffect(() => {
+		const emptyPersona: MyPersona = {
+			createdAt: Timestamp.now(),
+			description: ``,
+			name: ``,
+		};
+		const emptyPersonaArray: MyPersona[] = Array.from({ length: 5 }, () => emptyPersona);
+
+		if (personas && personas.empty) {
+			setPersonaList(emptyPersonaArray)
+		} else if (personas) {
+			const newPersonas = personas.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+			const personaList = newPersonas.length >= 5 ? newPersonas : [...newPersonas, ...Array.from({ length: 5 - newPersonas.length }, () => emptyPersona)];
+			setPersonaList(personaList);
+		}
+	}, [personas])
+
 	const [businessOutcomes, , businessOutcomesError] = useCollection(
 		query(collection(product.ref, `BusinessOutcomes`), orderBy(`createdAt`, `asc`)).withConverter(
 			BusinessOutcomeConverter,
 		),
 	)
 	useErrorHandler(businessOutcomesError)
+
 	const [userPriorities, , userPrioritiesError] = useCollection(
 		query(collection(product.ref, `UserPriorities`), orderBy(`createdAt`, `asc`)).withConverter(UserPriorityConverter),
 	)
 	useErrorHandler(userPrioritiesError)
+
 	const [potentialRisks, , potentialRisksError] = useCollection(
 		query(collection(product.ref, `PotentialRisks`), orderBy(`createdAt`, `asc`)).withConverter(PotentialRiskConverter),
 	)
 	useErrorHandler(potentialRisksError)
+
 	const [marketLeaders, , marketLeadersError] = useCollection(
 		query(collection(product.ref, `MarketLeaders`), orderBy(`createdAt`, `asc`)).withConverter(MarketLeaderConverter),
 	)
 	useErrorHandler(marketLeadersError)
 
 	const gpt = trpc.gpt.useMutation()
+
+	const personaChange = (index: number, value: string) => {
+
+		setPersonaList(prevList => {
+			const updatedList = [...prevList];
+			updatedList[index] = {
+				...updatedList[index],
+				name: value
+			};
+			return updatedList;
+		});
+	}
+
+	const personaAction = async (index: number) => {
+		const persona = personaList[index]
+		if (persona?.name === ``) return
+
+		if (persona?.id) {
+			try {
+				await updateDoc(doc(product.ref, `Personas`, persona.id).withConverter(PersonaConverter), {
+					name: persona.name,
+				})
+			} catch (error) {
+				console.error(error)
+			}
+		} else {
+			try {
+				await addDoc(collection(product.ref, `Personas`), {
+					...persona,
+					createdAt: Timestamp.now(),
+				})
+			} catch (error) {
+				console.error(error)
+			}
+		}
+
+
+	}
 
 	return (
 		<div className="h-full overflow-auto px-12 pb-8">
@@ -105,16 +174,20 @@ const KickoffClientPage: FC = () => {
 					title="Personas"
 				>
 
-					{['1.', '2.', '3.', '4.', '5.'].map((input, index) => (
+					{personaList.map((persona, index) => (
 						<Input className="mb-3"
 							key={index}
-							prefix={input}
+							prefix={`${index + 1}.`}
 							suffix={
 								<CloseCircleOutlined />
 							}
+							value={persona.name}
+							onChange={(e) => personaChange(index, e.target.value)}
+							onBlur={() => {
+								personaAction(index).catch(console.error)
+							}}
 						/>
 					))}
-					{/* <TextListEditor textList={draftTextList} onChange={setDraftTextList} /> */}
 				</Card>
 
 				{/* <TextListCard
@@ -163,16 +236,16 @@ const KickoffClientPage: FC = () => {
 					onEditStart={() => setEditingSection(`businessOutcomes`)}
 					onEditEnd={() => setEditingSection(undefined)}
 					onCommit={async (textList) => {
-						console.log('saving to db')
+						console.log(`saving to db`)
 						await Promise.all(
 							textList.map(async (item) => {
 								if (businessOutcomes?.docs.some((doc) => doc.id === item.id)) {
-									console.log('updating doc')
+									console.log(`updating doc`)
 									await updateDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
 										text: item.text,
 									}).catch(console.error)
 								} else {
-									console.log('setting doc')
+									console.log(`setting doc`)
 									await setDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
 										createdAt: Timestamp.now(),
 										text: item.text,

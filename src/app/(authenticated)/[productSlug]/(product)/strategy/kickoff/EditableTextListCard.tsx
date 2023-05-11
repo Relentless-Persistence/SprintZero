@@ -1,18 +1,18 @@
-import {Button, Card, Empty} from "antd"
-import {useState} from "react"
+import { Button, Card, Empty } from "antd"
+import { useState } from "react"
 
-import type {FC} from "react"
-import type {Promisable} from "type-fest"
+import type { FC } from "react"
+import type { Promisable } from "type-fest"
 
 import TextListEditor from "~/components/TextListEditor"
 
 export type EditableTextListCardProps = {
 	title: string
-	textList: Array<{id: string; text: string}> | undefined
+	textList: Array<{ id: string; text: string }> | undefined
 	isEditing: boolean
 	onEditStart: () => void
 	onEditEnd: () => void
-	onCommit: (textList: Array<{id: string; text: string}>) => Promisable<void>
+	onCommit: (textList: Array<{ id: string; text: string }>) => Promisable<void>
 }
 
 const EditableTextListCard: FC<EditableTextListCardProps> = ({
@@ -23,7 +23,8 @@ const EditableTextListCard: FC<EditableTextListCardProps> = ({
 	onEditEnd,
 	onCommit,
 }) => {
-	const [draftTextList, setDraftTextList] = useState<Array<{id: string; text: string}>>([])
+	const [draftTextList, setDraftTextList] = useState<Array<{ id: string; text: string }>>([])
+	console.log(textList)
 
 	return (
 		<Card
