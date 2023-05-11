@@ -69,7 +69,7 @@ const ParticipantsClientPage: FC = () => {
                                     title: null,
                                     transcript: ``,
                                     updatedAt: Timestamp.now(),
-                                    personaId: null,
+                                    personaIds: [],
                                     updatedAtUserId: user.id,
                                 })
                                     .then((docRef) => {
@@ -135,15 +135,18 @@ const ParticipantsClientPage: FC = () => {
                                         >
                                             <div className="flex flex-wrap gap-2">
                                                 {personas?.docs.map((persona) => {
-                                                    if (persona.id === participant.data().personaId) {
-                                                        return (
-                                                            <Tag key={persona.id} color="geekblue" icon={<UserOutlined />}>
-                                                                {persona.data().name}
-                                                            </Tag>
-                                                        );
-                                                    } else {
-                                                        return null;
-                                                    }
+                                                    return <Tag key={persona.id} color="geekblue" icon={<UserOutlined />}>
+                                                        {persona.data().name}
+                                                    </Tag>
+                                                    // if (persona.id === participant.data().personaId) {
+                                                    //     return (
+                                                    //         <Tag key={persona.id} color="geekblue" icon={<UserOutlined />}>
+                                                    //             {persona.data().name}
+                                                    //         </Tag>
+                                                    //     );
+                                                    // } else {
+                                                    //     return null;
+                                                    // }
                                                 })}
                                                 {participant.data().disabilities.auditory && (
                                                     <Tag

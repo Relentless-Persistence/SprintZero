@@ -20,7 +20,7 @@ import { CommentConverter } from "~/types/db/Products/StoryMapItems/Comments"
 
 export type CommentsProps = {
 	storyMapItem: StoryMapItem
-	commentType: `code` | `design`
+	commentType: `engineering` | `design`
 	flagged?: boolean
 	onFlag?: () => Promisable<void>
 }
@@ -136,7 +136,7 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 	return (
 		<div className="absolute inset-0 flex flex-col">
 			<div className="flex grow flex-col-reverse overflow-auto">
-				<div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-4	">
 					{comments?.docs.length === 0 ? (
 						<p className="italic leading-normal text-textTertiary">Nothing here yet</p>
 					) : (
@@ -176,7 +176,7 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 				/>
 				<div className="flex grow flex-col gap-2">
 
-					<MentionsInput value={commentDraft} onChange={(e: { target: { value: SetStateAction<string> } }) => setCommentDraft(e.target.value)} style={mentionStyle}>
+					<MentionsInput placeholder="What's Up?" value={commentDraft} onChange={(e: { target: { value: SetStateAction<string> } }) => setCommentDraft(e.target.value)} style={mentionStyle}>
 						<Mention
 							trigger="@"
 							className="text-primary bg-primaryBg"
@@ -201,7 +201,7 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 						>
 							Post
 						</Button>
-						{flagged !== undefined && onFlag && (
+						{/* {flagged !== undefined && onFlag && (
 							<Button
 								icon={<FlagOutlined />}
 								danger
@@ -213,7 +213,7 @@ const Comments: FC<CommentsProps> = ({ storyMapItem, commentType, flagged, onFla
 							>
 								{flagged ? `Flagged` : `Flag`}
 							</Button>
-						)}
+						)} */}
 					</div>
 				</div>
 			</form>

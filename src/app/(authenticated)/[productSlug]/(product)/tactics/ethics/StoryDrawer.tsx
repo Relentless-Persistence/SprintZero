@@ -9,28 +9,28 @@ import {
 	NumberOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
-import {Avatar, Drawer, Input, Popover, Radio, Segmented, Tag} from "antd"
+import { Avatar, Drawer, Input, Popover, Radio, Segmented, Tag } from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {collection, doc, updateDoc} from "firebase/firestore"
-import {useEffect, useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
-import {useInterval} from "react-use"
+import { collection, doc, updateDoc } from "firebase/firestore"
+import { useEffect, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
+import { useInterval } from "react-use"
 
-import type {QueryDocumentSnapshot, WithFieldValue} from "firebase/firestore"
-import type {FC} from "react"
-import type {Member} from "~/types/db/Products/Members"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type { QueryDocumentSnapshot, WithFieldValue } from "firebase/firestore"
+import type { FC } from "react"
+import type { Member } from "~/types/db/Products/Members"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import Comments from "~/components/Comments"
 import LinkTo from "~/components/LinkTo"
-import {MemberConverter} from "~/types/db/Products/Members"
-import {sprintColumns} from "~/types/db/Products/StoryMapItems"
+import { MemberConverter } from "~/types/db/Products/Members"
+import { sprintColumns } from "~/types/db/Products/StoryMapItems"
 import dollarFormat from "~/utils/dollarFormat"
-import {getStories} from "~/utils/storyMap"
+import { getStories } from "~/utils/storyMap"
 
 dayjs.extend(relativeTime)
 
@@ -41,11 +41,11 @@ export type StoryDrawerProps = {
 	onClose: () => void
 }
 
-const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onClose}) => {
-	const {product, member} = useAppContext()
+const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, storyId, isOpen, onClose }) => {
+	const { product, member } = useAppContext()
 	const story = getStories(storyMapItems).find((story) => story.id === storyId)!
 	const [description, setDescription] = useState(story.description)
-	const [commentType, setCommentType] = useState<`design` | `code`>(`design`)
+	const [commentType, setCommentType] = useState<`engineering` | `design`>(`engineering`)
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
@@ -150,7 +150,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 								<Tag
 									color={story.branchName ? `#0958d9` : `#f5f5f5`}
 									icon={<CodeOutlined />}
-									style={story.branchName ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+									style={story.branchName ? {} : { color: `#d9d9d9`, border: `1px solid currentColor` }}
 								>
 									{story.branchName ?? `No branch`}
 								</Tag>
@@ -158,7 +158,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 									<Tag
 										color={story.designLink ? `#0958d9` : `#f5f5f5`}
 										icon={<BlockOutlined />}
-										style={story.designLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+										style={story.designLink ? {} : { color: `#d9d9d9`, border: `1px solid currentColor` }}
 									>
 										Design
 									</Tag>
@@ -167,7 +167,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 									<Tag
 										color={story.pageLink ? `#0958d9` : `#f5f5f5`}
 										icon={<LinkOutlined />}
-										style={story.pageLink ? {} : {color: `#d9d9d9`, border: `1px solid currentColor`}}
+										style={story.pageLink ? {} : { color: `#d9d9d9`, border: `1px solid currentColor` }}
 									>
 										Page
 									</Tag>
@@ -196,8 +196,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 										story.ethicsVotes[member.id] === true
 											? `allow`
 											: story.ethicsVotes[member.id] === false
-											? `reject`
-											: undefined
+												? `reject`
+												: undefined
 									}
 									onChange={(e) => {
 										addVote(e.target.value === `allow`).catch(console.error)
@@ -229,7 +229,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 							value={description}
 							onChange={(e) => {
 								setDescription(e.target.value)
-								updateDoc(doc(product.ref, `StoryMapItems`, story.id), {description: e.target.value}).catch(
+								updateDoc(doc(product.ref, `StoryMapItems`, story.id), { description: e.target.value }).catch(
 									console.error,
 								)
 							}}
@@ -245,10 +245,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 						<Segmented
 							size="small"
 							value={commentType}
-							onChange={(value) => setCommentType(value as `code` | `design`)}
+							onChange={(value) => setCommentType(value as `engineering` | `design`)}
 							options={[
-								{label: `Design`, icon: <BlockOutlined />, value: `design`},
-								{label: `Code`, icon: <CodeOutlined />, value: `code`},
+								{ label: `Design`, icon: <BlockOutlined />, value: `design` },
+								{ label: `Code`, icon: <CodeOutlined />, value: `engineering` },
 							]}
 						/>
 					</div>
@@ -258,7 +258,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({storyMapItems, storyId, isOpen, onCl
 							commentType={commentType}
 							flagged={story.ethicsColumn !== null}
 							onFlag={async () => {
-								await updateDoc(doc(product.ref, `StoryMapItems`, story.id), {ethicsColumn: `underReview`})
+								await updateDoc(doc(product.ref, `StoryMapItems`, story.id), { ethicsColumn: `underReview` })
 							}}
 						/>
 					</div>

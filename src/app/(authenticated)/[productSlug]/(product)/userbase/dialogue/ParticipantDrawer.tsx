@@ -8,29 +8,29 @@ import {
 	SoundOutlined,
 	SyncOutlined,
 } from "@ant-design/icons"
-import {zodResolver} from "@hookform/resolvers/zod"
-import {Button, Drawer, Tag} from "antd"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Button, Drawer, Tag } from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {Timestamp, collection, doc, updateDoc} from "firebase/firestore"
-import {useEffect, useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection, useDocument} from "react-firebase-hooks/firestore"
-import {useForm} from "react-hook-form"
+import { Timestamp, collection, doc, updateDoc } from "firebase/firestore"
+import { useEffect, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection, useDocument } from "react-firebase-hooks/firestore"
+import { useForm } from "react-hook-form"
 
-import type {QuerySnapshot} from "firebase/firestore"
-import type {FC} from "react"
-import type {z} from "zod"
-import type {DialogueParticipant} from "~/types/db/Products/DialogueParticipants"
+import type { QuerySnapshot } from "firebase/firestore"
+import type { FC } from "react"
+import type { z } from "zod"
+import type { DialogueParticipant } from "~/types/db/Products/DialogueParticipants"
 
 import ParticipantEditForm from "./ParticipantEditForm"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import {DialogueParticipantSchema, statuses, timings} from "~/types/db/Products/DialogueParticipants"
-import {MemberConverter} from "~/types/db/Products/Members"
-import {PersonaConverter} from "~/types/db/Products/Personas"
+import { DialogueParticipantSchema, statuses, timings } from "~/types/db/Products/DialogueParticipants"
+import { MemberConverter } from "~/types/db/Products/Members"
+import { PersonaConverter } from "~/types/db/Products/Personas"
 import BoneIcon from "~public/icons/bone.svg"
 import CognitionIcon from "~public/icons/cognition.svg"
 import EarIcon from "~public/icons/ear.svg"
@@ -44,7 +44,7 @@ const formSchema = DialogueParticipantSchema.pick({
 	phoneNumber: true,
 	title: true,
 	transcript: true,
-	personaId: true,
+	personaIds: true,
 })
 type FormInputs = z.infer<typeof formSchema>
 
@@ -54,8 +54,8 @@ export type ParticipantDrawerProps = {
 	onClose: () => void
 }
 
-const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activeParticipant, onClose}) => {
-	const {product} = useAppContext()
+const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activeParticipant, onClose }) => {
+	const { product } = useAppContext()
 
 	const [isOpen, setIsOpen] = useState(true)
 	const close = () => {
@@ -78,7 +78,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 	)
 	useErrorHandler(lastUpdatedAtUserError)
 
-	const {control, handleSubmit, setValue} = useForm<FormInputs>({
+	const { control, handleSubmit, setValue } = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		shouldFocusError: false,
@@ -89,7 +89,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 			phoneNumber: participantData?.phoneNumber ?? null,
 			title: participantData?.title ?? null,
 			transcript: participantData?.transcript ?? ``,
-			personaId: participantData?.personaId ?? null,
+			personaIds: participantData?.personaIds ?? null,
 		},
 	})
 
@@ -241,13 +241,13 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 											}}
 											className="w-[78px]"
 											options={[
-												{label: `Dr.`, value: `dr`},
-												{label: `Miss`, value: `miss`},
-												{label: `Mr.`, value: `mr`},
-												{label: `Mrs.`, value: `mrs`},
-												{label: `Ms.`, value: `ms`},
-												{label: `Prof.`, value: `prof`},
-												{label: `Sir`, value: `sir`},
+												{ label: `Dr.`, value: `dr` },
+												{ label: `Miss`, value: `miss` },
+												{ label: `Mr.`, value: `mr` },
+												{ label: `Mrs.`, value: `mrs` },
+												{ label: `Ms.`, value: `ms` },
+												{ label: `Prof.`, value: `prof` },
+												{ label: `Sir`, value: `sir` },
 											]}
 										/>
 									}
@@ -294,12 +294,12 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 									}}
 									className="w-full"
 									options={[
-										{label: `9am - 5pm only`, value: `95only`},
-										{label: `Email`, value: `email`},
-										{label: `Phone`, value: `phone`},
-										{label: `Text`, value: `text`},
-										{label: `Weekdays only`, value: `weekdays`},
-										{label: `Weekends only`, value: `weekends`},
+										{ label: `9am - 5pm only`, value: `95only` },
+										{ label: `Email`, value: `email` },
+										{ label: `Phone`, value: `phone` },
+										{ label: `Text`, value: `text` },
+										{ label: `Weekdays only`, value: `weekdays` },
+										{ label: `Weekends only`, value: `weekends` },
 									]}
 								/>
 							</div>
@@ -307,12 +307,12 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({participants, activePart
 								<span className="text-sm text-textTertiary">Persona</span>
 								<RhfSelect
 									control={control}
-									name="personaId"
+									name="personaIds"
 									onChange={() => {
 										onSubmit().catch(console.error)
 									}}
 									options={
-										personas ? personas.docs.map((persona) => ({label: persona.data().name, value: persona.id})) : []
+										personas ? personas.docs.map((persona) => ({ label: persona.data().name, value: persona.id })) : []
 									}
 									className="w-full [contain:inline-size]"
 								/>

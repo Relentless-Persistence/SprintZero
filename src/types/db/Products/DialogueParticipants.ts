@@ -21,7 +21,7 @@ export const DialogueParticipantSchema = z.object({
 	transcript: z.string(),
 	updatedAt: timestampSchema,
 
-	personaId: z.string().nullable(),
+	personaIds: z.array(z.string()).nullable(),
 	updatedAtUserId: z.string(),
 })
 

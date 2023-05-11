@@ -5,7 +5,7 @@ import {genConverter, serverTimestampSchema} from "~/types"
 export const CommentSchema = z.object({
 	createdAt: serverTimestampSchema,
 	text: z.string(),
-	type: z.enum([`design`, `code`]),
+	type: z.enum([`design`, `engineering`]),
 
 	authorId: z.string(),
 })

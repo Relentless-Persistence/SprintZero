@@ -161,7 +161,7 @@ const DialogueClientPage: FC = () => {
 							title: null,
 							transcript: ``,
 							updatedAt: Timestamp.now(),
-							personaId: null,
+							personaIds: null,
 							updatedAtUserId: user.id,
 						})
 							.then((docRef) => {

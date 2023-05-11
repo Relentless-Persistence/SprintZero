@@ -73,10 +73,10 @@ const getItems = (activeProductId: string) => [
 		icon: <PullRequestOutlined />,
 		label: `Tactics`,
 		children: [
-			{
-				key: `tactics/ethics`,
-				label: <LinkTo href={`/${activeProductId}/tactics/ethics`}>Ethics</LinkTo>,
-			},
+			// {
+			// 	key: `tactics/ethics`,
+			// 	label: <LinkTo href={`/${activeProductId}/tactics/ethics`}>Ethics</LinkTo>,
+			// },
 			{
 				key: `tactics/priorities`,
 				label: <LinkTo href={`/${activeProductId}/tactics/priorities`}>Priorities</LinkTo>,
@@ -85,10 +85,10 @@ const getItems = (activeProductId: string) => [
 				key: `tactics/roadmap`,
 				label: <LinkTo href={`/${activeProductId}/tactics/roadmap`}>Roadmap</LinkTo>,
 			},
-			{
-				key: `tactics/voice`,
-				label: <LinkTo href={`/${activeProductId}/tactics/voice`}>Voice</LinkTo>,
-			},
+			// {
+			// 	key: `tactics/voice`,
+			// 	label: <LinkTo href={`/${activeProductId}/tactics/voice`}>Voice</LinkTo>,
+			// },
 		],
 	},
 	{
@@ -100,14 +100,14 @@ const getItems = (activeProductId: string) => [
 				key: `operations/huddle`,
 				label: <LinkTo href={`/${activeProductId}/operations/huddle`}>Huddle</LinkTo>,
 			},
-			{
-				key: `operations/performance`,
-				label: <LinkTo href={`/${activeProductId}/operations/performance`}>Performance</LinkTo>,
-			},
-			{
-				key: `operations/retrospective`,
-				label: <LinkTo href={`/${activeProductId}/operations/retrospective`}>Retrospective</LinkTo>,
-			},
+			// {
+			// 	key: `operations/performance`,
+			// 	label: <LinkTo href={`/${activeProductId}/operations/performance`}>Performance</LinkTo>,
+			// },
+			// {
+			// 	key: `operations/retrospective`,
+			// 	label: <LinkTo href={`/${activeProductId}/operations/retrospective`}>Retrospective</LinkTo>,
+			// },
 			{
 				key: `operations/sprint`,
 				label: <LinkTo href={`/${activeProductId}/operations/sprint`}>Sprint</LinkTo>,
@@ -116,10 +116,10 @@ const getItems = (activeProductId: string) => [
 				key: `operations/tasks`,
 				label: <LinkTo href={`/${activeProductId}/operations/tasks`}>Tasks</LinkTo>,
 			},
-			{
-				key: `operations/updates`,
-				label: <LinkTo href={`/${activeProductId}/operations/updates`}>Updates</LinkTo>,
-			},
+			// {
+			// 	key: `operations/updates`,
+			// 	label: <LinkTo href={`/${activeProductId}/operations/updates`}>Updates</LinkTo>,
+			// },
 		],
 	},
 	{
@@ -131,18 +131,18 @@ const getItems = (activeProductId: string) => [
 				key: `userbase/participants`,
 				label: <LinkTo href={`/${activeProductId}/userbase/participants`}>Participants</LinkTo>,
 			},
-			{
-				key: `userbase/dialogue`,
-				label: <LinkTo href={`/${activeProductId}/userbase/dialogue`}>Dialogue</LinkTo>,
-			},
-			{
-				key: `userbase/journeys`,
-				label: <LinkTo href={`/${activeProductId}/userbase/journeys`}>Journeys</LinkTo>,
-			},
-			{
-				key: `userbase/insights`,
-				label: <LinkTo href={`/${activeProductId}/userbase/insights`}>Insights</LinkTo>,
-			},
+			// {
+			// 	key: `userbase/dialogue`,
+			// 	label: <LinkTo href={`/${activeProductId}/userbase/dialogue`}>Dialogue</LinkTo>,
+			// },
+			// {
+			// 	key: `userbase/journeys`,
+			// 	label: <LinkTo href={`/${activeProductId}/userbase/journeys`}>Journeys</LinkTo>,
+			// },
+			// {
+			// 	key: `userbase/insights`,
+			// 	label: <LinkTo href={`/${activeProductId}/userbase/insights`}>Insights</LinkTo>,
+			// },
 			{
 				key: `userbase/personas`,
 				label: <LinkTo href={`/${activeProductId}/userbase/personas`}>Personas</LinkTo>,

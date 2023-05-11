@@ -59,13 +59,15 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 		console.log(newStoryDesc)
 
 		if (!story.description && newStoryDesc) {
-			updateItem(product, storyMapItems, versions, story.id, { description: newStoryDesc }).catch(console.error)
+			await updateItem(product, storyMapItems, versions, story.id, { description: newStoryDesc }).catch(console.error)
+			setIsStoryGenInProgress(false);
 		}
 	}
 
 	const version = versions.docs.find((version) => version.id === story.versionId)
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const [isStoryGenInProgress, setIsStoryGenInProgress] = useState(false)
 	const [localStoryName, setLocalStoryName] = useState(story.name)
 	useEffect(() => {
 		setLocalStoryName(story.name)
@@ -113,9 +115,11 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 								}}
 								onKeyDown={(e) => {
 									if (e.key === `Enter`) {
+										setIsStoryGenInProgress(true)
 										updateDoc(doc(product.ref, `StoryMapItems`, storyId), { initialRenameDone: true }).catch(
 											console.error,
 										)
+
 										sgGenUserStory()
 									}
 								}}
@@ -147,6 +151,7 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 				versions={versions}
 				storyId={storyId}
 				isOpen={isDrawerOpen}
+				//isUsGenInProgress={isStoryGenInProgress}
 				onClose={() => setIsDrawerOpen(false)}
 			/>
 		</div>

@@ -371,12 +371,12 @@ export const productRouter = router({
 
 			const queryParams = querystring.stringify({invite_token: inviteToken})
 			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
-			await sendEmail({
-				to: email,
-				from: `no-reply@sprintzero.app`,
-				subject: `SprintZero | Member Invite`,
-				body: `<b>${memberData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
-			})
+			// await sendEmail({
+			// 	to: email,
+			// 	from: `no-reply@sprintzero.app`,
+			// 	subject: `SprintZero | Member Invite`,
+			// 	body: `<b>${memberData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
+			// })
 		}),
 
 	inviteReminder: procedure

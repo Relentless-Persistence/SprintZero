@@ -8,7 +8,7 @@ import {
     SoundOutlined,
     SyncOutlined,
 } from "@ant-design/icons"
-import { Button, Drawer, Tag, Typography } from 'antd';
+import { Button, Drawer, Dropdown, Popover, Tag, Typography } from 'antd';
 const { Text } = Typography;
 import { zodResolver } from "@hookform/resolvers/zod"
 import dayjs from "dayjs"
@@ -19,14 +19,19 @@ import { useErrorHandler } from "react-error-boundary"
 import { useCollection, useDocument } from "react-firebase-hooks/firestore"
 import { useForm } from "react-hook-form"
 
+import type { MenuProps } from 'antd';
 import type { QuerySnapshot } from "firebase/firestore"
 import type { FC } from "react"
 import type { z } from "zod"
 import type { DialogueParticipant } from "~/types/db/Products/DialogueParticipants"
 
 import DragDrop from "./DragDrop"
+import ParticipantDisability from "./ParticipantDisability";
 import ParticipantEditForm from "./ParticipantEditForm"
+import ParticipantLocation from "./ParticipantLocation";
+//import ParticipantStatus from "./ParticipantStatus";
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import LinkTo from "~/components/LinkTo";
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
@@ -46,7 +51,7 @@ const formSchema = DialogueParticipantSchema.pick({
     phoneNumber: true,
     title: true,
     transcript: true,
-    personaId: true,
+    personaIds: true,
 })
 type FormInputs = z.infer<typeof formSchema>
 
@@ -55,6 +60,15 @@ export type ParticipantDrawerProps = {
     activeParticipant: string | undefined
     onClose: () => void
 }
+
+const items: MenuProps[`items`] = [
+    { key: `identified`, label: `Identified` },
+    { key: `contacted`, label: `Contacted` },
+    { key: `scheduled`, label: `Scheduled` },
+    { key: `interviewed`, label: `Interviewed` },
+    { key: `analyzing`, label: `Analyzing` },
+    { key: `processed`, label: `Processed` }
+]
 
 const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activeParticipant, onClose }) => {
     const { product } = useAppContext()
@@ -67,6 +81,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
         }, 300)
     }
 
+    const [isEditorOpen, setIsEditorOpen] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
     const participantData = participant?.data()
@@ -91,7 +106,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
             phoneNumber: participantData?.phoneNumber ?? null,
             title: participantData?.title ?? null,
             transcript: participantData?.transcript ?? ``,
-            personaId: participantData?.personaId ?? null,
+            personaIds: participantData?.personaIds ?? [],
         },
     })
 
@@ -119,11 +134,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
             open={isOpen}
             onClose={close}
             title={
-                isEditing ? (
-                    <Button type="primary" danger>
-                        Delete
-                    </Button>
-                ) : (
+                (
                     <div className="mr-4 flex min-w-0 max-w-full flex-col gap-1 overflow-auto">
                         <p className="max-w-full leading-none">
                             <span className="mr-4 inline-block max-w-full truncate font-semibold">{participant?.data().name}</span>
@@ -135,50 +146,75 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                             )}
                         </p>
                         <div className="flex gap-2">
-                            {participantData?.location && (
+                            <Popover placement="bottomLeft" content={
+                                participant && <ParticipantLocation participant={participant} onFinish={close} />
+                            }
+                                trigger="click">
+
                                 <Tag color="#585858" icon={<PushpinOutlined />}>
-                                    {participantData.location}
+                                    <LinkTo href="">{participantData?.location ? participantData.location : `Location Unknown`}</LinkTo>
                                 </Tag>
-                            )}
-                            {participantData?.status && (
+                            </Popover>
+
+                            {/* {participantData?.status && (
+                                 */}
+                            <Dropdown menu={{ items }} placement="bottomRight" arrow>
+
                                 <Tag color="#585858" icon={<FlagOutlined />}>
-                                    {statuses.find((status) => status[0] === participantData.status)![1]}
+                                    {statuses.find((status) => status[0] === participantData?.status)![1]}
                                 </Tag>
-                            )}
-                            {participantData?.disabilities.auditory && (
-                                <Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
-                                    Auditory
-                                </Tag>
-                            )}
-                            {participantData?.disabilities.cognitive && (
-                                <Tag
-                                    color="#585858"
-                                    icon={<CognitionIcon className="mr-1.5 inline-block" />}
-                                    className="flex items-center"
-                                >
-                                    Cognitive
-                                </Tag>
-                            )}
-                            {participantData?.disabilities.physical && (
-                                <Tag color="#585858" icon={<BoneIcon className="mr-1.5 inline-block" />} className="flex items-center">
-                                    Physical
-                                </Tag>
-                            )}
-                            {participantData?.disabilities.speech && (
-                                <Tag color="#585858" icon={<SoundOutlined />}>
-                                    Speech
-                                </Tag>
-                            )}
-                            {participantData?.disabilities.visual && (
-                                <Tag color="#585858" icon={<EyeOutlined />}>
-                                    Visual
-                                </Tag>
-                            )}
-                            {participantData?.timing && (
-                                <Tag color="#585858" icon={<SyncOutlined />}>
-                                    {timings.find((timing) => timing[0] === participantData.timing)![1]}
-                                </Tag>
-                            )}
+                            </Dropdown>
+
+                            {(participantData?.disabilities.auditory || participantData?.disabilities.cognitive || participantData?.disabilities.physical || participantData?.disabilities.speech || participantData?.disabilities.visual || participantData?.timing) ? (<>
+
+                                {participantData.disabilities.auditory && (
+                                    <Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
+                                        Auditory
+                                    </Tag>
+                                )}
+                                {participantData.disabilities.cognitive && (
+                                    <Tag
+                                        color="#585858"
+                                        icon={<CognitionIcon className="mr-1.5 inline-block" />}
+                                        className="flex items-center"
+                                    >
+                                        Cognitive
+                                    </Tag>
+                                )}
+                                {participantData.disabilities.physical && (
+                                    <Tag color="#585858" icon={<BoneIcon className="mr-1.5 inline-block" />} className="flex items-center">
+                                        Physical
+                                    </Tag>
+                                )}
+                                {participantData.disabilities.speech && (
+                                    <Tag color="#585858" icon={<SoundOutlined />}>
+                                        Speech
+                                    </Tag>
+                                )}
+                                {participantData.disabilities.visual && (
+                                    <Tag color="#585858" icon={<EyeOutlined />}>
+                                        Visual
+                                    </Tag>
+                                )}
+                                {participantData.timing && (
+                                    <Tag color="#585858" icon={<SyncOutlined />}>
+                                        {timings.find((timing) => timing[0] === participantData.timing)![1]}
+                                    </Tag>
+                                )}
+
+                            </>) :
+                                (
+                                    <Popover placement="bottomLeft" content={
+                                        participant && <ParticipantDisability participant={participant} onFinish={close} />
+                                    }
+                                        trigger="click">
+
+                                        <Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
+                                            Not Set
+                                        </Tag>
+                                    </Popover>
+
+                                )}
                         </div>
                     </div>
                 )
@@ -193,13 +229,19 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                     </div>
                 ) : (
                     <div className="flex gap-4">
-                        <Button
+                        <Button danger>
+                            Delete
+                        </Button>
+                        {/* <Button htmlType="submit" form="participant-form">
+                            Done
+                        </Button> */}
+                        {/* <Button
                             onClick={() => {
                                 setIsEditing(true)
                             }}
                         >
                             Edit
-                        </Button>
+                        </Button> */}
                         <button type="button" onClick={close}>
                             <CloseOutlined />
                         </button>
@@ -213,25 +255,39 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                 <form className="grid h-full grid-cols-[3fr_2fr] gap-6">
                     <div className="flex flex-col gap-2">
                         <p className="text-lg font-semibold">Interview Transcript</p>
-                        {!participantData?.transcript ? (
+                        {!participantData?.transcript && !isEditorOpen ? (
                             <>
                                 <div className="flex flex-col gap-2 items-center">
-                                    <Button type="primary">Open Editor</Button>
+                                    <Button type="primary" onClick={() => setIsEditorOpen(true)}>Open Editor</Button>
                                     <Text>or</Text>
                                 </div>
                                 <DragDrop />
                             </>
                         )
                             :
-                            <RhfTextArea
-                                control={control}
-                                name="transcript"
-                                onChange={() => {
-                                    onSubmit().catch(console.error)
-                                }}
-                                wrapperClassName="grow"
-                                className="!h-full !resize-none"
-                            />
+                            <>
+                                <RhfTextArea
+                                    control={control}
+                                    name="transcript"
+                                    onChange={() => {
+                                        onSubmit().catch(console.error)
+                                    }}
+                                    wrapperClassName="grow"
+                                    className="!h-full !resize-none"
+                                />
+                                <figure>
+                                    <audio
+                                        style={{ width: `100%` }}
+                                        className="mt-2"
+                                        controls
+                                        src="/media/cc0-audio/t-rex-roar.mp3">
+                                        <LinkTo href="/media/cc0-audio/t-rex-roar.mp3">
+                                            Download audio
+                                        </LinkTo>
+                                    </audio>
+                                </figure>
+                            </>
+
                         }
 
                     </div>
@@ -321,7 +377,8 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                                 <span className="text-sm text-textTertiary">Persona</span>
                                 <RhfSelect
                                     control={control}
-                                    name="personaId"
+                                    name="personaIds"
+                                    mode="multiple"
                                     onChange={() => {
                                         onSubmit().catch(console.error)
                                     }}
