@@ -1,8 +1,8 @@
 "use client"
 
 import { CloseCircleOutlined } from "@ant-design/icons"
-import { Breadcrumb, Card, Input } from "antd"
-import { Timestamp, addDoc, collection, doc, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } from "firebase/firestore"
+import { Breadcrumb, Button, Card, Input } from "antd"
+import { Timestamp, addDoc, collection, deleteDoc, doc, orderBy, query, updateDoc } from "firebase/firestore"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
@@ -11,18 +11,13 @@ import Masonry from "react-masonry-css"
 import type { FC } from "react"
 // import type { Persona } from "~/types/db/Products/Personas"
 
-import EditableTextCard from "./EditableTextCard"
-import EditableTextListCard from "./EditableTextListCard"
 import TextareaCard from "./TextareaCard"
-import TextListCard from "./TextListCard"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
-import TextListEditor from "~/components/TextListEditor"
 import { BusinessOutcomeConverter } from "~/types/db/Products/BusinessOutcomes"
 import { MarketLeaderConverter } from "~/types/db/Products/MarketLeaders"
 import { PersonaConverter } from "~/types/db/Products/Personas";
 import { PotentialRiskConverter } from "~/types/db/Products/PotentialRisks"
 import { UserPriorityConverter } from "~/types/db/Products/UserPriorities"
-import { db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
 
 interface MyPersona {
@@ -45,6 +40,14 @@ const KickoffClientPage: FC = () => {
 	>(undefined)
 
 	const [personaList, setPersonaList] = useState<MyPersona[]>([])
+	const [addNewBusiness, setAddNewBusiness] = useState(false)
+	const [newBusiness, setNewBusiness] = useState(``)
+	const [addNewPriority, setAddNewPriority] = useState(false)
+	const [newPriority, setNewPriority] = useState(``)
+	const [addNewRisk, setAddNewRisk] = useState(false)
+	const [newRisk, setNewRisk] = useState(``)
+	const [addNewMarket, setAddNewMarket] = useState(false)
+	const [newMarket, setNewMarket] = useState(``)
 
 	const [personas, , personasError] = useCollection(
 		query(collection(product.ref, `Personas`), orderBy(`createdAt`, `asc`)).withConverter(PersonaConverter),
@@ -147,16 +150,6 @@ const KickoffClientPage: FC = () => {
 				className="flex gap-8"
 				columnClassName="flex flex-col gap-5"
 			>
-				{/* <EditableTextCard
-					title="Problem Statement"
-					text={product.data().problemStatement}
-					isEditing={editingSection === `problemStatement`}
-					onEditStart={() => setEditingSection(`problemStatement`)}
-					onEditEnd={() => setEditingSection(undefined)}
-					onCommit={async (text) => {
-						await updateDoc(product.ref, {problemStatement: text})
-					}}
-				/> */}
 
 				<TextareaCard
 					title="Problem Statement"
@@ -179,8 +172,15 @@ const KickoffClientPage: FC = () => {
 							key={index}
 							prefix={`${index + 1}.`}
 							suffix={
-								<CloseCircleOutlined />
+								<CloseCircleOutlined onClick={() => {
+									if (!persona.id) return;
+									deleteDoc(doc(product.ref, `Personas`, persona.id))
+										.catch(error => {
+											console.error(error);
+										});
+								}} />
 							}
+
 							value={persona.name}
 							onChange={(e) => personaChange(index, e.target.value)}
 							onBlur={() => {
@@ -190,132 +190,358 @@ const KickoffClientPage: FC = () => {
 					))}
 				</Card>
 
-				{/* <TextListCard
-					title="Personas"
-					textList={personas?.docs.map((doc) => ({ id: doc.id, text: doc.data().name })) ?? []}
-					isEditing={editingSection === `personas`}
-					onEditStart={() => setEditingSection(`personas`)}
-					onEditEnd={() => setEditingSection(undefined)}
-					onCommit={async (textList) => {
-						await Promise.all(
-							textList.map(async (item) => {
-								if (personas?.docs.some((doc) => doc.id === item.id)) {
-									await updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
-										name: item.text,
-									})
-								} else {
-									await setDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
-										createdAt: Timestamp.now(),
-										description: ``,
-										name: item.text,
-									})
-
-									// Generate description asynchonously
-									gpt
-										.mutateAsync({
-											prompt: `Below is a vision statement for an app I'm building:\n\n"${product.data().finalVision
-												}"\n\nDescribe the user persona "${item.text}" in a paragraph.`,
-										})
-										.then(({ response }) => {
-											const description = response?.replace(/^\\n+/, ``).replace(/\\n+$/, ``)
-											updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
-												description,
-											}).catch(console.error)
-										})
-										.catch(console.error)
-								}
-							}),
-						)
-					}}
-				/> */}
-
-				<TextListCard
+				<Card
+					type="inner"
 					title="Business Outcomes"
-					textList={businessOutcomes?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-					isEditing={editingSection === `businessOutcomes`}
-					onEditStart={() => setEditingSection(`businessOutcomes`)}
-					onEditEnd={() => setEditingSection(undefined)}
-					onCommit={async (textList) => {
-						console.log(`saving to db`)
-						await Promise.all(
-							textList.map(async (item) => {
-								if (businessOutcomes?.docs.some((doc) => doc.id === item.id)) {
-									console.log(`updating doc`)
-									await updateDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
-										text: item.text,
-									}).catch(console.error)
-								} else {
-									console.log(`setting doc`)
-									await setDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
-										createdAt: Timestamp.now(),
-										text: item.text,
-									}).catch(console.error)
-								}
-							}),
-						)
-					}}
-				// onCommit={async (textList) => {
-				// 	console.log(textList)
-				// 	const batch = writeBatch(db)
-				// 	textList.forEach((item) => {
-				// 		batch.update(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
-				// 			text: item.text,
-				// 		})
-				// 	})
-				// 	await batch.commit()
-				// }}
-				/>
+				>
 
-				<TextListCard
+					{businessOutcomes?.docs.map(doc => ({ id: doc.id, ...doc.data() })).map((outcome, index) => (
+						<Input className="mb-3"
+							key={index}
+							prefix={`${index + 1}.`}
+							suffix={
+								<CloseCircleOutlined onClick={() => {
+									if (!outcome.id) return;
+									deleteDoc(doc(product.ref, `BusinessOutcomes`, outcome.id))
+										.catch(error => {
+											console.error(error);
+										});
+								}} />
+							}
+
+							value={outcome.text}
+							onChange={(e) => {
+								if (outcome.text === ``) return
+								updateDoc(doc(product.ref, `BusinessOutcomes`, outcome.id), {
+									text: e.target.value
+								})
+									.catch(error => {
+										console.error(error)
+									})
+							}}
+						/>
+					))}
+					{businessOutcomes && businessOutcomes.empty && <Input className="mb-3"
+						prefix={`${businessOutcomes.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewBusiness(``)
+								setAddNewBusiness(false)
+							}} />
+						}
+						value={newBusiness}
+						onChange={(e) => setNewBusiness(e.target.value)}
+						onBlur={() => {
+							if (newBusiness === ``) return;
+							setAddNewBusiness(false)
+							addDoc(collection(product.ref, `BusinessOutcomes`), {
+								text: newBusiness,
+								createdAt: Timestamp.now(),
+							})
+								.then(() => {
+									setNewBusiness(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					{businessOutcomes && addNewBusiness && <Input className="mb-3"
+						prefix={`${businessOutcomes.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewBusiness(``)
+								setAddNewBusiness(false)
+							}} />
+						}
+						value={newBusiness}
+						onChange={(e) => setNewBusiness(e.target.value)}
+						onBlur={() => {
+							if (newBusiness === ``) return;
+							setAddNewBusiness(false)
+							addDoc(collection(product.ref, `BusinessOutcomes`), {
+								text: newBusiness,
+								createdAt: Timestamp.now(),
+							})
+								.then(() => {
+									setNewBusiness(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					<Button block className="mt-1" onClick={() => {
+						if (businessOutcomes?.empty) return
+						setAddNewBusiness(true)
+					}}
+					>Add</Button>
+				</Card>
+
+				<Card
+					type="inner"
 					title="User Priorities"
-					textList={userPriorities?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-					isEditing={editingSection === `userPriorities`}
-					onEditStart={() => setEditingSection(`userPriorities`)}
-					onEditEnd={() => setEditingSection(undefined)}
-					onCommit={async (textList) => {
-						const batch = writeBatch(db)
-						textList.forEach((item) => {
-							batch.update(doc(product.ref, `UserPriorities`, item.id).withConverter(UserPriorityConverter), {
-								text: item.text,
-							})
-						})
-						await batch.commit()
-					}}
-				/>
+				>
 
-				<TextListCard
+					{userPriorities?.docs.map(doc => ({ id: doc.id, ...doc.data() })).map((priority, index) => (
+						<Input className="mb-3"
+							key={index}
+							prefix={`${index + 1}.`}
+							suffix={
+								<CloseCircleOutlined onClick={() => {
+									if (!priority.id) return;
+									deleteDoc(doc(product.ref, `UserPriorities`, priority.id))
+										.catch(error => {
+											console.error(error);
+										});
+								}} />
+							}
+
+							value={priority.text}
+							onChange={(e) => {
+								if (priority.text === ``) return
+								updateDoc(doc(product.ref, `UserPriorities`, priority.id), {
+									text: e.target.value
+								})
+									.catch(error => {
+										console.error(error)
+									})
+							}}
+						/>
+					))}
+					{userPriorities && userPriorities.empty && <Input className="mb-3"
+						prefix={`${userPriorities.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewPriority(``)
+								setAddNewPriority(false)
+							}} />
+						}
+						value={newPriority}
+						onChange={(e) => setNewPriority(e.target.value)}
+						onBlur={() => {
+							if (newPriority === ``) return;
+							setAddNewPriority(false)
+							addDoc(collection(product.ref, `UserPriorities`), {
+								text: newPriority,
+								createdAt: Timestamp.now(),
+							})
+								.then(() => {
+									setNewPriority(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					{userPriorities && addNewPriority && <Input className="mb-3"
+						prefix={`${userPriorities.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewPriority(``)
+								setAddNewPriority(false)
+							}} />
+						}
+						value={newPriority}
+						onChange={(e) => setNewPriority(e.target.value)}
+						onBlur={() => {
+							if (newPriority === ``) return;
+							setAddNewPriority(false)
+							addDoc(collection(product.ref, `UserPriorities`), {
+								text: newPriority,
+								createdAt: Timestamp.now(),
+							})
+								.then(() => {
+									setNewPriority(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					<Button block className="mt-1" onClick={() => {
+						if (userPriorities?.empty) return
+						setAddNewPriority(true)
+					}}
+					>Add</Button>
+				</Card>
+
+				<Card
+					type="inner"
 					title="Potential Risks"
-					textList={potentialRisks?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-					isEditing={editingSection === `potentialRisks`}
-					onEditStart={() => setEditingSection(`potentialRisks`)}
-					onEditEnd={() => setEditingSection(undefined)}
-					onCommit={async (textList) => {
-						const batch = writeBatch(db)
-						textList.forEach((item) => {
-							batch.update(doc(product.ref, `PotentialRisks`, item.id).withConverter(PotentialRiskConverter), {
-								text: item.text,
-							})
-						})
-						await batch.commit()
-					}}
-				/>
+				>
 
-				<TextListCard
-					title="Market Leaders"
-					textList={marketLeaders?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-					isEditing={editingSection === `marketLeaders`}
-					onEditStart={() => setEditingSection(`marketLeaders`)}
-					onEditEnd={() => setEditingSection(undefined)}
-					onCommit={async (textList) => {
-						const batch = writeBatch(db)
-						textList.forEach((item) => {
-							batch.update(doc(product.ref, `MarketLeaders`, item.id).withConverter(MarketLeaderConverter), {
-								text: item.text,
+					{potentialRisks?.docs.map(doc => ({ id: doc.id, ...doc.data() })).map((risk, index) => (
+						<Input className="mb-3"
+							key={index}
+							prefix={`${index + 1}.`}
+							suffix={
+								<CloseCircleOutlined onClick={() => {
+									if (!risk.id) return;
+									deleteDoc(doc(product.ref, `PotentialRisks`, risk.id))
+										.catch(error => {
+											console.error(error);
+										});
+								}} />
+							}
+
+							value={risk.text}
+							onChange={(e) => {
+								if (risk.text === ``) return
+								updateDoc(doc(product.ref, `PotentialRisks`, risk.id), {
+									text: e.target.value
+								})
+									.catch(error => {
+										console.error(error)
+									})
+							}}
+						/>
+					))}
+					{potentialRisks && potentialRisks.empty && <Input className="mb-3"
+						prefix={`${potentialRisks.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewRisk(``)
+								setAddNewRisk(false)
+							}} />
+						}
+						value={newRisk}
+						onChange={(e) => setNewRisk(e.target.value)}
+						onBlur={() => {
+							if (newRisk === ``) return;
+							setAddNewRisk(false)
+							addDoc(collection(product.ref, `PotentialRisks`), {
+								text: newRisk,
+								createdAt: Timestamp.now(),
 							})
-						})
-						await batch.commit()
+								.then(() => {
+									setNewRisk(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					{potentialRisks && addNewRisk && <Input className="mb-3"
+						prefix={`${potentialRisks.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewRisk(``)
+								setAddNewRisk(false)
+							}} />
+						}
+						value={newRisk}
+						onChange={(e) => setNewRisk(e.target.value)}
+						onBlur={() => {
+							if (newRisk === ``) return;
+							setAddNewRisk(false)
+							addDoc(collection(product.ref, `PotentialRisks`), {
+								text: newRisk,
+								createdAt: Timestamp.now(),
+							})
+								.then(() => {
+									setNewRisk(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					<Button block className="mt-1" onClick={() => {
+						if (potentialRisks?.empty) return
+						setAddNewRisk(true)
 					}}
-				/>
+					>Add</Button>
+				</Card>
+
+				<Card
+					type="inner"
+					title="Market Leaders"
+				>
+
+					{marketLeaders?.docs.map(doc => ({ id: doc.id, ...doc.data() })).map((market, index) => (
+						<Input className="mb-3"
+							key={index}
+							prefix={`${index + 1}.`}
+							suffix={
+								<CloseCircleOutlined onClick={() => {
+									if (!market.id) return;
+									deleteDoc(doc(product.ref, `MarketLeaders`, market.id))
+										.catch(error => {
+											console.error(error);
+										});
+								}} />
+							}
+
+							value={market.text}
+							onChange={(e) => {
+								if (market.text === ``) return
+								updateDoc(doc(product.ref, `MarketLeaders`, market.id), {
+									text: e.target.value
+								})
+									.catch(error => {
+										console.error(error)
+									})
+							}}
+						/>
+					))}
+					{marketLeaders && marketLeaders.empty && <Input className="mb-3"
+						prefix={`${marketLeaders.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewMarket(``)
+								setAddNewMarket(false)
+							}} />
+						}
+						value={newMarket}
+						onChange={(e) => setNewMarket(e.target.value)}
+						onBlur={() => {
+							if (newMarket === ``) return;
+							setAddNewMarket(false)
+							addDoc(collection(product.ref, `MarketLeaders`), {
+								text: newMarket,
+								createdAt: Timestamp.now(),
+							})
+								.then(() => {
+									setNewMarket(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					{marketLeaders && addNewMarket && <Input className="mb-3"
+						prefix={`${marketLeaders.size + 1}.`}
+						suffix={
+							<CloseCircleOutlined onClick={() => {
+								setNewMarket(``)
+								setAddNewMarket(false)
+							}} />
+						}
+						value={newMarket}
+						onChange={(e) => setNewMarket(e.target.value)}
+						onBlur={() => {
+							if (newMarket === ``) return;
+							setAddNewMarket(false)
+							addDoc(collection(product.ref, `MarketLeaders`), {
+								text: newMarket,
+								createdAt: Timestamp.now(),
+							})
+								.then(() => {
+									setNewMarket(``)
+								})
+								.catch(error => {
+									console.error(error)
+								})
+						}}
+					/>}
+					<Button block className="mt-1" onClick={() => {
+						if (marketLeaders?.empty) return
+						setAddNewMarket(true)
+					}}
+					>Add</Button>
+				</Card>
+
 			</Masonry>
 		</div>
 	)

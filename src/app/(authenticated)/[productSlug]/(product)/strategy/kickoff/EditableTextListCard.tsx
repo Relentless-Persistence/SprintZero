@@ -24,7 +24,6 @@ const EditableTextListCard: FC<EditableTextListCardProps> = ({
 	onCommit,
 }) => {
 	const [draftTextList, setDraftTextList] = useState<Array<{ id: string; text: string }>>([])
-	console.log(textList)
 
 	return (
 		<Card
