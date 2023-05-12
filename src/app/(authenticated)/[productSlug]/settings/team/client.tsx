@@ -15,6 +15,7 @@ import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { InviteConverter } from "~/types/db/Products/Invites"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { auth, db } from "~/utils/firebase"
+import { dbAdmin } from "~/utils/firebaseAdmin"
 import { trpc } from "~/utils/trpc"
 
 const TeamSettingsClientPage: FC = () => {
@@ -72,9 +73,9 @@ const TeamSettingsClientPage: FC = () => {
 	}
 
 	const removeInvitee = async (id: string) => {
-		const invitesRef = dbAdmin.collection(`Invites`)
+		const invitesRef = collection(db, `Invites`)
 
-		await deleteDoc(doc(invitesRef, id))
+		await deleteDoc(doc(invitesRef, id));
 	}
 
 	const sendInvite = async () => {
@@ -185,7 +186,7 @@ const TeamSettingsClientPage: FC = () => {
 													title={
 														<div className="space-x-1">
 															<span className="capitalize">{member.data().name}</span>
-															<Tag className="text-sm font-normal">Owner`</Tag>
+															<Tag className="text-sm font-normal">Owner</Tag>
 														</div>
 													}
 													description={memberEmails.data?.[member.id]}
