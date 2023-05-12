@@ -94,7 +94,7 @@ const AcceptTermsClientPage: FC = () => {
 					<br />
 					<PrivacyPolicy />
 					<br />
-					<NonDiscolsureAgreement />
+					{/* <NonDiscolsureAgreement /> */}
 				</Card>
 
 				<Checkbox checked={agree} onChange={() => setAgree((agree) => !agree)}>
