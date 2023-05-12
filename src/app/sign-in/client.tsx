@@ -82,6 +82,13 @@ const SignInClientPage: FC = () => {
 		let isNewUser = !user
 
 		if (typeof inviteToken === `string`) {
+			await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
+				email: credential.user.email,
+				hasAcceptedTos: false,
+				preferredMusicClient: `appleMusic`,
+				type: `user`,
+			})
+
 			await putUserOnProduct.mutateAsync({
 				userAvatar: credential.user.photoURL,
 				userName: credential.user.displayName ?? credential.user.email,
@@ -102,9 +109,9 @@ const SignInClientPage: FC = () => {
 			//router.push(`/accept-terms`)
 			router.push(`/billing`)
 		}
-		// else if (!user.hasAcceptedTos) {
-		// 	router.push(`/accept-terms`)
-		// }
+		else if (!user?.hasAcceptedTos) {
+			router.push(`/accept-terms`)
+		}
 		else {
 			// Nothing special to do, redirect to one of their products
 

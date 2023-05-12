@@ -1,10 +1,16 @@
 "use client"
 
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useLayoutEffect } from 'react';
 
 // import type * as React from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
 import type { FC } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+
+import { UserConverter } from '~/types/db/Users';
+import { auth, db } from '~/utils/firebase';
 
 
 // declare global {
@@ -17,12 +23,25 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 const PricingClientPage: FC = () => {
 
+    const [user, , userError] = useAuthState(auth)
+
     const router = useRouter();
     const searchParams = useSearchParams();
-    const session_id = searchParams?.get('session_id');
+    const session_id = searchParams?.get(`session_id`);
 
     if (session_id) {
-        router.push(`/configuration`)
+        //setHasAccepted(true)
+        updateDoc(doc(db, `Users`, user!.uid).withConverter(UserConverter), {
+            hasAcceptedTos: true,
+        })
+            .then(() => {
+                router.push(`/configuration`);
+            })
+            .catch(error => {
+                console.error(`Error updating document:`, error);
+            });
+
+
     }
 
     return (
