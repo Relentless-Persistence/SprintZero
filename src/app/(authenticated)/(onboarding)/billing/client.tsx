@@ -47,11 +47,11 @@ const PricingClientPage: FC = () => {
     return (
         <div className='w-full'>
             {/* Add the Stripe pricing table element to the page */}
+
             {/* @ts-ignore */}
             <stripe-pricing-table
-                pricing-table-id="prctbl_1MsFVIIUry2flRTcmQWTzv9C"
-                publishable-key="pk_test_51Ji035IUry2flRTc8XUkfCQqzwcBBHiMCDLPmhJNTpDovjA7LnKQTELrmqiw6gy9eaWs973iEEDMKmKxwdj9vt4s00lcvsFZ0i"
-            >
+                pricing-table-id="prctbl_1MsWMcIUry2flRTcck3ARuqX"
+                publishable-key="pk_live_51Ji035IUry2flRTc2LMpEtx61pG8Wy9JcxQDWjgvzNIyzwolUWHa8Ro5vdBtlb55p6HogAJotBW3BtDHfeoHtF1i00W5TlQctT">
                 {/* @ts-ignore */}
             </stripe-pricing-table>
         </div>
