@@ -28,6 +28,7 @@ export const productRouter = router({
 				effortCostCurrencySymbol: true,
 				name: true,
 				sprintStartDayOfWeek: true,
+				productTypes: true
 			}).extend({
 				userIdToken: z.string(),
 				userName: z.string(),
@@ -41,15 +42,16 @@ export const productRouter = router({
 					effortCost,
 					effortCostCurrencySymbol,
 					name,
+					productTypes,
 					sprintStartDayOfWeek,
 					userIdToken,
 					userName,
 					userAvatar,
 				},
 			}) => {
-				console.log(`user - 1`, userIdToken)
+				//console.log(`user - 1`, userIdToken)
 				const user = await authAdmin.verifyIdToken(userIdToken)
-				console.log(`user - 2`, user)
+				//console.log(`user - 2`, user)
 
 				const slug = `${name.replaceAll(/[^A-Za-z0-9]/g, ``)}-${nanoid().slice(0, 6)}`
 				const storyMapHistoryId = nanoid()
@@ -61,6 +63,7 @@ export const productRouter = router({
 					effortCost,
 					effortCostCurrencySymbol,
 					name,
+					productTypes,
 					sprintStartDayOfWeek,
 					createdAt: Timestamp.now(),
 					id: slug,
@@ -80,7 +83,6 @@ export const productRouter = router({
 					},
 
 					finalVision: ``,
-					productTypes: [`web`],
 					valueProposition: ``,
 					features: [``],
 
@@ -371,12 +373,12 @@ export const productRouter = router({
 
 			const queryParams = querystring.stringify({invite_token: inviteToken})
 			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
-			// await sendEmail({
-			// 	to: email,
-			// 	from: `no-reply@sprintzero.app`,
-			// 	subject: `SprintZero | Member Invite`,
-			// 	body: `<b>${memberData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
-			// })
+			await sendEmail({
+				to: email,
+				from: `no-reply@sprintzero.app`,
+				subject: `SprintZero | Member Invite`,
+				body: `<b>${memberData.name}</b> has invited you to join the product <b>"${productData.name}"</b>.<br><br><a href="${inviteLink}">Accept Invitation</a>`,
+			})
 		}),
 
 	inviteReminder: procedure

@@ -3,14 +3,17 @@
 import { Button, Form, Input, Select, Space, Tag } from "antd"
 import { doc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
-import { FC, useState } from "react"
+import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { useDocument } from "react-firebase-hooks/firestore"
+
+import type { SelectProps } from 'antd';
+import type { FC } from "react";
+
 import { UserConverter } from "~/types/db/Users"
 import { auth, db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
-import type { SelectProps } from 'antd';
 
 const ConfigurationPageClientPage: FC = () => {
     const router = useRouter()
@@ -19,14 +22,14 @@ const ConfigurationPageClientPage: FC = () => {
 
     const [user, , userError] = useAuthState(auth)
 
-    console.log("A point")
+    console.log(`A point`)
 
     useErrorHandler(userError)
     const [dbUser, , dbUserError] = useDocument(
         user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined,
     )
 
-    console.log("B point")
+    console.log(`B point`)
     useErrorHandler(dbUserError)
 
     const [sprintLength, setSprintLength] = useState<1 | 2 | 3>(2)
@@ -36,9 +39,9 @@ const ConfigurationPageClientPage: FC = () => {
 
     /* eslint-disable no-template-curly-in-string */
     const validateMessages = {
-        required: '${label} is required!',
+        required: `\${label} is required!`,
         types: {
-            email: 'Please enter a valid email',
+            email: `Please enter a valid email`,
         },
     };
 
@@ -55,7 +58,10 @@ const ConfigurationPageClientPage: FC = () => {
         { label: `API`, value: `api` },
     ];
 
-    const onFinish = async (values: { productName: string, members: { email1: string | null, email2?: string | null, email3?: string | null } }) => {
+    type ProductTypesType = 'mobile' | 'tablet' | 'desktop' | 'watch' | 'web' | 'augmentedReality' | 'virtualReality' | 'artificialIntelligence' | 'humanoid' | 'api';
+
+
+    const onFinish = async (values: { productName: string, productType: string[], members: { email1: string | null, email2?: string | null, email3?: string | null } }) => {
         if (hasSubmitted || !dbUser?.exists() || !user) return
         setHasSubmitted(true)
 
@@ -64,7 +70,7 @@ const ConfigurationPageClientPage: FC = () => {
             effortCost: null,
             effortCostCurrencySymbol: null,
             name: values.productName,
-            // type: values.productType,
+            productTypes: values.productType,
             sprintStartDayOfWeek: sprintGate,
             userIdToken: await user.getIdToken(true),
             userAvatar: user.photoURL,
@@ -113,7 +119,7 @@ const ConfigurationPageClientPage: FC = () => {
                         </div>
                         <Form.Item
                             name="productName"
-                            rules={[{ required: true, message: 'Please input a product name' }]}
+                            rules={[{ required: true, message: `Please input a product name` }]}
                         >
                             <Input placeholder="eg. Netflix, Headspace, Spotify" />
                         </Form.Item>
@@ -126,12 +132,12 @@ const ConfigurationPageClientPage: FC = () => {
                         </div>
                         <Form.Item
                             name="productType"
-                            rules={[{ required: true, message: 'Please select a product type' }]}
+                            rules={[{ required: true, message: `Please select a product type` }]}
                         >
                             <Select
                                 mode="multiple"
                                 allowClear
-                                style={{ width: '100%' }}
+                                style={{ width: `100%` }}
                                 placeholder="eg. Tablet, Mobile, Web"
                                 //defaultValue={['mobile', 'web']}
                                 //onChange={handleChange}
@@ -148,17 +154,17 @@ const ConfigurationPageClientPage: FC = () => {
                 </div>
                 <div className="flex gap-4 mb-7">
                     <div className="w-1/3">
-                        <Form.Item name={['members', 'email1']} rules={[{ type: 'email' }]}>
+                        <Form.Item name={[`members`, `email1`]} rules={[{ type: `email` }]}>
                             <Input addonBefore="Email" placeholder="username@domain.com" />
                         </Form.Item>
                     </div>
                     <div className="w-1/3">
-                        <Form.Item name={['members', 'email2']} rules={[{ type: 'email' }]}>
+                        <Form.Item name={[`members`, `email2`]} rules={[{ type: `email` }]}>
                             <Input addonBefore="Email" placeholder="username@domain.com" />
                         </Form.Item>
                     </div>
                     <div className="w-1/3">
-                        <Form.Item name={['members', 'email3']} rules={[{ type: 'email' }]}>
+                        <Form.Item name={[`members`, `email3`]} rules={[{ type: `email` }]}>
                             <Input addonBefore="Email" placeholder="username@domain.com" />
                         </Form.Item>
                     </div>
