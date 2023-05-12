@@ -58,9 +58,6 @@ const ConfigurationPageClientPage: FC = () => {
         { label: `API`, value: `api` },
     ];
 
-    type ProductTypesType = 'mobile' | 'tablet' | 'desktop' | 'watch' | 'web' | 'augmentedReality' | 'virtualReality' | 'artificialIntelligence' | 'humanoid' | 'api';
-
-
     const onFinish = async (values: { productName: string, productType: string[], members: { email1: string | null, email2?: string | null, email3?: string | null } }) => {
         if (hasSubmitted || !dbUser?.exists() || !user) return
         setHasSubmitted(true)

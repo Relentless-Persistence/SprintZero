@@ -1,23 +1,24 @@
-import {TRPCError} from "@trpc/server"
+import { TRPCError } from "@trpc/server"
 import crypto from "crypto"
-import {FieldValue, Timestamp} from "firebase-admin/firestore"
-import {nanoid} from "nanoid"
+import { FieldValue, Timestamp } from "firebase-admin/firestore"
+import { nanoid } from "nanoid"
 import querystring from "querystring"
 import invariant from "tiny-invariant"
-import {z} from "zod"
+import { z } from "zod"
 
-import {procedure, router} from "../trpc"
-import {genAdminConverter} from "~/types"
-import {ProductSchema} from "~/types/db/Products"
-import {HuddleSchema} from "~/types/db/Products/Huddles"
-import {InviteSchema} from "~/types/db/Products/Invites"
-import {MemberSchema} from "~/types/db/Products/Members"
-import {ObjectiveSchema} from "~/types/db/Products/Objectives"
-import {StoryMapHistorySchema} from "~/types/db/Products/StoryMapHistories"
-import {VersionSchema} from "~/types/db/Products/Versions"
-import {UserSchema} from "~/types/db/Users"
-import {authAdmin, dbAdmin} from "~/utils/firebaseAdmin"
-import {sendEmail} from "~/utils/sendEmail"
+import { procedure, router } from "../trpc"
+import { genAdminConverter } from "~/types"
+import { ProductSchema } from "~/types/db/Products"
+import { HuddleSchema } from "~/types/db/Products/Huddles"
+import { InviteSchema } from "~/types/db/Products/Invites"
+import { MemberSchema } from "~/types/db/Products/Members"
+import { ObjectiveSchema } from "~/types/db/Products/Objectives"
+import { StoryMapHistorySchema } from "~/types/db/Products/StoryMapHistories"
+import { VersionSchema } from "~/types/db/Products/Versions"
+import { UserSchema } from "~/types/db/Users"
+import { db } from "~/utils/firebase"
+import { authAdmin, dbAdmin } from "~/utils/firebaseAdmin"
+import { sendEmail } from "~/utils/sendEmail"
 
 export const productRouter = router({
 	create: procedure
@@ -270,7 +271,7 @@ export const productRouter = router({
 				})
 				await batch.commit()
 
-				return {productId: slug}
+				return { productId: slug }
 			},
 		),
 
@@ -281,7 +282,7 @@ export const productRouter = router({
 				userIdToken: z.string(),
 			}),
 		)
-		.query(async ({input: {productId, userIdToken}}) => {
+		.query(async ({ input: { productId, userIdToken } }) => {
 			const user = await authAdmin.verifyIdToken(userIdToken)
 			const member = await dbAdmin
 				.collection(`Products`)
@@ -290,7 +291,7 @@ export const productRouter = router({
 				.doc(user.uid)
 				.withConverter(genAdminConverter(MemberSchema))
 				.get()
-			if (member.data()?.type !== `owner`) throw new TRPCError({code: `UNAUTHORIZED`})
+			if (member.data()?.type !== `owner`) throw new TRPCError({ code: `UNAUTHORIZED` })
 
 			const members = await dbAdmin
 				.collection(`Products`)
@@ -319,7 +320,7 @@ export const productRouter = router({
 				userIdToken: z.string(),
 			}),
 		)
-		.mutation(async ({input: {productId, userIdToken}}) => {
+		.mutation(async ({ input: { productId, userIdToken } }) => {
 			const user = await authAdmin.verifyIdToken(userIdToken)
 			const member = await dbAdmin
 				.collection(`Products`)
@@ -328,7 +329,7 @@ export const productRouter = router({
 				.doc(user.uid)
 				.withConverter(genAdminConverter(MemberSchema))
 				.get()
-			if (member.data()?.type !== `owner`) throw new TRPCError({code: `UNAUTHORIZED`})
+			if (member.data()?.type !== `owner`) throw new TRPCError({ code: `UNAUTHORIZED` })
 
 			await dbAdmin.recursiveDelete(
 				dbAdmin.collection(`Products`).doc(productId).withConverter(genAdminConverter(ProductSchema)),
@@ -344,7 +345,7 @@ export const productRouter = router({
 				userType: z.string(),
 			}),
 		)
-		.mutation(async ({input: {email, productId, userIdToken, userType}}) => {
+		.mutation(async ({ input: { email, productId, userIdToken, userType } }) => {
 			const user = await authAdmin.verifyIdToken(userIdToken)
 			const member = await dbAdmin
 				.collection(`Products`)
@@ -364,14 +365,15 @@ export const productRouter = router({
 			invariant(productData)
 
 			const inviteToken = crypto.randomBytes(16).toString(`hex`)
-			await product.ref.collection(`Invites`).doc(inviteToken).withConverter(genAdminConverter(InviteSchema)).set({
+			await dbAdmin.collection(`Invites`).doc(inviteToken).withConverter(genAdminConverter(InviteSchema)).set({
 				email,
+				productId,
 				id: inviteToken,
 				userType,
 				status: `pending`,
 			})
 
-			const queryParams = querystring.stringify({invite_token: inviteToken})
+			const queryParams = querystring.stringify({ invite_token: inviteToken })
 			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
 			await sendEmail({
 				to: email,
@@ -389,7 +391,7 @@ export const productRouter = router({
 				userIdToken: z.string(),
 			}),
 		)
-		.mutation(async ({input: {email, productId, userIdToken}}) => {
+		.mutation(async ({ input: { email, productId, userIdToken } }) => {
 			const user = await authAdmin.verifyIdToken(userIdToken)
 			const member = await dbAdmin
 				.collection(`Products`)
@@ -410,7 +412,7 @@ export const productRouter = router({
 
 			const inviteToken = crypto.randomBytes(16).toString(`hex`)
 
-			const queryParams = querystring.stringify({invite_token: inviteToken})
+			const queryParams = querystring.stringify({ invite_token: inviteToken })
 			const inviteLink = `https://web.sprintzero.app/sign-in?${queryParams}`
 			await sendEmail({
 				to: email,

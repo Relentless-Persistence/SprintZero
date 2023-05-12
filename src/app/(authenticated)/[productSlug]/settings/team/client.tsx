@@ -1,24 +1,24 @@
 "use client"
 
-import {DeleteOutlined, DownOutlined, EditOutlined, EyeOutlined, SendOutlined, UserOutlined} from "@ant-design/icons"
-import {Avatar, Breadcrumb, Button, Card, Dropdown, Input, Space, Tabs, Tag, notification} from "antd"
-import {collection, deleteDoc, doc, getDoc, getDocs, limit, query, where} from "firebase/firestore"
-import {useEffect, useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { DeleteOutlined, DownOutlined, EditOutlined, EyeOutlined, SendOutlined, UserOutlined } from "@ant-design/icons"
+import { Avatar, Breadcrumb, Button, Card, Dropdown, Input, Space, Tabs, Tag, notification } from "antd"
+import { collection, deleteDoc, doc, getDoc, getDocs, limit, query, where } from "firebase/firestore"
+import { useEffect, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
-const {Meta} = Card
+const { Meta } = Card
 
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {InviteConverter} from "~/types/db/Products/Invites"
-import {MemberConverter} from "~/types/db/Products/Members"
-import {auth, db} from "~/utils/firebase"
-import {trpc} from "~/utils/trpc"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { InviteConverter } from "~/types/db/Products/Invites"
+import { MemberConverter } from "~/types/db/Products/Members"
+import { auth, db } from "~/utils/firebase"
+import { trpc } from "~/utils/trpc"
 
 const TeamSettingsClientPage: FC = () => {
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 
 	const inviteUser = trpc.product.inviteUser.useMutation()
 	const inviteReminder = trpc.product.inviteReminder.useMutation()
@@ -41,8 +41,8 @@ const TeamSettingsClientPage: FC = () => {
 	}, [])
 
 	const memberEmails = trpc.product.getMemberEmails.useQuery(
-		{productId: product.id, userIdToken: token!},
-		{enabled: !!token},
+		{ productId: product.id, userIdToken: token! },
+		{ enabled: !!token },
 	)
 
 	const checkMemberExists = async (email: string) => {
@@ -72,7 +72,7 @@ const TeamSettingsClientPage: FC = () => {
 	}
 
 	const removeInvitee = async (id: string) => {
-		const invitesRef = collection(product.ref, `Invites`)
+		const invitesRef = dbAdmin.collection(`Invites`)
 
 		await deleteDoc(doc(invitesRef, id))
 	}
@@ -120,7 +120,7 @@ const TeamSettingsClientPage: FC = () => {
 
 	return (
 		<div className="flex flex-col gap-6 px-12 py-8">
-			<Breadcrumb items={[{title: `Settings`}, {title: `Team`}]} />
+			<Breadcrumb items={[{ title: `Settings` }, { title: `Team` }]} />
 			<Tabs
 				activeKey={currentTab}
 				onChange={(key) => setcurrentTab(key as `editor` | `viewer`)}
@@ -190,7 +190,7 @@ const TeamSettingsClientPage: FC = () => {
 													}
 													description={memberEmails.data?.[member.id]}
 												/>
-												<Avatar size="small" style={{backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)`}}>
+												<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
 													{i + 1}
 												</Avatar>
 											</div>
@@ -228,7 +228,7 @@ const TeamSettingsClientPage: FC = () => {
 													}
 													description={memberEmails.data?.[member.id]}
 												/>
-												<Avatar size="small" style={{backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)`}}>
+												<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
 													{i + 2}
 												</Avatar>
 											</div>
@@ -326,7 +326,7 @@ const TeamSettingsClientPage: FC = () => {
 													onChange={(e) => setEmail(e.target.value)}
 												/>
 											</div>
-											<Avatar size="small" style={{backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)`}}>
+											<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
 												#
 											</Avatar>
 										</div>
@@ -371,7 +371,7 @@ const TeamSettingsClientPage: FC = () => {
 													}
 													description={memberEmails.data?.[member.id]}
 												/>
-												<Avatar size="small" style={{backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)`}}>
+												<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
 													{i + 1}
 												</Avatar>
 											</div>
@@ -469,7 +469,7 @@ const TeamSettingsClientPage: FC = () => {
 													onChange={(e) => setEmail(e.target.value)}
 												/>
 											</div>
-											<Avatar size="small" style={{backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)`}}>
+											<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
 												#
 											</Avatar>
 										</div>
