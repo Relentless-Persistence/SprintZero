@@ -79,15 +79,18 @@ const SignInClientPage: FC = () => {
 		}
 
 		const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
-		const isNewUser = !user
+		let isNewUser = !user
 
-		if (typeof inviteToken === `string`)
+		if (typeof inviteToken === `string`) {
 			await putUserOnProduct.mutateAsync({
 				userAvatar: credential.user.photoURL,
 				userName: credential.user.displayName ?? credential.user.email,
 				userId: credential.user.uid,
 				inviteToken,
 			})
+
+			isNewUser = false;
+		}
 
 		if (isNewUser) {
 			await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {

@@ -4,6 +4,7 @@ import {genConverter} from "~/types"
 
 export const InviteSchema = z.object({
 	email: z.string(),
+	productId: z.string(),
 	userType: z.string(),
 	status: z.string(),
 

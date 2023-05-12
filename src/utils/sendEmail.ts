@@ -11,7 +11,7 @@ type SendEmailInput = {
 }
 
 export const sendEmail = async ({body, from, subject, to}: SendEmailInput): Promise<void> => {
-	if (process.env.NODE_ENV === `production`) {
+	// if (process.env.NODE_ENV === `production`) {
 		const emailFrom = process.env.EMAIL_FROM_NO_REPLY
 		invariant(emailFrom, `EMAIL_FROM_NO_REPLY is not set`)
 		const emailPassword = process.env.EMAIL_PASSWORD_NO_REPLY
@@ -33,7 +33,7 @@ export const sendEmail = async ({body, from, subject, to}: SendEmailInput): Prom
 			subject,
 			html: body,
 		})
-	} else {
-		console.info(`sendEmail`, {from, to, subject, body})
-	}
+	// } else {
+	// 	console.info(`sendEmail`, {from, to, subject, body})
+	// }
 }
