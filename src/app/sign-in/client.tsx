@@ -61,68 +61,69 @@ const SignInClientPage: FC = () => {
 
 		setHasSignedIn(true)
 
-		const isBetaUser =
-			betaUsers.includes(credential.user.email) || credential.user.email.endsWith(`@relentlesspersistenceinc.com`)
-		if (isBetaUser) {
-			setHasSignedIn(true)
+		// const isBetaUser =
+		// 	betaUsers.includes(credential.user.email) || credential.user.email.endsWith(`@relentlesspersistenceinc.com`)
 
-			// Ask to verify email if not already verified
-			if (auth.currentUser && !auth.currentUser.emailVerified) {
-				await sendEmailVerification(auth.currentUser).then(() => {
-					notification.success({
-						message: `Email Verification`,
-						description: `Please check your email to verify your account.`,
-						placement: `bottomRight`,
-					})
+		// if (isBetaUser) {
+		//setHasSignedIn(true)
+
+		// Ask to verify email if not already verified
+		if (auth.currentUser && !auth.currentUser.emailVerified) {
+			await sendEmailVerification(auth.currentUser).then(() => {
+				notification.success({
+					message: `Email Verification`,
+					description: `Please check your email to verify your account.`,
+					placement: `bottomRight`,
 				})
-			}
-
-			const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
-			const isNewUser = !user
-
-			if (typeof inviteToken === `string`)
-				await putUserOnProduct.mutateAsync({
-					userAvatar: credential.user.photoURL,
-					userName: credential.user.displayName ?? credential.user.email,
-					userId: credential.user.uid,
-					inviteToken,
-				})
-
-			if (isNewUser) {
-				await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
-					email: credential.user.email,
-					hasAcceptedTos: false,
-					preferredMusicClient: `appleMusic`,
-					type: `user`,
-				})
-				//router.push(`/accept-terms`)
-				router.push(`/billing`)
-			}
-			// else if (!user.hasAcceptedTos) {
-			// 	router.push(`/accept-terms`)
-			// }
-			else {
-				// Nothing special to do, redirect to one of their products
-
-				const members = await getDocs(
-					query(
-						collectionGroup(db, `Members`),
-						where(`id`, `==`, credential.user.uid),
-						where(`type`, `in`, [`owner`, `editor`]),
-					).withConverter(MemberConverter),
-				)
-				if (members.docs.length === 0) {
-					router.push(`/billing`)
-				} else {
-					const productId = members.docs[0]!.ref.parent.parent!.id
-					router.push(`/${productId}/map`)
-				}
-			}
-		} else {
-			notification.error({ message: `Sorry, you are not yet enrolled in the beta.` })
-			await signOut(auth)
-			setHasSignedIn(false)
+			})
 		}
+
+		const user = (await getDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter))).data()
+		const isNewUser = !user
+
+		if (typeof inviteToken === `string`)
+			await putUserOnProduct.mutateAsync({
+				userAvatar: credential.user.photoURL,
+				userName: credential.user.displayName ?? credential.user.email,
+				userId: credential.user.uid,
+				inviteToken,
+			})
+
+		if (isNewUser) {
+			await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
+				email: credential.user.email,
+				hasAcceptedTos: false,
+				preferredMusicClient: `appleMusic`,
+				type: `user`,
+			})
+			//router.push(`/accept-terms`)
+			router.push(`/billing`)
+		}
+		// else if (!user.hasAcceptedTos) {
+		// 	router.push(`/accept-terms`)
+		// }
+		else {
+			// Nothing special to do, redirect to one of their products
+
+			const members = await getDocs(
+				query(
+					collectionGroup(db, `Members`),
+					where(`id`, `==`, credential.user.uid),
+					where(`type`, `in`, [`owner`, `editor`]),
+				).withConverter(MemberConverter),
+			)
+			if (members.docs.length === 0) {
+				router.push(`/billing`)
+			} else {
+				const productId = members.docs[0]!.ref.parent.parent!.id
+				router.push(`/${productId}/map`)
+			}
+		}
+		// } else {
+		// 	notification.error({ message: `Sorry, you are not yet enrolled in the beta.` })
+		// 	await signOut(auth)
+		// 	setHasSignedIn(false)
+		// }
 	}
 
 	const handleOnClick = async (provider: AuthProvider) => {
