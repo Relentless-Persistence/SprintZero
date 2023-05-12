@@ -85,7 +85,7 @@ const ConfigurationPageClientPage: FC = () => {
                 email: recipient,
                 productId,
                 userIdToken: await user.getIdToken(),
-                userType: `member`,
+                userType: `editor`,
             })
         }
 
