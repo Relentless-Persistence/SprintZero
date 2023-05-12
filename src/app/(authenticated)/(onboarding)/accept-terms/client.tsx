@@ -39,7 +39,7 @@ const AcceptTermsClientPage: FC = () => {
 				),
 			)
 
-			console.log(members)
+			//console.log(members)
 			if (members.length === 0) router.push(`/billing`)
 			else router.push(`/${members[0]!.ref.parent.parent!.id}/map`)
 		} catch (e) {
