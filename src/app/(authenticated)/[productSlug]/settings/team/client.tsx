@@ -29,7 +29,8 @@ const TeamSettingsClientPage: FC = () => {
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
 
-	const [invitees, , inviteesError] = useCollection(collection(product.ref, `Invites`).withConverter(InviteConverter))
+	//const [invitees, , inviteesError] = useCollection(collection(product.ref, `Invites`).withConverter(InviteConverter))
+	const [invitees, , inviteesError] = useCollection(collection(db, `Invites`).withConverter(InviteConverter))
 	useErrorHandler(inviteesError)
 
 	const [token, setToken] = useState<string | undefined>(undefined)

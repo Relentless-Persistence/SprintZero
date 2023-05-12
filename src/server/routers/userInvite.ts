@@ -19,7 +19,8 @@ export const userInviteRouter = router({
 		)
 		.query(async ({ input: { inviteToken } }) => {
 			const invites = await dbAdmin
-				.collection(`Invites/${inviteToken}`)
+				.collection(`Invites`)
+				.where(FieldPath.documentId(), `==`, inviteToken)
 				.withConverter(genAdminConverter(InviteSchema))
 				.get()
 			if (!invites.docs[0]) throw new TRPCError({ code: `UNAUTHORIZED` })
@@ -90,6 +91,15 @@ export const userInviteRouter = router({
 					updatedAt: Timestamp.now(),
 					yesterdayStoryIds: [],
 				},
+			)
+			batch.update(
+				dbAdmin
+					.collection(`Invites`)
+					.doc(invite.id),
+				{
+					status: `accepted`
+				}
+
 			)
 			await batch.commit()
 		}),

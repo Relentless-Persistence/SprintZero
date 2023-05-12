@@ -82,6 +82,7 @@ const SignInClientPage: FC = () => {
 		let isNewUser = !user
 
 		if (typeof inviteToken === `string`) {
+			// do below in batch
 			await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
 				email: credential.user.email,
 				hasAcceptedTos: false,
