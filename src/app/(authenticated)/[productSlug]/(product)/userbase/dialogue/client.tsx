@@ -152,6 +152,7 @@ const DialogueClientPage: FC = () => {
 								speech: false,
 								visual: false,
 							},
+							audioFilePath: ``,
 							email: null,
 							location: ``,
 							name: `New Participant`,
@@ -160,8 +161,9 @@ const DialogueClientPage: FC = () => {
 							timing: null,
 							title: null,
 							transcript: ``,
+							transcriptAudio: ``,
 							updatedAt: Timestamp.now(),
-							personaIds: null,
+							personaIds: [],
 							updatedAtUserId: user.id,
 						})
 							.then((docRef) => {
