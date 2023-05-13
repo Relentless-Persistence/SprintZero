@@ -11,6 +11,7 @@ export const DialogueParticipantSchema = z.object({
 		speech: z.boolean(),
 		visual: z.boolean(),
 	}),
+	audioFilePath: z.string(),
 	email: z.string().email().nullable(),
 	location: z.string(),
 	name: z.string({invalid_type_error: `Required`}),
@@ -19,6 +20,7 @@ export const DialogueParticipantSchema = z.object({
 	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable(),
 	title: z.enum([`dr`, `miss`, `mr`, `mrs`, `ms`, `prof`, `sir`]).nullable(),
 	transcript: z.string(),
+	transcriptAudio: z.string(),
 	updatedAt: timestampSchema,
 
 	personaIds: z.array(z.string()).nullable(),

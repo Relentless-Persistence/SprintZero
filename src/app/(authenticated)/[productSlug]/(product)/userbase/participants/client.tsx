@@ -1,7 +1,6 @@
 "use client"
 
 import { EyeOutlined, PhoneOutlined, SoundOutlined, UserAddOutlined, UserOutlined } from "@ant-design/icons";
-import Icon from "@ant-design/icons/lib/components/Icon";
 import { Avatar, Breadcrumb, Button, Card, Empty, Spin, Tabs, Tag } from "antd"
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import { useState } from "react"
@@ -9,11 +8,9 @@ import { useErrorHandler } from "react-error-boundary";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Masonry from "react-masonry-css"
 
-
 import type { FC } from "react";
 
-
-import ParticipantCard from "./ParticipantCard"
+// import ParticipantCard from "./ParticipantCard"
 import ParticipantDrawer from "./ParticipantDrawer";
 import { useAppContext } from "../../../AppContext"
 import { DialogueParticipantConverter } from "~/types/db/Products/DialogueParticipants";
@@ -60,6 +57,7 @@ const ParticipantsClientPage: FC = () => {
                                         speech: false,
                                         visual: false,
                                     },
+                                    audioFilePath: ``,
                                     email: null,
                                     location: ``,
                                     name: `New Participant`,
@@ -68,6 +66,7 @@ const ParticipantsClientPage: FC = () => {
                                     timing: null,
                                     title: null,
                                     transcript: ``,
+                                    transcriptAudio: ``,
                                     updatedAt: Timestamp.now(),
                                     personaIds: [],
                                     updatedAtUserId: user.id,
