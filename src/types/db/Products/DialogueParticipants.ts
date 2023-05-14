@@ -1,6 +1,6 @@
-import {z} from "zod"
+import { z } from "zod"
 
-import {genConverter, timestampSchema} from "~/types"
+import { genConverter, timestampSchema } from "~/types"
 
 export const DialogueParticipantSchema = z.object({
 	availability: z.array(z.enum([`95only`, `email`, `phone`, `text`, `weekdays`, `weekends`])),
@@ -14,7 +14,8 @@ export const DialogueParticipantSchema = z.object({
 	audioFilePath: z.string(),
 	email: z.string().email().nullable(),
 	location: z.string(),
-	name: z.string({invalid_type_error: `Required`}),
+	location_id: z.string(),
+	name: z.string({ invalid_type_error: `Required` }),
 	phoneNumber: z.string().nullable(),
 	status: z.enum([`identified`, `contacted`, `scheduled`, `interviewed`, `analyzing`, `processed`]),
 	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable(),
@@ -22,6 +23,7 @@ export const DialogueParticipantSchema = z.object({
 	transcript: z.string(),
 	transcriptAudio: z.string(),
 	updatedAt: timestampSchema,
+	wiki_link: z.string(),
 
 	personaIds: z.array(z.string()).nullable(),
 	updatedAtUserId: z.string(),

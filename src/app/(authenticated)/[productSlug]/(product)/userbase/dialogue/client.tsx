@@ -155,6 +155,7 @@ const DialogueClientPage: FC = () => {
 							audioFilePath: ``,
 							email: null,
 							location: ``,
+							location_id: ``,
 							name: `New Participant`,
 							phoneNumber: ``,
 							status: `identified`,
@@ -163,6 +164,7 @@ const DialogueClientPage: FC = () => {
 							transcript: ``,
 							transcriptAudio: ``,
 							updatedAt: Timestamp.now(),
+							wiki_link: ``,
 							personaIds: [],
 							updatedAtUserId: user.id,
 						})
