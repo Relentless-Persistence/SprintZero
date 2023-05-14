@@ -229,7 +229,7 @@ export const productRouter = router({
 				)
 				batch.set(product.collection(`Versions`).doc(nanoid()).withConverter(genAdminConverter(VersionSchema)), {
 					deleted: false,
-					name: `1.0`,
+					name: `1.0.0`,
 					updates: {
 						changed: {
 							description: ``,
