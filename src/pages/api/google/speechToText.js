@@ -34,6 +34,12 @@ const handler = async (req, res) => {
 			sampleRateHertz: 16000,
 			languageCode: "en-US",
 		}
+	} else if (fileExtension === "flac") {
+		config = {
+			encoding: "FLAC",
+			languageCode: "en-US",
+			sampleRateHertz: 44100,
+		}
 	} else if (fileExtension === `m4a`) {
 		config = {
 			encoding: `LINEAR16`,
@@ -65,9 +71,9 @@ const handler = async (req, res) => {
 	}
 
 	try {
-		const [operation] = await client.longRunningRecognize(request)
+		const [operation] = await client.longRunningRecognize(request).catch(console.error)
 
-		const [response] = await operation.promise()
+		const [response] = await operation.promise().catch(console.error)
 
 		const transcription = await response.results.map((result) => result.alternatives[0].transcript).join(`\n`)
 		res.status(200).json({transcript: transcription})
