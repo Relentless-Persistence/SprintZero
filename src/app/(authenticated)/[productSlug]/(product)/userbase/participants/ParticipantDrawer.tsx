@@ -193,6 +193,21 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
     setIsEditorOpen(false)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const onClick: MenuProps[`onClick`] = async ({ key }) => {
+    const id: string | undefined = activeParticipant
+
+    if (!id) return
+
+    const participantRef = doc(product.ref, `DialogueParticipants`, id);
+    const updateData = {
+      status: key,
+      updatedAt: Timestamp.now(),
+    };
+
+    await updateDoc(participantRef, updateData)
+  };
+
   useEffect(() => {
     if (storageBucketUri.length > 0) {
       fetchTranscript().catch(console.error)
@@ -232,7 +247,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 
               {/* {participantData?.status && (
                                  */}
-              <Dropdown menu={{ items }} placement="bottomRight" arrow>
+              <Dropdown menu={{ items, onClick }} placement="bottomRight" arrow>
 
                 <Tag color="#585858" icon={<FlagOutlined />}>
                   {statuses.find((status) => status[0] === participantData?.status)![1]}

@@ -63,6 +63,7 @@ const ParticipantLocation: FC<ParticipantEditFormProps> = ({ participant, onFini
 
     const [placeId, setPlaceId] = useState<string | undefined>(undefined)
     const [wikipediaLink, setWikipediaLink] = useState<string | undefined>(undefined)
+
     const handleLocationSelect = useCallback(
         async (address: string) => {
             setValue(address, false)
@@ -86,11 +87,27 @@ const ParticipantLocation: FC<ParticipantEditFormProps> = ({ participant, onFini
                 })
 
                 const page = res.data.query.pages[Object.keys(res.data.query.pages)[0] ?? ``]
+
                 if (page) setWikipediaLink(page.canonicalurl)
+                await updateDoc(participant.ref, {
+                    location: address,
+                    location_id: result.place_id,
+                    wiki_link: page?.canonicalurl,
+                    updatedAt: Timestamp.now()
+                })
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [clearSuggestions, setValue],
     )
+
+    useEffect(() => {
+        setValue(participant.data().location, true)
+        setPlaceId(participant.data().location_id)
+        setWikipediaLink(participant.data().wiki_link)
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [participant])
 
     useEffect(() => {
         if (isLoaded) {
@@ -114,7 +131,9 @@ const ParticipantLocation: FC<ParticipantEditFormProps> = ({ participant, onFini
                     name="location"
                     className="w-full"
                     value={value}
-                    onChange={(data) => setValue(data as string)}
+                    onChange={(data) => {
+                        setValue(data as string)
+                    }}
                     disabled={!ready}
                     onSelect={(data) => {
                         handleLocationSelect(data as string).catch(console.error)
