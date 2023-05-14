@@ -1,11 +1,11 @@
-import {Breadcrumb} from "antd"
+import { Breadcrumb } from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import {useState} from "react"
-import {useInterval} from "react-use"
+import { useState } from "react"
+import { useInterval } from "react-use"
 
-import type {Dayjs} from "dayjs"
-import type {FC} from "react"
+import type { Dayjs } from "dayjs"
+import type { FC } from "react"
 
 dayjs.extend(relativeTime)
 
@@ -14,7 +14,7 @@ export type StoryMapHeaderProps = {
 	lastUpdated: Dayjs | undefined
 }
 
-const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName, lastUpdated}) => {
+const StoryMapHeader: FC<StoryMapHeaderProps> = ({ versionName, lastUpdated }) => {
 	const [lastUpdatedText, setLastUpdatedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
 		if (lastUpdated !== undefined) setLastUpdatedText(lastUpdated.fromNow())
@@ -23,7 +23,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({versionName, lastUpdated}) => 
 	return (
 		<div className="flex flex-col gap-8">
 			<div className="flex items-center justify-between gap-4 px-12 pt-8">
-				<Breadcrumb items={[{title: `Story Map`}, {title: versionName}]} />
+				<Breadcrumb items={[{ title: `Story Map` }, { title: versionName ?? `All` }]} />
 				{lastUpdatedText && <p className="text-sm italic text-textTertiary">Last updated {lastUpdatedText}</p>}
 			</div>
 			<div className="px-12 text-[#595959]">

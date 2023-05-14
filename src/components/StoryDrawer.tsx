@@ -16,7 +16,7 @@ import {
 	UserOutlined,
 } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Avatar, Button, Checkbox, Divider, Drawer, Dropdown, Form, Input, MenuProps, Popover, Segmented, Skeleton, Tabs, Tag } from "antd"
+import { Avatar, Button, Checkbox, Divider, Drawer, Dropdown, Form, Input, Popover, Segmented, Skeleton, Tabs, Tag } from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -29,6 +29,7 @@ import { useCollection } from "react-firebase-hooks/firestore"
 import { useForm } from "react-hook-form"
 import { useInterval } from "react-use"
 
+import type { MenuProps } from "antd";
 import type { QueryDocumentSnapshot, QuerySnapshot } from "firebase/firestore"
 import type { FC } from "react"
 import type { z } from "zod"
@@ -88,14 +89,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 	const sgGenUserStory = async () => {
 		setScrumGenieRunning(true);
-		setDescription('')
+		setDescription(``)
 		const storyName = story.name
 		const feature = storyMapItems.find((item) => item.id === story.parentId)
 		const featureName = feature?.name
 		const epicName = storyMapItems.find((item) => item.id === feature?.parentId)?.name
 
 		const newStoryDescRaw = await genStoryDesc.mutateAsync({
-			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ""}". And the feature belongs to an epic called "${epicName ?? ""}". And the user story has a short name "${storyName ?? ""}". Your output should include only one sentence.`,
+			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
 		})
 
 		console.log(newStoryDescRaw)
@@ -256,7 +257,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 						</Button>
 					</div>
 				) : (
-					<div className="flex h-14 flex-col justify-center gap-2">
+					<div className="flex h-14 flex-col justify-center gap-2 storyDrawerTags">
 						<div className="flex items-center gap-4">
 							<div className="relative w-fit min-w-[1rem]">
 								<p className="text-2xl font-normal">{localStoryName || `_`}</p>
@@ -292,43 +293,29 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										</label>
 									</div>
 								} trigger="click">
-									<Tag color="#DDE3D5" icon={<NumberOutlined />} style={{ color: "#103001", border: "1px solid #A7C983" }}>
+									<Button type="primary" size="small" icon={<NumberOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 										{totalEffort} Point{totalEffort === 1 ? `` : `s`}
-									</Tag>
+									</Button>
 								</Popover>
 
 
-								<Tag
-									color={
-										typeof product.data().effortCost === `number`
-											? `#DDE3D5`
-											: theme === `light`
-												? `#DDE3D5`
-												: `#333333`
-									}
-									icon={<DollarOutlined />}
-									style={{ color: "#103001", border: "1px solid #A7C983" }}
-								// className={clsx(
-								// 	typeof product.data().effortCost !== `number` &&
-								// 	`!border-current !text-[#d9d9d9] dark:!text-[#555555]`,
-								// )}
-								>
+								<Button type="primary" size="small" icon={<DollarOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 									{Math.floor((product.data().effortCost ?? 0) * totalEffort)} USD
-								</Tag>
+								</Button>
 
 
 								<Dropdown menu={{
 									items
 								}} placement="bottomRight" arrow>
 
-									<Tag color="#DDE3D5" icon={<RocketOutlined />} style={{ color: "#103001", border: "1px solid #A7C983" }}>
+									<Button type="primary" size="small" icon={<RocketOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 										{versions.docs.find(v => v.id === story.versionId)?.data().name}
-									</Tag>
+									</Button>
 								</Dropdown>
 
-								<Tag color="#DDE3D5" icon={<FlagOutlined />} style={{ color: "#103001", border: "1px solid #A7C983" }}>
+								<Button type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 									{sprintColumns[story.sprintColumn]}
-								</Tag>
+								</Button>
 								<Popover
 									placement="bottom"
 									content={
@@ -340,7 +327,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 												.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
 												.map((member) => ({ label: member.data().name, value: member.id }))}
 
-											style={{ width: "430px" }}
+											style={{ width: `430px` }}
 										/>
 										// <div className="-m-1 flex flex-col gap-2">
 										// 	{peoplePopoverItems.length > 0 ? (
@@ -351,28 +338,30 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										// </div>
 									}
 								>
-									<Tag color="#DDE3D5" icon={<UserOutlined />} className="text-sm" style={{ color: "#103001", border: "1px solid #A7C983" }}>
-										{story.peopleIds.length}
-									</Tag>
+									<Button type="primary" size="small" icon={<UserOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+										<span>{story.peopleIds.length}</span>
+									</Button>
 								</Popover>
 
-								<Divider type="vertical" style={{ height: "15px" }} />
+								<Divider type="vertical" style={{ height: `15px` }} />
 
-								<Tag color="#DDE3D5" icon={<BranchesOutlined />} className="text-sm" style={{ color: "#103001", border: "1px solid #A7C983" }}>
+								<Button disabled type="primary" size="small" icon={<BranchesOutlined />}
+								//style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}
+								>
 									Commit
-								</Tag>
-								<Tag color="#DDE3D5" icon={<BlockOutlined />} className="text-sm" style={{ color: "#103001", border: "1px solid #A7C983" }}>
+								</Button>
+								<Button type="primary" size="small" icon={<BlockOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 									Design
-								</Tag>
-								<Tag color="#DDE3D5" icon={<SolutionOutlined />} className="text-sm" style={{ color: "#103001", border: "1px solid #A7C983" }}>
+								</Button>
+								<Button disabled type="primary" size="small" icon={<SolutionOutlined />}>
 									Insight
-								</Tag>
-								<Tag color="#DDE3D5" icon={<LinkOutlined />} className="text-sm" style={{ color: "#103001", border: "1px solid #A7C983" }}>
+								</Button>
+								<Button disabled type="primary" size="small" icon={<LinkOutlined />}>
 									Page
-								</Tag>
-								<Tag color="#DDE3D5" icon={<ClusterOutlined />} className="text-sm" style={{ color: "#103001", border: "1px solid #A7C983" }}>
+								</Button>
+								<Button disabled type="primary" size="small" icon={<ClusterOutlined />}>
 									System
-								</Tag>
+								</Button>
 
 								{/* <div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
 									<Tag
@@ -434,7 +423,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 						</>
 					) : (
 						<>
-							<Button onClick={() => setEditMode(true)}>Edit</Button>
+							{/* <Button onClick={() => setEditMode(true)}>Edit</Button> */}
 							<button type="button" onClick={() => onClose()}>
 								<CloseOutlined />
 							</button>
@@ -520,16 +509,17 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 						<div className="flex flex-col gap-2">
 							<div className="flex justify-between gap-3">
 								<div className="flex gap-2 items-center">
-									<p className="text-xl font-semibold" style={{ color: "#595959" }}>User Story</p>
+									<p className="text-xl font-semibold" style={{ color: `#595959` }}>User Story</p>
 									<div className="flex gap-2">
 										<Button disabled={scrumGenieRunning} onClick={sgGenUserStory}
 											className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
 									</div>
 								</div>
 
-								<Button
+								{/* Should not show for Basic tier, to be implemented */}
+								{/* <Button
 									icon={<FlagOutlined color="#820014" />}
-									style={{ color: '#820014', borderColor: '#820014' }}
+									style={{ color: `#820014`, borderColor: `#820014` }}
 									disabled={story.ethicsColumn !== null}
 									onClick={() => {
 										if (story.ethicsColumn == null) {
@@ -542,9 +532,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 									className="flex items-center"
 								>
 									{story.ethicsColumn !== null ? `Flagged` : `Flag`}
-								</Button>
+								</Button> */}
 							</div>
-							<div style={{ position: 'relative', justifyContent: 'center' }}>
+							<div style={{ position: `relative`, justifyContent: `center` }}>
 								<Input.TextArea
 									rows={5}
 									value={description}
@@ -556,8 +546,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 									}}
 									className=""
 								/>
-								{(scrumGenieRunning) && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999, width: '97%' }}>
-									<Skeleton active loading={true} style={{ height: "50px" }} title={false} paragraph={{ rows: 3 }} />
+								{(scrumGenieRunning) && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
+									<Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 3 }} />
 								</div>}
 							</div>
 						</div>
@@ -570,16 +560,16 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 								key, label:
 									(
 										<span>
-											<Tag>{(key === "bugs") ? story.bugs.length : key === "accCriteria" ? story.acceptanceCriteria.length : 0}</Tag>
+											<Tag>{(key === `bugs`) ? story.bugs.length : key === `accCriteria` ? story.acceptanceCriteria.length : 0}</Tag>
 											<span className="ml-2">{label}</span>
 										</span>
-									), disabled: key === "changeLog" ? true : false
+									), disabled: key === `changeLog` ? true : false
 							}))}
 						/>
 
 						{
-							currentStoryTab === "bugs" && <div className="flex min-h-0 flex-col gap-2">
-								<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: "wrap", overflowX: "auto" }}>
+							currentStoryTab === `bugs` && <div className="flex min-h-0 flex-col gap-2">
+								<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: `wrap`, overflowX: `auto` }}>
 									{story.bugs.map((bug) => (
 										<Checkbox
 											key={bug.id}
@@ -611,11 +601,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 						}
 
 						{
-							currentStoryTab === "accCriteria" &&
+							currentStoryTab === `accCriteria` &&
 
 
 							<div className="flex min-h-0 flex-col gap-2">
-								<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: "wrap", overflowX: "auto" }}>
+								<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: `wrap`, overflowX: `auto` }}>
 									{story.acceptanceCriteria.map((criterion) => (
 										<Checkbox
 											key={criterion.id}
@@ -650,7 +640,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 					{/* Right column */}
 					<div className="flex h-full flex-col gap-2">
 						<div className="flex items-center justify-between">
-							<p className="text-xl font-semibold" style={{ color: "#595959" }}>Comments</p>
+							<p className="text-xl font-semibold" style={{ color: `#595959` }}>Comments</p>
 							<Segmented
 								size="small"
 								value={commentType}
