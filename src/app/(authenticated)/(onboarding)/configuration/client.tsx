@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Form, Input, Select, Space, Tag } from "antd"
+import { Button, Form, Input, Segmented, Select, Space, Tag } from "antd"
 import { doc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -15,6 +15,8 @@ import { UserConverter } from "~/types/db/Users"
 import { auth, db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
 
+
+
 const ConfigurationPageClientPage: FC = () => {
     const router = useRouter()
     const createProduct = trpc.product.create.useMutation()
@@ -22,20 +24,30 @@ const ConfigurationPageClientPage: FC = () => {
 
     const [user, , userError] = useAuthState(auth)
 
-    console.log(`A point`)
-
     useErrorHandler(userError)
     const [dbUser, , dbUserError] = useDocument(
         user ? doc(db, `Users`, user.uid).withConverter(UserConverter) : undefined,
     )
 
-    console.log(`B point`)
     useErrorHandler(dbUserError)
 
-    const [sprintLength, setSprintLength] = useState<1 | 2 | 3>(2)
-    const [sprintGate, setSprintGate] = useState<1 | 2 | 3 | 4 | 5>(2)
+    const [sprintLength, setSprintLength] = useState<1 | 2 | 3>(1)
+    const [sprintGate, setSprintGate] = useState<1 | 2 | 3 | 4 | 5>(1)
     const [hasSubmitted, setHasSubmitted] = useState(false)
 
+    const updateSprintLength = (sprintLenStr: string) => {
+        if (sprintLenStr === `One Week`) setSprintLength(1)
+        else if (sprintLenStr === `Two Weeks`) setSprintLength(2)
+        else if (sprintLenStr === `Three Weeks`) setSprintLength(3)
+    }
+
+    const updateSprintGate = (sprintGateStr: string) => {
+        if (sprintGateStr === `Monday`) setSprintGate(1)
+        else if (sprintGateStr === `Tuesday`) setSprintGate(2)
+        else if (sprintGateStr === `Wednesday`) setSprintGate(3)
+        else if (sprintGateStr === `Thursday`) setSprintGate(4)
+        else if (sprintGateStr === `Friday`) setSprintGate(5)
+    }
 
     /* eslint-disable no-template-curly-in-string */
     const validateMessages = {
@@ -118,7 +130,7 @@ const ConfigurationPageClientPage: FC = () => {
                             name="productName"
                             rules={[{ required: true, message: `Please input a product name` }]}
                         >
-                            <Input placeholder="eg. Netflix, Headspace, Spotify" />
+                            <Input placeholder="eg. Netflix, Headspace, Spotify" size="large" />
                         </Form.Item>
 
                     </div>
@@ -139,6 +151,7 @@ const ConfigurationPageClientPage: FC = () => {
                                 //defaultValue={['mobile', 'web']}
                                 //onChange={handleChange}
                                 options={productTypeOptions}
+                                size="large"
                             />
                         </Form.Item>
                     </div>
@@ -152,17 +165,17 @@ const ConfigurationPageClientPage: FC = () => {
                 <div className="flex gap-4 mb-7">
                     <div className="w-1/3">
                         <Form.Item name={[`members`, `email1`]} rules={[{ type: `email` }]}>
-                            <Input addonBefore="Email" placeholder="username@domain.com" />
+                            <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
                         </Form.Item>
                     </div>
                     <div className="w-1/3">
                         <Form.Item name={[`members`, `email2`]} rules={[{ type: `email` }]}>
-                            <Input addonBefore="Email" placeholder="username@domain.com" />
+                            <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
                         </Form.Item>
                     </div>
                     <div className="w-1/3">
                         <Form.Item name={[`members`, `email3`]} rules={[{ type: `email` }]}>
-                            <Input addonBefore="Email" placeholder="username@domain.com" />
+                            <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
                         </Form.Item>
                     </div>
                 </div>
@@ -172,23 +185,13 @@ const ConfigurationPageClientPage: FC = () => {
                         <p className="text-base text-xs text-textSecondary">How many weeks does it take?</p>
                     </div>
                 </div>
-                <div className="flex gap-4 mb-7">
-                    <div className="w-1/3">
-                        <Button onClick={() => setSprintLength(1)} type={sprintLength === 1 ? `primary` : `default`} className="w-full" disabled={false}>
-                            One week
-                        </Button>
-                    </div>
-                    <div className="w-1/3">
-                        <Button onClick={() => setSprintLength(2)} type={sprintLength === 2 ? `primary` : `default`} className="w-full" disabled={false}>
-                            Two weeks
-                        </Button>
-                    </div>
-                    <div className="w-1/3">
-                        <Button onClick={() => setSprintLength(3)} type={sprintLength === 3 ? `primary` : `default`} className="w-full" disabled={false}>
-                            Three weeks
-                        </Button>
-
-                    </div>
+                <div className="flex mb-7">
+                    <Form.Item
+                        name="sprintLength"
+                        className="flex-grow"
+                    >
+                        <Segmented defaultValue="One Week" size="large" block options={[`One Week`, `Two Weeks`, `Three Weeks`]} value={sprintLength} onChange={updateSprintLength} style={{ background: `#EBEBEB` }} />
+                    </Form.Item>
                 </div>
                 <div className="flex">
                     <div className="leading-normal mb-2">
@@ -197,31 +200,12 @@ const ConfigurationPageClientPage: FC = () => {
                     </div>
                 </div>
                 <div className="flex gap-4 mb-7">
-                    <div className="w-1/5">
-                        <Button onClick={() => setSprintGate(1)} type={sprintGate === 1 ? `primary` : `default`} className="w-full" disabled={false}>
-                            Monday
-                        </Button>
-                    </div>
-                    <div className="w-1/5">
-                        <Button onClick={() => setSprintGate(2)} type={sprintGate === 2 ? `primary` : `default`} className="w-full" disabled={false}>
-                            Tuesday
-                        </Button>
-                    </div>
-                    <div className="w-1/5">
-                        <Button onClick={() => setSprintGate(3)} type={sprintGate === 3 ? `primary` : `default`} className="w-full" disabled={false}>
-                            Wednesday
-                        </Button>
-                    </div>
-                    <div className="w-1/5">
-                        <Button onClick={() => setSprintGate(4)} type={sprintGate === 4 ? `primary` : `default`} className="w-full" disabled={false}>
-                            Thursday
-                        </Button>
-                    </div>
-                    <div className="w-1/5">
-                        <Button onClick={() => setSprintGate(5)} type={sprintGate === 5 ? `primary` : `default`} className="w-full" disabled={false}>
-                            Friday
-                        </Button>
-                    </div>
+                    <Form.Item
+                        name="sprintLength"
+                        className="flex-grow"
+                    >
+                        <Segmented defaultValue="Monday" size="large" block options={[`Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`]} value={sprintGate} onChange={updateSprintGate} style={{ background: `#EBEBEB` }} />
+                    </Form.Item>
                 </div>
                 <div className="flex justify-end">
                     <Button type="primary" htmlType="submit" loading={hasSubmitted}>
