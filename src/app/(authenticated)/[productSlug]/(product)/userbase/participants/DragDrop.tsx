@@ -1,5 +1,5 @@
 import { InboxOutlined } from '@ant-design/icons';
-import { Upload, message } from 'antd';
+import { Upload, message, notification } from 'antd';
 import {
     getDownloadURL,
     ref,
@@ -23,9 +23,12 @@ interface DragDropProps {
 const DragDrop: FC<DragDropProps> = ({ setAudioUrl, setStorageBucketUri }) => {
 
     function beforeUpload(file: RcFile) {
-        const isAudio = file.type === `audio/mpeg` || file.type === `audio/wav` || file.type === `audio/x-m4a`;
+        const isAudio = file.type === `audio/mpeg` || file.type === `audio/wav` || file.type === `audio/x-m4a` || file.type === `audio / flac`;
         if (!isAudio) {
-            void message.error(`You can only upload MP3, WMA or M4A audio files!`);
+            notification.error({
+                message: `You can only upload MP3, WAV or FLAC audio files!`,
+                placement: `topRight`
+            })
         }
         return isAudio;
     }
@@ -56,13 +59,13 @@ const DragDrop: FC<DragDropProps> = ({ setAudioUrl, setStorageBucketUri }) => {
         <Dragger action={(file: RcFile): string => {
             onUpload(file)
             return ``
-        }} beforeUpload={beforeUpload} className="grow">
+        }} beforeUpload={beforeUpload} maxCount={1} className="grow">
             <p className="ant-upload-drag-icon">
                 <InboxOutlined />
             </p>
             <p className="ant-upload-text">Click or drag audio file to this area to upload + transcribe</p>
             <p className="ant-upload-hint">
-                .mp3, .m4a, or .wav only
+                .mp3, .wav, or .flac only
             </p>
         </Dragger>
     );
