@@ -10,7 +10,7 @@ import {
   UploadOutlined,
 } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Drawer, Dropdown, Popover, Tag, Typography } from 'antd';
+import { Button, Drawer, Dropdown, Popover, Skeleton, Tag, Typography } from 'antd';
 import axios from "axios"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -96,6 +96,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
   const [isEditing, setIsEditing] = useState(false)
   const [audioUrl, setAudioUrl] = useState(``)
   const [storageBucketUri, setStorageBucketUri] = useState(``)
+  const [loadingTranscript, setLoadingTranscrript] = useState(false)
 
   const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
   const participantData = participant?.data()
@@ -141,6 +142,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
   }, [participantData, setValue])
 
   const fetchTranscript = async (): Promise<void> => {
+    setLoadingTranscrript(true)
     try {
       const response: TranscribeResponse = await axios.post(`/api/google/speechToText`, { gcsUri: storageBucketUri });
       const transcript = response.data.transcript;
@@ -162,7 +164,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
       };
 
       await updateDoc(participantRef, updateData);
-
+      setLoadingTranscrript(false)
     } catch (error) {
       console.error(error);
       throw new Error(`Something went wrong while fetching transcript.`);
@@ -348,47 +350,67 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
               <p className="text-lg font-semibold">Interview Transcript</p>
               {participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => {
                 deleteAudio().catch(console.error)
-              }}>Replace audio file</Button>}
+              }} disabled={loadingTranscript}>Replace audio file</Button>}
 
               {isEditorOpen && !participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => setIsEditorOpen(false)}>Upload audio file</Button>}
             </div>
 
-            {!participantData?.transcript && !isEditorOpen ? (
-              <>
+            {!participantData?.transcript && !isEditorOpen ?
+              !loadingTranscript ? <>
                 <div className="flex flex-col gap-2 items-center">
                   <Button type="primary" onClick={() => setIsEditorOpen(true)}>Open Editor</Button>
                   <Text>or</Text>
                 </div>
                 <DragDrop setAudioUrl={setAudioUrl} setStorageBucketUri={setStorageBucketUri} />
               </>
-            )
+                :
+                <div style={{ position: `relative`, justifyContent: `center` }}>
+                  <RhfTextArea
+                    control={control}
+                    name="transcript"
+                    onChange={() => {
+                      onSubmit().catch(console.error)
+                    }}
+                    rows={12}
+                    wrapperClassName="grow"
+                    className="!h-full !resize-none"
+                  />
+                  {!participantData?.transcript && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
+                    <Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 9 }} />
+                  </div>}
+                </div>
+
               :
-              <>
+
+              <div style={{ position: `relative`, justifyContent: `center` }}>
                 <RhfTextArea
                   control={control}
                   name="transcript"
                   onChange={() => {
                     onSubmit().catch(console.error)
                   }}
+                  rows={10}
                   wrapperClassName="grow"
                   className="!h-full !resize-none"
                 />
-                {participantData?.transcriptAudio && <figure>
-                  <audio
-                    style={{ width: `100%` }}
-                    className="mt-2"
-                    controls
-                    src={participantData.transcriptAudio}>
-                    <LinkTo href={participantData.transcriptAudio}>
-                      Download audio
-                    </LinkTo>
-                  </audio>
-                </figure>}
-              </>
+              </div>
+
 
             }
 
+            {participantData?.transcriptAudio && <figure>
+              <audio
+                style={{ width: `100%` }}
+                className="mt-2"
+                controls
+                src={participantData.transcriptAudio}>
+                <LinkTo href={participantData.transcriptAudio}>
+                  Download audio
+                </LinkTo>
+              </audio>
+            </figure>}
           </div>
+
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <p className="text-lg font-semibold">Contact</p>
