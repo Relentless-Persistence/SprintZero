@@ -87,6 +87,18 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const [designEffort, setDesignEffort] = useState<number>(story.designEffort);
 	const genStoryDesc = trpc.gpt4.useMutation()
 
+	const [selectedVersion, setSelectedVersion] = useState<string>(versions.docs.find((v) => v.id === story.versionId)!.data().name);
+
+	// const handleVersionChange = async (e:any) => {
+	// 	//console.log(e.key)
+
+	// 	const selectedVersion = versions.docs.find((v) => v.id === e.key)!.data().name;
+	// 	setSelectedVersion(selectedVersion);
+	// 	await updateItem(product, storyMapItems, versions, story.id, {
+	// 		versionId: e.key,
+	// 	})
+	// };
+
 	const sgGenUserStory = async () => {
 		setScrumGenieRunning(true);
 		setDescription(``)
@@ -99,7 +111,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
 		})
 
-		console.log(newStoryDescRaw)
+		//console.log(newStoryDescRaw)
 
 		const newStoryDesc = newStoryDescRaw.response
 			?.split(`\n`)
@@ -141,6 +153,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	// 	{ key: `analyzing`, label: `Analyzing` },
 	// 	{ key: `processed`, label: `Processed` }
 	// ]
+	//items.sort((a, b) => a.label.localeCompare(b.label));
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
@@ -305,15 +318,15 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 
 								<Dropdown menu={{
+									//onClick: handleVersionChange,
 									items
-								}} placement="bottomRight" arrow>
-
-									<Button type="primary" size="small" icon={<RocketOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
-										{versions.docs.find(v => v.id === story.versionId)?.data().name}
+								}} placement="bottomRight">
+									<Button disabled type="primary" size="small" icon={<RocketOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+										{selectedVersion}
 									</Button>
 								</Dropdown>
 
-								<Button type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+								<Button disabled type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 									{sprintColumns[story.sprintColumn]}
 								</Button>
 								<Popover
@@ -338,7 +351,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										// </div>
 									}
 								>
-									<Button type="primary" size="small" icon={<UserOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+									<Button disabled type="primary" size="small" icon={<UserOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 										<span>{story.peopleIds.length}</span>
 									</Button>
 								</Popover>
@@ -350,7 +363,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 								>
 									Commit
 								</Button>
-								<Button type="primary" size="small" icon={<BlockOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+								<Button disabled type="primary" size="small" icon={<BlockOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 									Design
 								</Button>
 								<Button disabled type="primary" size="small" icon={<SolutionOutlined />}>
