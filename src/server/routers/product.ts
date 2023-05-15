@@ -2,7 +2,6 @@ import { TRPCError } from "@trpc/server"
 import crypto from "crypto"
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import { nanoid } from "nanoid"
-import { useRouter } from "next/navigation"
 import querystring from "querystring"
 import invariant from "tiny-invariant"
 import { z } from "zod"
@@ -331,11 +330,10 @@ export const productRouter = router({
 				.withConverter(genAdminConverter(MemberSchema))
 				.get()
 			if (member.data()?.type !== `owner`) throw new TRPCError({ code: `UNAUTHORIZED` })
-			const router = useRouter()
+
 			await dbAdmin.recursiveDelete(
 				dbAdmin.collection(`Products`).doc(productId).withConverter(genAdminConverter(ProductSchema)),
 			)
-			router.push(`/`)
 		}),
 
 	inviteUser: procedure

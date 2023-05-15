@@ -4,6 +4,7 @@ import { FireFilled } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Breadcrumb, Button, Card, Popconfirm } from "antd"
 import { updateDoc } from "firebase/firestore"
+import { useRouter } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -33,6 +34,7 @@ type FormInputs = z.infer<typeof formSchema>
 
 const ConfigurationSettingsClientPage: FC = () => {
 	const { product } = useAppContext()
+	const router = useRouter()
 
 	const { control, handleSubmit, reset } = useForm<FormInputs>({
 		mode: `onChange`,
@@ -179,9 +181,9 @@ const ConfigurationSettingsClientPage: FC = () => {
 							.currentUser!.getIdToken(true)
 							.then(async (userIdToken) => {
 								await haltAndCatchFire.mutateAsync({ productId: product.id, userIdToken })
+								router.push(`/`)
 							})
 							.catch(console.error)
-						// router.push(`/`)
 					}}
 				>
 					<Button icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
