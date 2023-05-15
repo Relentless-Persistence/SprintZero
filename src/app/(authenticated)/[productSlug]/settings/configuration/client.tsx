@@ -1,22 +1,22 @@
 "use client"
 
-import {FireFilled} from "@ant-design/icons"
-import {zodResolver} from "@hookform/resolvers/zod"
-import {Breadcrumb, Button, Card, Popconfirm} from "antd"
-import {updateDoc} from "firebase/firestore"
-import {useEffect, useRef} from "react"
-import {useForm} from "react-hook-form"
-import {z} from "zod"
+import { FireFilled } from "@ant-design/icons"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Breadcrumb, Button, Card, Popconfirm } from "antd"
+import { updateDoc } from "firebase/firestore"
+import { useEffect, useRef } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-import type {FC} from "react"
+import type { FC } from "react"
 
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
-import {ProductSchema} from "~/types/db/Products"
-import {auth} from "~/utils/firebase"
-import {trpc} from "~/utils/trpc"
+import { ProductSchema } from "~/types/db/Products"
+import { auth } from "~/utils/firebase"
+import { trpc } from "~/utils/trpc"
 
 const formSchema = ProductSchema.pick({
 	name: true,
@@ -32,9 +32,9 @@ const formSchema = ProductSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 const ConfigurationSettingsClientPage: FC = () => {
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 
-	const {control, handleSubmit, reset} = useForm<FormInputs>({
+	const { control, handleSubmit, reset } = useForm<FormInputs>({
 		mode: `onChange`,
 		resolver: zodResolver(formSchema),
 		shouldFocusError: false,
@@ -72,7 +72,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 	return (
 		<div className="flex h-full flex-col gap-6 overflow-auto px-12 py-8">
 			<div className="flex flex-col gap-2">
-				<Breadcrumb items={[{title: `Settings`}, {title: `Configuration`}]} />
+				<Breadcrumb items={[{ title: `Settings` }, { title: `Configuration` }]} />
 				<h1 className="text-3xl font-bold">Product Configuration</h1>
 			</div>
 
@@ -98,9 +98,9 @@ const ConfigurationSettingsClientPage: FC = () => {
 							control={control}
 							name="cadence"
 							options={[
-								{label: `One`, value: 1},
-								{label: `Two`, value: 2},
-								{label: `Three`, value: 3},
+								{ label: `One`, value: 1 },
+								{ label: `Two`, value: 2 },
+								{ label: `Three`, value: 3 },
 							]}
 							onChange={() => {
 								onSubmit().catch(console.error)
@@ -114,11 +114,11 @@ const ConfigurationSettingsClientPage: FC = () => {
 							control={control}
 							name="sprintStartDayOfWeek"
 							options={[
-								{label: `Monday`, value: 1},
-								{label: `Tuesday`, value: 2},
-								{label: `Wednesday`, value: 3},
-								{label: `Thursday`, value: 4},
-								{label: `Friday`, value: 5},
+								{ label: `Monday`, value: 1 },
+								{ label: `Tuesday`, value: 2 },
+								{ label: `Wednesday`, value: 3 },
+								{ label: `Thursday`, value: 4 },
+								{ label: `Friday`, value: 5 },
 							]}
 							onChange={() => {
 								onSubmit().catch(console.error)
@@ -147,11 +147,11 @@ const ConfigurationSettingsClientPage: FC = () => {
 										onSubmit().catch(console.error)
 									}}
 									options={[
-										{label: `$`, value: `dollar`},
-										{label: `£`, value: `pound`},
-										{label: `€`, value: `euro`},
-										{label: `¥`, value: `yen`},
-										{label: `₹`, value: `rupee`},
+										{ label: `$`, value: `dollar` },
+										{ label: `£`, value: `pound` },
+										{ label: `€`, value: `euro` },
+										{ label: `¥`, value: `yen` },
+										{ label: `₹`, value: `rupee` },
 									]}
 								/>
 							}
@@ -178,7 +178,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 						auth
 							.currentUser!.getIdToken(true)
 							.then(async (userIdToken) => {
-								await haltAndCatchFire.mutateAsync({productId: product.id, userIdToken})
+								await haltAndCatchFire.mutateAsync({ productId: product.id, userIdToken })
 							})
 							.catch(console.error)
 						// router.push(`/`)
