@@ -43,38 +43,36 @@ const StoryTask: FC<Props> = ({ storyMapItems, tab }) => {
 
   return (
     <div className="">
-      {acceptanceCriterias.length > 0 && bugs.length > 0 && (
-        <div className="h-full grid grow auto-cols-[360px] grid-flow-col gap-4">
-          <StoryTaskColumn
-            id="todo"
-            title="To Do"
-            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
-            storyMapItems={storyMapItems}
-            tab={tab}
-          />
-          <StoryTaskColumn
-            id="inProgress"
-            title="In Progress"
-            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
-            storyMapItems={storyMapItems}
-            tab={tab}
-          />
-          <StoryTaskColumn
-            id="review"
-            title="Review"
-            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
-            storyMapItems={storyMapItems}
-            tab={tab}
-          />
-          <StoryTaskColumn
-            id="done"
-            title="Done"
-            tasks={tab === `bugs` ? bugs : acceptanceCriterias}
-            storyMapItems={storyMapItems}
-            tab={tab}
-          />
-        </div>
-      )}
+      <div className="h-full grid grow auto-cols-[360px] grid-flow-col gap-4 mb-2 overflow-x-auto">
+        <StoryTaskColumn
+          id="todo"
+          title="To Do"
+          tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+          storyMapItems={storyMapItems}
+          tab={tab}
+        />
+        <StoryTaskColumn
+          id="inProgress"
+          title="In Progress"
+          tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+          storyMapItems={storyMapItems}
+          tab={tab}
+        />
+        <StoryTaskColumn
+          id="review"
+          title="Review"
+          tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+          storyMapItems={storyMapItems}
+          tab={tab}
+        />
+        <StoryTaskColumn
+          id="done"
+          title="Done"
+          tasks={tab === `bugs` ? bugs : acceptanceCriterias}
+          storyMapItems={storyMapItems}
+          tab={tab}
+        />
+      </div>
     </div>
   );
 };
