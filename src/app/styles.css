@@ -303,14 +303,15 @@ circle {
    
 
 .roadmapCircle1 {
-	padding-left: 600px;
-	padding-top: 600px;
-	top: -300px;
-	left: -300px;
+	padding-left: 630px;
+	padding-top: 630px;
+	top: -315px;
+	left: -315px;
 	/* transform: translate(-50%, -50%);  */
 	/* green/6 */
-
-	background: #52c41a;
+	
+	background: #c3ffa5;
+	z-index: 6;
 }
 
 .roadmapCircle2 {
@@ -321,7 +322,8 @@ circle {
 
 	/* green/5 */
 
-	background: #73d13d;
+	background: #d3ffba;
+	z-index: 5;
 }
 
 .roadmapCircle3 {
@@ -331,7 +333,8 @@ circle {
 	left: -900px;
 	/* green/4 */
 
-	background: #95de64;
+	background: #deffc8;
+	z-index: 4;
 }
 
 .roadmapCircle4 {
@@ -342,19 +345,21 @@ circle {
 
 	/* green/3 */
 
-	background: #b7eb8f;
+	background: #eaffdc;
+	z-index: 3;
 	/* colorBorder */
 }
 
 .roadmapCircle5 {
-	padding-left: 3000px;
-	padding-top: 3000px;
-	top: -1500px;
-	left: -1500px;
+	padding-left: 3110px;
+	padding-top: 3110px;
+	top: -1560px;
+	left: -1550px;
 	border-radius: 0% !important;
+	z-index: 2;
 	/* green/3 */
 
-	background: #b7eb8f;
+	background: #f5ffed;
 
 	/* colorBorder */
 }
@@ -363,7 +368,8 @@ circle {
 	box-sizing: border-box;
 	border-radius: 50%;
 	position: absolute;
-	opacity: 0.2;
+	/* opacity: 0.2; */
+	opacity: 0.8;
 	border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
