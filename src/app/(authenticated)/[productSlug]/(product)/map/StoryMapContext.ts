@@ -1,15 +1,15 @@
-import {createContext, useContext} from "react"
+import { createContext, useContext } from "react"
 
-import type {QuerySnapshot} from "firebase/firestore"
-import type {Dispatch, SetStateAction} from "react"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
-import type {Version} from "~/types/db/Products/Versions"
+import type { QuerySnapshot } from "firebase/firestore"
+import type { Dispatch, SetStateAction } from "react"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
+import type { Version } from "~/types/db/Products/Versions"
 
 export const StoryMapContext = createContext<{
 	storyMapItems: StoryMapItem[]
 	versions: QuerySnapshot<Version>
 	editMode: boolean
-
+	setEditMode: Dispatch<SetStateAction<boolean>>
 	currentVersionId: string
 	setCurrentVersionId: Dispatch<SetStateAction<string>>
 	newVersionInputValue: string | undefined

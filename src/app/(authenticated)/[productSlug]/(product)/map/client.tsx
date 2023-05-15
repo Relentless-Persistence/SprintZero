@@ -9,7 +9,7 @@ import {
 	RedoOutlined,
 	UndoOutlined,
 } from "@ant-design/icons"
-import {FloatButton, Tooltip} from "antd"
+import { FloatButton, Tooltip } from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import {
@@ -23,44 +23,37 @@ import {
 	serverTimestamp,
 	writeBatch,
 } from "firebase/firestore"
-import {motion} from "framer-motion"
+import { motion } from "framer-motion"
 import produce from "immer"
-import {nanoid} from "nanoid"
-import {useEffect, useRef, useState} from "react"
-import {useErrorHandler} from "react-error-boundary"
-import {useCollection} from "react-firebase-hooks/firestore"
+import { nanoid } from "nanoid"
+import { useEffect, useRef, useState } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useCollection } from "react-firebase-hooks/firestore"
 
-import type {FC} from "react"
-import type {HistoryItem} from "~/types/db/Products/StoryMapHistories/HistoryItems"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
-import type {AllVersions} from "~/utils/storyMap"
+import type { FC } from "react"
+import type { HistoryItem } from "~/types/db/Products/StoryMapHistories/HistoryItems"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
+import type { AllVersions } from "~/utils/storyMap"
 
 import StoryMap from "./StoryMap"
-import {StoryMapContext} from "./StoryMapContext"
+import { StoryMapContext } from "./StoryMapContext"
 import StoryMapHeader from "./StoryMapHeader"
 import VersionList from "./VersionList"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {StoryMapHistoryConverter} from "~/types/db/Products/StoryMapHistories"
-import {HistoryItemConverter} from "~/types/db/Products/StoryMapHistories/HistoryItems"
-import {StoryMapItemConverter} from "~/types/db/Products/StoryMapItems"
-import {VersionConverter} from "~/types/db/Products/Versions"
-import {db} from "~/utils/firebase"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { StoryMapHistoryConverter } from "~/types/db/Products/StoryMapHistories"
+import { HistoryItemConverter } from "~/types/db/Products/StoryMapHistories/HistoryItems"
+import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
+import { VersionConverter } from "~/types/db/Products/Versions"
+import { db } from "~/utils/firebase"
 
 const StoryMapClientPage: FC = () => {
-	const {product} = useAppContext()
+	const { product } = useAppContext()
 	const [storyMapItems, , storyMapItemsError] = useCollection(
 		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
 	useErrorHandler(storyMapItemsError)
 	const [versions, , versionsError] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
 	useErrorHandler(versionsError)
-	const [histories, , historiesError] = useCollection(
-		query(
-			collection(product.ref, `StoryMapHistories`).withConverter(StoryMapHistoryConverter),
-			orderBy(`timestamp`, `desc`),
-		),
-	)
-	useErrorHandler(historiesError)
 
 	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions | undefined>(undefined)
 	const [newVersionInputValue, setNewVersionInputValue] = useState<string | undefined>(undefined)
@@ -72,151 +65,12 @@ const StoryMapClientPage: FC = () => {
 	const [editMode, setEditMode] = useState(false)
 	const [itemsToBeDeleted, setItemsToBeDeleted] = useState<string[]>([])
 	const [versionsToBeDeleted, setVersionsToBeDeleted] = useState<string[]>([])
-	const [isToolbeltOpen, setIsToolbeltOpen] = useState(false)
-
-	const lastHistory =
-		product.exists() &&
-		histories?.docs.find(
-			(history) => history.data().future === false && history.id !== product.data().storyMapCurrentHistoryId,
-		)
-	const currentHistory =
-		product.exists() && histories?.docs.find((history) => history.id === product.data().storyMapCurrentHistoryId)
-	const nextHistory = histories?.docs.findLast((history) => history.data().future === true)
-
-	const undo = async () => {
-		if (!histories || !lastHistory || !currentHistory) return
-
-		await runTransaction(db, async (transaction) => {
-			const currentHistoryItems = await getDocs(
-				collection(product.ref, `StoryMapHistories`, currentHistory.id, `HistoryItems`).withConverter(
-					HistoryItemConverter,
-				),
-			)
-			const lastHistoryItems = await getDocs(
-				collection(product.ref, `StoryMapHistories`, lastHistory.id, `HistoryItems`).withConverter(
-					HistoryItemConverter,
-				),
-			)
-
-			lastHistoryItems.docs.forEach((historyItem) => {
-				const dataWithoutNull = produce(historyItem.data(), (draft) => {
-					for (const key in draft) {
-						if (draft[key as keyof HistoryItem] === null) delete draft[key as keyof HistoryItem]
-					}
-				}) as StoryMapItem
-				transaction.update(doc(product.ref, `StoryMapItems`, historyItem.id).withConverter(StoryMapItemConverter), {
-					...dataWithoutNull,
-					updatedAt: serverTimestamp(),
-				})
-			})
-
-			const itemsToDelete = currentHistoryItems.docs
-				.filter((item) => !item.data().deleted)
-				.filter(
-					(currentHistoryItem) =>
-						!lastHistoryItems.docs
-							.filter((item) => !item.data().deleted)
-							.some((item) => item.id === currentHistoryItem.id),
-				)
-			itemsToDelete.forEach((item) => {
-				transaction.update(doc(product.ref, `StoryMapItems`, item.id).withConverter(StoryMapItemConverter), {
-					deleted: true,
-					updatedAt: Timestamp.now(),
-				})
-			})
-
-			transaction.update(currentHistory.ref, {
-				future: true,
-			})
-			transaction.update(product.ref, {
-				storyMapCurrentHistoryId: lastHistory.id,
-			})
-		})
-	}
-
-	const redo = async () => {
-		if (!histories || !nextHistory) return
-
-		await runTransaction(db, async (transaction) => {
-			const nextHistoryItems = await getDocs(
-				collection(product.ref, `StoryMapHistories`, nextHistory.id, `HistoryItems`).withConverter(
-					HistoryItemConverter,
-				),
-			)
-
-			nextHistoryItems.docs.forEach((historyItem) => {
-				const dataWithoutNull = produce(historyItem.data(), (draft) => {
-					for (const key in draft) {
-						if (draft[key as keyof HistoryItem] === null) delete draft[key as keyof HistoryItem]
-					}
-				}) as StoryMapItem
-				transaction.update(doc(product.ref, `StoryMapItems`, historyItem.id).withConverter(StoryMapItemConverter), {
-					...dataWithoutNull,
-					updatedAt: serverTimestamp(),
-				})
-			})
-
-			transaction.update(nextHistory.ref, {
-				future: false,
-			})
-			transaction.update(product.ref, {
-				storyMapCurrentHistoryId: nextHistory.id,
-			})
-		})
-	}
-
-	const canRedo = histories?.docs.findLast((history) => history.data().future === true)
-	const canUndo =
-		product.exists() &&
-		histories?.docs.find(
-			(history) => history.data().future === false && history.id !== product.data().storyMapCurrentHistoryId,
-		)
 
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
 	let lastUpdated: Timestamp | null = null
 	if (product.exists() && product.data().storyMapUpdatedAt instanceof Timestamp)
 		lastUpdated = product.data().storyMapUpdatedAt
-
-	const deleteItems = async () => {
-		if (!storyMapItems || !versions || (itemsToBeDeleted.length === 0 && versionsToBeDeleted.length === 0)) {
-			setEditMode(false)
-			return
-		}
-		const batch = writeBatch(db)
-
-		itemsToBeDeleted.forEach((id) => {
-			batch.update(doc(product.ref, `StoryMapItems`, id).withConverter(StoryMapItemConverter), {
-				deleted: true,
-			})
-		})
-		versionsToBeDeleted.forEach((id) => {
-			batch.update(doc(product.ref, `Versions`, id).withConverter(VersionConverter), {
-				deleted: true,
-			})
-		})
-
-		// Add a story map history entry
-		const historyId = nanoid()
-		batch.set(doc(product.ref, `StoryMapHistories`, historyId).withConverter(StoryMapHistoryConverter), {
-			future: false,
-			timestamp: serverTimestamp(),
-		})
-		storyMapItems.forEach((item) => {
-			batch.set(
-				doc(product.ref, `StoryMapHistories`, historyId, `HistoryItems`, item.id).withConverter(HistoryItemConverter),
-				item.data(),
-			)
-		})
-		batch.update(product.ref, {
-			storyMapCurrentHistoryId: historyId,
-		})
-
-		await batch.commit()
-		setEditMode(false)
-		setItemsToBeDeleted([])
-		setVersionsToBeDeleted([])
-	}
 
 	if (!product.exists() || !storyMapItems || !versions || currentVersionId === undefined) return null
 	return (
@@ -225,6 +79,7 @@ const StoryMapClientPage: FC = () => {
 				storyMapItems: storyMapItems.docs.map((item) => item.data()),
 				versions,
 				editMode,
+				setEditMode,
 				currentVersionId,
 				setCurrentVersionId,
 				newVersionInputValue,
@@ -235,7 +90,7 @@ const StoryMapClientPage: FC = () => {
 				setVersionsToBeDeleted,
 			}}
 		>
-			<div className="grid h-full grid-cols-[1fr_6rem]">
+			<div className="grid h-full grid-cols-[1fr_9rem]">
 				<div className="relative flex flex-col gap-8">
 					{currentVersionId && (
 						<StoryMapHeader
@@ -259,7 +114,7 @@ const StoryMapClientPage: FC = () => {
 						</motion.div>
 					</div>
 
-					{editMode ? (
+					{/* {editMode ? (
 						<FloatButton.Group key="edit" className="absolute right-12 bottom-8">
 							<Tooltip placement="left" title="Cancel">
 								<FloatButton
@@ -327,7 +182,7 @@ const StoryMapClientPage: FC = () => {
 								<FloatButton icon={<EditOutlined />} onClick={() => setEditMode(true)} />
 							</Tooltip>
 						</FloatButton.Group>
-					)}
+					)} */}
 				</div>
 
 				<VersionList />
