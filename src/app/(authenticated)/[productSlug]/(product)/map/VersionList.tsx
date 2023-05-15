@@ -91,29 +91,42 @@ const VersionList: FC = () => {
 				.map((version) => ({
 					key: version.id,
 					label: (
-						<div className="flex justify-between">
+						<div>
+							{/* <div className="flex justify-between"> */}
 							<div className="flex items-center justify-between space-x-3">
 								<p className="overflow-hidden truncate">{version.data().name}</p>
-								<Tag className="text-right">{storyLength(version.id)}</Tag>
-							</div>
-							{editMode && (
-								<button
-									type="button"
-									onClick={(e) => {
-										e.stopPropagation()
-										if (currentVersionId === version.id) setCurrentVersionId(AllVersions)
-										setVersionsToBeDeleted((versions) => [...versions, version.id])
-										const itemsWithVersion = storyMapItems
-											.filter((item) => item.versionId === version.id)
-											.map((item) => item.id)
-										itemsWithVersion.forEach((id) => {
-											setItemsToBeDeleted((items) => [...items, id])
-										})
-									}}
+
+								<Tag
+									hidden={editMode}
+									style={
+										version.id === currentVersionId
+											? { border: `1px solid #A7C983`, backgroundColor: `#DDE3D5` }
+											: {}
+									}
+									className="text-right"
 								>
-									<MinusCircleOutlined className="!mr-0 text-error" />
-								</button>
-							)}
+									{storyLength(version.id)}
+								</Tag>
+								{editMode && (
+									<button
+										type="button"
+										onClick={(e) => {
+											e.stopPropagation()
+											if (currentVersionId === version.id) setCurrentVersionId(AllVersions)
+											setVersionsToBeDeleted((versions) => [...versions, version.id])
+											const itemsWithVersion = storyMapItems
+												.filter((item) => item.versionId === version.id)
+												.map((item) => item.id)
+											itemsWithVersion.forEach((id) => {
+												setItemsToBeDeleted((items) => [...items, id])
+											})
+										}}
+									>
+										<MinusCircleOutlined className="!mr-0 text-error" />
+									</button>
+								)}
+							</div>
+
 						</div>
 					),
 				}))
@@ -121,51 +134,65 @@ const VersionList: FC = () => {
 					{
 						key: AllVersions,
 						label: (
-							<p data-all className="text-left">
-								All
-							</p>
+							<div className="flex items-center justify-between space-x-3">
+								<p data-all className="text-left">
+									All
+								</p>
+								<Tag hidden={editMode} className="text-right">{stories.length}</Tag>
+							</div>
 						),
 					},
 				])
 				.concat(
-					newVersionInputValue !== undefined
-						? [
-							{
-								key: `__NEW_VERSION__`,
-								label: (
-									<Input.Group compact className="-mx-2 -my-2 w-[calc(100%+1rem)]">
-										<Input
-											size="small"
-											autoFocus
-											value={newVersionInputValue}
-											onChange={(e) => setNewVersionInputValue(e.target.value)}
-											status={isVersionValid ? `` : `error`}
-											//help={!isVersionValid && `Please enter a valid semantic version number`}
-											onPressEnter={() => {
-												if (newVersionInputValue)
-													addVersion()
-														.then((doc) => {
-															setNewVersionInputValue(undefined)
-															setCurrentVersionId(doc.id)
-														})
-														.catch(console.error)
-											}}
-											onKeyDown={(e) => {
-												if (e.key === `Escape`) setNewVersionInputValue(undefined)
-											}}
-											className="!w-12"
-										/>
-										<Button
+					// newVersionInputValue !== undefined
+					// 	? 
+					[
+						{
+							key: `__NEW_VERSION__`,
+							label: (
+								<Input.Group compact className="-my-2">
+									<Input
+										disabled={editMode}
+										style={{ borderStyle: `dashed` }}
+										placeholder="Add Release"
+										size="small"
+										//autoFocus
+										value={newVersionInputValue}
+										onChange={(e) => setNewVersionInputValue(e.target.value)}
+										status={isVersionValid ? `` : `error`}
+										//help={!isVersionValid && `Please enter a valid semantic version number`}
+										onPressEnter={() => {
+											if (newVersionInputValue)
+												addVersion()
+													.then((doc) => {
+														setNewVersionInputValue(undefined)
+														setCurrentVersionId(doc.id)
+													})
+													.catch(console.error)
+										}}
+										onBlur={(e) => {
+											setNewVersionInputValue(undefined)
+											setVersionIsValid(true)
+										}}
+										onKeyDown={(e) => {
+											if (e.key === `Escape`) {
+												setNewVersionInputValue(undefined)
+												setVersionIsValid(true)
+											}
+										}}
+										className="!w-25"
+									/>
+									{/* <Button
 											size="small"
 											icon={<MinusCircleOutlined className="!mr-0" />}
 											onClick={() => setNewVersionInputValue(undefined)}
 											className="!inline-grid place-items-center !text-xs"
-										/>
-									</Input.Group>
-								),
-							},
-						]
-						: [],
+										/> */}
+								</Input.Group>
+							),
+						},
+					]
+					// : [],
 				)}
 			className="h-full min-w-0 [&>.ant-tabs-nav]:w-full [&_.ant-tabs-tab-btn]:w-full"
 		/>
