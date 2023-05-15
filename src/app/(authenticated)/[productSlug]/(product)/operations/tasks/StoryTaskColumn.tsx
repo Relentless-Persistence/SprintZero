@@ -39,7 +39,7 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
 
   return (
     <div>
-      <Card title={title} className="w-[360px] h-[463px] lg-h-[600px] overflow-y-auto">
+      <Card title={title} className="w-[360px] h-[463px] lg:h-[560px] overflow-y-auto">
         <div className="flex flex-col gap-4">
           {tasks.length > 0 ? tasks
             .filter((task) => task.status === id)

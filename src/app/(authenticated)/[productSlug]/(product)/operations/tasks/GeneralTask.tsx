@@ -20,7 +20,7 @@ const GeneralTask: FC<Props> = ({ tasks }) => {
 	return (
 		<div className="">
 
-			<div className="h-full grid grow auto-cols-[286px] grid-flow-col gap-4">
+			<div className="h-full grid grow auto-cols-[360px] grid-flow-col gap-4 mb-2 overflow-x-auto">
 
 
 				<TaskColumn id="todo" title="To Do" tasks={tasks} />

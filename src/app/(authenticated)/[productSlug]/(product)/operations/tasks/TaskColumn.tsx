@@ -23,7 +23,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ id, title, tasks }) => {
 
 	return (
 		<div>
-			<Card title={title} className="h-[463px] lg-h-[600px]" extra=<Tag>{tasks.length > 0 ? tasks
+			<Card title={title} className="w-[360px] h-[463px] lg:h-[560px] overflow-y-auto" extra=<Tag>{tasks.length > 0 ? tasks
 				.filter((task) => task.status === id).length : 0}</Tag>>
 				<div className="flex flex-col gap-4">
 					{tasks.length > 0 ? tasks
