@@ -190,7 +190,7 @@ const ConfigurationPageClientPage: FC = () => {
                         name="sprintLength"
                         className="flex-grow"
                     >
-                        <Segmented defaultValue="One Week" size="large" block options={[`One Week`, `Two Weeks`, `Three Weeks`]} value={sprintLength} onChange={updateSprintLength} style={{ background: `#EBEBEB` }} />
+                        <Segmented name="sprintLength" defaultValue="One Week" size="large" block options={[`One Week`, `Two Weeks`, `Three Weeks`]} value={sprintLength} onChange={updateSprintLength} style={{ background: `#EBEBEB` }} />
                     </Form.Item>
                 </div>
                 <div className="flex">
@@ -201,10 +201,10 @@ const ConfigurationPageClientPage: FC = () => {
                 </div>
                 <div className="flex gap-4 mb-7">
                     <Form.Item
-                        name="sprintLength"
+                        name="sprintGate"
                         className="flex-grow"
                     >
-                        <Segmented defaultValue="Monday" size="large" block options={[`Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`]} value={sprintGate} onChange={updateSprintGate} style={{ background: `#EBEBEB` }} />
+                        <Segmented name="sprintGate" defaultValue="Monday" size="large" block options={[`Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`]} value={sprintGate} onChange={updateSprintGate} style={{ background: `#EBEBEB` }} />
                     </Form.Item>
                 </div>
                 <div className="flex justify-end">
