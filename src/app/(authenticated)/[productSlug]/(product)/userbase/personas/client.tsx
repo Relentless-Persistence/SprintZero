@@ -165,7 +165,7 @@ const PersonasClientPage: FC = () => {
                     ) : (
                         <>
                             {currentTab === `description` && (
-                                <div className="flex h-full gap-6">
+                                <div className="flex gap-6" style={{ height: `600px` }}>
                                     <div className="w-1/3">
                                         <Card title="Description" style={{ width: `100%`, height: `100%`, border: `1px solid #D9D9D9`, borderRadius: `2px` }}
                                             extra={
@@ -174,7 +174,7 @@ const PersonasClientPage: FC = () => {
                                                 </div>
                                             }
                                         >
-                                            <TextArea style={{ height: `600px` }} />
+                                            <TextArea style={{ fontSize: `14px`, lineHeight: 1.8 }} value={personas.docs.find(doc => doc.id === currentPersona)?.data().description} rows={19} />
                                         </Card>
                                     </div>
                                     <div className="w-1/3">
@@ -184,9 +184,7 @@ const PersonasClientPage: FC = () => {
                                                 <Button className="flex items-center justify-center" icon={<LikeOutlined />}></Button>
                                                 <Button className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
                                             </div>}>
-                                            <p>Card content</p>
-                                            <p>Card content</p>
-                                            <p>Card content</p>
+                                            <div style={{ height: `490px`, overflow: `auto` }}>{personas.docs.find(doc => doc.id === currentPersona)?.data().toolset}</div>
                                         </Card>
                                     </div>
                                     <div className="w-1/3">
@@ -196,9 +194,7 @@ const PersonasClientPage: FC = () => {
                                                 <Button className="flex items-center justify-center" icon={<LikeOutlined />}></Button>
                                                 <Button className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
                                             </div>}>
-                                            <p>Card content</p>
-                                            <p>Card content</p>
-                                            <p>Card content</p>
+                                            <div style={{ height: `490px`, overflow: `auto` }}>{personas.docs.find(doc => doc.id === currentPersona)?.data().education} {personas.docs.find(doc => doc.id === currentPersona)?.data().education}</div>
                                         </Card>
                                     </div>
                                 </div>
@@ -225,7 +221,7 @@ const PersonasClientPage: FC = () => {
                                     })}
                                     <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                         <Button block={false} type="text" onClick={async () => {
-                                            const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
+                                            const personaRef = personas.docs.find(doc => doc.id === currentPersona)!.ref;
                                             const goalsCollectionRef = collection(personaRef, `Goals`);
                                             const newGoalDocRef = doc(goalsCollectionRef, nanoid());
 
@@ -260,7 +256,7 @@ const PersonasClientPage: FC = () => {
                                     })}
                                     <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                         <Button block={false} type="text" onClick={async () => {
-                                            const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
+                                            const personaRef = personas.docs.find(doc => doc.id === currentPersona)!.ref;
                                             const interactionsCollectionRef = collection(personaRef, `Interactions`);
                                             const newInteractionDocRef = doc(interactionsCollectionRef, nanoid());
 
@@ -295,7 +291,7 @@ const PersonasClientPage: FC = () => {
                                     })}
                                     <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                         <Button block={false} type="text" onClick={async () => {
-                                            const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
+                                            const personaRef = personas.docs.find(doc => doc.id === currentPersona)!.ref;
                                             const criticalitiesCollectionRef = collection(personaRef, `Criticalities`);
                                             const newCriticalityDocRef = doc(criticalitiesCollectionRef, nanoid());
 
@@ -330,7 +326,7 @@ const PersonasClientPage: FC = () => {
                                     })}
                                     <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                         <Button block={false} type="text" onClick={async () => {
-                                            const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
+                                            const personaRef = personas.docs.find(doc => doc.id === currentPersona)!.ref;
                                             const itemsCollectionRef = collection(personaRef, `Responsibilities`);
                                             const newItemRef = doc(itemsCollectionRef, nanoid());
 
@@ -365,7 +361,7 @@ const PersonasClientPage: FC = () => {
                                     })}
                                     <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                         <Button block={false} type="text" onClick={async () => {
-                                            const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
+                                            const personaRef = personas.docs.find(doc => doc.id === currentPersona)!.ref;
                                             const itemsCollectionRef = collection(personaRef, `Priorities`);
                                             const newItemRef = doc(itemsCollectionRef, nanoid());
 
@@ -400,7 +396,7 @@ const PersonasClientPage: FC = () => {
                                     })}
                                     <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                         <Button block={false} type="text" onClick={async () => {
-                                            const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
+                                            const personaRef = personas.docs.find(doc => doc.id === currentPersona)!.ref;
                                             const itemsCollectionRef = collection(personaRef, `Frustrations`);
                                             const newItemRef = doc(itemsCollectionRef, nanoid());
 
@@ -435,7 +431,7 @@ const PersonasClientPage: FC = () => {
                                     })}
                                     <div className="flex justify-center items-center" style={{ border: `2px dashed #54A31C`, borderRadius: `6px`, height: `205px` }}>
                                         <Button block={false} type="text" onClick={async () => {
-                                            const personaRef = personas!.docs.find(doc => doc.id === currentPersona)!.ref;
+                                            const personaRef = personas.docs.find(doc => doc.id === currentPersona)!.ref;
                                             const itemsCollectionRef = collection(personaRef, `Changes`);
                                             const newItemRef = doc(itemsCollectionRef, nanoid());
 

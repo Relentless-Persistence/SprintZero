@@ -29,6 +29,8 @@ const ParticipantsClientPage: FC = () => {
     const [personas, , personasError] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
     useErrorHandler(personasError)
 
+    const personasData = personas && personas.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+
     return (
         <div className="grid h-full grid-cols-[1fr_auto]">
             <div className="relative flex flex-col gap-4 overflow-auto px-12 py-8">
@@ -135,9 +137,10 @@ const ParticipantsClientPage: FC = () => {
                                             }
                                         >
                                             <div className="flex flex-wrap gap-2">
-                                                {personas?.docs.map((persona) => {
-                                                    return <Tag key={persona.id} color="geekblue" icon={<UserOutlined />}>
-                                                        {persona.data().name}
+                                                {participant.data().personaIds?.map((personaId) => {
+                                                    const persona = personasData?.find(persona => persona.id === personaId)
+                                                    return <Tag key={persona?.id} color="geekblue" icon={<UserOutlined />}>
+                                                        {persona?.name}
                                                     </Tag>
                                                     // if (persona.id === participant.data().personaId) {
                                                     //     return (
