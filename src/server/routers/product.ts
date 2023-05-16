@@ -85,7 +85,7 @@ export const productRouter = router({
 
 					finalVision: ``,
 					valueProposition: ``,
-					features: [``],
+					features: [``, ``, ``, ``, ``],
 
 					voiceData: {
 						voice: {

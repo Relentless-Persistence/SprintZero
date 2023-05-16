@@ -47,7 +47,7 @@ const VisionsClientPage: FC = () => {
 
   const gpt = trpc.gpt.useMutation()
 
-  const [features, setFeatures] = useState<string[]>([``, ``, ``, ``, ``]);
+  const [features, setFeatures] = useState<string[]>(product.data().features);
   //const [features, setFeatures] = useState<string[]>([`Feature 1`, `Feature 2`, `Feature 3`, `Feature 4`, `Feature 5`]);
   const [isSaveSuccessful, setIsSaveSuccessful] = useState(false);
   //console.log(features)
@@ -79,15 +79,19 @@ const VisionsClientPage: FC = () => {
 
   const reset = () => {
     setCurrent(0);
+    //setValueProposition(``);
     setProductVision(``);
+    //setFeatures([``, ``, ``, ``, ``]);
   };
 
   useEffect(() => {
+    product.data().finalVision && setCurrent(2)
+    setIsSaveSuccessful(true)
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (product) {
-      //setFeatures(product.data().features)
-      //setValueProposition(product.data().valueProposition)
-      //setProductVision(product.data().finalVision)
+      setFeatures(product.data().features)
+      setValueProposition(product.data().valueProposition)
+      setProductVision(product.data().finalVision)
     }
   }, [product])
 
@@ -108,6 +112,7 @@ const VisionsClientPage: FC = () => {
       });
       setProductVision(data.response?.trim())
       setGeneratingVision(false)
+      setIsSaveSuccessful(false)
     } catch (error) {
       console.error(error);
     }
@@ -232,7 +237,10 @@ const VisionsClientPage: FC = () => {
                   title={
                     !statementEditMode ?
                       <Button size="small" className="flex items-center justify-center" color="#103001" style={{ color: `#103001`, border: `1px solid #103001` }} icon={<RobotOutlined style={{ color: `#103001` }} />}>ScrumGenie</Button> :
-                      <Button type="text" danger onClick={() => setStatementEditMode(!statementEditMode)}>Cancel</Button>
+                      <Button type="text" danger onClick={() => {
+                        setStatementEditMode(!statementEditMode)
+                        setIsSaveSuccessful(true)
+                      }}>Cancel</Button>
                   }
                   extra=
                   {
@@ -241,7 +249,8 @@ const VisionsClientPage: FC = () => {
                       <Button type="text" onClick={() => {
                         setStatementEditMode(!statementEditMode)
                         setIsSaveSuccessful(false)
-                      }}>Edit</Button>
+                      }}
+                        disabled={generatingVision}>Edit</Button>
 
 
                   }
@@ -250,7 +259,7 @@ const VisionsClientPage: FC = () => {
                     {
                       statementEditMode ? <TextArea rows={8} onChange={(e) => setProductVision(e.target.value)} value={productVision} />
                         :
-                        <p style={{ fontWeight: 600, fontSize: 24, color: `rgba(0, 0, 0, 0.25)` }}>{generatingVision ? (
+                        <p style={{ fontWeight: 600, fontSize: 20, color: `rgba(0, 0, 0, 0.25)` }}>{generatingVision ? (
                           //<div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
                           <Skeleton active loading style={{ height: `50px` }} paragraph={{ rows: 5 }} />
                           //</div>
@@ -286,7 +295,7 @@ const VisionsClientPage: FC = () => {
                         console.error
                       })
                     }}
-                    disabled={isSaveSuccessful}
+                    disabled={isSaveSuccessful || generatingVision || statementEditMode}
                   >
                     Save
                   </Button>
