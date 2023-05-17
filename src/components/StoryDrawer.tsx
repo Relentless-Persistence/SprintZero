@@ -87,23 +87,17 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const [designEffort, setDesignEffort] = useState<number>(story.designEffort);
 	const genStoryDesc = trpc.gpt4.useMutation()
 
-	const [selectedVersion, setSelectedVersion] = useState<string>(versions.docs.find((v) => v.id === story.versionId)!.data().name);
+	const [storyVersionKey, setStoryVersionKey] = useState<string>(versions.docs.find((v) => v.id === story.versionId)!.id);
+	const [storyVersionLabel, setStoryVersionLabel] = useState<string>(versions.docs.find((v) => v.id === story.versionId)!.data().name);
 	const [storyLifecycleKey, setStoryLifecycleKey] = useState<string>(Object.entries(sprintColumns).find(([key]) => key === story.sprintColumn)![0])
 	const [storyLifecycleLabel, setStoryLifecycleLabel] = useState<string>(Object.entries(sprintColumns).find(([key]) => key === story.sprintColumn)![1])
 	const [storyLifecyclePopoverIsOpen, setStoryLifecyclePopoverIsOpen] = useState(false)
+	const [storyVersionPopoverIsOpen, setStoryVersionPopoverIsOpen] = useState(false)
 
-	const handleVersionChange: MenuProps[`onClick`] = async ({ key }) => {
-		const selectedVersion = versions.docs.find((v) => v.id === key)!.data().name;
-		setSelectedVersion(selectedVersion);
-		await updateItem(product, storyMapItems, versions, story.id, {
-			versionId: key,
-		})
-	};
 
 	type sprintColumnKey = keyof typeof sprintColumns
 
 	const handleStoryLifecycleChange = async ({ key }: { key: string }) => {
-		console.log(key)
 		const label = Object.entries(sprintColumns).find(([keyL, valueL]) => keyL === key)![1];
 		setStoryLifecycleKey(key);
 		setStoryLifecycleLabel(label);
@@ -111,6 +105,16 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			sprintColumn: key as WithFieldValue<sprintColumnKey>,
 		})
 	};
+
+	const handleStoryVersionChange = async ({ key }: { key: string }) => {
+		const label = versions.docs.find((v) => v.id === key)!.data().name;
+		setStoryVersionKey(key);
+		setStoryVersionLabel(label);
+		await updateItem(product, storyMapItems, versions, story.id, {
+			versionId: key,
+		})
+	};
+
 
 	const sgGenUserStory = async () => {
 		setScrumGenieRunning(true);
@@ -157,17 +161,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
-
-	const items: MenuProps[`items`] = versions.docs.map(v => ({ key: v.id, label: v.data().name }))
-	const sprintLifecycles: MenuProps[`items`] = Object.entries(sprintColumns).map(([key, value]) => ({ key, label: value }))
-	// 	{ key: `identified`, label: `Identified` },
-	// 	{ key: `contacted`, label: `Contacted` },
-	// 	{ key: `scheduled`, label: `Scheduled` },
-	// 	{ key: `interviewed`, label: `Interviewed` },
-	// 	{ key: `analyzing`, label: `Analyzing` },
-	// 	{ key: `processed`, label: `Processed` }
-	// ]
-	//items.sort((a, b) => a.label.localeCompare(b.label));
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
@@ -330,6 +323,37 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 									{Math.floor((product.data().effortCost ?? 0) * totalEffort)} USD
 								</Button>
 
+								<Popover style={{ height: `200px`, overflow: `auto` }} placement="bottomRight"
+									open={storyVersionPopoverIsOpen}
+									content={
+										<Menu
+											mode="vertical"
+											selectedKeys={[storyVersionKey]}
+											onClick={handleStoryVersionChange}
+											style={{ border: `none`, maxHeight: `250px`, overflow: `auto` }}
+										>
+											{/* versions.docs.map(v => ({ key: v.id, label: v.data().name })) */}
+											{versions.docs.sort((a, b) => {
+												const versionA = a.data().name.split(`.`).map(Number);
+												const versionB = b.data().name.split(`.`).map(Number);
+
+												for (let i = 0; i < 3; i++) {
+													if (versionA[i] !== versionB[i]) {
+														return versionB[i] - versionA[i];
+													}
+												}
+
+												return 0;
+											}).reverse().map((version) => (
+												<Menu.Item key={version.id} style={{ height: `30px`, lineHeight: `30px` }} onClick={() => setStoryVersionPopoverIsOpen(false)}>{version.data().name}</Menu.Item>
+											))}
+										</Menu>
+									} trigger="click">
+									<Button onClick={() => setStoryVersionPopoverIsOpen(!storyVersionPopoverIsOpen)} type="primary" size="small" icon={<RocketOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+										{storyVersionLabel}
+									</Button>
+								</Popover>
+
 								<Popover style={{ height: `200px`, overflow: `auto` }} placement="topRight"
 									open={storyLifecyclePopoverIsOpen}
 									content={
@@ -337,7 +361,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 											mode="vertical"
 											selectedKeys={[storyLifecycleKey]}
 											onClick={handleStoryLifecycleChange}
-											style={{ border: `none`, height: `300px`, overflow: `auto` }}
+											style={{ border: `none`, maxHeight: `300px`, overflow: `auto` }}
 										>
 											{Object.entries(sprintColumns).map(([key, column]) => (
 												<Menu.Item key={key} style={{ height: `30px`, lineHeight: `30px` }} onClick={() => setStoryLifecyclePopoverIsOpen(false)}>{column}</Menu.Item>
@@ -349,16 +373,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 									</Button>
 								</Popover>
 
-								<Dropdown
-									menu={{
-										onClick: handleVersionChange,
-										items
-
-									}}>
-									<Button disabled type="primary" size="small" icon={<RocketOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
-										{selectedVersion}
-									</Button>
-								</Dropdown>
 								{/* <Dropdown menu={{
 									onClick: handleStoryLifecycleChange,
 									items: sprintLifecycles
