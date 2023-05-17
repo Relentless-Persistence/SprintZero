@@ -100,14 +100,16 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		})
 	};
 
+	type sprintColumnKey = keyof typeof sprintColumns
+
 	const handleStoryLifecycleChange = async ({ key }: { key: string }) => {
 		console.log(key)
 		const label = Object.entries(sprintColumns).find(([keyL, valueL]) => keyL === key)![1];
 		setStoryLifecycleKey(key);
 		setStoryLifecycleLabel(label);
-		// await updateItem(product, storyMapItems, versions, story.id, {
-		// 	sprintColumn: key as WithFieldValue<sprintColumnKey>,
-		// })
+		await updateItem(product, storyMapItems, versions, story.id, {
+			sprintColumn: key as WithFieldValue<sprintColumnKey>,
+		})
 	};
 
 	const sgGenUserStory = async () => {
