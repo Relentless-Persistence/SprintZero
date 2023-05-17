@@ -93,6 +93,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const [storyLifecycleLabel, setStoryLifecycleLabel] = useState<string>(Object.entries(sprintColumns).find(([key]) => key === story.sprintColumn)![1])
 	const [storyLifecyclePopoverIsOpen, setStoryLifecyclePopoverIsOpen] = useState(false)
 	const [storyVersionPopoverIsOpen, setStoryVersionPopoverIsOpen] = useState(false)
+	const [storyAssignment, setStoryAssignment] = useState<string[] | undefined>(story.peopleIds)
+
+
 
 
 	type sprintColumnKey = keyof typeof sprintColumns
@@ -114,6 +117,15 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			versionId: key,
 		})
 	};
+
+	const handleStoryAssignmentChange = async (value: string[]) => {
+		setStoryAssignment(value);
+		await updateItem(product, storyMapItems, versions, story.id, {
+			peopleIds: value as WithFieldValue<string[] | undefined>,
+		})
+	};
+
+
 
 
 	const sgGenUserStory = async () => {
@@ -325,6 +337,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 								<Popover style={{ height: `200px`, overflow: `auto` }} placement="bottomRight"
 									open={storyVersionPopoverIsOpen}
+
 									content={
 										<Menu
 											mode="vertical"
@@ -339,7 +352,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 												for (let i = 0; i < 3; i++) {
 													if (versionA[i] !== versionB[i]) {
-														return versionB[i] - versionA[i];
+														return versionB[i]! - versionA[i]!;
 													}
 												}
 
@@ -373,34 +386,19 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 									</Button>
 								</Popover>
 
-								{/* <Dropdown menu={{
-									onClick: handleStoryLifecycleChange,
-									items: sprintLifecycles
-
-								}}
-								//placement="topRight"
-								>
-									<Button disabled type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
-										{storyLifecycle}
-									</Button>
-								</Dropdown> */}
-
-								{/* <Button disabled type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
-										{storyLifecycle}
-									</Button>
-								</Menu> */}
 								<Popover
 									placement="bottom"
 									content={
-										<RhfSelect
-											control={control}
-											name="peopleIds"
+										<Select
+											onChange={handleStoryAssignmentChange}
+											//name="peopleIds"
 											mode="multiple"
 											options={members?.docs
 												.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
 												.map((member) => ({ label: member.data().name, value: member.id }))}
 
 											style={{ width: `430px` }}
+											value={storyAssignment}
 										/>
 										// <div className="-m-1 flex flex-col gap-2">
 										// 	{peoplePopoverItems.length > 0 ? (
@@ -411,7 +409,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										// </div>
 									}
 								>
-									<Button disabled type="primary" size="small" icon={<UserOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+									<Button type="primary" size="small" icon={<UserOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 										<span>{story.peopleIds.length}</span>
 									</Button>
 								</Popover>
