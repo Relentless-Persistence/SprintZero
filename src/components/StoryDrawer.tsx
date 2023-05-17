@@ -16,7 +16,7 @@ import {
 	UserOutlined,
 } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Avatar, Button, Checkbox, Divider, Drawer, Dropdown, Form, Input, Popover, Segmented, Skeleton, Tabs, Tag } from "antd"
+import { Avatar, Button, Checkbox, Divider, Drawer, Dropdown, Form, Input, Menu, Popover, Segmented, Select, Skeleton, Tabs, Tag } from "antd"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -30,7 +30,7 @@ import { useForm } from "react-hook-form"
 import { useInterval } from "react-use"
 
 import type { MenuProps } from "antd";
-import type { QueryDocumentSnapshot, QuerySnapshot } from "firebase/firestore"
+import type { QueryDocumentSnapshot, QuerySnapshot, WithFieldValue } from "firebase/firestore"
 import type { FC } from "react"
 import type { z } from "zod"
 import type { Member } from "~/types/db/Products/Members"
@@ -88,16 +88,36 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const genStoryDesc = trpc.gpt4.useMutation()
 
 	const [selectedVersion, setSelectedVersion] = useState<string>(versions.docs.find((v) => v.id === story.versionId)!.data().name);
+	const [storyLifecycleKey, setStoryLifecycleKey] = useState<string>(Object.entries(sprintColumns).find(([key]) => key === story.sprintColumn)![0])
+	const [storyLifecycleLabel, setStoryLifecycleLabel] = useState<string>(Object.entries(sprintColumns).find(([key]) => key === story.sprintColumn)![1])
+	const [storyLifecyclePopoverIsOpen, setStoryLifecyclePopoverIsOpen] = useState(false)
 
-	// const handleVersionChange = async (e:any) => {
-	// 	//console.log(e.key)
+	const handleVersionChange: MenuProps[`onClick`] = async ({ key }) => {
+		const selectedVersion = versions.docs.find((v) => v.id === key)!.data().name;
+		setSelectedVersion(selectedVersion);
+		await updateItem(product, storyMapItems, versions, story.id, {
+			versionId: key,
+		})
+	};
 
-	// 	const selectedVersion = versions.docs.find((v) => v.id === e.key)!.data().name;
-	// 	setSelectedVersion(selectedVersion);
+	type sprintColumnKey = keyof typeof sprintColumns
+
+	// const handleStoryLifecycleChange: MenuProps[`onClick`] = async ({ key }) => {
+	// 	const selectedSprintLifecycle = Object.entries(sprintColumns).find(([keyL, valueL]) => keyL === key)![1];
+	// 	setStoryLifecycle(selectedSprintLifecycle);
 	// 	await updateItem(product, storyMapItems, versions, story.id, {
-	// 		versionId: e.key,
+	// 		sprintColumn: key as WithFieldValue<sprintColumnKey>,
 	// 	})
 	// };
+	const handleStoryLifecycleChange = async ({ key }) => {
+		console.log(key)
+		const label = Object.entries(sprintColumns).find(([keyL, valueL]) => keyL === key)![1];
+		setStoryLifecycleKey(key);
+		setStoryLifecycleLabel(label);
+		// await updateItem(product, storyMapItems, versions, story.id, {
+		// 	sprintColumn: key as WithFieldValue<sprintColumnKey>,
+		// })
+	};
 
 	const sgGenUserStory = async () => {
 		setScrumGenieRunning(true);
@@ -146,6 +166,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	useErrorHandler(membersError)
 
 	const items: MenuProps[`items`] = versions.docs.map(v => ({ key: v.id, label: v.data().name }))
+	const sprintLifecycles: MenuProps[`items`] = Object.entries(sprintColumns).map(([key, value]) => ({ key, label: value }))
 	// 	{ key: `identified`, label: `Identified` },
 	// 	{ key: `contacted`, label: `Contacted` },
 	// 	{ key: `scheduled`, label: `Scheduled` },
@@ -316,19 +337,51 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 									{Math.floor((product.data().effortCost ?? 0) * totalEffort)} USD
 								</Button>
 
+								<Popover style={{ height: `200px`, overflow: `auto` }} placement="topRight"
+									open={storyLifecyclePopoverIsOpen}
+									content={
+										<Menu
+											mode="vertical"
+											selectedKeys={[storyLifecycleKey]}
+											onClick={handleStoryLifecycleChange}
+											style={{ border: `none`, height: `300px`, overflow: `auto` }}
+										>
+											{Object.entries(sprintColumns).map(([key, column]) => (
+												<Menu.Item key={key} style={{ height: `30px`, lineHeight: `30px` }} onClick={() => setStoryLifecyclePopoverIsOpen(false)}>{column}</Menu.Item>
+											))}
+										</Menu>
+									} trigger="click">
+									<Button onClick={() => setStoryLifecyclePopoverIsOpen(true)} type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+										{storyLifecycleLabel}
+									</Button>
+								</Popover>
 
-								<Dropdown menu={{
-									//onClick: handleVersionChange,
-									items
-								}} placement="bottomRight">
+								<Dropdown
+									menu={{
+										onClick: handleVersionChange,
+										items
+
+									}}>
 									<Button disabled type="primary" size="small" icon={<RocketOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 										{selectedVersion}
 									</Button>
 								</Dropdown>
+								{/* <Dropdown menu={{
+									onClick: handleStoryLifecycleChange,
+									items: sprintLifecycles
 
-								<Button disabled type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
-									{sprintColumns[story.sprintColumn]}
-								</Button>
+								}}
+								//placement="topRight"
+								>
+									<Button disabled type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+										{storyLifecycle}
+									</Button>
+								</Dropdown> */}
+
+								{/* <Button disabled type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+										{storyLifecycle}
+									</Button>
+								</Menu> */}
 								<Popover
 									placement="bottom"
 									content={
