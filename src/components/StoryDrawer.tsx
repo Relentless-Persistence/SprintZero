@@ -100,16 +100,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		})
 	};
 
-	type sprintColumnKey = keyof typeof sprintColumns
-
-	// const handleStoryLifecycleChange: MenuProps[`onClick`] = async ({ key }) => {
-	// 	const selectedSprintLifecycle = Object.entries(sprintColumns).find(([keyL, valueL]) => keyL === key)![1];
-	// 	setStoryLifecycle(selectedSprintLifecycle);
-	// 	await updateItem(product, storyMapItems, versions, story.id, {
-	// 		sprintColumn: key as WithFieldValue<sprintColumnKey>,
-	// 	})
-	// };
-	const handleStoryLifecycleChange = async ({ key }) => {
+	const handleStoryLifecycleChange = async ({ key }: { key: string }) => {
 		console.log(key)
 		const label = Object.entries(sprintColumns).find(([keyL, valueL]) => keyL === key)![1];
 		setStoryLifecycleKey(key);
@@ -351,7 +342,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 											))}
 										</Menu>
 									} trigger="click">
-									<Button onClick={() => setStoryLifecyclePopoverIsOpen(true)} type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+									<Button onClick={() => setStoryLifecyclePopoverIsOpen(!storyLifecyclePopoverIsOpen)} type="primary" size="small" icon={<FlagOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
 										{storyLifecycleLabel}
 									</Button>
 								</Popover>
