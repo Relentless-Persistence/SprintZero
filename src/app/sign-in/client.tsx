@@ -13,16 +13,18 @@ import {
 	signInWithPopup,
 	signOut,
 } from "firebase/auth"
-import { collectionGroup, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore"
+import { collection, collectionGroup, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
+import { useCollection } from "react-firebase-hooks/firestore"
 import { z } from "zod"
 
 import type { AuthProvider, UserCredential } from "firebase/auth"
 import type { FC } from "react"
 
+import { InviteConverter } from "~/types/db/Products/Invites"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { UserConverter } from "~/types/db/Users"
 import { betaUsers } from "~/utils/betaUserList"
@@ -54,6 +56,13 @@ const SignInClientPage: FC = () => {
 		{ enabled: !!inviteToken },
 	).data?.productName
 
+	const userType = trpc.userInvite.getProductInviteInfo.useQuery(
+		{ inviteToken: inviteToken! },
+		{ enabled: !!inviteToken },
+	).data?.userType ?? `viewer`
+
+	//console.log(userType)
+
 	const putUserOnProduct = trpc.userInvite.putUserOnProduct.useMutation()
 
 	const processUser = async (credential: UserCredential) => {
@@ -83,6 +92,7 @@ const SignInClientPage: FC = () => {
 
 		if (typeof inviteToken === `string`) {
 			// do below in batch
+
 			await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
 				email: credential.user.email,
 				hasAcceptedTos: false,
@@ -90,10 +100,13 @@ const SignInClientPage: FC = () => {
 				type: `user`,
 			})
 
+
+
 			await putUserOnProduct.mutateAsync({
 				userAvatar: credential.user.photoURL,
 				userName: credential.user.displayName ?? credential.user.email,
 				userId: credential.user.uid,
+				userType,
 				inviteToken,
 			})
 

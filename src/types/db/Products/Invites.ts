@@ -1,11 +1,11 @@
-import {z} from "zod"
+import { z } from "zod"
 
-import {genConverter} from "~/types"
+import { genConverter } from "~/types"
 
 export const InviteSchema = z.object({
 	email: z.string(),
 	productId: z.string(),
-	userType: z.string(),
+	userType: z.enum([`owner`, `editor`, `viewer`]),
 	status: z.string(),
 
 	// This is necessary since it's not possible to query Invites across Products by ID in Firestore.
