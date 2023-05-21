@@ -1,4 +1,5 @@
 import {
+	ArrowRightOutlined,
 	BlockOutlined,
 	BranchesOutlined,
 	CloseOutlined,
@@ -28,11 +29,11 @@ import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
 import { useForm } from "react-hook-form"
 import { useInterval } from "react-use"
+import { z } from 'zod';
 
-import type { MenuProps } from "antd";
+import type { MenuProps, SelectProps } from "antd";
 import type { QueryDocumentSnapshot, QuerySnapshot, WithFieldValue } from "firebase/firestore"
 import type { FC } from "react"
-import type { z } from "zod"
 import type { Member } from "~/types/db/Products/Members"
 import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 import type { Version } from "~/types/db/Products/Versions"
@@ -94,9 +95,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const [storyLifecyclePopoverIsOpen, setStoryLifecyclePopoverIsOpen] = useState(false)
 	const [storyVersionPopoverIsOpen, setStoryVersionPopoverIsOpen] = useState(false)
 	const [storyAssignment, setStoryAssignment] = useState<string[] | undefined>(story.peopleIds)
-
-
-
+	const [storyDesignLink, setStoryDesignLink] = useState(story.designLink)
+	const [isDesignLinkValidUrl, setIsDesignLinkValidUrl] = useState(true)
 
 	type sprintColumnKey = keyof typeof sprintColumns
 
@@ -124,6 +124,14 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			peopleIds: value as WithFieldValue<string[] | undefined>,
 		})
 	};
+
+	// const handleStoryDesignLinkChange = async (value: string) => {
+	// 	console.log(value)
+	// 	setStoryDesignLink(value);
+	// 	await updateItem(product, storyMapItems, versions, story.id, {
+	// 		designLink: value as WithFieldValue<string | undefined>,
+	// 	})
+	// };
 
 
 
@@ -173,6 +181,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
+
+	const storyAssignmentOptions: SelectProps['options'] = members?.docs
+		.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
+		.map((member) => ({ label: member.data().name, value: member.id }))
 
 	const [lastModifiedText, setLastModifiedText] = useState<string | undefined>(undefined)
 	useInterval(() => {
@@ -388,15 +400,16 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 								<Popover
 									placement="bottom"
+									trigger="click"
 									content={
 										<Select
+											showSearch
+											optionFilterProp="children"
 											onChange={handleStoryAssignmentChange}
 											//name="peopleIds"
 											mode="multiple"
-											options={members?.docs
-												.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
-												.map((member) => ({ label: member.data().name, value: member.id }))}
-
+											options={storyAssignmentOptions}
+											allowClear
 											style={{ width: `430px` }}
 											value={storyAssignment}
 										/>
@@ -421,9 +434,55 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 								>
 									Commit
 								</Button>
-								<Button disabled type="primary" size="small" icon={<BlockOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
-									Design
-								</Button>
+								<Popover
+									placement="bottom"
+									trigger="click"
+									content={
+										<Input
+											status={!isDesignLinkValidUrl ? `error` : ``}
+											onChange={(e) => {
+												//console.log(e.target.value)
+												setStoryDesignLink(e.target.value);
+
+												const schema = z.string().url();
+												try {
+													schema.parse(e.target.value);
+													// URL is valid
+													//console.log(`Valid URL:`, e.target.value);
+													setIsDesignLinkValidUrl(true)
+													updateItem(product, storyMapItems, versions, story.id, {
+														//designLink: value as WithFieldValue<string | undefined>,
+														designLink: e.target.value
+													})
+													// Perform other actions here
+												} catch (error) {
+													// URL is not valid
+													//console.error(`Invalid URL:`, e.target.value);
+													setIsDesignLinkValidUrl(false)
+													// Handle the validation error
+												}
+
+
+
+											}}
+											style={{ width: `430px` }}
+											value={storyDesignLink ?? ``}
+											suffix={
+												<LinkTo openInNewTab href={storyDesignLink}>
+													<div
+														className="flex items-center justify-center gap-1">
+														<span className="font-semibold" style={{ color: `#0958D9` }}>View</span>
+														<ArrowRightOutlined style={{ color: `#0958D9` }} />
+													</div>
+												</LinkTo>
+											}
+										/>
+									}
+								>
+									<Button type="primary" size="small" icon={<BlockOutlined />} style={{ background: `#DDE3D5`, color: `#000000`, border: `1px solid #A7C983` }}>
+										Design
+									</Button>
+								</Popover>
 								<Button disabled type="primary" size="small" icon={<SolutionOutlined />}>
 									Insight
 								</Button>
@@ -464,131 +523,133 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 								</div> */}
 							</div>
 						</div>
-					</div>
+					</div >
 				)
 			}
 			extra={
-				<div className="flex items-center gap-4">
-					{editMode ? (
-						<>
-							<Button
-								onClick={() => {
-									setEditMode(false)
-									reset({
-										branchName: story.branchName,
-										designLink: story.designLink,
-										designEffort: story.designEffort,
-										engineeringEffort: story.engineeringEffort,
-										pageLink: story.pageLink,
-										sprintColumn: story.sprintColumn,
-										peopleIds: story.peopleIds,
-										versionId: story.versionId,
-									})
-								}}
-							>
-								Cancel
-							</Button>
-							<Button type="primary" htmlType="submit" form="story-form">
-								Done
-							</Button>
-						</>
-					) : (
-						<>
-							{/* <Button onClick={() => setEditMode(true)}>Edit</Button> */}
-							<button type="button" onClick={() => onClose()}>
-								<CloseOutlined />
-							</button>
-						</>
-					)}
-				</div>
+				< div className="flex items-center gap-4" >
+					{
+						editMode ? (
+							<>
+								<Button
+									onClick={() => {
+										setEditMode(false)
+										reset({
+											branchName: story.branchName,
+											designLink: story.designLink,
+											designEffort: story.designEffort,
+											engineeringEffort: story.engineeringEffort,
+											pageLink: story.pageLink,
+											sprintColumn: story.sprintColumn,
+											peopleIds: story.peopleIds,
+											versionId: story.versionId,
+										})
+									}}
+								>
+									Cancel
+								</Button>
+								<Button type="primary" htmlType="submit" form="story-form">
+									Done
+								</Button>
+							</>
+						) : (
+							<>
+								{/* <Button onClick={() => setEditMode(true)}>Edit</Button> */}
+								<button type="button" onClick={() => onClose()}>
+									<CloseOutlined />
+								</button>
+							</>
+						)}
+				</div >
 			}
 		>
-			{editMode ? (
-				<form
-					id="story-form"
-					className="flex flex-col gap-4"
-					onSubmit={(e) => {
-						onSubmit(e).catch(console.error)
-					}}
-				>
-					<div className="flex gap-8">
-						<label className="flex grow flex-col gap-2">
-							<span className="font-semibold">Team members</span>
-							<RhfSelect
-								control={control}
-								name="peopleIds"
-								mode="multiple"
-								options={members?.docs
-									.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
-									.map((member) => ({ label: member.data().name, value: member.id }))}
-							/>
-						</label>
-						<label className="flex flex-col gap-2">
-							<span className="font-semibold">Design Effort</span>
-							<RhfSegmented control={control} name="designEffort" options={[1, 2, 3, 5, 8, 13]} />
-						</label>
-						<label className="flex flex-col gap-2">
-							<span className="font-semibold">Engineering Effort</span>
-							<RhfSegmented control={control} name="engineeringEffort" options={[1, 2, 3, 5, 8, 13]} />
-						</label>
-						<label className="flex shrink-0 basis-20 flex-col gap-2">
-							<span className="font-semibold">Version</span>
-							<RhfSelect
-								control={control}
-								name="versionId"
-								options={versions.docs.map((version) => ({ label: version.data().name, value: version.id }))}
-							/>
-						</label>
-						<label className="flex shrink-0 basis-56 flex-col gap-2">
-							<span className="font-semibold">Status</span>
-							<RhfSelect
-								control={control}
-								name="sprintColumn"
-								options={Object.entries(sprintColumns).map(([key, value]) => ({ label: value, value: key }))}
-							/>
-						</label>
-					</div>
-					<Form.Item
-						label="Design"
-						hasFeedback
-						validateStatus={formValidateStatus(getFieldState(`designLink`, formState))}
-						help={formState.errors.designLink?.message}
+			{
+				editMode ? (
+					<form
+						id="story-form"
+						className="flex flex-col gap-4"
+						onSubmit={(e) => {
+							onSubmit(e).catch(console.error)
+						}}
 					>
-						<RhfInput control={control} name="designLink" placeholder="https://" />
-					</Form.Item>
-					<Form.Item
-						label="Branch"
-						hasFeedback
-						validateStatus={formValidateStatus(getFieldState(`branchName`, formState))}
-						help={formState.errors.branchName?.message}
-					>
-						<RhfInput control={control} name="branchName" />
-					</Form.Item>
-					<Form.Item
-						label="Page"
-						hasFeedback
-						validateStatus={formValidateStatus(getFieldState(`pageLink`, formState))}
-						help={formState.errors.pageLink?.message}
-					>
-						<RhfInput control={control} name="pageLink" placeholder="https://" />
-					</Form.Item>
-				</form>
-			) : (
-				<div className="grid h-full grid-cols-2 gap-14">
-					{/* Left column */}
-					<div className="flex h-full min-h-0 flex-col gap-1">
-						<div className="flex flex-col gap-2">
-							<div className="flex justify-between gap-3">
-								<div className="flex gap-2 items-center">
-									<p className="text-xl font-semibold" style={{ color: `#595959` }}>User Story</p>
-									<div className="flex gap-2">
-										<Button disabled={scrumGenieRunning} onClick={sgGenUserStory}
-											className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
+						<div className="flex gap-8">
+							<label className="flex grow flex-col gap-2">
+								<span className="font-semibold">Team members</span>
+								<RhfSelect
+									control={control}
+									name="peopleIds"
+									mode="multiple"
+									options={members?.docs
+										.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
+										.map((member) => ({ label: member.data().name, value: member.id }))}
+								/>
+							</label>
+							<label className="flex flex-col gap-2">
+								<span className="font-semibold">Design Effort</span>
+								<RhfSegmented control={control} name="designEffort" options={[1, 2, 3, 5, 8, 13]} />
+							</label>
+							<label className="flex flex-col gap-2">
+								<span className="font-semibold">Engineering Effort</span>
+								<RhfSegmented control={control} name="engineeringEffort" options={[1, 2, 3, 5, 8, 13]} />
+							</label>
+							<label className="flex shrink-0 basis-20 flex-col gap-2">
+								<span className="font-semibold">Version</span>
+								<RhfSelect
+									control={control}
+									name="versionId"
+									options={versions.docs.map((version) => ({ label: version.data().name, value: version.id }))}
+								/>
+							</label>
+							<label className="flex shrink-0 basis-56 flex-col gap-2">
+								<span className="font-semibold">Status</span>
+								<RhfSelect
+									control={control}
+									name="sprintColumn"
+									options={Object.entries(sprintColumns).map(([key, value]) => ({ label: value, value: key }))}
+								/>
+							</label>
+						</div>
+						<Form.Item
+							label="Design"
+							hasFeedback
+							validateStatus={formValidateStatus(getFieldState(`designLink`, formState))}
+							help={formState.errors.designLink?.message}
+						>
+							<RhfInput control={control} name="designLink" placeholder="https://" />
+						</Form.Item>
+						<Form.Item
+							label="Branch"
+							hasFeedback
+							validateStatus={formValidateStatus(getFieldState(`branchName`, formState))}
+							help={formState.errors.branchName?.message}
+						>
+							<RhfInput control={control} name="branchName" />
+						</Form.Item>
+						<Form.Item
+							label="Page"
+							hasFeedback
+							validateStatus={formValidateStatus(getFieldState(`pageLink`, formState))}
+							help={formState.errors.pageLink?.message}
+						>
+							<RhfInput control={control} name="pageLink" placeholder="https://" />
+						</Form.Item>
+					</form >
+				) : (
+					<div className="grid h-full grid-cols-2 gap-14">
+						{/* Left column */}
+						<div className="flex h-full min-h-0 flex-col gap-1">
+							<div className="flex flex-col gap-2">
+								<div className="flex justify-between gap-3">
+									<div className="flex gap-2 items-center">
+										<p className="text-xl font-semibold" style={{ color: `#595959` }}>User Story</p>
+										<div className="flex gap-2">
+											<Button disabled={scrumGenieRunning} onClick={sgGenUserStory}
+												className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
+										</div>
 									</div>
-								</div>
 
-								{/* Should not show for Basic tier, to be implemented */}
-								{/* <Button
+									{/* Should not show for Basic tier, to be implemented */}
+									{/* <Button
 									icon={<FlagOutlined color="#820014" />}
 									style={{ color: `#820014`, borderColor: `#820014` }}
 									disabled={story.ethicsColumn !== null}
@@ -604,140 +665,140 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 								>
 									{story.ethicsColumn !== null ? `Flagged` : `Flag`}
 								</Button> */}
+								</div>
+								<div style={{ position: `relative`, justifyContent: `center` }}>
+									<Input.TextArea
+										rows={5}
+										value={description}
+										onChange={(e) => {
+											setDescription(e.target.value)
+											debouncedUpdateItem(product, storyMapItems, versions, story.id, { description: e.target.value })?.catch(
+												console.error,
+											)
+										}}
+										className=""
+									/>
+									{(scrumGenieRunning) && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
+										<Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 3 }} />
+									</div>}
+								</div>
 							</div>
-							<div style={{ position: `relative`, justifyContent: `center` }}>
-								<Input.TextArea
-									rows={5}
-									value={description}
-									onChange={(e) => {
-										setDescription(e.target.value)
-										debouncedUpdateItem(product, storyMapItems, versions, story.id, { description: e.target.value })?.catch(
+
+							<Tabs
+								tabPosition="top"
+								activeKey={currentStoryTab}
+								onChange={(tab: (typeof storyTabs)[number][0]) => setCurrentStoryTab(tab)}
+								items={storyTabs.map(([key, label]) => ({
+									key, label:
+										(
+											<span>
+												<Tag>{(key === `bugs`) ? story.bugs.length : key === `accCriteria` ? story.acceptanceCriteria.length : 0}</Tag>
+												<span className="ml-2">{label}</span>
+											</span>
+										), disabled: key === `changeLog` ? true : false
+								}))}
+							/>
+
+							{
+								currentStoryTab === `bugs` && <div className="flex min-h-0 flex-col gap-2">
+									<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: `wrap`, overflowX: `auto` }}>
+										{story.bugs.map((bug) => (
+											<Checkbox
+												key={bug.id}
+												checked={bug.checked}
+												onChange={(e) => {
+													toggleBug(bug.id, e.target.checked).catch(console.error)
+												}}
+												className="w-full [&_span:last-child]:grow [&_span:last-child]:basis-0 [&_span:last-child]:truncate"
+											>
+												{bug.name}
+											</Checkbox>
+										))}
+										<Input
+											size="small"
+											placeholder="Add item"
+											value={newBugInput}
+											onChange={(e) => setNewBugInput(e.target.value)}
+											onPressEnter={() => {
+												addBug()
+													.then(() => {
+														setNewBugInput(``)
+													})
+													.catch(console.error)
+											}}
+											className="w-48"
+										/>
+									</div>
+								</div>
+							}
+
+							{
+								currentStoryTab === `accCriteria` &&
+
+
+								<div className="flex min-h-0 flex-col gap-2">
+									<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: `wrap`, overflowX: `auto` }}>
+										{story.acceptanceCriteria.map((criterion) => (
+											<Checkbox
+												key={criterion.id}
+												checked={criterion.checked}
+												onChange={(e) => {
+													toggleAcceptanceCriterion(criterion.id, e.target.checked).catch(console.error)
+												}}
+												style={{ marginLeft: `0px` }}
+											>
+												{criterion.name}
+											</Checkbox>
+										))}
+										<Input
+											size="small"
+											placeholder="Add item"
+											value={newAcceptanceCriterionInput}
+											onChange={(e) => setNewAcceptanceCriterionInput(e.target.value)}
+											onPressEnter={() => {
+												addAcceptanceCriterion()
+													.then(() => {
+														setNewAcceptanceCriterionInput(``)
+													})
+													.catch(console.error)
+											}}
+											className="w-52"
+										/>
+									</div>
+								</div>
+							}
+						</div>
+
+						{/* Right column */}
+						<div className="flex h-full flex-col gap-2">
+							<div className="flex items-center justify-between">
+								<p className="text-xl font-semibold" style={{ color: `#595959` }}>Comments</p>
+								<Segmented
+									size="small"
+									value={commentType}
+									onChange={(value) => setCommentType(value as `engineering` | `design`)}
+									options={[
+										{ label: `Design`, icon: <BlockOutlined />, value: `design` },
+										{ label: `Engineering`, icon: <PullRequestOutlined />, value: `engineering` },
+									]}
+								/>
+							</div>
+							<div className="relative grow">
+								<Comments
+									storyMapItem={story}
+									flagged={story.ethicsColumn !== null}
+									commentType={commentType}
+									onFlag={() => {
+										updateItem(product, storyMapItems, versions, story.id, { ethicsColumn: `underReview` }).catch(
 											console.error,
 										)
 									}}
-									className=""
 								/>
-								{(scrumGenieRunning) && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
-									<Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 3 }} />
-								</div>}
 							</div>
-						</div>
-
-						<Tabs
-							tabPosition="top"
-							activeKey={currentStoryTab}
-							onChange={(tab: (typeof storyTabs)[number][0]) => setCurrentStoryTab(tab)}
-							items={storyTabs.map(([key, label]) => ({
-								key, label:
-									(
-										<span>
-											<Tag>{(key === `bugs`) ? story.bugs.length : key === `accCriteria` ? story.acceptanceCriteria.length : 0}</Tag>
-											<span className="ml-2">{label}</span>
-										</span>
-									), disabled: key === `changeLog` ? true : false
-							}))}
-						/>
-
-						{
-							currentStoryTab === `bugs` && <div className="flex min-h-0 flex-col gap-2">
-								<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: `wrap`, overflowX: `auto` }}>
-									{story.bugs.map((bug) => (
-										<Checkbox
-											key={bug.id}
-											checked={bug.checked}
-											onChange={(e) => {
-												toggleBug(bug.id, e.target.checked).catch(console.error)
-											}}
-											className="w-full [&_span:last-child]:grow [&_span:last-child]:basis-0 [&_span:last-child]:truncate"
-										>
-											{bug.name}
-										</Checkbox>
-									))}
-									<Input
-										size="small"
-										placeholder="Add item"
-										value={newBugInput}
-										onChange={(e) => setNewBugInput(e.target.value)}
-										onPressEnter={() => {
-											addBug()
-												.then(() => {
-													setNewBugInput(``)
-												})
-												.catch(console.error)
-										}}
-										className="w-48"
-									/>
-								</div>
-							</div>
-						}
-
-						{
-							currentStoryTab === `accCriteria` &&
-
-
-							<div className="flex min-h-0 flex-col gap-2">
-								<div className="flex flex-col gap-2 p-0.5" style={{ flexWrap: `wrap`, overflowX: `auto` }}>
-									{story.acceptanceCriteria.map((criterion) => (
-										<Checkbox
-											key={criterion.id}
-											checked={criterion.checked}
-											onChange={(e) => {
-												toggleAcceptanceCriterion(criterion.id, e.target.checked).catch(console.error)
-											}}
-											style={{ marginLeft: `0px` }}
-										>
-											{criterion.name}
-										</Checkbox>
-									))}
-									<Input
-										size="small"
-										placeholder="Add item"
-										value={newAcceptanceCriterionInput}
-										onChange={(e) => setNewAcceptanceCriterionInput(e.target.value)}
-										onPressEnter={() => {
-											addAcceptanceCriterion()
-												.then(() => {
-													setNewAcceptanceCriterionInput(``)
-												})
-												.catch(console.error)
-										}}
-										className="w-52"
-									/>
-								</div>
-							</div>
-						}
-					</div>
-
-					{/* Right column */}
-					<div className="flex h-full flex-col gap-2">
-						<div className="flex items-center justify-between">
-							<p className="text-xl font-semibold" style={{ color: `#595959` }}>Comments</p>
-							<Segmented
-								size="small"
-								value={commentType}
-								onChange={(value) => setCommentType(value as `engineering` | `design`)}
-								options={[
-									{ label: `Design`, icon: <BlockOutlined />, value: `design` },
-									{ label: `Engineering`, icon: <PullRequestOutlined />, value: `engineering` },
-								]}
-							/>
-						</div>
-						<div className="relative grow">
-							<Comments
-								storyMapItem={story}
-								flagged={story.ethicsColumn !== null}
-								commentType={commentType}
-								onFlag={() => {
-									updateItem(product, storyMapItems, versions, story.id, { ethicsColumn: `underReview` }).catch(
-										console.error,
-									)
-								}}
-							/>
 						</div>
 					</div>
-				</div>
-			)}
-		</Drawer>
+				)}
+		</Drawer >
 	)
 }
 
