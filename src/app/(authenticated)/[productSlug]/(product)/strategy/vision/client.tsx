@@ -108,7 +108,7 @@ const VisionsClientPage: FC = () => {
       setGeneratingVision(true)
       next()
       const data = await gpt.mutateAsync({
-        prompt: `Write a product vision for a ${listToSentence(product.data().productTypes)} app. Its goal is to: ${valueProposition}. The app has the following features: ${features.join(`,`)}.`,
+        prompt: `In a single paragraph, write a product vision for a ${listToSentence(product.data().productTypes)} app. Its goal is to: ${valueProposition}. The app has the following features: ${features.join(`,`)}.`,
       });
       setProductVision(data.response?.trim())
       setGeneratingVision(false)
