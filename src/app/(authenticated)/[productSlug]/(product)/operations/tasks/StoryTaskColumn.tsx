@@ -8,6 +8,7 @@ import { useCollection } from "react-firebase-hooks/firestore"
 import type { FC } from "react"
 import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 
+import StoryTaskContainer from "./StoryTaskContianer"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import StoryDrawer from "~/components/StoryDrawer"
 import { VersionConverter } from "~/types/db/Products/Versions"
@@ -68,20 +69,13 @@ const StoryTaskColumn: FC<TaskColumnProps> = ({ id, title, storyMapItems, tasks,
 
 
               return (
-                <Card
+                <StoryTaskContainer
                   key={task.id}
-                  type="inner"
-                  className=""
-                  title=<span className="cursor-pointer">{task.name}</span>
-                >
-                  <div className="flex flex-wrap item-center gap-1">
-                    <Tag icon={<ReadOutlined />}>{epicName}</Tag>
-                    <ArrowRightOutlined />
-                    <Tag icon={<CopyOutlined />}>{featureName}</Tag>
-                    <ArrowRightOutlined />
-                    <Tag icon={<FileTextOutlined />}>{selectedStoryName}</Tag>
-                  </div>
-                </Card>
+                  title={task.name}
+                  epicName={epicName!}
+                  featureName={featureName!}
+                  selectedStoryName={selectedStoryName!}
+                />
               )
             }) : null}
         </div>

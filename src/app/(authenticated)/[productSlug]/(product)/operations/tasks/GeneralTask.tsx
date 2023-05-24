@@ -21,12 +21,15 @@ const GeneralTask: FC<Props> = ({ tasks }) => {
 		<div className="">
 
 			<div className="h-full grid grow auto-cols-[360px] grid-flow-col gap-4 mb-2 overflow-x-auto">
-
-
-				<TaskColumn id="todo" title="To Do" tasks={tasks} />
-				<TaskColumn id="inProgress" title="In Progress" tasks={tasks} />
-				<TaskColumn id="review" title="Review" tasks={tasks} />
-				<TaskColumn id="done" title="Done" tasks={tasks} />
+				{
+					Object.entries(taskColumns).map(([columnName, title]) => (
+						<TaskColumn
+							key={columnName}
+							columnName={columnName}
+							title={title}
+							tasks={tasks}
+						/>
+					))}
 
 			</div>
 		</div>
@@ -34,3 +37,12 @@ const GeneralTask: FC<Props> = ({ tasks }) => {
 }
 
 export default GeneralTask
+
+
+export const taskColumns = {
+	todo: `To Do`,
+	inProgress: `In Progress`,
+	review: `Review`,
+	done: `Done`,
+}
+
