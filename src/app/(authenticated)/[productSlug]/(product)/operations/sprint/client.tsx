@@ -126,42 +126,42 @@ const SprintClientPage: FC = () => {
 							</div>
 						),
 					},
-					{
-						key: `plan`,
-						disabled: true,
-						label: (
-							<span>
-								<OrderedListOutlined /> Plan
-							</span>
-						),
-					},
-					{
-						key: `refine`,
-						disabled: true,
-						label: (
-							<span>
-								<FileSearchOutlined /> Refine
-							</span>
-						),
-					},
-					{
-						key: `critique`,
-						disabled: true,
-						label: (
-							<span>
-								<AuditOutlined /> Critique
-							</span>
-						),
-					},
-					{
-						key: `review`,
-						disabled: true,
-						label: (
-							<span>
-								<CodeSandboxOutlined /> Review
-							</span>
-						),
-					},
+					// {
+					// 	key: `plan`,
+					// 	disabled: true,
+					// 	label: (
+					// 		<span>
+					// 			<OrderedListOutlined /> Plan
+					// 		</span>
+					// 	),
+					// },
+					// {
+					// 	key: `refine`,
+					// 	disabled: true,
+					// 	label: (
+					// 		<span>
+					// 			<FileSearchOutlined /> Refine
+					// 		</span>
+					// 	),
+					// },
+					// {
+					// 	key: `critique`,
+					// 	disabled: true,
+					// 	label: (
+					// 		<span>
+					// 			<AuditOutlined /> Critique
+					// 		</span>
+					// 	),
+					// },
+					// {
+					// 	key: `review`,
+					// 	disabled: true,
+					// 	label: (
+					// 		<span>
+					// 			<CodeSandboxOutlined /> Review
+					// 		</span>
+					// 	),
+					// },
 				]}
 			/>
 		</div>
