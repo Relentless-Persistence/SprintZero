@@ -1,3 +1,4 @@
+import { CloseCircleOutlined, CloseOutlined, CloudOutlined, MinusCircleOutlined } from "@ant-design/icons"
 import { Button, Card, Empty, Input, Space } from "antd"
 import { useEffect, useState } from "react"
 
@@ -5,7 +6,6 @@ import type { FC } from "react"
 import type { Promisable } from "type-fest"
 
 import TextListEditor from "~/components/TextListEditor"
-import { CloseCircleOutlined, CloseOutlined, CloudOutlined, MinusCircleOutlined } from "@ant-design/icons"
 
 export type TextListCardProps = {
 	title: string
@@ -24,7 +24,7 @@ const TextListCard: FC<TextListCardProps> = ({
 	onEditEnd,
 	onCommit,
 }) => {
-	console.log("receiving textList:", textList)
+	//console.log("receiving textList:", textList)
 	const [draftTextList, setDraftTextList] = useState<Array<{ id: string; text: string }>>([])
 
 	// useEffect(() => {
