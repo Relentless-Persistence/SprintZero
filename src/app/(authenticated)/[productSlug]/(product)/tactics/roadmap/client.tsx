@@ -29,46 +29,53 @@ const RoadmapClientPage: FC = () => {
         <p className="text-textTertiary">Set realistic expectations for the order for when epics will be addressed.</p>
       </div>
 
-      <div className="w-full h-full relative" style={{
-        overflow: `hidden`, backgroundColor: ``, zIndex: 1,
-        //border: `4px solid #e3e3e3` 
-      }}>
-        <div className="flex roadmapCircle1 roadmapCircle">
-          <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
-            <Badge.Ribbon text="Done" color="black">
-            </Badge.Ribbon>
+      <div className="relative w-full h-full ">
+        <div className="w-full h-full relative" style={{
+          overflow: `hidden`, backgroundColor: ``, zIndex: 1,
+          border: `4px solid #e3e3e3`,
+        }}>
+          <div className="flex roadmapCircle1 roadmapCircle" style={{
+
+          }}>
+            <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
+              <Badge.Ribbon text="Done" color="black">
+              </Badge.Ribbon>
+            </div>
+          </div>
+          <div className="roadmapCircle2 roadmapCircle" style={{
+          }}>
+            <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
+              <Badge.Ribbon text="Now" color="black">
+              </Badge.Ribbon>
+            </div>
+          </div>
+          <div className="roadmapCircle3 roadmapCircle" style={{
+          }}>
+            <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
+              <Badge.Ribbon text="Next" color="black">
+              </Badge.Ribbon>
+            </div>
+          </div>
+          <div className="roadmapCircle4 roadmapCircle" style={{
+          }}>
+            <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
+              <Badge.Ribbon text="Later" color="black">
+              </Badge.Ribbon>
+            </div>
+          </div>
+          <div className="roadmapCircle5 roadmapCircle" style={{
+          }}>
+          </div>
+          <div className="h-full w-full absolute top-0 left-0 mr-100" style={{ zIndex: 10 }}>
+            <EpicsTab storyMapItems={storyMapItems.docs.map((item) => item.data())} />
           </div>
         </div>
-        <div className="roadmapCircle2 roadmapCircle">
-          <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
-            <Badge.Ribbon text="Now" color="black">
-            </Badge.Ribbon>
-          </div>
+        <div style={{ position: `absolute`, top: `1%`, right: 0, zIndex: 15 }}>
+          <Badge.Ribbon text="Future" color="black">
+          </Badge.Ribbon>
         </div>
-        <div className="roadmapCircle3 roadmapCircle" >
-          <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
-            <Badge.Ribbon text="Next" color="black">
-            </Badge.Ribbon>
-          </div>
-        </div>
-        <div className="roadmapCircle4 roadmapCircle" >
-          <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
-            <Badge.Ribbon text="Later" color="black">
-            </Badge.Ribbon>
-          </div>
-        </div>
-        <div className="roadmapCircle5 roadmapCircle" >
-          <div style={{ position: `absolute`, top: `50%`, right: 0 }}>
-            <Badge.Ribbon text="Future" color="black">
-            </Badge.Ribbon>
-          </div>
-        </div>
-        <div className="h-full w-full absolute top-0 left-0 mr-100" style={{ zIndex: 10 }}>
-          <EpicsTab storyMapItems={storyMapItems.docs.map((item) => item.data())} />
-        </div>
+
       </div>
-
-
     </div>
   )
 }
