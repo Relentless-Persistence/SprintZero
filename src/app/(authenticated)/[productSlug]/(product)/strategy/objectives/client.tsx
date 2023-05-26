@@ -1,14 +1,12 @@
 "use client"
 
-import { CloseCircleFilled, CloseCircleOutlined, DeleteOutlined } from "@ant-design/icons"
+import { CloseCircleOutlined, DeleteOutlined } from "@ant-design/icons"
 import { Breadcrumb, Button, Card, Input, Select, Tabs } from "antd"
-import { Timestamp, addDoc, collection, deleteDoc, doc, orderBy, query, setDoc, updateDoc, writeBatch } from "firebase/firestore"
-import { current } from "immer"
+import { Timestamp, addDoc, collection, deleteDoc, doc, orderBy, query, updateDoc } from "firebase/firestore"
 import { useEffect, useRef, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
 import Masonry from "react-masonry-css"
-import { useDebounce } from "react-use"
 
 import type { SelectProps } from "antd";
 import type { QueryDocumentSnapshot } from "firebase/firestore";
@@ -16,23 +14,13 @@ import type { FC } from "react"
 import type { Objective } from "~/types/db/Products/Objectives";
 import type { Persona } from "~/types/db/Products/Personas";
 
-import TextareaCard from "../kickoff/TextareaCard"
-import TextListCard from "../kickoff/TextListCard"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
-import TextListEditor from "~/components/TextListEditor"
-import { BusinessOutcomeConverter } from "~/types/db/Products/BusinessOutcomes"
-import { MarketLeaderConverter } from "~/types/db/Products/MarketLeaders"
-import { ObjectiveConverter, ObjectiveKeyResultConverter } from "~/types/db/Products/Objectives";
-import { ResultConverter } from "~/types/db/Products/Objectives/Results"
+import { ObjectiveBreakdownReasonConverter, ObjectiveConverter, ObjectiveKeyResultConverter } from "~/types/db/Products/Objectives";
 import { PersonaConverter } from "~/types/db/Products/Personas"
-import { PotentialRiskConverter } from "~/types/db/Products/PotentialRisks"
-import { UserPriorityConverter } from "~/types/db/Products/UserPriorities"
-import { db } from "~/utils/firebase"
-import { trpc } from "~/utils/trpc"
-
 
 const ObjectivesClientPage: FC = () => {
 	const { product } = useAppContext()
+
 	const [objectives, , objectivesError] = useCollection(query(collection(product.ref, `Objectives`)).withConverter(ObjectiveConverter))
 	useErrorHandler(objectivesError)
 
@@ -46,6 +34,8 @@ const ObjectivesClientPage: FC = () => {
 	const [jobToBeDoneSoICan, setJobToBeDoneSoICan] = useState<string>();
 	const [addNewObjectiveKeyResult, setAddNewObjectiveKeyResult] = useState(false)
 	const [newObjectiveKeyResult, setNewObjectiveKeyResult] = useState(``)
+	const [addNewObjectiveBreakdownReason, setAddNewObjectiveBreakdownReason] = useState(false)
+	const [newObjectiveBreakdownReason, setNewObjectiveBreakdownReason] = useState(``)
 
 	const hasSetDefaultObjective = useRef(false)
 	useEffect(() => {
@@ -83,9 +73,6 @@ const ObjectivesClientPage: FC = () => {
 	const handleTargetPersonaChange = async (value: string[]) => {
 		setTargetPersona(value);
 		await updateDoc(currentObjective!.ref, { targetPersona: value })
-		// await updateItem(product, storyMapItems, versions, story.id, {
-		// 	peopleIds: value as WithFieldValue<string[] | undefined>,
-		// })
 	};
 
 	const [personas, , personasError] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
@@ -95,67 +82,6 @@ const ObjectivesClientPage: FC = () => {
 		.filter((persona): persona is QueryDocumentSnapshot<Persona> => persona.exists())
 		.map((persona) => ({ label: persona.data().name, value: persona.id }))
 
-
-	const [results, , resultsError] = useCollection(
-		currentObjective?.id
-			? query(
-				collection(product.ref, `Objectives`, currentObjective.id, `Results`),
-				orderBy(`createdAt`, `asc`),
-			).withConverter(ResultConverter)
-			: undefined,
-	)
-	useErrorHandler(resultsError)
-
-	const [statement, setStatement] = useState(currentObjective?.data().statement ?? ``)
-	//const dbStatement = currentObjective?.data().statement
-	// useEffect(() => {
-	// 	// if (!dbStatement) return
-	// 	// setStatement(dbStatement)
-	// }, [dbStatement])
-	// useDebounce(
-	// 	async () => {
-	// 		if (!currentObjective || statement === dbStatement) return
-	// 		await updateDoc(doc(product.ref, `Objectives`, currentObjective.id).withConverter(ObjectiveConverter), {
-	// 			statement,
-	// 		})
-	// 	},
-	// 	500,
-	// 	[statement, dbStatement, currentObjective],
-	// )
-
-	const [activeResultId, setActiveResultId] = useState<string | `new` | undefined>(undefined)
-
-	// kickoff stuff
-	const [editingSection, setEditingSection] = useState<
-		| `okrHowMightWeStatement`
-		| `okrTargetPersonas`
-		| `okrJobToBeDone`
-		| `okrKeyResults`
-		| `okrBreakdownReasons`
-		| `okrBlockersDependencies`
-		| undefined
-	>(undefined)
-
-	const [TargetPersonas, , TargetPersonasError] = useCollection(
-		objectives && currentObjective ?
-			query(collection(currentObjective.ref, `TargetPersonas`), orderBy(`createdAt`, `asc`))
-			: undefined,
-	)
-	useErrorHandler(TargetPersonasError)
-
-	const [JobToBeDones, , JobToBeDonesError] = useCollection(
-		objectives && currentObjective ?
-			query(collection(currentObjective.ref, `JobToBeDones`), orderBy(`createdAt`, `asc`))
-			: undefined,
-	)
-	useErrorHandler(JobToBeDonesError)
-
-	const [businessOutcomes, , businessOutcomesError] = useCollection(
-		query(collection(product.ref, `BusinessOutcomes`), orderBy(`createdAt`, `asc`)).withConverter(
-			BusinessOutcomeConverter,
-		),
-	)
-
 	const [keyResults, , keyResultsError] = useCollection(
 		objectives && currentObjective ?
 			query(collection(currentObjective.ref, `KeyResults`), orderBy(`createdAt`, `asc`)).withConverter(ObjectiveKeyResultConverter)
@@ -163,12 +89,12 @@ const ObjectivesClientPage: FC = () => {
 	)
 	useErrorHandler(keyResultsError)
 
-	const [BreakdownReasons, , BreakdownReasonsError] = useCollection(
+	const [breakdownReasons, , breakdownReasonsError] = useCollection(
 		objectives && currentObjective ?
-			query(collection(currentObjective.ref, `BreakdownReasons`), orderBy(`createdAt`, `asc`))
+			query(collection(currentObjective.ref, `BreakdownReasons`), orderBy(`createdAt`, `asc`)).withConverter(ObjectiveBreakdownReasonConverter)
 			: undefined,
 	)
-	useErrorHandler(BreakdownReasonsError)
+	useErrorHandler(breakdownReasonsError)
 
 	const order = [`One`, `Two`, `Three`, `Four`, `Five`, `Six`];
 
@@ -182,8 +108,10 @@ const ObjectivesClientPage: FC = () => {
 						Define the measurable outcomes that will define success
 					</p>
 				</div>
+
 				<Tabs
 					tabPosition="top"
+					className="centered-tab"
 					activeKey={currentObjectiveId}
 					onChange={(key) => {
 						setCurrentObjectiveId(key)
@@ -203,8 +131,11 @@ const ObjectivesClientPage: FC = () => {
 					onChange={(e) => {
 						setObjectiveStatement(e.target.value)
 					}}
-					onBlur={async () => {
-						await updateDoc(currentObjective.ref, { statement: objectiveStatement })
+					onBlur={() => {
+						updateDoc(currentObjective!.ref, { statement: objectiveStatement })
+							.catch((error) => {
+								console.error(error);
+							});
 					}}
 				/>
 
@@ -223,8 +154,11 @@ const ObjectivesClientPage: FC = () => {
 						<Input.TextArea autoSize={{ minRows: 2, maxRows: 5 }}
 							value={howMightWeStatement}
 							onChange={(e) => setHowMightWeStatement(e.target.value)}
-							onBlur={async () => {
-								await updateDoc(currentObjective.ref, { howMightWeStatement })
+							onBlur={() => {
+								updateDoc(currentObjective!.ref, { howMightWeStatement })
+									.catch((error) => {
+										console.error(error);
+									});
 							}}
 						/>
 					</Card>
@@ -237,7 +171,7 @@ const ObjectivesClientPage: FC = () => {
 						<Select
 							showSearch
 							optionFilterProp="children"
-							onChange={handleTargetPersonaChange}
+							onChange={() => handleTargetPersonaChange}
 							//name="peopleIds"
 							mode="multiple"
 							options={targetPersonaOptions}
@@ -253,24 +187,33 @@ const ObjectivesClientPage: FC = () => {
 								prefix="When:"
 								value={jobToBeDoneWhen}
 								onChange={(e) => setJobToBeDoneWhen(e.target.value)}
-								onBlur={async () => {
-									await updateDoc(currentObjective.ref, { "jobToBeDone.when": jobToBeDoneWhen })
+								onBlur={() => {
+									updateDoc(currentObjective!.ref, { "jobToBeDone.when": jobToBeDoneWhen })
+										.catch((error) => {
+											console.error(error);
+										});
 								}}
 							/>
 							<Input
 								prefix="I want to:"
 								value={jobToBeDoneIWantTo}
 								onChange={(e) => setJobToBeDoneIWantTo(e.target.value)}
-								onBlur={async () => {
-									await updateDoc(currentObjective.ref, { "jobToBeDone.iWantTo": jobToBeDoneIWantTo })
+								onBlur={() => {
+									updateDoc(currentObjective!.ref, { "jobToBeDone.iWantTo": jobToBeDoneIWantTo })
+										.catch((error) => {
+											console.error(error);
+										});
 								}}
 							/>
 							<Input
 								prefix="So I can:"
 								value={jobToBeDoneSoICan}
 								onChange={(e) => setJobToBeDoneSoICan(e.target.value)}
-								onBlur={async () => {
-									await updateDoc(currentObjective.ref, { "jobToBeDone.soICan": jobToBeDoneSoICan })
+								onBlur={() => {
+									updateDoc(currentObjective!.ref, { "jobToBeDone.soICan": jobToBeDoneSoICan })
+										.catch((error) => {
+											console.error(error);
+										});
 								}}
 							/>
 						</div>
@@ -288,7 +231,7 @@ const ObjectivesClientPage: FC = () => {
 								suffix={
 									<DeleteOutlined onClick={() => {
 										if (!keyResult.id) return;
-										deleteDoc(doc(currentObjective.ref, `KeyResults`, keyResult.id))
+										deleteDoc(doc(currentObjective!.ref, `KeyResults`, keyResult.id))
 											.catch(error => {
 												console.error(error);
 											});
@@ -298,7 +241,7 @@ const ObjectivesClientPage: FC = () => {
 								value={keyResult.text}
 								onChange={(e) => {
 									if (keyResult.text === ``) return
-									updateDoc(doc(currentObjective.ref, `KeyResults`, keyResult.id), {
+									updateDoc(doc(currentObjective!.ref, `KeyResults`, keyResult.id), {
 										text: e.target.value
 									})
 										.catch(error => {
@@ -320,7 +263,7 @@ const ObjectivesClientPage: FC = () => {
 							onBlur={() => {
 								if (newObjectiveKeyResult === ``) return;
 								setAddNewObjectiveKeyResult(false)
-								addDoc(collection(currentObjective.ref, `KeyResults`), {
+								addDoc(collection(currentObjective!.ref, `KeyResults`), {
 									text: newObjectiveKeyResult,
 									createdAt: Timestamp.now(),
 								})
@@ -345,7 +288,7 @@ const ObjectivesClientPage: FC = () => {
 							onBlur={() => {
 								if (newObjectiveKeyResult === ``) return;
 								setAddNewObjectiveKeyResult(false)
-								addDoc(collection(currentObjective.ref, `KeyResults`), {
+								addDoc(collection(currentObjective!.ref, `KeyResults`), {
 									text: newObjectiveKeyResult,
 									createdAt: Timestamp.now(),
 								})
@@ -358,165 +301,99 @@ const ObjectivesClientPage: FC = () => {
 							}}
 						/>}
 						<Button block className="mt-1" onClick={() => {
-							if (businessOutcomes?.empty) return
+							if (keyResults?.empty) return
 							setAddNewObjectiveKeyResult(true)
 						}}
 						>Add</Button>
 					</Card>
 
-					{/* <TextareaCard
-						title="How Might We Statement"
-						text={currentObjective?.data().howMightWeStatement}
-						isEditing={editingSection === `okrHowMightWeStatement`}
-						onEditStart={() => setEditingSection(`okrHowMightWeStatement`)}
-						onEditEnd={() => setEditingSection(undefined)}
-						onCommit={async (text) => {
-							currentObjective && await updateDoc(currentObjective.ref, { howMightWeStatement: text })
-						}}
-					/> */}
-
-					{/* <Card
+					<Card
 						type="inner"
-						title="Target Personas"
+						title="Breakdown Reasons"
 					>
 
-						{[`1.`, `2.`, `3.`, `4.`, `5.`].map((input, index) => (
+						{breakdownReasons?.docs.map(doc => ({ id: doc.id, ...doc.data() })).map((reason, index) => (
 							<Input className="mb-3"
 								key={index}
-								prefix={input}
+								prefix={`${index + 1}.`}
 								suffix={
-									<CloseCircleOutlined />
+									<DeleteOutlined onClick={() => {
+										if (!reason.id) return;
+										deleteDoc(doc(currentObjective!.ref, `BreakdownReasons`, reason.id))
+											.catch(error => {
+												console.error(error);
+											});
+									}} />
 								}
+
+								value={reason.text}
+								onChange={(e) => {
+									if (reason.text === ``) return
+									updateDoc(doc(currentObjective!.ref, `BreakdownReasons`, reason.id), {
+										text: e.target.value
+									})
+										.catch(error => {
+											console.error(error)
+										})
+								}}
 							/>
 						))}
-					</Card> */}
-
-					{/* <TextListCard
-                    title="Personas"
-                    textList={personas?.docs.map((doc) => ({ id: doc.id, text: doc.data().name })) ?? []}
-                    isEditing={editingSection === `personas`}
-                    onEditStart={() => setEditingSection(`personas`)}
-                    onEditEnd={() => setEditingSection(undefined)}
-                    onCommit={async (textList) => {
-                        await Promise.all(
-                            textList.map(async (item) => {
-                                if (personas?.docs.some((doc) => doc.id === item.id)) {
-                                    await updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
-                                        name: item.text,
-                                    })
-                                } else {
-                                    await setDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
-                                        createdAt: Timestamp.now(),
-                                        description: ``,
-                                        name: item.text,
-                                    })
-
-                                    // Generate description asynchonously
-                                    gpt
-                                        .mutateAsync({
-                                            prompt: `Below is a vision statement for an app I'm building:\n\n"${product.data().finalVision
-                                                }"\n\nDescribe the user persona "${item.text}" in a paragraph.`,
-                                        })
-                                        .then(({ response }) => {
-                                            const description = response?.replace(/^\\n+/, ``).replace(/\\n+$/, ``)
-                                            updateDoc(doc(product.ref, `Personas`, item.id).withConverter(PersonaConverter), {
-                                                description,
-                                            }).catch(console.error)
-                                        })
-                                        .catch(console.error)
-                                }
-                            }),
-                        )
-                    }}
-                /> */}
-
-					{/* <TextListCard
-						title="Job To Be Done"
-						textList={okrJobToBeDone?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-						isEditing={editingSection === `okrJobToBeDone`}
-						onEditStart={() => setEditingSection(`okrJobToBeDone`)}
-						onEditEnd={() => setEditingSection(undefined)}
-						onCommit={async (textList) => {
-							//console.log(`saving to db`)
-							await Promise.all(
-								textList.map(async (item) => {
-									if (okrJobToBeDone?.docs.some((doc) => doc.id === item.id)) {
-										//console.log(`updating doc`)
-										await updateDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
-											text: item.text,
-										}).catch(console.error)
-									} else {
-										//console.log(`setting doc`)
-										await setDoc(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
-											createdAt: Timestamp.now(),
-											text: item.text,
-										}).catch(console.error)
-									}
-								}),
-							)
-						}}
-					// onCommit={async (textList) => {
-					//  console.log(textList)
-					//  const batch = writeBatch(db)
-					//  textList.forEach((item) => {
-					//      batch.update(doc(product.ref, `BusinessOutcomes`, item.id).withConverter(BusinessOutcomeConverter), {
-					//          text: item.text,
-					//      })
-					//  })
-					//  await batch.commit()
-					// }}
-					/> */}
-
-					{/* <TextListCard
-						title="Key Results"
-						textList={okrKeyResults?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-						isEditing={editingSection === `okrKeyResults`}
-						onEditStart={() => setEditingSection(`okrKeyResults`)}
-						onEditEnd={() => setEditingSection(undefined)}
-						onCommit={async (textList) => {
-							const batch = writeBatch(db)
-							textList.forEach((item) => {
-								batch.update(doc(product.ref, `UserPriorities`, item.id).withConverter(UserPriorityConverter), {
-									text: item.text,
+						{breakdownReasons && breakdownReasons.empty && <Input className="mb-3"
+							prefix={`${breakdownReasons.size + 1}.`}
+							suffix={
+								<CloseCircleOutlined onClick={() => {
+									setNewObjectiveBreakdownReason(``)
+									setAddNewObjectiveBreakdownReason(false)
+								}} />
+							}
+							value={newObjectiveBreakdownReason}
+							onChange={(e) => setNewObjectiveBreakdownReason(e.target.value)}
+							onBlur={() => {
+								if (newObjectiveBreakdownReason === ``) return;
+								setAddNewObjectiveBreakdownReason(false)
+								addDoc(collection(currentObjective!.ref, `BreakdownReasons`), {
+									text: newObjectiveBreakdownReason,
+									createdAt: Timestamp.now(),
 								})
-							})
-							await batch.commit()
-						}}
-					/>
-
-					<TextListCard
-						title="Breakdown Reasons"
-						textList={okrBreakdownReasons?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-						isEditing={editingSection === `okrBreakdownReasons`}
-						onEditStart={() => setEditingSection(`okrBreakdownReasons`)}
-						onEditEnd={() => setEditingSection(undefined)}
-						onCommit={async (textList) => {
-							const batch = writeBatch(db)
-							textList.forEach((item) => {
-								batch.update(doc(product.ref, `PotentialRisks`, item.id).withConverter(PotentialRiskConverter), {
-									text: item.text,
+									.then(() => {
+										setNewObjectiveBreakdownReason(``)
+									})
+									.catch(error => {
+										console.error(error)
+									})
+							}}
+						/>}
+						{breakdownReasons && addNewObjectiveBreakdownReason && <Input className="mb-3"
+							prefix={`${breakdownReasons.size + 1}.`}
+							suffix={
+								<DeleteOutlined onClick={() => {
+									setNewObjectiveBreakdownReason(``)
+									setAddNewObjectiveBreakdownReason(false)
+								}} />
+							}
+							value={newObjectiveBreakdownReason}
+							onChange={(e) => setNewObjectiveBreakdownReason(e.target.value)}
+							onBlur={() => {
+								if (newObjectiveBreakdownReason === ``) return;
+								setAddNewObjectiveBreakdownReason(false)
+								addDoc(collection(currentObjective!.ref, `BreakdownReasons`), {
+									text: newObjectiveBreakdownReason,
+									createdAt: Timestamp.now(),
 								})
-							})
-							await batch.commit()
+									.then(() => {
+										setNewObjectiveBreakdownReason(``)
+									})
+									.catch(error => {
+										console.error(error)
+									})
+							}}
+						/>}
+						<Button block className="mt-1" onClick={() => {
+							if (breakdownReasons?.empty) return
+							setAddNewObjectiveBreakdownReason(true)
 						}}
-					/>
-
-					<TextListCard
-						title="Blockers/Dependencies"
-						textList={okrBlockersDependencies?.docs.map((item) => ({ id: item.id, text: item.data().text }))}
-						isEditing={editingSection === `okrBlockersDependencies`}
-						onEditStart={() => setEditingSection(`okrBlockersDependencies`)}
-						onEditEnd={() => setEditingSection(undefined)}
-						onCommit={async (textList) => {
-							const batch = writeBatch(db)
-							textList.forEach((item) => {
-								batch.update(doc(product.ref, `MarketLeaders`, item.id).withConverter(MarketLeaderConverter), {
-									text: item.text,
-								})
-							})
-							await batch.commit()
-						}}
-					/> */}
+						>Add</Button>
+					</Card>
 				</Masonry>)
 				}
 			</div>
