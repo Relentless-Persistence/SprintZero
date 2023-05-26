@@ -1,10 +1,11 @@
-import { CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined } from "@ant-design/icons"
+import { CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons"
 import { Avatar, Layout, Menu, Popover, Segmented } from "antd"
 import { collection, collectionGroup, query, where } from "firebase/firestore"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
+import { useAuthState } from "react-firebase-hooks/auth"
 import { useCollection, useCollectionOnce } from "react-firebase-hooks/firestore"
 
 import type { FC } from "react"
@@ -12,7 +13,7 @@ import type { FC } from "react"
 import { useAppContext } from "./AppContext"
 import LinkTo from "~/components/LinkTo"
 import { MemberConverter } from "~/types/db/Products/Members"
-import { db } from "~/utils/firebase"
+import { auth, db } from "~/utils/firebase"
 import { useSetTheme, useTheme } from "~/utils/ThemeContext"
 import MoonIcon from "~public/icons/moon.svg"
 import SunIcon from "~public/icons/sun.svg"
@@ -23,6 +24,7 @@ const Header: FC = () => {
 	const { product, member } = useAppContext()
 	const pathname = usePathname()
 	const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(`online`);
+	const [user, , userError] = useAuthState(auth)
 
 	const [members, , membersError] = useCollectionOnce(
 		query(
@@ -193,7 +195,15 @@ const Header: FC = () => {
 					</div>
 				}
 			>
-				<Avatar src={member.data().avatar} className="cursor-pointer border-2 border-primary" />
+				<Avatar src={member.data().avatar}
+					style={{
+						backgroundColor: `#7265e6`,
+					}}
+					icon={member.data().avatar ? null : <UserOutlined />}
+					className="cursor-pointer border-2 border-primary" />
+				{//!member.data().avatar ? user?.displayName?.charAt(0).toUpperCase() : ``
+					//user?.displayName?.charAt(0).toUpperCase() ?? `A`
+				}
 			</Popover>
 		</Layout.Header>
 	)
