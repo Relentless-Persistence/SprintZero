@@ -47,10 +47,22 @@ const TasksClientPage: FC = () => {
     return sum + item.bugs.length;
   }, 0);
 
+  const acTasks: MyTask[] = tasks
+    ? tasks.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((task) => task.type === `acceptanceCriteria`)
+    : [];
+
+  const bugTasks: MyTask[] = tasks
+    ? tasks.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((task) => task.type === `bug`)
+    : [];
+
   const dSTasks: MyTask[] = tasks
     ? tasks.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter((task) => task.type === `data science`)
+      .filter((task) => task.type === `dataScience`)
     : [];
 
   const pipeTasks: MyTask[] = tasks
@@ -84,7 +96,7 @@ const TasksClientPage: FC = () => {
               key: `acceptance criteria`,
               children: (
                 <div className="w-full">
-                  <StoryTask storyMapItems={storyMapItems.docs.map((item) => item.data())} tab={currentTab} />
+                  <GeneralTasks tasks={acTasks} />
                 </div>
               ),
             },
@@ -93,7 +105,7 @@ const TasksClientPage: FC = () => {
               key: `bugs`,
               children: (
                 <div className="w-full">
-                  <StoryTask storyMapItems={storyMapItems.docs.map((item) => item.data())} tab={currentTab} />
+                  <GeneralTasks tasks={bugTasks} />
                 </div>
               ),
             },

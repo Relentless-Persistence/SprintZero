@@ -37,19 +37,19 @@ export type TaskDrawerProps = {
 
 const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => {
 	const { product } = useAppContext()
-	const [title, setTitle] = useState(``)
-	const [notes, setNotes] = useState(``)
+	const [title, setTitle] = useState<string>(``)
+	const [notes, setNotes] = useState<string>(``)
 	const [assign, setAssign] = useState<string[]>([])
-	const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs())
+	const [dueDate, setDueDate] = useState<Dayjs | null>()
 	const [subtasks, setSubtasks] = useState<Subtask[]>([])
 
 	useEffect(() => {
 		if (data) {
 			setTitle(data.title)
-			setNotes(data.notes)
-			setAssign(data.assigneeIds)
-			setDueDate(dayjs(data.dueDate.toMillis()))
-			setSubtasks(data.subtasks)
+			setNotes(data.notes ?? notes)
+			setAssign(data.assigneeIds ?? assign)
+			setDueDate(dayjs(data.dueDate?.toMillis()) ?? dueDate)
+			setSubtasks(data.subtasks ?? subtasks)
 		}
 	}, [data])
 

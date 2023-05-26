@@ -1,6 +1,6 @@
-import {z} from "zod"
+import { z } from "zod"
 
-import {genConverter, timestampSchema} from "~/types"
+import { genConverter, timestampSchema } from "~/types"
 
 export const StoryMapItemSchema = z.object({
 	id: z.string(),
@@ -10,8 +10,7 @@ export const StoryMapItemSchema = z.object({
 			z.object({
 				id: z.string(),
 				name: z.string(),
-				checked: z.boolean(),
-				status: z.string(),
+				taskId: z.string(),
 			}),
 		)
 		.default([]),
@@ -21,8 +20,7 @@ export const StoryMapItemSchema = z.object({
 			z.object({
 				id: z.string(),
 				name: z.string(),
-				checked: z.boolean(),
-				status: z.string(),
+				taskId: z.string(),
 			}),
 		)
 		.default([]),

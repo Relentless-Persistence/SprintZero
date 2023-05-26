@@ -21,7 +21,7 @@ import { Avatar, Button, Checkbox, Divider, Drawer, Dropdown, Form, Input, Menu,
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { collection } from "firebase/firestore"
+import { addDoc, collection, writeBatch } from "firebase/firestore"
 import produce from "immer"
 import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
@@ -46,7 +46,9 @@ import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { StoryMapItemSchema, sprintColumns } from "~/types/db/Products/StoryMapItems"
+import { TaskConverter } from "~/types/db/Products/Tasks"
 import dollarFormat from "~/utils/dollarFormat"
+import { db } from "~/utils/firebase"
 import { formValidateStatus } from "~/utils/formValidateStatus"
 import { debouncedUpdateItem, deleteItem, updateItem } from "~/utils/storyMap"
 import { useTheme } from "~/utils/ThemeContext"
@@ -182,6 +184,9 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
 
+	const [tasks, , tasksError] = useCollection(collection(product.ref, `Tasks`).withConverter(TaskConverter))
+	useErrorHandler(tasksError)
+
 	const storyAssignmentOptions: SelectProps['options'] = members?.docs
 		.filter((member): member is QueryDocumentSnapshot<Member> => member.exists())
 		.map((member) => ({ label: member.data().name, value: member.id }))
@@ -225,22 +230,29 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		await updateItem(product, storyMapItems, versions, story.id, {
 			acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
 				const index = draft.findIndex((criterion) => criterion.id === id)
-				draft[index]!.checked = checked
-				if (checked === true) {
-					draft[index]!.status = `done`
-				} else {
-					draft[index]!.status = `todo`
-				}
+				// draft[index]!.checked = checked
+				// if (checked === true) {
+				// 	draft[index]!.status = `done`
+				// } else {
+				// 	draft[index]!.status = `todo`
+				// }
 			}),
 		})
 	}
 
 	const addAcceptanceCriterion = async () => {
 		if (!newAcceptanceCriterionInput) return
+
+		const newAcTask = await addDoc(collection(product.ref, `Tasks`).withConverter(TaskConverter), {
+			title: newAcceptanceCriterionInput,
+			type: `acceptanceCriteria`,
+			status: `todo`
+		})
+
 		await updateItem(product, storyMapItems, versions, story.id, {
 			acceptanceCriteria: [
 				...story.acceptanceCriteria,
-				{ id: nanoid(), name: newAcceptanceCriterionInput, checked: false, status: `todo` },
+				{ id: nanoid(), name: newAcceptanceCriterionInput, taskId: newAcTask.id },
 			],
 		})
 	}
@@ -249,20 +261,27 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		await updateItem(product, storyMapItems, versions, story.id, {
 			bugs: produce(story.bugs, (draft) => {
 				const index = draft.findIndex((bug) => bug.id === id)
-				draft[index]!.checked = checked
-				if (checked === true) {
-					draft[index]!.status = `done`
-				} else {
-					draft[index]!.status = `todo`
-				}
+				// draft[index]!.checked = checked
+				// if (checked === true) {
+				// 	draft[index]!.status = `done`
+				// } else {
+				// 	draft[index]!.status = `todo`
+				// }
 			}),
 		})
 	}
 
 	const addBug = async () => {
 		if (!newBugInput) return
+
+		const newBugTask = await addDoc(collection(product.ref, `Tasks`).withConverter(TaskConverter), {
+			title: newBugInput,
+			type: `bug`,
+			status: `todo`
+		})
+
 		await updateItem(product, storyMapItems, versions, story.id, {
-			bugs: [...story.bugs, { id: nanoid(), name: newBugInput, checked: false, status: `todo` }],
+			bugs: [...story.bugs, { id: nanoid(), name: newBugInput, taskId: newBugTask.id }],
 		})
 	}
 
@@ -741,7 +760,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										{story.acceptanceCriteria.map((criterion) => (
 											<Checkbox
 												key={criterion.id}
-												checked={criterion.checked}
+												//checked={criterion.checked}
 												onChange={(e) => {
 													toggleAcceptanceCriterion(criterion.id, e.target.checked).catch(console.error)
 												}}
