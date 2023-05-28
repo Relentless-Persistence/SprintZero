@@ -5,7 +5,6 @@ import type { FC } from "react"
 import type { Task } from "~/types/db/Products/Tasks"
 
 import TaskColumn from "./TaskColumn"
-// import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 
 interface MyTask extends Task {
 	id: string
@@ -16,11 +15,9 @@ interface Props {
 }
 
 const GeneralTask: FC<Props> = ({ tasks }) => {
-
 	return (
-		<div className="">
-
-			<div className="h-full grid grow auto-cols-[360px] grid-flow-col gap-4 mb-2 overflow-x-auto">
+		<div className="flex h-full w-full grow overflow-x-auto pb-4">
+			<div className="grid h-full grid-cols-[repeat(4,20rem)] gap-4">
 				{
 					Object.entries(taskColumns).map(([columnName, title]) => (
 						<TaskColumn
@@ -32,12 +29,13 @@ const GeneralTask: FC<Props> = ({ tasks }) => {
 					))}
 
 			</div>
+			{/* Spacer because padding doesn't work in the overflow */}
+			<div className="shrink-0 basis-0" />
 		</div>
 	)
 }
 
 export default GeneralTask
-
 
 export const taskColumns = {
 	todo: `To Do`,

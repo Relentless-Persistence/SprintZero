@@ -66,7 +66,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 
 	return (
 		<>
-			<Card id={columnName} title={title} className="task-column w-[360px] h-[463px] lg:h-[560px] overflow-y-auto" extra={<Tag>{tasks.length > 0 ? tasks
+			<Card id={columnName} title={title} className="task-column grid min-h-0 grid-rows-[auto_1fr] [&>.ant-card-body]:overflow-auto" extra={<Tag>{tasks.length > 0 ? tasks
 				.filter((task) => task.status === columnName).length : 0}</Tag>}>
 				<div className="flex flex-col gap-4">
 					{tasks.length > 0 ? tasks

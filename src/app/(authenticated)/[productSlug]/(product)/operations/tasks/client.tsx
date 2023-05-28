@@ -78,15 +78,16 @@ const TasksClientPage: FC = () => {
     : [];
 
   return (
-    <div className="flex flex-col px-12 py-8">
-      <div className="">
+    <div className="flex h-full flex-col px-12 pb-0 py-8">
+      <div className="mb-5">
         <Breadcrumb className="capitalize mb-3" items={[{ title: `Tactics` }, { title: `Tasks` }, { title: currentTab }]} />
         <h1 className="text-4xl font-semibold capitalize mb-1">Get.Stuff.Done.</h1>
         <p className="text-textTertiary">Track specific activity that needs to be completed to achieve a certain goal or objective.</p>
       </div>
 
-      <div className="flex-grow mt-6">
+      <div className="flex h-full flex-col gap-4">
         <Tabs
+          className="min-h-0 grow [&_.ant-tabs-content]:h-full [&_.ant-tabs-nav]:px-0 [&_.ant-tabs-tabpane]:h-full"
           activeKey={currentTab}
           onChange={(key) => setCurrentTab(key)}
           tabBarExtraContent={currentTab !== `acceptance criteria` && currentTab !== `bugs` ? <Button onClick={() => setNewTask(true)}>Add Task</Button> : null}
@@ -95,45 +96,40 @@ const TasksClientPage: FC = () => {
               label: <div className="space-x-2"><Tag>{totalAcceptanceCriteria}</Tag><span>Acceptance Criteria</span></div>,
               key: `acceptance criteria`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={acTasks} />
-                </div>
+
+                <GeneralTasks tasks={acTasks} />
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{totalBugs}</Tag><span>Bugs</span></div>,
               key: `bugs`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={bugTasks} />
-                </div>
+
+                <GeneralTasks tasks={bugTasks} />
+
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{dSTasks.length}</Tag><span>Data Science</span></div>,
-              key: `data science`,
+              key: `dataScience`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={dSTasks} />
-                </div>
+
+                <GeneralTasks tasks={dSTasks} />
+
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{pipeTasks.length}</Tag><span>Pipelines</span></div>,
               key: `pipelines`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={pipeTasks} />
-                </div>
+                <GeneralTasks tasks={pipeTasks} />
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{randomTasks.length}</Tag><span>Random</span></div>,
               key: `random`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={randomTasks} />
-                </div>
+                <GeneralTasks tasks={randomTasks} />
               ),
             },
           ]}
