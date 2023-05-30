@@ -26,6 +26,7 @@ button.ant-switch {
 
 ul.ant-menu-dark.ant-menu-horizontal > li.ant-menu-item-selected {
 	background-color: transparent;
+	font-weight: bold;
 }
 
 .ant-notification-notice-message {
@@ -90,7 +91,6 @@ button.ant-btn-link {
 
 #mainMenu .ant-menu-item-selected {
 	color: #103001 !important;
-	font-weight: 600;
 }
 
 .editable-cell {
@@ -370,4 +370,17 @@ circle {
 .storyDrawerTags span {
 	display: inline-flex !important;
 	align-items: center !important;
+}
+
+.ant-menu-light .ant-menu-item-selected {
+	color: #103001 !important;
+	font-weight: 600 !important;
+}
+
+.ant-menu-inline.ant-menu-root .ant-menu-submenu-title > .ant-menu-title-content {
+	color: #103001 !important;
+}
+
+.ant-menu .ant-menu-submenu-title .ant-menu-item-icon {
+	color: #103001 !important;
 }
