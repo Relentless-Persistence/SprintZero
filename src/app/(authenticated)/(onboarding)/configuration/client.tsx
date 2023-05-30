@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Form, Input, Segmented, Select, Space, Tag } from "antd"
+import { Avatar, Button, Form, Input, Segmented, Select, Space, Tag } from "antd"
 import { doc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -11,6 +11,7 @@ import { useDocument } from "react-firebase-hooks/firestore"
 import type { SelectProps } from 'antd';
 import type { FC } from "react";
 
+import LinkTo from "~/components/LinkTo"
 import { UserConverter } from "~/types/db/Users"
 import { auth, db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
@@ -112,12 +113,31 @@ const ConfigurationPageClientPage: FC = () => {
         >
 
             <div className="">
-                <div className="flex flex-col gap-6 w-full mb-8">
+                <div className="flex w-full mb-8">
                     <div className="leading-normal">
                         <h1 className="text-4xl font-semibold">Let’s get this party started!</h1>
                         <p className="text-base text-textSecondary">
                             Please provide your information below so we can keep our internet overlords happy
                         </p>
+                    </div>
+                    <div className="flex items-center flex-end gap-4">
+                        <div className="flex min-w-0 flex-1 flex-col items-end gap-1">
+                            <div className="flex w-full flex-1 items-center gap-3">
+                                <div className="min-w-0 flex-1 text-end leading-normal">
+                                    <p className="font-semibold">{user?.displayName}</p>
+                                    <p className="truncate text-sm text-textTertiary">{user?.email}</p>
+                                </div>
+                                <Avatar
+                                    src={user?.photoURL}
+                                    size={48}
+                                    alt="Avatar"
+                                    className="shrink-0 basis-auto border border-primary"
+                                />
+                            </div>
+                            <LinkTo href="/sign-out" className="text-sm text-info">
+                                Log out
+                            </LinkTo>
+                        </div>
                     </div>
                 </div>
                 <div className="flex gap-4 mb-7">
