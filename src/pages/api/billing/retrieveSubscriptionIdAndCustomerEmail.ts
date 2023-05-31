@@ -15,6 +15,7 @@ export default async function handler(
 
     try {
         const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId as string);
+
         const subscriptionId = checkoutSession.subscription as string;
         const customerEmail = checkoutSession.customer_details?.email as string;
 

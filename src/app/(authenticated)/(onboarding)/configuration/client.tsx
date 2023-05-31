@@ -1,13 +1,13 @@
 "use client"
 
 import { Avatar, Button, Form, Input, Segmented, Select, Space, Spin, Tag, notification } from "antd"
-import { collection, doc, setDoc, updateDoc } from "firebase/firestore"
+import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { nanoid } from "nanoid"
 import { redirect, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useAuthState } from "react-firebase-hooks/auth"
-import { useDocument } from "react-firebase-hooks/firestore"
+import { useCollection, useDocument } from "react-firebase-hooks/firestore"
 
 import type { SelectProps } from 'antd';
 import type { FC } from "react";
@@ -41,37 +41,64 @@ const ConfigurationPageClientPage: FC = () => {
     useErrorHandler(userError)
 
     const searchParams = useSearchParams();
+
+    const [billings, , billingsError] = useCollection(
+        query(collection(db, `Billings`)).withConverter(BillingConverter),
+    )
+    useErrorHandler(billingsError)
+
     const session_id = searchParams?.get(`session_id`);
 
-    if (!session_id) router.push(`/`);
-
-
+    console.log(`userId`, user?.uid)
 
     const billingsRef = collection(db, `Billings`);
+    if (session_id) {
 
-    fetchSubscriptionIdAndEmail(session_id!).then((result: { subscriptionId: string, customerEmail: string }) => {
-        const { subscriptionId, customerEmail } = result;
-        setDoc(doc(billingsRef, subscriptionId).withConverter(BillingConverter), {
-            billingOwner: user!.uid,
-            subscriptionId,
-            billingEmail: customerEmail
-        })
 
-        updateDoc(doc(db, `Users`, user!.uid).withConverter(UserConverter), {
-            hasAcceptedTos: true,
-        })
-            .then(() => {
-                //router.push(`/configuration`);
+        fetchSubscriptionIdAndEmail(session_id).then((result: { subscriptionId: string, customerEmail: string }) => {
+            const { subscriptionId, customerEmail } = result;
+            setDoc(doc(billingsRef, subscriptionId).withConverter(BillingConverter), {
+                billingOwner: user!.uid,
+                subscriptionId,
+                billingEmail: customerEmail
             })
-            .catch(error => {
-                console.error(`Error when handling billing:`, error);
+
+            updateDoc(doc(db, `Users`, user!.uid).withConverter(UserConverter), {
+                hasAcceptedTos: true,
+            })
+                .then(() => {
+                    //router.push(`/configuration`);
+                })
+                .catch(error => {
+                    console.error(`Error when handling billing:`, error);
+                });
+            setLoading(false)
+        }).catch(error => {
+            notification.error({ message: `An error occurred while trying to validate your subscription.` })
+            //console.log(error)
+            router.push(`/`);
+        });
+    }
+    else {
+        const q = query(billingsRef, where(`billingOwner`, `==`, user?.uid)).withConverter(BillingConverter);
+        getDocs(q)
+            .then((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    console.log(`No billingOwner document found for the user`);
+                    router.push(`/`);
+                } else {
+                    console.log(`billingOwner document found for the user`);
+                    // Do something with the document(s) if needed
+                    setLoading(false)
+                }
+            })
+            .catch((error) => {
+                console.log(`Error getting billingOwner document: `, error);
             });
-        setLoading(false)
-    }).catch(error => {
-        notification.error({ message: `An error occurred while trying to validate your subscription.` })
-        //console.log(error)
-        router.push(`/`);
-    });
+    }
+
+
+
 
     const createProduct = trpc.product.create.useMutation()
     const inviteUser = trpc.product.inviteUser.useMutation()
@@ -81,6 +108,7 @@ const ConfigurationPageClientPage: FC = () => {
     )
 
     useErrorHandler(dbUserError)
+
 
     const [sprintLength, setSprintLength] = useState<1 | 2 | 3>(1)
     const [sprintGate, setSprintGate] = useState<1 | 2 | 3 | 4 | 5>(1)
