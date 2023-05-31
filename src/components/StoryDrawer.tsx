@@ -724,7 +724,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										{story.bugs.map((bug) => (
 											<Checkbox
 												key={bug.id}
-												checked={bug.checked}
+												//checked={bug.checked}
 												onChange={(e) => {
 													toggleBug(bug.id, e.target.checked).catch(console.error)
 												}}

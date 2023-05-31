@@ -1,16 +1,19 @@
 "use client"
 
 import { Avatar } from 'antd';
-import { doc, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { nanoid } from 'nanoid';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useLayoutEffect } from 'react';
 
 // import type * as React from 'react';
+import { useErrorHandler } from 'react-error-boundary';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import type { FC } from 'react';
 
 import LinkTo from '~/components/LinkTo';
+import { BillingConverter } from '~/types/db/Billings';
 import { UserConverter } from '~/types/db/Users';
 import { auth, db } from '~/utils/firebase';
 
@@ -27,24 +30,7 @@ const PricingClientPage: FC = () => {
 
     const [user, , userError] = useAuthState(auth)
 
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const session_id = searchParams?.get(`session_id`);
-
-    if (session_id) {
-        //setHasAccepted(true)
-        updateDoc(doc(db, `Users`, user!.uid).withConverter(UserConverter), {
-            hasAcceptedTos: true,
-        })
-            .then(() => {
-                router.push(`/configuration`);
-            })
-            .catch(error => {
-                console.error(`Error updating document:`, error);
-            });
-
-
-    }
+    useErrorHandler(userError)
 
     return (
         <div className='w-full'>

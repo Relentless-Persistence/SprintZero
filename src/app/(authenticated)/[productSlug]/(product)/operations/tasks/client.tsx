@@ -10,7 +10,6 @@ import type { FC } from "react"
 import type { Task } from "~/types/db/Products/Tasks"
 
 import GeneralTasks from "./GeneralTask"
-import StoryTask from "./StoryTask"
 import TaskDrawer from "./TaskDrawer"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"

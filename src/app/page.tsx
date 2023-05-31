@@ -1,5 +1,6 @@
 "use client"
 
+import { Spin } from "antd"
 import { collectionGroup, query, where } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -31,7 +32,8 @@ const HomePage: FC = () => {
 
 	return (
 		<div className="grid h-full place-items-center">
-			<p className="text-xl">Redirecting you to your dashboard...</p>
+			{/* <p className="text-xl">Redirecting you to your dashboard...</p> */}
+			<Spin size="large" tip="bleeps, sweeps, and creeps..." />
 		</div>
 	)
 }

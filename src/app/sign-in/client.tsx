@@ -91,16 +91,14 @@ const SignInClientPage: FC = () => {
 		let isNewUser = !user
 
 		if (typeof inviteToken === `string`) {
-			// do below in batch
 
+			// implement the code below as a single transaction
 			await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
 				email: credential.user.email,
 				hasAcceptedTos: false,
 				preferredMusicClient: `appleMusic`,
 				type: `user`,
 			})
-
-
 
 			await putUserOnProduct.mutateAsync({
 				userAvatar: credential.user.photoURL,
@@ -120,7 +118,6 @@ const SignInClientPage: FC = () => {
 				preferredMusicClient: `appleMusic`,
 				type: `user`,
 			})
-			//router.push(`/accept-terms`)
 			router.push(`/billing`)
 		}
 		else if (!user?.hasAcceptedTos) {
@@ -128,7 +125,6 @@ const SignInClientPage: FC = () => {
 		}
 		else {
 			// Nothing special to do, redirect to one of their products
-
 			const members = await getDocs(
 				query(
 					collectionGroup(db, `Members`),
