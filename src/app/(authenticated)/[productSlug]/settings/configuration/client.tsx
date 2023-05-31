@@ -6,6 +6,8 @@ import { Breadcrumb, Button, Card, Popconfirm } from "antd"
 import { updateDoc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef } from "react"
+import { useErrorHandler } from "react-error-boundary"
+import { useAuthState } from "react-firebase-hooks/auth"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -34,6 +36,10 @@ const formSchema = ProductSchema.pick({
 type FormInputs = z.infer<typeof formSchema>
 
 const ConfigurationSettingsClientPage: FC = () => {
+	const [user, , userError] = useAuthState(auth)
+
+	useErrorHandler(userError)
+
 	const { product } = useAppContext()
 	const router = useRouter()
 
@@ -197,7 +203,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 					<div className="leading-normal mb-1">
 						<h2 className="font-semibold">Billing</h2>
 					</div>
-					<LinkTo openInNewTab href="https://billing.stripe.com/p/login/5kAcNR56g1J3cUwaEE"><Button className="flex items-center justify-center" icon={<CreditCardOutlined />}>Manage Subscription</Button></LinkTo>
+					<LinkTo openInNewTab href={`https://billing.stripe.com/p/login/5kAcNR56g1J3cUwaEE?prefilled_email=${user?.email}`}><Button className="flex items-center justify-center" icon={<CreditCardOutlined />}>Manage Subscription</Button></LinkTo>
 				</div>
 
 			</div>
