@@ -1,6 +1,6 @@
 "use client"
 
-import { FireFilled } from "@ant-design/icons"
+import { CreditCardOutlined, FireFilled } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Breadcrumb, Button, Card, Popconfirm } from "antd"
 import { updateDoc } from "firebase/firestore"
@@ -12,6 +12,7 @@ import { z } from "zod"
 import type { FC } from "react"
 
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSegmented from "~/components/rhf/RhfSegmented"
 import RhfSelect from "~/components/rhf/RhfSelect"
@@ -78,116 +79,127 @@ const ConfigurationSettingsClientPage: FC = () => {
 				<h1 className="text-3xl font-bold">Product Configuration</h1>
 			</div>
 
-			<Card className="w-fit">
-				<form className="flex flex-col items-start gap-4">
-					<label className="flex flex-col gap-1">
-						<span className="font-semibold">Product Title</span>
-						<RhfInput
-							control={control}
-							name="name"
-							onChange={() => {
-								onSubmit().catch(console.error)
-							}}
-							className="w-72"
-						/>
-					</label>
-
-					<label className="flex flex-col gap-1">
-						<span className="font-semibold">
-							Cadence <span className="font-normal text-textTertiary">(Weeks)</span>
-						</span>
-						<RhfSegmented
-							control={control}
-							name="cadence"
-							options={[
-								{ label: `One`, value: 1 },
-								{ label: `Two`, value: 2 },
-								{ label: `Three`, value: 3 },
-							]}
-							onChange={() => {
-								onSubmit().catch(console.error)
-							}}
-						/>
-					</label>
-
-					<label className="flex flex-col gap-1">
-						<span className="font-semibold">Gate</span>
-						<RhfSegmented
-							control={control}
-							name="sprintStartDayOfWeek"
-							options={[
-								{ label: `Monday`, value: 1 },
-								{ label: `Tuesday`, value: 2 },
-								{ label: `Wednesday`, value: 3 },
-								{ label: `Thursday`, value: 4 },
-								{ label: `Friday`, value: 5 },
-							]}
-							onChange={() => {
-								onSubmit().catch(console.error)
-							}}
-							className="w-fit"
-						/>
-					</label>
-
-					<label className="flex flex-col gap-1">
-						<span className="font-semibold">
-							Cost per Story Point <span className="font-normal text-textTertiary">(optional)</span>
-						</span>
-						<RhfInput
-							control={control}
-							name="effortCost"
-							number="currency"
-							placeholder="0.00"
-							onChange={() => {
-								onSubmit().catch(console.error)
-							}}
-							addonAfter={
-								<RhfSelect
+			<div className="flex gap-12">
+				<div className="flex flex-col">
+					<Card className="w-fit mb-6">
+						<form className="flex flex-col items-start gap-4">
+							<label className="flex flex-col gap-1">
+								<span className="font-semibold">Product Title</span>
+								<RhfInput
 									control={control}
-									name="effortCostCurrencySymbol"
+									name="name"
 									onChange={() => {
 										onSubmit().catch(console.error)
 									}}
-									options={[
-										{ label: `$`, value: `dollar` },
-										{ label: `£`, value: `pound` },
-										{ label: `€`, value: `euro` },
-										{ label: `¥`, value: `yen` },
-										{ label: `₹`, value: `rupee` },
-									]}
+									className="w-72"
 								/>
-							}
-						/>
-					</label>
-				</form>
-			</Card>
+							</label>
 
-			<div className="flex flex-col items-start gap-2">
-				<div className="leading-normal">
-					<h2 className="font-semibold">Erase All Data</h2>
-					<p className="text-sm text-textTertiary">
-						This action will erase all stored data and start over from scratch.
-					</p>
+							<label className="flex flex-col gap-1">
+								<span className="font-semibold">
+									Cadence <span className="font-normal text-textTertiary">(Weeks)</span>
+								</span>
+								<RhfSegmented
+									control={control}
+									name="cadence"
+									options={[
+										{ label: `One`, value: 1 },
+										{ label: `Two`, value: 2 },
+										{ label: `Three`, value: 3 },
+									]}
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+								/>
+							</label>
+
+							<label className="flex flex-col gap-1">
+								<span className="font-semibold">Gate</span>
+								<RhfSegmented
+									control={control}
+									name="sprintStartDayOfWeek"
+									options={[
+										{ label: `Monday`, value: 1 },
+										{ label: `Tuesday`, value: 2 },
+										{ label: `Wednesday`, value: 3 },
+										{ label: `Thursday`, value: 4 },
+										{ label: `Friday`, value: 5 },
+									]}
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+									className="w-fit"
+								/>
+							</label>
+
+							<label className="flex flex-col gap-1">
+								<span className="font-semibold">
+									Cost per Story Point <span className="font-normal text-textTertiary">(optional)</span>
+								</span>
+								<RhfInput
+									control={control}
+									name="effortCost"
+									number="currency"
+									placeholder="0.00"
+									onChange={() => {
+										onSubmit().catch(console.error)
+									}}
+									addonAfter={
+										<RhfSelect
+											control={control}
+											name="effortCostCurrencySymbol"
+											onChange={() => {
+												onSubmit().catch(console.error)
+											}}
+											options={[
+												{ label: `$`, value: `dollar` },
+												{ label: `£`, value: `pound` },
+												{ label: `€`, value: `euro` },
+												{ label: `¥`, value: `yen` },
+												{ label: `₹`, value: `rupee` },
+											]}
+										/>
+									}
+								/>
+							</label>
+						</form>
+					</Card>
+
+					<div className="flex flex-col items-start gap-2">
+						<div className="leading-normal">
+							<h2 className="font-semibold">Erase All Data</h2>
+							<p className="text-sm text-textTertiary">
+								This action will erase all stored data and start over from scratch.
+							</p>
+						</div>
+						<Popconfirm
+							title="Delete Product"
+							description="Are you sure you want to do this? This action is not reversable."
+							rootClassName="max-w-xs"
+							placement="right"
+							okText="Yes"
+							cancelText="No"
+							onConfirm={() => {
+								auth
+									.currentUser!.getIdToken(true)
+									.then(async (userIdToken) => {
+										await haltAndCatchFire.mutateAsync({ productId: product.id, userIdToken })
+										router.push(`/`)
+									})
+									.catch(console.error)
+							}}
+						>
+							<Button icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
+						</Popconfirm>
+					</div>
 				</div>
-				<Popconfirm
-					title="Delete Product"
-					description="Are you sure you want to do this? This action is not reversable."
-					rootClassName="max-w-xs"
-					placement="right"
-					okText="Yes"
-					cancelText="No"
-					onConfirm={() => {
-						auth
-							.currentUser!.getIdToken(true)
-							.then(async (userIdToken) => {
-								await haltAndCatchFire.mutateAsync({ productId: product.id, userIdToken })
-								router.push(`/`)
-							})
-							.catch(console.error)
-					}}
-				>
-					<Button icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
-				</Popconfirm>
+				<div className="flex flex-col">
+					<div className="leading-normal mb-1">
+						<h2 className="font-semibold">Billing</h2>
+					</div>
+					<LinkTo openInNewTab href="https://billing.stripe.com/p/login/5kAcNR56g1J3cUwaEE"><Button className="flex items-center justify-center" icon={<CreditCardOutlined />}>Manage Subscription</Button></LinkTo>
+				</div>
+
 			</div>
 		</div>
 	)
