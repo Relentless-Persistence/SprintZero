@@ -2,7 +2,7 @@ import { Button, Card, Tag } from "antd"
 import dayjs from "dayjs"
 import { doc, updateDoc } from "firebase/firestore"
 import { motion, useMotionValue, useTransform } from "framer-motion"
-import { useEffect, useRef, useState } from "react"
+import { createRef, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 
 import type { taskColumns } from "./GeneralTask"
@@ -24,12 +24,19 @@ export type TaskColumnProps = {
 }
 
 const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
+
 	const { product } = useAppContext()
 	const [editTask, setEditTask] = useState(false)
 	const [selectedTask, setSelectedTask] = useState<MyTask | null>(null)
-	const [isBeingDragged, setIsBeingDragged] = useState(false)
+	const [isBeingDragged, setIsBeingDragged] = useState<string | null>(null)
 
-	const ref = useRef<HTMLDivElement>(null)
+
+	//const ref = useRef<HTMLDivElement>(null)
+
+	const refs = useRef<(HTMLDivElement | null)[]>([]);
+	refs.current = refs.current.slice(0, tasks.length);
+
+
 	const [dragInfo, setDragInfo] = useState({
 		width: 0,
 		height: 0,
@@ -45,8 +52,8 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 	const pointerPos = useRef({ x: 0, y: 0 })
 	const currentColumn = useRef<keyof typeof taskColumns | undefined>(undefined)
 
-	const onDragStart = () => setIsBeingDragged(true)
-	const onDragEnd = () => setIsBeingDragged(false)
+	//const onDragStart = () => setIsBeingDragged(true)
+	//const onDragEnd = () => setIsBeingDragged(false)
 
 	useEffect(() => {
 		const onPointerMove = (e: PointerEvent) => {
@@ -71,21 +78,22 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 				<div className="flex flex-col gap-4">
 					{tasks.length > 0 ? tasks
 						.filter((task) => task.status === columnName)
-						.map((task) => (
+						.map((task, index) => (
 							<>
 								<motion.div
 									key={task.id}
 									layoutId={`board-task-${task.id}`}
 									onPointerDown={(e) => e.preventDefault()}
 									onPanStart={() => {
-										const rect = ref.current!.getBoundingClientRect()
+										//const rect = ref.current!.getBoundingClientRect()
+										const rect = refs.current[index]!.getBoundingClientRect()
 										setDragInfo({
 											width: rect.width,
 											height: rect.height,
 											offsetX: pointerPos.current.x - rect.x,
 											offsetY: pointerPos.current.y - rect.y,
 										})
-										onDragStart()
+										setIsBeingDragged(task.id)
 									}}
 									onPanEnd={() => {
 
@@ -99,7 +107,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 											status: currentColumn.current,
 										})
 											.then(() => {
-												onDragEnd()
+												setIsBeingDragged(null)
 											})
 											.catch(console.error)
 									}
@@ -109,7 +117,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 										y.set(info.point.y)
 									}}
 									className="touch-none"
-									ref={ref}
+									ref={el => (refs.current[index] = el)}
 								>
 									<Card
 										key={task.id}
@@ -128,7 +136,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 									</Card>
 								</motion.div>
 
-								{isBeingDragged &&
+								{isBeingDragged === task.id &&
 									createPortal(
 										<motion.div
 											key={`${task.id}-dragging`}
