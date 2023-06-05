@@ -129,7 +129,7 @@ const Header: FC = () => {
 				overlayClassName="pr-2 pt-4"
 				content={
 					<div className="flex w-48 flex-col gap-4">
-						<div className="flex flex-col gap-2">
+						{/* <div className="flex flex-col gap-2">
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Theme</p>
 							<Segmented
 								block
@@ -143,7 +143,7 @@ const Header: FC = () => {
 									{ icon: <MoonIcon className="inline-block" />, label: `Dark`, value: `dark` },
 								]}
 							/>
-						</div>
+						</div> */}
 						<div className="flex flex-col gap-2">
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Settings</p>
 							<Menu
