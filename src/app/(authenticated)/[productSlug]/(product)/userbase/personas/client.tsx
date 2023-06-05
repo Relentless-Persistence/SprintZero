@@ -128,7 +128,7 @@ const PersonasClientPage: FC = () => {
     }, [personas])
 
     return (
-        <div className="grid h-full grid-cols-[1fr_auto]">
+        <div id="personas" className="grid h-full grid-cols-[1fr_auto]">
             <div className="relative flex flex-col gap-4 overflow-auto px-12 py-8">
                 <Breadcrumb items={[{ title: `Userbase` }, { title: `Participants` }, { title: tabs.find(([key]) => key === currentTab)![1] },]} />
                 <div className="leading-normal">
@@ -160,7 +160,23 @@ const PersonasClientPage: FC = () => {
                 {personas ? (
                     personas.docs.length === 0 ? (
                         <div className="grid grow place-items-center">
-                            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                            <Empty
+                                style={{
+                                    backgroundColor: `#ffffff`,
+                                    boxShadow: `0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12), 0px 9px 28px 8px rgba(0, 0, 0, 0.05)`,
+                                    borderRadius: `6px`,
+                                    padding: `16px 50px`
+                                }}
+                                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                imageStyle={{ height: 100, }}
+                                description={
+                                    <span
+                                    // style={{ color: `rgba(0,0,0.45)` }}
+                                    >
+                                        Navigate to <span style={{ color: `#0958D9` }}>Strategy &gt; Kickoff</span> and add a persona to populate this section
+                                    </span>
+                                }
+                            />
                         </div>
                     ) : (
                         <>

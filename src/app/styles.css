@@ -384,3 +384,13 @@ circle {
 .ant-menu .ant-menu-submenu-title .ant-menu-item-icon {
 	color: #103001 !important;
 }
+
+#participants .ant-empty-image svg {
+	height: 100px !important;
+	width: 132px !important;
+}
+
+#personas .ant-empty-image svg {
+	height: 100px !important;
+	width: 132px !important;
+}
