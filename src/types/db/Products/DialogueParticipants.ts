@@ -17,7 +17,7 @@ export const DialogueParticipantSchema = z.object({
 	location_id: z.string(),
 	name: z.string({ invalid_type_error: `Required` }),
 	phoneNumber: z.string().nullable(),
-	status: z.enum([`identified`, `contacted`, `scheduled`, `interviewed`, `analyzing`, `processed`]),
+	status: z.enum([`identified`, `contacted`, `scheduled`, `interviewed`, `analyzing`, `processed`, `archived`]),
 	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable(),
 	title: z.enum([`dr`, `miss`, `mr`, `mrs`, `ms`, `prof`, `sir`]).nullable(),
 	transcript: z.string(),
@@ -32,15 +32,15 @@ export const DialogueParticipantSchema = z.object({
 export type DialogueParticipant = z.infer<typeof DialogueParticipantSchema>
 export const DialogueParticipantConverter = genConverter(DialogueParticipantSchema)
 
-export const statuses = [
-	[`identified`, `Identified`],
-	[`contacted`, `Contacted`],
-	[`scheduled`, `Scheduled`],
-	[`interviewed`, `Interviewed`],
-	[`analyzing`, `Analyzing`],
-	[`processed`, `Processed`],
-	[`archived`, `Archived`],
-]
+export const statuses = {
+	identified: `Identified`,
+	contacted: `Contacted`,
+	scheduled: `Scheduled`,
+	interviewed: `Interviewed`,
+	analyzing: `Analyzing`,
+	processed: `Processed`,
+	archived: `Archived`,
+}
 
 export const timings = [
 	[`permanent`, `Permanent`],

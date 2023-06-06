@@ -195,7 +195,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 									.catch(console.error)
 							}}
 						>
-							<Button icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
+							<Button type="primary" icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
 						</Popconfirm>
 					</div>
 				</div>

@@ -10,7 +10,7 @@ import {
   UploadOutlined,
 } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Drawer, Dropdown, Popover, Skeleton, Tag, Typography } from 'antd';
+import { Button, Drawer, Dropdown, Menu, Popover, Skeleton, Tag, Typography } from 'antd';
 import axios from "axios"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -22,7 +22,7 @@ import { useCollection, useDocument } from "react-firebase-hooks/firestore"
 import { useForm } from "react-hook-form"
 
 import type { MenuProps } from 'antd';
-import type { QuerySnapshot } from "firebase/firestore"
+import type { QuerySnapshot, WithFieldValue } from "firebase/firestore"
 import type { FC } from "react"
 import type { z } from "zod"
 import type { DialogueParticipant } from "~/types/db/Products/DialogueParticipants";
@@ -42,6 +42,7 @@ import { DialogueParticipantConverter, DialogueParticipantSchema, statuses, timi
 import { MemberConverter } from "~/types/db/Products/Members"
 import { PersonaConverter } from "~/types/db/Products/Personas"
 import { storage } from "~/utils/firebase";
+import { updateItem } from "~/utils/storyMap";
 import BoneIcon from "~public/icons/bone.svg"
 import CognitionIcon from "~public/icons/cognition.svg"
 import EarIcon from "~public/icons/ear.svg"
@@ -86,6 +87,9 @@ interface TranscribeResponse {
 const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activeParticipant, onClose }) => {
   const { product } = useAppContext()
 
+  const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
+  const participantData = participant?.data()
+
   const [isOpen, setIsOpen] = useState(true)
   const close = () => {
     setIsOpen(false)
@@ -99,9 +103,20 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
   const [audioUrl, setAudioUrl] = useState(``)
   const [storageBucketUri, setStorageBucketUri] = useState(``)
   const [loadingTranscript, setLoadingTranscrript] = useState(false)
+  const [participantStatusPopoverIsOpen, setParticipantStatusPopoverIsOpen] = useState(false)
+  const [participantStatusKey, setParticipantStatusKey] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![0])
+  const [participantStatusLabel, setParticipantStatusLabel] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![1])
 
-  const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
-  const participantData = participant?.data()
+  type statusKey = keyof typeof statuses
+  const handleParticipantStatusChange = async ({ key }: { key: string }) => {
+    const label = Object.entries(statuses).find(([keyL, valueL]) => keyL === key)![1];
+    setParticipantStatusKey(key);
+    setParticipantStatusLabel(label);
+    const participantRef = doc(product.ref, `DialogueParticipants`, participant!.id);
+    await updateDoc(participantRef, {
+      status: key as WithFieldValue<statusKey>
+    })
+  };
 
   const [personas, , personasError] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
   useErrorHandler(personasError)
@@ -244,20 +259,41 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
               }
                 trigger="click">
 
-                <Tag color="#585858" icon={<PushpinOutlined />}>
-                  <LinkTo href="">{participantData?.location ? participantData.location : `Location Unknown`}</LinkTo>
-                </Tag>
+                <Button size="small" color="#585858" icon={<PushpinOutlined />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                  {participantData?.location ? participantData.location : `Location Unknown`}
+                </Button>
               </Popover>
 
 
               {participantData?.status && (
+                <>
+                  <Popover style={{ height: `200px`, overflow: `auto`, padding: `6px` }} placement="bottomRight"
+                    id="participantStatusPopover"
+                    open={participantStatusPopoverIsOpen}
+                    content={
+                      <Menu
+                        mode="vertical"
+                        selectedKeys={[participantStatusKey]}
+                        onClick={handleParticipantStatusChange}
+                        style={{ border: `none`, maxHeight: `300px`, overflow: `auto` }}
+                      >
+                        {Object.entries(statuses).map(([key, status]) => (
+                          <Menu.Item key={key} style={{ height: `30px`, lineHeight: `30px` }} onClick={() => setParticipantStatusPopoverIsOpen(false)}>{status}</Menu.Item>
+                        ))}
+                      </Menu>
+                    } trigger="click">
+                    <Button onClick={() => setParticipantStatusPopoverIsOpen(!participantStatusPopoverIsOpen)} size="small" color="#585858" icon={<FlagOutlined />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                      {participantStatusLabel}
+                    </Button>
+                  </Popover>
 
-                <Dropdown menu={{ items, onClick }} placement="bottomRight" arrow>
+                  {/* <Dropdown menu={{ items, onClick }} placement="bottomRight" arrow>
 
-                  <Tag color="#585858" icon={<FlagOutlined />}>
-                    {statuses.find((status) => status[0] === participantData.status)![1]}
-                  </Tag>
-                </Dropdown>
+                    <Button size="small" color="#585858" icon={<FlagOutlined />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                      {statuses.find((status) => status[0] === participantData.status)![1]}
+                    </Button>
+                  </Dropdown> */}
+                </>
               )
               }
 
