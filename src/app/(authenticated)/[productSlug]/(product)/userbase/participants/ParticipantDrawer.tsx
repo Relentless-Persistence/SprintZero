@@ -25,7 +25,8 @@ import type { MenuProps } from 'antd';
 import type { QuerySnapshot } from "firebase/firestore"
 import type { FC } from "react"
 import type { z } from "zod"
-import type { DialogueParticipant } from "~/types/db/Products/DialogueParticipants"
+import type { DialogueParticipant } from "~/types/db/Products/DialogueParticipants";
+
 
 import DragDrop from "./DragDrop"
 import ParticipantDisability from "./ParticipantDisability";
@@ -37,7 +38,7 @@ import LinkTo from "~/components/LinkTo";
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import { DialogueParticipantSchema, statuses, timings } from "~/types/db/Products/DialogueParticipants"
+import { DialogueParticipantConverter, DialogueParticipantSchema, statuses, timings } from "~/types/db/Products/DialogueParticipants"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { PersonaConverter } from "~/types/db/Products/Personas"
 import { storage } from "~/utils/firebase";
@@ -56,7 +57,7 @@ const formSchema = DialogueParticipantSchema.pick({
   phoneNumber: true,
   title: true,
   transcript: true,
-  personaIds: true,
+  personaId: true,
 })
 type FormInputs = z.infer<typeof formSchema>
 
@@ -121,7 +122,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
       phoneNumber: participantData?.phoneNumber ?? null,
       title: participantData?.title ?? null,
       transcript: participantData?.transcript ?? ``,
-      personaIds: participantData?.personaIds ?? [],
+      personaId: participantData?.personaId ?? null,
     },
   })
 
@@ -183,7 +184,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 
     if (!id) return
 
-    const participantRef = doc(product.ref, `DialogueParticipants`, id);
+    const participantRef = doc(product.ref, `DialogueParticipants`, id).withConverter(DialogueParticipantConverter);
     const updateData = {
       transcript: ``,
       transcriptAudio: ``,
@@ -496,9 +497,11 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
               <label className="leading-normal">
                 <span className="text-sm text-textTertiary">Persona</span>
                 <RhfSelect
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) => typeof option?.label === `string` ? option.label.includes(input) : false}
                   control={control}
-                  name="personaIds"
-                  mode="multiple"
+                  name="personaId"
                   onChange={() => {
                     onSubmit().catch(console.error)
                   }}

@@ -25,7 +25,7 @@ export const DialogueParticipantSchema = z.object({
 	updatedAt: timestampSchema,
 	wiki_link: z.string(),
 
-	personaIds: z.array(z.string()).nullable(),
+	personaId: z.string().nullable(),
 	updatedAtUserId: z.string(),
 })
 

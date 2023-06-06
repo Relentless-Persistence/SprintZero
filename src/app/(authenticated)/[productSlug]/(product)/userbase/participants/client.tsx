@@ -72,7 +72,7 @@ const ParticipantsClientPage: FC = () => {
                                     transcriptAudio: ``,
                                     updatedAt: Timestamp.now(),
                                     wiki_link: ``,
-                                    personaIds: [],
+                                    personaId: null,
                                     updatedAtUserId: user.id,
                                 })
                                     .then((docRef) => {
@@ -153,25 +153,12 @@ const ParticipantsClientPage: FC = () => {
                                             }
                                         >
                                             <div className="flex flex-wrap gap-2">
-                                                {participant.data().personaIds?.map((personaId) => {
-                                                    const persona = personasData?.find(persona => persona.id === personaId)
-                                                    return (
-                                                        <Tag key={persona?.id} style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#geekblue" icon={<UserOutlined style={{ color: `#000000` }} />}>
-                                                            <span style={{ color: `#000000` }}>
-                                                                {persona?.name}
-                                                            </span>
-                                                        </Tag>
-                                                    )
-                                                    // if (persona.id === participant.data().personaId) {
-                                                    //     return (
-                                                    //         <Tag key={persona.id} color="geekblue" icon={<UserOutlined />}>
-                                                    //             {persona.data().name}
-                                                    //         </Tag>
-                                                    //     );
-                                                    // } else {
-                                                    //     return null;
-                                                    // }
-                                                })}
+                                                {participant.data().personaId && (<Tag style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#geekblue" icon={<UserOutlined style={{ color: `#000000` }} />}>
+                                                    <span style={{ color: `#000000` }}>
+                                                        {personasData?.find(persona => persona.id === participant.data().personaId)?.name}
+                                                    </span>
+                                                </Tag>)
+                                                }
                                                 {participant.data().disabilities.auditory && (
                                                     <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<EarIcon className="mr-1.5 inline-block" style={{ color: `#000000` }} />}>
                                                         <span style={{ color: `#000000` }}>
