@@ -44,7 +44,7 @@ const formSchema = DialogueParticipantSchema.pick({
 	phoneNumber: true,
 	title: true,
 	transcript: true,
-	personaIds: true,
+	personaId: true,
 })
 type FormInputs = z.infer<typeof formSchema>
 
@@ -89,7 +89,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 			phoneNumber: participantData?.phoneNumber ?? null,
 			title: participantData?.title ?? null,
 			transcript: participantData?.transcript ?? ``,
-			personaIds: participantData?.personaIds ?? null,
+			personaId: participantData?.personaId ?? null,
 		},
 	})
 
@@ -307,7 +307,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 								<span className="text-sm text-textTertiary">Persona</span>
 								<RhfSelect
 									control={control}
-									name="personaIds"
+									name="personaId"
 									onChange={() => {
 										onSubmit().catch(console.error)
 									}}

@@ -165,7 +165,7 @@ const DialogueClientPage: FC = () => {
 							transcriptAudio: ``,
 							updatedAt: Timestamp.now(),
 							wiki_link: ``,
-							personaIds: [],
+							personaId: null,
 							updatedAtUserId: user.id,
 						})
 							.then((docRef) => {

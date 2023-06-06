@@ -14,7 +14,7 @@ import { Button, Drawer, Dropdown, Popover, Skeleton, Tag, Typography } from 'an
 import axios from "axios"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { Timestamp, collection, doc, updateDoc } from "firebase/firestore"
+import { Timestamp, collection, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { deleteObject, ref } from "firebase/storage";
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
@@ -248,14 +248,17 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                 </Tag>
               </Popover>
 
-              {/* {participantData?.status && (
-                                 */}
-              <Dropdown menu={{ items, onClick }} placement="bottomRight" arrow>
 
-                <Tag color="#585858" icon={<FlagOutlined />}>
-                  {statuses.find((status) => status[0] === participantData?.status)![1]}
-                </Tag>
-              </Dropdown>
+              {participantData?.status && (
+
+                <Dropdown menu={{ items, onClick }} placement="bottomRight" arrow>
+
+                  <Tag color="#585858" icon={<FlagOutlined />}>
+                    {statuses.find((status) => status[0] === participantData.status)![1]}
+                  </Tag>
+                </Dropdown>
+              )
+              }
 
               {(participantData?.disabilities.auditory || participantData?.disabilities.cognitive || participantData?.disabilities.physical || participantData?.disabilities.speech || participantData?.disabilities.visual || participantData?.timing) ? (<>
 
@@ -321,7 +324,13 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
           </div>
         ) : (
           <div className="flex gap-4">
-            <Button danger>
+            <Button onClick={
+              () => {
+                deleteDoc(participant!.ref).then(() => {
+                  close()
+                }).catch((error) => console.error(error));
+              }
+            } danger>
               Delete
             </Button>
             {/* <Button htmlType="submit" form="participant-form">
