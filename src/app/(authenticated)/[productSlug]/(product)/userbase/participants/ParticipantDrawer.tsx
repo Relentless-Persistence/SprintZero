@@ -45,6 +45,7 @@ import { storage } from "~/utils/firebase";
 import BoneIcon from "~public/icons/bone.svg"
 import CognitionIcon from "~public/icons/cognition.svg"
 import EarIcon from "~public/icons/ear.svg"
+import PhysicalDisability from "~public/icons/physical-disability.svg"
 
 dayjs.extend(relativeTime)
 
@@ -304,7 +305,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                   }
                     trigger="click">
 
-                    <Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
+                    <Tag color="#585858" icon={<PhysicalDisability className="mr-1.5 inline-block" />} className="flex items-center">
                       Not Set
                     </Tag>
                   </Popover>
