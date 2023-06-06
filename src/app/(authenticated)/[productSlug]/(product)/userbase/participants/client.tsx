@@ -170,7 +170,7 @@ const ParticipantsClientPage: FC = () => {
                                                 })}
                                                 {participant.data().disabilities.auditory && (
                                                     <Tag
-                                                        color="gold"
+                                                        color="#DDE3D5"
                                                         icon={<EarIcon className="mr-1.5 inline-block" />}
                                                         className="flex items-center"
                                                     >
@@ -179,7 +179,7 @@ const ParticipantsClientPage: FC = () => {
                                                 )}
                                                 {participant.data().disabilities.cognitive && (
                                                     <Tag
-                                                        color="gold"
+                                                        color="#DDE3D5"
                                                         icon={<CognitionIcon className="mr-1.5 inline-block" />}
                                                         className="flex items-center"
                                                     >
@@ -188,7 +188,7 @@ const ParticipantsClientPage: FC = () => {
                                                 )}
                                                 {participant.data().disabilities.physical && (
                                                     <Tag
-                                                        color="gold"
+                                                        color="#DDE3D5"
                                                         icon={<BoneIcon className="mr-1.5 inline-block stroke-current" />}
                                                         className="flex items-center"
                                                     >
@@ -197,7 +197,7 @@ const ParticipantsClientPage: FC = () => {
                                                 )}
                                                 {participant.data().disabilities.speech && (
                                                     <Tag
-                                                        color="gold"
+                                                        color="#DDE3D5"
                                                         icon={<SoundOutlined className="inline-block" />}
                                                         className="flex items-center"
                                                     >
@@ -205,12 +205,12 @@ const ParticipantsClientPage: FC = () => {
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.visual && (
-                                                    <Tag color="gold" icon={<EyeOutlined />} className="flex items-center">
+                                                    <Tag color="#DDE3D5" icon={<EyeOutlined />} className="flex items-center">
                                                         Visual
                                                     </Tag>
                                                 )}
                                                 {participant.data().phoneNumber && (
-                                                    <Tag color="red" icon={<PhoneOutlined />}>
+                                                    <Tag color="#FFF1F0" icon={<PhoneOutlined />}>
                                                         {participant.data().phoneNumber}
                                                     </Tag>
                                                 )}
