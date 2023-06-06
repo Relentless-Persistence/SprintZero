@@ -155,9 +155,13 @@ const ParticipantsClientPage: FC = () => {
                                             <div className="flex flex-wrap gap-2">
                                                 {participant.data().personaIds?.map((personaId) => {
                                                     const persona = personasData?.find(persona => persona.id === personaId)
-                                                    return <Tag key={persona?.id} color="geekblue" icon={<UserOutlined />}>
-                                                        {persona?.name}
-                                                    </Tag>
+                                                    return (
+                                                        <Tag key={persona?.id} style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#geekblue" icon={<UserOutlined style={{ color: `#000000` }} />}>
+                                                            <span style={{ color: `#000000` }}>
+                                                                {persona?.name}
+                                                            </span>
+                                                        </Tag>
+                                                    )
                                                     // if (persona.id === participant.data().personaId) {
                                                     //     return (
                                                     //         <Tag key={persona.id} color="geekblue" icon={<UserOutlined />}>
@@ -169,49 +173,44 @@ const ParticipantsClientPage: FC = () => {
                                                     // }
                                                 })}
                                                 {participant.data().disabilities.auditory && (
-                                                    <Tag
-                                                        color="#DDE3D5"
-                                                        icon={<EarIcon className="mr-1.5 inline-block" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Auditory
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<EarIcon className="mr-1.5 inline-block" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Auditory
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.cognitive && (
-                                                    <Tag
-                                                        color="#DDE3D5"
-                                                        icon={<CognitionIcon className="mr-1.5 inline-block" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Cognitive
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<CognitionIcon className="mr-1.5 inline-block" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Cognitive
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.physical && (
-                                                    <Tag
-                                                        color="#DDE3D5"
-                                                        icon={<BoneIcon className="mr-1.5 inline-block stroke-current" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Physical
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<BoneIcon className="mr-1.5 inline-block stroke-current" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Physical
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.speech && (
-                                                    <Tag
-                                                        color="#DDE3D5"
-                                                        icon={<SoundOutlined className="inline-block" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Speech
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<SoundOutlined className="inline-block" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Speech
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.visual && (
-                                                    <Tag color="#DDE3D5" icon={<EyeOutlined />} className="flex items-center">
-                                                        Visual
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#FFF1F0" icon={<EyeOutlined style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Visual
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().phoneNumber && (
-                                                    <Tag color="#FFF1F0" icon={<PhoneOutlined />}>
-                                                        {participant.data().phoneNumber}
+                                                    <Tag style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#FFF1F0" icon={<PhoneOutlined style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            {participant.data().phoneNumber}</span>
                                                     </Tag>
                                                 )}
                                             </div>
