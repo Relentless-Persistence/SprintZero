@@ -18,6 +18,19 @@ import { UserConverter } from "~/types/db/Users"
 import { auth, db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
 
+export const productTypeOptions: SelectProps['options'] = [
+    { label: `Mobile`, value: `mobile` },
+    { label: `Tablet`, value: `tablet` },
+    { label: `Desktop`, value: `desktop` },
+    { label: `Watch`, value: `watch` },
+    { label: `Web`, value: `web` },
+    { label: `Augmented Reality`, value: `augmentedReality` },
+    { label: `Virtual Reality`, value: `virtualReality` },
+    { label: `Artificial Intelligence`, value: `artificialIntelligence` },
+    { label: `Humanoid`, value: `humanoid` },
+    { label: `API`, value: `api` },
+];
+
 async function fetchSubscriptionIdAndEmail(sessionId: string) {
     const response = await fetch(`/api/billing/retrieveSubscriptionIdAndCustomerEmail?sessionId=${sessionId}`);
     //const data = await response.json() as { subscriptionId: string, customerEmail: string };
@@ -130,18 +143,7 @@ const ConfigurationPageClientPage: FC = () => {
         },
     };
 
-    const productTypeOptions: SelectProps['options'] = [
-        { label: `Mobile`, value: `mobile` },
-        { label: `Tablet`, value: `tablet` },
-        { label: `Desktop`, value: `desktop` },
-        { label: `Watch`, value: `watch` },
-        { label: `Web`, value: `web` },
-        { label: `Augmented Reality`, value: `augmentedReality` },
-        { label: `Virtual Reality`, value: `virtualReality` },
-        { label: `Artificial Intelligence`, value: `artificialIntelligence` },
-        { label: `Humanoid`, value: `humanoid` },
-        { label: `API`, value: `api` },
-    ];
+
 
     const onFinish = async (values: { productName: string, productType: string[], members: { email1: string | null, email2?: string | null, email3?: string | null } }) => {
         if (hasSubmitted || !dbUser?.exists() || !user) return

@@ -13,6 +13,7 @@ import { z } from "zod"
 
 import type { FC } from "react"
 
+import { productTypeOptions } from "~/app/(authenticated)/(onboarding)/configuration/client"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import LinkTo from "~/components/LinkTo"
 import RhfInput from "~/components/rhf/RhfInput"
@@ -24,6 +25,7 @@ import { trpc } from "~/utils/trpc"
 
 const formSchema = ProductSchema.pick({
 	name: true,
+	productTypes: true,
 	cadence: true,
 	sprintStartDayOfWeek: true,
 	effortCostCurrencySymbol: true,
@@ -49,6 +51,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 		shouldFocusError: false,
 		defaultValues: {
 			name: product.data().name,
+			productTypes: product.data().productTypes,
 			cadence: product.data().cadence,
 			sprintStartDayOfWeek: product.data().sprintStartDayOfWeek,
 			effortCost: product.data().effortCost ? product.data()!.effortCost?.toString() : null,
@@ -61,6 +64,7 @@ const ConfigurationSettingsClientPage: FC = () => {
 		if (!product.exists() || hasSetInitialData.current) return
 		reset({
 			name: product.data().name,
+			productTypes: product.data().productTypes,
 			cadence: product.data().cadence,
 			sprintStartDayOfWeek: product.data().sprintStartDayOfWeek,
 			effortCost: product.data().effortCost ? product.data().effortCost?.toString() : null,
@@ -86,44 +90,68 @@ const ConfigurationSettingsClientPage: FC = () => {
 			</div>
 
 			<div className="flex gap-12">
-				<div className="flex flex-col">
-					<Card className="w-fit mb-6">
-						<form className="flex flex-col items-start gap-4">
-							<label className="flex flex-col gap-1">
-								<span className="font-semibold">Product Title</span>
-								<RhfInput
-									control={control}
-									name="name"
-									onChange={() => {
-										onSubmit().catch(console.error)
-									}}
-									className="w-72"
-								/>
-							</label>
+				<div className="flex w-1/2 flex-col">
+					<form className="flex flex-col items-start gap-5">
+						<label className="flex flex-col gap-2">
+							<span className="font-semibold">Product Title</span>
+							<RhfInput
+								control={control}
+								name="name"
+								onChange={() => {
+									onSubmit().catch(console.error)
+								}}
+								className="w-72"
+							/>
+						</label>
 
-							<label className="flex flex-col gap-1">
-								<span className="font-semibold">
-									Cadence <span className="font-normal text-textTertiary">(Weeks)</span>
-								</span>
-								<RhfSegmented
-									control={control}
-									name="cadence"
-									options={[
-										{ label: `One`, value: 1 },
-										{ label: `Two`, value: 2 },
-										{ label: `Three`, value: 3 },
-									]}
-									onChange={() => {
-										onSubmit().catch(console.error)
-									}}
-								/>
-							</label>
+						<label className="flex flex-col gap-2 w-full">
+							<span className="font-semibold">Product Type</span>
+							<RhfSelect
+								control={control}
+								style={{ width: `100%` }}
+								allowClear
+								name="productTypes"
+								options={productTypeOptions}
+								placeholder="eg. Tablet, Mobile, Web"
+								mode="multiple"
+								onChange={() => {
+									onSubmit().catch(console.error)
+								}}
+								className="w-full"
+							/>
+						</label>
 
-							<label className="flex flex-col gap-1">
-								<span className="font-semibold">Gate</span>
+
+
+						<label className="flex flex-col gap-2">
+							<span className="font-semibold">
+								Cadence <span className="font-normal text-textTertiary">(Weeks)</span>
+							</span>
+							<RhfSegmented
+								control={control}
+								name="cadence"
+								block
+								className="w-72"
+								style={{ background: `#EBEBEB` }}
+								options={[
+									{ label: `One`, value: 1 },
+									{ label: `Two`, value: 2 },
+									{ label: `Three`, value: 3 },
+								]}
+								onChange={() => {
+									onSubmit().catch(console.error)
+								}}
+							/>
+						</label>
+
+						<label className="flex flex-col gap-2 w-full">
+							<span className="font-semibold">Gate</span>
+							<div className="flex-grow">
 								<RhfSegmented
+									style={{ background: `#EBEBEB` }}
 									control={control}
 									name="sprintStartDayOfWeek"
+									block
 									options={[
 										{ label: `Monday`, value: 1 },
 										{ label: `Tuesday`, value: 2 },
@@ -134,44 +162,44 @@ const ConfigurationSettingsClientPage: FC = () => {
 									onChange={() => {
 										onSubmit().catch(console.error)
 									}}
-									className="w-fit"
+									className="w-full"
 								/>
-							</label>
+							</div>
+						</label>
 
-							<label className="flex flex-col gap-1">
-								<span className="font-semibold">
-									Cost per Story Point <span className="font-normal text-textTertiary">(optional)</span>
-								</span>
-								<RhfInput
-									control={control}
-									name="effortCost"
-									number="currency"
-									placeholder="0.00"
-									onChange={() => {
-										onSubmit().catch(console.error)
-									}}
-									addonAfter={
-										<RhfSelect
-											control={control}
-											name="effortCostCurrencySymbol"
-											onChange={() => {
-												onSubmit().catch(console.error)
-											}}
-											options={[
-												{ label: `$`, value: `dollar` },
-												{ label: `£`, value: `pound` },
-												{ label: `€`, value: `euro` },
-												{ label: `¥`, value: `yen` },
-												{ label: `₹`, value: `rupee` },
-											]}
-										/>
-									}
-								/>
-							</label>
-						</form>
-					</Card>
+						<label className="flex flex-col gap-2">
+							<span className="font-semibold">
+								Cost per Story Point <span className="font-normal text-textTertiary">(optional)</span>
+							</span>
+							<RhfInput
+								control={control}
+								name="effortCost"
+								number="currency"
+								placeholder="0.00"
+								onChange={() => {
+									onSubmit().catch(console.error)
+								}}
+								addonAfter={
+									<RhfSelect
+										control={control}
+										name="effortCostCurrencySymbol"
+										onChange={() => {
+											onSubmit().catch(console.error)
+										}}
+										options={[
+											{ label: `$`, value: `dollar` },
+											{ label: `£`, value: `pound` },
+											{ label: `€`, value: `euro` },
+											{ label: `¥`, value: `yen` },
+											{ label: `₹`, value: `rupee` },
+										]}
+									/>
+								}
+							/>
+						</label>
+					</form>
 
-					<div className="flex flex-col items-start gap-2">
+					<div className="flex flex-col items-start gap-2 mt-5">
 						<div className="leading-normal">
 							<h2 className="font-semibold">Erase All Data</h2>
 							<p className="text-sm text-textTertiary">
@@ -195,11 +223,11 @@ const ConfigurationSettingsClientPage: FC = () => {
 									.catch(console.error)
 							}}
 						>
-							<Button type="primary" icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
+							<Button icon={<FireFilled className="relative -top-[2.5px] text-sm text-error" />}>Halt + Catch Fire</Button>
 						</Popconfirm>
 					</div>
 				</div>
-				<div className="flex flex-col">
+				<div className="flex w-1/2 flex-col">
 					<div className="leading-normal mb-1">
 						<h2 className="font-semibold">Billing</h2>
 					</div>
