@@ -188,7 +188,7 @@ const ParticipantsClientPage: FC = () => {
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.visual && (
-                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#FFF1F0" icon={<EyeOutlined style={{ color: `#000000` }} />}>
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<EyeOutlined style={{ color: `#000000` }} />}>
                                                         <span style={{ color: `#000000` }}>
                                                             Visual
                                                         </span>

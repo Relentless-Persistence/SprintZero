@@ -18,7 +18,7 @@ export const DialogueParticipantSchema = z.object({
 	name: z.string({ invalid_type_error: `Required` }),
 	phoneNumber: z.string().nullable(),
 	status: z.enum([`identified`, `contacted`, `scheduled`, `interviewed`, `analyzing`, `processed`, `archived`]),
-	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable(),
+	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable().optional(),
 	title: z.enum([`dr`, `miss`, `mr`, `mrs`, `ms`, `prof`, `sir`]).nullable(),
 	transcript: z.string(),
 	transcriptAudio: z.string(),
