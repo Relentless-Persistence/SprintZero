@@ -140,7 +140,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 							)}
 							{participantData?.status && (
 								<Tag color="#585858" icon={<FlagOutlined />}>
-									{statuses.find((status) => status[0] === participantData.status)![1]}
+									{statuses[participantData.status]}
 								</Tag>
 							)}
 							{participantData?.disabilities.auditory && (
