@@ -404,7 +404,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
         <ParticipantEditForm participant={participant} onFinish={close} />
       ) : (
         <form className="grid h-full grid-cols-[3fr_2fr] gap-6">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 grow">
 
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold">Interview Transcript</p>
@@ -415,50 +415,56 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
               {isEditorOpen && !participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => setIsEditorOpen(false)}>Upload audio file</Button>}
             </div>
 
-            {!participantData?.transcript && !isEditorOpen ?
-              !loadingTranscript ? <>
-                <div className="flex flex-col gap-2 items-center">
-                  <Button type="primary" onClick={() => setIsEditorOpen(true)}>Open Editor</Button>
-                  <Text>or</Text>
-                </div>
-                <DragDrop setAudioUrl={setAudioUrl} setStorageBucketUri={setStorageBucketUri} />
-              </>
-                :
-                <div style={{ position: `relative`, justifyContent: `center` }}>
-                  <RhfTextArea
-                    control={control}
-                    name="transcript"
-                    onChange={() => {
-                      onSubmit().catch(console.error)
-                    }}
-                    rows={12}
-                    wrapperClassName="grow"
-                    className="!h-full !resize-none"
-                  />
-                  {!participantData?.transcript && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
-                    <Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 9 }} />
-                  </div>}
-                </div>
+            {
+              // !participantData?.transcript && !isEditorOpen ?
+              //   !loadingTranscript ? 
 
-              :
+              //   <>
+              //     <div className="flex flex-col gap-2 items-center">
+              //       <Button type="primary" onClick={() => setIsEditorOpen(true)}>Open Editor</Button>
+              //       <Text>or</Text>
+              //     </div>
+              //     <DragDrop setAudioUrl={setAudioUrl} setStorageBucketUri={setStorageBucketUri} />
+              //   </>
+              //     :
+              //     <div style={{ position: `relative`, justifyContent: `center` }}>
+              //       <RhfTextArea
+              //         control={control}
+              //         name="transcript"
+              //         onChange={() => {
+              //           onSubmit().catch(console.error)
+              //         }}
+              //         rows={12}
+              //         wrapperClassName="grow"
+              //         className="!h-full !resize-none"
+              //       />
+              //       {!participantData?.transcript && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
+              //         <Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 9 }} />
+              //       </div>}
+              //     </div>
 
-              <div style={{ position: `relative`, justifyContent: `center` }}>
-                <RhfTextArea
-                  control={control}
-                  name="transcript"
-                  onChange={() => {
-                    onSubmit().catch(console.error)
-                  }}
-                  rows={10}
-                  wrapperClassName="grow"
-                  className="!h-full !resize-none"
-                />
-              </div>
-
-
+              //   :
             }
 
-            {participantData?.transcriptAudio && <figure>
+            <div style={{ position: `relative`, justifyContent: `center`, height: `100%` }} className="flex-grow h-full">
+              <RhfTextArea
+
+                control={control}
+                name="transcript"
+                onChange={() => {
+                  onSubmit().catch(console.error)
+                }}
+                rows={12}
+                wrapperClassName="grow"
+                className="!h-full !resize-none"
+                style={{ height: `100%` }}
+              />
+            </div>
+
+
+
+
+            {/* {participantData?.transcriptAudio && <figure>
               <audio
                 style={{ width: `100%` }}
                 className="mt-2"
@@ -468,7 +474,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                   Download audio
                 </LinkTo>
               </audio>
-            </figure>}
+            </figure>} */}
           </div>
 
           <div className="flex flex-col gap-4">
