@@ -1,6 +1,10 @@
 
 import Stripe from 'stripe';
 
+interface IError {
+    message: string;
+}
+
 const stripe = new Stripe(process.env.STRIPE_SECRET!, {
     apiVersion: `2022-11-15`,
 });
@@ -22,6 +26,7 @@ export default async function handler(
         res.status(200).json({ subscriptionId, customerEmail });
     } catch (error) {
         console.error(`Error retrieving subscription ID:`, error);
-        res.status(500).json({ error: `An error occurred while retrieving the subscription ID.` });
+        const errMsg = (error as IError).message;
+        res.status(500).json({ error: errMsg });
     }
 }
