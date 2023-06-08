@@ -298,68 +298,16 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
               )
               }
 
-              {(participantData?.disabilities.auditory || participantData?.disabilities.cognitive || participantData?.disabilities.physical || participantData?.disabilities.speech || participantData?.disabilities.visual || participantData?.timing) ? (
-                // <>
-                //   {participantData.disabilities.auditory && (
-                //     <Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
-                //       Auditory
-                //     </Tag>
-                //   )}
-                //   {participantData.disabilities.cognitive && (
-                //     <Tag
-                //       color="#585858"
-                //       icon={<CognitionIcon className="mr-1.5 inline-block" />}
-                //       className="flex items-center"
-                //     >
-                //       Cognitive
-                //     </Tag>
-                //   )}
-                //   {participantData.disabilities.physical && (
-                //     <Tag color="#585858" icon={<BoneIcon className="mr-1.5 inline-block" />} className="flex items-center">
-                //       Physical
-                //     </Tag>
-                //   )}
-                //   {participantData.disabilities.speech && (
-                //     <Tag color="#585858" icon={<SoundOutlined />}>
-                //       Speech
-                //     </Tag>
-                //   )}
-                //   {participantData.disabilities.visual && (
-                //     <Tag color="#585858" icon={<EyeOutlined />}>
-                //       Visual
-                //     </Tag>
-                //   )}
-                //   {participantData.timing && (
-                //     <Tag color="#585858" icon={<SyncOutlined />}>
-                //       {timings.find((timing) => timing[0] === participantData.timing)![1]}
-                //     </Tag>
-                //   )}
+              <Popover placement="bottomLeft" content={
+                participant && <ParticipantDisability participant={participant} onFinish={close} />
+              }
+                trigger="click">
 
-                // </>
+                <Button onClick={() => setParticipantDisabilityPopoverIsOpen(!participantDisabilityPopoverIsOpen)} size="small" color="#585858" icon={<PhysicalDisability className="mr-1.5 inline-block" />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                  Disability
+                </Button>
+              </Popover>
 
-                <Popover placement="bottomLeft" content={
-                  participant && <ParticipantDisability participant={participant} onFinish={close} />
-                }
-                  trigger="click">
-
-                  <Button onClick={() => setParticipantDisabilityPopoverIsOpen(!participantDisabilityPopoverIsOpen)} size="small" color="#585858" icon={<PhysicalDisability className="mr-1.5 inline-block" />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
-                    Set
-                  </Button>
-                </Popover>
-
-              ) :
-                (
-                  <Popover placement="bottomLeft" content={
-                    participant && <ParticipantDisability participant={participant} onFinish={close} />
-                  }
-                    trigger="click">
-
-                    <Button onClick={() => setParticipantDisabilityPopoverIsOpen(!participantDisabilityPopoverIsOpen)} size="small" color="#585858" icon={<PhysicalDisability className="mr-1.5 inline-block" />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
-                      Not Set
-                    </Button>
-                  </Popover>
-
-                )}
             </div>
           </div>
         )
