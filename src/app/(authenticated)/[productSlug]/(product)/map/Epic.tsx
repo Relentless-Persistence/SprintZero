@@ -93,7 +93,7 @@ const Epic: FC<EpicProps> = ({ epicId, dragInfo, inert = false, measures }) => {
 							<p className="px-0.5">{localEpicName || `_`}</p>
 							<input
 								value={localEpicName}
-								autoFocus={!epic.initialRenameDone && !editMode}
+								autoFocus={!epic.initialRenameDone && !editMode && user.id === epic.updatedAtUserId}
 								onFocus={(e) => e.target.select()}
 								onBlur={() => {
 									if (localEpicName !== ``)
