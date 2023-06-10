@@ -111,6 +111,8 @@ const HuddleClientPage: FC = () => {
 													return (
 														<Dropdown
 															trigger={[`click`]}
+															disabled={blockerStoryOptions.length === 0}
+
 															menu={{
 																items:
 																	blockerStoryOptions.length === 0
@@ -134,7 +136,7 @@ const HuddleClientPage: FC = () => {
 															}}
 														>
 															<Button className="flex items-center justify-between">
-																Add blocker
+																{blockerStoryOptions.length === 0 ? `No more stories assigned to you` : `Add blocker`}
 																<DownOutlined />
 															</Button>
 														</Dropdown>
@@ -182,6 +184,7 @@ const HuddleClientPage: FC = () => {
 													return (
 														<Dropdown
 															trigger={[`click`]}
+															disabled={todayStoryOptions.length === 0}
 															menu={{
 																items:
 																	todayStoryOptions.length === 0
@@ -205,7 +208,7 @@ const HuddleClientPage: FC = () => {
 															}}
 														>
 															<Button className="flex items-center justify-between">
-																Add story
+																{todayStoryOptions.length === 0 ? `No more stories assigned to you` : `Add story`}
 																<DownOutlined />
 															</Button>
 														</Dropdown>
@@ -253,6 +256,7 @@ const HuddleClientPage: FC = () => {
 													return (
 														<Dropdown
 															trigger={[`click`]}
+															disabled={yesterdayStoryOptions.length === 0}
 															menu={{
 																items:
 																	yesterdayStoryOptions.length === 0
@@ -276,7 +280,7 @@ const HuddleClientPage: FC = () => {
 															}}
 														>
 															<Button className="flex items-center justify-between">
-																Add story
+																{yesterdayStoryOptions.length === 0 ? `No more stories assigned to you` : `Add story`}
 																<DownOutlined />
 															</Button>
 														</Dropdown>
@@ -353,6 +357,7 @@ const HuddleClientPage: FC = () => {
 													return (
 														<Dropdown
 															trigger={[`click`]}
+															disabled={blockerStoryOptions.length === 0}
 															menu={{
 																items:
 																	blockerStoryOptions.length === 0
@@ -376,7 +381,7 @@ const HuddleClientPage: FC = () => {
 															}}
 														>
 															<Button className="flex items-center justify-between">
-																Add blocker
+																{blockerStoryOptions.length === 0 ? `No more stories assigned to you` : `Add blocker`}
 																<DownOutlined />
 															</Button>
 														</Dropdown>
@@ -424,6 +429,7 @@ const HuddleClientPage: FC = () => {
 													return (
 														<Dropdown
 															trigger={[`click`]}
+															disabled={todayStoryOptions.length === 0}
 															menu={{
 																items:
 																	todayStoryOptions.length === 0
@@ -447,7 +453,7 @@ const HuddleClientPage: FC = () => {
 															}}
 														>
 															<Button className="flex items-center justify-between">
-																Add story
+																{todayStoryOptions.length === 0 ? `No more stories assigned to you` : `Add story`}
 																<DownOutlined />
 															</Button>
 														</Dropdown>
@@ -495,6 +501,7 @@ const HuddleClientPage: FC = () => {
 													return (
 														<Dropdown
 															trigger={[`click`]}
+															disabled={yesterdayStoryOptions.length === 0}
 															menu={{
 																items:
 																	yesterdayStoryOptions.length === 0
@@ -518,7 +525,7 @@ const HuddleClientPage: FC = () => {
 															}}
 														>
 															<Button className="flex items-center justify-between">
-																Add story
+																{yesterdayStoryOptions.length === 0 ? `No more stories assigned to you` : `Add story`}
 																<DownOutlined />
 															</Button>
 														</Dropdown>
