@@ -88,7 +88,7 @@ const VersionList: FC = () => {
 		//checkIfVersionIsValid(newVersionInputValue)
 
 		const existingDoc = (
-			await getDocs(query(collection(product.ref, `Versions`), where(`name`, `==`, newVersionInputValue)))
+			await getDocs(query(collection(product.ref, `Versions`), where(`name`, `==`, newVersionInputValue), where(`deleted`, `!=`, true)))
 		).docs[0]
 		if (existingDoc) {
 			notification.warning({ message: `Release number you entered already exists.` })
@@ -135,7 +135,9 @@ const VersionList: FC = () => {
 			}}
 			activeKey={currentVersionId}
 			items={versions.docs
-				.filter((version) => !versionsToBeDeleted.includes(version.id))
+				.filter((version) =>
+					!versionsToBeDeleted.includes(version.id) && !version.data().deleted
+				)
 				.sort((a, b) => a.data().name.localeCompare(b.data().name))
 				.map((version) => ({
 					key: version.id,
@@ -186,7 +188,7 @@ const VersionList: FC = () => {
 						{
 							key: `__NEW_VERSION__`,
 							label: (
-								<Input.Group compact className="-my-2">
+								<Input.Group compact className="-my-2 mt-1 mb-1">
 									<Input
 										style={{ textAlign: `left` }}
 										ref={inputRef}

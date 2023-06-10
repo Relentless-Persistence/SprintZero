@@ -29,7 +29,7 @@ export const productTypeOptions: SelectProps['options'] = [
     { label: `Artificial Intelligence`, value: `artificialIntelligence` },
     { label: `Humanoid`, value: `humanoid` },
     { label: `API`, value: `api` },
-];
+].sort((a, b) => a.label.localeCompare(b.label));
 
 async function fetchSubscriptionIdAndEmail(sessionId: string) {
     const response = await fetch(`/api/billing/retrieveSubscriptionIdAndCustomerEmail?sessionId=${sessionId}`);

@@ -160,6 +160,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({ versionName, lastUpdated }) =
 			setEditMode(false)
 			return
 		}
+
 		const batch = writeBatch(db)
 
 		itemsToBeDeleted.forEach((id) => {
