@@ -1,3 +1,4 @@
+import { ArrowRightOutlined, CopyOutlined, FileTextOutlined, ReadOutlined } from "@ant-design/icons"
 import { Button, Card, Tag } from "antd"
 import dayjs from "dayjs"
 import { doc, updateDoc } from "firebase/firestore"
@@ -7,10 +8,12 @@ import { createPortal } from "react-dom"
 
 import type { taskColumns } from "./GeneralTask"
 import type { FC } from "react"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 import type { Task } from "~/types/db/Products/Tasks";
 
 import TaskDrawer from "./TaskDrawer"
 import { useAppContext } from "../../../AppContext"
+import { useStoryMapContext } from "../../map/StoryMapContext"
 import { TaskConverter } from "~/types/db/Products/Tasks"
 
 interface MyTask extends Task {
@@ -20,16 +23,17 @@ interface MyTask extends Task {
 export type TaskColumnProps = {
 	columnName: string
 	title: string
-	tasks: MyTask[]
+	tasks: MyTask[],
+	storyMapItems: StoryMapItem[]
+
 }
 
-const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
+const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapItems }) => {
 
 	const { product } = useAppContext()
 	const [editTask, setEditTask] = useState(false)
 	const [selectedTask, setSelectedTask] = useState<MyTask | null>(null)
 	const [isBeingDragged, setIsBeingDragged] = useState<string | null>(null)
-
 
 	//const ref = useRef<HTMLDivElement>(null)
 
@@ -78,8 +82,31 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 				<div className="flex flex-col gap-4">
 					{tasks.length > 0 ? tasks
 						.filter((task) => task.status === columnName)
-						.map((task, index) => (
-							<>
+						.map((task, index) => {
+
+							let storyName = ``
+							let featureName = ``
+							let epicName = ``
+
+							if (task.type === `acceptanceCriteria` || task.type === `bug`) {
+								const selectedStory = storyMapItems.find(item => task.storyId === item.id);
+
+								// const selectedStoryId = selectedStory?.id;
+								storyName = selectedStory?.name ?? ``;
+								// const openDrawer = () => {
+								//   setStoryId(selectedStoryId)
+								//   setViewStory(true)
+								// };
+
+								const selectedFeatureId: string = selectedStory?.parentId ?? ``;
+								const feature = storyMapItems.find(story => story.id === selectedFeatureId);
+								featureName = feature?.name ?? ``;
+
+								const epic = storyMapItems.find(story => story.id === feature?.parentId);
+								epicName = epic?.name ?? ``;
+							}
+
+							return (<>
 								<motion.div
 									key={task.id}
 									layoutId={`board-task-${task.id}`}
@@ -132,6 +159,16 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 											</Button>
 										}
 									>
+										{(task.type === `acceptanceCriteria` || task.type === `bug`) && (
+											<div className="flex flex-wrap item-center gap-1">
+												<Tag icon={<ReadOutlined />}>{epicName}</Tag>
+												<ArrowRightOutlined />
+												<Tag icon={<CopyOutlined />}>{featureName}</Tag>
+												<ArrowRightOutlined />
+												<Tag icon={<FileTextOutlined />}>{storyName}</Tag>
+											</div>
+										)}
+
 										{task.dueDate && <Tag>{dayjs(task.dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}</Tag>}
 									</Card>
 								</motion.div>
@@ -164,8 +201,9 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks }) => {
 										document.body,
 									)}
 							</>
+							)
 
-						)) : null}
+						}) : null}
 				</div>
 			</Card>
 

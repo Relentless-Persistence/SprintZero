@@ -2,6 +2,7 @@
 // import { useState } from "react"
 
 import type { FC } from "react"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 import type { Task } from "~/types/db/Products/Tasks"
 
 import TaskColumn from "./TaskColumn"
@@ -11,16 +12,18 @@ interface MyTask extends Task {
 }
 
 interface Props {
-	tasks: MyTask[];
+	tasks: MyTask[],
+	storyMapItems: StoryMapItem[]
 }
 
-const GeneralTask: FC<Props> = ({ tasks }) => {
+const GeneralTask: FC<Props> = ({ tasks, storyMapItems }) => {
 	return (
 		<div className="flex h-full w-full grow overflow-x-auto pb-4">
 			<div className="grid h-full grid-cols-[repeat(4,20rem)] gap-4">
 				{
 					Object.entries(taskColumns).map(([columnName, title]) => (
 						<TaskColumn
+							storyMapItems={storyMapItems}
 							key={columnName}
 							columnName={columnName}
 							title={title}

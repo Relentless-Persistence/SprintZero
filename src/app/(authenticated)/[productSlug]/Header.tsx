@@ -190,7 +190,7 @@ const Header: FC = () => {
 						</div>
 						<div className="flex items-center justify-between border-t border-border pt-[4px]">
 							<p className="text-end text-sm text-primary italic capitalize">{onlineStatus}</p>
-							<p className="text-end text-sm text-textTertiary">v1.0</p>
+							<p className="text-end text-sm text-textTertiary"><span className="font-semibold">Basic</span> [v1.0.0]</p>
 						</div>
 					</div>
 				}

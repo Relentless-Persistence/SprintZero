@@ -11,6 +11,7 @@ import type { Task } from "~/types/db/Products/Tasks"
 
 import GeneralTasks from "./GeneralTask"
 import TaskDrawer from "./TaskDrawer"
+import { useStoryMapContext } from "../../map/StoryMapContext"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 import { TaskConverter } from "~/types/db/Products/Tasks"
@@ -29,20 +30,20 @@ const TasksClientPage: FC = () => {
   )
   useErrorHandler(tasksError)
 
-  const [storyMapItems, , storyMapItemsError] = useCollection(
+  const [storyMapItemsSnap, , storyMapItemsSnapError] = useCollection(
     collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
   )
-  useErrorHandler(storyMapItemsError)
+  useErrorHandler(storyMapItemsSnapError)
 
-  if (!storyMapItems) return null
+  if (!storyMapItemsSnap) return null
 
-  const storyMaps = storyMapItems.docs.map((item) => item.data())
+  const storyMapsItems = storyMapItemsSnap.docs.map((item) => item.data())
 
-  const totalAcceptanceCriteria = storyMaps.reduce((sum, item) => {
+  const totalAcceptanceCriteria = storyMapsItems.reduce((sum, item) => {
     return sum + item.acceptanceCriteria.length;
   }, 0);
 
-  const totalBugs = storyMaps.reduce((sum, item) => {
+  const totalBugs = storyMapsItems.reduce((sum, item) => {
     return sum + item.bugs.length;
   }, 0);
 
@@ -96,7 +97,7 @@ const TasksClientPage: FC = () => {
               key: `acceptance criteria`,
               children: (
 
-                <GeneralTasks tasks={acTasks} />
+                <GeneralTasks tasks={acTasks} storyMapItems={storyMapsItems} />
               ),
             },
             {
@@ -104,7 +105,7 @@ const TasksClientPage: FC = () => {
               key: `bugs`,
               children: (
 
-                <GeneralTasks tasks={bugTasks} />
+                <GeneralTasks tasks={bugTasks} storyMapItems={storyMapsItems} />
 
               ),
             },

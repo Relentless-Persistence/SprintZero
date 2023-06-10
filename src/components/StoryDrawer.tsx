@@ -246,7 +246,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		const newAcTask = await addDoc(collection(product.ref, `Tasks`).withConverter(TaskConverter), {
 			title: newAcceptanceCriterionInput,
 			type: `acceptanceCriteria`,
-			status: `todo`
+			status: `todo`,
+			storyId: story.id
 		})
 
 		await updateItem(product, storyMapItems, versions, story.id, {
@@ -277,7 +278,8 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		const newBugTask = await addDoc(collection(product.ref, `Tasks`).withConverter(TaskConverter), {
 			title: newBugInput,
 			type: `bug`,
-			status: `todo`
+			status: `todo`,
+			storyId: story.id,
 		})
 
 		await updateItem(product, storyMapItems, versions, story.id, {
