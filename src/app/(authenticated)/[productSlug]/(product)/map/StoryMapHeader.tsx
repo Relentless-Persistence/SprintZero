@@ -219,7 +219,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({ versionName, lastUpdated }) =
 								onClick={() => {
 									redo().catch(console.error)
 								}}
-							//disabled={editMode}
+								disabled={editMode}
 							/>
 						</Tooltip>
 						<Tooltip placement="bottom" title="Undo">
@@ -229,6 +229,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({ versionName, lastUpdated }) =
 								onClick={() => {
 									undo().catch(console.error)
 								}}
+								disabled={editMode}
 							/>
 						</Tooltip>
 						{!editMode ? (<Tooltip placement="bottom" title="Edit">
