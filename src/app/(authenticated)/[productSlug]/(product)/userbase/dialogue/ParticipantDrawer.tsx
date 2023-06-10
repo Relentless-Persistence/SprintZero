@@ -85,7 +85,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 		defaultValues: {
 			availability: participantData?.availability ?? [],
 			email: participantData?.email ?? null,
-			name: participantData?.name ?? `New Participant`,
+			name: participantData?.name ?? ``,
 			phoneNumber: participantData?.phoneNumber ?? null,
 			title: participantData?.title ?? null,
 			transcript: participantData?.transcript ?? ``,

@@ -156,7 +156,7 @@ const DialogueClientPage: FC = () => {
 							email: null,
 							location: ``,
 							location_id: ``,
-							name: `New Participant`,
+							name: ``,
 							phoneNumber: ``,
 							status: `identified`,
 							timing: null,

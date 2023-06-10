@@ -2,7 +2,7 @@
 
 import { MinusCircleOutlined } from "@ant-design/icons"
 import Icon from "@ant-design/icons/lib/components/Icon"
-import { Button, Input, Tabs, Tag } from "antd"
+import { Alert, Button, Input, Tabs, Tag, notification } from "antd"
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
 import { debounce } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -51,6 +51,7 @@ const VersionList: FC = () => {
 
 	useEffect(() => {
 		if (inputRef.current && !isVersionValid && newVersionInputValue) {
+			//console.log(`have reached until focus code`)
 			inputRef.current.focus();
 		}
 	}, [newVersionInputValue, isVersionValid]);
@@ -89,7 +90,10 @@ const VersionList: FC = () => {
 		const existingDoc = (
 			await getDocs(query(collection(product.ref, `Versions`), where(`name`, `==`, newVersionInputValue)))
 		).docs[0]
-		if (existingDoc) throw new Error(`Version already exists.`)
+		if (existingDoc) {
+			notification.warning({ message: `Release number you entered already exists.` })
+			throw new Error(`Version already exists.`)
+		}
 
 		const data: Version = {
 			deleted: false,
