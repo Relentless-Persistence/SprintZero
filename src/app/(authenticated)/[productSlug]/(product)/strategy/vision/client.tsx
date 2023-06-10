@@ -205,7 +205,9 @@ const VisionsClientPage: FC = () => {
               current === 0 && (
                 <Card type="inner" title="What unique benefit are you offering to users?">
                   <div style={{ height: `220px`, overflow: `auto` }} className="pt-3 pb-3">
-                    <TextArea rows={8} value={valueProposition} onChange={(e) => setValueProposition(e.target.value)} />
+                    <TextArea rows={8} value={valueProposition} onChange={(e) => setValueProposition(e.target.value)}
+                      placeholder="Apple's Vision Pro is super cool because it can help your apps do awesome things like figure out what's in pictures and recognize faces. It can even understand different scenes! This makes your apps smarter and more fun to use. Plus, Apple takes care of the privacy stuff, so you know it's safe for everyone."
+                    />
                   </div>
                 </Card>
               )
@@ -257,9 +259,9 @@ const VisionsClientPage: FC = () => {
                 >
                   <div style={{ height: `220px`, overflow: `auto` }} className="pt-3 pb-3">
                     {
-                      statementEditMode ? <TextArea rows={8} onChange={(e) => setProductVision(e.target.value)} value={productVision} />
+                      statementEditMode ? <TextArea rows={6} style={{ fontWeight: 600, fontSize: 20, color: `rgba(0, 0, 0, 0.65)` }} onChange={(e) => setProductVision(e.target.value)} value={productVision} />
                         :
-                        <p style={{ fontWeight: 600, fontSize: 20, color: `rgba(0, 0, 0, 0.25)` }}>{generatingVision ? (
+                        <p style={{ fontWeight: 600, fontSize: 20, color: `rgba(0, 0, 0, 0.65)` }}>{generatingVision ? (
                           //<div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
                           <Skeleton active loading style={{ height: `50px` }} paragraph={{ rows: 5 }} />
                           //</div>
