@@ -13,6 +13,7 @@ import type { FC } from "react";
 // import ParticipantCard from "./ParticipantCard"
 import ParticipantDrawer from "./ParticipantDrawer";
 import { useAppContext } from "../../../AppContext"
+import LinkTo from "~/components/LinkTo";
 import { DialogueParticipantConverter } from "~/types/db/Products/DialogueParticipants";
 import { PersonaConverter } from "~/types/db/Products/Personas";
 import BoneIcon from "~public/icons/bone.svg"
@@ -116,7 +117,39 @@ const ParticipantsClientPage: FC = () => {
                                     <span
                                     // style={{ color: `rgba(0,0,0.45)` }}
                                     >
-                                        Add a participant using the <span style={{ color: `#0958D9` }}>Add</span> button at the top right of your screen to populate this section
+                                        Add a participant using the <LinkTo href="#"
+                                            onClick={() => {
+                                                addDoc(collection(product.ref, `DialogueParticipants`).withConverter(DialogueParticipantConverter), {
+                                                    availability: [],
+                                                    disabilities: {
+                                                        auditory: false,
+                                                        cognitive: false,
+                                                        physical: false,
+                                                        speech: false,
+                                                        visual: false,
+                                                    },
+                                                    audioFilePath: ``,
+                                                    email: null,
+                                                    location: ``,
+                                                    location_id: ``,
+                                                    name: `New Participant`,
+                                                    phoneNumber: ``,
+                                                    status: `identified`,
+                                                    timing: null,
+                                                    title: null,
+                                                    transcript: ``,
+                                                    transcriptAudio: ``,
+                                                    updatedAt: Timestamp.now(),
+                                                    wiki_link: ``,
+                                                    personaId: null,
+                                                    updatedAtUserId: user.id,
+                                                })
+                                                    .then((docRef) => {
+                                                        setActiveParticipant(docRef.id)
+                                                    })
+                                                    .catch(console.error)
+                                            }}
+                                            style={{ color: `#0958D9` }}>Add</LinkTo> button at the top right of your screen to populate this section
                                     </span>
                                 }
                             />

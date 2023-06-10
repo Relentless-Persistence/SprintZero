@@ -16,6 +16,7 @@ import type { FC } from "react";
 
 import TextareaCard from "./TextareaCard";
 import { useAppContext } from "../../../AppContext"
+import LinkTo from "~/components/LinkTo";
 import { DialogueParticipantConverter } from "~/types/db/Products/DialogueParticipants";
 import { PersonaConverter } from "~/types/db/Products/Personas";
 import { ChangeConverter, CriticalityConverter, FrustrationConverter, GoalConverter, InteractionConverter, PriorityConverter, ResponsibilityConverter } from "~/types/db/Products/Personas/Goals";
@@ -173,7 +174,7 @@ const PersonasClientPage: FC = () => {
                                     <span
                                     // style={{ color: `rgba(0,0,0.45)` }}
                                     >
-                                        Navigate to <span style={{ color: `#0958D9` }}>Strategy &gt; Kickoff</span> and add a persona to populate this section
+                                        Navigate to <LinkTo href={`/${product.id}/strategy/kickoff`} style={{ color: `#0958D9` }}>Strategy &gt; Kickoff</LinkTo> and add a persona to populate this section
                                     </span>
                                 }
                             />
