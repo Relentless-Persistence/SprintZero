@@ -105,8 +105,16 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
   const [loadingTranscript, setLoadingTranscrript] = useState(false)
   const [participantStatusPopoverIsOpen, setParticipantStatusPopoverIsOpen] = useState(false)
   const [participantDisabilityPopoverIsOpen, setParticipantDisabilityPopoverIsOpen] = useState(false)
-  const [participantStatusKey, setParticipantStatusKey] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![0])
-  const [participantStatusLabel, setParticipantStatusLabel] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![1])
+
+  const participantStatusEntry = Object.entries(statuses).find(([key]) => participantData && key === participantData.status);
+
+  const [participantStatusKey, setParticipantStatusKey] = useState<string>(participantStatusEntry ? participantStatusEntry[0] : ``);
+  const [participantStatusLabel, setParticipantStatusLabel] = useState<string>(participantStatusEntry ? participantStatusEntry[1] : ``);
+
+
+
+  // const [participantStatusKey, setParticipantStatusKey] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![0])
+  // const [participantStatusLabel, setParticipantStatusLabel] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![1])
 
   type statusKey = keyof typeof statuses
   const handleParticipantStatusChange = async ({ key }: { key: string }) => {
@@ -153,7 +161,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 
   useEffect(() => {
     if (!participantData) return
-    setValue(`transcript`, participantData.transcript)
+    setValue(`transcript`, participantData.transcript ?? ``)
     setValue(`name`, participantData.name)
     setValue(`email`, participantData.email)
     setValue(`phoneNumber`, participantData.phoneNumber)
@@ -356,9 +364,9 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold">Interview Transcript</p>
-              {participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => {
+              {/* {participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => {
                 deleteAudio().catch(console.error)
-              }} disabled={loadingTranscript}>Replace audio file</Button>}
+              }} disabled={loadingTranscript}>Replace audio file</Button>} */}
 
               {isEditorOpen && !participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => setIsEditorOpen(false)}>Upload audio file</Button>}
             </div>

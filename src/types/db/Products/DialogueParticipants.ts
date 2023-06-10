@@ -20,7 +20,7 @@ export const DialogueParticipantSchema = z.object({
 	status: z.enum([`identified`, `contacted`, `scheduled`, `interviewed`, `analyzing`, `processed`, `archived`]),
 	timing: z.enum([`permanent`, `temporary`, `situational`]).nullable().optional(),
 	title: z.enum([`dr`, `miss`, `mr`, `mrs`, `ms`, `prof`, `sir`]).nullable(),
-	transcript: z.string(),
+	transcript: z.string().nullable(),
 	transcriptAudio: z.string(),
 	updatedAt: timestampSchema,
 	wiki_link: z.string(),
