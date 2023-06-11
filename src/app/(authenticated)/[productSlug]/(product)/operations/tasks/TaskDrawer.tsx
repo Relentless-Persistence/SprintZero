@@ -1,4 +1,4 @@
-import { Button, Checkbox, DatePicker, Drawer, Input, Select } from "antd"
+import { Button, Checkbox, DatePicker, Drawer, Input, Select, TimePicker } from "antd"
 import dayjs from "dayjs"
 import { Timestamp, addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { nanoid } from "nanoid"
@@ -69,6 +69,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 		if (data) {
 			await updateDoc(doc(product.ref, `Tasks`, data.id), {
 				...updatedTask,
+				dueDate: dueDate ? Timestamp.fromDate(dueDate.toDate()) : null,
 			})
 		} else {
 			await addDoc(collection(product.ref, `Tasks`), {
@@ -84,9 +85,19 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 		setNewTask(false)
 	}
 
-	const onChangeDate: DatePickerProps['onChange'] = (date) => {
-		setDueDate(dayjs(date, dateFormat))
-	}
+	const onChangeDate = (date: DatePickerProps['value'], dateString: string) => {
+		console.log(dateString);
+
+		if (dateString) {
+			const dateTime = dayjs(dateString, `YYYY-MM-DD HH:mm:ss`);
+			console.log(dateTime);
+			setDueDate(dateTime);
+		} else {
+			setDueDate(null);  // clear the date when input is cleared
+		}
+	};
+
+
 
 	const onChangeSubtask = (index: number): void => {
 		const newSubtasks = [...subtasks]
@@ -164,7 +175,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
 						<p className="text-lg font-semibold">Due Date / Time</p>
-						<DatePicker value={dueDate} format={dateFormat} onChange={onChangeDate} />
+						<DatePicker showTime value={dueDate} format="YYYY-MM-DD HH:mm:ss" onChange={onChangeDate} />
 						{/* <TimePicker /> */}
 					</div>
 
