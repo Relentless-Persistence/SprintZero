@@ -1,5 +1,5 @@
 import { AppleFilled, NotificationOutlined, SettingOutlined } from "@ant-design/icons"
-import { Button, Card, DatePicker, Dropdown, Skeleton } from "antd"
+import { Button, Card, DatePicker, Dropdown, Segmented, Skeleton } from "antd"
 import dayjs from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
 import { doc, updateDoc } from "firebase/firestore"
@@ -24,6 +24,7 @@ const FunCard: FC = () => {
 	const [songName, setSongName] = useState<string | undefined>(undefined)
 	const [clues, setClues] = useState<string[] | undefined>(undefined)
 	const [showSong, setShowSong] = useState(false)
+	const [preferredMusicClient, setPreferredMusicClient] = useState(user.data().preferredMusicClient)
 
 	const generateRandomDate = async () => {
 		const randomYear = Math.floor(random(1960, 2020))
@@ -101,49 +102,70 @@ const FunCard: FC = () => {
 				</div>
 			}
 			extra={
-				<Dropdown
-					trigger={[`click`]}
-					placement="bottomRight"
-					menu={{
-						selectable: true,
-						selectedKeys: [user.data().preferredMusicClient],
-						items: [
-							{
-								key: `apple`,
-								label: (
-									<div
-										className="flex items-center gap-2"
-										onClick={() => {
-											updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
-												preferredMusicClient: `appleMusic`,
-											}).catch(console.error)
-										}}
-									>
-										<AppleFilled />
-										<span>Apple Music</span>
-									</div>
-								),
-							},
-							{
-								key: `spotify`,
-								label: (
-									<div
-										className="flex items-center gap-2"
-										onClick={() => {
-											updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
-												preferredMusicClient: `spotify`,
-											}).catch(console.error)
-										}}
-									>
-										<SpotifyIcon /> <span>Spotify</span>
-									</div>
-								),
-							},
-						],
+				<Segmented
+					options={[
+						{
+							value: `spotify`,
+							icon: <SpotifyIcon color="#52C41A" className="mr-1.5 inline-block" />,
+						},
+						{
+							value: `appleMusic`,
+							icon: <AppleFilled style={{ color: `#F5222D` }} />,
+						},
+					]}
+					value={preferredMusicClient}
+					onChange={(newValue) => {
+						const newMusicClient = newValue as "appleMusic" | "spotify";
+						setPreferredMusicClient(newMusicClient);
+						updateDoc(doc(db, `Users`, user.id), {
+							preferredMusicClient: newMusicClient,
+						}).catch(console.error);
 					}}
-				>
-					<SettingOutlined className="text-lg" />
-				</Dropdown>
+				/>
+
+				// <Dropdown
+				// 	trigger={[`click`]}
+				// 	placement="bottomRight"
+				// 	menu={{
+				// 		selectable: true,
+				// 		selectedKeys: [user.data().preferredMusicClient],
+				// 		items: [
+				// 			{
+				// 				key: `apple`,
+				// 				label: (
+				// 					<div
+				// 						className="flex items-center gap-2"
+				// 						onClick={() => {
+				// 							updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
+				// 								preferredMusicClient: `appleMusic`,
+				// 							}).catch(console.error)
+				// 						}}
+				// 					>
+				// 						<AppleFilled />
+				// 						<span>Apple Music</span>
+				// 					</div>
+				// 				),
+				// 			},
+				// 			{
+				// 				key: `spotify`,
+				// 				label: (
+				// 					<div
+				// 						className="flex items-center gap-2"
+				// 						onClick={() => {
+				// 							updateDoc(doc(db, `Users`, user.id).withConverter(UserConverter), {
+				// 								preferredMusicClient: `spotify`,
+				// 							}).catch(console.error)
+				// 						}}
+				// 					>
+				// 						<SpotifyIcon /> <span>Spotify</span>
+				// 					</div>
+				// 				),
+				// 			},
+				// 		],
+				// 	}}
+				// >
+				// 	<SettingOutlined className="text-lg" />
+				// </Dropdown>
 			}
 		>
 			<div className="flex h-full flex-col gap-4">
