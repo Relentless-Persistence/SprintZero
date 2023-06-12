@@ -24,7 +24,7 @@ export type TaskColumnProps = {
 	columnName: string
 	title: string
 	tasks: MyTask[],
-	storyMapItems: StoryMapItem[]
+	storyMapItems?: StoryMapItem[]
 
 }
 
@@ -89,7 +89,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 							let epicName = ``
 
 							if (task.type === `acceptanceCriteria` || task.type === `bug`) {
-								const selectedStory = storyMapItems.find(item => task.storyId === item.id);
+								const selectedStory = storyMapItems?.find(item => task.storyId === item.id);
 
 								// const selectedStoryId = selectedStory?.id;
 								storyName = selectedStory?.name ?? ``;
@@ -99,10 +99,10 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 								// };
 
 								const selectedFeatureId: string = selectedStory?.parentId ?? ``;
-								const feature = storyMapItems.find(story => story.id === selectedFeatureId);
+								const feature = storyMapItems?.find(story => story.id === selectedFeatureId);
 								featureName = feature?.name ?? ``;
 
-								const epic = storyMapItems.find(story => story.id === feature?.parentId);
+								const epic = storyMapItems?.find(story => story.id === feature?.parentId);
 								epicName = epic?.name ?? ``;
 							}
 

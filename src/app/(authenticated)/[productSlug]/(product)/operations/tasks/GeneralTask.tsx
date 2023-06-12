@@ -13,7 +13,7 @@ interface MyTask extends Task {
 
 interface Props {
 	tasks: MyTask[],
-	storyMapItems: StoryMapItem[]
+	storyMapItems?: StoryMapItem[]
 }
 
 const GeneralTask: FC<Props> = ({ tasks, storyMapItems }) => {
