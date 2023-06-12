@@ -197,7 +197,8 @@ const Header: FC = () => {
 			>
 				<Avatar src={member.data().avatar}
 					style={{
-						backgroundColor: `#7265e6`,
+						backgroundColor: `#bfbfbf`,
+						border: member.data().avatar ? `` : `none`
 					}}
 					icon={member.data().avatar ? null : <UserOutlined />}
 					className="cursor-pointer border-2 border-primary" />
