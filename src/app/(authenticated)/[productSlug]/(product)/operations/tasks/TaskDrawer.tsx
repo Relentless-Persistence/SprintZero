@@ -1,6 +1,6 @@
 import { Button, Checkbox, DatePicker, Drawer, Input, Select, TimePicker } from "antd"
 import dayjs from "dayjs"
-import { Timestamp, addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore"
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore"
 import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
@@ -14,6 +14,7 @@ import type { Task } from "~/types/db/Products/Tasks";
 import Comments from "./Comment"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { MemberConverter } from "~/types/db/Products/Members"
+import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 // import { TaskConverter } from "~/types/db/Products/Tasks"
 
 const dateFormat = `MMMM D, YYYY`;
@@ -112,12 +113,42 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 			const taskRef = doc(product.ref, `Tasks`, data.id);
 			try {
 				await deleteDoc(taskRef);
+
+				if (data.type === `acceptanceCriteria` || data.type === `bug`) {
+					if (data.storyId) {
+						const userStoryRef = doc(product.ref, `StoryMapItems`, data.storyId).withConverter(StoryMapItemConverter);
+						const userStorySnap = await getDoc(userStoryRef)
+
+						if (userStorySnap.exists()) {
+							const userStory = userStorySnap.data()
+
+							if (data.type === `acceptanceCriteria`) {
+								const updatedAcceptanceCriteria = userStory.acceptanceCriteria.filter(ac => ac.taskId !== data.id);
+
+								// Update the document with the new acceptanceCriteria
+								await updateDoc(userStoryRef, {
+									acceptanceCriteria: updatedAcceptanceCriteria,
+								});
+							}
+							else if (data.type === `bug`) {
+								const updatedBugs = userStory.bugs.filter(bug => bug.taskId !== data.id);
+
+								// Update the document with the new bugs
+								await updateDoc(userStoryRef, {
+									bugs: updatedBugs,
+								});
+							}
+						}
+					}
+				}
+
 				setNewTask(false)
 			} catch (error) {
 				console.error(`Error deleting task: `, error);
 			}
 		}
 	};
+
 
 	return (
 		<Drawer
