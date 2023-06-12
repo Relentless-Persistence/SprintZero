@@ -21,7 +21,7 @@ import { Avatar, Button, Checkbox, Divider, Drawer, Dropdown, Form, Input, Menu,
 import clsx from "clsx"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { addDoc, collection, writeBatch } from "firebase/firestore"
+import { addDoc, collection, updateDoc, writeBatch } from "firebase/firestore"
 import produce from "immer"
 import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
@@ -230,6 +230,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		await updateItem(product, storyMapItems, versions, story.id, {
 			acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
 				const index = draft.findIndex((criterion) => criterion.id === id)
+
 				// draft[index]!.checked = checked
 				// if (checked === true) {
 				// 	draft[index]!.status = `done`
@@ -238,6 +239,12 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 				// }
 			}),
 		})
+
+		const task = tasks?.docs.find(t => t.id === story.acceptanceCriteria.find(cr => cr.id === id)?.taskId)
+		await updateDoc(task!.ref, {
+			status: checked ? `done` : `todo`
+		})
+
 	}
 
 	const addAcceptanceCriterion = async () => {
@@ -269,6 +276,11 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 				// 	draft[index]!.status = `todo`
 				// }
 			}),
+		})
+
+		const task = tasks?.docs.find(t => t.id === story.bugs.find(bug => bug.id === id)?.taskId)
+		await updateDoc(task!.ref, {
+			status: checked ? `done` : `todo`
 		})
 	}
 
