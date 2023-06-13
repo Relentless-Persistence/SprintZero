@@ -70,7 +70,7 @@ const RoadmapClientPage: FC = () => {
             <EpicsTab storyMapItems={storyMapItems.docs.map((item) => item.data())} />
           </div>
         </div>
-        <div style={{ position: `absolute`, top: `1%`, right: 0, zIndex: 15 }}>
+        <div style={{ position: `absolute`, top: `50%`, right: 0, zIndex: 15 }}>
           <Badge.Ribbon text="Future" color="black">
           </Badge.Ribbon>
         </div>
