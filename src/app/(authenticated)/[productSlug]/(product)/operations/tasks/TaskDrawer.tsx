@@ -41,7 +41,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 	const [title, setTitle] = useState<string>(``)
 	const [notes, setNotes] = useState<string>(``)
 	const [assign, setAssign] = useState<string[]>([])
-	const [dueDate, setDueDate] = useState<Dayjs | null>()
+	const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs())
 	const [subtasks, setSubtasks] = useState<Subtask[]>([])
 
 	useEffect(() => {
@@ -86,17 +86,9 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 		setNewTask(false)
 	}
 
-	const onChangeDate = (date: DatePickerProps['value'], dateString: string) => {
-		console.log(dateString);
-
-		if (dateString) {
-			const dateTime = dayjs(dateString, `YYYY-MM-DD HH:mm:ss`);
-			console.log(dateTime);
-			setDueDate(dateTime);
-		} else {
-			setDueDate(null);  // clear the date when input is cleared
-		}
-	};
+	const onChangeDate: DatePickerProps['onChange'] = (date) => {
+		setDueDate(dayjs(date, dateFormat))
+	}
 
 
 
@@ -206,7 +198,8 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 				<div className="flex h-full flex-col gap-6">
 					<div className="flex flex-col gap-2">
 						<p className="text-lg font-semibold">Due Date / Time</p>
-						<DatePicker showTime value={dueDate} format="YYYY-MM-DD HH:mm:ss" onChange={onChangeDate} />
+						<DatePicker value={dueDate} format={dateFormat} onChange={onChangeDate} />
+						<TimePicker disabled />
 						{/* <TimePicker /> */}
 					</div>
 
