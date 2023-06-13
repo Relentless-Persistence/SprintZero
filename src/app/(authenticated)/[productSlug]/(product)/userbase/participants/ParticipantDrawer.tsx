@@ -151,13 +151,44 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
     },
   })
 
+  const [saving, setSaving] = useState(false);
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const delay = 1000; // delay in milliseconds
+
   const onSubmit = handleSubmit(async (data) => {
     if (!activeParticipant) return
+
+    //console.log(` I am here ..`)
+
+    if (timer) {
+      clearTimeout(timer);
+      setTimer(null); // Reset timer to null after clearTimeout
+    }
+
+    setSaving(true);
+    setTimer(setTimeout(() => {
+      setSaving(false);
+    }, delay));
+
     await updateDoc(doc(product.ref, `DialogueParticipants`, activeParticipant), {
       ...data,
       updatedAt: Timestamp.now(),
     })
+
+    // if (timer) {
+    //   clearTimeout(timer);
+    //   setTimer(null); // Reset timer to null after clearTimeout
+    // }
+    // setSaving(false);
   })
+
+  useEffect(() => {
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [timer]);
 
   useEffect(() => {
     if (!participantData) return
@@ -255,12 +286,15 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
           <div className="mr-4 flex min-w-0 max-w-full flex-col gap-1 overflow-auto">
             <p className="max-w-full leading-none">
               <span className="mr-4 inline-block max-w-full truncate font-semibold">{participant?.data().name}</span>
-              {participant && (
+              {participant && !saving ? (
                 <span className="mb-0.5 text-sm font-normal text-textTertiary">
                   Last modified {dayjs(participant.data().updatedAt.toMillis()).fromNow()}
                   {lastUpdatedAtUser?.data() && ` by ${lastUpdatedAtUser.data()!.name}`}
                 </span>
-              )}
+              ) : (
+                <span className="mb-0.5 text-sm font-normal text-textTertiary" style={{ color: `#397D0F` }}><SyncOutlined className="mr-1" /> Saving changes...</span>
+              )
+              }
             </p>
             <div className="flex gap-2">
               <Popover placement="bottomLeft" content={
