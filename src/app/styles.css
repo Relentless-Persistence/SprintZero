@@ -301,10 +301,21 @@ circle {
 	text-align: center !important;
 }
 
+/* @media only screen and (min-width: 1200px) {
+	.roadmapCircle1 {
+	  padding-left: 20vw;
+	  padding-top: 20vw;
+	  top: -10vw;
+	  left: -10vw;
+	  z-index: 6;
+	}
+
+  } */
+
 .roadmapCircle1 {
 	padding-left: 36vw;
-	padding-top: 36vw;
-	top: -18vw;
+	padding-top: 36vh;
+	top: -18vh;
 	left: -18vw;
 	background: #c3ffa5;
 	z-index: 6;
@@ -312,8 +323,8 @@ circle {
 
 .roadmapCircle2 {
 	padding-left: 68vw;
-	padding-top: 68vw;
-	top: -34vw;
+	padding-top: 68vh;
+	top: -34vh;
 	left: -34vw;
 
 	/* green/5 */
@@ -324,8 +335,8 @@ circle {
 
 .roadmapCircle3 {
 	padding-left: 100vw;
-	padding-top: 100vw;
-	top: -50vw;
+	padding-top: 100vh;
+	top: -50vh;
 	left: -50vw;
 	/* green/4 */
 
@@ -335,8 +346,8 @@ circle {
 
 .roadmapCircle4 {
 	padding-left: 130vw;
-	padding-top: 130vw;
-	top: -65vw;
+	padding-top: 130vh;
+	top: -65vh;
 	left: -65vw;
 
 	/* green/3 */
