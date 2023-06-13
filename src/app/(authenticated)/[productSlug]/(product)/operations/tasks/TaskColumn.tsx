@@ -174,7 +174,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 											</div>
 										)}
 
-										{task.dueDate && <Tag>{dayjs(task.dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}</Tag>}
+										{task.dueDate && <Tag>{dayjs(task.dueDate.toDate()).format(`MMM D, YYYY`)}</Tag>}
 									</Card>
 								</motion.div>
 

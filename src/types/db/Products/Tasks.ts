@@ -3,7 +3,7 @@ import { string, z } from "zod"
 import { genConverter, timestampSchema } from "~/types"
 
 export const TaskSchema = z.object({
-	dueDate: timestampSchema.optional(),
+	dueDate: timestampSchema.optional().nullable(),
 	notes: z.string().optional(),
 	status: z.enum([`todo`, `inProgress`, `review`, `done`]),
 	subtasks: z.array(

@@ -41,7 +41,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 	const [title, setTitle] = useState<string>(``)
 	const [notes, setNotes] = useState<string>(``)
 	const [assign, setAssign] = useState<string[]>([])
-	const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs())
+	const [dueDate, setDueDate] = useState<Dayjs | null>(null)
 	const [subtasks, setSubtasks] = useState<Subtask[]>([])
 
 	useEffect(() => {
@@ -49,7 +49,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 			setTitle(data.title)
 			setNotes(data.notes ?? notes)
 			setAssign(data.assigneeIds ?? assign)
-			setDueDate(dayjs(data.dueDate?.toMillis()) ?? dueDate)
+			setDueDate(data.dueDate ? dayjs(data.dueDate.toMillis()) : null);
 			setSubtasks(data.subtasks ?? subtasks)
 		}
 	}, [data])
@@ -78,7 +78,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 				notes,
 				assigneeIds: assign,
 				subtasks,
-				dueDate: Timestamp.fromDate(dayjs(dueDate).toDate()),
+				dueDate: dueDate ? Timestamp.fromDate(dayjs(dueDate).toDate()) : null,
 				type,
 				status: `todo`
 			})
@@ -87,7 +87,11 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 	}
 
 	const onChangeDate: DatePickerProps['onChange'] = (date) => {
-		setDueDate(dayjs(date, dateFormat))
+		if (date !== null) {
+			setDueDate(dayjs(date, dateFormat));
+		} else {
+			setDueDate(null); // properly handle when date is null
+		}
 	}
 
 
