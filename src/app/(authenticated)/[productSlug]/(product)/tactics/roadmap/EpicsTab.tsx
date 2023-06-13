@@ -48,8 +48,9 @@ const EpicsTab: FC<EpicsTabProps> = ({ storyMapItems }) => {
   }, [])
 
   return (
-    <div className="flex h-full flex-col px-12 py-8">
-      <div className="relative mt-6 grow">
+    <div className="flex h-full flex-col px-12 py-5">
+      {/* <div className="relative mt-6 grow"> */}
+      <div className="relative grow">
         <div className="absolute inset-0" ref={matrixRef}>
           <PrioritiesMatrix>
             {epics.map((epic) => (

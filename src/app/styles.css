@@ -330,7 +330,7 @@ circle {
 	height: 100%;
 	/* top: -50%; */
 	left: -80%;
-	background: #c3ffa5;
+	background: rgb(174, 229, 142);
 	z-index: 6;
 }
 
@@ -341,7 +341,7 @@ circle {
 	height: 100%;
 	/* top: -40%; */
 	left: -60%;
-	background: #d3ffba;
+	background: rgb(197, 237, 171);
 	z-index: 5;
 }
 
@@ -364,7 +364,7 @@ circle {
 	height: 100%;
 	/* top: -30%; */
 	left: -40%;
-	background: #deffc8;
+	background: rgb(217, 244, 198);
 	z-index: 4;
 }
 
@@ -387,7 +387,7 @@ circle {
 	height: 100%;
 	/* top: -20%; */
 	left: -20%;
-	background: #eaffdc;
+	background: rgb(234, 249, 222);
 	z-index: 3;
 }
 
@@ -410,7 +410,7 @@ circle {
 	border-radius: 0% !important;
 	z-index: 2;
 	/* green/3 */
-	background: #f5ffed;
+	background: rgb(247, 253, 242);
 	/* colorBorder */
 	border: none !important;
 }

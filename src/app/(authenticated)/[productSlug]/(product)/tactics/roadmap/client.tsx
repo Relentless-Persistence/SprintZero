@@ -32,7 +32,7 @@ const RoadmapClientPage: FC = () => {
       <div className="relative w-full h-full ">
         <div className="w-full h-full relative" style={{
           overflow: `hidden`, backgroundColor: ``, zIndex: 1,
-          border: `4px solid #e3e3e3`,
+          border: `3px solid rgb(210, 215, 206)`,
         }}>
           <div className="flex roadmapCircle1 roadmapCircle" style={{
 
