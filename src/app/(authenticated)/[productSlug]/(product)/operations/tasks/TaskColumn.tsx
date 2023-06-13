@@ -155,14 +155,18 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 										type="inner"
 										size="small"
 										title={task.title}
-										extra={
-											<Button size="small" onClick={() => {
-												setSelectedTask(task)
-												setEditTask(true)
-											}}>
-												Edit
-											</Button>
-										}
+										onClick={() => {
+											setSelectedTask(task)
+											setEditTask(true)
+										}}
+									// extra={
+									// 	<Button size="small" onClick={() => {
+									// 		setSelectedTask(task)
+									// 		setEditTask(true)
+									// 	}}>
+									// 		Edit
+									// 	</Button>
+									// }
 									>
 										{(task.type === `acceptanceCriteria` || task.type === `bug`) && (
 											<div className="flex flex-wrap item-center gap-1">
@@ -188,18 +192,22 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 											style={{ left: xP, top: yP, width: dragInfo.width, height: dragInfo.height }}
 										>
 											<Card
+												// onClick={() => {
+												// 	setSelectedTask(task)
+												// 	setEditTask(true)
+												// }}
 												key={task.id}
 												type="inner"
 												size="small"
 												title={task.title}
-												extra={
-													<Button size="small" onClick={() => {
-														setSelectedTask(task)
-														setEditTask(true)
-													}}>
-														Edit
-													</Button>
-												}
+											// extra={
+											// 	<Button size="small" onClick={() => {
+											// 		setSelectedTask(task)
+											// 		setEditTask(true)
+											// 	}}>
+											// 		Edit
+											// 	</Button>
+											// }
 											>
 												{(task.type === `acceptanceCriteria` || task.type === `bug`) && (
 													<div className="flex flex-wrap item-center gap-1">
