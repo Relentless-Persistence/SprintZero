@@ -195,6 +195,16 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 													</Button>
 												}
 											>
+												{(task.type === `acceptanceCriteria` || task.type === `bug`) && (
+													<div className="flex flex-wrap item-center gap-1">
+														<Tag icon={<ReadOutlined />}>{epicName}</Tag>
+														<ArrowRightOutlined />
+														<Tag icon={<CopyOutlined />}>{featureName}</Tag>
+														<ArrowRightOutlined />
+														<Tag icon={<FileTextOutlined />}>{storyName}</Tag>
+													</div>
+												)}
+
 												{task.dueDate && <Tag>{dayjs(task.dueDate.toDate()).format(`MMM D [at] HH:mm:ss`)}</Tag>}
 											</Card>
 										</motion.div>,

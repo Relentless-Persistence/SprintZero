@@ -19,7 +19,7 @@ interface Props {
 const GeneralTask: FC<Props> = ({ tasks, storyMapItems }) => {
 	return (
 		<div className="flex h-full w-full grow overflow-x-auto pb-4">
-			<div className="grid h-full grid-cols-[repeat(4,20rem)] gap-4">
+			<div className="grid h-full grid-cols-[repeat(4,26rem)] gap-4">
 				{
 					Object.entries(taskColumns).map(([columnName, title]) => (
 						<TaskColumn
