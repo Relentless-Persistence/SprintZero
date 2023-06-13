@@ -149,6 +149,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 									<Card
 										key={task.id}
 										type="inner"
+										size="small"
 										title={task.title}
 										extra={
 											<Button size="small" onClick={() => {
@@ -185,6 +186,7 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 											<Card
 												key={task.id}
 												type="inner"
+												size="small"
 												title={task.title}
 												extra={
 													<Button size="small" onClick={() => {

@@ -82,6 +82,7 @@ const FunCard: FC = () => {
 
 	const onReset = () => {
 		setSongName(undefined)
+		setDate(null)
 		setClues(undefined)
 		setShowSong(false)
 	}
@@ -193,7 +194,7 @@ const FunCard: FC = () => {
 							Randomize
 						</Button>
 						<div className="space-x-2 text-right">
-							<Button type="text" size="small" disabled={date === null} onClick={onReset}>
+							<Button type="text" size="small" disabled={date === null || cluesGpt.isLoading} onClick={onReset}>
 								Reset
 							</Button>
 							<Button
