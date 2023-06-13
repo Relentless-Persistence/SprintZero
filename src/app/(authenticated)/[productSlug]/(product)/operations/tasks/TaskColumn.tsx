@@ -7,13 +7,16 @@ import { createRef, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 
 import type { taskColumns } from "./GeneralTask"
+import type { QuerySnapshot } from "firebase/firestore";
 import type { FC } from "react"
 import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 import type { Task } from "~/types/db/Products/Tasks";
+import type { Version } from "~/types/db/Products/Versions"
 
 import TaskDrawer from "./TaskDrawer"
 import { useAppContext } from "../../../AppContext"
 import { useStoryMapContext } from "../../map/StoryMapContext"
+import StoryDrawer from "~/components/StoryDrawer"
 import { TaskConverter } from "~/types/db/Products/Tasks"
 
 interface MyTask extends Task {
@@ -25,10 +28,11 @@ export type TaskColumnProps = {
 	title: string
 	tasks: MyTask[],
 	storyMapItems?: StoryMapItem[]
+	versions?: QuerySnapshot<Version>
 
 }
 
-const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapItems }) => {
+const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapItems, versions }) => {
 
 	const { product } = useAppContext()
 	const [editTask, setEditTask] = useState(false)
@@ -219,13 +223,25 @@ const TaskColumn: FC<TaskColumnProps> = ({ columnName, title, tasks, storyMapIte
 				</div>
 			</Card>
 
-			{editTask && (
+			{editTask && (selectedTask?.storyId ? (
+				<StoryDrawer
+					storyMapItems={storyMapItems!}
+					versions={versions!}
+					//versions={versions}
+					isOpen={editTask}
+					onClose={() => setEditTask(false)}
+					storyId={selectedTask.storyId}
+				/>
+			) : (
 				<TaskDrawer
 					isOpen={editTask}
 					setNewTask={setEditTask}
 					data={selectedTask}
 				/>
-			)}
+			)
+			)
+
+			}
 		</>
 	)
 }

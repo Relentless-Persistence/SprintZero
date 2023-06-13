@@ -1,7 +1,7 @@
 "use client"
 
 import { Breadcrumb, Button, Tabs, Tag } from "antd"
-import { collection, query } from "firebase/firestore"
+import { collection, orderBy, query } from "firebase/firestore"
 import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
@@ -15,6 +15,7 @@ import { useStoryMapContext } from "../../map/StoryMapContext"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 import { TaskConverter } from "~/types/db/Products/Tasks"
+import { VersionConverter } from "~/types/db/Products/Versions"
 
 interface MyTask extends Task {
   id: string
@@ -34,6 +35,11 @@ const TasksClientPage: FC = () => {
     collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
   )
   useErrorHandler(storyMapItemsSnapError)
+
+  const [versions, , versionsError] = useCollection(
+    query(collection(product.ref, `Versions`), orderBy(`name`, `asc`)).withConverter(VersionConverter),
+  )
+  useErrorHandler(versionsError)
 
   if (!storyMapItemsSnap) return null
 
@@ -97,7 +103,7 @@ const TasksClientPage: FC = () => {
               key: `acceptance criteria`,
               children: (
 
-                <GeneralTasks tasks={acTasks} storyMapItems={storyMapsItems} />
+                <GeneralTasks tasks={acTasks} storyMapItems={storyMapsItems} versions={versions} />
               ),
             },
             {
@@ -105,7 +111,7 @@ const TasksClientPage: FC = () => {
               key: `bugs`,
               children: (
 
-                <GeneralTasks tasks={bugTasks} storyMapItems={storyMapsItems} />
+                <GeneralTasks tasks={bugTasks} storyMapItems={storyMapsItems} versions={versions} />
 
               ),
             },
