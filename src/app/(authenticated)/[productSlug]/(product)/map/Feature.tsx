@@ -1,17 +1,17 @@
-import {CopyOutlined, FileOutlined, MinusCircleOutlined} from "@ant-design/icons"
+import { CopyOutlined, FileOutlined, MinusCircleOutlined } from "@ant-design/icons"
 import clsx from "clsx"
-import {doc, updateDoc} from "firebase/firestore"
-import {motion, useAnimationFrame} from "framer-motion"
-import {useEffect, useRef, useState} from "react"
+import { doc, updateDoc } from "firebase/firestore"
+import { motion, useAnimationFrame } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
-import type {DragInfo} from "./types"
-import type {FC} from "react"
+import type { DragInfo } from "./types"
+import type { FC } from "react"
 
-import {elementRegistry} from "./globals"
+import { elementRegistry } from "./globals"
 import Story from "./Story"
-import {useStoryMapContext} from "./StoryMapContext"
-import {useAppContext} from "~/app/(authenticated)/[productSlug]/AppContext"
-import {AllVersions, addStory, sortStories, updateItem} from "~/utils/storyMap"
+import { useStoryMapContext } from "./StoryMapContext"
+import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
+import { AllVersions, addStory, sortStories, updateItem } from "~/utils/storyMap"
 
 export type FeatureProps = {
 	featureId: string
@@ -19,9 +19,9 @@ export type FeatureProps = {
 	inert?: boolean
 }
 
-const Feature: FC<FeatureProps> = ({featureId, dragInfo, inert = false}) => {
-	const {product, user} = useAppContext()
-	const {storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted, setItemsToBeDeleted} =
+const Feature: FC<FeatureProps> = ({ featureId, dragInfo, inert = false }) => {
+	const { product, user } = useAppContext()
+	const { storyMapItems, versions, editMode, currentVersionId, itemsToBeDeleted, setItemsToBeDeleted } =
 		useStoryMapContext()
 
 	const feature = storyMapItems.find((feature) => feature.id === featureId)!
@@ -77,17 +77,17 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, inert = false}) => {
 							<p className="px-0.5">{localFeatureName || `_`}</p>
 							<input
 								value={localFeatureName}
-								autoFocus={!feature.initialRenameDone && !editMode}
+								autoFocus={!feature.initialRenameDone && !editMode && user.id === feature.updatedAtUserId}
 								onFocus={(e) => e.target.select()}
 								onBlur={() => {
 									if (localFeatureName !== ``)
-										updateDoc(doc(product.ref, `StoryMapItems`, featureId), {initialRenameDone: true}).catch(
+										updateDoc(doc(product.ref, `StoryMapItems`, featureId), { initialRenameDone: true }).catch(
 											console.error,
 										)
 								}}
 								onKeyDown={(e) => {
 									if (e.key === `Enter`)
-										updateDoc(doc(product.ref, `StoryMapItems`, featureId), {initialRenameDone: true}).catch(
+										updateDoc(doc(product.ref, `StoryMapItems`, featureId), { initialRenameDone: true }).catch(
 											console.error,
 										)
 								}}
@@ -100,7 +100,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, inert = false}) => {
 								onChange={(e) => {
 									setLocalFeatureName(e.target.value)
 									if (e.target.value === ``) return
-									updateItem(product, storyMapItems, versions, feature.id, {name: e.target.value}).catch(console.error)
+									updateItem(product, storyMapItems, versions, feature.id, { name: e.target.value }).catch(console.error)
 								}}
 								onPointerDownCapture={(e) => e.stopPropagation()}
 							/>
@@ -127,7 +127,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, inert = false}) => {
 						type="button"
 						onClick={() => {
 							if (currentVersionId !== AllVersions)
-								addStory(product, storyMapItems, versions, {parentId: feature.id}, user.id, currentVersionId).catch(
+								addStory(product, storyMapItems, versions, { parentId: feature.id }, user.id, currentVersionId).catch(
 									console.error,
 								)
 						}}
@@ -149,7 +149,7 @@ const Feature: FC<FeatureProps> = ({featureId, dragInfo, inert = false}) => {
 								type="button"
 								onClick={() => {
 									if (currentVersionId !== AllVersions)
-										addStory(product, storyMapItems, versions, {parentId: feature.id}, user.id, currentVersionId).catch(
+										addStory(product, storyMapItems, versions, { parentId: feature.id }, user.id, currentVersionId).catch(
 											console.error,
 										)
 								}}
