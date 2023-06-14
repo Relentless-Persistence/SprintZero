@@ -40,7 +40,7 @@ const AcceptTermsClientPage: FC = () => {
 			)
 
 			//console.log(members)
-			if (members.length === 0) router.push(`/billing`)
+			if (members.length === 0) router.push(`/configuration`)
 			else router.push(`/${members[0]!.ref.parent.parent!.id}/map`)
 		} catch (e) {
 			setHasAccepted(false)

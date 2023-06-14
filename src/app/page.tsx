@@ -27,7 +27,7 @@ const HomePage: FC = () => {
 
 		const firstProduct = members.docs[0]?.ref.parent.parent
 		if (firstProduct) router.replace(`/${firstProduct.id}/map`)
-		else router.replace(`/billing`)
+		else router.replace(`/configuration`)
 	}, [members, router, user, userLoading])
 
 	return (

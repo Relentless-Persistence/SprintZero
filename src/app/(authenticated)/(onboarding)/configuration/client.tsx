@@ -44,7 +44,7 @@ async function fetchSubscriptionIdAndEmail(sessionId: string) {
 }
 
 const ConfigurationPageClientPage: FC = () => {
-    const [loading, setLoading] = useState(true);
+    //const [loading, setLoading] = useState(true);
 
     const router = useRouter()
 
@@ -60,54 +60,54 @@ const ConfigurationPageClientPage: FC = () => {
     )
     useErrorHandler(billingsError)
 
-    const session_id = searchParams?.get(`session_id`);
+    // const session_id = searchParams?.get(`session_id`);
 
-    useEffect(() => {
-        const billingsRef = collection(db, `Billings`);
-        if (session_id) {
+    // useEffect(() => {
+    //     const billingsRef = collection(db, `Billings`);
+    //     if (session_id) {
 
 
-            fetchSubscriptionIdAndEmail(session_id).then((result: { subscriptionId: string, customerEmail: string }) => {
-                const { subscriptionId, customerEmail } = result;
-                setDoc(doc(billingsRef, subscriptionId).withConverter(BillingConverter), {
-                    billingOwner: user!.uid,
-                    subscriptionId,
-                    billingEmail: customerEmail
-                })
+    //         fetchSubscriptionIdAndEmail(session_id).then((result: { subscriptionId: string, customerEmail: string }) => {
+    //             const { subscriptionId, customerEmail } = result;
+    //             setDoc(doc(billingsRef, subscriptionId).withConverter(BillingConverter), {
+    //                 billingOwner: user!.uid,
+    //                 subscriptionId,
+    //                 billingEmail: customerEmail
+    //             })
 
-                updateDoc(doc(db, `Users`, user!.uid).withConverter(UserConverter), {
-                    hasAcceptedTos: true,
-                })
-                    .then(() => {
-                        //router.push(`/configuration`);
-                    })
-                    .catch(error => {
-                        console.error(`Error when handling billing:`, error);
-                    });
-                setLoading(false)
-            }).catch(error => {
-                notification.error({ message: `An error occurred while trying to validate your subscription.` })
-                //console.log(error)
-                router.push(`/`);
-            });
-        }
-        else {
-            const q = query(billingsRef, where(`billingOwner`, `==`, user?.uid)).withConverter(BillingConverter);
-            getDocs(q)
-                .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        // user is not a billing owner
-                        router.push(`/`);
-                    } else {
-                        // user is a billig owner
-                        setLoading(false)
-                    }
-                })
-                .catch((error) => {
-                    console.log(`Error when looking up for billing owner rights: `, error);
-                });
-        }
-    }, [])
+    //             updateDoc(doc(db, `Users`, user!.uid).withConverter(UserConverter), {
+    //                 hasAcceptedTos: true,
+    //             })
+    //                 .then(() => {
+    //                     //router.push(`/configuration`);
+    //                 })
+    //                 .catch(error => {
+    //                     console.error(`Error when handling billing:`, error);
+    //                 });
+    //             setLoading(false)
+    //         }).catch(error => {
+    //             notification.error({ message: `An error occurred while trying to validate your subscription.` })
+    //             //console.log(error)
+    //             router.push(`/`);
+    //         });
+    //     }
+    //     else {
+    //         const q = query(billingsRef, where(`billingOwner`, `==`, user?.uid)).withConverter(BillingConverter);
+    //         getDocs(q)
+    //             .then((querySnapshot) => {
+    //                 if (querySnapshot.empty) {
+    //                     // user is not a billing owner
+    //                     router.push(`/`);
+    //                 } else {
+    //                     // user is a billig owner
+    //                     setLoading(false)
+    //                 }
+    //             })
+    //             .catch((error) => {
+    //                 console.log(`Error when looking up for billing owner rights: `, error);
+    //             });
+    //     }
+    // }, [])
 
     const createProduct = trpc.product.create.useMutation()
     const inviteUser = trpc.product.inviteUser.useMutation()
@@ -179,145 +179,145 @@ const ConfigurationPageClientPage: FC = () => {
         router.push(`/${productId}/map`)
     };
 
-    if (loading) {
-        return (
-            <div className="grid h-full place-items-center">
-                {/* <p className="text-xl">Redirecting you to your dashboard...</p> */}
-                <Spin size="large" tip="bleeps, sweeps, and creeps..." />
-            </div>
-        )
-    }
-    else
-        return (
-            <Form
-                name="product-configuration"
-                onFinish={onFinish}
-                validateMessages={validateMessages}
-            >
+    // if (loading) {
+    //     return (
+    //         <div className="grid h-full place-items-center">
+    //             {/* <p className="text-xl">Redirecting you to your dashboard...</p> */}
+    //             <Spin size="large" tip="bleeps, sweeps, and creeps..." />
+    //         </div>
+    //     )
+    // }
+    // else
+    return (
+        <Form
+            name="product-configuration"
+            onFinish={onFinish}
+            validateMessages={validateMessages}
+        >
 
-                <div className="">
-                    <div className="flex w-full mb-8">
-                        <div className="leading-normal">
-                            <h1 className="text-4xl font-semibold">Let’s get this party started!</h1>
-                            <p className="text-base text-textSecondary">
-                                Please provide your information below so we can keep our internet overlords happy
-                            </p>
-                        </div>
-                        <div className="flex items-center flex-end gap-4">
-                            <div className="flex min-w-0 flex-1 flex-col items-end gap-1">
-                                <div className="flex w-full flex-1 items-center gap-3">
-                                    <div className="min-w-0 flex-1 text-end leading-normal">
-                                        <p className="font-semibold">{user?.displayName}</p>
-                                        <p className="truncate text-sm text-textTertiary">{user?.email}</p>
-                                    </div>
-                                    <Avatar
-                                        src={user?.photoURL}
-                                        size={48}
-                                        alt="Avatar"
-                                        className="shrink-0 basis-auto border border-primary"
-                                    />
+            <div className="">
+                <div className="flex w-full mb-8">
+                    <div className="leading-normal">
+                        <h1 className="text-4xl font-semibold">Let’s get this party started!</h1>
+                        <p className="text-base text-textSecondary">
+                            Please provide your information below so we can keep our internet overlords happy
+                        </p>
+                    </div>
+                    <div className="flex items-center flex-end gap-4">
+                        <div className="flex min-w-0 flex-1 flex-col items-end gap-1">
+                            <div className="flex w-full flex-1 items-center gap-3">
+                                <div className="min-w-0 flex-1 text-end leading-normal">
+                                    <p className="font-semibold">{user?.displayName}</p>
+                                    <p className="truncate text-sm text-textTertiary">{user?.email}</p>
                                 </div>
-                                <LinkTo href="/sign-out" className="text-sm text-info">
-                                    Log out
-                                </LinkTo>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex gap-4 mb-7">
-                        <div className="w-1/2">
-                            <div className="leading-normal mb-2">
-                                <p className="text-lg font-medium">Product name</p>
-                                <p className="text-base text-xs text-textSecondary">What are we gonna call this thing?</p>
-                            </div>
-                            <Form.Item
-                                name="productName"
-                                rules={[{ required: true, message: `Please input a product name` }]}
-                            >
-                                <Input placeholder="eg. Netflix, Headspace, Spotify" size="large" />
-                            </Form.Item>
-
-                        </div>
-                        <div className="w-1/2">
-                            <div className="leading-normal mb-2">
-                                <p className="text-lg font-medium">Product type</p>
-                                <p className="text-base text-xs text-textSecondary">How will users typically access your product?</p>
-                            </div>
-                            <Form.Item
-                                name="productType"
-                                rules={[{ required: true, message: `Please select a product type` }]}
-                            >
-                                <Select
-                                    mode="multiple"
-                                    allowClear
-                                    style={{ width: `100%` }}
-                                    placeholder="eg. Tablet, Mobile, Web"
-                                    //defaultValue={['mobile', 'web']}
-                                    //onChange={handleChange}
-                                    options={productTypeOptions}
-                                    size="large"
+                                <Avatar
+                                    src={user?.photoURL}
+                                    size={48}
+                                    alt="Avatar"
+                                    className="shrink-0 basis-auto border border-primary"
                                 />
-                            </Form.Item>
+                            </div>
+                            <LinkTo href="/sign-out" className="text-sm text-info">
+                                Log out
+                            </LinkTo>
                         </div>
-                    </div>
-                    <div className="flex">
-                        <div className="leading-normal mb-2">
-                            <p className="text-lg font-medium">Team members <Tag>Optional</Tag></p>
-                            <p className="text-base text-xs text-textSecondary">Who’s gonna saddle up with you?</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4 mb-7">
-                        <div className="w-1/3">
-                            <Form.Item name={[`members`, `email1`]} rules={[{ type: `email` }]}>
-                                <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
-                            </Form.Item>
-                        </div>
-                        <div className="w-1/3">
-                            <Form.Item name={[`members`, `email2`]} rules={[{ type: `email` }]}>
-                                <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
-                            </Form.Item>
-                        </div>
-                        <div className="w-1/3">
-                            <Form.Item name={[`members`, `email3`]} rules={[{ type: `email` }]}>
-                                <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
-                            </Form.Item>
-                        </div>
-                    </div>
-                    <div className="flex">
-                        <div className="leading-normal mb-2">
-                            <p className="text-lg font-medium">Sprint length</p>
-                            <p className="text-base text-xs text-textSecondary">How many weeks does it take?</p>
-                        </div>
-                    </div>
-                    <div className="flex mb-7">
-                        <Form.Item
-                            name="sprintLength"
-                            className="flex-grow"
-                        >
-                            <Segmented name="sprintLength" defaultValue="One Week" size="large" block options={[`One Week`, `Two Weeks`, `Three Weeks`]} value={sprintLength} onChange={updateSprintLength} style={{ background: `#EBEBEB` }} />
-                        </Form.Item>
-                    </div>
-                    <div className="flex">
-                        <div className="leading-normal mb-2">
-                            <p className="text-lg font-medium">Gate</p>
-                            <p className="text-base text-xs text-textSecondary">What day do you start one?</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4 mb-7">
-                        <Form.Item
-                            name="sprintGate"
-                            className="flex-grow"
-                        >
-                            <Segmented name="sprintGate" defaultValue="Monday" size="large" block options={[`Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`]} value={sprintGate} onChange={updateSprintGate} style={{ background: `#EBEBEB` }} />
-                        </Form.Item>
-                    </div>
-                    <div className="flex justify-end">
-                        <Button type="primary" htmlType="submit" loading={hasSubmitted}>
-                            Start
-                        </Button>
                     </div>
                 </div>
-            </Form>
-        )
+                <div className="flex gap-4 mb-7">
+                    <div className="w-1/2">
+                        <div className="leading-normal mb-2">
+                            <p className="text-lg font-medium">Product name</p>
+                            <p className="text-base text-xs text-textSecondary">What are we gonna call this thing?</p>
+                        </div>
+                        <Form.Item
+                            name="productName"
+                            rules={[{ required: true, message: `Please input a product name` }]}
+                        >
+                            <Input placeholder="eg. Netflix, Headspace, Spotify" size="large" />
+                        </Form.Item>
+
+                    </div>
+                    <div className="w-1/2">
+                        <div className="leading-normal mb-2">
+                            <p className="text-lg font-medium">Product type</p>
+                            <p className="text-base text-xs text-textSecondary">How will users typically access your product?</p>
+                        </div>
+                        <Form.Item
+                            name="productType"
+                            rules={[{ required: true, message: `Please select a product type` }]}
+                        >
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                style={{ width: `100%` }}
+                                placeholder="eg. Tablet, Mobile, Web"
+                                //defaultValue={['mobile', 'web']}
+                                //onChange={handleChange}
+                                options={productTypeOptions}
+                                size="large"
+                            />
+                        </Form.Item>
+                    </div>
+                </div>
+                <div className="flex">
+                    <div className="leading-normal mb-2">
+                        <p className="text-lg font-medium">Team members <Tag>Optional</Tag></p>
+                        <p className="text-base text-xs text-textSecondary">Who’s gonna saddle up with you?</p>
+                    </div>
+                </div>
+                <div className="flex gap-4 mb-7">
+                    <div className="w-1/3">
+                        <Form.Item name={[`members`, `email1`]} rules={[{ type: `email` }]}>
+                            <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
+                        </Form.Item>
+                    </div>
+                    <div className="w-1/3">
+                        <Form.Item name={[`members`, `email2`]} rules={[{ type: `email` }]}>
+                            <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
+                        </Form.Item>
+                    </div>
+                    <div className="w-1/3">
+                        <Form.Item name={[`members`, `email3`]} rules={[{ type: `email` }]}>
+                            <Input addonBefore="Email" placeholder="username@domain.com" size="large" />
+                        </Form.Item>
+                    </div>
+                </div>
+                <div className="flex">
+                    <div className="leading-normal mb-2">
+                        <p className="text-lg font-medium">Sprint length</p>
+                        <p className="text-base text-xs text-textSecondary">How many weeks does it take?</p>
+                    </div>
+                </div>
+                <div className="flex mb-7">
+                    <Form.Item
+                        name="sprintLength"
+                        className="flex-grow"
+                    >
+                        <Segmented name="sprintLength" defaultValue="One Week" size="large" block options={[`One Week`, `Two Weeks`, `Three Weeks`]} value={sprintLength} onChange={updateSprintLength} style={{ background: `#EBEBEB` }} />
+                    </Form.Item>
+                </div>
+                <div className="flex">
+                    <div className="leading-normal mb-2">
+                        <p className="text-lg font-medium">Gate</p>
+                        <p className="text-base text-xs text-textSecondary">What day do you start one?</p>
+                    </div>
+                </div>
+                <div className="flex gap-4 mb-7">
+                    <Form.Item
+                        name="sprintGate"
+                        className="flex-grow"
+                    >
+                        <Segmented name="sprintGate" defaultValue="Monday" size="large" block options={[`Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`]} value={sprintGate} onChange={updateSprintGate} style={{ background: `#EBEBEB` }} />
+                    </Form.Item>
+                </div>
+                <div className="flex justify-end">
+                    <Button type="primary" htmlType="submit" loading={hasSubmitted}>
+                        Start
+                    </Button>
+                </div>
+            </div>
+        </Form>
+    )
 }
 
 export default ConfigurationPageClientPage

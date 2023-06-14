@@ -118,7 +118,8 @@ const SignInClientPage: FC = () => {
 				preferredMusicClient: `appleMusic`,
 				type: `user`,
 			})
-			router.push(`/billing`)
+			//router.push(`/billing`)
+			router.push(`/accept-terms`)
 		}
 		else if (!user?.hasAcceptedTos) {
 			router.push(`/accept-terms`)
@@ -133,7 +134,7 @@ const SignInClientPage: FC = () => {
 				).withConverter(MemberConverter),
 			)
 			if (members.docs.length === 0) {
-				router.push(`/billing`)
+				router.push(`/configuration`)
 			} else {
 				const productId = members.docs[0]!.ref.parent.parent!.id
 				router.push(`/${productId}/map`)
