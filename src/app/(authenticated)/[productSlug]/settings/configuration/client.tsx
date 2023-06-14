@@ -231,7 +231,12 @@ const ConfigurationSettingsClientPage: FC = () => {
 					<div className="leading-normal mb-1">
 						<h2 className="font-semibold">Billing</h2>
 					</div>
-					<LinkTo openInNewTab href={`https://billing.stripe.com/p/login/5kAcNR56g1J3cUwaEE?prefilled_email=${user?.email ?? ``}`}><Button className="flex items-center justify-center">Manage Subscription</Button></LinkTo>
+					{/* <LinkTo
+					openInNewTab href={`https://billing.stripe.com/p/login/5kAcNR56g1J3cUwaEE?prefilled_email=${user?.email ?? ``}`} 
+					>*/}
+					<Button disabled style={{ width: `170px`, display: `inline-block` }}>Manage Subscription</Button>
+
+					{/* </LinkTo> */}
 				</div>
 
 			</div>
