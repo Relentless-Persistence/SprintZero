@@ -738,7 +738,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										{story.bugs.map((bug) => (
 											<Checkbox
 												key={bug.id}
-												//checked={bug.checked}
+												checked={tasks?.docs.find(t => t.id === story.bugs.find(cr => cr.id === bug.id)?.taskId)?.data().status === `done` ? true : false}
 												onChange={(e) => {
 													toggleBug(bug.id, e.target.checked).catch(console.error)
 												}}
@@ -774,7 +774,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 										{story.acceptanceCriteria.map((criterion) => (
 											<Checkbox
 												key={criterion.id}
-												//checked={criterion.checked}
+												checked={tasks?.docs.find(t => t.id === story.acceptanceCriteria.find(cr => cr.id === criterion.id)?.taskId)?.data().status === `done` ? true : false}
 												onChange={(e) => {
 													toggleAcceptanceCriterion(criterion.id, e.target.checked).catch(console.error)
 												}}
