@@ -664,7 +664,7 @@ const StoryMap: FC<StoryMapProps> = ({ onScroll }) => {
 						const boundaryTop = allStoryBounds.find((story) => story.id === prevStory?.id && story.parentId === storyBeingDragged.parentId)?.bottom ?? 0
 						const boundaryBottom = allStoryBounds.find((story) => story.id === nextStory?.id && story.parentId === storyBeingDragged.parentId)?.top ?? 0
 
-						console.log(prevStory?.name, nextStory?.name, boundaryTop, boundaryBottom, y)
+						//console.log(prevStory?.name, nextStory?.name, boundaryTop, boundaryBottom, y)
 						if (prevStory && y < boundaryTop) {
 							operationCompleteCondition.current = (storyMapItems) => {
 								const item = storyMapItems.find((item) => item.id === currentStory.id)

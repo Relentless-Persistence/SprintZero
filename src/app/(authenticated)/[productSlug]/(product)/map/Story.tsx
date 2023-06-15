@@ -49,14 +49,14 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
 		})
 
-		console.log(newStoryDescRaw)
+		//console.log(newStoryDescRaw)
 
 		const newStoryDesc = newStoryDescRaw.response
 			?.split(`\n`)
 			.map((s) => s.replace(/^[0-9]+\. */, ``))
 			.filter((s) => s !== ``)[0]
 
-		console.log(newStoryDesc)
+		//console.log(newStoryDesc)
 
 		if (!story.description && newStoryDesc) {
 			await updateItem(product, storyMapItems, versions, story.id, { description: newStoryDesc }).catch(console.error)
