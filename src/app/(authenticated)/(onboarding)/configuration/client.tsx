@@ -1,19 +1,19 @@
 "use client"
 
-import { Avatar, Button, Form, Input, Segmented, Select, Space, Spin, Tag, notification } from "antd"
-import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
-import { nanoid } from "nanoid"
-import { redirect, useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Avatar, Button, Form, Input, Segmented, Select, Tag } from "antd"
+import { doc } from "firebase/firestore"
+//import { nanoid } from "nanoid"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useAuthState } from "react-firebase-hooks/auth"
-import { useCollection, useDocument } from "react-firebase-hooks/firestore"
+import { useDocument } from "react-firebase-hooks/firestore"
 
 import type { SelectProps } from 'antd';
 import type { FC } from "react";
 
 import LinkTo from "~/components/LinkTo"
-import { BillingConverter } from "~/types/db/Billings"
+//import { BillingConverter } from "~/types/db/Billings"
 import { UserConverter } from "~/types/db/Users"
 import { auth, db } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
@@ -31,17 +31,17 @@ export const productTypeOptions: SelectProps['options'] = [
     { label: `API`, value: `api` },
 ].sort((a, b) => a.label.localeCompare(b.label));
 
-async function fetchSubscriptionIdAndEmail(sessionId: string) {
-    const response = await fetch(`/api/billing/retrieveSubscriptionIdAndCustomerEmail?sessionId=${sessionId}`);
-    //const data = await response.json() as { subscriptionId: string, customerEmail: string };
-    const data = await response.json() as { subscriptionId?: string, customerEmail?: string, error?: string };
+// async function fetchSubscriptionIdAndEmail(sessionId: string) {
+//     const response = await fetch(`/api/billing/retrieveSubscriptionIdAndCustomerEmail?sessionId=${sessionId}`);
+//     //const data = await response.json() as { subscriptionId: string, customerEmail: string };
+//     const data = await response.json() as { subscriptionId?: string, customerEmail?: string, error?: string };
 
-    if (!response.ok) {
-        throw new Error(data.error || `An error occurred while fetching the subscription ID.`);
-    }
+//     if (!response.ok) {
+//         throw new Error(data.error || `An error occurred while fetching the subscription ID.`);
+//     }
 
-    return { subscriptionId: data.subscriptionId, customerEmail: data.customerEmail };
-}
+//     return { subscriptionId: data.subscriptionId, customerEmail: data.customerEmail };
+// }
 
 const ConfigurationPageClientPage: FC = () => {
     //const [loading, setLoading] = useState(true);
@@ -53,12 +53,12 @@ const ConfigurationPageClientPage: FC = () => {
 
     useErrorHandler(userError)
 
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams();
 
-    const [billings, , billingsError] = useCollection(
-        query(collection(db, `Billings`)).withConverter(BillingConverter),
-    )
-    useErrorHandler(billingsError)
+    // const [billings, , billingsError] = useCollection(
+    //     query(collection(db, `Billings`)).withConverter(BillingConverter),
+    // )
+    // useErrorHandler(billingsError)
 
     // const session_id = searchParams?.get(`session_id`);
 
