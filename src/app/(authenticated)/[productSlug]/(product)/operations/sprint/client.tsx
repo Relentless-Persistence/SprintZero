@@ -10,7 +10,7 @@ import {
 import { Breadcrumb, Select, Switch, Tabs, Tag } from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { collection, orderBy, query } from "firebase/firestore"
+import { collection, orderBy, query, where } from "firebase/firestore"
 import { useMemo, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
@@ -55,7 +55,7 @@ const SprintClientPage: FC = () => {
 	const currentSprintEndDate = dayjs(sprints.at(-1)?.endDate)
 
 	const [versions, , versionsError] = useCollection(
-		query(collection(product.ref, `Versions`), orderBy(`name`, `asc`)).withConverter(VersionConverter),
+		query(collection(product.ref, `Versions`), where(`deleted`, `==`, false), orderBy(`name`, `asc`)).withConverter(VersionConverter),
 	)
 	useErrorHandler(versionsError)
 
