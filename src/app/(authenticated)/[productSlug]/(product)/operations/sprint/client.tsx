@@ -66,14 +66,15 @@ const SprintClientPage: FC = () => {
 			<div className="mx-12 mt-8 flex flex-col gap-4">
 				<Breadcrumb items={[{ title: `Operations` }, { title: `Sprint` }]} />
 
-				<div className="flex justify-between">
-					<div className="flex items-center gap-4">
-						<h1 className="text-2xl font-semibold">Sprint Board</h1>
-						<Tag color="volcano">Sprint ends {currentSprintEndDate.fromNow()}</Tag>
+				<div className="flex flex-col md:flex-row justify-between">
+					<div className="flex items-center gap-4 mr-3">
+						<h1 className="text-2xl font-semibold min-w-max">Sprint Board</h1>
+						<Tag className="min-w-max" color="volcano">Sprint ends {currentSprintEndDate.fromNow()}</Tag>
 					</div>
-					<div className="flex items-center gap-6">
-						<label className="flex items-center gap-2">
-							My stories only <Switch checked={myStoriesOnly} onChange={(value) => setMyStoriesOnly(value)} />
+					<div className="flex flex-wrap items-center gap-6 md:gap-2 mt-4 md:mt-0">
+						<label className="flex items-center gap-2 min-w-max">
+							My stories only
+							<Switch checked={myStoriesOnly} onChange={(value) => setMyStoriesOnly(value)} />
 						</label>
 						{versions && (
 							<Select
@@ -90,6 +91,7 @@ const SprintClientPage: FC = () => {
 							/>
 						)}
 					</div>
+
 				</div>
 			</div>
 
