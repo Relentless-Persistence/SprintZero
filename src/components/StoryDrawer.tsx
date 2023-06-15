@@ -82,7 +82,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	const [scrumGenieRunning, setScrumGenieRunning] = useState(false)
 	const [engEffort, setEngEffort] = useState<number>(story.engineeringEffort);
 	const [designEffort, setDesignEffort] = useState<number>(story.designEffort);
-	const genStoryDesc = trpc.gpt4.useMutation()
+	const genStoryDesc = trpc.gpt.useMutation()
 
 	const [storyVersionKey, setStoryVersionKey] = useState<string>(versions.docs.find((v) => v.id === story.versionId)!.id);
 	const [storyVersionLabel, setStoryVersionLabel] = useState<string>(versions.docs.find((v) => v.id === story.versionId)!.data().name);
@@ -130,7 +130,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		const epicName = storyMapItems.find((item) => item.id === feature?.parentId)?.name
 
 		const newStoryDescRaw = await genStoryDesc.mutateAsync({
-			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
+			prompt: `You are a business analyst. We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
 		})
 
 		const newStoryDesc = newStoryDescRaw.response

@@ -23,7 +23,7 @@ export type StoryProps = {
 const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 	const { product, user } = useAppContext()
 	const { storyMapItems, versions, editMode, setItemsToBeDeleted } = useStoryMapContext()
-	const genStoryDesc = trpc.gpt4.useMutation()
+	const genStoryDesc = trpc.gpt.useMutation()
 
 	const story = storyMapItems.find((story) => story.id === storyId)!
 	// const feature = storyMapItems.find((feature) => feature.id === story.parentId)!
@@ -46,7 +46,7 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 		const epicName = storyMapItems.find((item) => item.id === feature?.parentId)?.name
 
 		const newStoryDescRaw = await genStoryDesc.mutateAsync({
-			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
+			prompt: `You are a business analyst. We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
 		})
 
 		//console.log(newStoryDescRaw)
