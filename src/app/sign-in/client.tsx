@@ -250,8 +250,10 @@ const SignInClientPage: FC = () => {
 						</button>
 
 						<button
+							disabled
 							type="button"
-							className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
+							//className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
+							className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border text-xl font-medium"
 							onClick={() => {
 								handleOnClick(githubAuthProvider).catch(console.error)
 							}}
