@@ -140,15 +140,15 @@ const TeamSettingsClientPage: FC = () => {
 										setAddNew(true)
 									},
 								},
-								{
-									label: `Viewer`,
-									key: `viewer`,
-									icon: <EyeOutlined />,
-									onClick: () => {
-										setcurrentTab(`viewer`)
-										setAddNew(true)
-									},
-								},
+								// {
+								// 	label: `Viewer`,
+								// 	key: `viewer`,
+								// 	icon: <EyeOutlined />,
+								// 	onClick: () => {
+								// 		setcurrentTab(`viewer`)
+								// 		setAddNew(true)
+								// 	},
+								// },
 							],
 						}}
 					>
@@ -337,149 +337,149 @@ const TeamSettingsClientPage: FC = () => {
 							</div>
 						),
 					},
-					{
-						label: `Viewers`,
-						key: `viewer`,
-						children: (
-							<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-								{members?.docs
-									.filter((member) => member.data().type === `viewer`)
-									.map((member, i) => (
-										<Card
-											key={member.id}
-											actions={[
-												<div
-													key="setting"
-													className="space-x-[10px]"
-													onClick={() => {
-														removeMember(member.id).catch(console.error)
-													}}
-												>
-													<span>
-														<DeleteOutlined />
-													</span>
-													{` `}
-													<span>Remove</span>
-												</div>,
-											]}
-										>
-											<div className="flex items-center justify-between">
-												<Meta
-													avatar={<Avatar shape="square" src={member.data().avatar} />}
-													title={
-														<div className="space-x-1">
-															<span className="capitalize">{member.data().name}</span>
-														</div>
-													}
-													description={memberEmails.data?.[member.id]}
-												/>
-												<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
-													{i + 1}
-												</Avatar>
-											</div>
-										</Card>
-									))}
+					// {
+					// 	label: `Viewers`,
+					// 	key: `viewer`,
+					// 	children: (
+					// 		<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+					// 			{members?.docs
+					// 				.filter((member) => member.data().type === `viewer`)
+					// 				.map((member, i) => (
+					// 					<Card
+					// 						key={member.id}
+					// 						actions={[
+					// 							<div
+					// 								key="setting"
+					// 								className="space-x-[10px]"
+					// 								onClick={() => {
+					// 									removeMember(member.id).catch(console.error)
+					// 								}}
+					// 							>
+					// 								<span>
+					// 									<DeleteOutlined />
+					// 								</span>
+					// 								{` `}
+					// 								<span>Remove</span>
+					// 							</div>,
+					// 						]}
+					// 					>
+					// 						<div className="flex items-center justify-between">
+					// 							<Meta
+					// 								avatar={<Avatar shape="square" src={member.data().avatar} />}
+					// 								title={
+					// 									<div className="space-x-1">
+					// 										<span className="capitalize">{member.data().name}</span>
+					// 									</div>
+					// 								}
+					// 								description={memberEmails.data?.[member.id]}
+					// 							/>
+					// 							<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
+					// 								{i + 1}
+					// 							</Avatar>
+					// 						</div>
+					// 					</Card>
+					// 				))}
 
-								{invitees?.docs
-									.filter((invitee) => invitee.data().userType === `viewer` && invitee.data().status === `pending`)
-									.map((invitee) => (
-										<Card
-											key={invitee.id}
-											actions={[
-												<div
-													key="setting"
-													className="space-x-[10px]"
-													onClick={() => {
-														removeInvitee(invitee.id).catch(console.error)
-													}}
-												>
-													<span>
-														<DeleteOutlined />
-													</span>
-													{` `}
-													<span>Remove</span>
-												</div>,
-												<div key="reminder" className="px-2">
-													<Button
-														icon={<SendOutlined />}
-														block
-														className="flex items-center justify-center"
-														onClick={() => {
-															sendReminder(invitee.data().email).catch(console.error)
-														}}
-													>
-														Send Reminder
-													</Button>
-												</div>,
-											]}
-										>
-											<div className="flex items-center justify-between">
-												<Meta
-													avatar={<Avatar shape="square" icon={<UserOutlined />} />}
-													title={
-														<Tag className="capitalize" color="orange">
-															{invitee.data().status}
-														</Tag>
-													}
-													description={
-														<div className="space-x-1">
-															<span>{invitee.data().email}</span>
-														</div>
-													}
-												/>
-											</div>
-										</Card>
-									))}
+					// 			{invitees?.docs
+					// 				.filter((invitee) => invitee.data().userType === `viewer` && invitee.data().status === `pending`)
+					// 				.map((invitee) => (
+					// 					<Card
+					// 						key={invitee.id}
+					// 						actions={[
+					// 							<div
+					// 								key="setting"
+					// 								className="space-x-[10px]"
+					// 								onClick={() => {
+					// 									removeInvitee(invitee.id).catch(console.error)
+					// 								}}
+					// 							>
+					// 								<span>
+					// 									<DeleteOutlined />
+					// 								</span>
+					// 								{` `}
+					// 								<span>Remove</span>
+					// 							</div>,
+					// 							<div key="reminder" className="px-2">
+					// 								<Button
+					// 									icon={<SendOutlined />}
+					// 									block
+					// 									className="flex items-center justify-center"
+					// 									onClick={() => {
+					// 										sendReminder(invitee.data().email).catch(console.error)
+					// 									}}
+					// 								>
+					// 									Send Reminder
+					// 								</Button>
+					// 							</div>,
+					// 						]}
+					// 					>
+					// 						<div className="flex items-center justify-between">
+					// 							<Meta
+					// 								avatar={<Avatar shape="square" icon={<UserOutlined />} />}
+					// 								title={
+					// 									<Tag className="capitalize" color="orange">
+					// 										{invitee.data().status}
+					// 									</Tag>
+					// 								}
+					// 								description={
+					// 									<div className="space-x-1">
+					// 										<span>{invitee.data().email}</span>
+					// 									</div>
+					// 								}
+					// 							/>
+					// 						</div>
+					// 					</Card>
+					// 				))}
 
-								{addNew && (
-									<Card
-										actions={[
-											<div
-												key="setting"
-												className="space-x-[10px]"
-												onClick={() => {
-													setEmail(``)
-													setAddNew(false)
-												}}
-											>
-												<span>
-													<DeleteOutlined />
-												</span>
-												{` `}
-												<span>Remove</span>
-											</div>,
-											<div key="invite" className="px-2">
-												<Button
-													icon={<SendOutlined />}
-													block
-													className="flex items-center justify-center"
-													onClick={() => {
-														sendInvite().catch(console.error)
-													}}
-												>
-													Invite
-												</Button>
-											</div>,
-										]}
-									>
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex-1">
-												<Input
-													prefix="Email"
-													className="w-full"
-													value={email}
-													onChange={(e) => setEmail(e.target.value)}
-												/>
-											</div>
-											<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
-												#
-											</Avatar>
-										</div>
-									</Card>
-								)}
-							</div>
-						),
-					},
+					// 			{addNew && (
+					// 				<Card
+					// 					actions={[
+					// 						<div
+					// 							key="setting"
+					// 							className="space-x-[10px]"
+					// 							onClick={() => {
+					// 								setEmail(``)
+					// 								setAddNew(false)
+					// 							}}
+					// 						>
+					// 							<span>
+					// 								<DeleteOutlined />
+					// 							</span>
+					// 							{` `}
+					// 							<span>Remove</span>
+					// 						</div>,
+					// 						<div key="invite" className="px-2">
+					// 							<Button
+					// 								icon={<SendOutlined />}
+					// 								block
+					// 								className="flex items-center justify-center"
+					// 								onClick={() => {
+					// 									sendInvite().catch(console.error)
+					// 								}}
+					// 							>
+					// 								Invite
+					// 							</Button>
+					// 						</div>,
+					// 					]}
+					// 				>
+					// 					<div className="flex items-center justify-between gap-2">
+					// 						<div className="flex-1">
+					// 							<Input
+					// 								prefix="Email"
+					// 								className="w-full"
+					// 								value={email}
+					// 								onChange={(e) => setEmail(e.target.value)}
+					// 							/>
+					// 						</div>
+					// 						<Avatar size="small" style={{ backgroundColor: `#DDE3D5`, color: `rgba(0, 0, 0, 0.88)` }}>
+					// 							#
+					// 						</Avatar>
+					// 					</div>
+					// 				</Card>
+					// 			)}
+					// 		</div>
+					// 	),
+					// },
 				]}
 			/>
 		</div>
