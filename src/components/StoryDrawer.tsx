@@ -4,8 +4,6 @@ import {
 	BranchesOutlined,
 	CloseOutlined,
 	ClusterOutlined,
-	CodeOutlined,
-	CommentOutlined,
 	DollarOutlined,
 	FlagOutlined,
 	LinkOutlined,
@@ -17,11 +15,10 @@ import {
 	UserOutlined,
 } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Avatar, Button, Checkbox, Divider, Drawer, Dropdown, Form, Input, Menu, Popover, Segmented, Select, Skeleton, Tabs, Tag } from "antd"
-import clsx from "clsx"
+import { Avatar, Button, Checkbox, Divider, Drawer, Form, Input, Menu, Popover, Segmented, Select, Skeleton, Tabs, Tag } from "antd"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { addDoc, collection, updateDoc, writeBatch } from "firebase/firestore"
+import { addDoc, collection, updateDoc } from "firebase/firestore"
 import produce from "immer"
 import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
@@ -31,7 +28,7 @@ import { useForm } from "react-hook-form"
 import { useInterval } from "react-use"
 import { z } from 'zod';
 
-import type { MenuProps, SelectProps } from "antd";
+import type { SelectProps } from "antd";
 import type { QueryDocumentSnapshot, QuerySnapshot, WithFieldValue } from "firebase/firestore"
 import type { FC } from "react"
 import type { Member } from "~/types/db/Products/Members"
@@ -47,8 +44,6 @@ import RhfSelect from "~/components/rhf/RhfSelect"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { StoryMapItemSchema, sprintColumns } from "~/types/db/Products/StoryMapItems"
 import { TaskConverter } from "~/types/db/Products/Tasks"
-import dollarFormat from "~/utils/dollarFormat"
-import { db } from "~/utils/firebase"
 import { formValidateStatus } from "~/utils/formValidateStatus"
 import { debouncedUpdateItem, deleteItem, updateItem } from "~/utils/storyMap"
 import { useTheme } from "~/utils/ThemeContext"
@@ -73,7 +68,6 @@ export type StoryDrawerProps = {
 	versions: QuerySnapshot<Version>
 	storyId: string
 	isOpen: boolean,
-	//isUsGenInProgress: boolean
 	onClose: () => void
 }
 
@@ -127,17 +121,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 		})
 	};
 
-	// const handleStoryDesignLinkChange = async (value: string) => {
-	// 	console.log(value)
-	// 	setStoryDesignLink(value);
-	// 	await updateItem(product, storyMapItems, versions, story.id, {
-	// 		designLink: value as WithFieldValue<string | undefined>,
-	// 	})
-	// };
-
-
-
-
 	const sgGenUserStory = async () => {
 		setScrumGenieRunning(true);
 		setDescription(``)
@@ -150,14 +133,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
 		})
 
-		//console.log(newStoryDescRaw)
-
 		const newStoryDesc = newStoryDescRaw.response
 			?.split(`\n`)
 			.map((s) => s.replace(/^[0-9]+\. */, ``))
 			.filter((s) => s !== ``)[0]
-
-		//console.log(newStoryDesc)
 
 		if (newStoryDesc) {
 			await updateItem(product, storyMapItems, versions, story.id, { description: newStoryDesc }).catch(console.error)
@@ -179,7 +158,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 			designEffort: value,
 		})
 	};
-
 
 	const [members, , membersError] = useCollection(collection(product.ref, `Members`).withConverter(MemberConverter))
 	useErrorHandler(membersError)
@@ -227,24 +205,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	})
 
 	const toggleAcceptanceCriterion = async (id: string, checked: boolean) => {
-		await updateItem(product, storyMapItems, versions, story.id, {
-			acceptanceCriteria: produce(story.acceptanceCriteria, (draft) => {
-				const index = draft.findIndex((criterion) => criterion.id === id)
-
-				// draft[index]!.checked = checked
-				// if (checked === true) {
-				// 	draft[index]!.status = `done`
-				// } else {
-				// 	draft[index]!.status = `todo`
-				// }
-			}),
-		})
-
 		const task = tasks?.docs.find(t => t.id === story.acceptanceCriteria.find(cr => cr.id === id)?.taskId)
 		await updateDoc(task!.ref, {
 			status: checked ? `done` : `todo`
 		})
-
 	}
 
 	const addAcceptanceCriterion = async () => {
@@ -266,18 +230,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	}
 
 	const toggleBug = async (id: string, checked: boolean) => {
-		await updateItem(product, storyMapItems, versions, story.id, {
-			bugs: produce(story.bugs, (draft) => {
-				const index = draft.findIndex((bug) => bug.id === id)
-				// draft[index]!.checked = checked
-				// if (checked === true) {
-				// 	draft[index]!.status = `done`
-				// } else {
-				// 	draft[index]!.status = `todo`
-				// }
-			}),
-		})
-
 		const task = tasks?.docs.find(t => t.id === story.bugs.find(bug => bug.id === id)?.taskId)
 		await updateDoc(task!.ref, {
 			status: checked ? `done` : `todo`
@@ -300,18 +252,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 	}
 
 	const totalEffort = story.designEffort + story.engineeringEffort
-
-	const peoplePopoverItems = story.peopleIds
-		.map((userId) => members?.docs.find((user) => user.id === userId))
-		.filter((member): member is QueryDocumentSnapshot<Member> => member?.exists() ?? false)
-		.map((member) => (
-			<div key={member.id} className="flex items-center gap-2 rounded bg-[#f0f0f0] p-2">
-				<Avatar src={member.data().avatar} shape="square" size="small" />
-				{member.data().name}
-			</div>
-		))
-
-	const theme = useTheme()
 
 	return (
 		<Drawer
@@ -382,6 +322,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 								<Popover style={{ height: `200px`, overflow: `auto` }} placement="bottomRight"
 									open={storyVersionPopoverIsOpen}
+									onOpenChange={visible => setStoryVersionPopoverIsOpen(visible)}
 
 									content={
 										<Menu
@@ -414,6 +355,7 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 
 								<Popover style={{ height: `200px`, overflow: `auto` }} placement="topRight"
 									open={storyLifecyclePopoverIsOpen}
+									onOpenChange={visible => setStoryLifecyclePopoverIsOpen(visible)}
 									content={
 										<Menu
 											mode="vertical"
@@ -525,35 +467,6 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 								<Button disabled type="primary" size="small" icon={<ClusterOutlined />}>
 									System
 								</Button>
-
-								{/* <div className="absolute left-1/2 top-0 flex -translate-x-1/2 gap-1">
-									<Tag
-										color={story.branchName ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
-										icon={<CodeOutlined />}
-										className={clsx(!story.branchName && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
-									>
-										{story.branchName ?? `No branch`}
-									</Tag>
-									<LinkTo href={story.designLink} openInNewTab>
-										<Tag
-											color={story.designLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
-											icon={<BlockOutlined />}
-											className={clsx(!story.designLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
-										>
-											Design
-										</Tag>
-									</LinkTo>
-									<LinkTo href={story.pageLink} openInNewTab>
-										<Tag
-											color={story.pageLink ? `#0958d9` : theme === `light` ? `#f5f5f5` : `#333333`}
-											icon={<LinkOutlined />}
-											style={story.pageLink ? {} : { color: `#d9d9d9`, border: `1px solid currentColor` }}
-											className={clsx(!story.pageLink && `!border-current !text-[#d9d9d9] dark:!text-[#555555]`)}
-										>
-											Page
-										</Tag>
-									</LinkTo>
-								</div> */}
 							</div>
 						</div>
 					</div >
