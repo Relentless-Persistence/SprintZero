@@ -22,11 +22,11 @@ const TextListEditor: ForwardRefRenderFunction<HTMLInputElement, TextListEditorP
 	ref,
 ) => {
 	useEffect(() => {
-		console.log("initialll:", textList)
+		//console.log(`initialll:`, textList)
 		if (textList.length === 0) onChange([{ id: nanoid(), text: `` }])
 	}, [onChange, textList.length])
 
-	console.log("intial textlist", textList)
+	//console.log("intial textlist", textList)
 
 	// For managing focus on new elements
 	const newestElement = useRef<string>(``)

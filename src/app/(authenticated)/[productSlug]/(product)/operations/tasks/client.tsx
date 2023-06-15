@@ -1,7 +1,7 @@
 "use client"
 
 import { Breadcrumb, Button, Tabs, Tag } from "antd"
-import { collection, query } from "firebase/firestore"
+import { collection, orderBy, query } from "firebase/firestore"
 import { useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
 import { useCollection } from "react-firebase-hooks/firestore"
@@ -10,11 +10,12 @@ import type { FC } from "react"
 import type { Task } from "~/types/db/Products/Tasks"
 
 import GeneralTasks from "./GeneralTask"
-import StoryTask from "./StoryTask"
 import TaskDrawer from "./TaskDrawer"
+import { useStoryMapContext } from "../../map/StoryMapContext"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 import { TaskConverter } from "~/types/db/Products/Tasks"
+import { VersionConverter } from "~/types/db/Products/Versions"
 
 interface MyTask extends Task {
   id: string
@@ -30,27 +31,44 @@ const TasksClientPage: FC = () => {
   )
   useErrorHandler(tasksError)
 
-  const [storyMapItems, , storyMapItemsError] = useCollection(
+  const [storyMapItemsSnap, , storyMapItemsSnapError] = useCollection(
     collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
   )
-  useErrorHandler(storyMapItemsError)
+  useErrorHandler(storyMapItemsSnapError)
 
-  if (!storyMapItems) return null
+  const [versions, , versionsError] = useCollection(
+    query(collection(product.ref, `Versions`), orderBy(`name`, `asc`)).withConverter(VersionConverter),
+  )
+  useErrorHandler(versionsError)
 
-  const storyMaps = storyMapItems.docs.map((item) => item.data())
+  if (!storyMapItemsSnap) return null
 
-  const totalAcceptanceCriteria = storyMaps.reduce((sum, item) => {
+  const storyMapsItems = storyMapItemsSnap.docs.map((item) => item.data())
+
+  const totalAcceptanceCriteria = storyMapsItems.reduce((sum, item) => {
     return sum + item.acceptanceCriteria.length;
   }, 0);
 
-  const totalBugs = storyMaps.reduce((sum, item) => {
+  const totalBugs = storyMapsItems.reduce((sum, item) => {
     return sum + item.bugs.length;
   }, 0);
+
+  const acTasks: MyTask[] = tasks
+    ? tasks.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((task) => task.type === `acceptanceCriteria`)
+    : [];
+
+  const bugTasks: MyTask[] = tasks
+    ? tasks.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((task) => task.type === `bug`)
+    : [];
 
   const dSTasks: MyTask[] = tasks
     ? tasks.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter((task) => task.type === `data science`)
+      .filter((task) => task.type === `dataScience`)
     : [];
 
   const pipeTasks: MyTask[] = tasks
@@ -66,15 +84,16 @@ const TasksClientPage: FC = () => {
     : [];
 
   return (
-    <div className="flex flex-col px-12 py-8">
-      <div className="">
+    <div className="flex h-full flex-col px-12 pb-0 py-8">
+      <div className="mb-5">
         <Breadcrumb className="capitalize mb-3" items={[{ title: `Tactics` }, { title: `Tasks` }, { title: currentTab }]} />
         <h1 className="text-4xl font-semibold capitalize mb-1">Get.Stuff.Done.</h1>
         <p className="text-textTertiary">Track specific activity that needs to be completed to achieve a certain goal or objective.</p>
       </div>
 
-      <div className="flex-grow mt-6">
+      <div className="flex h-full flex-col gap-4">
         <Tabs
+          className="min-h-0 grow [&_.ant-tabs-content]:h-full [&_.ant-tabs-nav]:px-0 [&_.ant-tabs-tabpane]:h-full"
           activeKey={currentTab}
           onChange={(key) => setCurrentTab(key)}
           tabBarExtraContent={currentTab !== `acceptance criteria` && currentTab !== `bugs` ? <Button onClick={() => setNewTask(true)}>Add Task</Button> : null}
@@ -83,45 +102,40 @@ const TasksClientPage: FC = () => {
               label: <div className="space-x-2"><Tag>{totalAcceptanceCriteria}</Tag><span>Acceptance Criteria</span></div>,
               key: `acceptance criteria`,
               children: (
-                <div className="w-full">
-                  <StoryTask storyMapItems={storyMapItems.docs.map((item) => item.data())} tab={currentTab} />
-                </div>
+
+                <GeneralTasks tasks={acTasks} storyMapItems={storyMapsItems} versions={versions} />
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{totalBugs}</Tag><span>Bugs</span></div>,
               key: `bugs`,
               children: (
-                <div className="w-full">
-                  <StoryTask storyMapItems={storyMapItems.docs.map((item) => item.data())} tab={currentTab} />
-                </div>
+
+                <GeneralTasks tasks={bugTasks} storyMapItems={storyMapsItems} versions={versions} />
+
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{dSTasks.length}</Tag><span>Data Science</span></div>,
-              key: `data science`,
+              key: `dataScience`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={dSTasks} />
-                </div>
+
+                <GeneralTasks tasks={dSTasks} />
+
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{pipeTasks.length}</Tag><span>Pipelines</span></div>,
               key: `pipelines`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={pipeTasks} />
-                </div>
+                <GeneralTasks tasks={pipeTasks} />
               ),
             },
             {
               label: <div className="space-x-2"><Tag>{randomTasks.length}</Tag><span>Random</span></div>,
               key: `random`,
               children: (
-                <div className="w-full">
-                  <GeneralTasks tasks={randomTasks} />
-                </div>
+                <GeneralTasks tasks={randomTasks} />
               ),
             },
           ]}

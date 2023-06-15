@@ -342,7 +342,7 @@ export const productRouter = router({
 				email: z.string().email(),
 				productId: z.string(),
 				userIdToken: z.string(),
-				userType: z.string(),
+				userType: z.enum([`owner`, `editor`, `viewer`]),
 			}),
 		)
 		.mutation(async ({ input: { email, productId, userIdToken, userType } }) => {

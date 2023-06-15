@@ -238,7 +238,7 @@ const TeamSettingsClientPage: FC = () => {
 									))}
 
 								{invitees?.docs
-									.filter((invitee) => invitee.data().userType === `editor` && invitee.data().status === `pending`)
+									.filter((invitee) => invitee.data().userType === `editor` && invitee.data().productId === product.data().id && invitee.data().status === `pending`)
 									.map((invitee) => (
 										<Card
 											key={invitee.id}

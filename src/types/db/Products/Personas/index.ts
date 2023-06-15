@@ -4,7 +4,7 @@ import { genConverter, timestampSchema } from "~/types"
 
 export const PersonaSchema = z.object({
 	createdAt: timestampSchema,
-	description: z.string(),
+	description: z.string().optional(),
 	name: z.string(),
 	toolset: z.string().optional(),
 	education: z.string().optional(),

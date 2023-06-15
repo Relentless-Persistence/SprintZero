@@ -121,40 +121,41 @@ const KickoffClientPage: FC = () => {
 			}
 		} else {
 			try {
-				const newPersonaRef = await addDoc(collection(product.ref, `Personas`), {
+				//const newPersonaRef = 
+				await addDoc(collection(product.ref, `Personas`), {
 					...persona,
 					createdAt: Timestamp.now(),
 				})
 
-				const personaDescription = await gpt.mutateAsync({
-					prompt: `Write a multi-paragraph description for a user persona called "${persona!.name}" describing who he is. Use plural pronouns to stay gender-neutral when writing.`,
-				});
+				// const personaDescription = await gpt.mutateAsync({
+				// 	prompt: `Write a multi-paragraph description for a user persona called "${persona!.name}" describing who he is. Use plural pronouns to stay gender-neutral when writing.`,
+				// });
 
-				//console.log(personaDescription.response?.trim())
+				// //console.log(personaDescription.response?.trim())
 
-				await updateDoc(newPersonaRef.withConverter(PersonaConverter), {
-					description: personaDescription.response?.trim()
-				}).then().catch()
+				// await updateDoc(newPersonaRef.withConverter(PersonaConverter), {
+				// 	description: personaDescription.response?.trim()
+				// }).then().catch()
 
-				const personaToolset = await gpt.mutateAsync({
-					prompt: `Write a description as a numbered list for a user persona called "${persona!.name}" describing his core skills. Use plural pronouns to stay gender-neutral when writing.`,
-				});
+				// const personaToolset = await gpt.mutateAsync({
+				// 	prompt: `Write a description as a numbered list for a user persona called "${persona!.name}" describing his core skills. Use plural pronouns to stay gender-neutral when writing.`,
+				// });
 
-				//console.log(personaToolset.response?.trim())
+				// //console.log(personaToolset.response?.trim())
 
-				await updateDoc(newPersonaRef.withConverter(PersonaConverter), {
-					toolset: personaToolset.response?.trim()
-				}).then().catch()
+				// await updateDoc(newPersonaRef.withConverter(PersonaConverter), {
+				// 	toolset: personaToolset.response?.trim()
+				// }).then().catch()
 
-				const personaEducation = await gpt.mutateAsync({
-					prompt: `Write a multi-paragraph description for a user persona called "${persona!.name}" describing his typical education. Use plural pronouns to stay gender-neutral when writing.`,
-				});
+				// const personaEducation = await gpt.mutateAsync({
+				// 	prompt: `Write a multi-paragraph description for a user persona called "${persona!.name}" describing his typical education. Use plural pronouns to stay gender-neutral when writing.`,
+				// });
 
-				//console.log(personaEducation.response?.trim())
+				// //console.log(personaEducation.response?.trim())
 
-				await updateDoc(newPersonaRef.withConverter(PersonaConverter), {
-					education: personaEducation.response?.trim()
-				}).then().catch()
+				// await updateDoc(newPersonaRef.withConverter(PersonaConverter), {
+				// 	education: personaEducation.response?.trim()
+				// }).then().catch()
 
 			} catch (error) {
 				console.error(error)

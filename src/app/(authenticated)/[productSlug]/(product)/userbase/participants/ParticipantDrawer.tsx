@@ -10,11 +10,11 @@ import {
   UploadOutlined,
 } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Drawer, Dropdown, Popover, Skeleton, Tag, Typography } from 'antd';
+import { Button, Drawer, Dropdown, Menu, Popover, Skeleton, Tag, Typography } from 'antd';
 import axios from "axios"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { Timestamp, collection, doc, updateDoc } from "firebase/firestore"
+import { Timestamp, collection, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { deleteObject, ref } from "firebase/storage";
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
@@ -22,10 +22,11 @@ import { useCollection, useDocument } from "react-firebase-hooks/firestore"
 import { useForm } from "react-hook-form"
 
 import type { MenuProps } from 'antd';
-import type { QuerySnapshot } from "firebase/firestore"
+import type { QuerySnapshot, WithFieldValue } from "firebase/firestore"
 import type { FC } from "react"
 import type { z } from "zod"
-import type { DialogueParticipant } from "~/types/db/Products/DialogueParticipants"
+import type { DialogueParticipant } from "~/types/db/Products/DialogueParticipants";
+
 
 import DragDrop from "./DragDrop"
 import ParticipantDisability from "./ParticipantDisability";
@@ -37,13 +38,15 @@ import LinkTo from "~/components/LinkTo";
 import RhfInput from "~/components/rhf/RhfInput"
 import RhfSelect from "~/components/rhf/RhfSelect"
 import RhfTextArea from "~/components/rhf/RhfTextArea"
-import { DialogueParticipantSchema, statuses, timings } from "~/types/db/Products/DialogueParticipants"
+import { DialogueParticipantConverter, DialogueParticipantSchema, statuses, timings } from "~/types/db/Products/DialogueParticipants"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { PersonaConverter } from "~/types/db/Products/Personas"
 import { storage } from "~/utils/firebase";
+import { updateItem } from "~/utils/storyMap";
 import BoneIcon from "~public/icons/bone.svg"
 import CognitionIcon from "~public/icons/cognition.svg"
 import EarIcon from "~public/icons/ear.svg"
+import PhysicalDisability from "~public/icons/physical-disability.svg"
 
 dayjs.extend(relativeTime)
 
@@ -56,7 +59,7 @@ const formSchema = DialogueParticipantSchema.pick({
   phoneNumber: true,
   title: true,
   transcript: true,
-  personaIds: true,
+  personaId: true,
 })
 type FormInputs = z.infer<typeof formSchema>
 
@@ -84,6 +87,9 @@ interface TranscribeResponse {
 const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activeParticipant, onClose }) => {
   const { product } = useAppContext()
 
+  const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
+  const participantData = participant?.data()
+
   const [isOpen, setIsOpen] = useState(true)
   const close = () => {
     setIsOpen(false)
@@ -97,9 +103,29 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
   const [audioUrl, setAudioUrl] = useState(``)
   const [storageBucketUri, setStorageBucketUri] = useState(``)
   const [loadingTranscript, setLoadingTranscrript] = useState(false)
+  const [participantStatusPopoverIsOpen, setParticipantStatusPopoverIsOpen] = useState(false)
+  const [participantDisabilityPopoverIsOpen, setParticipantDisabilityPopoverIsOpen] = useState(false)
 
-  const participant = participants?.docs.find((participant) => participant.id === activeParticipant)
-  const participantData = participant?.data()
+  const participantStatusEntry = Object.entries(statuses).find(([key]) => participantData && key === participantData.status);
+
+  const [participantStatusKey, setParticipantStatusKey] = useState<string>(participantStatusEntry ? participantStatusEntry[0] : ``);
+  const [participantStatusLabel, setParticipantStatusLabel] = useState<string>(participantStatusEntry ? participantStatusEntry[1] : ``);
+
+
+
+  // const [participantStatusKey, setParticipantStatusKey] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![0])
+  // const [participantStatusLabel, setParticipantStatusLabel] = useState<string>(Object.entries(statuses).find(([key]) => key === participantData?.status)![1])
+
+  type statusKey = keyof typeof statuses
+  const handleParticipantStatusChange = async ({ key }: { key: string }) => {
+    const label = Object.entries(statuses).find(([keyL, valueL]) => keyL === key)![1];
+    setParticipantStatusKey(key);
+    setParticipantStatusLabel(label);
+    const participantRef = doc(product.ref, `DialogueParticipants`, participant!.id);
+    await updateDoc(participantRef, {
+      status: key as WithFieldValue<statusKey>
+    })
+  };
 
   const [personas, , personasError] = useCollection(collection(product.ref, `Personas`).withConverter(PersonaConverter))
   useErrorHandler(personasError)
@@ -121,21 +147,52 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
       phoneNumber: participantData?.phoneNumber ?? null,
       title: participantData?.title ?? null,
       transcript: participantData?.transcript ?? ``,
-      personaIds: participantData?.personaIds ?? [],
+      personaId: participantData?.personaId ?? null,
     },
   })
 
+  const [saving, setSaving] = useState(false);
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const delay = 1000; // delay in milliseconds
+
   const onSubmit = handleSubmit(async (data) => {
     if (!activeParticipant) return
+
+    //console.log(` I am here ..`)
+
+    if (timer) {
+      clearTimeout(timer);
+      setTimer(null); // Reset timer to null after clearTimeout
+    }
+
+    setSaving(true);
+    setTimer(setTimeout(() => {
+      setSaving(false);
+    }, delay));
+
     await updateDoc(doc(product.ref, `DialogueParticipants`, activeParticipant), {
       ...data,
       updatedAt: Timestamp.now(),
     })
+
+    // if (timer) {
+    //   clearTimeout(timer);
+    //   setTimer(null); // Reset timer to null after clearTimeout
+    // }
+    // setSaving(false);
   })
 
   useEffect(() => {
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [timer]);
+
+  useEffect(() => {
     if (!participantData) return
-    setValue(`transcript`, participantData.transcript)
+    setValue(`transcript`, participantData.transcript ?? ``)
     setValue(`name`, participantData.name)
     setValue(`email`, participantData.email)
     setValue(`phoneNumber`, participantData.phoneNumber)
@@ -183,7 +240,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
 
     if (!id) return
 
-    const participantRef = doc(product.ref, `DialogueParticipants`, id);
+    const participantRef = doc(product.ref, `DialogueParticipants`, id).withConverter(DialogueParticipantConverter);
     const updateData = {
       transcript: ``,
       transcriptAudio: ``,
@@ -229,12 +286,15 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
           <div className="mr-4 flex min-w-0 max-w-full flex-col gap-1 overflow-auto">
             <p className="max-w-full leading-none">
               <span className="mr-4 inline-block max-w-full truncate font-semibold">{participant?.data().name}</span>
-              {participant && (
+              {participant && !saving ? (
                 <span className="mb-0.5 text-sm font-normal text-textTertiary">
                   Last modified {dayjs(participant.data().updatedAt.toMillis()).fromNow()}
                   {lastUpdatedAtUser?.data() && ` by ${lastUpdatedAtUser.data()!.name}`}
                 </span>
-              )}
+              ) : (
+                <span className="mb-0.5 text-sm font-normal text-textTertiary" style={{ color: `#397D0F` }}><SyncOutlined className="mr-1" /> Saving changes...</span>
+              )
+              }
             </p>
             <div className="flex gap-2">
               <Popover placement="bottomLeft" content={
@@ -242,70 +302,54 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
               }
                 trigger="click">
 
-                <Tag color="#585858" icon={<PushpinOutlined />}>
-                  <LinkTo href="">{participantData?.location ? participantData.location : `Location Unknown`}</LinkTo>
-                </Tag>
+                <Button size="small" color="#585858" icon={<PushpinOutlined />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                  {participantData?.location ? participantData.location : `Location Unknown`}
+                </Button>
               </Popover>
 
-              {/* {participantData?.status && (
-                                 */}
-              <Dropdown menu={{ items, onClick }} placement="bottomRight" arrow>
 
-                <Tag color="#585858" icon={<FlagOutlined />}>
-                  {statuses.find((status) => status[0] === participantData?.status)![1]}
-                </Tag>
-              </Dropdown>
-
-              {(participantData?.disabilities.auditory || participantData?.disabilities.cognitive || participantData?.disabilities.physical || participantData?.disabilities.speech || participantData?.disabilities.visual || participantData?.timing) ? (<>
-
-                {participantData.disabilities.auditory && (
-                  <Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
-                    Auditory
-                  </Tag>
-                )}
-                {participantData.disabilities.cognitive && (
-                  <Tag
-                    color="#585858"
-                    icon={<CognitionIcon className="mr-1.5 inline-block" />}
-                    className="flex items-center"
-                  >
-                    Cognitive
-                  </Tag>
-                )}
-                {participantData.disabilities.physical && (
-                  <Tag color="#585858" icon={<BoneIcon className="mr-1.5 inline-block" />} className="flex items-center">
-                    Physical
-                  </Tag>
-                )}
-                {participantData.disabilities.speech && (
-                  <Tag color="#585858" icon={<SoundOutlined />}>
-                    Speech
-                  </Tag>
-                )}
-                {participantData.disabilities.visual && (
-                  <Tag color="#585858" icon={<EyeOutlined />}>
-                    Visual
-                  </Tag>
-                )}
-                {participantData.timing && (
-                  <Tag color="#585858" icon={<SyncOutlined />}>
-                    {timings.find((timing) => timing[0] === participantData.timing)![1]}
-                  </Tag>
-                )}
-
-              </>) :
-                (
-                  <Popover placement="bottomLeft" content={
-                    participant && <ParticipantDisability participant={participant} onFinish={close} />
-                  }
-                    trigger="click">
-
-                    <Tag color="#585858" icon={<EarIcon className="mr-1.5 inline-block" />} className="flex items-center">
-                      Not Set
-                    </Tag>
+              {participantData?.status && (
+                <>
+                  <Popover style={{ height: `200px`, overflow: `auto`, padding: `6px` }} placement="bottomRight"
+                    id="participantStatusPopover"
+                    open={participantStatusPopoverIsOpen}
+                    content={
+                      <Menu
+                        mode="vertical"
+                        selectedKeys={[participantStatusKey]}
+                        onClick={handleParticipantStatusChange}
+                        style={{ border: `none`, maxHeight: `300px`, overflow: `auto` }}
+                      >
+                        {Object.entries(statuses).map(([key, status]) => (
+                          <Menu.Item key={key} style={{ height: `30px`, lineHeight: `30px` }} onClick={() => setParticipantStatusPopoverIsOpen(false)}>{status}</Menu.Item>
+                        ))}
+                      </Menu>
+                    } trigger="click">
+                    <Button onClick={() => setParticipantStatusPopoverIsOpen(!participantStatusPopoverIsOpen)} size="small" color="#585858" icon={<FlagOutlined />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                      {participantStatusLabel}
+                    </Button>
                   </Popover>
 
-                )}
+                  {/* <Dropdown menu={{ items, onClick }} placement="bottomRight" arrow>
+
+                    <Button size="small" color="#585858" icon={<FlagOutlined />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                      {statuses.find((status) => status[0] === participantData.status)![1]}
+                    </Button>
+                  </Dropdown> */}
+                </>
+              )
+              }
+
+              <Popover placement="bottomLeft" content={
+                participant && <ParticipantDisability participant={participant} onFinish={close} />
+              }
+                trigger="click">
+
+                <Button onClick={() => setParticipantDisabilityPopoverIsOpen(!participantDisabilityPopoverIsOpen)} size="small" color="#585858" icon={<PhysicalDisability className="mr-1.5 inline-block" />} className="flex items-center justify-center" style={{ background: `rgba(0,0,0,0.65)`, color: `#ffffff`, fontSize: `12px` }}>
+                  Disability
+                </Button>
+              </Popover>
+
             </div>
           </div>
         )
@@ -320,7 +364,13 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
           </div>
         ) : (
           <div className="flex gap-4">
-            <Button danger>
+            <Button onClick={
+              () => {
+                deleteDoc(participant!.ref).then(() => {
+                  close()
+                }).catch((error) => console.error(error));
+              }
+            } danger>
               Delete
             </Button>
             {/* <Button htmlType="submit" form="participant-form">
@@ -344,61 +394,67 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
         <ParticipantEditForm participant={participant} onFinish={close} />
       ) : (
         <form className="grid h-full grid-cols-[3fr_2fr] gap-6">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 grow">
 
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold">Interview Transcript</p>
-              {participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => {
+              {/* {participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => {
                 deleteAudio().catch(console.error)
-              }} disabled={loadingTranscript}>Replace audio file</Button>}
+              }} disabled={loadingTranscript}>Replace audio file</Button>} */}
 
               {isEditorOpen && !participantData?.transcriptAudio && <Button size="small" className="flex items-center" icon={<UploadOutlined />} onClick={() => setIsEditorOpen(false)}>Upload audio file</Button>}
             </div>
 
-            {!participantData?.transcript && !isEditorOpen ?
-              !loadingTranscript ? <>
-                <div className="flex flex-col gap-2 items-center">
-                  <Button type="primary" onClick={() => setIsEditorOpen(true)}>Open Editor</Button>
-                  <Text>or</Text>
-                </div>
-                <DragDrop setAudioUrl={setAudioUrl} setStorageBucketUri={setStorageBucketUri} />
-              </>
-                :
-                <div style={{ position: `relative`, justifyContent: `center` }}>
-                  <RhfTextArea
-                    control={control}
-                    name="transcript"
-                    onChange={() => {
-                      onSubmit().catch(console.error)
-                    }}
-                    rows={12}
-                    wrapperClassName="grow"
-                    className="!h-full !resize-none"
-                  />
-                  {!participantData?.transcript && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
-                    <Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 9 }} />
-                  </div>}
-                </div>
+            {
+              // !participantData?.transcript && !isEditorOpen ?
+              //   !loadingTranscript ? 
 
-              :
+              //   <>
+              //     <div className="flex flex-col gap-2 items-center">
+              //       <Button type="primary" onClick={() => setIsEditorOpen(true)}>Open Editor</Button>
+              //       <Text>or</Text>
+              //     </div>
+              //     <DragDrop setAudioUrl={setAudioUrl} setStorageBucketUri={setStorageBucketUri} />
+              //   </>
+              //     :
+              //     <div style={{ position: `relative`, justifyContent: `center` }}>
+              //       <RhfTextArea
+              //         control={control}
+              //         name="transcript"
+              //         onChange={() => {
+              //           onSubmit().catch(console.error)
+              //         }}
+              //         rows={12}
+              //         wrapperClassName="grow"
+              //         className="!h-full !resize-none"
+              //       />
+              //       {!participantData?.transcript && <div style={{ position: `absolute`, top: `50%`, left: `50%`, transform: `translate(-50%, -50%)`, zIndex: 9999, width: `97%` }}>
+              //         <Skeleton active loading style={{ height: `50px` }} title={false} paragraph={{ rows: 9 }} />
+              //       </div>}
+              //     </div>
 
-              <div style={{ position: `relative`, justifyContent: `center` }}>
-                <RhfTextArea
-                  control={control}
-                  name="transcript"
-                  onChange={() => {
-                    onSubmit().catch(console.error)
-                  }}
-                  rows={10}
-                  wrapperClassName="grow"
-                  className="!h-full !resize-none"
-                />
-              </div>
-
-
+              //   :
             }
 
-            {participantData?.transcriptAudio && <figure>
+            <div style={{ position: `relative`, justifyContent: `center`, height: `100%` }} className="flex-grow h-full">
+              <RhfTextArea
+
+                control={control}
+                name="transcript"
+                onChange={() => {
+                  onSubmit().catch(console.error)
+                }}
+                rows={12}
+                wrapperClassName="grow"
+                className="!h-full !resize-none"
+                style={{ height: `100%` }}
+              />
+            </div>
+
+
+
+
+            {/* {participantData?.transcriptAudio && <figure>
               <audio
                 style={{ width: `100%` }}
                 className="mt-2"
@@ -408,7 +464,7 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
                   Download audio
                 </LinkTo>
               </audio>
-            </figure>}
+            </figure>} */}
           </div>
 
           <div className="flex flex-col gap-4">
@@ -496,9 +552,11 @@ const ParticipantDrawer: FC<ParticipantDrawerProps> = ({ participants, activePar
               <label className="leading-normal">
                 <span className="text-sm text-textTertiary">Persona</span>
                 <RhfSelect
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) => typeof option?.label === `string` ? option.label.includes(input) : false}
                   control={control}
-                  name="personaIds"
-                  mode="multiple"
+                  name="personaId"
                   onChange={() => {
                     onSubmit().catch(console.error)
                   }}

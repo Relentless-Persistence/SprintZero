@@ -156,7 +156,7 @@ const DialogueClientPage: FC = () => {
 							email: null,
 							location: ``,
 							location_id: ``,
-							name: `New Participant`,
+							name: ``,
 							phoneNumber: ``,
 							status: `identified`,
 							timing: null,
@@ -165,7 +165,7 @@ const DialogueClientPage: FC = () => {
 							transcriptAudio: ``,
 							updatedAt: Timestamp.now(),
 							wiki_link: ``,
-							personaIds: [],
+							personaId: null,
 							updatedAtUserId: user.id,
 						})
 							.then((docRef) => {

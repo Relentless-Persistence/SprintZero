@@ -1,21 +1,21 @@
 "use client"
 
-import {Breadcrumb, Select} from "antd"
-import {useEffect, useRef, useState} from "react"
+import { Breadcrumb, Select } from "antd"
+import { useEffect, useRef, useState } from "react"
 
-import type {FC} from "react"
-import type {StoryMapItem} from "~/types/db/Products/StoryMapItems"
+import type { FC } from "react"
+import type { StoryMapItem } from "~/types/db/Products/StoryMapItems"
 
 import Feature from "./Feature"
-import {matrixRect, pointerLocation} from "./globals"
+import { matrixRect, pointerLocation } from "./globals"
 import PrioritiesMatrix from "./PrioritiesMatrix"
-import {getEpics, getFeatures} from "~/utils/storyMap"
+import { getEpics, getFeatures } from "~/utils/storyMap"
 
 export type FeaturesTabProps = {
 	storyMapItems: StoryMapItem[]
 }
 
-const FeaturesTab: FC<FeaturesTabProps> = ({storyMapItems}) => {
+const FeaturesTab: FC<FeaturesTabProps> = ({ storyMapItems }) => {
 	const [selectedEpic, setSelectedEpic] = useState<string | undefined>(undefined)
 
 	const epics = getEpics(storyMapItems)
@@ -39,6 +39,15 @@ const FeaturesTab: FC<FeaturesTabProps> = ({storyMapItems}) => {
 	}, [])
 
 	useEffect(() => {
+		if (epics.length > 0 && !selectedEpic) {
+			const firstEpic = epics[0]
+			if (firstEpic) {  // check if first epic exists
+				setSelectedEpic(firstEpic.id)
+			}
+		}
+	}, [epics, selectedEpic])
+
+	useEffect(() => {
 		if (typeof window !== `undefined`) {
 			const onPointerMove = (e: PointerEvent) => {
 				pointerLocation.current = [e.clientX, e.clientY]
@@ -54,14 +63,15 @@ const FeaturesTab: FC<FeaturesTabProps> = ({storyMapItems}) => {
 	return (
 		<div className="flex h-full flex-col px-12 py-8">
 			<div className="flex justify-between">
-				<Breadcrumb items={[{title: `Tactics`}, {title: `Priorities`}, {title: `Features`}]} />
+				<Breadcrumb items={[{ title: `Tactics` }, { title: `Priorities` }, { title: `Features` }]} />
 
 				<div className="h-0">
 					<Select
 						placeholder="Select an epic..."
-						options={epics.map((epic) => ({value: epic.id, label: epic.name}))}
+						options={epics.map((epic) => ({ value: epic.id, label: epic.name }))}
 						onChange={(value: string) => setSelectedEpic(value)}
 						className="w-48"
+						value={selectedEpic}
 					/>
 				</div>
 			</div>

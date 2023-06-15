@@ -1,5 +1,6 @@
 "use client"
 
+import { Spin } from "antd"
 import { collectionGroup, query, where } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -26,12 +27,13 @@ const HomePage: FC = () => {
 
 		const firstProduct = members.docs[0]?.ref.parent.parent
 		if (firstProduct) router.replace(`/${firstProduct.id}/map`)
-		else router.replace(`/billing`)
+		else router.replace(`/configuration`)
 	}, [members, router, user, userLoading])
 
 	return (
 		<div className="grid h-full place-items-center">
-			<p className="text-xl">Redirecting you to your dashboard...</p>
+			{/* <p className="text-xl">Redirecting you to your dashboard...</p> */}
+			<Spin size="large" tip="bleeps, sweeps, and creeps..." />
 		</div>
 	)
 }

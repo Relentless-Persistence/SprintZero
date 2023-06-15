@@ -4,6 +4,7 @@ import { AutoComplete, Radio } from "antd"
 import axios from "axios"
 import clsx from "clsx"
 import { Timestamp, updateDoc } from "firebase/firestore"
+import _ from 'lodash' // for isEqual
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import usePlacesAutocomplete, { getGeocode } from "use-places-autocomplete"
@@ -21,8 +22,6 @@ import { DialogueParticipantSchema } from "~/types/db/Products/DialogueParticipa
 
 const formSchema = DialogueParticipantSchema.pick({
     disabilities: true,
-    location: true,
-    status: true,
     timing: true,
 })
 type FormInputs = z.infer<typeof formSchema>
@@ -35,75 +34,52 @@ export type ParticipantEditFormProps = {
 const ParticipantDisability: FC<ParticipantEditFormProps> = ({ participant, onFinish }) => {
     const participantData = participant.data()
 
-    const { control, handleSubmit } = useForm<FormInputs>({
+    const { control, handleSubmit, watch } = useForm<FormInputs>({
         mode: `onChange`,
         resolver: zodResolver(formSchema),
         defaultValues: {
             disabilities: participant.data().disabilities,
-            location: participant.data().location,
-            status: participant.data().status,
-            timing: participant.data().timing ?? undefined,
+            timing: participant.data().timing ?? null,
         },
     })
 
-    const onSubmit = handleSubmit(async (data) => {
+
+
+    const saveData = async (data: FormInputs) => {
         await updateDoc(participant.ref, { ...data, updatedAt: Timestamp.now() })
-        onFinish()
-    })
+    }
 
-    const { init, ready, value, setValue, suggestions, clearSuggestions } = usePlacesAutocomplete({
-        initOnMount: false,
-        requestOptions: { types: [`(cities)`] },
-    })
+    // Watch for changes in form values
+    //    const disabilities = watch(`disabilities`);
+    const auditory = watch(`disabilities.auditory`);
+    const cognitive = watch(`disabilities.cognitive`);
+    const physical = watch(`disabilities.physical`);
+    const speech = watch(`disabilities.speech`);
+    const visual = watch(`disabilities.visual`);
+    const timing = watch(`timing`);
 
-    const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY || ``,
-        libraries: useRef<Array<`places`>>([`places`]).current,
-    })
-
-    const [placeId, setPlaceId] = useState<string | undefined>(undefined)
-    const [wikipediaLink, setWikipediaLink] = useState<string | undefined>(undefined)
-    const handleLocationSelect = useCallback(
-        async (address: string) => {
-            setValue(address, false)
-            clearSuggestions()
-
-            const results = await getGeocode({ address })
-            const result = results[0]
-            if (result) {
-                setPlaceId(result.place_id)
-                const res = await axios.get<MediaWikiSearchApiResponse>(`https://en.wikipedia.org/w/api.php`, {
-                    params: {
-                        action: `query`,
-                        format: `json`,
-                        generator: `search`,
-                        gsrlimit: 1,
-                        gsrsearch: result.formatted_address,
-                        inprop: `url`,
-                        prop: `info`,
-                        origin: `*`,
-                    },
-                })
-
-                const page = res.data.query.pages[Object.keys(res.data.query.pages)[0] ?? ``]
-                if (page) setWikipediaLink(page.canonicalurl)
-            }
-        },
-        [clearSuggestions, setValue],
-    )
+    const initialRender = useRef(true)
 
     useEffect(() => {
-        if (isLoaded) {
-            init()
-            if (participantData.location) handleLocationSelect(participantData.location).catch(console.error)
+        // Trigger form submission when form values change
+
+        if (initialRender.current) {
+            initialRender.current = false
+            return
         }
-    }, [isLoaded, init, participantData.location, handleLocationSelect])
+
+        saveData({
+            disabilities: { auditory, cognitive, physical, speech, visual },
+            timing
+        }).catch(console.error);
+    }, [auditory, cognitive, physical, speech, visual, timing])
 
     return (
         <form
             id="participant-form"
             onSubmit={(e) => {
-                onSubmit(e).catch(console.error)
+                e.preventDefault()
+                //onSubmit(e).catch(console.error)
             }}
 
         >

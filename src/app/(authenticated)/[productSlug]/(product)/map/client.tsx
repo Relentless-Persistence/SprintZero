@@ -21,6 +21,7 @@ import {
 	query,
 	runTransaction,
 	serverTimestamp,
+	where,
 	writeBatch,
 } from "firebase/firestore"
 import { motion } from "framer-motion"
@@ -52,7 +53,13 @@ const StoryMapClientPage: FC = () => {
 		collection(product.ref, `StoryMapItems`).withConverter(StoryMapItemConverter),
 	)
 	useErrorHandler(storyMapItemsError)
-	const [versions, , versionsError] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
+
+	const versionsQuery = query(
+		collection(product.ref, `Versions`).withConverter(VersionConverter),
+		where(`deleted`, `==`, false)
+	);
+	const [versions, , versionsError] = useCollection(versionsQuery);
+	//const [versions, , versionsError] = useCollection(collection(product.ref, `Versions`).withConverter(VersionConverter))
 	useErrorHandler(versionsError)
 
 	const [currentVersionId, setCurrentVersionId] = useState<string | typeof AllVersions | undefined>(undefined)

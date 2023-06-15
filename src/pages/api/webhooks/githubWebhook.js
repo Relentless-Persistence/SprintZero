@@ -20,7 +20,7 @@ const handler = async (req, res) => {
 	// }
 
 	// const payload = JSON.parse(body)
-	console.log(`Received event from Github: `, body)
+	//console.log(`Received event from Github: `, body)
 
 	res.status(200).json({message: `Github webhook successfully received`})
 }

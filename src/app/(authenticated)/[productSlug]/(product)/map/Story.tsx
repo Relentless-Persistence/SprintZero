@@ -21,9 +21,9 @@ export type StoryProps = {
 }
 
 const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
-	const { product } = useAppContext()
+	const { product, user } = useAppContext()
 	const { storyMapItems, versions, editMode, setItemsToBeDeleted } = useStoryMapContext()
-	const genStoryDesc = trpc.gpt4.useMutation()
+	const genStoryDesc = trpc.gpt.useMutation()
 
 	const story = storyMapItems.find((story) => story.id === storyId)!
 	// const feature = storyMapItems.find((feature) => feature.id === story.parentId)!
@@ -46,17 +46,17 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 		const epicName = storyMapItems.find((item) => item.id === feature?.parentId)?.name
 
 		const newStoryDescRaw = await genStoryDesc.mutateAsync({
-			prompt: `We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ""}". And the feature belongs to an epic called "${epicName ?? ""}". And the user story has a short name "${storyName ?? ""}". Your output should include only one sentence.`,
+			prompt: `You are a business analyst. We are a team building a product. Help us to write a complete user story described as a "user story template". The user story belongs to a feature called "${featureName ?? ``}". And the feature belongs to an epic called "${epicName ?? ``}". And the user story has a short name "${storyName ?? ``}". Your output should include only one sentence.`,
 		})
 
-		console.log(newStoryDescRaw)
+		//console.log(newStoryDescRaw)
 
 		const newStoryDesc = newStoryDescRaw.response
 			?.split(`\n`)
 			.map((s) => s.replace(/^[0-9]+\. */, ``))
 			.filter((s) => s !== ``)[0]
 
-		console.log(newStoryDesc)
+		//console.log(newStoryDesc)
 
 		if (!story.description && newStoryDesc) {
 			await updateItem(product, storyMapItems, versions, story.id, { description: newStoryDesc }).catch(console.error)
@@ -104,8 +104,9 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 						<div className="relative my-0.5 mx-auto min-w-[1rem]">
 							<p className="px-0.5">{localStoryName || `_`}</p>
 							<input
+								maxLength={24}
 								value={localStoryName}
-								autoFocus={!story.initialRenameDone && !editMode}
+								autoFocus={!story.initialRenameDone && !editMode && user.id === story.updatedAtUserId}
 								onFocus={(e) => e.target.select()}
 								onBlur={() => {
 									if (localStoryName !== ``)

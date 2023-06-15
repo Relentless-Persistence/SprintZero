@@ -96,6 +96,14 @@ const ParticipantLocation: FC<ParticipantEditFormProps> = ({ participant, onFini
                     updatedAt: Timestamp.now()
                 })
             }
+            // else {
+            //     setPlaceId(undefined) // or setPlaceId('')
+            //     await updateDoc(participant.ref, {
+            //         location: address,
+            //         location_id: ``,
+            //         updatedAt: Timestamp.now()
+            //     })
+            // }
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [clearSuggestions, setValue],
@@ -127,12 +135,23 @@ const ParticipantLocation: FC<ParticipantEditFormProps> = ({ participant, onFini
             <div className="flex h-full flex-col gap-2">
                 <p className="text-lg font-semibold">Location</p>
                 <RhfAutoComplete
+                    showSearch
                     control={control}
                     name="location"
                     className="w-full"
                     value={value}
-                    onChange={(data) => {
-                        setValue(data as string)
+                    onChange={async (data) => {
+                        const newLocation = data as string
+                        setValue(newLocation)
+
+                        if (newLocation === ``) {
+                            setPlaceId(undefined)
+                            await updateDoc(participant.ref, {
+                                location: newLocation,
+                                location_id: ``, // or deleteField(), like before
+                                updatedAt: Timestamp.now()
+                            })
+                        }
                     }}
                     disabled={!ready}
                     onSelect={(data) => {
@@ -157,18 +176,24 @@ const ParticipantLocation: FC<ParticipantEditFormProps> = ({ participant, onFini
                             className="h-full w-full"
                         />
                     ) : (
-                        <p className="italic text-textTertiary">Enter a location above.</p>
+                        <iframe
+                            loading="lazy"
+                            allowFullScreen
+                            referrerPolicy="no-referrer-when-downgrade"
+                            className="h-full w-full"
+                        />
                     )}
                 </div>
                 <LinkTo
                     href={wikipediaLink}
+                    style={{ textDecoration: `none` }}
                     className={clsx(
                         `text-sm`,
                         wikipediaLink ? `text-textTertiary underline` : `cursor-not-allowed text-textQuaternary`,
                     )}
                     openInNewTab
                 >
-                    Learn more about this place on Wikipedia
+                    <span style={{ fontStyle: `italic`, fontSize: `12px`, color: placeId ? `#1677ff` : `rgba(0, 0, 0, 0.25)` }}>Learn more about this place on Wikipedia</span>
                 </LinkTo>
             </div>
         </form>

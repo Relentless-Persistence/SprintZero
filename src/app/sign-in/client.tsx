@@ -13,16 +13,18 @@ import {
 	signInWithPopup,
 	signOut,
 } from "firebase/auth"
-import { collectionGroup, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore"
+import { collection, collectionGroup, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
+import { useCollection } from "react-firebase-hooks/firestore"
 import { z } from "zod"
 
 import type { AuthProvider, UserCredential } from "firebase/auth"
 import type { FC } from "react"
 
+import { InviteConverter } from "~/types/db/Products/Invites"
 import { MemberConverter } from "~/types/db/Products/Members"
 import { UserConverter } from "~/types/db/Users"
 import { betaUsers } from "~/utils/betaUserList"
@@ -54,6 +56,13 @@ const SignInClientPage: FC = () => {
 		{ enabled: !!inviteToken },
 	).data?.productName
 
+	const userType = trpc.userInvite.getProductInviteInfo.useQuery(
+		{ inviteToken: inviteToken! },
+		{ enabled: !!inviteToken },
+	).data?.userType ?? `viewer`
+
+	//console.log(userType)
+
 	const putUserOnProduct = trpc.userInvite.putUserOnProduct.useMutation()
 
 	const processUser = async (credential: UserCredential) => {
@@ -82,7 +91,8 @@ const SignInClientPage: FC = () => {
 		let isNewUser = !user
 
 		if (typeof inviteToken === `string`) {
-			// do below in batch
+
+			// implement the code below as a single transaction
 			await setDoc(doc(db, `Users`, credential.user.uid).withConverter(UserConverter), {
 				email: credential.user.email,
 				hasAcceptedTos: false,
@@ -94,6 +104,7 @@ const SignInClientPage: FC = () => {
 				userAvatar: credential.user.photoURL,
 				userName: credential.user.displayName ?? credential.user.email,
 				userId: credential.user.uid,
+				userType,
 				inviteToken,
 			})
 
@@ -107,15 +118,14 @@ const SignInClientPage: FC = () => {
 				preferredMusicClient: `appleMusic`,
 				type: `user`,
 			})
-			//router.push(`/accept-terms`)
-			router.push(`/billing`)
+			//router.push(`/billing`)
+			router.push(`/accept-terms`)
 		}
 		else if (!user?.hasAcceptedTos) {
 			router.push(`/accept-terms`)
 		}
 		else {
 			// Nothing special to do, redirect to one of their products
-
 			const members = await getDocs(
 				query(
 					collectionGroup(db, `Members`),
@@ -124,7 +134,7 @@ const SignInClientPage: FC = () => {
 				).withConverter(MemberConverter),
 			)
 			if (members.docs.length === 0) {
-				router.push(`/billing`)
+				router.push(`/configuration`)
 			} else {
 				const productId = members.docs[0]!.ref.parent.parent!.id
 				router.push(`/${productId}/map`)
@@ -240,8 +250,10 @@ const SignInClientPage: FC = () => {
 						</button>
 
 						<button
+							disabled
 							type="button"
-							className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
+							//className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border bg-bgContainer text-xl font-medium"
+							className="flex h-14 w-80 items-center justify-center gap-4 rounded-lg border border-border text-xl font-medium"
 							onClick={() => {
 								handleOnClick(githubAuthProvider).catch(console.error)
 							}}

@@ -1,10 +1,11 @@
-import { CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined } from "@ant-design/icons"
+import { CustomerServiceOutlined, LogoutOutlined, SettingOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons"
 import { Avatar, Layout, Menu, Popover, Segmented } from "antd"
 import { collection, collectionGroup, query, where } from "firebase/firestore"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
+import { useAuthState } from "react-firebase-hooks/auth"
 import { useCollection, useCollectionOnce } from "react-firebase-hooks/firestore"
 
 import type { FC } from "react"
@@ -12,7 +13,7 @@ import type { FC } from "react"
 import { useAppContext } from "./AppContext"
 import LinkTo from "~/components/LinkTo"
 import { MemberConverter } from "~/types/db/Products/Members"
-import { db } from "~/utils/firebase"
+import { auth, db } from "~/utils/firebase"
 import { useSetTheme, useTheme } from "~/utils/ThemeContext"
 import MoonIcon from "~public/icons/moon.svg"
 import SunIcon from "~public/icons/sun.svg"
@@ -23,6 +24,7 @@ const Header: FC = () => {
 	const { product, member } = useAppContext()
 	const pathname = usePathname()
 	const [onlineStatus, setOnlineStatus] = useState<OnlineStatus>(`online`);
+	const [user, , userError] = useAuthState(auth)
 
 	const [members, , membersError] = useCollectionOnce(
 		query(
@@ -127,7 +129,7 @@ const Header: FC = () => {
 				overlayClassName="pr-2 pt-4"
 				content={
 					<div className="flex w-48 flex-col gap-4">
-						<div className="flex flex-col gap-2">
+						{/* <div className="flex flex-col gap-2">
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Theme</p>
 							<Segmented
 								block
@@ -141,7 +143,7 @@ const Header: FC = () => {
 									{ icon: <MoonIcon className="inline-block" />, label: `Dark`, value: `dark` },
 								]}
 							/>
-						</div>
+						</div> */}
 						<div className="flex flex-col gap-2">
 							<p className="border-b border-border font-semibold leading-relaxed text-textTertiary">Settings</p>
 							<Menu
@@ -188,12 +190,21 @@ const Header: FC = () => {
 						</div>
 						<div className="flex items-center justify-between border-t border-border pt-[4px]">
 							<p className="text-end text-sm text-primary italic capitalize">{onlineStatus}</p>
-							<p className="text-end text-sm text-textTertiary">v1.0</p>
+							<p className="text-end text-sm text-textTertiary"><span className="font-semibold">Basic</span> [v1.0.0]</p>
 						</div>
 					</div>
 				}
 			>
-				<Avatar src={member.data().avatar} className="cursor-pointer border-2 border-primary" />
+				<Avatar src={member.data().avatar}
+					style={{
+						backgroundColor: `#bfbfbf`,
+						border: member.data().avatar ? `` : `none`
+					}}
+					icon={member.data().avatar ? null : <UserOutlined />}
+					className="cursor-pointer border-2 border-primary" />
+				{//!member.data().avatar ? user?.displayName?.charAt(0).toUpperCase() : ``
+					//user?.displayName?.charAt(0).toUpperCase() ?? `A`
+				}
 			</Popover>
 		</Layout.Header>
 	)

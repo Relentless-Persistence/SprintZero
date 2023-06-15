@@ -9,6 +9,10 @@ service cloud.firestore {
       allow get: if true;
     }
 
+    match /Invites/{inviteId} {
+        allow read, write: if true
+      }
+
     match /Products/{productId} {
       allow read, update: if resource != null && isEditorOnProduct(resource.data.id);
       allow read: if resource != null && isViewerOnProduct(resource.data.id);
@@ -37,12 +41,6 @@ service cloud.firestore {
 
       match /Insights/{insightId} {
         allow read, write: if isEditorOnProduct(productId);
-        allow read: if isViewerOnProduct(productId);
-      }
-
-      match /Invites/{inviteId} {
-        allow read: if isEditorOnProduct(productId) || request.auth.token.email == resource.data.email;
-        allow write: if isEditorOnProduct(productId)
         allow read: if isViewerOnProduct(productId);
       }
 
@@ -119,6 +117,11 @@ service cloud.firestore {
           allow read, write: if isEditorOnProduct(productId);
           allow read: if isViewerOnProduct(productId);
         }
+
+        match /Criticalities/{criticalityId} {
+          allow read, write: if isEditorOnProduct(productId);
+          allow read: if isViewerOnProduct(productId);
+        }
       }
 
       match /PotentialRisks/{potentialRiskId} {
@@ -157,11 +160,9 @@ service cloud.firestore {
         allow read, write: if isEditorOnProduct(productId);
         allow read: if isViewerOnProduct(productId);
 
-        match /Comments/{taskCommentId} {
-          allow read: if isEditorOnProduct(productId);
+        match /Comments/{commentId} {
+          allow read, write: if isEditorOnProduct(productId);
           allow read: if isViewerOnProduct(productId);
-          allow create: if isEditorOnProduct(productId) && request.auth.uid == request.resource.data.authorId;
-          allow update, delete: if isEditorOnProduct(productId) && request.auth.uid == resource.data.authorId;
         }
       }
 

@@ -1,6 +1,6 @@
-import { Button, Checkbox, DatePicker, Drawer, Input, Select } from "antd"
+import { Button, Checkbox, DatePicker, Drawer, Input, Select, TimePicker } from "antd"
 import dayjs from "dayjs"
-import { Timestamp, addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore"
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore"
 import { nanoid } from "nanoid"
 import { useEffect, useState } from "react"
 import { useErrorHandler } from "react-error-boundary"
@@ -14,6 +14,7 @@ import type { Task } from "~/types/db/Products/Tasks";
 import Comments from "./Comment"
 import { useAppContext } from "~/app/(authenticated)/[productSlug]/AppContext"
 import { MemberConverter } from "~/types/db/Products/Members"
+import { StoryMapItemConverter } from "~/types/db/Products/StoryMapItems"
 // import { TaskConverter } from "~/types/db/Products/Tasks"
 
 const dateFormat = `MMMM D, YYYY`;
@@ -37,19 +38,19 @@ export type TaskDrawerProps = {
 
 const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => {
 	const { product } = useAppContext()
-	const [title, setTitle] = useState(``)
-	const [notes, setNotes] = useState(``)
+	const [title, setTitle] = useState<string>(``)
+	const [notes, setNotes] = useState<string>(``)
 	const [assign, setAssign] = useState<string[]>([])
-	const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs())
+	const [dueDate, setDueDate] = useState<Dayjs | null>(null)
 	const [subtasks, setSubtasks] = useState<Subtask[]>([])
 
 	useEffect(() => {
 		if (data) {
 			setTitle(data.title)
-			setNotes(data.notes)
-			setAssign(data.assigneeIds)
-			setDueDate(dayjs(data.dueDate.toMillis()))
-			setSubtasks(data.subtasks)
+			setNotes(data.notes ?? notes)
+			setAssign(data.assigneeIds ?? assign)
+			setDueDate(data.dueDate ? dayjs(data.dueDate.toMillis()) : null);
+			setSubtasks(data.subtasks ?? subtasks)
 		}
 	}, [data])
 
@@ -69,6 +70,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 		if (data) {
 			await updateDoc(doc(product.ref, `Tasks`, data.id), {
 				...updatedTask,
+				dueDate: dueDate ? Timestamp.fromDate(dueDate.toDate()) : null,
 			})
 		} else {
 			await addDoc(collection(product.ref, `Tasks`), {
@@ -76,7 +78,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 				notes,
 				assigneeIds: assign,
 				subtasks,
-				dueDate: Timestamp.fromDate(dayjs(dueDate).toDate()),
+				dueDate: dueDate ? Timestamp.fromDate(dayjs(dueDate).toDate()) : null,
 				type,
 				status: `todo`
 			})
@@ -85,8 +87,14 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 	}
 
 	const onChangeDate: DatePickerProps['onChange'] = (date) => {
-		setDueDate(dayjs(date, dateFormat))
+		if (date !== null) {
+			setDueDate(dayjs(date, dateFormat));
+		} else {
+			setDueDate(null); // properly handle when date is null
+		}
 	}
+
+
 
 	const onChangeSubtask = (index: number): void => {
 		const newSubtasks = [...subtasks]
@@ -101,12 +109,42 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 			const taskRef = doc(product.ref, `Tasks`, data.id);
 			try {
 				await deleteDoc(taskRef);
+
+				if (data.type === `acceptanceCriteria` || data.type === `bug`) {
+					if (data.storyId) {
+						const userStoryRef = doc(product.ref, `StoryMapItems`, data.storyId).withConverter(StoryMapItemConverter);
+						const userStorySnap = await getDoc(userStoryRef)
+
+						if (userStorySnap.exists()) {
+							const userStory = userStorySnap.data()
+
+							if (data.type === `acceptanceCriteria`) {
+								const updatedAcceptanceCriteria = userStory.acceptanceCriteria.filter(ac => ac.taskId !== data.id);
+
+								// Update the document with the new acceptanceCriteria
+								await updateDoc(userStoryRef, {
+									acceptanceCriteria: updatedAcceptanceCriteria,
+								});
+							}
+							else if (data.type === `bug`) {
+								const updatedBugs = userStory.bugs.filter(bug => bug.taskId !== data.id);
+
+								// Update the document with the new bugs
+								await updateDoc(userStoryRef, {
+									bugs: updatedBugs,
+								});
+							}
+						}
+					}
+				}
+
 				setNewTask(false)
 			} catch (error) {
 				console.error(`Error deleting task: `, error);
 			}
 		}
 	};
+
 
 	return (
 		<Drawer
@@ -165,6 +203,7 @@ const TaskDrawer: FC<TaskDrawerProps> = ({ isOpen, setNewTask, data, type }) => 
 					<div className="flex flex-col gap-2">
 						<p className="text-lg font-semibold">Due Date / Time</p>
 						<DatePicker value={dueDate} format={dateFormat} onChange={onChangeDate} />
+						<TimePicker disabled />
 						{/* <TimePicker /> */}
 					</div>
 

@@ -13,6 +13,7 @@ import type { FC } from "react";
 // import ParticipantCard from "./ParticipantCard"
 import ParticipantDrawer from "./ParticipantDrawer";
 import { useAppContext } from "../../../AppContext"
+import LinkTo from "~/components/LinkTo";
 import { DialogueParticipantConverter } from "~/types/db/Products/DialogueParticipants";
 import { PersonaConverter } from "~/types/db/Products/Personas";
 import BoneIcon from "~public/icons/bone.svg"
@@ -32,7 +33,7 @@ const ParticipantsClientPage: FC = () => {
     const personasData = personas && personas.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
 
     return (
-        <div className="grid h-full grid-cols-[1fr_auto]">
+        <div id="participants" className="grid h-full grid-cols-[1fr_auto]">
             <div className="relative flex flex-col gap-4 overflow-auto px-12 py-8">
                 <Breadcrumb items={[{ title: `Userbase` }, { title: `Participants` }, { title: tabs.find(([key]) => key === currentTab)![1] },]} />
                 <div className="leading-normal">
@@ -63,7 +64,7 @@ const ParticipantsClientPage: FC = () => {
                                     email: null,
                                     location: ``,
                                     location_id: ``,
-                                    name: `New Participant`,
+                                    name: ``,
                                     phoneNumber: ``,
                                     status: `identified`,
                                     timing: null,
@@ -72,7 +73,7 @@ const ParticipantsClientPage: FC = () => {
                                     transcriptAudio: ``,
                                     updatedAt: Timestamp.now(),
                                     wiki_link: ``,
-                                    personaIds: [],
+                                    personaId: null,
                                     updatedAtUserId: user.id,
                                 })
                                     .then((docRef) => {
@@ -103,7 +104,56 @@ const ParticipantsClientPage: FC = () => {
                 {participants ? (
                     participants.docs.length === 0 ? (
                         <div className="grid grow place-items-center">
-                            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                            <Empty
+                                style={{
+                                    backgroundColor: `#ffffff`,
+                                    boxShadow: `0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12), 0px 9px 28px 8px rgba(0, 0, 0, 0.05)`,
+                                    borderRadius: `6px`,
+                                    padding: `16px 50px`
+                                }}
+                                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                imageStyle={{ height: 100, }}
+                                description={
+                                    <span
+                                    // style={{ color: `rgba(0,0,0.45)` }}
+                                    >
+                                        Add a participant using the <LinkTo href="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                addDoc(collection(product.ref, `DialogueParticipants`).withConverter(DialogueParticipantConverter), {
+                                                    availability: [],
+                                                    disabilities: {
+                                                        auditory: false,
+                                                        cognitive: false,
+                                                        physical: false,
+                                                        speech: false,
+                                                        visual: false,
+                                                    },
+                                                    audioFilePath: ``,
+                                                    email: null,
+                                                    location: ``,
+                                                    location_id: ``,
+                                                    name: ``,
+                                                    phoneNumber: ``,
+                                                    status: `identified`,
+                                                    timing: null,
+                                                    title: null,
+                                                    transcript: ``,
+                                                    transcriptAudio: ``,
+                                                    updatedAt: Timestamp.now(),
+                                                    wiki_link: ``,
+                                                    personaId: null,
+                                                    updatedAtUserId: user.id,
+                                                })
+                                                    .then((docRef) => {
+                                                        setActiveParticipant(docRef.id)
+                                                    })
+                                                    .catch(console.error)
+                                            }}
+                                            style={{ color: `#0958D9` }}>Add</LinkTo> button at the top right of your screen to populate this section
+                                    </span>
+                                }
+                            />
                         </div>
                     ) : (
                         <Masonry
@@ -137,65 +187,51 @@ const ParticipantsClientPage: FC = () => {
                                             }
                                         >
                                             <div className="flex flex-wrap gap-2">
-                                                {participant.data().personaIds?.map((personaId) => {
-                                                    const persona = personasData?.find(persona => persona.id === personaId)
-                                                    return <Tag key={persona?.id} color="geekblue" icon={<UserOutlined />}>
-                                                        {persona?.name}
-                                                    </Tag>
-                                                    // if (persona.id === participant.data().personaId) {
-                                                    //     return (
-                                                    //         <Tag key={persona.id} color="geekblue" icon={<UserOutlined />}>
-                                                    //             {persona.data().name}
-                                                    //         </Tag>
-                                                    //     );
-                                                    // } else {
-                                                    //     return null;
-                                                    // }
-                                                })}
+                                                {participant.data().personaId && (<Tag style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#geekblue" icon={<UserOutlined style={{ color: `#000000` }} />}>
+                                                    <span style={{ color: `#000000` }}>
+                                                        {personasData?.find(persona => persona.id === participant.data().personaId)?.name}
+                                                    </span>
+                                                </Tag>)
+                                                }
                                                 {participant.data().disabilities.auditory && (
-                                                    <Tag
-                                                        color="gold"
-                                                        icon={<EarIcon className="mr-1.5 inline-block" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Auditory
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<EarIcon className="mr-1.5 inline-block" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Auditory
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.cognitive && (
-                                                    <Tag
-                                                        color="gold"
-                                                        icon={<CognitionIcon className="mr-1.5 inline-block" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Cognitive
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<CognitionIcon className="mr-1.5 inline-block" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Cognitive
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.physical && (
-                                                    <Tag
-                                                        color="gold"
-                                                        icon={<BoneIcon className="mr-1.5 inline-block stroke-current" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Physical
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<BoneIcon className="mr-1.5 inline-block stroke-current" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Physical
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.speech && (
-                                                    <Tag
-                                                        color="gold"
-                                                        icon={<SoundOutlined className="inline-block" />}
-                                                        className="flex items-center"
-                                                    >
-                                                        Speech
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<SoundOutlined className="inline-block" style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Speech
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().disabilities.visual && (
-                                                    <Tag color="gold" icon={<EyeOutlined />} className="flex items-center">
-                                                        Visual
+                                                    <Tag className="flex items-center" style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#DDE3D5" icon={<EyeOutlined style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            Visual
+                                                        </span>
                                                     </Tag>
                                                 )}
                                                 {participant.data().phoneNumber && (
-                                                    <Tag color="red" icon={<PhoneOutlined />}>
-                                                        {participant.data().phoneNumber}
+                                                    <Tag style={{ border: `1px solid rgba(0,0,0,0.15)` }} color="#FFF1F0" icon={<PhoneOutlined style={{ color: `#000000` }} />}>
+                                                        <span style={{ color: `#000000` }}>
+                                                            {participant.data().phoneNumber}</span>
                                                     </Tag>
                                                 )}
                                             </div>

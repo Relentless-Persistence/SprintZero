@@ -160,6 +160,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({ versionName, lastUpdated }) =
 			setEditMode(false)
 			return
 		}
+
 		const batch = writeBatch(db)
 
 		itemsToBeDeleted.forEach((id) => {
@@ -219,7 +220,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({ versionName, lastUpdated }) =
 								onClick={() => {
 									redo().catch(console.error)
 								}}
-							//disabled={editMode}
+								disabled={editMode}
 							/>
 						</Tooltip>
 						<Tooltip placement="bottom" title="Undo">
@@ -229,6 +230,7 @@ const StoryMapHeader: FC<StoryMapHeaderProps> = ({ versionName, lastUpdated }) =
 								onClick={() => {
 									undo().catch(console.error)
 								}}
+								disabled={editMode}
 							/>
 						</Tooltip>
 						{!editMode ? (<Tooltip placement="bottom" title="Edit">
