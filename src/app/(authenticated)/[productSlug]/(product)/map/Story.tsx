@@ -104,6 +104,7 @@ const Story: FC<StoryProps> = ({ storyId, dragInfo, inert = false }) => {
 						<div className="relative my-0.5 mx-auto min-w-[1rem]">
 							<p className="px-0.5">{localStoryName || `_`}</p>
 							<input
+								maxLength={24}
 								value={localStoryName}
 								autoFocus={!story.initialRenameDone && !editMode && user.id === story.updatedAtUserId}
 								onFocus={(e) => e.target.select()}

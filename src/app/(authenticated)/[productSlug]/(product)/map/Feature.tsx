@@ -76,6 +76,7 @@ const Feature: FC<FeatureProps> = ({ featureId, dragInfo, inert = false }) => {
 						<div className="relative my-0.5 min-w-[1rem]">
 							<p className="px-0.5">{localFeatureName || `_`}</p>
 							<input
+								maxLength={24}
 								value={localFeatureName}
 								autoFocus={!feature.initialRenameDone && !editMode && user.id === feature.updatedAtUserId}
 								onFocus={(e) => e.target.select()}
