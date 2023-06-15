@@ -118,7 +118,8 @@ const ParticipantsClientPage: FC = () => {
                                     // style={{ color: `rgba(0,0,0.45)` }}
                                     >
                                         Add a participant using the <LinkTo href="#"
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                e.preventDefault();
                                                 addDoc(collection(product.ref, `DialogueParticipants`).withConverter(DialogueParticipantConverter), {
                                                     availability: [],
                                                     disabilities: {
