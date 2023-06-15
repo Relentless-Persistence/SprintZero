@@ -20,6 +20,7 @@ import LinkTo from "~/components/LinkTo";
 import { DialogueParticipantConverter } from "~/types/db/Products/DialogueParticipants";
 import { PersonaConverter } from "~/types/db/Products/Personas";
 import { ChangeConverter, CriticalityConverter, FrustrationConverter, GoalConverter, InteractionConverter, PriorityConverter, ResponsibilityConverter } from "~/types/db/Products/Personas/Goals";
+import { db } from "~/utils/firebase";
 
 const items: MenuProps['items'] = [
     {
@@ -126,7 +127,18 @@ const PersonasClientPage: FC = () => {
             setCurrentPersona(personas.docs[0].id)
             hasSetDefaultPersona.current = true
         }
-    }, [personas])
+
+        if (personas) {
+            setDescription(personas.docs.find(doc => doc.id === currentPersona)?.data().description || ``)
+            setToolset(personas.docs.find(doc => doc.id === currentPersona)?.data().toolset || ``)
+            setEducation(personas.docs.find(doc => doc.id === currentPersona)?.data().education || ``)
+        }
+
+    }, [personas, currentPersona])
+
+    const [description, setDescription] = useState(personas?.docs.find(doc => doc.id === currentPersona)?.data().description)
+    const [toolset, setToolset] = useState(personas?.docs.find(doc => doc.id === currentPersona)?.data().toolset)
+    const [education, setEducation] = useState(personas?.docs.find(doc => doc.id === currentPersona)?.data().education)
 
     return (
         <div id="personas" className="grid h-full grid-cols-[1fr_auto]">
@@ -182,40 +194,81 @@ const PersonasClientPage: FC = () => {
                     ) : (
                         <>
                             {currentTab === `description` && (
-                                <div className="flex gap-6" style={{ height: `600px` }}>
+                                <div className="flex gap-6 h-screen">
                                     <div className="w-1/3">
-                                        <Card title="Description" style={{ width: `100%`, height: `100%`, border: `1px solid #D9D9D9`, borderRadius: `2px` }}
+                                        <Card title="Description" className="h-full border border-gray-300 rounded"
                                             extra={
                                                 <div className="flex gap-2">
-                                                    <Button className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
+                                                    <Button disabled className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
                                                 </div>
                                             }
                                         >
-                                            <TextArea style={{ fontSize: `14px`, lineHeight: 1.8 }} value={personas.docs.find(doc => doc.id === currentPersona)?.data().description} rows={19} />
+                                            <TextArea
+                                                key="personaDescription"
+                                                style={{ fontSize: `14px`, lineHeight: 1.8, overflow: `auto`, resize: `none`, height: `36vh` }} className="flex-grow"
+                                                onChange={(e) => {
+                                                    setDescription(e.target.value)
+
+                                                }}
+                                                onBlur={async (e) => {
+                                                    const persona = personas.docs.find(doc => doc.id === currentPersona)!;
+                                                    await updateDoc(persona.ref, {
+                                                        description: e.target.value
+                                                    })
+                                                }}
+                                                value={description}
+                                            />
                                         </Card>
                                     </div>
                                     <div className="w-1/3">
-                                        <Card title="Toolset" style={{ width: `100%`, height: `100%`, border: `1px solid #D9D9D9`, borderRadius: `2px` }}
+                                        <Card title="Toolset" className="h-full border border-gray-300 rounded"
                                             extra={<div className="flex gap-2">
-                                                <Button className="flex items-center justify-center" style={{ border: `1px solid #D9D9D9` }} icon={<DislikeOutlined />}></Button>
-                                                <Button className="flex items-center justify-center" icon={<LikeOutlined />}></Button>
-                                                <Button className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
+                                                <Button disabled className="flex items-center justify-center" style={{ border: `1px solid #D9D9D9` }} icon={<DislikeOutlined />}></Button>
+                                                <Button disabled className="flex items-center justify-center" icon={<LikeOutlined />}></Button>
+                                                <Button disabled className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
                                             </div>}>
-                                            <div style={{ height: `490px`, overflow: `auto` }}>{personas.docs.find(doc => doc.id === currentPersona)?.data().toolset}</div>
+                                            <TextArea style={{ fontSize: `14px`, lineHeight: 1.8, overflow: `auto`, resize: `none`, height: `36vh` }} className="flex-grow"
+                                                key="personaToolset"
+                                                onChange={(e) => {
+                                                    setToolset(e.target.value)
+
+                                                }}
+                                                onBlur={async (e) => {
+                                                    const persona = personas.docs.find(doc => doc.id === currentPersona)!;
+                                                    await updateDoc(persona.ref, {
+                                                        toolset: e.target.value
+                                                    })
+                                                }}
+                                                value={toolset}
+                                            />
                                         </Card>
                                     </div>
                                     <div className="w-1/3">
-                                        <Card title="Education" style={{ width: `100%`, height: `100%`, border: `1px solid #D9D9D9`, borderRadius: `2px` }}
+                                        <Card title="Education" className="h-full border border-gray-300 rounded"
                                             extra={<div className="flex gap-2">
-                                                <Button className="flex items-center justify-center" style={{ border: `1px solid #D9D9D9` }} icon={<DislikeOutlined />}></Button>
-                                                <Button className="flex items-center justify-center" icon={<LikeOutlined />}></Button>
-                                                <Button className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
+                                                <Button disabled className="flex items-center justify-center" style={{ border: `1px solid #D9D9D9` }} icon={<DislikeOutlined />}></Button>
+                                                <Button disabled className="flex items-center justify-center" icon={<LikeOutlined />}></Button>
+                                                <Button disabled className="flex items-center justify-center" icon={<RobotOutlined />}></Button>
                                             </div>}>
-                                            <div style={{ height: `490px`, overflow: `auto` }}>{personas.docs.find(doc => doc.id === currentPersona)?.data().education} {personas.docs.find(doc => doc.id === currentPersona)?.data().education}</div>
+                                            <TextArea style={{ fontSize: `14px`, lineHeight: 1.8, overflow: `auto`, resize: `none`, height: `36vh` }} className="flex-grow"
+                                                key="personaEducation"
+                                                onChange={(e) => {
+                                                    setEducation(e.target.value)
+
+                                                }}
+                                                onBlur={async (e) => {
+                                                    const persona = personas.docs.find(doc => doc.id === currentPersona)!;
+                                                    await updateDoc(persona.ref, {
+                                                        education: e.target.value
+                                                    })
+                                                }}
+                                                value={education}
+                                            />
                                         </Card>
                                     </div>
                                 </div>
                             )}
+
 
                             {currentTab === `goals` && (
                                 <div className="grid grid-cols-3 gap-4">
