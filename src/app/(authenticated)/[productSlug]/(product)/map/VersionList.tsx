@@ -196,7 +196,7 @@ const VersionList: FC = () => {
 										//style={{ borderStyle: `dashed` }}
 										placeholder="1.0.0"
 										size="small"
-										//autoFocus
+										autoFocus
 										value={newVersionInputValue}
 										onChange={(e) => {
 											setNewVersionInputValue(e.target.value)
