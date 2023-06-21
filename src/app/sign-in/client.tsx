@@ -37,6 +37,7 @@ import {
 	microsoftAuthProvider,
 } from "~/utils/firebase"
 import { trpc } from "~/utils/trpc"
+import GoogleSignInIcon from "~public/icons/google-sign-in-icon.svg"
 
 const SignInClientPage: FC = () => {
 	const router = useRouter()
@@ -235,7 +236,7 @@ const SignInClientPage: FC = () => {
 							data-testid="apple-sign-in"
 						>
 							<AppleFilled className="text-2xl" />
-							<p>Sign in with Apple</p>
+							<p>Continue with Apple</p>
 						</button>
 						<button
 							type="button"
@@ -245,8 +246,9 @@ const SignInClientPage: FC = () => {
 							}}
 							data-testid="google-sign-in"
 						>
-							<GoogleOutlined className="text-2xl" />
-							<p>Sign in with Google</p>
+							{/* <GoogleOutlined className="text-2xl" /> */}
+							<GoogleSignInIcon className="text-2xl" />
+							<p>Continue with Google</p>
 						</button>
 
 						<button
@@ -260,7 +262,7 @@ const SignInClientPage: FC = () => {
 							data-testid="github-sign-in"
 						>
 							<GithubOutlined className="text-2xl" />
-							<p>Sign in with GitHub</p>
+							<p>Continue with GitHub</p>
 						</button>
 
 						<button
@@ -272,7 +274,7 @@ const SignInClientPage: FC = () => {
 							data-testid="microsoft-sign-in"
 						>
 							<AppstoreFilled className="text-2xl" />
-							<p>Sign in with Microsoft</p>
+							<p>Continue with Microsoft</p>
 						</button>
 					</div>
 				</Spin>
