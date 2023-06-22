@@ -283,6 +283,10 @@ const StoryDrawer: FC<StoryDrawerProps> = ({ storyMapItems, versions, storyId, i
 									className="absolute inset-0 bg-transparent text-2xl font-normal"
 									onChange={(e) => {
 										setLocalStoryName(e.target.value)
+
+										if (e.target.value === ``)
+											return
+
 										updateItem(product, storyMapItems, versions, story.id, { name: e.target.value }).catch(console.error)
 									}}
 								/>
