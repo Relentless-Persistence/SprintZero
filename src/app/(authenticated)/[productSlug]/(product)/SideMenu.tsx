@@ -7,7 +7,7 @@ import {
 	PullRequestOutlined,
 	UserOutlined,
 } from "@ant-design/icons"
-import { Menu } from "antd"
+import { Button, Menu, Tag } from "antd"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 
@@ -146,6 +146,15 @@ const getItems = (activeProductId: string) => [
 			{
 				key: `userbase/personas`,
 				label: <LinkTo href={`/${activeProductId}/userbase/personas`}>Personas</LinkTo>,
+			},
+			{
+				key: `userbase/practice`,
+				label: (
+					<div style={{ display: `flex`, alignItems: `center` }}>
+						<LinkTo href={`/${activeProductId}/userbase/practice`}>Practice</LinkTo>
+						<Tag color="purple" style={{ marginLeft: `5px`, fontWeight: `normal` }}>Preview</Tag>
+					</div>
+				),
 			},
 		],
 	},
