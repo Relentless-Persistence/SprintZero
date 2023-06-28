@@ -1,11 +1,12 @@
-import {Configuration, OpenAIApi} from "openai"
-import {z} from "zod"
+import { Configuration, OpenAIApi } from "openai"
+import { z } from "zod"
 
-import {funCardRouter} from "./funCard"
-import {productRouter} from "./product"
-import {userInviteRouter} from "./userInvite"
-import {procedure, router} from "../trpc"
-import {dbAdmin} from "~/utils/firebaseAdmin"
+import { funCardRouter } from "./funCard"
+import { productRouter } from "./product"
+import { userInviteRouter } from "./userInvite"
+import { procedure, router } from "../trpc"
+import { ChatRole } from "~/app/(authenticated)/[productSlug]/(product)/userbase/practice/types"
+import { dbAdmin } from "~/utils/firebaseAdmin"
 
 const configuration = new Configuration({
 	apiKey: process.env.OPENAI_API_KEY,
@@ -17,7 +18,7 @@ export const appRouter = router({
 	product: productRouter,
 	userInvite: userInviteRouter,
 
-	gpt: procedure.input(z.object({prompt: z.string()})).mutation(async ({input: {prompt}}) => {
+	gpt: procedure.input(z.object({ prompt: z.string() })).mutation(async ({ input: { prompt } }) => {
 		const response = await openai.createCompletion({
 			model: `text-davinci-003`,
 			prompt,
@@ -31,10 +32,24 @@ export const appRouter = router({
 			response: response.data.choices[0]?.text,
 		}
 	}),
-	gpt4: procedure.input(z.object({prompt: z.string()})).mutation(async ({input: {prompt}}) => {
+	gptChat35: procedure.input(z.object({
+		chatConversation: z.array(z.object({
+			role: z.nativeEnum(ChatRole),
+			content: z.string()
+		}))
+	})).mutation(async ({ input: { chatConversation } }) => {
+		const response = await openai.createChatCompletion({
+			model: `gpt-3.5-turbo`,
+			messages: chatConversation
+		})
+		return {
+			response: response.data.choices[0]?.message?.content,
+		}
+	}),
+	gpt4: procedure.input(z.object({ prompt: z.string() })).mutation(async ({ input: { prompt } }) => {
 		const response = await openai.createChatCompletion({
 			model: `gpt-4`,
-			messages: [{"role": "assistant", "content": prompt}],
+			messages: [{ "role": `assistant`, "content": prompt }],
 			//prompt,
 			// temperature: 0.8,
 			// max_tokens: 3000,
