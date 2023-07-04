@@ -460,3 +460,7 @@ circle {
 #participantStatusPopover {
 	padding: 6px !important;
 }
+
+#practice .ant-card-meta-title {
+	margin-bottom: 0px !important;
+}

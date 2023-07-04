@@ -46,6 +46,21 @@ export const appRouter = router({
 			response: response.data.choices[0]?.message?.content,
 		}
 	}),
+	gptChat4: procedure.input(z.object({
+		chatConversation: z.array(z.object({
+			role: z.nativeEnum(ChatRole),
+			content: z.string()
+		}))
+	})).mutation(async ({ input: { chatConversation } }) => {
+		const response = await openai.createChatCompletion({
+			model: `gpt-4`,
+			messages: chatConversation,
+			//stream: true
+		})
+		return {
+			response: response.data.choices[0]?.message?.content,
+		}
+	}),
 	gpt4: procedure.input(z.object({ prompt: z.string() })).mutation(async ({ input: { prompt } }) => {
 		const response = await openai.createChatCompletion({
 			model: `gpt-4`,
